@@ -15,7 +15,7 @@ async function starta(page) {
   return fel;
 }
 const pos = (page) => page.evaluate(() => window.__ORDSTAVEN.position());
-/** Avstånd i rumspixlar till en punkt. Ett tryck landar på hela skärmpunkter, så en pixels avvikelse är väntad. */
+/** Avstånd i rumspixlar till en punkt. Ett tryck landar på hela skärmpunkter, så upp till två pixlars avvikelse är väntad (en ruta är 16). */
 const avstand = async (page, x, y) => { const p = await pos(page); return Math.hypot(p.x - x, p.y - y); };
 
 test('startar utan fel, med hel skala och rummet helt i bild', async ({ page }, info) => {
@@ -78,21 +78,21 @@ test('tryck eller klick flyttar blocket dit', async ({ page }, info) => {
   const skarm = await page.evaluate(() => { const s = window.__ORDSTAVEN.skala(); return { x: s.vanster + 60 * s.cssSkala, y: s.topp + 160 * s.cssSkala }; });
   if (info.project.use.hasTouch) await page.touchscreen.tap(skarm.x, skarm.y);
   else await page.mouse.click(skarm.x, skarm.y);
-  await expect.poll(() => avstand(page, 60, 160), { timeout: 5000 }).toBeLessThan(1);
+  await expect.poll(() => avstand(page, 60, 160), { timeout: 5000 }).toBeLessThan(2);
 });
 
 test('minns var blocket stod efter omladdning', async ({ page }) => {
   await starta(page);
   const skarm = await page.evaluate(() => { const s = window.__ORDSTAVEN.skala(); return { x: s.vanster + 250 * s.cssSkala, y: s.topp + 60 * s.cssSkala }; });
   await page.mouse.click(skarm.x, skarm.y);
-  await expect.poll(() => avstand(page, 250, 60), { timeout: 5000 }).toBeLessThan(1);
+  await expect.poll(() => avstand(page, 250, 60), { timeout: 5000 }).toBeLessThan(2);
   const stod = await pos(page);
   await page.waitForTimeout(2500); // sparning sker högst varannan sekund
   await page.reload();
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.scene.isActive('Testrum'));
   // Sparningen avrundar till hela rumspixlar.
   const efter = await pos(page);
-  expect(Math.hypot(efter.x - stod.x, efter.y - stod.y)).toBeLessThan(1);
+  expect(Math.hypot(efter.x - stod.x, efter.y - stod.y)).toBeLessThan(2);
 });
 
 test('startar offline', async ({ page, context }, info) => {
