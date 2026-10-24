@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ordstaven/schema/ordlistor.schema.json",
+  "title": "ORDSTAVEN – ordlistor 1–6",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "listor", "flaggor", "forbjudna_par", "ord"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "format": { "const": 1 },
+    "meta": { "type": "object", "additionalProperties": true },
+    "listor": {
+      "type": "object",
+      "propertyNames": { "pattern": "^[1-6]$" },
+      "additionalProperties": { "type": "string" }
+    },
+    "flaggor": {
+      "type": "object",
+      "propertyNames": { "enum": ["aao", "helord", "sparrad", "berattelseord", "formel", "ordbild", "gemen_forvaxling"] },
+      "additionalProperties": { "type": "string" }
+    },
+    "forbjudna_par": {
+      "type": "array",
+      "items": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "string" } },
+      "description": "Ord som aldrig får stå som enda skillnad mellan rätt svar och en distraktor."
+    },
+    "regler": { "type": "array", "items": { "type": "string" } },
+    "ord": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["ord", "lista", "flaggor"],
+        "properties": {
+          "ord": { "type": "string", "pattern": "^[A-ZÅÄÖa-zåäöé]+$", "description": "Vanlig skrift: gemener, stor bokstav bara i egennamn. Formler i versaler." },
+          "lista": { "type": "integer", "minimum": 1, "maximum": 6 },
+          "bild": { "type": ["string", "null"], "description": "Platshållare (emoji) i gråboxen, bild-id senare." },
+          "tema": { "type": "string" },
+          "flaggor": { "type": "array", "uniqueItems": true, "items": { "enum": ["aao", "helord", "sparrad", "berattelseord", "formel", "ordbild", "gemen_forvaxling"] } },
+          "varfor": { "type": "string" }
+        }
+      }
+    }
+  }
+}

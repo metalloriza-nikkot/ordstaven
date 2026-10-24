@@ -1,0 +1,394 @@
+{
+  "$schema": "../schema/kapitel.schema.json",
+  "format": 1,
+  "id": "kap-00",
+  "kapitel": 0,
+  "meta": {
+    "namn": "Prologen",
+    "kalla": "Innehålls innehall-prolog.json v0.3 (2026-10-24), omvandlad till format 1 och vanlig skrift av teknik. Innehåll äger texten och ersätter filen med sin nästa version.",
+    "agare": "Innehåll"
+  },
+  "rum": [
+    {
+      "id": "vinden",
+      "namn": "Vinden",
+      "tillstand": ["natt", "morgon"],
+      "innehall": ["runt_fonster", "lada_med_stav", "lada_med_agg", "hylla_tre_lador", "tre_langa_lador", "fem_krukor", "stege_ner"]
+    },
+    {
+      "id": "koket",
+      "namn": "Köket",
+      "tillstand": ["natt", "morgon"],
+      "innehall": ["farfar_vid_bordet", "fatolj", "kakaokopp", "expeditionsbok", "radio", "dorr_ut", "stege_upp"]
+    },
+    {
+      "id": "tradgarden",
+      "namn": "Trädgården",
+      "innehall": ["staket", "grind_mot_skogen", "berg", "luftskepp_over_tradgarden", "klaffen", "tva_buskar"]
+    }
+  ],
+  "scener": [
+    {
+      "id": "s00_start",
+      "pass": 1,
+      "rum": null,
+      "steg": [
+        { "typ": "mellanscen", "beskrivning": "Titelbild: en stav som glimmar i mörker, en stor knapp utan text. Trycket startar ljudet." },
+        { "typ": "replik", "talare": "berattare", "text": "Ordstaven. Den gömda dalen.", "upplast": true },
+        { "typ": "skapa_hjalte", "delar": ["kropp", "hudton", "klader", "hatt"], "bara_bilder": true },
+        { "typ": "replik", "talare": "berattare", "text": "Vem är du? Välj din hjälte.", "upplast": true },
+        { "typ": "pussel", "pussel_id": "p0_hjaltenamn" }
+      ]
+    },
+    {
+      "id": "s01_natten",
+      "pass": 1,
+      "rum": null,
+      "vy": "sidovy",
+      "steg": [
+        { "typ": "mellanscen", "beskrivning": "Farfars hus på natten. Ett fönster lyser svagt på vinden." },
+        { "typ": "replik", "talare": "berattare", "text": "Det är höstlov. Du sover över hos Farfar.", "upplast": true },
+        { "typ": "replik", "talare": "berattare", "text": "Mitt i natten hörs ett dunk. Det kom från vinden.", "upplast": true },
+        { "typ": "ljud", "id": "dunk" },
+        { "typ": "replik", "talare": "farfar", "text": "Hörde du? Mina knän klarar inte stegen. Kan du gå upp och titta?", "upplast": true }
+      ]
+    },
+    {
+      "id": "s02_glimten",
+      "pass": 1,
+      "rum": "vinden",
+      "tillstand": "natt",
+      "steg": [
+        { "typ": "replik", "talare": "berattare", "text": "Det är mörkt på vinden. Men något glimmar där inne.", "upplast": true },
+        { "typ": "replik", "talare": "berattare", "text": "Gå och titta.", "upplast": true },
+        {
+          "typ": "ga_till",
+          "mal": "lada_med_stav",
+          "visa_styrhjalp": true,
+          "knuff": { "handling": "glimten blinkar", "replik": { "talare": "berattare", "text": "Där. I lådan.", "upplast": true } }
+        }
+      ]
+    },
+    {
+      "id": "s03_staven",
+      "pass": 1,
+      "rum": "vinden",
+      "tillstand": "natt",
+      "steg": [
+        { "typ": "replik", "talare": "berattare", "text": "En gammal stav. Den har ett ord på sig.", "upplast": true },
+        { "typ": "replik", "talare": "berattare", "text": "Sätt bokstäverna i rätt ordning.", "upplast": true },
+        { "typ": "pussel", "pussel_id": "p0_ljus" }
+      ]
+    },
+    {
+      "id": "s04_agget",
+      "pass": 1,
+      "rum": "vinden",
+      "tillstand": "natt_upplyst",
+      "steg": [
+        { "typ": "replik", "talare": "berattare", "text": "Ett ägg! Det gungar.", "upplast": true },
+        { "typ": "replik", "talare": "berattare", "text": "Ägget är kallt. Det fryser. Hitta rätt låda på hyllan.", "upplast": true },
+        { "typ": "pussel", "pussel_id": "p0_filt" }
+      ]
+    },
+    {
+      "id": "s05_klackningen",
+      "pass": 1,
+      "rum": "vinden",
+      "steg": [
+        { "typ": "mellanscen", "beskrivning": "Ägget blir varmt och lyser svagt inifrån." },
+        { "typ": "replik", "talare": "berattare", "text": "Ägget blir varmt. Det lyser!", "upplast": true },
+        { "typ": "replik", "talare": "berattare", "text": "Knack. Knack. Kras!", "upplast": true },
+        { "typ": "mellanscen", "beskrivning": "Först ett öga, sedan nosen. Ungen ramlar ut, blinkar, ler med sin lilla mun och hoppar." },
+        { "typ": "ljud", "id": "unge_forsta_late" },
+        { "typ": "replik", "talare": "berattare", "text": "En dinounge! Det första den ser är du.", "upplast": true },
+        { "typ": "mellanscen", "beskrivning": "Utanför vindsfönstret: en liten skugga, ett tickande ljud, fladder. Klaffen flyger iväg." },
+        { "typ": "ljud", "id": "klaffen_tick" },
+        { "typ": "replik", "talare": "berattare", "text": "Tick, tick… Vad var det vid fönstret?", "upplast": true }
+      ]
+    },
+    {
+      "id": "s06_namnet",
+      "pass": 1,
+      "rum": "vinden",
+      "steg": [
+        { "typ": "replik", "talare": "berattare", "text": "Ungen behöver ett namn. Vad ska den heta? Skriv ett namn.", "upplast": true },
+        { "typ": "pussel", "pussel_id": "p0_ungenamn" },
+        { "typ": "replik", "talare": "berattare", "text": "Hej, {unge}!", "upplast": true },
+        { "typ": "replik", "talare": "berattare", "text": "Visa {unge} för Farfar!", "upplast": true },
+        { "typ": "ga_till", "mal": "stege_ner" }
+      ]
+    },
+    {
+      "id": "s07_ner_till_farfar",
+      "pass": 1,
+      "rum": "koket",
+      "tillstand": "natt",
+      "steg": [
+        { "typ": "mellanscen", "beskrivning": "Farfar i morgonrock vid bordet med en kopp kakao. Han tappar koppen." },
+        { "typ": "replik", "talare": "farfar", "text": "Staven lyser! Och ägget har kläckts!", "upplast": true },
+        { "typ": "replik", "talare": "farfar", "text": "Kläcktes det när du läste? Då har du ordkraft. Jag trodde det, när du började läsa.", "upplast": true },
+        { "typ": "replik", "talare": "farfar", "text": "Jag har väntat på den här natten i många år. Men jag kunde inte säga något. En ordstav måste man hitta själv.", "upplast": true },
+        { "typ": "ljud", "id": "mage_kurrar" },
+        { "typ": "replik", "talare": "farfar", "text": "Oj. {unge} är hungrig. Jag ska berätta allt. Men först måste {unge} äta.", "upplast": true },
+        { "typ": "sparpunkt", "pass_slut": true, "valfri": false }
+      ]
+    },
+    {
+      "id": "s08_farfars_lapp",
+      "pass": 2,
+      "rum": "koket",
+      "tillstand": "natt",
+      "vid_omstart": { "talare": "farfar", "text": "Var var vi? Just det. {unge} är hungrig.", "upplast": true },
+      "steg": [
+        { "typ": "replik", "talare": "farfar", "text": "Jag har dinomat på vinden. Mina knän klarar inte stegen, så jag skriver var den är.", "upplast": true },
+        { "typ": "replik", "talare": "farfar", "text": "Du läser själv. Ordkraft växer när man läser.", "upplast": true },
+        { "typ": "mellanscen", "beskrivning": "Farfar skriver på en lapp och ger den till hjälten. Spelar en förälder Farfar kan lappen skrivas på riktigt papper." },
+        { "typ": "replik", "talare": "farfar", "text": "Och låt {unge} nosa runt däruppe. Jag har gömt något mer.", "upplast": true },
+        { "typ": "oppna_lasplatta", "pussel_id": "p0_dinomat" },
+        { "typ": "visa_ui", "element": "nosknappen" },
+        { "typ": "replik", "talare": "berattare", "text": "{unge} kan nosa på ett ord. Då hör du ordet.", "upplast": true },
+        { "typ": "nos_demo", "ord": "dinomat", "kostnad": 0 },
+        { "typ": "replik", "talare": "berattare", "text": "Vill du höra ett ord? Tryck på nosen.", "upplast": true },
+        { "typ": "ga_till", "mal": "stege_upp" }
+      ]
+    },
+    {
+      "id": "s09_ladorna",
+      "pass": 2,
+      "rum": "vinden",
+      "tillstand": "natt_upplyst",
+      "steg": [
+        { "typ": "replik", "talare": "berattare", "text": "Vilken låda ska du öppna?", "upplast": true },
+        { "typ": "pussel", "pussel_id": "p0_dinomat" }
+      ]
+    },
+    {
+      "id": "s10_pasarna",
+      "pass": 2,
+      "rum": "vinden",
+      "steg": [
+        { "typ": "replik", "talare": "berattare", "text": "Vad vill {unge} äta?", "upplast": true },
+        { "typ": "pussel", "pussel_id": "p0_bar" },
+        { "typ": "visa_ui", "element": "barraknaren" },
+        { "typ": "ge_bar", "antal": 3 },
+        { "typ": "replik", "talare": "berattare", "text": "Bär är till {unge}.", "upplast": true }
+      ]
+    },
+    {
+      "id": "s11_krukorna",
+      "pass": 2,
+      "rum": "vinden",
+      "steg": [
+        { "typ": "replik", "talare": "berattare", "text": "{unge} känner en lukt. Något ligger i krukorna.", "upplast": true },
+        { "typ": "replik", "talare": "berattare", "text": "Svinga staven mot krukorna.", "upplast": true },
+        { "typ": "pussel", "pussel_id": "p0_krukor" }
+      ]
+    },
+    {
+      "id": "s12_kartbiten",
+      "pass": 2,
+      "rum": "vinden",
+      "vy": "narbild",
+      "steg": [
+        { "typ": "mellanscen", "beskrivning": "Kartbit 1: berg, en dal full av moln, en stor skugga av en dinosaurie som liknar ungen. Ingen text." },
+        { "typ": "ljud", "id": "unge_langtan" },
+        { "typ": "replik", "talare": "berattare", "text": "Pappret luktar som dalen.", "upplast": true },
+        { "typ": "replik", "talare": "berattare", "text": "{unge} känner igen skuggan. Det är mamma.", "upplast": true },
+        { "typ": "ge_kartbit", "nummer": 1 },
+        { "typ": "ga_till", "mal": "stege_ner" }
+      ]
+    },
+    {
+      "id": "s13_godnattsagan",
+      "pass": 2,
+      "rum": "koket",
+      "tillstand": "natt",
+      "steg": [
+        { "typ": "mellanscen", "beskrivning": "Farfar i fåtöljen med en gammal bok i knät. Ungen kryper upp i filten i hjältens knä." },
+        { "typ": "replik", "talare": "farfar", "text": "Du hittade kartbiten. Då är det dags för sagan.", "upplast": true },
+        {
+          "typ": "bok",
+          "id": "farfars_bok",
+          "talare": "farfar",
+          "las_upp_efter_tryck": true,
+          "uppslag": [
+            { "bild": "dal_i_moln", "bildtext": "dal", "text": "Långt bort finns en dal. Där lever dinosaurierna kvar. Dalen är gömd i moln." },
+            { "bild": "ordtradet", "bildtext": "träd", "text": "I dalen växer Ordträdet. En stav från trädet gör ord till saker. Men bara för den som har ordkraft." },
+            { "bild": "unge_farfar_med_dino", "bildtext": "stav", "text": "När jag var liten hade jag ordkraft. Jag blev dalens läsare. Och jag fick en vän." },
+            { "bild": "unge_farfar_far_agg", "bildtext": "ägg", "text": "Dalens ägg kläcks bara av ordkraft. När min ordkraft försvann, gav en vän i dalen mig sitt ägg. Jag lovade att hitta någon med ordkraft. Nu har jag hållit mitt löfte." },
+            { "bild": "karta_sju_bitar", "bildtext": "karta", "text": "Jag ritade en karta till dalen. Sen rev jag den i sju bitar, så att ingen girig skulle hitta dit." }
+          ]
+        },
+        { "typ": "replik", "talare": "farfar", "text": "Du kan din första magi. Nu är du lärling!", "upplast": true },
+        { "typ": "ge_grad", "grad": "Lärling", "fest": "mellan_dampad" },
+        { "typ": "replik", "talare": "berattare", "text": "Ni somnar alla tre i köket.", "upplast": true },
+        { "typ": "sparpunkt", "pass_slut": true, "valfri": false }
+      ]
+    },
+    {
+      "id": "s14_uppdraget",
+      "pass": 3,
+      "rum": "koket",
+      "tillstand": "morgon",
+      "vid_omstart": { "talare": "berattare", "text": "God morgon!", "upplast": true },
+      "steg": [
+        { "typ": "replik", "talare": "farfar", "text": "{unge} måste hem till sin mamma. Jag är för gammal. Och staven vaknar inte för mig längre. Men du har ordkraft.", "upplast": true },
+        { "typ": "replik", "talare": "farfar", "text": "De andra kartbitarna gömde jag längs vägen till dalen. Nästa ligger i skogen.", "upplast": true },
+        { "typ": "mellanscen", "beskrivning": "Farfar tittar oroligt mot fönstret." },
+        { "typ": "replik", "talare": "farfar", "text": "Var försiktig. Det finns de som gör allt för att stjäla en sån här unge. Den värsta är Baron Gripklo. Han har letat efter dalen i hela sitt liv.", "upplast": true },
+        { "typ": "replik", "talare": "farfar", "text": "Ta min gamla radio. Då kan vi prata hela tiden.", "upplast": true },
+        { "typ": "visa_ui", "element": "radioramen" }
+      ]
+    },
+    {
+      "id": "s15_tradgarden",
+      "pass": 3,
+      "rum": "tradgarden",
+      "steg": [
+        { "typ": "fritt", "beskrivning": "Två buskar att svinga staven mot, bär trillar ut. Frivilligt.", "foremal": ["tva_buskar"] },
+        { "typ": "mellanscen", "beskrivning": "Ungen springer till grinden och pekar mot bergen." },
+        { "typ": "replik", "talare": "berattare", "text": "{unge} pekar mot bergen. Dit ska vi.", "upplast": true },
+        { "typ": "mellanscen", "beskrivning": "Ett lila luftskepp glider fram över trädgården, en mekanisk fågel fladdrar bredvid. Ungen gömmer sig bakom hjälten." },
+        { "typ": "replik", "talare": "baronen", "text": "En levande dinounge! Den ska bli min!", "upplast": true },
+        { "typ": "replik", "talare": "farfar", "text": "Spring! In i skogen!", "upplast": true },
+        { "typ": "ga_till", "mal": "grind_mot_skogen" },
+        { "typ": "mellanscen", "beskrivning": "Sidovy: hjälten och ungen springer in i skogen, luftskeppet bakom träden." },
+        { "typ": "replik", "talare": "berattare", "text": "Kapitel 1. Skogen.", "upplast": true },
+        { "typ": "sparpunkt", "pass_slut": true, "valfri": false }
+      ]
+    }
+  ],
+  "pussel": [
+    {
+      "id": "p0_hjaltenamn",
+      "typ": "P12_dop",
+      "instruktion": { "talare": "berattare", "text": "Skriv ditt namn.", "upplast": true },
+      "min_bokstaver": 1,
+      "max_bokstaver": 10,
+      "vuxen_far_hjalpa": true,
+      "sparas_som": "hjalte.namn"
+    },
+    {
+      "id": "p0_ljus",
+      "typ": "P11_formel",
+      "niva": "S1",
+      "forsta_formel": true,
+      "forebild": { "text": "LJUS", "upplast": false, "placering": "inristat_pa_staven", "ligger_kvar": true },
+      "brickor": ["S", "U", "L", "J"],
+      "svar": "LJUS",
+      "helord": true,
+      "formler": [{ "ord": "LJUS", "effekt": "ljusboll_foljer_hjalten", "tillstand_efter": "natt_upplyst" }],
+      "nastan": [],
+      "hjalp": null,
+      "ratt_bokstav_stannar": true,
+      "vid_ratt": {
+        "handling": "ordet skrivs i luften ca 1 s, puff, ljusboll",
+        "replik": { "talare": "berattare", "text": "Det blev ljust!", "upplast": true },
+        "fest": "mellan"
+      },
+      "vid_fel": {
+        "reaktion": "staven fräser, pff och en rökring",
+        "replik": { "talare": "berattare", "text": "Nästan! Titta på staven igen.", "upplast": true }
+      },
+      "knuff": { "handling": "första bokstaven i förebilden blinkar" },
+      "forenkla": { "efter_fel": 2, "andring": "nästa rätta bokstav blinkar" }
+    },
+    {
+      "id": "p0_filt",
+      "typ": "P1_las_och_valj",
+      "hjalp": null,
+      "varianter": {
+        "L1": {
+          "bild": "tankebubbla_filt",
+          "alternativ": [
+            { "id": "filt", "ord": "filt", "ratt": true },
+            {
+              "id": "bil", "ord": "bil",
+              "vid_valj": { "reaktion": "leksaksbil rullar ut, tutar, knuffar ägget", "replik": { "talare": "berattare", "text": "Hoppsan! Ägget fryser fortfarande.", "upplast": true } }
+            },
+            {
+              "id": "ost", "ord": "ost",
+              "vid_valj": { "reaktion": "ost ploppar ut, hjälten håller för näsan", "replik": { "talare": "berattare", "text": "Hoppsan! Ägget fryser fortfarande.", "upplast": true } }
+            }
+          ]
+        }
+      },
+      "vid_ratt": { "handling": "filten om ägget, frosten smälter" },
+      "knuff": { "handling": "ägget hackar tänder, tankebubblan blinkar" },
+      "forenkla": { "efter_fel": 2, "andring": "en distraktor tas bort" },
+      "efter_3_fel": { "handling": "ägget gungar mot rätt låda" }
+    },
+    {
+      "id": "p0_ungenamn",
+      "typ": "P12_dop",
+      "min_bokstaver": 1,
+      "max_bokstaver": 10,
+      "sparas_som": "unge.namn",
+      "vid_ratt": { "handling": "namnet lyser i luften ca 1 s, ungen snurrar av glädje" },
+      "knuff": { "handling": "översta raden på tangentbordet blinkar", "replik": { "talare": "berattare", "text": "Tryck på en bokstav.", "upplast": true } }
+    },
+    {
+      "id": "p0_dinomat",
+      "typ": "P1_las_och_valj",
+      "avsandare": "farfar",
+      "papper": "anteckningspapper_kompassros",
+      "kan_oppnas_igen": true,
+      "hjalp": "ett_ord",
+      "varianter": {
+        "L2": {
+          "text": ["Dinomat.", "Ta den röda lådan."],
+          "alternativ": [
+            { "id": "rod", "ratt": true },
+            { "id": "bla", "vid_valj": { "reaktion": "dammoln, båda nyser" } },
+            { "id": "gul", "vid_valj": { "reaktion": "strumpa landar på hjältens huvud" } }
+          ]
+        },
+        "L3": {
+          "text": ["Dinomat.", "Ta den stora röda lådan."],
+          "alternativ": [
+            { "id": "stor_rod", "ratt": true },
+            { "id": "liten_rod", "vid_valj": { "reaktion": "leksaksgroda hoppar ut, KVACK" } },
+            { "id": "stor_bla", "vid_valj": { "reaktion": "dammoln, båda nyser" } }
+          ]
+        }
+      },
+      "vid_fel": { "replik": { "talare": "berattare", "text": "Hoppsan! Där var ingen mat.", "upplast": true } },
+      "vid_ratt": { "handling": "locket knarrar upp, tre små påsar" },
+      "forenkla": { "efter_fel": 2, "andring": "L3 byts mot L2 med två lådor (röd, blå)" },
+      "efter_3_fel": { "handling": "ungen nosar på rätt låda" },
+      "anteckning": "Lappen skrivs i scen s08_farfars_lapp. Färgerna måste skilja sig i ljushet (dokument 10)."
+    },
+    {
+      "id": "p0_bar",
+      "typ": "P1_las_och_valj",
+      "hjalp": "ett_ord",
+      "varianter": {
+        "L1": {
+          "bild": "tankebubbla_bar",
+          "alternativ": [
+            { "id": "bar", "ord": "bär", "ratt": true },
+            {
+              "id": "rep", "ord": "rep",
+              "vid_valj": { "reaktion": "repet ringlar sig runt hjältens fötter", "replik": { "talare": "berattare", "text": "Hoppsan! {unge} är fortfarande hungrig.", "upplast": true } }
+            },
+            {
+              "id": "lok", "ord": "lök",
+              "vid_valj": { "reaktion": "ungen nyser, tårar i ögonen", "replik": { "talare": "berattare", "text": "Hoppsan! {unge} är fortfarande hungrig.", "upplast": true } }
+            }
+          ]
+        }
+      },
+      "vid_ratt": { "handling": "bär rullar ut, ungen äter och dansar" },
+      "forenkla": { "efter_fel": 2, "andring": "en distraktor tas bort" },
+      "efter_3_fel": { "handling": "ungen nosar mot rätt påse" }
+    },
+    {
+      "id": "p0_krukor",
+      "typ": "P26_krukorna",
+      "innehall": ["bar", "bar", "tom", "tom", "kartbit_1"],
+      "kartbit_i_sista": true,
+      "knuff": { "handling": "ungen nosar mot närmaste hela kruka" }
+    }
+  ]
+}

@@ -129,7 +129,8 @@ En modul (`karna/inmatning.js`) översätter tangentbord och pekskärm till **ha
 
 - **Tiled-kartan** (`rum/*.tmj`) innehåller rutor, kollision, utgångar och objekt med *id:n* (`skylt_01`, `pussel:p1_skylt`). **Ingen spelartext i Tiled**, så att storyspåret aldrig behöver öppna Tiled.
 - **`manus.json`** innehåller repliker per id: talare, text (versaler), om den läses upp (`upplast: true` bara för instruktioner, enligt uppläsningsregeln).
-- **`pussel.json`** följer fälten i pusselkatalogen (dokument 08, avsnitt 8): `id`, `typ`, `nivå`, `text`, `bild`, `alternativ`, `svar`, `ledtrådar`, `hjälp`, `vid_fel`, `vid_rätt`. Giltiga formelkombinationer ligger i pusslet (`formler: ["STOR STEGE"]`), inget fritt system.
+- **Formatet är beskrivet i `docs/innehallsschema.md`** (format 1, ett kapitel per fil med rum, scener och pussel). Kort sammanfattning nedan.
+- **`pussel`** följer fälten i pusselkatalogen (dokument 08, avsnitt 8): `id`, `typ`, `nivå`, `text`, `bild`, `alternativ`, `svar`, `ledtrådar`, `hjälp`, `vid_fel`, `vid_rätt`. Giltiga formelkombinationer ligger i pusslet (`formler: ["STOR STEGE"]`), inget fritt system.
 - **Pusseltyperna** är kod (en modul per typ, registreras med `typ`-namnet). Pusslen är data. En ny pusseltyp efter funktionsstoppet (kap 3) ska inte behövas.
 - **Schema för varje filtyp** i `content/schema/`. Bygget kontrollerar alla filer och dessutom att varje id som en karta pekar på finns, och att all spelartext är versaler.
 - Ordlistor ligger också som data (`content/ordlistor.json`), med ordets svårighet 1–6 åtskild från förståelsenivån L1–L7.
@@ -222,7 +223,7 @@ Enligt dokument 11. Inget spelinnehåll.
 
 **Grinden:** blocket går att flytta med piltangenter och tryck, publiceras automatiskt och startar offline på MacBook (Safari och Chrome), Windows (Chrome/Edge) och iPad (Safari, hemskärmen). De manuella stegen står i testmatrisen.
 
-Innehållskontrollen (JSON Schema, Ajv) och `content/` kommer i fas 2, när det finns innehåll att kontrollera. I fas 1 kör `npm run kontroll` bara enhetstesterna.
+Innehållskontrollen (JSON Schema, Ajv) finns sedan 0.1.3, se `docs/innehallsschema.md`. `npm run kontroll` kör den före enhetstesterna.
 
 ### Köra testerna lokalt
 `npm test` kör allt. I en miljö där Playwright inte kan hämta sina egna webbläsare kan en annan Chromium användas: `PW_CHROMIUM=/sökväg/till/chromium npm run test:webb` kör då bara Chromium-projekten. WebKit körs alltid i GitHub Actions.

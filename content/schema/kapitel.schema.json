@@ -1,0 +1,1014 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ordstaven/schema/kapitel.schema.json",
+  "title": "ORDSTAVEN – ett kapitel (rum, scener, pussel)",
+  "description": "Format 1. Beskrivs i docs/innehallsschema.md. All text lagras i vanlig skrift; spelet visar versaler tills nivån säger annat.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "id",
+    "kapitel",
+    "rum",
+    "scener",
+    "pussel"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "format": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^kap-[0-9]{2}$",
+      "description": "Samma som filnamnet, t.ex. kap-00."
+    },
+    "kapitel": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 7
+    },
+    "meta": {
+      "$ref": "#/$defs/meta"
+    },
+    "rum": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/rum"
+      }
+    },
+    "scener": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/scen"
+      }
+    },
+    "pussel": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/pussel"
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_]+$",
+      "description": "Små bokstäver a–z, siffror och understreck. Inga å, ä, ö."
+    },
+    "meta": {
+      "type": "object",
+      "description": "Fritt: version, datum, ägare, status. Påverkar inte spelet.",
+      "additionalProperties": true
+    },
+    "anteckning": {
+      "type": "string",
+      "description": "Fri anteckning till andra spår. Påverkar inte spelet."
+    },
+    "text": {
+      "description": "Speltext i vanlig skrift. En sträng, eller en lista med rader (spelet bryter aldrig inom en rad).",
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      ]
+    },
+    "formelord": {
+      "type": "string",
+      "pattern": "^[A-ZÅÄÖ]+( [A-ZÅÄÖ]+)?$",
+      "description": "Formler skrivs alltid i versaler (stavens skrift)."
+    },
+    "niva_l": {
+      "enum": [
+        "L1",
+        "L2",
+        "L3",
+        "L4",
+        "L5",
+        "L6",
+        "L7"
+      ]
+    },
+    "niva_s": {
+      "enum": [
+        "S1",
+        "S2",
+        "S3",
+        "S4",
+        "S5"
+      ]
+    },
+    "fest": {
+      "enum": [
+        "liten",
+        "mellan",
+        "mellan_dampad",
+        "stor"
+      ]
+    },
+    "replik": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "talare",
+        "text",
+        "upplast"
+      ],
+      "properties": {
+        "typ": {
+          "const": "replik"
+        },
+        "talare": {
+          "$ref": "#/$defs/id"
+        },
+        "text": {
+          "$ref": "#/$defs/text"
+        },
+        "upplast": {
+          "type": "boolean",
+          "description": "true = läses alltid upp (instruktioner, berättare). false = spelaren läser själv."
+        }
+      }
+    },
+    "handling": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "handling": {
+          "type": "string",
+          "description": "Vad som händer i bild. Fri text i gråboxen, blir animations-id senare."
+        },
+        "reaktion": {
+          "type": "string"
+        },
+        "replik": {
+          "$ref": "#/$defs/replik"
+        },
+        "fest": {
+          "$ref": "#/$defs/fest"
+        }
+      }
+    },
+    "knuff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "handling"
+      ],
+      "description": "Det som händer efter en stunds tvekan (standard 9 sekunder).",
+      "properties": {
+        "handling": {
+          "type": "string"
+        },
+        "replik": {
+          "$ref": "#/$defs/replik"
+        },
+        "efter_sek": {
+          "type": "number",
+          "minimum": 3,
+          "maximum": 30
+        }
+      }
+    },
+    "forenkla": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "efter_fel",
+        "andring"
+      ],
+      "properties": {
+        "efter_fel": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "andring": {
+          "type": "string"
+        }
+      }
+    },
+    "rum": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "namn",
+        "innehall"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "namn": {
+          "type": "string",
+          "description": "Vanlig skrift, t.ex. \"Vinden\"."
+        },
+        "tillstand": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "innehall": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "description": "Objekt i rummet. Tiled-kartan använder samma id:n."
+        },
+        "anteckning": {
+          "$ref": "#/$defs/anteckning"
+        }
+      }
+    },
+    "scen": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "pass",
+        "rum",
+        "steg"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "pass": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "rum": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tillstand": {
+          "$ref": "#/$defs/id"
+        },
+        "vy": {
+          "enum": [
+            "uppifran",
+            "sidovy",
+            "narbild"
+          ],
+          "description": "Standard: uppifran."
+        },
+        "vid_omstart": {
+          "$ref": "#/$defs/replik",
+          "description": "Sägs när spelet startar om vid den här scenen (efter en sparpunkt)."
+        },
+        "steg": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/steg"
+          }
+        },
+        "anteckning": {
+          "$ref": "#/$defs/anteckning"
+        }
+      }
+    },
+    "steg": {
+      "type": "object",
+      "required": [
+        "typ"
+      ],
+      "properties": {
+        "typ": {
+          "type": "string"
+        }
+      },
+      "discriminator": {
+        "propertyName": "typ"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/replik_steg"
+        },
+        {
+          "description": "Något händer i bild. Gråboxen visar beskrivningen för den vuxne.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "typ",
+            "beskrivning"
+          ],
+          "properties": {
+            "typ": {
+              "const": "mellanscen"
+            },
+            "beskrivning": {
+              "type": "string"
+            },
+            "bild": {
+              "$ref": "#/$defs/id"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "typ",
+            "id"
+          ],
+          "properties": {
+            "typ": {
+              "const": "ljud"
+            },
+            "id": {
+              "$ref": "#/$defs/id"
+            }
+          }
+        },
+        {
+          "description": "Spelaren ska gå till ett objekt i rummet.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "typ",
+            "mal"
+          ],
+          "properties": {
+            "typ": {
+              "const": "ga_till"
+            },
+            "mal": {
+              "$ref": "#/$defs/id"
+            },
+            "visa_styrhjalp": {
+              "type": "boolean"
+            },
+            "knuff": {
+              "$ref": "#/$defs/knuff"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "typ",
+            "pussel_id"
+          ],
+          "properties": {
+            "typ": {
+              "const": "pussel"
+            },
+            "pussel_id": {
+              "$ref": "#/$defs/id"
+            }
+          }
+        },
+        {
+          "description": "Visar ett pussels lästext på läsplattan utan att pusslet startar (t.ex. farfars lapp).",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "typ",
+            "pussel_id"
+          ],
+          "properties": {
+            "typ": {
+              "const": "oppna_lasplatta"
+            },
+            "pussel_id": {
+              "$ref": "#/$defs/id"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "typ",
+            "element"
+          ],
+          "properties": {
+            "typ": {
+              "const": "visa_ui"
+            },
+            "element": {
+              "enum": [
+                "nosknappen",
+                "barraknaren",
+                "radioramen",
+                "hjalteboken"
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "typ",
+            "ord"
+          ],
+          "properties": {
+            "typ": {
+              "const": "nos_demo"
+            },
+            "ord": {
+              "type": "string"
+            },
+            "kostnad": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "typ",
+            "antal"
+          ],
+          "properties": {
+            "typ": {
+              "const": "ge_bar"
+            },
+            "antal": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "typ",
+            "nummer"
+          ],
+          "properties": {
+            "typ": {
+              "const": "ge_kartbit"
+            },
+            "nummer": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 7
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "typ",
+            "grad"
+          ],
+          "properties": {
+            "typ": {
+              "const": "ge_grad"
+            },
+            "grad": {
+              "enum": [
+                "Lärling",
+                "Lögnavslöjare",
+                "Ordtrollare",
+                "Stortrollare",
+                "Mästertrollkarl"
+              ]
+            },
+            "fest": {
+              "$ref": "#/$defs/fest"
+            }
+          }
+        },
+        {
+          "description": "Bläddringsbar bok: bild, ett ord under bilden, text som läses upp efter tryck.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "typ",
+            "id",
+            "talare",
+            "uppslag"
+          ],
+          "properties": {
+            "typ": {
+              "const": "bok"
+            },
+            "id": {
+              "$ref": "#/$defs/id"
+            },
+            "talare": {
+              "$ref": "#/$defs/id"
+            },
+            "las_upp_efter_tryck": {
+              "type": "boolean"
+            },
+            "uppslag": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "bild",
+                  "text"
+                ],
+                "properties": {
+                  "bild": {
+                    "$ref": "#/$defs/id"
+                  },
+                  "bildtext": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "$ref": "#/$defs/text"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "typ",
+            "delar"
+          ],
+          "properties": {
+            "typ": {
+              "const": "skapa_hjalte"
+            },
+            "delar": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "kropp",
+                  "hudton",
+                  "klader",
+                  "hatt",
+                  "ryggsack"
+                ]
+              }
+            },
+            "bara_bilder": {
+              "type": "boolean"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "typ"
+          ],
+          "properties": {
+            "typ": {
+              "const": "sparpunkt"
+            },
+            "pass_slut": {
+              "type": "boolean"
+            },
+            "valfri": {
+              "type": "boolean"
+            }
+          }
+        },
+        {
+          "description": "Fri lek i rummet, t.ex. buskar att svinga staven mot.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "typ",
+            "beskrivning"
+          ],
+          "properties": {
+            "typ": {
+              "const": "fritt"
+            },
+            "beskrivning": {
+              "type": "string"
+            },
+            "foremal": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/id"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "replik_steg": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "typ",
+        "talare",
+        "text",
+        "upplast"
+      ],
+      "properties": {
+        "typ": {
+          "const": "replik"
+        },
+        "talare": {
+          "$ref": "#/$defs/id"
+        },
+        "text": {
+          "$ref": "#/$defs/text"
+        },
+        "upplast": {
+          "type": "boolean"
+        }
+      }
+    },
+    "pussel": {
+      "type": "object",
+      "required": [
+        "id",
+        "typ"
+      ],
+      "properties": {
+        "typ": {
+          "type": "string"
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        }
+      },
+      "discriminator": {
+        "propertyName": "typ"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/P1_las_och_valj"
+        },
+        {
+          "$ref": "#/$defs/P11_formel"
+        },
+        {
+          "$ref": "#/$defs/P12_dop"
+        },
+        {
+          "$ref": "#/$defs/P26_krukorna"
+        }
+      ]
+    },
+    "P1_las_och_valj": {
+      "description": "Läs ett ord eller en mening och välj rätt. Alltid med varianter per läsnivå, även om det bara finns en.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "typ",
+        "varianter"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "typ": {
+          "const": "P1_las_och_valj"
+        },
+        "instruktion": {
+          "$ref": "#/$defs/replik"
+        },
+        "avsandare": {
+          "$ref": "#/$defs/id",
+          "description": "Vem som skrev texten: styr papperet på läsplattan."
+        },
+        "papper": {
+          "$ref": "#/$defs/id"
+        },
+        "kan_oppnas_igen": {
+          "type": "boolean"
+        },
+        "hjalp": {
+          "enum": [
+            "ett_ord",
+            null
+          ],
+          "description": "ett_ord = nosknappen läser upp ett ord han pekar på."
+        },
+        "varianter": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {
+            "$ref": "#/$defs/niva_l"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/P1_variant"
+          }
+        },
+        "knuff": {
+          "$ref": "#/$defs/knuff"
+        },
+        "forenkla": {
+          "$ref": "#/$defs/forenkla"
+        },
+        "efter_3_fel": {
+          "$ref": "#/$defs/handling"
+        },
+        "vid_ratt": {
+          "$ref": "#/$defs/handling"
+        },
+        "vid_fel": {
+          "$ref": "#/$defs/handling"
+        },
+        "anteckning": {
+          "$ref": "#/$defs/anteckning"
+        }
+      }
+    },
+    "P1_variant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "alternativ"
+      ],
+      "properties": {
+        "text": {
+          "$ref": "#/$defs/text",
+          "description": "Lästexten (en ledtråd). Läses aldrig upp automatiskt."
+        },
+        "bild": {
+          "$ref": "#/$defs/id",
+          "description": "Bild som ställer frågan, t.ex. en tankebubbla."
+        },
+        "alternativ": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 5,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/id"
+              },
+              "ord": {
+                "type": "string",
+                "description": "Ordet på etiketten, som spelaren läser. Vanlig skrift."
+              },
+              "bild": {
+                "$ref": "#/$defs/id"
+              },
+              "ratt": {
+                "type": "boolean"
+              },
+              "vid_valj": {
+                "$ref": "#/$defs/handling"
+              }
+            }
+          }
+        }
+      }
+    },
+    "P11_formel": {
+      "description": "En trollformel: brickor (S1–S2) eller skrivet (S3–S5).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "typ",
+        "niva",
+        "svar",
+        "formler"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "typ": {
+          "const": "P11_formel"
+        },
+        "niva": {
+          "$ref": "#/$defs/niva_s"
+        },
+        "instruktion": {
+          "$ref": "#/$defs/replik"
+        },
+        "forsta_formel": {
+          "type": "boolean"
+        },
+        "forebild": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "text"
+          ],
+          "properties": {
+            "text": {
+              "$ref": "#/$defs/formelord"
+            },
+            "upplast": {
+              "type": "boolean"
+            },
+            "placering": {
+              "$ref": "#/$defs/id"
+            },
+            "ligger_kvar": {
+              "type": "boolean"
+            }
+          }
+        },
+        "brickor": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-ZÅÄÖ]$"
+          }
+        },
+        "svar": {
+          "$ref": "#/$defs/formelord"
+        },
+        "helord": {
+          "type": "boolean"
+        },
+        "formler": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "ord",
+              "effekt"
+            ],
+            "properties": {
+              "ord": {
+                "$ref": "#/$defs/formelord"
+              },
+              "effekt": {
+                "$ref": "#/$defs/id"
+              },
+              "tillstand_efter": {
+                "$ref": "#/$defs/id"
+              }
+            }
+          }
+        },
+        "nastan": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "ord",
+              "effekt"
+            ],
+            "properties": {
+              "ord": {
+                "$ref": "#/$defs/formelord"
+              },
+              "effekt": {
+                "$ref": "#/$defs/id"
+              }
+            }
+          }
+        },
+        "hjalp": {
+          "enum": [
+            "ett_ord",
+            null
+          ]
+        },
+        "ratt_bokstav_stannar": {
+          "type": "boolean"
+        },
+        "knuff": {
+          "$ref": "#/$defs/knuff"
+        },
+        "forenkla": {
+          "$ref": "#/$defs/forenkla"
+        },
+        "efter_3_fel": {
+          "$ref": "#/$defs/handling"
+        },
+        "vid_ratt": {
+          "$ref": "#/$defs/handling"
+        },
+        "vid_fel": {
+          "$ref": "#/$defs/handling"
+        },
+        "anteckning": {
+          "$ref": "#/$defs/anteckning"
+        }
+      }
+    },
+    "P12_dop": {
+      "description": "Fritt namn. Bedöms aldrig.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "typ",
+        "sparas_som"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "typ": {
+          "const": "P12_dop"
+        },
+        "instruktion": {
+          "$ref": "#/$defs/replik"
+        },
+        "min_bokstaver": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "max_bokstaver": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "vuxen_far_hjalpa": {
+          "type": "boolean"
+        },
+        "sparas_som": {
+          "enum": [
+            "hjalte.namn",
+            "unge.namn"
+          ]
+        },
+        "knuff": {
+          "$ref": "#/$defs/knuff"
+        },
+        "vid_ratt": {
+          "$ref": "#/$defs/handling"
+        },
+        "anteckning": {
+          "$ref": "#/$defs/anteckning"
+        }
+      }
+    },
+    "P26_krukorna": {
+      "description": "Vila: svinga staven mot krukor. Påverkar inte nivån.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "typ",
+        "innehall"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "typ": {
+          "const": "P26_krukorna"
+        },
+        "instruktion": {
+          "$ref": "#/$defs/replik"
+        },
+        "innehall": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "description": "En post per kruka."
+        },
+        "kartbit_i_sista": {
+          "type": "boolean",
+          "description": "Det sista som hittas är alltid kartbiten, oavsett ordning."
+        },
+        "knuff": {
+          "$ref": "#/$defs/knuff"
+        },
+        "vid_ratt": {
+          "$ref": "#/$defs/handling"
+        },
+        "anteckning": {
+          "$ref": "#/$defs/anteckning"
+        }
+      }
+    }
+  }
+}

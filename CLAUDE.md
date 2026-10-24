@@ -8,9 +8,9 @@ Läs- och skriväventyr för barn 6–8 år, byggt för en spelare först. Webba
 - `docs/` får bara innehålla design (spelvärld, pussel, stil, teknik). Testloggar och observationer hör inte hemma här.
 
 ## Arbetssätt
-- All text i spelet på svenska, i **VERSALER**. Kod, kommentarer och commit-meddelanden på svenska.
+- All text i spelet på svenska. Den **visas i VERSALER** men lagras i vanlig skrift (se arkitekturreglerna). Kod, kommentarer och commit-meddelanden på svenska.
 - **En avgränsad uppgift per session.** En commit per steg. Varje push till `main` publiceras automatiskt om testerna går igenom.
-- Kör före varje commit: `npm run kontroll` (innehållsschema + enhetstester) och `npm run test:webb` (Playwright). Ta skärmdumpar och titta på dem innan du lämnar över.
+- Kör före varje commit: `npm run kontroll` (innehållskontroll + enhetstester) och `npm run test:webb` (Playwright). Ta skärmdumpar och titta på dem innan du lämnar över.
 - Höj `version` i `package.json` vid varje leverans och skriv en rad i `docs/versioner.md`.
 - Bygg inget som inte står i nuvarande fas i färdplanen. Nya idéer skrivs ned, de byggs inte.
 
@@ -19,7 +19,9 @@ Läs- och skriväventyr för barn 6–8 år, byggt för en spelare först. Webba
 - `src/karna/` får inte importera Phaser eller röra DOM. Modulerna tar sina beroenden som argument. Inga globaler.
 - All läsbar text ritas i textlagret (DOM, Andika). Aldrig Phaser-text, aldrig text i pixelgrafiken.
 - Scener lyssnar på handlingar från `karna/inmatning.js`, aldrig på råa tangent- eller pekhändelser.
-- Innehåll (repliker, pussel, ordlistor) ligger i `content/` som JSON. Tiled-kartor innehåller id:n, aldrig spelartext. Hårdkoda aldrig innehåll i koden.
+- Innehåll (repliker, pussel, ordlistor) ligger i `content/` som JSON enligt `docs/innehallsschema.md` (format 1). Tiled-kartor innehåller id:n, aldrig spelartext. Hårdkoda aldrig innehåll i koden.
+- Speltext lagras i vanlig skrift och visas genom `src/karna/text.js` (versaler tills nivån säger annat). Formler alltid i versaler. Platshållare `{unge}`, `{hjalte}`.
+- `content/` ägs av Innehållsspåret. Teknik ändrar bara formatet (och skriver då om filerna), aldrig texten. Ändras schemat: höj `format`, uppdatera `docs/innehallsschema.md` och kontrollen i `verktyg/innehall/`.
 - Skalan räknas i fysiska pixlar och är alltid ett heltal (`karna/skalning.js`).
 
 ## Viktigt att inte förstöra
