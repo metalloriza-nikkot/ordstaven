@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#2a1d16">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="ORDSTAVEN">
+  <link rel="apple-touch-icon" href="/ordstaven/icons/ikon-180.png">
+  <link rel="icon" href="/ordstaven/icons/ikon-192.png">
+  <title>ORDSTAVEN</title>
+</head>
+<body>
+  <div id="ram">
+    <div id="varld"></div>
+    <div id="textlager"></div>
+  </div>
+  <!-- Stående läge på pekskärm: en bild, ingen text att läsa -->
+  <div id="vrid" aria-hidden="true">
+    <svg viewBox="0 0 120 120" width="160" height="160">
+      <rect x="38" y="18" width="44" height="74" rx="7" fill="none" stroke="#F5ECD7" stroke-width="6"/>
+      <rect x="23" y="56" width="74" height="44" rx="7" fill="#F2C14E" opacity=".85"/>
+      <path d="M92 30 q14 14 4 32" fill="none" stroke="#F2C14E" stroke-width="6" stroke-linecap="round"/>
+      <path d="M86 58 l10 6 l4-12" fill="none" stroke="#F2C14E" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

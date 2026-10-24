@@ -1,0 +1,8 @@
+node_modules/
+dist/
+dev-dist/
+.lokal/
+test-results/
+playwright-report/
+tests/skarmdumpar/
+.DS_Store
