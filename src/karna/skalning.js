@@ -6,13 +6,6 @@
 export const RUM = Object.freeze({ bredd: 320, hojd: 192, ruta: 16 });
 
 /**
- * Plats som hålls fri nertill på pekskärm för bokstavstangentbordet (CSS-pixlar):
- * tre rader à 64 + mellanrum + marginal. Reserveras från start så att rummet inte
- * byter storlek när tangentbordet visas.
- */
-export const TANGENTBORD_HOJD = 216;
-
-/**
  * @param {{ bredd: number, hojd: number, dpr?: number, reservNere?: number }} fonster
  *   bredd/hojd i CSS-pixlar, dpr = devicePixelRatio, reservNere = CSS-pixlar som hålls fria nertill (tangentbord)
  * @returns {{ fysisk: number, cssSkala: number, cssBredd: number, cssHojd: number, vanster: number, topp: number }}

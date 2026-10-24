@@ -89,7 +89,7 @@ ordstaven/
   ```
   Exempel: MacBook 1280×800, dpr 2 → fysisk 8, CSS 1280×768 (×4 i stilguidens mening). Windows 1536×864, dpr 1,25 → fysisk 5, CSS 1280×768.
 - **Halva steg på retinaskärmar.** Med dpr 2 kan skalan bli t.ex. 7 fysiska pixlar = 3,5 CSS-pixlar. Det är lika skarpt (varje spelpixel är 7×7 skärmpunkter) och ger ett större rum än stilguidens tabell: MacBook med webbläsarlist får 1120×672 i stället för 960×576.
-- **Pekskärm reserverar tangentbordets plats från start** (`TANGENTBORD_HOJD` = 216 CSS-punkter nertill) och lägger rummet överst. Rummet byter alltså inte storlek när tangentbordet visas i fas 2. Resultat: iPad 10:e gen och 4:3 får 960×576 (som stilguiden), **iPad mini får 800×480** (stilguiden räknade med 960×576, men då ryms inte tangentbordet).
+- **Ingen fast plats för tangentbordet** (ändrat i 0.1.2). När spelaren skriver är läsplattan öppen och världen står still och dämpas, så bokstavstangentbordet läggs över rummets nedre del just då. Resten av tiden får rummet hela skärmen. Resultat: iPad 10:e gen och mini får 1120×672 (×3,5), även i en Safari-flik. iPad 4:3 får 960×576. En fast reserv på 216 punkter gav i test ett för litet rum (800×480 i Safari-flik).
 - Omräkning vid `resize`, `orientationchange` och ändrad dpr (`matchMedia`). Stående läge på iPad visar en bild (vrid-skärmen), ingen text.
 - Ramen är en CSS-bakgrund som upprepas, så den tål vilken storlek som helst.
 

@@ -1,17 +1,17 @@
 import { describe, it, expect } from 'vitest';
-import { beraknaSkala, skarmTillRum, rumTillSkarm, TANGENTBORD_HOJD } from '../../src/karna/skalning.js';
+import { beraknaSkala, skarmTillRum, rumTillSkarm } from '../../src/karna/skalning.js';
 
 // Skärmtabellen i stilguiden. "fysisk" = fysiska pixlar per spelpixel (alltid heltal).
 // På retina (dpr 2) kan CSS-skalan bli ett halvt steg (7 fysiska = 3,5 CSS), lika skarpt.
-// Pekskärmar reserverar plats för tangentbordet nertill.
 const FALL = [
   { namn: 'MacBook 13" helskärm', bredd: 1280, hojd: 800, dpr: 2, fysisk: 8 },
   { namn: 'MacBook med webbläsarlist', bredd: 1280, hojd: 700, dpr: 2, fysisk: 7 },
   { namn: 'Windows 1920×1080', bredd: 1920, hojd: 1080, dpr: 1, fysisk: 5 },
   { namn: 'Windows 1366×768', bredd: 1366, hojd: 768, dpr: 1, fysisk: 4 },
-  { namn: 'iPad 10:e gen', bredd: 1180, hojd: 820, dpr: 2, reservNere: TANGENTBORD_HOJD, fysisk: 6 },
-  { namn: 'iPad 4:3', bredd: 1080, hojd: 810, dpr: 2, reservNere: TANGENTBORD_HOJD, fysisk: 6 },
-  { namn: 'iPad mini', bredd: 1133, hojd: 744, dpr: 2, reservNere: TANGENTBORD_HOJD, fysisk: 5 },
+  { namn: 'iPad 10:e gen (hemskärmen)', bredd: 1180, hojd: 820, dpr: 2, fysisk: 7 },
+  { namn: 'iPad 10:e gen (Safari-flik)', bredd: 1180, hojd: 740, dpr: 2, fysisk: 7 },
+  { namn: 'iPad 4:3', bredd: 1080, hojd: 810, dpr: 2, fysisk: 6 },
+  { namn: 'iPad mini', bredd: 1133, hojd: 744, dpr: 2, fysisk: 7 },
 ];
 
 describe('beraknaSkala', () => {
@@ -20,14 +20,13 @@ describe('beraknaSkala', () => {
       const s = beraknaSkala(f);
       expect(s.fysisk).toBe(f.fysisk);
       expect(s.cssBredd).toBeLessThanOrEqual(f.bredd);
-      expect(s.cssHojd).toBeLessThanOrEqual(f.hojd - (f.reservNere || 0));
+      expect(s.cssHojd).toBeLessThanOrEqual(f.hojd);
     });
   }
 
-  it('tangentbordets plats ryms under rummet på iPad', () => {
-    for (const f of FALL.filter((x) => x.reservNere)) {
-      const s = beraknaSkala(f);
-      expect(f.hojd - s.cssHojd).toBeGreaterThanOrEqual(TANGENTBORD_HOJD);
+  it('rummet fyller minst 85 % av bredden på iPad 16:10', () => {
+    for (const f of FALL.filter((x) => x.namn.startsWith('iPad 10') || x.namn === 'iPad mini')) {
+      expect(beraknaSkala(f).cssBredd / f.bredd).toBeGreaterThan(0.85);
     }
   });
 

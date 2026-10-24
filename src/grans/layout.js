@@ -1,13 +1,11 @@
 // @ts-check
 // Placerar pixelvärlden i fönstret med heltalsskala (fysiska pixlar). Ramen fyller resten.
-// På pekskärm ligger rummet överst så att ramen nertill blir plats för bokstavstangentbordet.
-import { beraknaSkala, TANGENTBORD_HOJD } from '../karna/skalning.js';
+import { beraknaSkala } from '../karna/skalning.js';
 
 /**
  * @param {{ varld: HTMLElement, logg?: { handelse(t: string, m: string, d?: any): void } }} opt
  */
 export function skapaLayout({ varld, logg }) {
-  const pek = window.matchMedia('(pointer: coarse)');
   /** @type {ReturnType<typeof beraknaSkala>} */
   let skala = beraknaSkala({ bredd: 320, hojd: 192 });
   /** @type {Set<(s: typeof skala) => void>} */
@@ -15,8 +13,9 @@ export function skapaLayout({ varld, logg }) {
 
   function uppdatera() {
     const dpr = window.devicePixelRatio || 1;
-    const s = beraknaSkala({ bredd: window.innerWidth, hojd: window.innerHeight, dpr, reservNere: pek.matches ? TANGENTBORD_HOJD : 0 });
-    if (pek.matches) s.topp = 0;
+    // Ingen reserv för tangentbordet: när spelaren skriver står världen still och tangentbordet
+    // läggs över rummets nedre del. Resten av tiden får rummet hela skärmen.
+    const s = beraknaSkala({ bredd: window.innerWidth, hojd: window.innerHeight, dpr });
     skala = s;
     const r = document.documentElement.style;
     r.setProperty('--rum-vanster', s.vanster + 'px');
