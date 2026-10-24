@@ -25,6 +25,10 @@ Version 0.1 (2026-10-24). Princip: spelet ska fungera i en modern webbläsare p�
 | ipad-10 | WebKit | 1180×820 | 2 | ja |
 | ipad-43 | WebKit | 1080×810 | 2 | ja |
 | ipad-mini | WebKit | 1133×744 | 2 | ja |
+| laptop-720p | Chromium | 1280×720 | 1 | nej |
+| win-150 | Chromium | 1280×800 | 1,5 | nej |
+| 4k | Chromium | 3840×2160 | 1 | nej |
+| ultrabred | Chromium | 3440×1440 | 1 | nej |
 
 Varje projekt kontrollerar:
 1. Skalan är ett heltal i **fysiska** pixlar och rummet syns helt.
@@ -32,6 +36,8 @@ Varje projekt kontrollerar:
 3. Text i textlagret är Andika och minst angiven storlek.
 4. Inga fel i konsolen.
 5. (Ett projekt räcker) Service workern registreras, och spelet startar igen utan nät.
+
+Dessutom svepet i `tests/enhet/skalning.test.js`: alla fönster från 800×500 till 3840×2160 i dpr 1–3. Varje storlek måste ge hela pixlar, ett helt synligt rum och största möjliga skala. Sämsta fallet (litet fönster, låg pixeltäthet) fyller minst två tredjedelar av skärmen, mitten av spannet 92–98 %.
 
 WebKit i Playwright är Safari-motorn men inte iPad-Safari. Den fångar det mesta, inte allt (ljudspärr, hemskärmsläge, datarensning). Därför finns de manuella stegen nedan.
 

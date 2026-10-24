@@ -47,6 +47,38 @@ describe('beraknaSkala', () => {
     }
   });
 
+  // Spelet ska fungera på vilken skärm som helst, inte bara de i testmatrisen.
+  it('svep över alla fönster 800–3840 och alla vanliga pixeltätheter', () => {
+    let sammaGolv = 1;
+    for (const dpr of [1, 1.25, 1.5, 1.75, 2, 2.25, 3]) {
+      for (let b = 800; b <= 3840; b += 32) {
+        for (let h = 500; h <= 2160; h += 32) {
+          if (b / h < 1.2 || b / h > 3.6) continue; // liggande skärmar, från nästan 4:3 till ultrabred
+          const s = beraknaSkala({ bredd: b, hojd: h, dpr });
+          const plats = `${b}×${h} dpr ${dpr}`;
+          // alltid hela fysiska pixlar
+          expect(Number.isInteger(s.fysisk), plats).toBe(true);
+          // rummet alltid helt synligt
+          expect(s.cssBredd, plats).toBeLessThanOrEqual(b + 1e-9);
+          expect(s.cssHojd, plats).toBeLessThanOrEqual(h + 1e-9);
+          expect(s.vanster, plats).toBeGreaterThanOrEqual(0);
+          expect(s.topp, plats).toBeGreaterThanOrEqual(0);
+          // alltid största möjliga heltal: ett steg till får inte plats
+          expect(((s.fysisk + 1) * 320) / dpr > b + 1e-9 || ((s.fysisk + 1) * 192) / dpr > h + 1e-9, plats).toBe(true);
+          sammaGolv = Math.min(sammaGolv, Math.max(s.cssBredd / b, s.cssHojd / h));
+        }
+      }
+    }
+    // Sämsta fallet (litet fönster, låg pixeltäthet) fyller ändå minst två tredjedelar.
+    expect(sammaGolv).toBeGreaterThan(0.66);
+  });
+
+  it('stående fönster på dator (vriden skärm): rummet ryms på bredden', () => {
+    const s = beraknaSkala({ bredd: 1080, hojd: 1920, dpr: 1 });
+    expect(s.cssBredd).toBeLessThanOrEqual(1080);
+    expect(s.fysisk).toBe(3);
+  });
+
   it('minst skala 1 även i mycket små fönster', () => {
     expect(beraknaSkala({ bredd: 100, hojd: 80 }).fysisk).toBe(1);
   });

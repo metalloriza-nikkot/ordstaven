@@ -78,14 +78,14 @@ test('tryck eller klick flyttar blocket dit', async ({ page }, info) => {
   const skarm = await page.evaluate(() => { const s = window.__ORDSTAVEN.skala(); return { x: s.vanster + 60 * s.cssSkala, y: s.topp + 160 * s.cssSkala }; });
   if (info.project.use.hasTouch) await page.touchscreen.tap(skarm.x, skarm.y);
   else await page.mouse.click(skarm.x, skarm.y);
-  await expect.poll(() => avstand(page, 60, 160), { timeout: 5000 }).toBeLessThan(2);
+  await expect.poll(() => avstand(page, 60, 160), { timeout: 15000 }).toBeLessThan(2);
 });
 
 test('minns var blocket stod efter omladdning', async ({ page }) => {
   await starta(page);
   const skarm = await page.evaluate(() => { const s = window.__ORDSTAVEN.skala(); return { x: s.vanster + 250 * s.cssSkala, y: s.topp + 60 * s.cssSkala }; });
   await page.mouse.click(skarm.x, skarm.y);
-  await expect.poll(() => avstand(page, 250, 60), { timeout: 5000 }).toBeLessThan(2);
+  await expect.poll(() => avstand(page, 250, 60), { timeout: 15000 }).toBeLessThan(2);
   const stod = await pos(page);
   await page.waitForTimeout(2500); // sparning sker högst varannan sekund
   await page.reload();

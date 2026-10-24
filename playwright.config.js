@@ -27,6 +27,11 @@ const alla = [
   chromium('win-125', { viewport: { width: 1536, height: 864 }, deviceScaleFactor: 1.25 }),
   chromium('win-liten', { viewport: { width: 1366, height: 768 }, deviceScaleFactor: 1 }),
   chromium('smalt-fonster', { viewport: { width: 1000, height: 625 }, deviceScaleFactor: 1 }),
+  // Andra skärmar än testmatrisens: spelet ska fungera överallt.
+  chromium('laptop-720p', { viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 }),
+  chromium('win-150', { viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1.5 }),
+  chromium('4k', { viewport: { width: 3840, height: 2160 }, deviceScaleFactor: 1 }),
+  chromium('ultrabred', { viewport: { width: 3440, height: 1440 }, deviceScaleFactor: 1 }),
   ipad('ipad-10', 1180, 820),
   ipad('ipad-43', 1080, 810),
   ipad('ipad-mini', 1133, 744),
