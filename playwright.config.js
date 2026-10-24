@@ -37,7 +37,8 @@ export default defineConfig({
   outputDir: 'test-results',
   timeout: 30000,
   retries: process.env.CI ? 1 : 0,
-  reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
+  // 'github' gör varje fel till en anteckning på körningen, läsbar via GitHubs API.
+  reporter: process.env.CI ? [['github'], ['list'], ['html', { open: 'never' }]] : 'list',
   use: { baseURL: 'http://localhost:4173/ordstaven/', serviceWorkers: 'allow' },
   projects: lokalChromium ? alla.filter((p) => p.use.browserName === 'chromium') : alla,
   webServer: {
