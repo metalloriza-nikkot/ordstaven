@@ -1,6 +1,6 @@
 # Arkitektur – ORDSTAVEN
 
-Version 0.1 (2026-10-24). Status: **förslag, väntar på godkännande innan fas 1 kodas.**
+Version 0.2 (2026-10-24). Status: **fas 1 byggd (spelversion 0.1.0).**
 ❓ = öppen fråga. Designen finns i `docs/design.md`. Testmatrisen i `docs/testmatris.md`.
 
 ## 1. Översikt
@@ -48,8 +48,7 @@ ordstaven/
 ├─ vite.config.js
 ├─ docs/                   bara design och teknik (integritetsregeln)
 ├─ public/
-│  ├─ fonts/               Andika (woff2) + OFL.txt
-│  └─ icons/               PWA-ikoner
+│  └─ icons/               PWA-ikoner (tillfälliga, ritas av verktyg/ikoner.py)
 ├─ assets/                 sprites, tiles, kartor (från fas 2)
 │  └─ LICENSER.md          licenslogg, obligatorisk
 ├─ content/                spelets innehåll som data
@@ -89,7 +88,8 @@ ordstaven/
   canvasens CSS-storlek = 320·fysisk/dpr × 192·fysisk/dpr
   ```
   Exempel: MacBook 1280×800, dpr 2 → fysisk 8, CSS 1280×768 (×4 i stilguidens mening). Windows 1536×864, dpr 1,25 → fysisk 5, CSS 1280×768.
-- **Tillgänglig höjd** minskas med tangentbordsremsan när den behövs (iPad, se avsnitt 5).
+- **Halva steg på retinaskärmar.** Med dpr 2 kan skalan bli t.ex. 7 fysiska pixlar = 3,5 CSS-pixlar. Det är lika skarpt (varje spelpixel är 7×7 skärmpunkter) och ger ett större rum än stilguidens tabell: MacBook med webbläsarlist får 1120×672 i stället för 960×576.
+- **Pekskärm reserverar tangentbordets plats från start** (`TANGENTBORD_HOJD` = 216 CSS-punkter nertill) och lägger rummet överst. Rummet byter alltså inte storlek när tangentbordet visas i fas 2. Resultat: iPad 10:e gen och 4:3 får 960×576 (som stilguiden), **iPad mini får 800×480** (stilguiden räknade med 960×576, men då ryms inte tangentbordet).
 - Omräkning vid `resize`, `orientationchange` och ändrad dpr (`matchMedia`). Stående läge på iPad visar en bild (vrid-skärmen), ingen text.
 - Ramen är en CSS-bakgrund som upprepas, så den tål vilken storlek som helst.
 
@@ -100,7 +100,7 @@ All läsbar text ritas som vanlig HTML ovanpå canvasen.
 - **Testbart:** Playwright kan läsa och klicka på texten, och kontrollera att den aldrig bryts mitt i "UNDER STENEN" (`white-space: nowrap` på fraser).
 - Läsplattan, pratbubblor, bokstavstangentbordet, ljudningsremsan och föräldravyn är DOM.
 - Pratbubblor som pekar på en figur placeras med en enkel omräkning rumskoordinat → skärmkoordinat (`skalning.rumTillSkarm(x, y)`).
-- Andika laddas lokalt (`public/fonts/`, `font-display: block`) och förcachas. Spelet väntar på `document.fonts.ready` innan första texten visas.
+- Andika kommer från npm-paketet `@fontsource/andika` (latin, 400 och 700), byggs in av Vite och förcachas. Textlagret visas först när typsnittet är laddat.
 
 ## 5. Inmatning
 
@@ -108,7 +108,7 @@ En modul (`karna/inmatning.js`) översätter tangentbord och pekskärm till **ha
 
 | Handling | Tangentbord | Pekskärm/mus |
 |---|---|---|
-| `riktning` {x, y} | piltangenter (WASD som reserv) | – |
+| `riktning` {x, y} | piltangenter (inte WASD: bokstäverna behövs för att skriva) | – |
 | `gaTill` {rumX, rumY} | – | tryck på marken |
 | `interagera` {mål} | Mellanslag / Enter | tryck på skylt, figur, buske |
 | `bokstav` {tecken} | A–Ö (versaler, bara A–Z, Å, Ä, Ö) | eget skärmtangentbord |
@@ -221,6 +221,11 @@ Enligt dokument 11. Inget spelinnehåll.
 9. `docs/testmatris.md` och `CLAUDE.md`.
 
 **Grinden:** blocket går att flytta med piltangenter och tryck, publiceras automatiskt och startar offline på MacBook (Safari och Chrome), Windows (Chrome/Edge) och iPad (Safari, hemskärmen). De manuella stegen står i testmatrisen.
+
+Innehållskontrollen (JSON Schema, Ajv) och `content/` kommer i fas 2, när det finns innehåll att kontrollera. I fas 1 kör `npm run kontroll` bara enhetstesterna.
+
+### Köra testerna lokalt
+`npm test` kör allt. I en miljö där Playwright inte kan hämta sina egna webbläsare kan en annan Chromium användas: `PW_CHROMIUM=/sökväg/till/chromium npm run test:webb` kör då bara Chromium-projekten. WebKit körs alltid i GitHub Actions.
 
 ## 12. Risker och mildring
 

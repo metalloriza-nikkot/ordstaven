@@ -1,0 +1,57 @@
+name: Testa och publicera
+on:
+  push:
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  testa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Enhetstester
+        run: npm run kontroll
+      - name: Bygg
+        run: npm run build
+      - name: Installera testwebbläsare
+        run: npx playwright install --with-deps chromium webkit
+      - name: Webbläsartester (hela testmatrisen)
+        run: npm run test:webb
+        env:
+          CI: '1'
+      - name: Spara skärmdumpar och testrapport
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: testresultat
+          path: |
+            tests/skarmdumpar/
+            playwright-report/
+            test-results/
+          retention-days: 14
+      - name: Förbered publicering
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+  publicera:
+    # Publiceras bara från main, och bara om alla tester gick igenom.
+    if: github.ref == 'refs/heads/main'
+    needs: testa
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.publicering.outputs.page_url }}
+    steps:
+      - id: publicering
+        uses: actions/deploy-pages@v4
