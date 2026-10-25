@@ -338,3 +338,19 @@ html, body {
 #hud-nos.nej { animation: skaka-nos .4s ease; }
 @keyframes skaka-nos { 20%, 60% { transform: translateX(-5px) rotate(-8deg); } 40%, 80% { transform: translateX(5px) rotate(8deg); } }
 #remsa { cursor: pointer; pointer-events: auto; }
+
+/* ett bär flyger till ungen när spelaren trycker på bärräknaren */
+.flygande-bar { position: absolute; left: 0; top: 0; margin: -18px 0 0 -18px; font-size: 36px; pointer-events: none; z-index: 5; }
+
+/* styrhjälpen: piltangenterna (dator) eller ett finger som trycker (pekskärm), utan text */
+#styrhjalp { position: absolute; pointer-events: none; z-index: 4; }
+#styrhjalp.pilar { left: calc(var(--rum-vanster) + var(--rum-bredd) / 2); bottom: calc(100vh - var(--rum-topp) - var(--rum-hojd) + 16px); transform: translateX(-50%); display: grid; grid-template-columns: repeat(3, 52px); grid-template-rows: 52px 52px; gap: 6px; }
+#styrhjalp .tangent { display: flex; align-items: center; justify-content: center; border-radius: 10px; background: #f5ecd7; color: var(--black); font-size: 22px; box-shadow: 0 5px 0 #b7a98a; animation: tangentpuls 1.6s ease-in-out infinite; }
+#styrhjalp .upp { grid-column: 2; grid-row: 1; } #styrhjalp .vanster { grid-column: 1; grid-row: 2; animation-delay: .4s; }
+#styrhjalp .ner { grid-column: 2; grid-row: 2; animation-delay: .8s; } #styrhjalp .hoger { grid-column: 3; grid-row: 2; animation-delay: 1.2s; }
+@keyframes tangentpuls { 0%, 70%, 100% { transform: none; } 80% { transform: translateY(4px); box-shadow: 0 1px 0 #b7a98a; } }
+#styrhjalp.tryck { transform: translate(-30%, 10%); }
+#styrhjalp .finger { display: block; font-size: 56px; animation: fingertryck 1.2s ease-in-out infinite; }
+@keyframes fingertryck { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+.snabb #styrhjalp * { animation: none; }
+.platta-oppen #styrhjalp { display: none; }

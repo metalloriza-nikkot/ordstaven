@@ -2,11 +2,12 @@
 // Spelet: kopplar berättelsemotorn (karna) till rummet (Phaser) och gränssnittet (DOM).
 // Varje stegtyp i innehållet har en hanterare här. Inget innehåll hårdkodas: allt kommer från content/.
 import { skapaBerattelse } from './karna/berattelse.js';
-import { skapaLasmotor } from './karna/lasmotor.js';
+import { skapaLasmotor, valjVariant } from './karna/lasmotor.js';
+import { egenskaper, PALETT } from './karna/egenskaper.js';
 import { skapaValj, skapaFormel, skapaDop, skapaKrukor } from './karna/pussel.js';
 import { forSkarm } from './karna/text.js';
 import { rumTillSkarm } from './karna/skalning.js';
-import { AVENTYR } from './karna/sparning.js';
+import { aventyrFor } from './karna/sparning.js';
 import { HJALTE_FARGER } from './scener/Rum.js';
 import { TANGENTBORD_HOJD } from './grans/tangentbord.js';
 
@@ -22,7 +23,8 @@ const vanta = (/** @type {number} */ ms) => new Promise((r) => setTimeout(r, ms)
  */
 export function skapaSpel(d) {
   const { aventyr, kartor = {}, tillstand, sparning, logg, rost, ljud, ui, rum, layout, inmatning, tangentbord, bilder, snabb } = d;
-  const av = tillstand.aventyr[AVENTYR];
+  const AVENTYR = aventyr.id;
+  const av = aventyrFor(tillstand, AVENTYR);
   const inst = (tillstand.installningar = { foralderLaserFarfar: false, etiketter: true, ...tillstand.installningar });
   const lasmotor = skapaLasmotor({ larande: tillstand.spelare.larande, logg });
   /** @type {ReturnType<typeof skapaBerattelse>} */
@@ -31,12 +33,41 @@ export function skapaSpel(d) {
   let aktuelltSteg = /** @type {any} */ (null);
 
   const spara = () => { sparning.spara(tillstand); };
+  /** Spelet står still (menyn för vuxna är öppen eller fliken är dold). */
+  let pausad = false;
+  /** @type {Set<string>} orsakerna till pausen */
+  const pausorsaker = new Set();
+  let fryst = false;
+  /**
+   * Pausa spelet: världen stannar, rösten tystnar, knuffar och tangenter väntar. Läsplattan och
+   * allt annat ligger kvar som det var, så att spelet fortsätter exakt där det stod.
+   * @param {string} orsak
+   */
+  function pausa(orsak) {
+    if (!pausorsaker.size) { fryst = rum.fryst; rum.frys(true); rost.tyst(); ui.avbrytLjudning(); spara(); }
+    pausorsaker.add(orsak); pausad = true;
+    logg.handelse('paus', orsak);
+  }
+  /** @param {string} orsak */
+  function fortsatt(orsak) {
+    if (!pausorsaker.delete(orsak) || pausorsaker.size) return;
+    pausad = false; rum.frys(fryst);
+    logg.handelse('paus', 'slut');
+  }
+  document.addEventListener('visibilitychange', () => { if (document.hidden) pausa('dold'); else fortsatt('dold'); });
+  /** Läsnivån för en pusseltyp, inom kapitlets golv och tak (nivaer). @param {string} typ */
+  const lasniva = (typ) => {
+    const n = lasmotor.niva('L', typ);
+    const [golv, tak] = (b?.kapitel?.nivaer?.lasning || ['L1', 'L7']).map((/** @type {string} */ x) => Number(x.slice(1)));
+    return Math.max(golv, Math.min(tak, n));
+  };
   const varden = () => b.varden();
   const tid = (/** @type {number} */ ms) => (snabb ? Math.min(ms, 30) : ms);
 
   // ------------------------------------------------------------------ hjälpare
   /** Lyssna på handlingar (tangenter) så länge ett steg pågår. */
-  const lyssnaHandling = (/** @type {(h: any) => void} */ f) => inmatning.lyssna(f);
+  // När spelet är pausat (menyn för vuxna, dold flik) når inga handlingar stegen.
+  const lyssnaHandling = (/** @type {(h: any) => void} */ f) => inmatning.lyssna((/** @type {any} */ h) => { if (!pausad) f(h); });
 
   /** Säg en replik högt (om den ska läsas upp). @param {any} r */
   function sag(r) {
@@ -82,7 +113,7 @@ export function skapaSpel(d) {
   function knuffKlocka(knuff, extra) {
     if (!knuff) return { nollstall() {}, stopp() {} };
     let t = 0;
-    const starta = () => { clearTimeout(t); t = window.setTimeout(async () => { logg.handelse('knuff', knuff.handling); extra?.(); if (knuff.handling) ui.visaRegi(knuff.handling, 0); if (knuff.replik) await sag(knuff.replik); else await vanta(2500); ui.doljRegi(); }, (knuff.efter_sek ? knuff.efter_sek * 1000 : KNUFF_MS)); };
+    const starta = () => { clearTimeout(t); t = window.setTimeout(async () => { if (pausad) { starta(); return; } logg.handelse('knuff', knuff.handling); extra?.(); if (knuff.handling) ui.visaRegi(knuff.handling, 0); if (knuff.replik) await sag(knuff.replik); else await vanta(2500); ui.doljRegi(); }, (knuff.efter_sek ? knuff.efter_sek * 1000 : KNUFF_MS)); };
     starta();
     return { nollstall: starta, stopp() { clearTimeout(t); } };
   }
@@ -97,6 +128,26 @@ export function skapaSpel(d) {
   }
 
   // ------------------------------------------------------------------ rummet
+  /** Föremålet i rummet som visar ett pussels alternativ (kartans "visar"). @param {string} pusselId */
+  const visarFor = (pusselId) => rum.objekt.find((o) => o.visar === pusselId) ?? null;
+  /** Alternativen som rutor i rätt färg och storlek. @param {any[]} alternativ */
+  const delarAv = (alternativ) => alternativ.map((a) => {
+    const e = egenskaper(a.bild || a.id);
+    return { farg: e.farg ? parseInt(PALETT[e.farg].slice(1), 16) : null, storlek: e.storlek };
+  });
+  /** Delar för alla föremål i ett rum som visar ett läs och välj-pussel, i den variant spelaren får. @param {any} karta */
+  function delarIRummet(karta) {
+    /** @type {Record<string, any[]>} */
+    const ut = {};
+    for (const o of karta?.objekt || []) {
+      const p = o.visar ? b.pussel(o.visar) : null;
+      if (!p || !p.varianter || p.i_rummet) continue;
+      const [, v] = valjVariant(p.varianter, lasniva(p.typ));
+      ut[o.id] = delarAv(v.alternativ);
+    }
+    return ut;
+  }
+
   function visaScen() {
     const scen = b.scen;
     if (!scen) return;
@@ -104,8 +155,8 @@ export function skapaSpel(d) {
     const franRum = aktuelltRum ?? null;
     aktuelltRum = scen.rum;
     const r = scen.rum ? b.rum(scen.rum) : null;
-    rum.visa({ rum: scen.rum, tillstand: b.rumsTillstand(scen.rum), innehall: r ? r.innehall : [], unge: !!av.ungen.namn, nyttRum: nytt,
-      karta: scen.rum ? kartor[scen.rum] ?? null : null, franRum });
+    rum.visa({ rum: scen.rum, tillstand: b.rumsTillstand(scen.rum), innehall: r ? r.innehall : [], unge: av.ungen.folj ?? !!av.ungen.namn, nyttRum: nytt,
+      karta: scen.rum ? kartor[scen.rum] ?? null : null, franRum, delar: scen.rum ? delarIRummet(kartor[scen.rum]) : {} });
     // närbilden (t.ex. kartbiten) visas tills spelaren ska röra sig i rummet igen
     const st = b.aktuellt();
     const sp = st && st.typ === 'pussel' ? b.pussel(st.pussel_id) : null;
@@ -130,7 +181,8 @@ export function skapaSpel(d) {
         const ms = tid(Math.min(6000, 1800 + st.beskrivning.split(' ').length * 140));
         await ui.visaRegi(st.beskrivning, ms); ui.doljRegi(); return;
       }
-      case 'ljud': ljud.spela(st.id); await vanta(tid(600)); return;
+      case 'ljud': ljud.spela(st.id); if (st.foremal) rum.hoppa(st.foremal); await vanta(tid(600)); return;
+      case 'unge_folj': return; // effekten (ungen syns och följer) görs i berättelsemotorn
       case 'ga_till': return gaTill(st);
       case 'pussel': return pussel(b.pussel(st.pussel_id));
       case 'oppna_lasplatta': return visaLapp(b.pussel(st.pussel_id), true);
@@ -200,8 +252,17 @@ export function skapaSpel(d) {
     rum.frys(false);
     if (!rum.ruta(st.mal)) { logg.handelse('FEL', 'objektet finns inte i rummet: ' + st.mal); return; }
     if (st.visa_styrhjalp) rum.markera(st.mal, true);
+    // styrhjälpen visar hur man går på just den här enheten: piltangenter på dator, ett finger som trycker på pekskärm.
+    // Den försvinner så fort hjälten börjar gå.
+    let styr = 0;
+    if (st.visa_styrhjalp) {
+      const o = rum.ruta(st.mal), start = { ...rum.pos };
+      ui.styrhjalp(d.pek() ? 'tryck' : 'pilar', o ? rumTillSkarm(layout.skala, o.x + o.b / 2, o.y + o.h / 2) : null);
+      styr = window.setInterval(() => { if (Math.hypot(rum.pos.x - start.x, rum.pos.y - start.y) > 6) { ui.styrhjalp(null); window.clearInterval(styr); } }, 100);
+    }
     const k = knuffKlocka(st.knuff ?? { handling: '' }, () => rum.markera(st.mal, true));
     await anvand([st.mal]);
+    window.clearInterval(styr); ui.styrhjalp(null);
     k.stopp(); rum.markera(st.mal, false); ui.doljRegi();
   }
 
@@ -233,7 +294,7 @@ export function skapaSpel(d) {
   /** Läs och välj (P1) och packa (P28). @param {any} p */
   async function valj(p) {
     const flera = p.typ === 'P28_packa';
-    const niva = lasmotor.niva('L', p.typ);
+    const niva = lasniva(p.typ);
     const v = skapaValj(p, { niva });
     const spar = { hjalp: false };
     if (p.instruktion) await replik(p.instruktion);
@@ -251,6 +312,8 @@ export function skapaSpel(d) {
       const rita = () => {
         const papper = v.s.text ? `<div class="lapp p-${ui.esc(p.papper || 'lapp')}">${ui.rader(v.s.text, varden())}</div>` : '';
         const bild = v.s.bild ? `<div class="fraga">${bilder.html(v.s.bild)}</div>` : '';
+        const visar = visarFor(p.id);
+        if (visar) rum.visaDelar(visar.id, delarAv(p.varianter[v.s.variantNyckel].alternativ.filter((/** @type {any} */ a) => v.s.alternativ.some((x) => x.id === a.id))));
         ui.visaPlatta(`<div class="pussel-ruta">${papper}${bild}<div class="kortrad">${v.s.alternativ.map(kortHtml).join('')}</div>${flera ? '<div class="ryggsack" aria-hidden="true">🎒</div>' : ''}</div>`, 'pussel ' + p.typ);
         tillatNos(p, spar);
         plattan().querySelectorAll('.kort').forEach((el) => el.addEventListener('click', () => tryck(/** @type {HTMLElement} */ (el).dataset.id || '')));
@@ -290,7 +353,7 @@ export function skapaSpel(d) {
    * @param {any} p
    */
   async function valjIRummet(p) {
-    const niva = lasmotor.niva('L', p.typ);
+    const niva = lasniva(p.typ);
     const v = skapaValj(p, { niva });
     const spar = { hjalp: false };
     if (p.instruktion) await replik(p.instruktion);
@@ -486,7 +549,9 @@ export function skapaSpel(d) {
   async function krukor(p) {
     const k = skapaKrukor(p);
     rum.frys(false);
-    const bas = rum.objekt.find((o) => /kruk/.test(o.id))?.id ?? '';
+    // kartan säger vilket föremål som är krukorna (visar: pusslets id)
+    const bas = visarFor(p.id)?.id ?? rum.objekt.find((o) => o.sort === 'sak')?.id ?? '';
+    if (!visarFor(p.id)) logg.handelse('FEL', `ingen karta visar ${p.id}, krukorna hamnar vid ${bas}`);
     const ids = rum.dela(bas, k.s.antal);
     visaEtiketter();
     const knuff = knuffKlocka(p.knuff, () => { const i = k.s.slagna.findIndex((x) => x === null); if (i >= 0) rum.markera(ids[i], true); });
@@ -507,7 +572,7 @@ export function skapaSpel(d) {
   /** Lappen (läsplattan utan pussel): visas, nosen tillåten, stängs med ▶. @param {any} p @param {boolean} forsta */
   async function visaLapp(p, forsta) {
     if (!p) return;
-    const niva = lasmotor.niva('L', p.typ);
+    const niva = lasniva(p.typ);
     const v = skapaValj(p, { niva });
     rum.frys(true);
     const el = ui.visaPlatta(`<div class="pussel-ruta"><div class="lapp p-${ui.esc(p.papper || 'lapp')}">${ui.rader(v.s.text || '', varden())}</div><button type="button" class="vidare synlig" aria-label="Stäng">▶</button></div>`, 'pussel lapp-vy');
@@ -517,6 +582,19 @@ export function skapaSpel(d) {
     ui.doljPlatta(); if (!forsta) rum.frys(false);
     ui.uppdateraHud(av);
   }
+  // Bärräknaren matar ungen: ett bär flyger till ungen, ungen hoppar och låter glad, räknaren går ned.
+  // Vid 0 bär rycker ungen på axlarna, utan straff. Bara när världen går (inte med läsplattan öppen).
+  ui.$('#hud-bar').addEventListener('click', () => {
+    if (!b || !ui.plattan.hidden || rum.fryst || !rum.harRum || !rum.unge.visible || pausad) return;
+    if (av.bar <= 0) { rum.ungeReagerar(false); ljud.spela('klick'); logg.handelse('bär', 'tom påse'); return; }
+    av.bar--; ui.uppdateraHud(av); spara();
+    logg.handelse('bär', 'ungen äter', { kvar: av.bar });
+    const fran = ui.$('#hud-bar').getBoundingClientRect();
+    const u = rum.ungePunkt, till = rumTillSkarm(layout.skala, u.x, u.y);
+    ui.flygBar({ x: fran.left + fran.width / 2, y: fran.top + fran.height / 2 }, till, tid(450)).then(() => {
+      rum.ungeReagerar(true); ljud.spela('unge');
+    });
+  });
   ui.$('#hud-lapp').addEventListener('click', () => {
     if (!ui.plattan.hidden) return;
     const id = av.lappar[av.lappar.length - 1];
@@ -672,13 +750,16 @@ export function skapaSpel(d) {
   meny.addEventListener('pointercancel', slapp);
   meny.addEventListener('contextmenu', (e) => e.preventDefault());
   window.addEventListener('keydown', (e) => { if (e.ctrlKey && e.shiftKey && e.code === 'KeyM') { e.preventDefault(); oppnaMeny(); } });
+  function stangMeny() { ui.doljMeny(); fortsatt('meny'); }
+  // Escape stänger menyn (en väg ut, även med tangentbord)
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !ui.$('#vuxenmeny').hidden) { e.preventDefault(); stangMeny(); } });
   function oppnaMeny() {
-    rost.tyst();
+    pausa('meny');
     const niva = lasmotor.niva('L', 'P1_las_och_valj');
     const scener = !b ? '' : b.kapitel.scener.map((/** @type {any} */ s, i) => `<button type="button" class="menyval scen ${i === b.scenIndex ? 'nu' : ''}" data-i="${i}">${i + 1}. ${ui.esc(s.id)} <small>(pass ${s.pass})</small></button>`).join('');
     const s = ui.visaMeny(`<div class="meny vuxen"><h2>Gråboxen <small>${ui.esc(String(d.version))}</small></h2>
       <div class="menygrupp"><b>Läsnivå (läs och välj):</b> ${[1, 2, 3, 4].map((n) => `<button type="button" class="menyval niva ${n === niva ? 'nu' : ''}" data-n="${n}">L${n}</button>`).join('')}</div>
-      <div class="menygrupp"><label><input type="checkbox" class="foralder" ${inst.foralderLaserFarfar ? 'checked' : ''}> Föräldern läser Farfars repliker</label>
+      <div class="menygrupp"><label><input type="checkbox" class="foralder" ${inst.foralderLaserFarfar ? 'checked' : ''}> Föräldern läser ${ui.esc(Object.values(aventyr.talare).filter((/** @type {any} */ t) => t.rost === 'foraldern_eller_datorrost').map((/** @type {any} */ t) => t.namn).join(' och ') || 'rollernas')} repliker</label>
       <label><input type="checkbox" class="etiketter" ${inst.etiketter ? 'checked' : ''}> Visa objektens namn</label></div>
       <div class="menygrupp scenlista"><b>Hoppa till scen:</b>${scener}</div>
       <div class="menygrupp"><button type="button" class="menyval logg">Spara loggen</button><button type="button" class="menyval nollstall">Börja om från början</button><button type="button" class="menyval stang">Stäng</button></div></div>`);
@@ -693,7 +774,7 @@ export function skapaSpel(d) {
     }));
     s.querySelector('.logg')?.addEventListener('click', () => d.exporteraLogg());
     s.querySelector('.nollstall')?.addEventListener('click', () => { sparning.nollstall(); location.reload(); });
-    s.querySelector('.stang')?.addEventListener('click', () => ui.doljMeny());
+    s.querySelector('.stang')?.addEventListener('click', stangMeny);
   }
 
   return {
@@ -701,6 +782,8 @@ export function skapaSpel(d) {
     /** För testerna. */
     get scen() { return b?.scen?.id ?? null; },
     get steg() { return aktuelltSteg; },
+    get pausad() { return pausad; },
+    get stegIndex() { return b?.stegIndex ?? null; },
     lasmotor,
   };
 }

@@ -54,8 +54,32 @@ async function anvand(page, id, satt) {
 }
 
 /** Spela tills slutskärmen syns. felFor = pussel-id där ett fel svar ska väljas först. */
-async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid = null, satt = 'mellanslag' } = {}) {
+/** Öppna menyn för vuxna över det som visas: spelet ska stå still, och Escape tar en ut igen. */
+async function menyOchTillbaka(page, var_) {
+  await page.keyboard.press('Control+Shift+KeyM');
+  await expect(page.locator('#vuxenmeny .meny'), `menyn öppnas inte i ${var_}`).toBeVisible();
+  expect(await page.evaluate(() => window.__ORDSTAVEN.pausad()), `spelet står inte still i ${var_}`).toBe(true);
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#vuxenmeny')).toBeHidden();
+  expect(await page.evaluate(() => window.__ORDSTAVEN.pausad())).toBe(false);
+}
+
+/** Stäng fliken mitt i en scen och öppna igen: spelet ska fortsätta i samma scen och på samma steg. */
+async function stangOchOppna(page) {
+  const fore = await page.evaluate(() => ({ scen: window.__ORDSTAVEN.scen(), steg: window.__ORDSTAVEN.stegIndex() }));
+  await page.goto('./?snabb');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  const efter = await page.evaluate(() => ({ scen: window.__ORDSTAVEN.scen(), steg: window.__ORDSTAVEN.stegIndex() }));
+  expect(efter.scen).toBe(fore.scen);
+  expect([fore.steg, -1]).toContain(efter.steg); // -1 = "Var var vi?" först
+  return fore;
+}
+
+async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid = null, satt = 'mellanslag', stangI = new Set() } = {}) {
   const sett = new Set();
+  const lagerSett = new Set();
+  const stangda = new Set();
   const sparadeDumpar = new Set();
   const oppnade = new Set();
   for (let varv = 0; varv < 400; varv++) {
@@ -89,6 +113,13 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
       expect(utanfor, `läsplattan går utanför skärmen i ${nyckel}`).toBeNull();
     }
     if (lage.start) { await page.click('.start-knapp'); continue; }
+    // stäng fliken mitt i scenen (inte på första steget) en gång per utvald scen
+    if (stangI.has(lage.scen) && !stangda.has(lage.scen) && (await page.evaluate(() => window.__ORDSTAVEN.stegIndex())) > 0) {
+      stangda.add(lage.scen); await stangOchOppna(page); continue;
+    }
+    // varje sorts lager: menyn går att öppna över det, och det finns en väg ut
+    const lager = lage.replik ? 'replik' : lage.kort ? 'kort' : lage.formel ? 'formel' : lage.dop ? 'dop' : lage.bok ? 'bok' : lage.lapp ? 'lapp' : lage.passSlut ? 'passSlut' : lage.hjalte ? 'hjalte' : lage.typ === 'ga_till' ? 'rummet' : null;
+    if (lager && !lagerSett.has(lager)) { lagerSett.add(lager); await menyOchTillbaka(page, `${lage.scen} (${lager})`); }
     if (lage.passSlut) { await page.click('.pass-slut .fortsatt'); continue; }
     if (lage.replik) { await page.click('#plattan .replik-ruta'); continue; }
     if (lage.hjalte) { await page.click('.hjalte-ruta .farg >> nth=1'); await page.click('.hjalte-ruta .klar'); continue; }
@@ -99,6 +130,8 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
     if (lage.formel) { await draFormel(page, pussel.get(lage.pusselId).svar.replace(/ /g, ''), dumpa); continue; }
     if (lage.kort) {
       const p = pussel.get(lage.pusselId); const ratt = rattaId(p);
+      // på läsplattan glimtar inget i rummet
+      expect(await page.evaluate(() => window.__ORDSTAVEN.interaktiva())).toEqual([]);
       const ids = await page.$$eval('#plattan .kort:not(.vald)', (els) => els.map((e) => e.dataset.id));
       if (felFor.has(p.id)) { felFor.delete(p.id); const fel = ids.find((i) => !ratt.has(i)); if (fel) { await page.click(`#plattan .kort[data-id="${fel}"]`); await page.waitForTimeout(300); continue; } }
       const valj = ids.find((i) => ratt.has(i));
@@ -135,6 +168,9 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
       if (fel) felFor.delete(p.id);
       oppnade.add(`${p.id}/${a.id}`);
       await expect(page.locator('#tanke')).toBeVisible();
+      // glimten avslöjar aldrig svaret: alla lådor som är kvar glimtar lika
+      const glimtar = await page.evaluate(() => window.__ORDSTAVEN.interaktiva());
+      expect([...glimtar].sort()).toEqual(alla.map((x) => x.objekt).filter((o) => o).sort());
       const pt = await page.evaluate((m) => window.__ORDSTAVEN.objekt(m), a.objekt);
       const skymd = await page.evaluate((q) => {
         for (const s of ['#plattan', '#tanke', '#skarm:not(.genomskinlig)']) {
@@ -181,14 +217,14 @@ test.describe('genomspelning av prologen', () => {
     const dumpa = info.project.name === 'mac-helskarm';
     // pass 1 och en bit in i pass 2, med fel svar på FILT och dörrarna
     const satt = { 'mac-helskarm': 'mellanslag', 'ipad-10': 'igen', 'mac-safari': 'hand' }[info.project.name];
-    await spelaProlog(page, { dumpa, satt, felFor: new Set(['p0_filt', 'p0_dorrar']), stoppVid: 's09_lappen' });
+    await spelaProlog(page, { dumpa, satt, felFor: new Set(['p0_filt', 'p0_dorrar']), stoppVid: 's09_lappen', stangI: new Set(['s04_agget']) });
     // starta om (utan ?ny): spelet ska fortsätta där det var, med Farfars "Var var vi?"
     await page.goto('./?snabb');
     await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
     const omstartRepliker = [];
     page.on('console', () => {});
     const samla = setInterval(async () => { try { const t = await page.$eval('#plattan .replik-ruta .text', (e) => e.textContent); if (t) omstartRepliker.push(t); } catch (e) { /* ingen replik just nu */ } }, 50);
-    const sett = await spelaProlog(page, { dumpa, satt, felFor: new Set(['p0_packlista']) });
+    const sett = await spelaProlog(page, { dumpa, satt, felFor: new Set(['p0_packlista']), stangI: new Set(['s12_pasarna', 's21_uppdraget']) });
     clearInterval(samla);
     expect([...sett].filter(Boolean)[0]).toBe('s09_lappen');
     expect(omstartRepliker.some((t) => /VAR VAR VI/.test(t))).toBe(true);

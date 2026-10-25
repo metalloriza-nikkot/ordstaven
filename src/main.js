@@ -5,12 +5,15 @@ import '@fontsource/andika/latin-700.css';
 import './stil.css';
 import Phaser from 'phaser';
 
-import aventyr from '../content/den-gomda-dalen/aventyr.json';
-import kap00 from '../content/den-gomda-dalen/kap-00.json';
-import kap01 from '../content/den-gomda-dalen/kap-01.json';
 import ordlistor from '../content/ordlistor.json';
-// Tiled-kartorna, en per rum (kartor/<äventyr>/<rum>.tmj)
-const kartfiler = import.meta.glob('../kartor/den-gomda-dalen/*.tmj', { query: '?raw', import: 'default', eager: true });
+
+// Äventyren: en mapp per äventyr i content/ (aventyr.json + kap-NN.json) och kartor/ (Tiled-kartor, platshållare).
+// Koden vet inget om ett visst äventyr. Med flera äventyr väljs ett med ?aventyr=<id>, annars det första.
+const aventyrsfiler = import.meta.glob('../content/*/aventyr.json', { import: 'default', eager: true });
+const kapitelfiler = import.meta.glob('../content/*/kap-*.json', { import: 'default', eager: true });
+const kartfiler = import.meta.glob('../kartor/*/*.tmj', { query: '?raw', import: 'default', eager: true });
+const platshallarfiler = import.meta.glob('../kartor/*/platshallare.json', { import: 'default', eager: true });
+const mappAv = (/** @type {string} */ fil) => fil.split('/').at(-2);
 
 import { skapaLogg } from './karna/logg.js';
 import { skapaSparning } from './karna/sparning.js';
@@ -32,6 +35,10 @@ import { skapaSpel } from './spel.js';
 
 const VERSION = __VERSION__;
 const parametrar = new URLSearchParams(location.search);
+const allaAventyr = Object.entries(aventyrsfiler).map(([fil, a]) => ({ mapp: mappAv(fil), data: /** @type {any} */ (a) })).sort((x, y) => x.mapp.localeCompare(y.mapp));
+const valt = allaAventyr.find((a) => a.data.id === parametrar.get('aventyr')) ?? allaAventyr[0];
+const aventyr = valt.data;
+const kapitel = Object.entries(kapitelfiler).filter(([fil]) => mappAv(fil) === valt.mapp).map(([, k]) => /** @type {any} */ (k));
 /** Testläge: ingen röst, korta pauser. */
 const snabb = parametrar.has('snabb');
 const pek = window.matchMedia('(pointer: coarse)');
@@ -57,8 +64,9 @@ kopplaInmatning({ inmatning, layout, yta: /** @type {HTMLElement} */ (document.g
 const rost = skapaRost({ logg, tyst: () => snabb });
 const ljud = skapaLjud({ tyst: () => snabb });
 const ui = skapaUi({ ordlistor, rost, ljud, logg });
-const bilder = skapaBilder(ordlistor);
-inmatning.lyssna(ui.handling);
+const platshallare = /** @type {any} */ (Object.entries(platshallarfiler).find(([fil]) => mappAv(fil) === valt.mapp)?.[1])?.bilder ?? {};
+const bilder = skapaBilder(ordlistor, platshallare);
+inmatning.lyssna((h) => { if (!spelet?.pausad) ui.handling(h); });
 // Skärmtangentbordet skickar sina tryck genom inmatningslagret, som det fysiska tangentbordet.
 const tangentbord = skapaTangentbord({
   rot: document.body,
@@ -105,10 +113,11 @@ const uppdatering = startaUppdatering({ logg, arStartlage: () => startlage });
 begarBestandigLagring().then((ok) => logg.handelse('lagring', ok ? 'beständig' : 'inte beständig'));
 
 /** @type {Record<string, import('./karna/karta.js').Karta>} */
-const kartor = Object.fromEntries(Object.entries(kartfiler).map(([fil, text]) => [fil.replace(/^.*\/|\.tmj$/g, ''), lasKarta(JSON.parse(/** @type {string} */ (text)))]));
+const kartor = Object.fromEntries(Object.entries(kartfiler).filter(([fil]) => mappAv(fil) === valt.mapp)
+  .map(([fil, text]) => [fil.replace(/^.*\/|\.tmj$/g, ''), lasKarta(JSON.parse(/** @type {string} */ (text)))]));
 
 const spelet = skapaSpel({
-  aventyr, kartor, kapitel: [kap00, kap01], ordlistor, tillstand, sparning, logg, rost, ljud, ui, rum, layout, inmatning, tangentbord, bilder,
+  aventyr, kartor, kapitel, ordlistor, tillstand, sparning, logg, rost, ljud, ui, rum, layout, inmatning, tangentbord, bilder,
   snabb, pek: () => pek.matches, version: VERSION, exporteraLogg: () => exportera(logg),
   uppdatering: { tillampa: () => { uppdatering.tillampa(); startlage = false; } },
 });
@@ -125,6 +134,8 @@ const spelet = skapaSpel({
   /** Skärmpunkt mitt på ett objekt i rummet (för att trycka på det). @param {string} id */
   objekt: (id) => { const o = rum.ruta(id); if (!o) return null; const s = layout.skala; return { x: s.vanster + (o.x + o.b / 2) * s.cssSkala, y: s.topp + (o.y + o.h / 2) * s.cssSkala }; },
   rumsobjekt: () => rum.objekt.map((o) => o.id),
+  pausad: () => spelet.pausad,
+  stegIndex: () => spelet.stegIndex,
   /** Föremålets sort (utgang, sak, figur). @param {string} id */
   sort: (id) => rum.ruta(id)?.sort ?? null,
   /** Föremålen som går att använda just nu. */

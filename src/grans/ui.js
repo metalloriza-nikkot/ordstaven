@@ -25,6 +25,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     <button type="button" id="hud-meny" aria-label="Meny för vuxna (håll inne)">⚙</button>
     <div id="tanke" hidden></div>
     <div id="ordskylt" hidden></div>
+    <div id="styrhjalp" hidden></div>
     <div id="handknapp" hidden><button type="button" aria-label="Använd">✋</button></div>
     <div id="regi" hidden></div>
     <div id="narbild" hidden><span>🗺️</span></div>
@@ -218,7 +219,35 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     if (plats && punkt.y - hand.offsetHeight - 6 < plats.rumTopp) { hand.classList.add('under'); hand.style.top = plats.under + 'px'; }
   }
 
+  /** Ett bär flyger från räknaren till ungen. @param {{ x: number, y: number }} fran @param {{ x: number, y: number }} till @param {number} ms */
+  function flygBar(fran, till, ms) {
+    const e = document.createElement('div');
+    e.className = 'flygande-bar'; e.textContent = '🫐';
+    ui.appendChild(e);
+    const mitt = { x: (fran.x + till.x) / 2, y: Math.min(fran.y, till.y) - 60 };
+    const anim = e.animate([
+      { transform: `translate(${fran.x}px, ${fran.y}px) scale(1)` },
+      { transform: `translate(${mitt.x}px, ${mitt.y}px) scale(1.2)`, offset: 0.5 },
+      { transform: `translate(${till.x}px, ${till.y}px) scale(.6)` },
+    ], { duration: Math.max(1, ms), easing: 'ease-in-out', fill: 'forwards' });
+    return new Promise((r) => { const klar = () => { e.remove(); r(undefined); }; anim.onfinish = klar; setTimeout(klar, ms + 300); });
+  }
+
+  /**
+   * Styrhjälpen, utan text: piltangenter (dator) eller ett finger som trycker på målet (pekskärm). null döljer.
+   * @param {'pilar' | 'tryck' | null} typ @param {{ x: number, y: number } | null} [punkt] målet på skärmen
+   */
+  function styrhjalp(typ, punkt) {
+    const e = $('#styrhjalp');
+    e.hidden = !typ; e.className = typ || '';
+    if (typ === 'pilar') e.innerHTML = '<span class="tangent upp">▲</span><span class="tangent vanster">◀</span><span class="tangent ner">▼</span><span class="tangent hoger">▶</span>';
+    else if (typ === 'tryck' && punkt) { e.innerHTML = '<span class="finger">👆</span>'; e.style.left = punkt.x + 'px'; e.style.top = punkt.y + 'px'; }
+    else e.innerHTML = '';
+  }
+
   return {
+    styrhjalp,
+    flygBar,
     handknapp,
     visaTanke, pulseraTanke, ordskylt,
     ui, $, plattan, rader, esc, visaPlatta, doljPlatta, vantaFortsatt, visaRegi, doljRegi, visaFest,

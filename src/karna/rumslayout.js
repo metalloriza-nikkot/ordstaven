@@ -8,12 +8,11 @@ const FIGUR_HOJD = 24;
 
 /**
  * @typedef {{ id: string, x: number, y: number, b: number, h: number, sort: 'utgang' | 'sak' | 'figur',
- *             till?: string, sida?: 'under' | 'over' | 'vanster' | 'hoger', golv?: boolean }} Objekt
+ *             till?: string, sida?: 'under' | 'over' | 'vanster' | 'hoger', golv?: boolean, visar?: string }} Objekt
  * till = rummet en utgång leder till, sida = var hjälten ställer sig, golv = man går på det (stig, grind).
  */
 
 const UTGANG = /^(stege_|dorr_|grind|stig_)/;
-const FIGUR = /^(farfar|apan|klaffen)/;
 
 /**
  * @param {string[]} innehall objektens id:n
@@ -47,8 +46,8 @@ export function placeraObjekt(innehall) {
   const steg = (x1 - x0) / kolumner;
   saker.forEach((id, i) => {
     const k = i % kolumner, r = Math.floor(i / kolumner);
-    const b = FIGUR.test(id) ? 16 : 28, h = FIGUR.test(id) ? 24 : 20;
-    ut.push({ id, x: Math.round(x0 + k * steg + (steg - b) / 2), y: y0 + r * 44, b, h, sort: FIGUR.test(id) ? 'figur' : 'sak' });
+    const b = 28, h = 20;
+    ut.push({ id, x: Math.round(x0 + k * steg + (steg - b) / 2), y: y0 + r * 44, b, h, sort: 'sak' });
   });
   return ut;
 }

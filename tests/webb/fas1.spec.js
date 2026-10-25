@@ -16,13 +16,14 @@ async function starta(page, sok = '?snabb') {
 }
 
 /** Gå direkt till en scen i prologen (via sparningen) och tryck förbi startskärmen och replikerna. */
-async function tillScen(page, index) {
+async function tillScen(page, index, extra = {}) {
   await starta(page, '?snabb&ny');
-  await page.evaluate((i) => {
+  await page.evaluate(([i, x]) => {
     const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
-    av.scen = i; delete av.scenId; av.startad = false; av.ungen.namn = 'KNOPP';
+    av.scen = i; delete av.scenId; delete av.steg; av.startad = false; av.ungen.namn = 'KNOPP';
+    Object.assign(av, x.av || {}); av.ui = { ...av.ui, ...(x.ui || {}) };
     localStorage.setItem('ordstaven_spar', JSON.stringify(t));
-  }, index);
+  }, [index, extra]);
   await starta(page);
   await page.click('.start-knapp');
   for (let k = 0; k < 6; k++) {
@@ -90,11 +91,15 @@ test('tryck på ett föremål: hjälten går dit, handen visas, och först ett t
   await tillScen(page, 2);
   const pt = await page.evaluate(() => window.__ORDSTAVEN.objekt('lada_med_stav'));
   const tryck = () => (info.project.use.hasTouch ? page.touchscreen.tap(pt.x, pt.y) : page.mouse.click(pt.x, pt.y));
+  // styrhjälpen visar hur man går på just den här enheten
+  await expect(page.locator(info.project.use.hasTouch ? '#styrhjalp.tryck' : '#styrhjalp.pilar')).toBeVisible();
+  await page.screenshot({ path: `tests/skarmdumpar/styrhjalp-${info.project.name}.png` });
   // på avstånd glimtar det som går att använda
   expect(await page.evaluate(() => window.__ORDSTAVEN.interaktiva())).toContain('lada_med_stav');
   await expect(page.locator('#handknapp')).toBeHidden();
   await tryck();
   await expect(page.locator('#handknapp')).toBeVisible({ timeout: 30000 });
+  await expect(page.locator('#styrhjalp')).toBeHidden(); // försvinner när hjälten går
   // att stå vid lådan räcker inte
   await page.waitForTimeout(500);
   expect(await page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('s02_glimten');
@@ -187,4 +192,18 @@ test('skrivläget på pekskärm: tangentbordet kommer fram och rummet krymper', 
   await page.locator('.tb-klar').dispatchEvent('pointerdown');
   await expect(page.locator('#tangentbord')).toBeHidden();
   await page.screenshot({ path: `tests/skarmdumpar/skrivlage-${info.project.name}.png` });
+});
+
+test('bärräknaren matar ungen, och vid 0 bär rycker ungen på axlarna', async ({ page }, info) => {
+  test.setTimeout(60000);
+  await tillScen(page, 2, { av: { bar: 1 }, ui: { barraknaren: true } });
+  const bar = page.locator('#hud-bar');
+  await expect(bar).toBeVisible();
+  await expect(bar.locator('.tal')).toHaveText('1');
+  if (info.project.use.hasTouch) await bar.tap(); else await bar.click();
+  await expect(bar.locator('.tal')).toHaveText('0');
+  await expect(page.locator('.flygande-bar')).toHaveCount(0, { timeout: 3000 });
+  if (info.project.use.hasTouch) await bar.tap(); else await bar.click();
+  await expect(bar.locator('.tal')).toHaveText('0');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.tillstand().aventyr['den-gomda-dalen'].bar)).toBe(0);
 });

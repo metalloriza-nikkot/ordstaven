@@ -43,6 +43,10 @@ export class Rum extends Phaser.Scene {
     /** @type {{ ids: string[], klar: (id: string) => void } | null} */
     this.vantar = null;
     this.markerade = new Set();
+    /** @type {Record<string, { farg: number | null, storlek: string | null }[]>} föremål som visar ett pussels alternativ */
+    this.delar = {};
+    /** @type {Map<string, any[]>} */
+    this.ritadeDelar = new Map();
     /** @type {((id: string) => void) | null} anropas när spelaren trycker på föremålet hjälten står vid */
     this.tryckPa = null;
     /** @type {string[]} föremål som går att använda just nu */
@@ -122,7 +126,8 @@ export class Rum extends Phaser.Scene {
   /**
    * Visa ett rum (eller inget rum, för scener utan rum).
    * @param {{ rum: string | null, tillstand: string | null, innehall: (string | { id: string, syns_i?: string[] })[], unge: boolean, nyttRum: boolean,
-   *           karta?: import('../karna/karta.js').Karta | null, franRum?: string | null }} v
+   *           karta?: import('../karna/karta.js').Karta | null, franRum?: string | null,
+   *           delar?: Record<string, { farg: number | null, storlek: string | null }[]> }} v
    */
   visa(v) {
     this.harRum = !!v.rum;
@@ -135,7 +140,8 @@ export class Rum extends Phaser.Scene {
     this.synliga = synliga;
     if (v.nyttRum || !this.harRum || andrat) {
       this.objekt = this.harRum ? rumsObjekt(v.innehall, v.tillstand, v.karta) : [];
-      this.lagerObjekt.removeAll(true); this.ritade.clear(); this.markerade.clear();
+      this.lagerObjekt.removeAll(true); this.ritade.clear(); this.markerade.clear(); this.ritadeDelar.clear();
+      this.delar = { ...(v.delar || {}) };
       for (const o of this.objekt) this.ritaObjekt(o);
       this.byggHinder();
       this.sattInteraktiva(this.interaktiva.filter((id) => this.ruta(id))); this.nara(null);
@@ -183,9 +189,35 @@ export class Rum extends Phaser.Scene {
   /** @param {import('../karna/rumslayout.js').Objekt} o */
   ritaObjekt(o) {
     const fyll = o.sort === 'utgang' ? FARG.utgang : o.sort === 'figur' ? FARG.figur : FARG.sak;
-    const r = this.add.rectangle(o.x, o.y, o.b, o.h, fyll).setOrigin(0, 0).setStrokeStyle(1, FARG.sakKant);
+    const delar = this.delar[o.id];
+    const r = this.add.rectangle(o.x, o.y, o.b, o.h, fyll, delar ? 0 : 1).setOrigin(0, 0).setStrokeStyle(1, FARG.sakKant, delar ? 0 : 1);
     this.lagerObjekt.add(r);
     this.ritade.set(o.id, r);
+    this.ritadeDelar.get(o.id)?.forEach((x) => x.destroy());
+    this.ritadeDelar.delete(o.id);
+    if (!delar) return;
+    // föremålet visar ett pussels alternativ (lådorna): i samma färg och storlek som texten säger
+    const n = delar.length, steg = o.b / n, bas = Math.min(steg - 3, o.h);
+    const ritade = delar.map((d, i) => {
+      const k = d.storlek === 'stor' ? 1 : d.storlek === 'liten' ? 0.55 : 0.8;
+      const b = Math.round(bas * k), h = Math.round(o.h * k);
+      const x = Math.round(o.x + i * steg + (steg - b) / 2), y = o.y + o.h - h;
+      const ruta = this.add.rectangle(x, y, b, h, d.farg ?? FARG.sak).setOrigin(0, 0).setStrokeStyle(1, 0x2b2420);
+      this.lagerObjekt.add(ruta);
+      return ruta;
+    });
+    this.ritadeDelar.set(o.id, ritade);
+  }
+
+  /**
+   * Visa ett pussels alternativ i föremålet (t.ex. lådorna i den variant spelaren har). null = som vanligt.
+   * @param {string} id @param {{ farg: number | null, storlek: string | null }[] | null} delar
+   */
+  visaDelar(id, delar) {
+    const o = this.ruta(id); if (!o) return;
+    if (delar) this.delar[id] = delar; else delete this.delar[id];
+    this.ritade.get(id)?.destroy();
+    this.ritaObjekt(o);
   }
 
   ritaLjus() {
@@ -240,6 +272,24 @@ export class Rum extends Phaser.Scene {
     this.b.vidAndring?.();
     return nya;
   }
+
+  /** Ett föremål hoppar till (det låter därifrån, t.ex. ägglådan som dunkar). @param {string} id */
+  hoppa(id) {
+    const r = this.ritade.get(id); if (!r) return;
+    const y = r.y;
+    this.tweens.add({ targets: r, y: y - 4, duration: 90, yoyo: true, repeat: 1, onComplete: () => { r.y = y; } });
+  }
+
+  /** Ungen hoppar av glädje (glad = true) eller rycker på axlarna (glad = false). @param {boolean} glad */
+  ungeReagerar(glad) {
+    const u = this.unge; if (!u.visible) return;
+    const y = u.y, x = u.x;
+    if (glad) this.tweens.add({ targets: u, y: y - 8, duration: 140, yoyo: true, repeat: 1, ease: 'Quad.easeOut', onComplete: () => { u.y = y; } });
+    else this.tweens.add({ targets: u, x: x + 2, duration: 70, yoyo: true, repeat: 2, onComplete: () => { u.x = x; } });
+  }
+
+  /** Ungens position på skärmen i rumspixlar (för att låta ett bär flyga dit). */
+  get ungePunkt() { return { x: this.ungePos.x, y: this.ungePos.y - 6 }; }
 
   /** Visa att ett föremål är öppnat och tomt. @param {string} id */
   tomt(id) { const r = this.ritade.get(id); if (r) { r.setFillStyle(0x6f6a62); r.setAlpha(0.6); } this.markera(id, false); }
