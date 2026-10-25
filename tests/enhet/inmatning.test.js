@@ -60,3 +60,11 @@ describe('rörelse', () => {
     expect(p.x).toBeLessThanOrEqual(100 + FIGUR.fart * 0.1 + 1e-9);
   });
 });
+
+describe('nosen och bokstäverna', () => {
+  it('N är en bokstav, nosen ligger på Tab', () => {
+    const i = skapaInmatning();
+    i.tangentNer('KeyN', 'n'); i.tangentNer('Tab', 'Tab');
+    expect(i.hamtaHandlingar()).toEqual([{ typ: 'bokstav', tecken: 'N' }, { typ: 'hjalp' }]);
+  });
+});

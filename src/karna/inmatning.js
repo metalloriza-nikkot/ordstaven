@@ -22,15 +22,23 @@ export function skapaInmatning() {
   let gaTill = null;
   /** @type {Handling[]} */
   let ko = [];
+  /** @type {Set<(h: Handling) => void>} */
+  const lyssnare = new Set();
+  /** @param {Handling} h */
+  const skicka = (h) => {
+    ko.push(h); if (ko.length > 50) ko.shift();
+    for (const f of lyssnare) { try { f(h); } catch (e) { /* en lyssnare får inte stoppa de andra */ } }
+  };
 
   return {
     /** @param {string} kod KeyboardEvent.code @param {string} [tecken] KeyboardEvent.key @returns {boolean} om tangenten användes */
     tangentNer(kod, tecken = '') {
       if (kod in RIKTNINGAR) { nere.add(kod); gaTill = null; return true; }
-      if (kod in KNAPPAR) { ko.push({ typ: KNAPPAR[/** @type {keyof KNAPPAR} */ (kod)] }); return true; }
-      if (kod === 'KeyN') { ko.push({ typ: 'hjalp' }); return true; }
+      if (kod in KNAPPAR) { skicka({ typ: KNAPPAR[/** @type {keyof KNAPPAR} */ (kod)] }); return true; }
+      // Nosen ligger på Tab, inte på en bokstav: alla bokstäver måste gå att skriva (N i ett namn).
+      if (kod === 'Tab') { skicka({ typ: 'hjalp' }); return true; }
       const t = tecken.toUpperCase();
-      if (BOKSTAV.test(t)) { ko.push({ typ: 'bokstav', tecken: t }); return true; }
+      if (BOKSTAV.test(t)) { skicka({ typ: 'bokstav', tecken: t }); return true; }
       return false;
     },
     /** @param {string} kod */
@@ -38,7 +46,11 @@ export function skapaInmatning() {
     /** Släpp allt (fönstret tappade fokus, appen gick i bakgrunden). */
     slappAllt() { nere.clear(); },
     /** Tryck eller klick på en punkt i rummet. @param {number} x @param {number} y */
-    tryck(x, y) { gaTill = { x, y }; ko.push({ typ: 'tryck', x, y }); },
+    tryck(x, y) { gaTill = { x, y }; skicka({ typ: 'tryck', x, y }); },
+    /** Sätt ett mål utan att skicka en handling (scenen styr om ett tryck till ett objekt). @param {number} x @param {number} y */
+    sattGaTill(x, y) { gaTill = { x, y }; },
+    /** Lyssna på alla handlingar. Returnerar en funktion som slutar lyssna. @param {(h: Handling) => void} f */
+    lyssna(f) { lyssnare.add(f); return () => lyssnare.delete(f); },
     /** Målet är nått eller avbrutet. */
     rensaGaTill() { gaTill = null; },
     /** Aktuell riktning från tangenterna, normaliserad (diagonal går lika fort). */

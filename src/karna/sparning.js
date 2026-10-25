@@ -83,6 +83,12 @@ export function skapaSparning({ lagring, spelversion, klocka = () => new Date(),
       try { lagring.setItem(NYCKEL, JSON.stringify(tillstand)); return true; }
       catch (e) { L('kunde inte spara (full lagring?)', String(e)); return false; }
     },
+    /** Börja om: sparningen läggs i backup (kan ångras), sedan tas den bort. */
+    nollstall() {
+      try { const nu = lagring.getItem(NYCKEL); if (nu) lagring.setItem(NYCKEL_BACKUP, JSON.stringify({ tid: klocka().toISOString(), tillstand: JSON.parse(nu) })); } catch (e) { /* ok */ }
+      try { lagring.removeItem(NYCKEL); } catch (e) { /* ok */ }
+      L('nollställd');
+    },
     /** Hela sparningen som text, för fil-export. @param {any} tillstand */
     tillText(tillstand) { return JSON.stringify(tillstand, null, 1); },
     /**
