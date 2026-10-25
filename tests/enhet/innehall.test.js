@@ -114,3 +114,52 @@ describe('läs i rummet, syns_i och kartor (format 2)', () => {
     expect(medFel(() => {}, karta([...hallen.slice(1), { ...hallen[0], till: 'kallaren' }]))).toMatch(/leder till kallaren/);
   });
 });
+
+import { PALETT, ljushet, egenskaper } from '../../src/karna/egenskaper.js';
+
+describe('bilden stämmer med texten', () => {
+  it('gråboxens färger skiljer sig i ljushet (minst 10 L* mellan alla par)', () => {
+    const e = Object.entries(PALETT);
+    for (const [a, x] of e) for (const [b, y] of e) if (a < b) expect(Math.abs(ljushet(x) - ljushet(y)), `${a}–${b}`).toBeGreaterThanOrEqual(10);
+  });
+  it('egenskaperna i ett bild-id läses ut', () => {
+    expect(egenskaper('lada_rod_stor')).toEqual({ farg: 'rod', storlek: 'stor' });
+    expect(egenskaper('liten_rod')).toEqual({ farg: 'rod', storlek: 'liten' });
+    expect(egenskaper('filt')).toEqual({ farg: null, storlek: null });
+  });
+  it('varje alternativ vars färg eller storlek läses i texten har den egenskapen i sitt id eller sin bild', () => {
+    const ORD = { röd: ['farg', 'rod'], röda: ['farg', 'rod'], blå: ['farg', 'bla'], gul: ['farg', 'gul'], gula: ['farg', 'gul'], stor: ['storlek', 'stor'], stora: ['storlek', 'stor'], stort: ['storlek', 'stor'], litet: ['storlek', 'liten'], liten: ['storlek', 'liten'], lilla: ['storlek', 'liten'] };
+    const d = riktigt();
+    for (const k of d.kapitel) for (const p of k.pussel) for (const [niva, v] of Object.entries(p.varianter || {})) {
+      // en rad i taget: egenskapen gäller saken på samma rad ("En röd filt."), eller alla rätta om de saknar ord
+      const har = (rad, o) => new RegExp(`(^|[^a-zåäö])${o}([^a-zåäö]|$)`).test(rad);
+      for (const rad of [v.text].flat().filter(Boolean).map((x) => x.toLocaleLowerCase('sv-SE'))) {
+        const lasta = Object.entries(ORD).filter(([o]) => har(rad, o));
+        const galler = v.alternativ.filter((a) => a.ratt && (!a.ord || har(rad, a.ord.toLocaleLowerCase('sv-SE'))));
+        for (const r of galler) for (const [, [slag, varde]] of lasta) {
+          expect(egenskaper(r.bild || r.id)[slag], `${k.id} ${p.id} ${niva}: ${r.id} syns inte som ${varde}`).toBe(varde);
+        }
+      }
+    }
+  });
+});
+
+describe('kontrollen: enhet, alias, nivåer', () => {
+  const medVarning = (andra) => { const d = riktigt(); andra(d.kapitel[0]); return kontrollera(d).varningar.join('\n'); };
+  const medFel = (andra) => { const d = riktigt(); andra(d.kapitel[0]); return kontrollera(d).fel.join('\n'); };
+  it('varnar för instruktioner som nämner en enhet', () => {
+    expect(medVarning((k) => { k.scener[2].steg[0].text = 'Använd piltangenterna.'; })).toMatch(/nämner en enhet \(piltangenterna\)/);
+    expect(medVarning((k) => { k.scener[2].steg[0].text = 'Klicka på lådan.'; })).toMatch(/nämner en enhet/);
+    expect(medVarning((k) => { k.scener[2].steg[0].text = 'Tryck på lådan.'; })).not.toMatch(/nämner en enhet/);
+  });
+  it('alias pekar på id:n som finns, och golvet ligger under taket', () => {
+    expect(medFel((k) => { k.alias = { scener: { s99_gammal: 's99_finnsinte' } }; })).toMatch(/pekar på s99_finnsinte/);
+    expect(medFel((k) => { k.alias = { scener: { s02_glimten: 's03_staven' } }; })).toMatch(/finns fortfarande/);
+    expect(medFel((k) => { k.alias = { scener: { s99_gammal: 's03_staven' } }; })).toBe('');
+    expect(medFel((k) => { k.nivaer = { lasning: ['L3', 'L1'] }; })).toMatch(/golvet L3/);
+  });
+  it('ljud från ett föremål: föremålet ska finnas i rummet', () => {
+    expect(medFel((k) => { k.scener.find((s) => s.id === 's04_agget').steg.unshift({ typ: 'ljud', id: 'dunk', foremal: 'lada_med_agg' }); })).toBe('');
+    expect(medFel((k) => { k.scener.find((s) => s.id === 's04_agget').steg.unshift({ typ: 'ljud', id: 'dunk', foremal: 'pianot' }); })).toMatch(/pianot finns inte/);
+  });
+});

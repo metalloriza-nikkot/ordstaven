@@ -1,6 +1,7 @@
 # Innehållsschema – kapitel i format 2
 
-Version 2.0 (2026-10-25). Ägs av teknikspåret.
+Version 2.1 (2026-10-25). Ägs av teknikspåret.
+2.1: `nivaer` och `alias` överst i kapitlet, steget `unge_folj`, `foremal` på `ljud`, `visar` i kartorna. Allt är tillägg, filer i 2.0 gäller fortfarande.
 2.0: kapitelfilerna har `"format": 2`. Packa heter `P28_packa` (P27 är Formelresan i pusselkatalogen). Nytt: `syns_i` på föremål, `i_rummet` på läs och välj, Tiled-kartor för rummen (avsnitt 3b).
 1.1: P27_packa, P15_raddning, P9_kodlas. Så skrivs berättelse, pussel och ordlistor som data.
 Schemafilerna finns i `content/schema/`. Kontrollen körs med `npm run kontroll` och i varje publicering.
@@ -44,6 +45,8 @@ Kapitelfilerna börjar med `"format": 2`, äventyret och ordlistorna med `"forma
 - **Scen:** `id`, `pass` (1, 2, 3 …), `rum` (eller `null` för scener utanför rummen), `tillstand`, `vy` (`uppifran`, `sidovy`, `narbild`), `vid_omstart` (en replik när spelet startar om här), `steg`.
 - **Scenerna spelas i ordning.** Ett `pussel`-steg väntar tills pusslet är löst. Det behövs alltså ingen `nasta_scen`.
 - `meta` och `anteckning` är fria fält för versionsnummer och noter. De påverkar inte spelet.
+- **`nivaer`** (frivilligt): golv och tak i kapitlet, `{ "lasning": ["L1", "L3"], "skrivning": ["S1", "S1"] }`. Anpassningen håller sig inom dem.
+- **`alias`** (frivilligt): id:n som har bytt namn, så att äldre sparningar hamnar rätt: `{ "scener": { "s10_ladorna": "s11_ladorna" }, "pussel": { … } }`. Bara för id:n som inte finns längre. En sparning i en scen som har tagits bort utan alias börjar i början av samma pass.
 
 ### Steg
 
@@ -51,7 +54,8 @@ Kapitelfilerna börjar med `"format": 2`, äventyret och ordlistorna med `"forma
 |---|---|---|
 | `replik` | `talare`, `text`, `upplast` | Någon säger något. Visas på läsplattan eller i en pratbubbla. |
 | `mellanscen` | `beskrivning`, `bild` | Något händer i bild. Gråboxen visar beskrivningen för den vuxne. |
-| `ljud` | `id` | Ett ljud spelas. |
+| `ljud` | `id`, `foremal` | Ett ljud spelas. Med `foremal` hoppar föremålet till i bild (ägglådan som dunkar). Samma `id` ger alltid samma ljud. |
+| `unge_folj` | `folj` | Ungen börjar (`true`) eller slutar (`false`) följa hjälten. |
 | `ga_till` | `mal`, `visa_styrhjalp`, `knuff` | Spelaren ska gå till ett objekt i rummet. |
 | `pussel` | `pussel_id` | Ett pussel startar. Scenen fortsätter när det är löst. |
 | `oppna_lasplatta` | `pussel_id` | Visar pusslets lästext utan att pusslet startar (farfars lapp). |
@@ -97,6 +101,7 @@ En **replik inuti något annat** (`knuff`, `vid_fel`, `instruktion`, `vid_omstar
 
 - Variant: `text` (lästexten) och/eller `bild` (det som ställer frågan, t.ex. en tankebubbla), och `alternativ` (2–5).
 - Alternativ: `id`, `ord` (etiketten spelaren läser, små bokstäver), `bild`, `ratt: true` på exakt ett, `vid_valj` för den roliga felreaktionen.
+- **Bilden stämmer med texten.** Nämner texten en färg eller storlek ska alternativets `bild` (eller `id`) säga den: `lada_rod_stor`, `filt_bla`, `liten_rod`. Färger: `rod`, `bla`, `gul`, `gron`, `vit`. Storlek: `stor`/`stort`, `liten`/`litet`. Ett test kontrollerar att det rätta alternativet har det texten säger.
 - `hjalp`: `"ett_ord"` (nosknappen) eller `null`.
 - **`i_rummet: true`** (läs i världen): alternativen ligger i föremål runt rummet i stället för kort på läsplattan. Varje alternativ har `objekt` (föremålets id i rummet) och `ord`. Frågan (`bild` eller `text`) syns uppe i rummet. När hjälten står vid föremålet syns ordet ovanför det, och spelaren trycker på ordet (eller på föremålet igen) för att öppna. Fel föremål ger sin `vid_valj` och blir tomt. Förenkling och att ungen pekar fungerar som vanligt.
 
@@ -138,6 +143,7 @@ Innehållet säger **vad** som finns i ett rum, kartan säger **var** det står.
 - Kartan är 20×12 rutor à 16 pixlar (320×192, ett rum).
 - Ett objektlager. Varje föremål är en rektangel där **namnet är föremålets id** i rummets `innehall`. Ingen text som spelaren ser.
 - **Typ** (klass): `utgang`, `sak` eller `figur`. Saknas den gissas den av id:t (`dorr_`, `stege_`, `grind`, `stig_` är utgångar).
+- **`visar`** = pusslet vars alternativ föremålet visar i rummet: lådorna i `p0_dinomat` ritas i den variant spelaren får, i rätt färg och storlek, och krukorna (P26) delas ut där `fem_krukor` står.
 - **Egenskaper:** `till` = rummet en utgång leder till (hjälten kommer in där när han kommer från det rummet), `sida` = var hjälten ställer sig (`under`, `over`, `vanster`, `hoger`, annars under), `golv` = man går på föremålet (stigar, grinden).
 - En **punkt** med namnet `start` är där hjälten står när han inte kommer genom en utgång (första gången, eller efter en omstart).
 - Saknas kartan placeras föremålen automatiskt i ett rutnät (kapitel 1 tills vidare).
@@ -159,7 +165,8 @@ Små bokstäver utom formler (`"LJUS"`). Flaggor: `aao`, `helord`, `sparrad`, `b
 - Text i versaler som inte är en formel. Platshållare i versaler (`{UNGE}`) eller okända platshållare.
 - Okänd talare, rum, objekt (`ga_till`), pussel eller tillstånd. Dubbla id:n, samma föremål två gånger i ett rum.
 - `syns_i` med ett tillstånd som rummet inte har. `i_rummet` där ett alternativ saknar `objekt` eller `ord`, eller där föremålet inte finns i rummet där pusslet spelas.
-- Kartor som inte stämmer med rummen (avsnitt 3b).
+- Kartor som inte stämmer med rummen (avsnitt 3b), och `visar` som pekar på ett pussel som inte finns.
+- `alias` som pekar på ett id som inte finns, eller ett gammalt id som finns kvar. `nivaer` där golvet ligger över taket. `ljud` med ett `foremal` som inte finns i rummet.
 - Läs och välj utan exakt ett rätt svar.
 - Förbjudna par på samma skärm (lås–läs, hår–här, bår–bär), och rätt svar och distraktor som bara skiljer sig på Å/Ä i L1–L3.
 - Spärrade ord (mjukt G/K, NG, SJ …) i text spelaren läser själv, även böjda former (berget, köket).
@@ -172,6 +179,7 @@ Små bokstäver utom formler (`"LJUS"`). Flaggor: `aao`, `helord`, `sparrad`, `b
 - Mer än 8 ord på en rad i text spelaren läser själv.
 - **Färre än två läsuppgifter som avgör något per pass.** Räknas: P1, P28, P15 (kategorin läses). Inte P9: kodlåset är avkodning med nyckel.
 - **Pass som uppskattas till mer än 10 minuter.** Uppskattningen: 1,5 s + 0,45 s per ord och replik, 40 s per pussel, 12 s per `ga_till`, 4 s per mellanscen, 6 s + uppläsning per bokuppslag.
+- **Instruktioner som nämner en enhet** (piltangent, tangentbord, mellanslag, mus, klicka, svep). Skriv "Gå till lådan" och "Tryck på …", som gäller både dator och iPad.
 - Pass som inte slutar med en sparpunkt, pussel som inte används, ord i alternativ som inte finns i ordlistorna, meningar som börjar med liten bokstav.
 
 Kontrollen skriver också ut varje pass med uppskattad tid och antal läsuppgifter.

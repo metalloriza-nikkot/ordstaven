@@ -52,6 +52,54 @@
       "items": {
         "$ref": "#/$defs/pussel"
       }
+    },
+    "nivaer": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Golv och tak för läsnivå och skrivnivå i kapitlet. Anpassningen håller sig inom dem.",
+      "properties": {
+        "lasning": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "$ref": "#/$defs/niva_l"
+          }
+        },
+        "skrivning": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "$ref": "#/$defs/niva_s"
+          }
+        }
+      }
+    },
+    "alias": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Gamla id:n som har bytt namn, så att äldre sparningar hamnar rätt: { \"gammalt_id\": \"nytt_id\" }.",
+      "properties": {
+        "scener": {
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/id"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "pussel": {
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/id"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/id"
+          }
+        }
+      }
     }
   },
   "$defs": {
@@ -363,6 +411,10 @@
             },
             "id": {
               "$ref": "#/$defs/id"
+            },
+            "foremal": {
+              "$ref": "#/$defs/id",
+              "description": "Föremålet i rummet som låter (det hoppar till i bild)."
             }
           }
         },
@@ -637,6 +689,23 @@
               "items": {
                 "$ref": "#/$defs/id"
               }
+            }
+          }
+        },
+        {
+          "description": "Ungen börjar (folj: true) eller slutar (folj: false) följa hjälten.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "typ",
+            "folj"
+          ],
+          "properties": {
+            "typ": {
+              "const": "unge_folj"
+            },
+            "folj": {
+              "type": "boolean"
             }
           }
         }

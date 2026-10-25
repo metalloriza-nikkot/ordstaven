@@ -61,6 +61,9 @@ function versalord(rad, formler) {
   return ord(rad).filter((o) => o.length >= 2 && o === versaler(o) && !formler.has(o));
 }
 
+/** Ord som bara gäller en enhet (dator eller pekskärm). "Tryck på …" är okej, det gäller båda. */
+const ENHETSORD = /\b(piltangent\w*|tangentbord\w*|mellanslag\w*|musen|mus|musknapp\w*|klick\w*|klicka\w*|swipe\w*|svep\w*)\b/i;
+
 /** Objektets id i rummets innehåll (ett id eller { id, syns_i }). */
 const objId = (x) => (typeof x === 'string' ? x : x.id);
 
@@ -81,6 +84,7 @@ function kontrolleraKartor(k, kartor, fel, varningar) {
       if (!ids.includes(o.id)) fel.push(`kartan ${r.id}: ${o.id} finns inte i rummets innehåll`);
       if (o.x < 0 || o.y < 0 || o.x + o.b > 320 || o.y + o.h > 192) fel.push(`kartan ${r.id}: ${o.id} går utanför rummet`);
       if (o.till && !allaRum.has(o.till)) fel.push(`kartan ${r.id}: ${o.id} leder till ${o.till}, som inte finns i ${k.id}`);
+      if (o.visar && !k.pussel.some((p) => p.id === o.visar)) fel.push(`kartan ${r.id}: ${o.id} visar ${o.visar}, som inte finns i ${k.id}`);
     }
   }
 }
@@ -156,6 +160,20 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
     }
     if (kartor) kontrolleraKartor(k, kartor, fel, varningar);
 
+    // Golv och tak: golvet får inte ligga över taket
+    for (const [slag, par] of Object.entries(k.nivaer || {})) {
+      const [g, t] = par.map((x) => Number(x.slice(1)));
+      if (g > t) fel.push(var_(`nivaer.${slag}: golvet ${par[0]} ligger över taket ${par[1]}`));
+    }
+    // Alias: gamla id pekar på id:n som finns, och ett gammalt id får inte finnas kvar
+    const scenIds = new Set(k.scener.map((x) => x.id)), pusselIds = new Set(k.pussel.map((x) => x.id));
+    for (const [sort, ids] of [['scener', scenIds], ['pussel', pusselIds]]) {
+      for (const [gammalt, nyttId] of Object.entries((k.alias || {})[sort] || {})) {
+        if (ids.has(gammalt)) fel.push(var_(`alias.${sort}: ${gammalt} finns fortfarande, ett alias gäller bara id:n som har tagits bort`));
+        if (!ids.has(nyttId) && !((k.alias || {})[sort] || {})[nyttId]) fel.push(var_(`alias.${sort}: ${gammalt} pekar på ${nyttId}, som inte finns`));
+      }
+    }
+
     // Kontroll av en text som visas
     const textKontroll = (text, plats, { lasesSjalv = false, replik = false } = {}) => {
       for (const r of rader(text)) {
@@ -179,6 +197,9 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
     const replikKontroll = (r, plats) => {
       if (!r) return;
       if (!talare.has(r.talare)) fel.push(var_(`${plats}: okänd talare ${r.talare}`));
+      // instruktioner gäller alla enheter: "gå till lådan", aldrig "använd piltangenterna" eller "klicka"
+      const enhet = rader(r.text).join(' ').match(ENHETSORD);
+      if (enhet) varningar.push(var_(`${plats}: nämner en enhet (${enhet[0]}), skriv så att det gäller både dator och iPad: "${rader(r.text).join(' ')}"`));
       textKontroll(r.text, plats, { lasesSjalv: !r.upplast, replik: true });
     };
     const handlingKontroll = (h, plats) => { if (h && h.replik) replikKontroll(h.replik, plats); };
@@ -201,7 +222,10 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
         switch (st.typ) {
           case 'replik': replikKontroll(st, sp); pp.sek += 1.5 + ord(rader(st.text).join(' ')).length * 0.45; break;
           case 'mellanscen': pp.sek += 4; break;
-          case 'ljud': pp.sek += 1; break;
+          case 'ljud':
+            pp.sek += 1;
+            if (st.foremal && (!s.rum || !rum.get(s.rum)?.innehall.map(objId).includes(st.foremal))) fel.push(var_(`${sp}: ${st.foremal} finns inte i rummet ${s.rum}`));
+            break;
           case 'ga_till': {
             pp.sek += 12;
             if (s.rum === null) fel.push(var_(`${sp}: scenen har inget rum att gå i`));
