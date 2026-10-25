@@ -19,7 +19,7 @@ Läs- och skriväventyr för barn 6–8 år, byggt för en spelare först. Webba
 - `src/karna/` får inte importera Phaser eller röra DOM. Modulerna tar sina beroenden som argument. Inga globaler.
 - All läsbar text ritas i textlagret (DOM, Andika). Aldrig Phaser-text, aldrig text i pixelgrafiken.
 - Scener lyssnar på handlingar från `karna/inmatning.js`, aldrig på råa tangent- eller pekhändelser.
-- Innehåll (repliker, pussel, ordlistor) ligger i `content/` som JSON enligt `docs/innehallsschema.md` (format 1). Tiled-kartor innehåller id:n, aldrig spelartext. Hårdkoda aldrig innehåll i koden.
+- Innehåll (repliker, pussel, ordlistor) ligger i `content/` som JSON enligt `docs/innehallsschema.md` (kapitel i format 2). Tiled-kartorna (`kartor/<äventyr>/<rum>.tmj`) säger var föremålen står och innehåller bara id:n, aldrig spelartext. Hårdkoda aldrig innehåll i koden.
 - Speltext lagras i vanlig skrift och visas genom `src/karna/text.js` (versaler tills nivån säger annat). Formler alltid i versaler. Platshållare `{unge}`, `{hjalte}`.
 - `content/` ägs av Innehållsspåret. Teknik ändrar bara formatet (och skriver då om filerna), aldrig texten. Ändras schemat: höj `format`, uppdatera `docs/innehallsschema.md` och kontrollen i `verktyg/innehall/`.
 - Skalan räknas i fysiska pixlar och är alltid ett heltal (`karna/skalning.js`).

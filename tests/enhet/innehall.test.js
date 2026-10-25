@@ -91,3 +91,26 @@ describe('innehållskontrollen', () => {
     expect(medFel((k) => { k.pussel.find((p) => p.id === 'p0_packlista').varianter.L1.alternativ.forEach((a) => { a.ratt = true; }); })).toMatch(/minst ett fel/);
   });
 });
+
+describe('läs i rummet, syns_i och kartor (format 2)', () => {
+  const medFel = (andra, kartor) => { const d = riktigt(); andra(d.kapitel[0], d); return kontrollera({ ...d, kartor }).fel.join('\n'); };
+  const filt = (k) => k.pussel.find((p) => p.id === 'p0_filt');
+  it('i_rummet: varje alternativ ska ligga i ett föremål som finns i rummet och ha ett ord', () => {
+    expect(medFel((k) => { delete filt(k).varianter.L1.alternativ[0].objekt; })).toMatch(/saknar objekt/);
+    expect(medFel((k) => { filt(k).varianter.L1.alternativ[1].objekt = 'lada_i_koket'; })).toMatch(/lada_i_koket, som inte finns i rummet vinden/);
+  });
+  it('syns_i får bara använda rummets tillstånd', () => {
+    expect(medFel((k) => { k.rum[0].innehall.find((x) => typeof x !== 'string').syns_i = ['dag']; })).toMatch(/syns_i dag/);
+  });
+  it('gamla kapitelfiler i format 1 godtas inte (P27_packa heter P28_packa)', () => {
+    expect(medFel((k) => { k.format = 1; })).toMatch(/format/);
+  });
+  it('kartan: alla föremål ska finnas, inga okända, och utgångar leder till rum som finns', () => {
+    const karta = (objekt) => ({ hallen: { objekt, start: null } });
+    const hallen = ['stege_upp', 'dorr_mat', 'dorr_bad', 'dorr_toa', 'dorr_sov'].map((id, i) => ({ id, x: 10 + i * 40, y: 4, b: 20, h: 20 }));
+    expect(medFel(() => {}, karta(hallen))).toBe('');
+    expect(medFel(() => {}, karta(hallen.slice(1)))).toMatch(/stege_upp saknas i kartan/);
+    expect(medFel(() => {}, karta([...hallen, { id: 'pianot', x: 0, y: 0, b: 10, h: 10 }]))).toMatch(/pianot finns inte/);
+    expect(medFel(() => {}, karta([...hallen.slice(1), { ...hallen[0], till: 'kallaren' }]))).toMatch(/leder till kallaren/);
+  });
+});

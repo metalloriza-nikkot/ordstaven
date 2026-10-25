@@ -14,7 +14,7 @@ export const MAX_RADER_REPLIK = 2;
 export const MAX_ORD_PER_RAD = 8;
 export const MAX_MINUTER_PER_PASS = 10;
 /** Pusseltyper som räknas som läsuppgifter som avgör något. P9 (kodlåset) är avkodning med nyckel, inte läsförståelse. */
-export const LASUPPGIFTER = new Set(['P1_las_och_valj', 'P27_packa', 'P15_raddning']);
+export const LASUPPGIFTER = new Set(['P1_las_och_valj', 'P28_packa', 'P15_raddning']);
 
 let ajv;
 function validerare() {
@@ -61,11 +61,35 @@ function versalord(rad, formler) {
   return ord(rad).filter((o) => o.length >= 2 && o === versaler(o) && !formler.has(o));
 }
 
+/** Objektets id i rummets innehåll (ett id eller { id, syns_i }). */
+const objId = (x) => (typeof x === 'string' ? x : x.id);
+
 /**
- * @param {{ aventyr: any, kapitel: any[], ordlistor: any }} innehall
+ * Kontrollera Tiled-kartorna mot rummen: varje föremål ska stå i kartan, kartan får inte ha föremål
+ * som inte finns, allt ska rymmas i rummet och utgångar får bara leda till rum som finns.
+ * @param {any} k kapitlet @param {Record<string, { objekt: any[], start: any }>} kartor @param {string[]} fel @param {string[]} varningar
+ */
+function kontrolleraKartor(k, kartor, fel, varningar) {
+  const allaRum = new Set(k.rum.map((r) => r.id));
+  for (const r of k.rum) {
+    const karta = kartor[r.id];
+    if (!karta) { varningar.push(`${k.id} rum ${r.id}: ingen Tiled-karta, föremålen placeras automatiskt`); continue; }
+    const ids = r.innehall.map(objId);
+    const iKartan = new Set(karta.objekt.map((o) => o.id));
+    for (const id of ids) if (!iKartan.has(id)) fel.push(`${k.id} rum ${r.id}: ${id} saknas i kartan`);
+    for (const o of karta.objekt) {
+      if (!ids.includes(o.id)) fel.push(`kartan ${r.id}: ${o.id} finns inte i rummets innehåll`);
+      if (o.x < 0 || o.y < 0 || o.x + o.b > 320 || o.y + o.h > 192) fel.push(`kartan ${r.id}: ${o.id} går utanför rummet`);
+      if (o.till && !allaRum.has(o.till)) fel.push(`kartan ${r.id}: ${o.id} leder till ${o.till}, som inte finns i ${k.id}`);
+    }
+  }
+}
+
+/**
+ * @param {{ aventyr: any, kapitel: any[], ordlistor: any, kartor?: Record<string, any> }} innehall
  * @returns {{ fel: string[], varningar: string[], pass: { kapitel: string, pass: number, minuter: number, lasuppgifter: number }[] }}
  */
-export function kontrollera({ aventyr, kapitel, ordlistor }) {
+export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
   const fel = [], varningar = [], passInfo = [];
   const v = validerare();
 
@@ -122,6 +146,16 @@ export function kontrollera({ aventyr, kapitel, ordlistor }) {
     for (const r of k.rum) for (const t of r.tillstand || []) tillstand.add(t);
     for (const p of k.pussel) if (p.typ === 'P11_formel') for (const f of p.formler) if (f.tillstand_efter) tillstand.add(f.tillstand_efter);
 
+    // Föremål i rummen: unika, och syns_i bara med tillstånd som rummet har
+    for (const r of k.rum) {
+      const ids = r.innehall.map(objId);
+      if (new Set(ids).size !== ids.length) fel.push(var_(`rum ${r.id}: samma föremål står två gånger i innehall`));
+      for (const x of r.innehall) if (typeof x !== 'string') for (const t of x.syns_i || []) {
+        if (!(r.tillstand || []).includes(t)) fel.push(var_(`rum ${r.id}: ${x.id} syns_i ${t}, men rummet har inte det tillståndet`));
+      }
+    }
+    if (kartor) kontrolleraKartor(k, kartor, fel, varningar);
+
     // Kontroll av en text som visas
     const textKontroll = (text, plats, { lasesSjalv = false, replik = false } = {}) => {
       for (const r of rader(text)) {
@@ -171,7 +205,7 @@ export function kontrollera({ aventyr, kapitel, ordlistor }) {
           case 'ga_till': {
             pp.sek += 12;
             if (s.rum === null) fel.push(var_(`${sp}: scenen har inget rum att gå i`));
-            else if (rum.has(s.rum) && !rum.get(s.rum).innehall.includes(st.mal)) fel.push(var_(`${sp}: ${st.mal} finns inte i rummet ${s.rum}`));
+            else if (rum.has(s.rum) && !rum.get(s.rum).innehall.map(objId).includes(st.mal)) fel.push(var_(`${sp}: ${st.mal} finns inte i rummet ${s.rum}`));
             if (st.knuff) replikKontroll(st.knuff.replik, `${sp} knuff`);
             break;
           }
@@ -181,6 +215,15 @@ export function kontrollera({ aventyr, kapitel, ordlistor }) {
             if (!p) { fel.push(var_(`${sp}: pusslet ${st.pussel_id} finns inte`)); break; }
             if (st.typ === 'pussel') {
               anvanda.add(p.id);
+              if (p.i_rummet) {
+                const r = rum.get(s.rum);
+                const ids = r ? r.innehall.map(objId) : [];
+                for (const vari of Object.values(p.varianter)) for (const a of vari.alternativ) {
+                  if (!a.objekt) fel.push(var_(`${sp}: ${p.id} har i_rummet, men alternativet ${a.id} saknar objekt`));
+                  else if (!ids.includes(a.objekt)) fel.push(var_(`${sp}: ${p.id} alternativet ${a.id} ligger i ${a.objekt}, som inte finns i rummet ${s.rum}`));
+                  if (!a.ord) fel.push(var_(`${sp}: ${p.id} har i_rummet, men alternativet ${a.id} saknar ord att läsa`));
+                }
+              }
               pp.sek += p.typ === 'P26_krukorna' ? 30 : p.typ === 'P12_dop' ? 45 : 40;
               if (LASUPPGIFTER.has(p.typ)) pp.lasuppgifter++;
             } else pp.sek += 10;
@@ -217,8 +260,8 @@ export function kontrollera({ aventyr, kapitel, ordlistor }) {
       if (p.knuff) replikKontroll(p.knuff.replik, `${plats} knuff`);
       for (const f of ['vid_ratt', 'vid_fel', 'efter_3_fel']) handlingKontroll(p[f], `${plats} ${f}`);
 
-      if (p.typ === 'P1_las_och_valj' || p.typ === 'P27_packa') {
-        const flera = p.typ === 'P27_packa';
+      if (p.typ === 'P1_las_och_valj' || p.typ === 'P28_packa') {
+        const flera = p.typ === 'P28_packa';
         for (const [niva, vari] of Object.entries(p.varianter)) {
           const vp = `${plats} ${niva}`;
           if (vari.text) textKontroll(vari.text, `${vp} text`, { lasesSjalv: true });

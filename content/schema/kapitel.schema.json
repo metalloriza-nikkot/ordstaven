@@ -18,7 +18,7 @@
       "type": "string"
     },
     "format": {
-      "const": 1
+      "const": 2
     },
     "id": {
       "type": "string",
@@ -226,9 +226,33 @@
         "innehall": {
           "type": "array",
           "items": {
-            "$ref": "#/$defs/id"
+            "oneOf": [
+              {
+                "$ref": "#/$defs/id"
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id"
+                ],
+                "properties": {
+                  "id": {
+                    "$ref": "#/$defs/id"
+                  },
+                  "syns_i": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "$ref": "#/$defs/id"
+                    },
+                    "description": "Föremålet syns bara i de här tillstånden av rummet, t.ex. först när ljuset är tänt."
+                  }
+                }
+              }
+            ]
           },
-          "description": "Objekt i rummet. Tiled-kartan använder samma id:n."
+          "description": "Objekt i rummet: ett id, eller { id, syns_i }. Tiled-kartan använder samma id:n."
         },
         "anteckning": {
           "$ref": "#/$defs/anteckning"
@@ -664,7 +688,7 @@
           "$ref": "#/$defs/P1_las_och_valj"
         },
         {
-          "$ref": "#/$defs/P27_packa"
+          "$ref": "#/$defs/P28_packa"
         },
         {
           "$ref": "#/$defs/P11_formel"
@@ -746,6 +770,10 @@
         },
         "anteckning": {
           "$ref": "#/$defs/anteckning"
+        },
+        "i_rummet": {
+          "type": "boolean",
+          "description": "Alternativen ligger i rummet (fältet objekt). Ordet syns när hjälten står vid föremålet, och spelaren öppnar det som stämmer."
         }
       }
     },
@@ -790,6 +818,10 @@
               },
               "vid_valj": {
                 "$ref": "#/$defs/handling"
+              },
+              "objekt": {
+                "$ref": "#/$defs/id",
+                "description": "Föremålet i rummet där alternativet ligger (bara med i_rummet)."
               }
             }
           }
@@ -1019,7 +1051,7 @@
         }
       }
     },
-    "P27_variant": {
+    "P28_variant": {
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -1066,7 +1098,7 @@
         }
       }
     },
-    "P27_packa": {
+    "P28_packa": {
       "description": "Packa efter en lista: flera alternativ är rätt, spelaren väljer alla. Fel val studsar tillbaka.",
       "type": "object",
       "additionalProperties": false,
@@ -1080,7 +1112,7 @@
           "$ref": "#/$defs/id"
         },
         "typ": {
-          "const": "P27_packa"
+          "const": "P28_packa"
         },
         "instruktion": {
           "$ref": "#/$defs/replik"
@@ -1109,7 +1141,7 @@
             "$ref": "#/$defs/niva_l"
           },
           "additionalProperties": {
-            "$ref": "#/$defs/P27_variant"
+            "$ref": "#/$defs/P28_variant"
           }
         },
         "knuff": {

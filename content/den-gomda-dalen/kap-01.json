@@ -1,6 +1,6 @@
 {
  "$schema": "../schema/kapitel.schema.json",
- "format": 1,
+ "format": 2,
  "id": "kap-01",
  "kapitel": 1,
  "meta": {
