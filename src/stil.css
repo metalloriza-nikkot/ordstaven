@@ -225,6 +225,11 @@ html, body {
 .brickor { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
 .bricka { width: calc(84px * var(--t)); height: calc(96px * var(--t)); border-radius: 12px; background: #fff; color: var(--black); font-size: calc(64px * var(--t)); box-shadow: 0 6px 0 #c8bb9c, 0 0 0 3px #e5d9bd; }
 .bricka.anvand { visibility: hidden; }
+.bricka[data-id], .plats.flyttbar { touch-action: none; user-select: none; -webkit-user-select: none; cursor: grab; }
+.plats.flyttbar { background: #fff; border-style: solid; }
+.bricka.lyft, .plats.lyft { opacity: .35; }
+.plats.over { border-color: var(--guld, #f2c14e); background: #fff6d8; }
+.bricka.dras { position: fixed; z-index: 100; pointer-events: none; transform: translate(-50%, -60%) scale(1.1) rotate(-3deg); display: flex; align-items: center; justify-content: center; box-shadow: 0 14px 22px rgba(0, 0, 0, .35); cursor: grabbing; }
 .bricka.sudda { font-size: 36px; background: #e9dfc8; }
 .formel-i-luften { font-size: calc(96px * var(--t)); color: #ffe9a8; text-shadow: 0 0 24px rgba(242, 193, 78, 1); letter-spacing: .1em; animation: luft 1s ease; }
 @keyframes luft { from { transform: scale(.4); opacity: 0; } }

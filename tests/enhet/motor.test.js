@@ -168,3 +168,34 @@ describe('berättelsemotorn', () => {
     expect(b.aktuellt().typ).toBe('mellanscen');
   });
 });
+
+describe('formeln med dra och släpp', () => {
+  const P = (id) => JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-00.json', import.meta.url), 'utf8')).pussel.find((p) => p.id === id);
+  it('dra till valfri plats, flytta om, ta tillbaka', () => {
+    const f = skapaFormel(P('p0_ljus'), { slump: () => 0.42 });
+    const id = (b) => f.s.brickor.find((x) => x.bokstav === b).id;
+    expect(f.laggPa(id('S'), 3).resultat).toBe('lagd');
+    expect(f.laggPa(id('U'), 1).resultat).toBe('lagd');
+    expect(f.laggPa(id('U'), 2).resultat).toBe('lagd'); // flyttad: plats 1 blir tom
+    expect(f.s.platser[1]).toBeNull();
+    expect(f.taBort(2)).toBe(true);
+    f.laggPa(id('U'), 2); f.laggPa(id('J'), 1);
+    expect(f.laggPa(id('L'), 0).resultat).toBe('klar');
+  });
+  it('två bokstäver byter plats när man drar den ena på den andra', () => {
+    const f = skapaFormel(P('p0_ljus'), { slump: () => 0.42 });
+    const id = (b) => f.s.brickor.find((x) => x.bokstav === b).id;
+    f.laggPa(id('J'), 0); f.laggPa(id('L'), 1);
+    f.laggPa(id('J'), 1); // J dras till L:s plats → de byter
+    expect(f.s.platser.slice(0, 2)).toEqual([id('L'), id('J')]);
+  });
+  it('låsta (rätta) bokstäver går inte att flytta', () => {
+    const f = skapaFormel(P('p0_ljus'), { slump: () => 0.42 });
+    const id = (b) => f.s.brickor.find((x) => x.bokstav === b).id;
+    f.laggPa(id('L'), 0); f.laggPa(id('U'), 1); f.laggPa(id('J'), 2);
+    expect(f.laggPa(id('S'), 3).resultat).toBe('fel'); // L rätt och låst, U och J tillbaka
+    expect(f.s.last[0]).toBe(true);
+    expect(f.taBort(0)).toBe(false);
+    expect(f.laggPa(id('U'), 0).resultat).toBe('ingen');
+  });
+});

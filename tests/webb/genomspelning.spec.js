@@ -8,6 +8,32 @@ const pussel = new Map(prolog.pussel.map((p) => [p.id, p]));
 const rattaId = (p) => new Set(Object.values(p.varianter || {}).flatMap((v) => v.alternativ.filter((a) => a.ratt).map((a) => a.id)));
 mkdirSync('tests/skarmdumpar/prolog', { recursive: true });
 
+/** Dra med musen från ett element till ett annat, i små steg som ett finger. */
+async function dra(page, fran, till, dump = null) {
+  const a = await fran.boundingBox(), b = await till.boundingBox();
+  await page.mouse.move(a.x + a.width / 2, a.y + a.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2 - 20, { steps: 8 });
+  if (dump) await page.screenshot({ path: dump });
+  await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2, { steps: 2 });
+  await page.mouse.up();
+  await page.waitForTimeout(120);
+}
+
+/** Lös formeln genom att dra brickorna: sista bokstaven först till fel plats, sedan flyttad rätt. */
+async function draFormel(page, svar, dumpa = false) {
+  const bricka = (b) => page.locator(`#plattan .bricka[data-id]:not(.anvand)`, { hasText: b }).first();
+  const plats = (i) => page.locator(`#plattan .plats[data-plats="${i}"]`);
+  const sista = svar.length - 1;
+  await dra(page, bricka(svar[sista]), plats(0), dumpa ? 'tests/skarmdumpar/prolog/dra-bokstav.png' : null);
+  await expect(plats(0)).toHaveText(svar[sista]);
+  await dra(page, plats(0), plats(sista)); // flytta om en lagd bokstav
+  await expect(plats(0)).toHaveText('');
+  await expect(plats(sista)).toHaveText(svar[sista]);
+  for (let i = sista - 1; i >= 0; i--) await dra(page, bricka(svar[i]), plats(i));
+  await page.waitForTimeout(100);
+}
+
 /** Spela tills slutskärmen syns. felFor = pussel-id där ett fel svar ska väljas först. */
 async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid = null } = {}) {
   const sett = new Set();
@@ -50,7 +76,7 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
     if (lage.bok) { await page.click('.bok-ruta .fram'); continue; }
     if (lage.vidareHornet) { await page.click('.vidare-hornet'); continue; }
     if (lage.dop) { await page.keyboard.type(lage.pusselId === 'p0_ungenamn' ? 'KNOPP' : 'TESTA'); await page.keyboard.press('Enter'); await page.waitForTimeout(100); continue; }
-    if (lage.formel) { const p = pussel.get(lage.pusselId); await page.keyboard.type(p.svar); await page.waitForTimeout(100); continue; }
+    if (lage.formel) { await draFormel(page, pussel.get(lage.pusselId).svar.replace(/ /g, ''), dumpa); continue; }
     if (lage.kort) {
       const p = pussel.get(lage.pusselId); const ratt = rattaId(p);
       const ids = await page.$$eval('#plattan .kort:not(.vald)', (els) => els.map((e) => e.dataset.id));
@@ -61,7 +87,21 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
       continue;
     }
     // i rummet: gå till målet, eller till krukorna
-    if (lage.typ === 'ga_till' && lage.mal) { const pt = await page.evaluate((m) => window.__ORDSTAVEN.objekt(m), lage.mal); if (pt) await page.mouse.click(pt.x, pt.y); await page.waitForTimeout(400); continue; }
+    if (lage.typ === 'ga_till' && lage.mal) {
+      const pt = await page.evaluate((m) => window.__ORDSTAVEN.objekt(m), lage.mal);
+      // målet måste synas: inget överlägg (närbild, läsplatta, helskärm) får ligga över det
+      const skymd = await page.evaluate((p) => {
+        for (const s of ['#narbild', '#plattan', '#skarm:not(.genomskinlig)']) {
+          const e = document.querySelector(s); if (!e || e.hidden) continue;
+          const r = e.getBoundingClientRect();
+          if (p.x >= r.left && p.x <= r.right && p.y >= r.top && p.y <= r.bottom) return s;
+        }
+        return null;
+      }, pt);
+      expect(skymd, `målet ${lage.mal} i ${lage.scen} syns inte`).toBeNull();
+      if (pt) await page.mouse.click(pt.x, pt.y);
+      await page.waitForTimeout(400); continue;
+    }
     if (lage.typ === 'pussel' && pussel.get(lage.pusselId)?.typ === 'P26_krukorna') {
       // gå till en kruka i taget och vänta tills hjälten står still
       const krukor = lage.objekt.filter((o) => /kruk.*_\d$/.test(o));

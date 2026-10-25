@@ -130,15 +130,37 @@ export function skapaFormel(pussel, { slump = Math.random } = {}) {
     return { resultat: 'fel', reaktion: pussel.vid_fel ?? null };
   }
 
+  const ingen = () => ({ resultat: /** @type {'ingen'} */ ('ingen'), reaktion: null });
+
   return {
     s,
     /** Lägg en bricka på första lediga plats. @param {number} brickId */
     lagg(brickId) {
-      if (s.klar) return { resultat: /** @type {'ingen'} */ ('ingen'), reaktion: null };
+      if (s.klar) return ingen();
       const plats = forstaTomma();
-      if (plats < 0 || s.platser.includes(brickId)) return { resultat: /** @type {'ingen'} */ ('ingen'), reaktion: null };
+      if (plats < 0 || s.platser.includes(brickId)) return ingen();
       s.platser[plats] = brickId;
       return kontrollera();
+    },
+    /**
+     * Dra en bricka till en viss plats. Ligger det redan en bokstav där byter de plats
+     * (eller går den gamla tillbaka till brickraden). Låsta platser går inte att ändra.
+     * @param {number} brickId @param {number} plats
+     */
+    laggPa(brickId, plats) {
+      if (s.klar || plats < 0 || plats >= s.platser.length || s.last[plats]) return ingen();
+      const fran = s.platser.indexOf(brickId);
+      if (fran >= 0 && s.last[fran]) return ingen();
+      if (fran === plats) return ingen();
+      const dar = s.platser[plats];
+      s.platser[plats] = brickId;
+      if (fran >= 0) s.platser[fran] = dar; // byt plats med bokstaven som låg där
+      return kontrollera();
+    },
+    /** Ta tillbaka bokstaven på en plats till brickraden. @param {number} plats */
+    taBort(plats) {
+      if (s.klar || s.last[plats] || s.platser[plats] === null) return false;
+      s.platser[plats] = null; uppdateraTips(); return true;
     },
     /** Skriv en bokstav på tangentbordet: lägger första lediga bricka med den bokstaven. @param {string} bokstav */
     skriv(bokstav) {

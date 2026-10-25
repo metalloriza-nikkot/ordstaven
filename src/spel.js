@@ -102,7 +102,10 @@ export function skapaSpel(d) {
     aktuelltRum = scen.rum;
     const r = scen.rum ? b.rum(scen.rum) : null;
     rum.visa({ rum: scen.rum, tillstand: b.rumsTillstand(scen.rum), innehall: r ? r.innehall : [], unge: !!av.ungen.namn, nyttRum: nytt });
-    ui.$('#narbild').hidden = scen.vy !== 'narbild';
+    // närbilden (t.ex. kartbiten) visas tills spelaren ska röra sig i rummet igen
+    const st = b.aktuellt();
+    const iRummet = st && (st.typ === 'ga_till' || st.typ === 'fritt' || (st.typ === 'pussel' && b.pussel(st.pussel_id)?.typ === 'P26_krukorna'));
+    ui.$('#narbild').hidden = scen.vy !== 'narbild' || !!iRummet;
     ui.uppdateraHud(av);
     visaEtiketter();
   }
@@ -247,12 +250,58 @@ export function skapaSpel(d) {
       const rita = () => {
         const bokstav = (/** @type {number | null} */ id) => (id === null ? '' : f.s.brickor.find((x) => x.id === id)?.bokstav ?? '');
         const forebild = p.forebild ? `<div class="forebild" aria-label="Förebild">${[...p.forebild.text].map((c) => `<span class="bokstav">${ui.esc(c)}</span>`).join('')}</div>` : '';
-        const platser = `<div class="platser">${f.s.platser.map((id, i) => `<span class="plats ${f.s.last[i] ? 'last' : ''}">${ui.esc(bokstav(id))}</span>`).join('')}</div>`;
+        const platser = `<div class="platser">${f.s.platser.map((id, i) => `<span class="plats ${f.s.last[i] ? 'last' : ''} ${id !== null && !f.s.last[i] ? 'flyttbar' : ''}" data-plats="${i}" ${id !== null ? `data-id="${id}"` : ''}>${ui.esc(bokstav(id))}</span>`).join('')}</div>`;
         const brickor = `<div class="brickor">${f.s.brickor.map((x) => `<button type="button" class="bricka ${f.s.platser.includes(x.id) ? 'anvand' : ''} ${f.s.tips === x.id ? 'tips' : ''}" data-id="${x.id}">${ui.esc(x.bokstav)}</button>`).join('')}<button type="button" class="bricka sudda" aria-label="Ta tillbaka">⌫</button></div>`;
         ui.visaPlatta(`<div class="formel-ruta">${forebild}${platser}${brickor}</div>`, 'pussel P11_formel');
         tillatNos(p, spar);
-        ui.plattan.querySelectorAll('.bricka[data-id]').forEach((el) => el.addEventListener('click', () => svar(f.lagg(Number(/** @type {HTMLElement} */ (el).dataset.id)))));
+        ui.plattan.querySelectorAll('.bricka[data-id]').forEach((el) => {
+          el.addEventListener('click', () => { if (!dra.nyss) svar(f.lagg(Number(/** @type {HTMLElement} */ (el).dataset.id))); });
+          el.addEventListener('pointerdown', (e) => borjaDra(/** @type {PointerEvent} */ (e), /** @type {HTMLElement} */ (el)));
+        });
+        ui.plattan.querySelectorAll('.plats.flyttbar').forEach((el) => {
+          // tryck på en lagd bokstav skickar tillbaka den
+          el.addEventListener('click', () => { if (!dra.nyss && !upptagen && f.taBort(Number(/** @type {HTMLElement} */ (el).dataset.plats))) { ljud.spela('klick'); rita(); } });
+          el.addEventListener('pointerdown', (e) => borjaDra(/** @type {PointerEvent} */ (e), /** @type {HTMLElement} */ (el)));
+        });
         ui.plattan.querySelector('.sudda')?.addEventListener('click', () => { if (!upptagen && f.sudda()) { ljud.spela('klick'); rita(); } });
+      };
+      // Dra och släpp: en bricka eller en lagd bokstav kan dras till valfri plats, eller tillbaka.
+      // Ett vanligt tryck fungerar som förut (rörelse under 8 px räknas som tryck).
+      const dra = { nyss: false };
+      const borjaDra = (/** @type {PointerEvent} */ e, /** @type {HTMLElement} */ kalla) => {
+        if (upptagen || e.button > 0) return;
+        const brickId = Number(kalla.dataset.id), franPlats = kalla.dataset.plats !== undefined ? Number(kalla.dataset.plats) : -1;
+        const x0 = e.clientX, y0 = e.clientY;
+        /** @type {HTMLElement | null} */ let spoke = null;
+        const flytta = (/** @type {PointerEvent} */ ev) => {
+          if (!spoke && Math.hypot(ev.clientX - x0, ev.clientY - y0) < 8) return;
+          if (!spoke) {
+            const r = kalla.getBoundingClientRect();
+            spoke = document.createElement('div');
+            spoke.className = 'bricka dras';
+            spoke.textContent = kalla.textContent;
+            spoke.style.width = r.width + 'px'; spoke.style.height = r.height + 'px';
+            document.body.appendChild(spoke);
+            kalla.classList.add('lyft');
+          }
+          spoke.style.left = ev.clientX + 'px'; spoke.style.top = ev.clientY + 'px';
+          ui.plattan.querySelectorAll('.plats').forEach((pl) => pl.classList.toggle('over', pl === under(ev)));
+        };
+        const under = (/** @type {PointerEvent} */ ev) => {
+          const el = document.elementsFromPoint(ev.clientX, ev.clientY).find((x) => x.classList.contains('plats'));
+          return /** @type {HTMLElement | undefined} */ (el);
+        };
+        const slapp = (/** @type {PointerEvent} */ ev) => {
+          window.removeEventListener('pointermove', flytta); window.removeEventListener('pointerup', slapp); window.removeEventListener('pointercancel', slapp);
+          if (!spoke) return; // ett tryck: click sköter det
+          spoke.remove(); kalla.classList.remove('lyft');
+          dra.nyss = true; setTimeout(() => { dra.nyss = false; }, 0);
+          const mal = ev.type === 'pointerup' ? under(ev) : undefined;
+          if (mal) { const r = f.laggPa(brickId, Number(mal.dataset.plats)); if (r.resultat === 'ingen') rita(); else svar(r); return; }
+          if (franPlats >= 0 && f.taBort(franPlats)) ljud.spela('klick'); // utanför platserna: tillbaka till raden
+          rita();
+        };
+        window.addEventListener('pointermove', flytta); window.addEventListener('pointerup', slapp); window.addEventListener('pointercancel', slapp);
       };
       const svar = async (/** @type {{ resultat: string, reaktion: any }} */ r) => {
         if (upptagen || r.resultat === 'ingen') return;
