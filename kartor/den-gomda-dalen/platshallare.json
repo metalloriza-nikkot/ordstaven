@@ -1,0 +1,15 @@
+{
+ "beskrivning": "Gråboxens platshållarbilder för bild-id:n i innehållet som inte är ord i ordlistorna. Ägs av teknik, ersätts av stilens grafik.",
+ "bilder": {
+  "tallrik": "🍽️",
+  "fotter": "🦶",
+  "dal_i_moln": "🏞️",
+  "ordtradet": "🌳",
+  "unge_farfar_med_dino": "🧒",
+  "unge_farfar_far_agg": "🥚",
+  "karta_sju_bitar": "🗺️",
+  "farfars_lista_sista_raden": "📜",
+  "buske": "🌳",
+  "trad": "🌲"
+ }
+}

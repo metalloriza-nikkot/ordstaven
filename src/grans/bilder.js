@@ -5,11 +5,11 @@
 /** ASCII-vikning så att id:n utan å, ä, ö hittar sina ord (bar → bär). @param {string} s */
 const vik = (s) => s.toLocaleLowerCase('sv-SE').replace(/[åä]/g, 'a').replace(/ö/g, 'o').replace(/é/g, 'e');
 
-const FARGER = { rod: '#b8382f', bla: '#3f6fb8', gul: '#f0cf4a', gron: '#4f9a4a', vit: '#eeeae0' };
-const EXTRA = /** @type {Record<string, string>} */ ({
-  tallrik: '🍽️', fotter: '🦶', dal_i_moln: '🏞️', ordtradet: '🌳', unge_farfar_med_dino: '🧒', unge_farfar_far_agg: '🥚',
-  karta_sju_bitar: '🗺️', farfars_lista_sista_raden: '📜', buske: '🌳', trad: '🌲',
-});
+import { PALETT, egenskaper } from '../karna/egenskaper.js';
+
+const FARGER = PALETT;
+/** Äventyrets egna platshållarbilder (kartor/<äventyr>/platshallare.json), sätts av skapaBilder. */
+let EXTRA = /** @type {Record<string, string>} */ ({});
 
 /** Egna platshållare där emoji saknas eller visar fel sak (🧣 är en halsduk, inte en filt). */
 const RITADE = /** @type {Record<string, (farg?: string) => string>} */ ({
@@ -24,8 +24,9 @@ const RITADE = /** @type {Record<string, (farg?: string) => string>} */ ({
   </svg>`,
 });
 
-/** @param {any} ordlistor */
-export function skapaBilder(ordlistor) {
+/** @param {any} ordlistor @param {Record<string, string>} [platshallare] äventyrets egna bild-id → emoji */
+export function skapaBilder(ordlistor, platshallare = {}) {
+  EXTRA = platshallare;
   /** @type {Map<string, string>} */
   const emoji = new Map();
   for (const o of ordlistor.ord) if (o.bild) emoji.set(vik(o.ord), o.bild);
@@ -44,7 +45,8 @@ export function skapaBilder(ordlistor) {
     }
     if (EXTRA[id]) return `<span class="bild emoji" data-bild="${id}">${EXTRA[id]}</span>`;
     const farg = delar.map((d) => FARGER[/** @type {keyof FARGER} */ (d)]).find(Boolean);
-    const stor = delar.includes('stor') ? 1.35 : delar.includes('liten') ? 0.7 : 1;
+    const storlek = egenskaper(id).storlek;
+    const stor = storlek === 'stor' ? 1.35 : storlek === 'liten' ? 0.7 : 1;
     const hog = delar.includes('hog') ? 1.5 : delar.includes('lag') ? 0.6 : 1;
     const bas = delar.find((d) => !(d in FARGER) && !['stor', 'liten', 'hog', 'lag', 'rund', 'spetsig', 'gammalt', 'ungt', 'litet', 'stort'].includes(d)) || 'lada';
     const e = hitta(bas);

@@ -2,7 +2,8 @@
 // Tiled-kartor för rummen. Kartan säger VAR föremålen står, innehållet säger VAD som finns.
 // Kartan innehåller bara id:n (objektets namn), aldrig text som spelaren ser.
 // Ett objektlager med rutor: namn = föremålets id, typ = utgang, sak eller figur (frivilligt).
-// Egenskaper: "till" (rummet en utgång leder till), "sida" (var hjälten ställer sig: under, over, vanster, hoger).
+// Egenskaper: "till" (rummet en utgång leder till), "sida" (var hjälten ställer sig: under, over, vanster, hoger),
+// "golv" (man går på det) och "visar" (pusslet vars alternativ föremålet visar, t.ex. lådorna eller krukorna).
 // En punkt med namnet "start" är där hjälten står när rummet visas utan att hjälten kom genom en utgång.
 import { RUM } from './skalning.js';
 
@@ -10,7 +11,6 @@ import { RUM } from './skalning.js';
 /** @typedef {{ objekt: Objekt[], start: { x: number, y: number } | null }} Karta */
 
 const UTGANG = /^(stege_|dorr_|grind|stig_)/;
-const FIGUR = /^(farfar|apan|klaffen)/;
 const SIDOR = new Set(['under', 'over', 'vanster', 'hoger']);
 
 /** Objektets id i rummets innehåll (ett id eller { id, syns_i }). @param {string | { id: string }} x */
@@ -25,7 +25,7 @@ export function synligaIds(innehall, tillstand) {
 }
 
 /** Sort efter id när kartan inte säger något. @param {string} id @returns {Objekt['sort']} */
-export const sortFor = (id) => (UTGANG.test(id) ? 'utgang' : FIGUR.test(id) ? 'figur' : 'sak');
+export const sortFor = (id) => (UTGANG.test(id) ? 'utgang' : 'sak');
 
 /**
  * Läs en Tiled-karta (JSON, .tmj).
@@ -55,6 +55,7 @@ export function lasKarta(tmj) {
       if (egen.till) ut.till = String(egen.till);
       if (SIDOR.has(egen.sida)) ut.sida = egen.sida;
       if (egen.golv) ut.golv = true;
+      if (egen.visar) ut.visar = String(egen.visar);
       objekt.push(ut);
     }
   }
