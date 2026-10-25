@@ -4,7 +4,8 @@
 import Phaser from 'phaser';
 import { RUM } from '../karna/skalning.js';
 import { FIGUR, steg } from '../karna/rorelse.js';
-import { placeraObjekt, framfor, vidObjekt } from '../karna/rumslayout.js';
+import { placeraObjekt, framfor, vidObjekt, hinderFran } from '../karna/rumslayout.js';
+import { skapaHinder } from '../karna/vag.js';
 
 const FARG = {
   golv: 0x8c8a86, rutnat: 0x7f7d79, kant: 0x5d5b58,
@@ -41,6 +42,11 @@ export class Rum extends Phaser.Scene {
     this.vantar = null;
     this.markerade = new Set();
     this.redo = new Promise((r) => { this._redo = r; });
+    this.hinder = skapaHinder([]);
+    /** @type {{ x: number, y: number }[]} vägen hjälten går just nu */
+    this.vag = [];
+    /** @type {{ x: number, y: number } | null} målet som vägen räknades till */
+    this.vagMal = null;
   }
 
   create() {
@@ -110,7 +116,8 @@ export class Rum extends Phaser.Scene {
       this.objekt = this.harRum ? placeraObjekt(v.innehall) : [];
       this.lagerObjekt.removeAll(true); this.ritade.clear(); this.markerade.clear();
       for (const o of this.objekt) this.ritaObjekt(o);
-      this.pos = { x: RUM.bredd / 2, y: RUM.hojd - 12 };
+      this.byggHinder();
+      this.pos = this.hinder.narmasteFria({ x: RUM.bredd / 2, y: RUM.hojd - 12 });
       this.ungePos = { x: this.pos.x - 18, y: this.pos.y };
       this.b.inmatning.rensaGaTill();
     }
@@ -120,6 +127,8 @@ export class Rum extends Phaser.Scene {
     this.placera();
     this.b.vidAndring?.();
   }
+
+  byggHinder() { this.hinder = skapaHinder(hinderFran(this.objekt)); this.vag = []; this.vagMal = null; }
 
   /** @param {import('../karna/rumslayout.js').Objekt} o */
   ritaObjekt(o) {
@@ -174,6 +183,7 @@ export class Rum extends Phaser.Scene {
       const n = { id: `${id}_${i}`, x: Math.round(((i + 1) * RUM.bredd) / (antal + 1)) - 9, y: 112, b: 18, h: 18, sort: /** @type {'sak'} */ ('sak') };
       this.objekt.push(n); this.ritaObjekt(n); nya.push(n.id);
     }
+    this.byggHinder();
     this.b.vidAndring?.();
     return nya;
   }
@@ -188,10 +198,28 @@ export class Rum extends Phaser.Scene {
   update(_t, dtMs) {
     const inm = this.b.inmatning;
     if (!this.harRum || this.fryst) return;
-    const gaTill = inm.gaTillMal();
-    const ny = steg(this.pos, { riktning: inm.riktning(), gaTill }, dtMs / 1000);
-    if (gaTill && !ny.framme) this.malKors.setPosition(Math.round(gaTill.x), Math.round(gaTill.y)).setVisible(true);
-    else { this.malKors.setVisible(false); if (ny.framme) inm.rensaGaTill(); }
+    const mal = inm.gaTillMal();
+    const riktning = inm.riktning();
+    /** @type {{ x: number, y: number, framme: boolean }} */
+    let ny;
+    if (riktning.x || riktning.y) {
+      // piltangenterna: glid längs hindren
+      this.vag = []; this.vagMal = null;
+      const d = Math.min(dtMs / 1000, 0.1) * FIGUR.fart;
+      ny = { ...this.hinder.glid(this.pos, riktning.x * d, riktning.y * d), framme: false };
+    } else if (mal) {
+      // tryck: räkna en väg runt hindren när målet är nytt, gå sedan punkt för punkt
+      if (!this.vagMal || this.vagMal.x !== mal.x || this.vagMal.y !== mal.y) { this.vagMal = mal; this.vag = this.hinder.vag(this.pos, mal); }
+      const nasta = this.vag[0];
+      if (!nasta) { ny = { ...this.pos, framme: true }; }
+      else {
+        ny = steg(this.pos, { riktning: { x: 0, y: 0 }, gaTill: nasta }, dtMs / 1000);
+        if (ny.framme) { this.vag.shift(); ny.framme = this.vag.length === 0; }
+      }
+    } else ny = { ...this.pos, framme: false };
+    const sista = this.vag.at(-1);
+    if (mal && !ny.framme && sista) this.malKors.setPosition(Math.round(sista.x), Math.round(sista.y)).setVisible(true);
+    else { this.malKors.setVisible(false); if (ny.framme) { inm.rensaGaTill(); this.vag = []; this.vagMal = null; } }
     const flyttad = ny.x !== this.pos.x || ny.y !== this.pos.y;
     this.pos = { x: ny.x, y: ny.y };
     // ungen följer efter på avstånd

@@ -68,3 +68,46 @@ describe('nosen och bokstäverna', () => {
     expect(i.hamtaHandlingar()).toEqual([{ typ: 'bokstav', tecken: 'N' }, { typ: 'hjalp' }]);
   });
 });
+
+import { skapaHinder } from '../../src/karna/vag.js';
+import { placeraObjekt, framfor, hinderFran } from '../../src/karna/rumslayout.js';
+
+describe('kollision och vägsökning', () => {
+  const lada = { x: 140, y: 80, b: 40, h: 30 };
+  const h = skapaHinder([lada]);
+  it('fötterna kan inte stå i en låda', () => {
+    expect(h.fri({ x: 160, y: 100 })).toBe(false);
+    expect(h.fri({ x: 160, y: 130 })).toBe(true);
+  });
+  it('vägen går runt lådan och varje bit har fri sikt', () => {
+    const fran = { x: 160, y: 150 }, till = { x: 160, y: 60 };
+    const v = h.vag(fran, till);
+    expect(v.length).toBeGreaterThan(1);
+    let a = fran;
+    for (const p of v) { expect(h.sikt(a, p)).toBe(true); a = p; }
+    expect(v.at(-1)).toEqual(till);
+  });
+  it('ett mål inne i lådan blir närmaste fria punkt', () => {
+    const v = h.vag({ x: 60, y: 150 }, { x: 160, y: 95 });
+    expect(h.fri(v.at(-1))).toBe(true);
+  });
+  it('piltangenterna glider längs kanten', () => {
+    const p = h.glid({ x: 130, y: 120 }, 2, -2); // snett upp mot lådans hörn
+    expect(h.fri(p)).toBe(true);
+  });
+  it('i varje rum i prologen går det att nå framför varje objekt från startpunkten', async () => {
+    const { readFileSync } = await import('node:fs');
+    const prolog = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-00.json', import.meta.url), 'utf8'));
+    for (const rum of prolog.rum) {
+      const obj = placeraObjekt(rum.innehall);
+      const hh = skapaHinder(hinderFran(obj));
+      const start = hh.narmasteFria({ x: 160, y: 180 });
+      for (const o of obj) {
+        const f = framfor(o);
+        const v = hh.vag(start, f);
+        expect(v.length, `${rum.id}: ${o.id}`).toBeGreaterThan(0);
+        expect(Math.hypot(v.at(-1).x - f.x, v.at(-1).y - f.y), `${rum.id}: ${o.id} nås inte`).toBeLessThan(14);
+      }
+    }
+  });
+});

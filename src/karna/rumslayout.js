@@ -51,11 +51,19 @@ export function framfor(o) {
   const x = Math.round(o.x + o.b / 2);
   if (o.sort === 'utgang' && o.y > RUM.hojd / 2) return { x, y: o.y + 2 };
   if (o.sort === 'utgang' && o.x < 20) return { x: o.x + o.b + 10, y: o.y + o.h };
-  return { x, y: Math.min(RUM.hojd, o.y + o.h + 26) };
+  return { x, y: Math.min(RUM.hojd, o.y + o.h + 12) };
 }
 
 /** Står hjälten vid objektet? @param {{ x: number, y: number }} pos fötterna @param {Objekt} o */
 export function vidObjekt(pos, o) {
   const f = framfor(o);
   return Math.abs(pos.x - f.x) <= 14 && Math.abs(pos.y - f.y) <= 14;
+}
+
+/**
+ * Objekt som hjälten inte kan gå igenom. Grindar och stigar nertill är golv man går på.
+ * @param {Objekt[]} objekt
+ */
+export function hinderFran(objekt) {
+  return objekt.filter((o) => !/^(stig_|grind)/.test(o.id));
 }
