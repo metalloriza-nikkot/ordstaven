@@ -14,14 +14,14 @@ const KNUFF_MS = 9000;
 const vanta = (/** @type {number} */ ms) => new Promise((r) => setTimeout(r, ms));
 
 /**
- * @param {{ aventyr: any, kapitel: any[], ordlistor: any, tillstand: any, sparning: any, logg: any, rost: any, ljud: any,
+ * @param {{ aventyr: any, kartor?: Record<string, import('./karna/karta.js').Karta>, kapitel: any[], ordlistor: any, tillstand: any, sparning: any, logg: any, rost: any, ljud: any,
  *           ui: ReturnType<typeof import('./grans/ui.js').skapaUi>, rum: import('./scener/Rum.js').Rum, layout: any,
  *           inmatning: any, tangentbord: ReturnType<typeof import('./grans/tangentbord.js').skapaTangentbord>,
  *           bilder: ReturnType<typeof import('./grans/bilder.js').skapaBilder>, snabb: boolean, pek: () => boolean,
  *           uppdatering: { tillampa(): void } }} d
  */
 export function skapaSpel(d) {
-  const { aventyr, tillstand, sparning, logg, rost, ljud, ui, rum, layout, inmatning, tangentbord, bilder, snabb } = d;
+  const { aventyr, kartor = {}, tillstand, sparning, logg, rost, ljud, ui, rum, layout, inmatning, tangentbord, bilder, snabb } = d;
   const av = tillstand.aventyr[AVENTYR];
   const inst = (tillstand.installningar = { foralderLaserFarfar: false, etiketter: true, ...tillstand.installningar });
   const lasmotor = skapaLasmotor({ larande: tillstand.spelare.larande, logg });
@@ -99,12 +99,15 @@ export function skapaSpel(d) {
     const scen = b.scen;
     if (!scen) return;
     const nytt = scen.rum !== aktuelltRum;
+    const franRum = aktuelltRum ?? null;
     aktuelltRum = scen.rum;
     const r = scen.rum ? b.rum(scen.rum) : null;
-    rum.visa({ rum: scen.rum, tillstand: b.rumsTillstand(scen.rum), innehall: r ? r.innehall : [], unge: !!av.ungen.namn, nyttRum: nytt });
+    rum.visa({ rum: scen.rum, tillstand: b.rumsTillstand(scen.rum), innehall: r ? r.innehall : [], unge: !!av.ungen.namn, nyttRum: nytt,
+      karta: scen.rum ? kartor[scen.rum] ?? null : null, franRum });
     // närbilden (t.ex. kartbiten) visas tills spelaren ska röra sig i rummet igen
     const st = b.aktuellt();
-    const iRummet = st && (st.typ === 'ga_till' || st.typ === 'fritt' || (st.typ === 'pussel' && b.pussel(st.pussel_id)?.typ === 'P26_krukorna'));
+    const sp = st && st.typ === 'pussel' ? b.pussel(st.pussel_id) : null;
+    const iRummet = st && (st.typ === 'ga_till' || st.typ === 'fritt' || sp?.typ === 'P26_krukorna' || !!sp?.i_rummet);
     ui.$('#narbild').hidden = scen.vy !== 'narbild' || !!iRummet;
     ui.uppdateraHud(av);
     visaEtiketter();
@@ -169,7 +172,7 @@ export function skapaSpel(d) {
     logg.handelse('pussel', p.id);
     let res;
     switch (p.typ) {
-      case 'P1_las_och_valj': case 'P27_packa': res = await valj(p); break;
+      case 'P1_las_och_valj': case 'P28_packa': res = p.i_rummet ? await valjIRummet(p) : await valj(p); break;
       case 'P11_formel': res = await formel(p); break;
       case 'P12_dop': res = await dop(p); break;
       case 'P26_krukorna': res = await krukor(p); break;
@@ -185,9 +188,9 @@ export function skapaSpel(d) {
     return res;
   }
 
-  /** Läs och välj (P1) och packa (P27). @param {any} p */
+  /** Läs och välj (P1) och packa (P28). @param {any} p */
   async function valj(p) {
-    const flera = p.typ === 'P27_packa';
+    const flera = p.typ === 'P28_packa';
     const niva = lasmotor.niva('L', p.typ);
     const v = skapaValj(p, { niva });
     const spar = { hjalp: false };
@@ -235,6 +238,76 @@ export function skapaSpel(d) {
         upptagen = false;
       };
       rita();
+    });
+  }
+
+  /**
+   * Läs och välj i rummet (P1 med i_rummet): alternativen ligger i föremål runt rummet. Frågan syns uppe i rummet.
+   * När hjälten står vid ett föremål syns ordet ovanför det. Ett tryck på ordet (eller på föremålet igen, eller
+   * Mellanslag) öppnar det. Fel föremål ger sin reaktion och blir tomt. Regler som P1: förenkling, ungen pekar.
+   * @param {any} p
+   */
+  async function valjIRummet(p) {
+    const niva = lasmotor.niva('L', p.typ);
+    const v = skapaValj(p, { niva });
+    const spar = { hjalp: false };
+    if (p.instruktion) await replik(p.instruktion);
+    /** @type {Set<string>} alternativ som är öppnade eller borttagna */
+    const borta = new Set();
+    const altFor = (/** @type {string} */ objekt) => v.s.alternativ.find((a) => a.objekt === objekt && !borta.has(a.id));
+    const kvar = () => v.s.alternativ.filter((a) => !borta.has(a.id)).map((a) => a.objekt);
+    const fraga = () => ui.visaTanke(v.s.bild ? bilder.html(v.s.bild) : v.s.text ? ui.rader(v.s.text, varden()) : null);
+    rum.frys(false);
+    fraga();
+    tillatNos(p, spar);
+    return new Promise((klar) => {
+      let upptagen = false;
+      /** @type {string | null} föremålet hjälten står vid och vars ord syns */
+      let vid = null;
+      const k = knuffKlocka(p.knuff, () => ui.pulseraTanke());
+      const visaOrd = () => {
+        const id = upptagen ? null : rum.starVid(kvar());
+        if (id === vid) return;
+        vid = id;
+        const a = id ? altFor(id) : null;
+        const o = id ? rum.ruta(id) : null;
+        if (!a || !o) { ui.ordskylt(null); return; }
+        ljud.spela('klick');
+        const pt = rumTillSkarm(layout.skala, o.x + o.b / 2, o.y);
+        const under = rumTillSkarm(layout.skala, o.x + o.b / 2, o.y + o.h).y;
+        ui.ordskylt(`<button type="button" class="kort ${v.s.pekar === a.id ? 'pekar' : ''}" data-id="${ui.esc(a.id)}"><span class="kort-etikett">${ui.rader(a.ord || '', varden(), 'kort-ord')}</span></button>`, pt, () => oppna(a.id), { under, rumTopp: layout.skala.topp });
+      };
+      const tick = window.setInterval(visaOrd, 80);
+      const sluta = lyssnaHandling((h) => { if (h.typ === 'interagera' && vid) { const a = altFor(vid); if (a) oppna(a.id); } });
+      rum.tryckPa = (/** @type {string} */ id) => { if (id === vid) { const a = altFor(id); if (a) oppna(a.id); } };
+      const oppna = async (/** @type {string} */ altId) => {
+        if (upptagen || ui.nosAktiv) return;
+        k.nollstall();
+        const alt = v.s.alternativ.find((a) => a.id === altId);
+        const r = v.valj(altId);
+        upptagen = true; vid = null; ui.ordskylt(null);
+        rum.frys(true);
+        if (r.resultat === 'fel') {
+          ljud.spela('fel');
+          borta.add(altId); if (alt?.objekt) rum.tomt(alt.objekt);
+          await reaktion(r.reaktion);
+          // förenklingen kan ha tagit bort ett alternativ: det föremålet blir tomt också
+          for (const a of /** @type {any[]} */ (Object.values(p.varianter).flatMap((x) => /** @type {any} */ (x).alternativ))) {
+            if (!v.s.alternativ.some((x) => x.id === a.id) && a.objekt) rum.tomt(a.objekt);
+          }
+          const pekar = v.s.pekar ? v.s.alternativ.find((a) => a.id === v.s.pekar) : null;
+          if (pekar?.objekt) rum.markera(pekar.objekt, true);
+          fraga();
+          rum.frys(false); upptagen = false;
+          return;
+        }
+        ljud.spela('ratt');
+        window.clearInterval(tick); sluta(); k.stopp(); rum.tryckPa = null;
+        ui.visaTanke(null);
+        for (const a of v.s.alternativ) if (a.objekt) rum.markera(a.objekt, false);
+        await reaktion(r.reaktion);
+        klar({ niva: v.s.variantNyckel, forstaForsoket: v.forstaForsoket, forsok: v.s.forsok, hjalp: spar.hjalp });
+      };
     });
   }
 
@@ -527,7 +600,7 @@ export function skapaSpel(d) {
     slutskarm();
   }
   /** Fas 2 spelar bara kapitel vars alla pusseltyper finns. @param {any} kapitel */
-  const stodsAvGrabox = (kapitel) => kapitel.pussel.every((/** @type {any} */ p) => ['P1_las_och_valj', 'P27_packa', 'P11_formel', 'P12_dop', 'P26_krukorna'].includes(p.typ));
+  const stodsAvGrabox = (kapitel) => kapitel.pussel.every((/** @type {any} */ p) => ['P1_las_och_valj', 'P28_packa', 'P11_formel', 'P12_dop', 'P26_krukorna'].includes(p.typ));
 
 
   function slutskarm() {
@@ -553,7 +626,7 @@ export function skapaSpel(d) {
       <label><input type="checkbox" class="etiketter" ${inst.etiketter ? 'checked' : ''}> Visa objektens namn</label></div>
       <div class="menygrupp scenlista"><b>Hoppa till scen:</b>${scener}</div>
       <div class="menygrupp"><button type="button" class="menyval logg">Spara loggen</button><button type="button" class="menyval nollstall">Börja om från början</button><button type="button" class="menyval stang">Stäng</button></div></div>`);
-    s.querySelectorAll('.niva').forEach((el) => el.addEventListener('click', () => { lasmotor.sattNiva('L', 'P1_las_och_valj', Number(/** @type {HTMLElement} */ (el).dataset.n)); lasmotor.sattNiva('L', 'P27_packa', Number(/** @type {HTMLElement} */ (el).dataset.n)); spara(); oppnaMeny(); }));
+    s.querySelectorAll('.niva').forEach((el) => el.addEventListener('click', () => { lasmotor.sattNiva('L', 'P1_las_och_valj', Number(/** @type {HTMLElement} */ (el).dataset.n)); lasmotor.sattNiva('L', 'P28_packa', Number(/** @type {HTMLElement} */ (el).dataset.n)); spara(); oppnaMeny(); }));
     s.querySelector('.foralder')?.addEventListener('change', (e) => { inst.foralderLaserFarfar = /** @type {HTMLInputElement} */ (e.target).checked; spara(); });
     s.querySelector('.etiketter')?.addEventListener('change', (e) => { inst.etiketter = /** @type {HTMLInputElement} */ (e.target).checked; spara(); visaEtiketter(); });
     s.querySelectorAll('.scen').forEach((el) => el.addEventListener('click', () => { av.scen = Number(/** @type {HTMLElement} */ (el).dataset.i); av.startad = false; spara(); location.reload(); }));

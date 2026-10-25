@@ -15,13 +15,13 @@ export function blanda(lista, slump = Math.random) {
 }
 
 // ---------------------------------------------------------------------------------------------
-// P1 läs och välj, P27 packa (flera rätt)
+// P1 läs och välj, P28 packa (flera rätt)
 // ---------------------------------------------------------------------------------------------
 /**
  * @param {any} pussel @param {{ niva: number, slump?: () => number }} opt
  */
 export function skapaValj(pussel, { niva, slump = Math.random }) {
-  const flera = pussel.typ === 'P27_packa';
+  const flera = pussel.typ === 'P28_packa';
   let [variantNyckel, variant] = valjVariant(pussel.varianter, niva);
   const s = {
     typ: pussel.typ,
@@ -30,7 +30,7 @@ export function skapaValj(pussel, { niva, slump = Math.random }) {
     bild: variant.bild ?? null,
     /** @type {any[]} synliga alternativ, i blandad ordning */
     alternativ: blanda(variant.alternativ, slump),
-    /** @type {Set<string>} valda (P27) */
+    /** @type {Set<string>} valda (P28) */
     valda: new Set(),
     fel: 0,
     forsok: 0,
@@ -50,7 +50,7 @@ export function skapaValj(pussel, { niva, slump = Math.random }) {
       s.alternativ = blanda(variant.alternativ, slump);
       return;
     }
-    // ta bort fel alternativ: ett i P1 (två kvar), två i P27
+    // ta bort fel alternativ: ett i P1 (två kvar), två i P28
     const antal = flera ? 2 : 1;
     const fel = s.alternativ.filter((a) => !a.ratt);
     const bort = new Set(blanda(fel, slump).slice(0, Math.min(antal, Math.max(0, fel.length - (flera ? 0 : 1)))).map((a) => a.id));
@@ -85,7 +85,7 @@ export function skapaValj(pussel, { niva, slump = Math.random }) {
       if (s.fel >= 3) s.pekar = flera ? rattaKvar()[0]?.id ?? null : s.alternativ.find((x) => x.ratt)?.id ?? null;
       return { resultat: 'fel', reaktion: a.vid_valj ?? pussel.vid_fel ?? null, forenklad };
     },
-    /** Löst på första försöket (P27: utan något fel). */
+    /** Löst på första försöket (P28: utan något fel). */
     get forstaForsoket() { return s.fel === 0; },
   };
 }

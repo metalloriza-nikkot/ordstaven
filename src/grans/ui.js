@@ -23,6 +23,8 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
       <span id="hud-radio" class="hud-knapp" hidden><span class="ikon">📻</span></span>
     </div>
     <button type="button" id="hud-meny" aria-label="Meny för vuxna (håll inne)">⚙</button>
+    <div id="tanke" hidden></div>
+    <div id="ordskylt" hidden></div>
     <div id="regi" hidden></div>
     <div id="narbild" hidden><span>🗺️</span></div>
     <div id="plattan" hidden></div>
@@ -153,7 +155,29 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     e.innerHTML = objekt.map((o) => { const p = tillSkarm(o.x + o.b / 2, o.y); return `<span class="etikett-obj" style="left:${p.x}px;top:${p.y}px">${esc(o.id.replace(/_/g, ' '))}</span>`; }).join('');
   }
 
+  // ---------------------------------------------------------------- läs i rummet
+  /** Frågan (tankebubblan) uppe i rummet medan spelaren letar. null döljer. @param {string | null} html */
+  function visaTanke(html) { const t = $('#tanke'); t.hidden = !html; t.innerHTML = html || ''; }
+  function pulseraTanke() { const t = $('#tanke'); t.classList.remove('puls'); void t.offsetWidth; t.classList.add('puls'); }
+  /**
+   * Ordet på föremålet hjälten står vid, som en knapp ovanför föremålet. null döljer.
+   * Ryms skylten inte ovanför föremålet (nära översta väggen) visas den under.
+   * @param {string | null} html @param {{ x: number, y: number }} [punkt] skärmpunkt (föremålets överkant, mitten)
+   * @param {() => void} [vidTryck] @param {{ under: number, rumTopp: number }} [plats] föremålets underkant och rummets överkant på skärmen
+   */
+  function ordskylt(html, punkt, vidTryck, plats) {
+    const e = $('#ordskylt');
+    if (!html || !punkt) { e.hidden = true; e.innerHTML = ''; return; }
+    e.innerHTML = html; e.hidden = false;
+    e.style.left = punkt.x + 'px'; e.style.top = punkt.y + 'px';
+    e.classList.remove('under');
+    if (plats && punkt.y - e.offsetHeight - 6 < plats.rumTopp) { e.classList.add('under'); e.style.top = plats.under + 'px'; }
+    const knapp = e.querySelector('button');
+    knapp?.addEventListener('click', () => { if (!nos.aktiv) vidTryck?.(); });
+  }
+
   return {
+    visaTanke, pulseraTanke, ordskylt,
     ui, $, plattan, rader, esc, visaPlatta, doljPlatta, vantaFortsatt, visaRegi, doljRegi, visaFest,
     uppdateraHud, pulsera, visaSkarm, doljSkarm, etiketter, sattNos, vaxlaNos, ljuda, arHelord,
     handling,

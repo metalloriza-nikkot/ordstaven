@@ -38,6 +38,7 @@ async function draFormel(page, svar, dumpa = false) {
 async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid = null } = {}) {
   const sett = new Set();
   const sparadeDumpar = new Set();
+  const oppnade = new Set();
   for (let varv = 0; varv < 400; varv++) {
     const lage = await page.evaluate(() => {
       const O = window.__ORDSTAVEN; const st = O.steg();
@@ -89,6 +90,7 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
     // i rummet: gå till målet, eller till krukorna
     if (lage.typ === 'ga_till' && lage.mal) {
       const pt = await page.evaluate((m) => window.__ORDSTAVEN.objekt(m), lage.mal);
+      if (!pt) { await page.waitForTimeout(80); continue; } // hjälten kom fram och rummet byttes just nu
       // målet måste synas: inget överlägg (närbild, läsplatta, helskärm) får ligga över det
       const skymd = await page.evaluate((p) => {
         for (const s of ['#narbild', '#plattan', '#skarm:not(.genomskinlig)']) {
@@ -99,8 +101,37 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
         return null;
       }, pt);
       expect(skymd, `målet ${lage.mal} i ${lage.scen} syns inte`).toBeNull();
+      if (dumpa && !sparadeDumpar.has(nyckel)) { sparadeDumpar.add(nyckel); await page.screenshot({ path: `tests/skarmdumpar/prolog/${String(sparadeDumpar.size).padStart(2, '0')}-${nyckel}-${lage.mal}.png` }); }
       if (pt) await page.mouse.click(pt.x, pt.y);
       await page.waitForTimeout(400); continue;
+    }
+    if (lage.typ === 'pussel' && pussel.get(lage.pusselId)?.i_rummet) {
+      // läs i rummet: gå till ett föremål, läs ordet som syns, tryck på det
+      const p = pussel.get(lage.pusselId);
+      const alla = Object.values(p.varianter).flatMap((v) => v.alternativ).filter((a) => !oppnade.has(`${p.id}/${a.id}`));
+      const fel = felFor.has(p.id) ? alla.find((a) => !a.ratt) : null;
+      const a = fel || alla.find((x) => x.ratt);
+      if (fel) felFor.delete(p.id);
+      oppnade.add(`${p.id}/${a.id}`);
+      await expect(page.locator('#tanke')).toBeVisible();
+      const pt = await page.evaluate((m) => window.__ORDSTAVEN.objekt(m), a.objekt);
+      const skymd = await page.evaluate((q) => {
+        for (const s of ['#plattan', '#tanke', '#skarm:not(.genomskinlig)']) {
+          const e = document.querySelector(s); if (!e || e.hidden) continue;
+          const r = e.getBoundingClientRect();
+          if (q.x >= r.left && q.x <= r.right && q.y >= r.top && q.y <= r.bottom) return s;
+        }
+        return null;
+      }, pt);
+      expect(skymd, `föremålet ${a.objekt} syns inte`).toBeNull();
+      await page.mouse.click(pt.x, pt.y);
+      const skylt = page.locator('#ordskylt .kort');
+      await expect(skylt).toBeVisible({ timeout: 20000 });
+      await expect(skylt).toHaveText(a.ord.toLocaleUpperCase('sv-SE'));
+      if (dumpa && !sparadeDumpar.has(`${nyckel}-skylt`)) { sparadeDumpar.add(`${nyckel}-skylt`); await page.screenshot({ path: `tests/skarmdumpar/prolog/${String(sparadeDumpar.size).padStart(2, '0')}-${nyckel}-skylt.png` }); }
+      await skylt.click();
+      await page.waitForTimeout(300);
+      continue;
     }
     if (lage.typ === 'pussel' && pussel.get(lage.pusselId)?.typ === 'P26_krukorna') {
       // gå till en kruka i taget och vänta tills hjälten står still

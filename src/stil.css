@@ -304,3 +304,15 @@ html, body {
 
 /* testläget: inga animationer, så att testerna kan trycka på knapparna */
 .snabb *, .snabb *::before, .snabb *::after { animation: none !important; transition: none !important; }
+
+/* läs i rummet: frågan uppe i rummet, ordet ovanför föremålet hjälten står vid */
+#tanke { position: absolute; left: calc(var(--rum-vanster) + var(--rum-bredd) / 2); top: calc(var(--rum-topp) + 10px); transform: translateX(-50%); padding: 6px 18px; border-radius: 40px; background: rgba(255, 255, 255, .92); box-shadow: 0 4px 14px rgba(0, 0, 0, .35); pointer-events: none; font-size: calc(48px * var(--t)); line-height: 1; }
+#tanke .bild.bubbla { font-size: inherit; }
+#tanke.puls { animation: tankepuls .6s ease-in-out 3; }
+@keyframes tankepuls { 50% { transform: translateX(-50%) scale(1.15); } }
+#ordskylt { position: absolute; transform: translate(-50%, calc(-100% - 6px)); z-index: 5; }
+#ordskylt .kort { min-width: calc(96px * var(--t)); min-height: calc(72px * var(--t)); padding: 6px 14px; animation: luft .25s ease; }
+#ordskylt .kort::after { content: ''; position: absolute; left: 50%; bottom: -10px; transform: translateX(-50%); border: 8px solid transparent; border-top-color: #fff; border-bottom: 0; }
+.platta-oppen #ordskylt, .platta-oppen #tanke { display: none; }
+#ordskylt.under { transform: translate(-50%, 6px); }
+#ordskylt.under .kort::after { top: -10px; bottom: auto; border-bottom: 8px solid #fff; border-top: 0; }
