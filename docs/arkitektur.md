@@ -263,6 +263,81 @@ content/*.json ──► karna/berattelse.js ──► spel.js ──► scener/
 - **Skrivläget**: på pekskärm visas skärmtangentbordet när ett namn skrivs. Layouten håller 232 punkter nertill, rummet krymper ett steg och glider upp. På dator skriver man på det fysiska tangentbordet (⌨ visar skärmtangentbordet ändå).
 - **Rösten**: bara datorröst (`grans/rost.js`), med rollröster per talare (`aventyr.json`). Menyn kan låta föräldern läsa Farfars repliker.
 - **Använda föremål** (0.3.1): att gå fram räcker inte. Det som går att använda just nu har en glimt (stjärna i hörnet). När hjälten står vid det lyser det, locket lyfts på glänt och en hand (✋) visas ovanför. Spelaren använder det med ett tryck till på föremålet, ett tryck på handen, eller Mellanslag/Enter. Utgångar (dörrar, stegar, grinden) går man igenom bara genom att gå dit. Gäller `ga_till`, krukorna och fri lek (`spel.js`, `anvand`). Läs i rummet (`i_rummet`) använder ordet ovanför lådan som knapp i stället för handen.
+- **Bilden stämmer med texten** (0.3.2): färg och storlek som en läsuppgift nämner syns i bilden. Gråboxens färger (`karna/egenskaper.js`) skiljer sig minst 10 L* i ljushet, och ett test kontrollerar att varje rätt alternativ har den färg och storlek texten säger. Ett föremål i kartan med `visar: <pussel>` ritar pusslets alternativ i rummet i samma färg och storlek, i den variant spelaren får.
+- **Bärräknaren matar ungen** (0.3.2): ett tryck när världen går får ett bär att flyga till ungen, ungen hoppar och låter glad. Vid 0 bär rycker ungen på axlarna. Ingen tangent (alla bokstäver ska gå att skriva), musen eller ett tryck räcker.
+- **Styrhjälpen** (`visa_styrhjalp`): piltangenter på dator, ett finger som trycker på målet på pekskärm. Utan text, försvinner när hjälten börjar gå. Kontrollen varnar för instruktioner som nämner en enhet (piltangent, mus, klicka m.fl.).
 - **Meny för vuxna**: håll inne ⚙ (eller Ctrl+Skift+M). En ring fylls medan man håller, ett kort tryck visar "Håll inne". Menyn ligger i ett eget lager och går att öppna även på startskärmen. Läsnivå, föräldern läser Farfar, objektens namn, hoppa till scen, spara loggen, börja om.
 - **Testläge**: `?snabb` stänger av rösten, animationerna och kortar pauserna. `?ny` börjar om från början.
 - **Kapitel 1** finns som data och går igenom kontrollen, men spelas inte: P15 och P9 byggs i fas 3. Gråboxen slutar efter prologen.
+
+## 14. Lager och tillstånd (0.3.2)
+
+Spelet är byggt i lager. Djupnumren (CSS `z-index`, med luckor för det som kommer) säger vad som ritas ovanpå vad.
+
+| Djup | Lager | Var | Vad det gör |
+|---|---|---|---|
+| 0 | Världen | Phaser (`scener/Rum.js`) | Rummet, hjälten, ungen, ljuset, glimtar och ram kring det som går att använda. Ingen text. |
+| 1 | Etiketter för den vuxne | `#etiketter` | Föremålens id över rummet (gråbox, kan stängas av). Tar aldrig emot tryck. |
+| 2 | HUD | `#hud`, `#hud-meny` | Bär, nos, lapp, radio. Knapparna tar emot tryck, resten släpper igenom. |
+| 3 | Läsplattan | `#plattan`, `#remsa` | Repliker, pussel, lappar, boken. Världen står still medan den är öppen. Remsan (ljudningen) ligger ovanpå och avbryts med ett tryck. |
+| 4 | Mellanscener och styrhjälp | `#regi`, `#styrhjalp`, `#narbild`, `#fest` | Regi för den vuxne, styrhjälpen, närbilder, korta fester. Tar aldrig emot tryck. |
+| 5 | Saker i rummet som väntar på spelaren | `#tanke`, `#ordskylt`, `#handknapp` | Frågan när man läser i rummet, ordet ovanför lådan, handen. Döljs när läsplattan är öppen. |
+| 4 | Helskärmar | `#skarm` | Startskärmen, passets slut och paus. Kan vara genomskinlig (fri lek) och släpper då bara igenom ▶. |
+| 6 | Menyknappen | `#hud-meny` | Ligger över helskärmarna, så att menyn går att öppna överallt. |
+| 7 | Menyn för vuxna | `#vuxenmeny` | Pausar spelet (se nedan). Ligger över allt. |
+| — | Skärmtangentbordet | `#tangentbord` | Bara när ett namn skrivs på pekskärm. Rummet krymper så att inget täcks. |
+| — | Felsökningsloggen | Ctrl+Skift+L | Ritas utanför spelet, rör inte tillståndet. |
+
+**Vem tar emot tryck och tangenter.** Tangenter och tryck på rummet går genom `karna/inmatning.js` som handlingar. Stegen lyssnar med `lyssnaHandling`. Tryck på knappar i DOM går direkt till knappen. Det översta lagret som syns tar trycket; lager som inte ska ta emot tryck har `pointer-events: none`.
+
+**När världen står still.** Läsplattan, helskärmar och pausen fryser världen (`rum.frys`). Hjälten går inte, knuffar väntar, handen och glimtarna visas inte. Röst och ljud fortsätter bara i det lager som syns.
+
+**Paus.** Menyn för vuxna och en dold flik pausar spelet (`pausa` / `fortsatt` i `spel.js`). Då stannar världen, rösten och ljudningen tystnar, knuffarnas klockor väntar, handlingar når inga steg och spelet sparas. Allt annat ligger kvar som det var, så att spelet fortsätter exakt där det stod.
+
+**Från varje tillstånd finns en väg ut.**
+
+| Tillstånd | Vägen ut |
+|---|---|
+| Replik | ▶, tryck på plattan, Mellanslag eller Enter |
+| Pussel | Lösa det (förenkling efter 2 fel, ungen pekar efter 3, aldrig fast). Menyn: hoppa till scen eller börja om |
+| Lapp, bok | ▶ / ✓, Mellanslag |
+| Ljudning | Tryck på remsan, på nosen eller Escape. Maxtid som säkerhetsnät |
+| Passets slut, paus | ▶ (💤 visar en pausbild med ▶) |
+| Fri lek | ▶ i hörnet |
+| Namn med skärmtangentbord | ✓ (minst en bokstav) |
+| Menyn för vuxna | Stäng, Escape |
+| Dold flik | Visa fliken igen |
+
+Genomspelningstestet öppnar menyn över varje sorts lager (replik, kort, formel, namn, bok, lapp, passets slut, hjälten, rummet), kontrollerar att spelet står still och tar sig ut med Escape. Det stänger också fliken mitt i en scen i varje pass och kontrollerar att spelet fortsätter på samma steg.
+
+**Dolda lager kör inget.** Varje steg stänger sina klockor och lyssnare när det är klart (`anvand`, `valjIRummet`, knuffarna). En dold HUD-knapp gör ingenting när den trycks.
+
+## 15. Fortsätta där man var (0.3.2)
+
+- Spelet sparar efter varje steg, alltså minst vid varje ny scen och varje löst pussel.
+- Sparningen har scenens id, numret, passet och steget (`scenId`, `scen`, `pass`, `steg`).
+- Vid en omstart spelas scenens `vid_omstart` ("Var var vi?"), och sedan fortsätter spelet på samma steg.
+- Ett steg som ger något (bär, kartbit, grad) ger det bara en gång, även om spelet startas om mitt i steget (`effekt` i sparningen).
+- **Stabila id:n.** Byter en scen eller ett pussel id står det gamla i kapitelfilens `alias` (`{ "scener": { "gammalt": "nytt" } }`). En sparning med ett id som har tagits bort utan alias börjar i början av samma pass. Lappar med borttagna id:n försvinner ur listan. Testat med en sparning från en äldre version av innehållet (`tests/fixturer/spar-aldre-innehall.json`).
+
+## 16. Ett nytt äventyr (0.3.2)
+
+Motorn vet inget om ett visst äventyr. Allt som är DEN GÖMDA DALEN ligger i data:
+
+| Var | Vad | Ägs av |
+|---|---|---|
+| `content/<äventyr>/aventyr.json` | `id`, titel, talare, platshållare, kapitelordning | Innehåll (formatet: teknik) |
+| `content/<äventyr>/kap-NN.json` | Kapitlen: rum, scener, pussel | Innehåll |
+| `kartor/<äventyr>/<rum>.tmj` | Var föremålen står (Tiled) | Teknik i gråboxen, sedan stil |
+| `kartor/<äventyr>/platshallare.json` | Gråboxens platshållarbilder för bild-id:n | Teknik |
+
+Ett nytt äventyr är en ny mapp i `content/` och en i `kartor/`. `main.js` hittar dem själv. Med flera äventyr väljs ett med `?aventyr=<id>` tills startskärmen får ett val (fas 3–4).
+
+**Sparfilen** har två delar:
+- **Spelarens** (`spelare`): hjälten (namn, utseende, grad, formler, eget formatfält så att den kan exporteras) och lärandeprofilen (nivåer per pusseltyp, historik). Följer med till nästa äventyr.
+- **Äventyrets** (`aventyr.<id>`): var man är (kapitel, scen, steg, pass), rummens tillstånd, bär, kartbitar, lappar, ungen, gränssnittet som har visats. Skapas första gången äventyret spelas (`aventyrFor`).
+
+Kvar att göra senare (noterat, inte byggt):
+- Inställningen `foralderLaserFarfar` har ett äventyrsnamn i nyckeln. Etiketten i menyn hämtar talarnas namn ur `aventyr.json`, men nyckeln byts först när sparformatet ändras av annat skäl.
+- Bärens räknare och nosen hör till serien (ungen), inte till äventyret, och ligger kvar i motorn.
+- Namnkonventionen för utgångar (`dorr_`, `stege_`, `grind`, `stig_`) används bara när kartan inte säger något.
