@@ -45,6 +45,10 @@ export class Rum extends Phaser.Scene {
     this.markerade = new Set();
     /** @type {((id: string) => void) | null} anropas när spelaren trycker på föremålet hjälten står vid */
     this.tryckPa = null;
+    /** @type {string[]} föremål som går att använda just nu */
+    this.interaktiva = [];
+    /** @type {string | null} föremålet hjälten står vid och kan använda */
+    this.naraId = null;
     this.redo = new Promise((r) => { this._redo = r; });
     this.hinder = skapaHinder([]);
     /** @type {{ x: number, y: number }[]} vägen hjälten går just nu */
@@ -62,6 +66,11 @@ export class Rum extends Phaser.Scene {
     this.hjalte = this.add.container(0, 0);
     this.unge = this.add.container(0, 0).setVisible(false);
     this.lagerFigurer.add([this.unge, this.hjalte]);
+    // det som går att använda: en glimt på avstånd, ljus ram och glänt lock när hjälten står vid det
+    this.glimtar = this.add.graphics();
+    this.tweens.add({ targets: this.glimtar, alpha: { from: 1, to: 0.25 }, duration: 700, yoyo: true, repeat: -1 });
+    this.naraRam = this.add.graphics();
+    this.tweens.add({ targets: this.naraRam, alpha: { from: 1, to: 0.55 }, duration: 450, yoyo: true, repeat: -1 });
     this.malKors = this.add.graphics().setVisible(false);
     this.malKors.fillStyle(FARG.markerad).fillRect(-3, 0, 7, 1).fillRect(0, -3, 1, 7);
     // tryck på ett objekt = gå fram till det
@@ -129,6 +138,7 @@ export class Rum extends Phaser.Scene {
       this.lagerObjekt.removeAll(true); this.ritade.clear(); this.markerade.clear();
       for (const o of this.objekt) this.ritaObjekt(o);
       this.byggHinder();
+      this.sattInteraktiva(this.interaktiva.filter((id) => this.ruta(id))); this.nara(null);
       if (v.nyttRum || !this.harRum) {
         // hjälten kommer in genom utgången från förra rummet, annars vid kartans startpunkt
         const dorr = v.franRum ? this.objekt.find((o) => o.till === v.franRum) : null;
@@ -143,6 +153,29 @@ export class Rum extends Phaser.Scene {
     this.ritaLjus();
     this.placera();
     this.b.vidAndring?.();
+  }
+
+  /** Föremålen som går att använda just nu får en glimt. @param {string[]} ids */
+  sattInteraktiva(ids) {
+    this.interaktiva = ids;
+    const g = this.glimtar; g.clear();
+    for (const id of ids) {
+      const o = this.ruta(id); if (!o || o.sort === 'utgang') continue;
+      // en liten stjärna i övre högra hörnet
+      const x = o.x + o.b - 2, y = o.y + 1;
+      g.fillStyle(FARG.markerad, 1).fillRect(x - 1, y - 3, 2, 6).fillRect(x - 3, y - 1, 6, 2);
+    }
+  }
+
+  /** Hjälten står vid ett föremål som går att använda: ljus ram och locket på glänt. @param {string | null} id */
+  nara(id) {
+    this.naraId = id;
+    const g = this.naraRam; g.clear();
+    const o = id ? this.ruta(id) : null;
+    if (!o) return;
+    g.lineStyle(2, FARG.markerad, 1).strokeRect(o.x - 1, o.y - 1, o.b + 2, o.h + 2);
+    // locket lyfts lite (gråboxens tecken för "här kan du göra något")
+    if (o.sort === 'sak') g.fillStyle(0xfff2b0, 0.9).fillRect(o.x + 2, o.y - 4, o.b - 4, 2);
   }
 
   byggHinder() { this.hinder = skapaHinder(hinderFran(this.objekt)); this.vag = []; this.vagMal = null; }

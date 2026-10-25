@@ -54,6 +54,8 @@ export function skapaSpel(d) {
   async function replik(r) {
     rum.frys(true);
     const el = ui.visaPlatta(`<div class="replik-ruta">${portratt(r.talare)}<div class="text">${ui.rader(r.text, varden())}</div><button type="button" class="vidare" aria-label="Vidare">▶</button></div>`, 'replik');
+    // nosen fungerar på repliker också, gratis (de läses ändå upp), så att "tryck på nosen" alltid ger svar
+    ui.sattNos(true, { betala: () => true });
     const fortsatt = ui.vantaFortsatt(el, lyssnaHandling);
     await Promise.race([sag(r), fortsatt]);
     el.classList.add('klar-att-ga');
@@ -153,13 +155,53 @@ export function skapaSpel(d) {
     }
   }
 
+  /**
+   * Vänta tills spelaren använder ett av föremålen. Att gå fram räcker inte: hjälten går dit, föremålet lyser
+   * och en hand visas ovanför, och spelaren använder det med ett tryck till (på föremålet eller handen),
+   * Mellanslag eller Enter. Utgångar (dörrar, stegar, grinden) går man igenom bara genom att gå dit.
+   * @param {string[]} ids
+   * @returns {Promise<string> & { avbryt(): void }}
+   */
+  function anvand(ids) {
+    let avbryt = () => {};
+    const lova = /** @type {Promise<string> & { avbryt(): void }} */ (new Promise((klar) => {
+      const utgangar = ids.filter((id) => rum.ruta(id)?.sort === 'utgang');
+      const saker = ids.filter((id) => !utgangar.includes(id));
+      rum.sattInteraktiva(saker);
+      /** @type {string | null} */
+      let nara = null;
+      const visaNara = (/** @type {string | null} */ id) => {
+        if (id === nara) return;
+        nara = id; rum.nara(id);
+        const o = id ? rum.ruta(id) : null;
+        if (!o) { ui.handknapp(null); return; }
+        ljud.spela('klick');
+        ui.handknapp(rumTillSkarm(layout.skala, o.x + o.b / 2, o.y), () => gor(o.id), { under: rumTillSkarm(layout.skala, 0, o.y + o.h).y, rumTopp: layout.skala.topp });
+      };
+      const tick = window.setInterval(() => {
+        if (rum.fryst) { visaNara(null); return; }
+        visaNara(rum.starVid(saker));
+        const ut = utgangar.length ? rum.starVid(utgangar) : null;
+        if (ut) gor(ut);
+      }, 60);
+      const sluta = lyssnaHandling((h) => { if (h.typ === 'interagera' && nara && !rum.fryst) gor(nara); });
+      rum.tryckPa = (id) => { if (id === nara) gor(id); };
+      let gjort = false;
+      const stada = () => { gjort = true; window.clearInterval(tick); sluta(); rum.tryckPa = null; visaNara(null); rum.sattInteraktiva([]); };
+      function gor(/** @type {string} */ id) { if (gjort) return; stada(); inmatning.rensaGaTill(); klar(id); }
+      avbryt = () => { if (!gjort) stada(); };
+    }));
+    lova.avbryt = () => avbryt();
+    return lova;
+  }
+
   /** @param {any} st */
   async function gaTill(st) {
     rum.frys(false);
     if (!rum.ruta(st.mal)) { logg.handelse('FEL', 'objektet finns inte i rummet: ' + st.mal); return; }
     if (st.visa_styrhjalp) rum.markera(st.mal, true);
     const k = knuffKlocka(st.knuff ?? { handling: '' }, () => rum.markera(st.mal, true));
-    await rum.vantaPa([st.mal]);
+    await anvand([st.mal]);
     k.stopp(); rum.markera(st.mal, false); ui.doljRegi();
   }
 
@@ -258,6 +300,7 @@ export function skapaSpel(d) {
     const kvar = () => v.s.alternativ.filter((a) => !borta.has(a.id)).map((a) => a.objekt);
     const fraga = () => ui.visaTanke(v.s.bild ? bilder.html(v.s.bild) : v.s.text ? ui.rader(v.s.text, varden()) : null);
     rum.frys(false);
+    rum.sattInteraktiva(kvar());
     fraga();
     tillatNos(p, spar);
     return new Promise((klar) => {
@@ -269,6 +312,7 @@ export function skapaSpel(d) {
         const id = upptagen ? null : rum.starVid(kvar());
         if (id === vid) return;
         vid = id;
+        rum.nara(id);
         const a = id ? altFor(id) : null;
         const o = id ? rum.ruta(id) : null;
         if (!a || !o) { ui.ordskylt(null); return; }
@@ -295,6 +339,7 @@ export function skapaSpel(d) {
           for (const a of /** @type {any[]} */ (Object.values(p.varianter).flatMap((x) => /** @type {any} */ (x).alternativ))) {
             if (!v.s.alternativ.some((x) => x.id === a.id) && a.objekt) rum.tomt(a.objekt);
           }
+          rum.sattInteraktiva(kvar());
           const pekar = v.s.pekar ? v.s.alternativ.find((a) => a.id === v.s.pekar) : null;
           if (pekar?.objekt) rum.markera(pekar.objekt, true);
           fraga();
@@ -302,7 +347,7 @@ export function skapaSpel(d) {
           return;
         }
         ljud.spela('ratt');
-        window.clearInterval(tick); sluta(); k.stopp(); rum.tryckPa = null;
+        window.clearInterval(tick); sluta(); k.stopp(); rum.tryckPa = null; rum.nara(null); rum.sattInteraktiva([]);
         ui.visaTanke(null);
         for (const a of v.s.alternativ) if (a.objekt) rum.markera(a.objekt, false);
         await reaktion(r.reaktion);
@@ -447,7 +492,7 @@ export function skapaSpel(d) {
     const knuff = knuffKlocka(p.knuff, () => { const i = k.s.slagna.findIndex((x) => x === null); if (i >= 0) rum.markera(ids[i], true); });
     while (!k.s.klar) {
       const kvar = ids.filter((_, i) => k.s.slagna[i] === null);
-      const id = await rum.vantaPa(kvar);
+      const id = await anvand(kvar);
       knuff.nollstall(); rum.markera(id, false);
       const fynd = k.sla(ids.indexOf(id));
       ljud.spela('sla'); rum.slagen(id);
@@ -534,22 +579,24 @@ export function skapaSpel(d) {
     const knapp = ui.visaSkarm('<button type="button" class="vidare-hornet" aria-label="Vidare">▶</button>');
     knapp.classList.add('genomskinlig');
     let fortsatt = false;
-    const vidare = ui.vantaFortsatt(/** @type {HTMLElement} */ (knapp.querySelector('button')), lyssnaHandling).then(() => { fortsatt = true; });
+    // bara knappen går vidare: Mellanslag används till att svinga staven mot buskarna
+    const vidare = ui.vantaFortsatt(/** @type {HTMLElement} */ (knapp.querySelector('button')), () => () => {}).then(() => { fortsatt = true; });
     const slagna = new Map();
+    /** @type {ReturnType<typeof anvand> | null} */
+    let vantar = null;
     (async () => {
       while (!fortsatt) {
-        const id = await Promise.race([rum.vantaPa(st.foremal || []), vidare.then(() => null)]);
+        vantar = anvand(st.foremal || []);
+        const id = await Promise.race([vantar, vidare.then(() => null)]);
         if (!id || fortsatt) break;
         const n = (slagna.get(id) || 0) + 1; slagna.set(id, n);
         ljud.spela('sla');
         if (n <= 2) { av.bar++; ui.uppdateraHud(av); ljud.spela('bar'); await ui.visaFest('🫐', tid(500)); }
-        // gå ett steg bort så att samma föremål kan slås igen
-        inmatning.sattGaTill(rum.pos.x, Math.min(188, rum.pos.y + 20));
-        await vanta(400);
+        await vanta(tid(300));
       }
     })();
     await vidare;
-    rum.vantar = null;
+    vantar?.avbryt();
     knapp.classList.remove('genomskinlig');
     ui.doljSkarm();
   }
@@ -609,18 +656,27 @@ export function skapaSpel(d) {
     s.querySelector('.om')?.addEventListener('click', () => { sparning.nollstall(); location.reload(); });
   }
 
-  // gråboxens meny för vuxna: håll inne ⚙
+  // gråboxens meny för vuxna: håll inne ⚙ en stund (en ring fylls). Ett kort tryck visar att man ska hålla.
+  // Hållet räknas på hela knappen och tål att fingret glider lite, så att det fungerar på iPad.
+  const HALL_MS = 800;
   let hallTimer = 0;
   const meny = ui.$('#hud-meny');
-  meny.addEventListener('pointerdown', () => { hallTimer = window.setTimeout(oppnaMeny, 700); });
-  for (const t of ['pointerup', 'pointerleave', 'pointercancel']) meny.addEventListener(t, () => clearTimeout(hallTimer));
+  const slapp = () => { clearTimeout(hallTimer); meny.classList.remove('haller'); };
+  meny.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    try { meny.setPointerCapture(e.pointerId); } catch (_) { /* ok */ }
+    meny.classList.remove('visa-hall'); meny.classList.add('haller');
+    hallTimer = window.setTimeout(() => { slapp(); oppnaMeny(); }, HALL_MS);
+  });
+  meny.addEventListener('pointerup', () => { if (meny.classList.contains('haller')) { meny.classList.add('visa-hall'); setTimeout(() => meny.classList.remove('visa-hall'), 1800); } slapp(); });
+  meny.addEventListener('pointercancel', slapp);
+  meny.addEventListener('contextmenu', (e) => e.preventDefault());
   window.addEventListener('keydown', (e) => { if (e.ctrlKey && e.shiftKey && e.code === 'KeyM') { e.preventDefault(); oppnaMeny(); } });
   function oppnaMeny() {
-    if (!b) return;
     rost.tyst();
     const niva = lasmotor.niva('L', 'P1_las_och_valj');
-    const scener = b.kapitel.scener.map((/** @type {any} */ s, i) => `<button type="button" class="menyval scen ${i === b.scenIndex ? 'nu' : ''}" data-i="${i}">${i + 1}. ${ui.esc(s.id)} <small>(pass ${s.pass})</small></button>`).join('');
-    const s = ui.visaSkarm(`<div class="meny vuxen"><h2>Gråboxen <small>${ui.esc(String(d.version))}</small></h2>
+    const scener = !b ? '' : b.kapitel.scener.map((/** @type {any} */ s, i) => `<button type="button" class="menyval scen ${i === b.scenIndex ? 'nu' : ''}" data-i="${i}">${i + 1}. ${ui.esc(s.id)} <small>(pass ${s.pass})</small></button>`).join('');
+    const s = ui.visaMeny(`<div class="meny vuxen"><h2>Gråboxen <small>${ui.esc(String(d.version))}</small></h2>
       <div class="menygrupp"><b>Läsnivå (läs och välj):</b> ${[1, 2, 3, 4].map((n) => `<button type="button" class="menyval niva ${n === niva ? 'nu' : ''}" data-n="${n}">L${n}</button>`).join('')}</div>
       <div class="menygrupp"><label><input type="checkbox" class="foralder" ${inst.foralderLaserFarfar ? 'checked' : ''}> Föräldern läser Farfars repliker</label>
       <label><input type="checkbox" class="etiketter" ${inst.etiketter ? 'checked' : ''}> Visa objektens namn</label></div>
@@ -629,10 +685,15 @@ export function skapaSpel(d) {
     s.querySelectorAll('.niva').forEach((el) => el.addEventListener('click', () => { lasmotor.sattNiva('L', 'P1_las_och_valj', Number(/** @type {HTMLElement} */ (el).dataset.n)); lasmotor.sattNiva('L', 'P28_packa', Number(/** @type {HTMLElement} */ (el).dataset.n)); spara(); oppnaMeny(); }));
     s.querySelector('.foralder')?.addEventListener('change', (e) => { inst.foralderLaserFarfar = /** @type {HTMLInputElement} */ (e.target).checked; spara(); });
     s.querySelector('.etiketter')?.addEventListener('change', (e) => { inst.etiketter = /** @type {HTMLInputElement} */ (e.target).checked; spara(); visaEtiketter(); });
-    s.querySelectorAll('.scen').forEach((el) => el.addEventListener('click', () => { av.scen = Number(/** @type {HTMLElement} */ (el).dataset.i); av.startad = false; spara(); location.reload(); }));
+    s.querySelectorAll('.scen').forEach((el) => el.addEventListener('click', () => {
+      const i = Number(/** @type {HTMLElement} */ (el).dataset.i);
+      av.scen = i; av.scenId = b.kapitel.scener[i]?.id; av.startad = false; spara();
+      // ladda om utan ?ny, annars nollställs sparningen igen
+      const u = new URL(location.href); u.searchParams.delete('ny'); location.href = u.toString();
+    }));
     s.querySelector('.logg')?.addEventListener('click', () => d.exporteraLogg());
     s.querySelector('.nollstall')?.addEventListener('click', () => { sparning.nollstall(); location.reload(); });
-    s.querySelector('.stang')?.addEventListener('click', () => ui.doljSkarm());
+    s.querySelector('.stang')?.addEventListener('click', () => ui.doljMeny());
   }
 
   return {

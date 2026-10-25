@@ -208,7 +208,7 @@ html, body {
 
 /* nosen: ord man kan nosa på */
 .ord { border-radius: 6px; transition: background .15s; }
-.nosar #plattan .ord { cursor: pointer; background: rgba(242, 193, 78, .35); box-shadow: 0 3px 0 var(--guld); }
+.nosar #plattan .ord, .nosar #ordskylt .ord, .nosar #tanke .ord { cursor: pointer; background: rgba(242, 193, 78, .35); box-shadow: 0 3px 0 var(--guld); }
 #remsa { position: absolute; left: 50%; top: calc(var(--rum-topp) + 16px); transform: translateX(-50%); display: flex; gap: 10px; padding: 14px; border-radius: 18px; background: rgba(26, 20, 16, .85); z-index: 3; }
 .remsa-b { display: inline-flex; align-items: center; justify-content: center; width: 72px; height: 84px; border-radius: 12px; background: #fff; color: var(--black); font-size: 64px; transition: transform .15s, background .15s; }
 .remsa-b.lyser { background: var(--guld); transform: translateY(-8px); }
@@ -316,3 +316,25 @@ html, body {
 .platta-oppen #ordskylt, .platta-oppen #tanke { display: none; }
 #ordskylt.under { transform: translate(-50%, 6px); }
 #ordskylt.under .kort::after { top: -10px; bottom: auto; border-bottom: 8px solid #fff; border-top: 0; }
+
+/* handen: här kan du göra något (tryck på handen, på föremålet igen, eller Mellanslag) */
+#handknapp { position: absolute; transform: translate(-50%, calc(-100% - 4px)); z-index: 5; }
+#handknapp.under { transform: translate(-50%, 4px); }
+#handknapp button { width: calc(64px * var(--t)); height: calc(64px * var(--t)); border-radius: 50%; background: var(--guld); font-size: calc(34px * var(--t)); box-shadow: 0 4px 0 #b8892b, 0 0 0 4px rgba(255, 242, 176, .6); animation: handpuls 0.9s ease-in-out infinite; }
+@keyframes handpuls { 50% { transform: translateY(-4px) scale(1.06); } }
+.snabb #handknapp button { animation: none; }
+.platta-oppen #handknapp { display: none; }
+
+/* menyn för vuxna: håll inne ⚙, en ring fylls medan man håller */
+#hud-meny { z-index: 6; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+#hud-meny::before { content: ''; position: absolute; inset: -4px; border-radius: 50%; background: conic-gradient(var(--guld) calc(var(--fyllt, 0) * 1turn), transparent 0); -webkit-mask: radial-gradient(circle, transparent 55%, #000 57%); mask: radial-gradient(circle, transparent 55%, #000 57%); opacity: 0; pointer-events: none; }
+@property --fyllt { syntax: '<number>'; inherits: false; initial-value: 0; }
+#hud-meny.haller::before { opacity: 1; animation: fyll .8s linear forwards; }
+@keyframes fyll { from { --fyllt: 0; } to { --fyllt: 1; } }
+#hud-meny.visa-hall::after { content: 'Håll inne'; position: absolute; right: 0; top: calc(100% + 6px); white-space: nowrap; padding: 4px 10px; border-radius: 8px; background: rgba(26, 20, 16, .85); color: #f5ecd7; font-size: 14px; pointer-events: none; }
+#vuxenmeny { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(20, 14, 10, .92); z-index: 7; }
+
+/* nosen: inget att nosa på här, ungen skakar på nosen */
+#hud-nos.nej { animation: skaka-nos .4s ease; }
+@keyframes skaka-nos { 20%, 60% { transform: translateX(-5px) rotate(-8deg); } 40%, 80% { transform: translateX(5px) rotate(8deg); } }
+#remsa { cursor: pointer; pointer-events: auto; }

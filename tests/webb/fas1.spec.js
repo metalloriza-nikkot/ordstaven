@@ -20,7 +20,7 @@ async function tillScen(page, index) {
   await starta(page, '?snabb&ny');
   await page.evaluate((i) => {
     const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
-    av.scen = i; av.startad = false; av.ungen.namn = 'KNOPP';
+    av.scen = i; delete av.scenId; av.startad = false; av.ungen.namn = 'KNOPP';
     localStorage.setItem('ordstaven_spar', JSON.stringify(t));
   }, index);
   await starta(page);
@@ -85,13 +85,68 @@ test('piltangenterna flyttar hjälten', async ({ page }, info) => {
   expect(Math.abs((await pos(page)).y - stopp.y)).toBeLessThan(3);
 });
 
-test('tryck på ett objekt: hjälten går dit och scenen går vidare', async ({ page }, info) => {
+test('tryck på ett föremål: hjälten går dit, handen visas, och först ett tryck till öppnar', async ({ page }, info) => {
   test.setTimeout(60000);
   await tillScen(page, 2);
   const pt = await page.evaluate(() => window.__ORDSTAVEN.objekt('lada_med_stav'));
-  if (info.project.use.hasTouch) await page.touchscreen.tap(pt.x, pt.y);
-  else await page.mouse.click(pt.x, pt.y);
-  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 30000 }).toBe('s03_staven');
+  const tryck = () => (info.project.use.hasTouch ? page.touchscreen.tap(pt.x, pt.y) : page.mouse.click(pt.x, pt.y));
+  // på avstånd glimtar det som går att använda
+  expect(await page.evaluate(() => window.__ORDSTAVEN.interaktiva())).toContain('lada_med_stav');
+  await expect(page.locator('#handknapp')).toBeHidden();
+  await tryck();
+  await expect(page.locator('#handknapp')).toBeVisible({ timeout: 30000 });
+  // att stå vid lådan räcker inte
+  await page.waitForTimeout(500);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('s02_glimten');
+  await page.screenshot({ path: `tests/skarmdumpar/nara-${info.project.name}.png` });
+  await tryck();
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 10000 }).toBe('s03_staven');
+});
+
+test('menyn för vuxna: ett kort tryck visar "håll inne", att hålla öppnar menyn, och scenhoppet fungerar', async ({ page }, info) => {
+  test.setTimeout(60000);
+  await starta(page, '?snabb&ny');
+  const knapp = page.locator('#hud-meny');
+  // går att öppna redan på startskärmen
+  await knapp.click();
+  await expect(knapp).toHaveClass(/visa-hall/);
+  await expect(page.locator('#vuxenmeny')).toBeHidden();
+  const r = await knapp.boundingBox();
+  await page.mouse.move(r.x + r.width / 2, r.y + r.height / 2);
+  await page.mouse.down(); await page.waitForTimeout(1000); await page.mouse.up();
+  await expect(page.locator('#vuxenmeny .meny')).toBeVisible();
+  await page.click('#vuxenmeny .stang');
+  await expect(page.locator('#vuxenmeny')).toBeHidden();
+  await expect(page.locator('.start-knapp')).toBeVisible();
+  // i spelet: hoppa till köket
+  await page.click('.start-knapp');
+  await page.keyboard.press('Control+Shift+KeyM');
+  await page.click('#vuxenmeny .scen[data-i="8"]');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('s08_farfar');
+});
+
+test('nosen: skakar när det inte finns något att nosa på, ljudningen går att avbryta', async ({ page }, info) => {
+  test.setTimeout(60000);
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  await tillScen(page, 2);
+  await page.evaluate(() => { const t = window.__ORDSTAVEN.tillstand(); t.aventyr['den-gomda-dalen'].ui.nosknappen = true; });
+  await page.evaluate(() => document.querySelector('#hud-nos').hidden = false);
+  await page.click('#hud-nos');
+  await expect(page.locator('#hud-nos')).toHaveClass(/nej/);
+  // på en replik: nosen på ett ord ljudar det, och ett tryck på remsan avbryter
+  await page.goto('./?snabb&ny');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  await expect(page.locator('#plattan .replik-ruta')).toBeVisible();
+  await page.evaluate(() => document.querySelector('#hud-nos').hidden = false);
+  await page.click('#hud-nos');
+  await page.locator('#plattan .ord').first().click();
+  await expect(page.locator('#remsa')).toBeVisible();
+  await page.click('#remsa');
+  await expect(page.locator('#remsa')).toBeHidden();
+  await expect(page.locator('#plattan .replik-ruta')).toBeVisible(); // repliken gick inte vidare
 });
 
 test('startar offline', async ({ page, context }, info) => {

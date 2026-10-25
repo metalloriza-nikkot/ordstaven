@@ -34,8 +34,27 @@ async function draFormel(page, svar, dumpa = false) {
   await page.waitForTimeout(100);
 }
 
+/**
+ * Använd ett föremål som spelaren: gå dit (tryck), vänta tills handen syns, och använd det.
+ * Tre sätt, ett per projekt: Mellanslag (dator), tryck på föremålet igen (iPad), tryck på handen (Safari).
+ */
+async function anvand(page, id, satt) {
+  const pt = await page.evaluate((m) => window.__ORDSTAVEN.objekt(m), id);
+  if (!pt) return;
+  await page.mouse.click(pt.x, pt.y);
+  const hand = page.locator('#handknapp');
+  await expect(hand).toBeVisible({ timeout: 20000 });
+  // att bara stå där räcker inte: steget väntar på att spelaren använder föremålet
+  await page.waitForTimeout(150);
+  await expect(hand).toBeVisible();
+  if (satt === 'mellanslag') await page.keyboard.press('Space');
+  else if (satt === 'igen') await page.mouse.click(pt.x, pt.y);
+  else await hand.locator('button').click();
+  await expect(hand).toBeHidden({ timeout: 5000 });
+}
+
 /** Spela tills slutskärmen syns. felFor = pussel-id där ett fel svar ska väljas först. */
-async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid = null } = {}) {
+async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid = null, satt = 'mellanslag' } = {}) {
   const sett = new Set();
   const sparadeDumpar = new Set();
   const oppnade = new Set();
@@ -102,8 +121,10 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
       }, pt);
       expect(skymd, `målet ${lage.mal} i ${lage.scen} syns inte`).toBeNull();
       if (dumpa && !sparadeDumpar.has(nyckel)) { sparadeDumpar.add(nyckel); await page.screenshot({ path: `tests/skarmdumpar/prolog/${String(sparadeDumpar.size).padStart(2, '0')}-${nyckel}-${lage.mal}.png` }); }
-      if (pt) await page.mouse.click(pt.x, pt.y);
-      await page.waitForTimeout(400); continue;
+      const utgang = await page.evaluate((m) => window.__ORDSTAVEN.sort(m), lage.mal);
+      if (utgang === 'utgang') await page.mouse.click(pt.x, pt.y); // utgångar: det räcker att gå dit
+      else await anvand(page, lage.mal, satt);
+      await page.waitForTimeout(300); continue;
     }
     if (lage.typ === 'pussel' && pussel.get(lage.pusselId)?.i_rummet) {
       // läs i rummet: gå till ett föremål, läs ordet som syns, tryck på det
@@ -135,17 +156,12 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
     }
     if (lage.typ === 'pussel' && pussel.get(lage.pusselId)?.typ === 'P26_krukorna') {
       // gå till en kruka i taget och vänta tills hjälten står still
-      const krukor = lage.objekt.filter((o) => /kruk.*_\d$/.test(o));
-      for (const k of krukor) {
-        const pt = await page.evaluate((m) => window.__ORDSTAVEN.objekt(m), k);
-        if (!pt) continue;
-        await page.mouse.click(pt.x, pt.y);
-        let forra = null;
-        for (let w = 0; w < 40; w++) {
-          await page.waitForTimeout(150);
-          const nu = JSON.stringify(await page.evaluate(() => window.__ORDSTAVEN.position()));
-          if (nu === forra) break; forra = nu;
-        }
+      for (let n = 0; n < 8; n++) {
+        const kvar = await page.evaluate(() => window.__ORDSTAVEN.interaktiva());
+        const k = kvar.find((o) => /kruk.*_\d$/.test(o));
+        if (!k) break;
+        await anvand(page, k, satt);
+        await page.waitForTimeout(200);
         if ((await page.evaluate(() => window.__ORDSTAVEN.steg()))?.pussel_id !== lage.pusselId) break;
       }
       continue;
@@ -164,14 +180,15 @@ test.describe('genomspelning av prologen', () => {
     await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
     const dumpa = info.project.name === 'mac-helskarm';
     // pass 1 och en bit in i pass 2, med fel svar på FILT och dörrarna
-    await spelaProlog(page, { dumpa, felFor: new Set(['p0_filt', 'p0_dorrar']), stoppVid: 's09_lappen' });
+    const satt = { 'mac-helskarm': 'mellanslag', 'ipad-10': 'igen', 'mac-safari': 'hand' }[info.project.name];
+    await spelaProlog(page, { dumpa, satt, felFor: new Set(['p0_filt', 'p0_dorrar']), stoppVid: 's09_lappen' });
     // starta om (utan ?ny): spelet ska fortsätta där det var, med Farfars "Var var vi?"
     await page.goto('./?snabb');
     await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
     const omstartRepliker = [];
     page.on('console', () => {});
     const samla = setInterval(async () => { try { const t = await page.$eval('#plattan .replik-ruta .text', (e) => e.textContent); if (t) omstartRepliker.push(t); } catch (e) { /* ingen replik just nu */ } }, 50);
-    const sett = await spelaProlog(page, { dumpa, felFor: new Set(['p0_packlista']) });
+    const sett = await spelaProlog(page, { dumpa, satt, felFor: new Set(['p0_packlista']) });
     clearInterval(samla);
     expect([...sett].filter(Boolean)[0]).toBe('s09_lappen');
     expect(omstartRepliker.some((t) => /VAR VAR VI/.test(t))).toBe(true);

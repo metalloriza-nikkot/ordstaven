@@ -25,12 +25,14 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     <button type="button" id="hud-meny" aria-label="Meny för vuxna (håll inne)">⚙</button>
     <div id="tanke" hidden></div>
     <div id="ordskylt" hidden></div>
+    <div id="handknapp" hidden><button type="button" aria-label="Använd">✋</button></div>
     <div id="regi" hidden></div>
     <div id="narbild" hidden><span>🗺️</span></div>
     <div id="plattan" hidden></div>
     <div id="remsa" hidden></div>
     <div id="fest" hidden></div>
-    <div id="skarm" hidden></div>`;
+    <div id="skarm" hidden></div>
+    <div id="vuxenmeny" hidden></div>`;
   document.body.appendChild(ui);
   const $ = (/** @type {string} */ s) => /** @type {HTMLElement} */ (ui.querySelector(s));
   const plattan = $('#plattan'), regi = $('#regi'), remsa = $('#remsa'), skarm = $('#skarm'), fest = $('#fest');
@@ -65,13 +67,21 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     nosKnapp.classList.toggle('av', !tillaten); ui.classList.remove('nosar');
   }
   function vaxlaNos() {
-    if (!nos.tillaten || nosKnapp.hidden) return;
+    if (nosKnapp.hidden) return;
+    // pågår en ljudning avbryter nosen den (om man tryckte av misstag)
+    if (ljudning.pagar) { avbrytLjudning(); return; }
+    if (!nos.tillaten) {
+      // inget att nosa på här: ungen skakar på nosen
+      nosKnapp.classList.remove('nej'); void nosKnapp.offsetWidth; nosKnapp.classList.add('nej');
+      ljud.spela('klick');
+      return;
+    }
     nos.aktiv = !nos.aktiv; ui.classList.toggle('nosar', nos.aktiv);
     ljud.spela('klick');
   }
   nosKnapp.addEventListener('click', vaxlaNos);
   /** Tab-tangenten (handlingen hjalp) växlar nosen. @param {any} h */
-  const handling = (h) => { if (h.typ === 'hjalp') vaxlaNos(); };
+  const handling = (h) => { if (h.typ === 'hjalp') vaxlaNos(); if (h.typ === 'stang' && ljudning.pagar) avbrytLjudning(); };
   ui.addEventListener('click', (e) => {
     const t = /** @type {HTMLElement} */ (e.target);
     const o = t.closest && /** @type {HTMLElement | null} */ (t.closest('.ord'));
@@ -83,6 +93,16 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     ljuda(o.dataset.ord || '');
   }, true);
 
+  // Ljudningen kan avbrytas: tryck på remsan, på nosen eller Escape.
+  const ljudning = { pagar: false, /** @type {any} */ vakt: 0 };
+  function avbrytLjudning() {
+    if (!ljudning.pagar) return;
+    ljudning.pagar = false; clearTimeout(ljudning.vakt);
+    rost.tyst(); remsa.hidden = true;
+    logg.handelse('nos', 'avbruten');
+  }
+  remsa.addEventListener('click', (e) => { e.stopPropagation(); avbrytLjudning(); });
+
   /** Ljuda ett ord med remsan där aktuell bokstav lyser. @param {string} ord */
   async function ljuda(ord) {
     const visat = versaler(ord);
@@ -90,13 +110,16 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     remsa.innerHTML = [...visat].map((b, i) => `<span class="remsa-b" data-i="${i}">${esc(b)}</span>`).join('');
     remsa.hidden = false;
     logg.handelse('nos', visat, { helord: arHelord(visat) });
-    const vakt = setTimeout(() => { remsa.hidden = true; }, maxtidMs(delar));
-    await rost.sekvens(delar.map((d) => d.text), (i) => {
+    ljudning.pagar = true;
+    ljudning.vakt = setTimeout(() => { ljudning.pagar = false; remsa.hidden = true; }, maxtidMs(delar));
+    const hur = await rost.sekvens(delar.map((d) => d.text), (i) => {
       const lyser = delar[i].lyser;
       remsa.querySelectorAll('.remsa-b').forEach((el, j) => el.classList.toggle('lyser', lyser === 'alla' || lyser === j));
     });
-    clearTimeout(vakt);
-    setTimeout(() => { remsa.hidden = true; }, 500);
+    if (!ljudning.pagar) return; // avbruten
+    ljudning.pagar = false; clearTimeout(ljudning.vakt);
+    if (hur === 'avbruten') { remsa.hidden = true; return; }
+    setTimeout(() => { if (!ljudning.pagar) remsa.hidden = true; }, 500);
   }
 
   // ---------------------------------------------------------------- plattan och regi
@@ -147,6 +170,9 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
   /** @param {string} html */
   function visaSkarm(html) { skarm.innerHTML = html; skarm.hidden = false; return skarm; }
   function doljSkarm() { skarm.hidden = true; skarm.innerHTML = ''; }
+  /** Menyn för vuxna ligger över allt annat, även startskärmen, och rör inte spelets skärmar. @param {string} html */
+  function visaMeny(html) { const m = $('#vuxenmeny'); m.innerHTML = html; m.hidden = false; return m; }
+  function doljMeny() { const m = $('#vuxenmeny'); m.hidden = true; m.innerHTML = ''; }
 
   /** Etiketter över rummets objekt (gråbox, för den vuxne). @param {{ id: string, x: number, y: number, b: number }[]} objekt @param {(x: number, y: number) => { x: number, y: number }} tillSkarm @param {boolean} visa */
   function etiketter(objekt, tillSkarm, visa) {
@@ -176,11 +202,30 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     knapp?.addEventListener('click', () => { if (!nos.aktiv) vidTryck?.(); });
   }
 
+  /**
+   * Handen ovanför föremålet hjälten står vid: här kan du göra något. Ett tryck på handen använder föremålet.
+   * @param {{ x: number, y: number } | null} punkt @param {() => void} [vidTryck] @param {{ under: number, rumTopp: number }} [plats]
+   */
+  const hand = $('#handknapp');
+  /** @type {() => void} */
+  let handTryck = () => {};
+  hand.querySelector('button')?.addEventListener('click', (e) => { e.stopPropagation(); handTryck(); });
+  function handknapp(punkt, vidTryck, plats) {
+    if (!punkt) { hand.hidden = true; handTryck = () => {}; return; }
+    handTryck = vidTryck || (() => {});
+    hand.hidden = false; hand.classList.remove('under');
+    hand.style.left = punkt.x + 'px'; hand.style.top = punkt.y + 'px';
+    if (plats && punkt.y - hand.offsetHeight - 6 < plats.rumTopp) { hand.classList.add('under'); hand.style.top = plats.under + 'px'; }
+  }
+
   return {
+    handknapp,
     visaTanke, pulseraTanke, ordskylt,
     ui, $, plattan, rader, esc, visaPlatta, doljPlatta, vantaFortsatt, visaRegi, doljRegi, visaFest,
-    uppdateraHud, pulsera, visaSkarm, doljSkarm, etiketter, sattNos, vaxlaNos, ljuda, arHelord,
+    uppdateraHud, pulsera, visaSkarm, doljSkarm, visaMeny, doljMeny, etiketter, sattNos, vaxlaNos, ljuda, arHelord,
     handling,
     get nosAktiv() { return nos.aktiv; },
+    get ljudar() { return ljudning.pagar; },
+    avbrytLjudning,
   };
 }

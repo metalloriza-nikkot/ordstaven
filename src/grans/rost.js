@@ -10,7 +10,7 @@ const ROLLER = {
   fanig: { pitch: 1.35, rate: 1.05 },
   metall: { pitch: 1.6, rate: 1.15 },
   unge: { pitch: 1.8, rate: 1.1 },
-  ljudning: { pitch: 1.05, rate: 0.8 },
+  ljudning: { pitch: 1.05, rate: 1.0 },
 };
 
 /**
@@ -72,7 +72,7 @@ export function skapaRost({ logg, tyst = () => false }) {
       token = min - 1; // saga() räknar upp till min igen, så sekvensen behåller sin token
       await saga(delar[i], 'ljudning');
       if (token !== min) return 'avbruten'; // någon annan har pratat eller tystat
-      await new Promise((rr) => setTimeout(rr, 180));
+      await new Promise((rr) => setTimeout(rr, 60));
     }
     return min === token ? 'klar' : 'avbruten';
   }

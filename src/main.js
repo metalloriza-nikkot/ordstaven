@@ -125,5 +125,9 @@ const spelet = skapaSpel({
   /** Skärmpunkt mitt på ett objekt i rummet (för att trycka på det). @param {string} id */
   objekt: (id) => { const o = rum.ruta(id); if (!o) return null; const s = layout.skala; return { x: s.vanster + (o.x + o.b / 2) * s.cssSkala, y: s.topp + (o.y + o.h / 2) * s.cssSkala }; },
   rumsobjekt: () => rum.objekt.map((o) => o.id),
+  /** Föremålets sort (utgang, sak, figur). @param {string} id */
+  sort: (id) => rum.ruta(id)?.sort ?? null,
+  /** Föremålen som går att använda just nu. */
+  interaktiva: () => [...rum.interaktiva],
   spel,
 };
