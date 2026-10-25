@@ -11,12 +11,25 @@ const EXTRA = /** @type {Record<string, string>} */ ({
   karta_sju_bitar: '🗺️', farfars_lista_sista_raden: '📜', buske: '🌳', trad: '🌲',
 });
 
+/** Egna platshållare där emoji saknas eller visar fel sak (🧣 är en halsduk, inte en filt). */
+const RITADE = /** @type {Record<string, (farg?: string) => string>} */ ({
+  // en vikt filt: rutig (tartan), med ett nervikt hörn och fransar
+  filt: (farg = '#c8453a') => `<svg class="ritad" viewBox="0 0 64 64" width="1em" height="1em" aria-hidden="true">
+    <path d="M6 14 h52 v34 l-14 0 l-38 0 z" fill="${farg}"/>
+    <g fill="#000" opacity=".18"><path d="M6 24 h52 v5 h-52 z M6 38 h52 v5 h-52 z M16 14 h5 v34 h-5 z M36 14 h5 v34 h-5 z"/></g>
+    <g fill="#fff" opacity=".3"><path d="M6 31 h52 v1.5 h-52 z M27 14 h1.5 v34 h-1.5 z M47 14 h1.5 v34 h-1.5 z"/></g>
+    <path d="M42 48 l16 -16 v16 z" fill="#000" opacity=".25"/>
+    <path d="M42 48 l16 -16 l-4 18 z" fill="${farg}"/><path d="M42 48 l16 -16 l-4 18 z" fill="#fff" opacity=".22"/>
+    <g stroke="${farg}" stroke-width="2" stroke-linecap="round"><path d="M9 48 v6 M14 48 v6 M19 48 v6 M24 48 v6 M29 48 v6 M34 48 v6 M39 48 v6"/></g>
+  </svg>`,
+});
+
 /** @param {any} ordlistor */
 export function skapaBilder(ordlistor) {
   /** @type {Map<string, string>} */
   const emoji = new Map();
   for (const o of ordlistor.ord) if (o.bild) emoji.set(vik(o.ord), o.bild);
-  const hitta = (/** @type {string} */ id) => emoji.get(vik(id)) || EXTRA[id] || null;
+  const hitta = (/** @type {string} */ id) => RITADE[vik(id)]?.() || emoji.get(vik(id)) || EXTRA[id] || null;
 
   /**
    * HTML för en platshållarbild.
@@ -35,6 +48,7 @@ export function skapaBilder(ordlistor) {
     const hog = delar.includes('hog') ? 1.5 : delar.includes('lag') ? 0.6 : 1;
     const bas = delar.find((d) => !(d in FARGER) && !['stor', 'liten', 'hog', 'lag', 'rund', 'spetsig', 'gammalt', 'ungt', 'litet', 'stort'].includes(d)) || 'lada';
     const e = hitta(bas);
+    if (RITADE[bas]) return `<span class="bild emoji" data-bild="${id}" style="font-size:calc(${Math.round(64 * stor)}px * var(--t))">${RITADE[bas](farg)}</span>`;
     if (farg || stor !== 1 || hog !== 1) {
       // en form: färgad låda, eller emoji på färgad botten
       const b = Math.round(64 * stor), h = Math.round(48 * stor * hog);
