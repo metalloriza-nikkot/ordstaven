@@ -1,0 +1,125 @@
+{
+ "type": "map",
+ "version": "1.10",
+ "tiledversion": "1.11.0",
+ "orientation": "orthogonal",
+ "renderorder": "right-down",
+ "width": 20,
+ "height": 12,
+ "tilewidth": 16,
+ "tileheight": 16,
+ "infinite": false,
+ "compressionlevel": -1,
+ "nextlayerid": 2,
+ "nextobjectid": 7,
+ "properties": [
+  {
+   "name": "rum",
+   "type": "string",
+   "value": "hallen"
+  }
+ ],
+ "layers": [
+  {
+   "id": 1,
+   "name": "foremal",
+   "type": "objectgroup",
+   "draworder": "topdown",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 1,
+     "name": "stege_upp",
+     "type": "utgang",
+     "x": 6,
+     "y": 60,
+     "width": 18,
+     "height": 40,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "till",
+       "type": "string",
+       "value": "vinden"
+      }
+     ]
+    },
+    {
+     "id": 2,
+     "name": "dorr_mat",
+     "type": "utgang",
+     "x": 64,
+     "y": 4,
+     "width": 26,
+     "height": 32,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "till",
+       "type": "string",
+       "value": "koket"
+      }
+     ]
+    },
+    {
+     "id": 3,
+     "name": "dorr_bad",
+     "type": "utgang",
+     "x": 124,
+     "y": 4,
+     "width": 26,
+     "height": 32,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 4,
+     "name": "dorr_toa",
+     "type": "utgang",
+     "x": 184,
+     "y": 4,
+     "width": 26,
+     "height": 32,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 5,
+     "name": "dorr_sov",
+     "type": "utgang",
+     "x": 244,
+     "y": 4,
+     "width": 26,
+     "height": 32,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "till",
+       "type": "string",
+       "value": "sovrummet"
+      }
+     ]
+    },
+    {
+     "id": 6,
+     "name": "start",
+     "type": "",
+     "x": 160,
+     "y": 150,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    }
+   ]
+  }
+ ],
+ "tilesets": []
+}

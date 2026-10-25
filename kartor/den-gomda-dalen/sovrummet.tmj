@@ -1,0 +1,96 @@
+{
+ "type": "map",
+ "version": "1.10",
+ "tiledversion": "1.11.0",
+ "orientation": "orthogonal",
+ "renderorder": "right-down",
+ "width": 20,
+ "height": 12,
+ "tilewidth": 16,
+ "tileheight": 16,
+ "infinite": false,
+ "compressionlevel": -1,
+ "nextlayerid": 2,
+ "nextobjectid": 5,
+ "properties": [
+  {
+   "name": "rum",
+   "type": "string",
+   "value": "sovrummet"
+  }
+ ],
+ "layers": [
+  {
+   "id": 1,
+   "name": "foremal",
+   "type": "objectgroup",
+   "draworder": "topdown",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 1,
+     "name": "dorr_hallen",
+     "type": "utgang",
+     "x": 80,
+     "y": 4,
+     "width": 26,
+     "height": 32,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "till",
+       "type": "string",
+       "value": "hallen"
+      }
+     ]
+    },
+    {
+     "id": 2,
+     "name": "fonster",
+     "type": "sak",
+     "x": 144,
+     "y": 2,
+     "width": 40,
+     "height": 18,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 3,
+     "name": "sang",
+     "type": "sak",
+     "x": 236,
+     "y": 56,
+     "width": 64,
+     "height": 44,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "vanster"
+      }
+     ]
+    },
+    {
+     "id": 4,
+     "name": "start",
+     "type": "",
+     "x": 214,
+     "y": 112,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    }
+   ]
+  }
+ ],
+ "tilesets": []
+}

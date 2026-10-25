@@ -74,9 +74,10 @@ test('piltangenterna flyttar hjälten', async ({ page }, info) => {
   test.skip(!!info.project.use.hasTouch, 'pekskärm');
   await tillScen(page, 2); // vinden, gå till lådan med staven
   const fore = await pos(page);
-  await page.keyboard.down('ArrowLeft');
-  await expect.poll(async () => (await pos(page)).x, { timeout: 20000 }).toBeLessThan(fore.x - 20); // långsamma testdatorer: lång väntan
-  await page.keyboard.up('ArrowLeft');
+  // åt höger: hjälten börjar vid stegen, till vänster är väggen
+  await page.keyboard.down('ArrowRight');
+  await expect.poll(async () => (await pos(page)).x, { timeout: 20000 }).toBeGreaterThan(fore.x + 20); // långsamma testdatorer: lång väntan
+  await page.keyboard.up('ArrowRight');
   await page.keyboard.down('ArrowUp');
   await expect.poll(async () => (await pos(page)).y, { timeout: 20000 }).toBeLessThan(fore.y - 10);
   await page.keyboard.up('ArrowUp');

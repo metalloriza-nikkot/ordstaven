@@ -9,11 +9,14 @@ import aventyr from '../content/den-gomda-dalen/aventyr.json';
 import kap00 from '../content/den-gomda-dalen/kap-00.json';
 import kap01 from '../content/den-gomda-dalen/kap-01.json';
 import ordlistor from '../content/ordlistor.json';
+// Tiled-kartorna, en per rum (kartor/<äventyr>/<rum>.tmj)
+const kartfiler = import.meta.glob('../kartor/den-gomda-dalen/*.tmj', { query: '?raw', import: 'default', eager: true });
 
 import { skapaLogg } from './karna/logg.js';
 import { skapaSparning } from './karna/sparning.js';
 import { skapaInmatning } from './karna/inmatning.js';
 import { RUM } from './karna/skalning.js';
+import { lasKarta } from './karna/karta.js';
 import { skapaLagring, begarBestandigLagring } from './grans/lagring.js';
 import { skapaLayout } from './grans/layout.js';
 import { kopplaInmatning } from './grans/inmatningDom.js';
@@ -101,8 +104,11 @@ let startlage = true;
 const uppdatering = startaUppdatering({ logg, arStartlage: () => startlage });
 begarBestandigLagring().then((ok) => logg.handelse('lagring', ok ? 'beständig' : 'inte beständig'));
 
+/** @type {Record<string, import('./karna/karta.js').Karta>} */
+const kartor = Object.fromEntries(Object.entries(kartfiler).map(([fil, text]) => [fil.replace(/^.*\/|\.tmj$/g, ''), lasKarta(JSON.parse(/** @type {string} */ (text)))]));
+
 const spelet = skapaSpel({
-  aventyr, kapitel: [kap00, kap01], ordlistor, tillstand, sparning, logg, rost, ljud, ui, rum, layout, inmatning, tangentbord, bilder,
+  aventyr, kartor, kapitel: [kap00, kap01], ordlistor, tillstand, sparning, logg, rost, ljud, ui, rum, layout, inmatning, tangentbord, bilder,
   snabb, pek: () => pek.matches, version: VERSION, exporteraLogg: () => exportera(logg),
   uppdatering: { tillampa: () => { uppdatering.tillampa(); startlage = false; } },
 });

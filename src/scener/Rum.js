@@ -4,7 +4,8 @@
 import Phaser from 'phaser';
 import { RUM } from '../karna/skalning.js';
 import { FIGUR, steg } from '../karna/rorelse.js';
-import { placeraObjekt, framfor, vidObjekt, hinderFran } from '../karna/rumslayout.js';
+import { rumsObjekt, framfor, vidObjekt, hinderFran } from '../karna/rumslayout.js';
+import { synligaIds } from '../karna/karta.js';
 import { skapaHinder } from '../karna/vag.js';
 
 const FARG = {
@@ -36,11 +37,14 @@ export class Rum extends Phaser.Scene {
     this.ritade = new Map();
     this.fryst = false;
     this.harRum = false;
+    this.synliga = '';
     this.visaUnge = false;
     this.tillstand = /** @type {string | null} */ (null);
     /** @type {{ ids: string[], klar: (id: string) => void } | null} */
     this.vantar = null;
     this.markerade = new Set();
+    /** @type {((id: string) => void) | null} anropas när spelaren trycker på föremålet hjälten står vid */
+    this.tryckPa = null;
     this.redo = new Promise((r) => { this._redo = r; });
     this.hinder = skapaHinder([]);
     /** @type {{ x: number, y: number }[]} vägen hjälten går just nu */
@@ -67,7 +71,10 @@ export class Rum extends Phaser.Scene {
       const traffar = this.objekt.filter((x) => h.x >= x.x - 4 && h.x <= x.x + x.b + 4 && h.y >= x.y - 4 && h.y <= x.y + x.h + 4);
       const avst = (/** @type {any} */ x) => Math.hypot(h.x - (x.x + x.b / 2), h.y - (x.y + x.h / 2));
       const o = traffar.sort((a, c) => avst(a) - avst(c))[0];
-      if (o) { const f = framfor(o); this.b.inmatning.sattGaTill(f.x, f.y); }
+      if (!o) return;
+      // står hjälten redan vid föremålet räknas trycket som att använda det
+      if (vidObjekt(this.pos, o) && this.tryckPa) { this.tryckPa(o.id); return; }
+      const f = framfor(o); this.b.inmatning.sattGaTill(f.x, f.y);
     });
     this.sattUtseende({});
     this.ritaUnge();
@@ -105,21 +112,31 @@ export class Rum extends Phaser.Scene {
 
   /**
    * Visa ett rum (eller inget rum, för scener utan rum).
-   * @param {{ rum: string | null, tillstand: string | null, innehall: string[], unge: boolean, nyttRum: boolean }} v
+   * @param {{ rum: string | null, tillstand: string | null, innehall: (string | { id: string, syns_i?: string[] })[], unge: boolean, nyttRum: boolean,
+   *           karta?: import('../karna/karta.js').Karta | null, franRum?: string | null }} v
    */
   visa(v) {
     this.harRum = !!v.rum;
     this.visaUnge = v.unge;
     this.tillstand = v.tillstand;
     this.ritaGolv(this.harRum);
-    if (v.nyttRum || !this.harRum) {
-      this.objekt = this.harRum ? placeraObjekt(v.innehall) : [];
+    // föremål som bara syns i vissa tillstånd (ägget när ljuset är tänt) gör att rummet byggs om
+    const synliga = this.harRum ? synligaIds(v.innehall, v.tillstand).join(' ') : '';
+    const andrat = synliga !== this.synliga;
+    this.synliga = synliga;
+    if (v.nyttRum || !this.harRum || andrat) {
+      this.objekt = this.harRum ? rumsObjekt(v.innehall, v.tillstand, v.karta) : [];
       this.lagerObjekt.removeAll(true); this.ritade.clear(); this.markerade.clear();
       for (const o of this.objekt) this.ritaObjekt(o);
       this.byggHinder();
-      this.pos = this.hinder.narmasteFria({ x: RUM.bredd / 2, y: RUM.hojd - 12 });
-      this.ungePos = { x: this.pos.x - 18, y: this.pos.y };
-      this.b.inmatning.rensaGaTill();
+      if (v.nyttRum || !this.harRum) {
+        // hjälten kommer in genom utgången från förra rummet, annars vid kartans startpunkt
+        const dorr = v.franRum ? this.objekt.find((o) => o.till === v.franRum) : null;
+        const start = dorr ? framfor(dorr) : v.karta?.start ?? { x: RUM.bredd / 2, y: RUM.hojd - 12 };
+        this.pos = this.hinder.narmasteFria(start);
+        this.ungePos = { x: this.pos.x - 18, y: this.pos.y };
+        this.b.inmatning.rensaGaTill();
+      } else this.pos = this.hinder.narmasteFria(this.pos);
     }
     this.hjalte.setVisible(this.harRum);
     this.unge.setVisible(this.harRum && this.visaUnge);
@@ -173,14 +190,17 @@ export class Rum extends Phaser.Scene {
     return new Promise((klar) => { this.vantar = { ids, klar }; });
   }
 
-  /** Ersätt ett objekt med flera små (krukorna). @param {string} id @param {number} antal @returns {string[]} */
+  /** Ersätt ett objekt med flera små (krukorna), jämnt fördelade där objektet stod. @param {string} id @param {number} antal @returns {string[]} */
   dela(id, antal) {
     const nya = [];
+    const bas = this.objekt.find((x) => x.id === id);
     this.objekt = this.objekt.filter((x) => x.id !== id);
     this.ritade.get(id)?.destroy(); this.ritade.delete(id);
+    const ryms = bas && bas.b >= antal * 22;
     for (let i = 0; i < antal; i++) {
-      // en egen rad under de andra sakerna, så att inget överlappar
-      const n = { id: `${id}_${i}`, x: Math.round(((i + 1) * RUM.bredd) / (antal + 1)) - 9, y: 112, b: 18, h: 18, sort: /** @type {'sak'} */ ('sak') };
+      // inom objektets ruta om de ryms, annars en egen rad mitt i rummet
+      const x = ryms && bas ? Math.round(bas.x + ((i + 0.5) * bas.b) / antal) - 9 : Math.round(((i + 1) * RUM.bredd) / (antal + 1)) - 9;
+      const n = { id: `${id}_${i}`, x, y: ryms && bas ? bas.y : 112, b: 18, h: 18, sort: /** @type {'sak'} */ ('sak') };
       this.objekt.push(n); this.ritaObjekt(n); nya.push(n.id);
     }
     this.byggHinder();
@@ -188,8 +208,17 @@ export class Rum extends Phaser.Scene {
     return nya;
   }
 
+  /** Visa att ett föremål är öppnat och tomt. @param {string} id */
+  tomt(id) { const r = this.ritade.get(id); if (r) { r.setFillStyle(0x6f6a62); r.setAlpha(0.6); } this.markera(id, false); }
+
   /** Visa att en kruka är slagen. @param {string} id */
   slagen(id) { const r = this.ritade.get(id); if (r) { r.setFillStyle(0x5a554e); r.setSize(18, 8); r.y += 10; } }
+
+  /** Vilket av objekten står hjälten vid just nu? @param {string[]} ids @returns {string | null} */
+  starVid(ids) {
+    const o = this.objekt.find((x) => ids.includes(x.id) && vidObjekt(this.pos, x));
+    return o ? o.id : null;
+  }
 
   /** Objektets ruta i rumskoordinater. @param {string} id */
   ruta(id) { return this.objekt.find((o) => o.id === id) ?? null; }

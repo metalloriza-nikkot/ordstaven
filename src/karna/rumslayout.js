@@ -2,8 +2,15 @@
 // Gråboxens rum: placerar rummets objekt automatiskt, tills stilspåret ritar riktiga Tiled-kartor.
 // Utgångar (stege, dörr, grind, stig) läggs längs kanterna, övriga objekt i ett rutnät.
 import { RUM } from './skalning.js';
+import { synligaIds } from './karta.js';
 
-/** @typedef {{ id: string, x: number, y: number, b: number, h: number, sort: 'utgang' | 'sak' | 'figur' }} Objekt */
+const FIGUR_HOJD = 24;
+
+/**
+ * @typedef {{ id: string, x: number, y: number, b: number, h: number, sort: 'utgang' | 'sak' | 'figur',
+ *             till?: string, sida?: 'under' | 'over' | 'vanster' | 'hoger', golv?: boolean }} Objekt
+ * till = rummet en utgång leder till, sida = var hjälten ställer sig, golv = man går på det (stig, grind).
+ */
 
 const UTGANG = /^(stege_|dorr_|grind|stig_)/;
 const FIGUR = /^(farfar|apan|klaffen)/;
@@ -49,6 +56,10 @@ export function placeraObjekt(innehall) {
 /** Punkten framför ett objekt där hjälten ska stå (fötterna). @param {Objekt} o */
 export function framfor(o) {
   const x = Math.round(o.x + o.b / 2);
+  if (o.sida === 'over') return { x, y: Math.max(FIGUR_HOJD, o.y - 2) };
+  if (o.sida === 'vanster') return { x: o.x - 10, y: Math.min(RUM.hojd, o.y + o.h) };
+  if (o.sida === 'hoger') return { x: o.x + o.b + 10, y: Math.min(RUM.hojd, o.y + o.h) };
+  if (o.sida === 'under') return { x, y: Math.min(RUM.hojd, o.y + o.h + 12) };
   if (o.sort === 'utgang' && o.y > RUM.hojd / 2) return { x, y: o.y + 2 };
   if (o.sort === 'utgang' && o.x < 20) return { x: o.x + o.b + 10, y: o.y + o.h };
   return { x, y: Math.min(RUM.hojd, o.y + o.h + 12) };
@@ -65,5 +76,20 @@ export function vidObjekt(pos, o) {
  * @param {Objekt[]} objekt
  */
 export function hinderFran(objekt) {
-  return objekt.filter((o) => !/^(stig_|grind)/.test(o.id));
+  return objekt.filter((o) => !o.golv && !/^(stig_|grind)/.test(o.id));
+}
+
+/**
+ * Rummets synliga föremål: från Tiled-kartan om den finns, annars automatiskt placerade.
+ * @param {(string | { id: string, syns_i?: string[] })[]} innehall
+ * @param {string | null} tillstand
+ * @param {import('./karta.js').Karta | null | undefined} karta
+ * @returns {Objekt[]}
+ */
+export function rumsObjekt(innehall, tillstand, karta) {
+  const ids = synligaIds(innehall, tillstand);
+  if (!karta) return placeraObjekt(ids);
+  const iKartan = karta.objekt.filter((o) => ids.includes(o.id)).map((o) => ({ ...o }));
+  const saknas = ids.filter((id) => !iKartan.some((o) => o.id === id));
+  return [...iKartan, ...placeraObjekt(saknas)];
 }

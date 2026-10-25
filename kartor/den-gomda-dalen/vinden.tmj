@@ -1,0 +1,173 @@
+{
+ "type": "map",
+ "version": "1.10",
+ "tiledversion": "1.11.0",
+ "orientation": "orthogonal",
+ "renderorder": "right-down",
+ "width": 20,
+ "height": 12,
+ "tilewidth": 16,
+ "tileheight": 16,
+ "infinite": false,
+ "compressionlevel": -1,
+ "nextlayerid": 2,
+ "nextobjectid": 12,
+ "properties": [
+  {
+   "name": "rum",
+   "type": "string",
+   "value": "vinden"
+  }
+ ],
+ "layers": [
+  {
+   "id": 1,
+   "name": "foremal",
+   "type": "objectgroup",
+   "draworder": "topdown",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 1,
+     "name": "runt_fonster",
+     "type": "sak",
+     "x": 204,
+     "y": 2,
+     "width": 24,
+     "height": 18,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 2,
+     "name": "hylla",
+     "type": "sak",
+     "x": 30,
+     "y": 24,
+     "width": 72,
+     "height": 14,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 3,
+     "name": "lada_hyllan",
+     "type": "sak",
+     "x": 62,
+     "y": 22,
+     "width": 20,
+     "height": 16,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 4,
+     "name": "lada_med_stav",
+     "type": "sak",
+     "x": 132,
+     "y": 74,
+     "width": 30,
+     "height": 18,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 5,
+     "name": "lada_med_agg",
+     "type": "sak",
+     "x": 276,
+     "y": 30,
+     "width": 32,
+     "height": 22,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 6,
+     "name": "lada_fonstret",
+     "type": "sak",
+     "x": 234,
+     "y": 24,
+     "width": 24,
+     "height": 16,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 7,
+     "name": "lada_hornet",
+     "type": "sak",
+     "x": 286,
+     "y": 160,
+     "width": 28,
+     "height": 24,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "vanster"
+      }
+     ]
+    },
+    {
+     "id": 8,
+     "name": "tre_langa_lador",
+     "type": "sak",
+     "x": 236,
+     "y": 92,
+     "width": 64,
+     "height": 24,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 9,
+     "name": "fem_krukor",
+     "type": "sak",
+     "x": 96,
+     "y": 140,
+     "width": 130,
+     "height": 18,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 10,
+     "name": "stege_ner",
+     "type": "utgang",
+     "x": 6,
+     "y": 110,
+     "width": 18,
+     "height": 40,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "till",
+       "type": "string",
+       "value": "hallen"
+      }
+     ]
+    },
+    {
+     "id": 11,
+     "name": "start",
+     "type": "",
+     "x": 40,
+     "y": 160,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    }
+   ]
+  }
+ ],
+ "tilesets": []
+}

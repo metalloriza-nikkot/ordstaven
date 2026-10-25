@@ -70,7 +70,7 @@ describe('nosen och bokstäverna', () => {
 });
 
 import { skapaHinder } from '../../src/karna/vag.js';
-import { placeraObjekt, framfor, hinderFran } from '../../src/karna/rumslayout.js';
+import { framfor, hinderFran, rumsObjekt, vidObjekt } from '../../src/karna/rumslayout.js';
 
 describe('kollision och vägsökning', () => {
   const lada = { x: 140, y: 80, b: 40, h: 30 };
@@ -95,19 +95,51 @@ describe('kollision och vägsökning', () => {
     const p = h.glid({ x: 130, y: 120 }, 2, -2); // snett upp mot lådans hörn
     expect(h.fri(p)).toBe(true);
   });
-  it('i varje rum i prologen går det att nå framför varje objekt från startpunkten', async () => {
+  it('i varje rum och tillstånd i prologen går det att nå framför varje föremål från där hjälten kommer in', async () => {
     const { readFileSync } = await import('node:fs');
     const prolog = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-00.json', import.meta.url), 'utf8'));
     for (const rum of prolog.rum) {
-      const obj = placeraObjekt(rum.innehall);
-      const hh = skapaHinder(hinderFran(obj));
-      const start = hh.narmasteFria({ x: 160, y: 180 });
-      for (const o of obj) {
-        const f = framfor(o);
-        const v = hh.vag(start, f);
-        expect(v.length, `${rum.id}: ${o.id}`).toBeGreaterThan(0);
-        expect(Math.hypot(v.at(-1).x - f.x, v.at(-1).y - f.y), `${rum.id}: ${o.id} nås inte`).toBeLessThan(14);
+      const karta = lasKarta(JSON.parse(readFileSync(new URL(`../../kartor/den-gomda-dalen/${rum.id}.tmj`, import.meta.url), 'utf8')));
+      for (const t of rum.tillstand || [null]) {
+        const obj = rumsObjekt(rum.innehall, t, karta);
+        const hh = skapaHinder(hinderFran(obj));
+        // alla ingångar: kartans start och varje utgång
+        const starter = [karta.start, ...obj.filter((o) => o.till).map(framfor)].filter(Boolean).map((p) => hh.narmasteFria(p));
+        for (const start of starter) for (const o of obj) {
+          const f = framfor(o);
+          const v = hh.vag(start, f);
+          expect(v.length, `${rum.id}/${t}: ${o.id}`).toBeGreaterThan(0);
+          const slut = v.at(-1);
+          expect(vidObjekt(slut, o), `${rum.id}/${t}: ${o.id} nås inte (hamnar ${slut.x},${slut.y}, mål ${f.x},${f.y})`).toBe(true);
+        }
       }
     }
+  });
+});
+
+import { lasKarta, synligaIds } from '../../src/karna/karta.js';
+
+describe('Tiled-kartor och synliga föremål', () => {
+  const tmj = (objekt) => ({ type: 'map', width: 20, height: 12, tilewidth: 16, tileheight: 16, layers: [{ type: 'objectgroup', objects: objekt }] });
+  it('läser föremål, utgångar och startpunkten', () => {
+    const k = lasKarta(tmj([
+      { name: 'dorr_mat', type: 'utgang', x: 64, y: 4, width: 26, height: 32, properties: [{ name: 'till', value: 'koket' }] },
+      { name: 'lada', x: 10.4, y: 20, width: 20, height: 16, properties: [{ name: 'sida', value: 'vanster' }] },
+      { name: 'start', point: true, x: 40, y: 150, width: 0, height: 0 },
+    ]));
+    expect(k.start).toEqual({ x: 40, y: 150 });
+    expect(k.objekt).toEqual([
+      { id: 'dorr_mat', x: 64, y: 4, b: 26, h: 32, sort: 'utgang', till: 'koket' },
+      { id: 'lada', x: 10, y: 20, b: 20, h: 16, sort: 'sak', sida: 'vanster' },
+    ]);
+  });
+  it('en karta i fel storlek godtas inte', () => {
+    expect(() => lasKarta({ ...tmj([]), width: 21 })).toThrow(/rummet är 320×192/);
+  });
+  it('syns_i döljer föremål tills rummet har rätt tillstånd', () => {
+    const inn = ['stav', { id: 'agg', syns_i: ['natt_upplyst', 'morgon'] }];
+    expect(synligaIds(inn, 'natt')).toEqual(['stav']);
+    expect(synligaIds(inn, 'natt_upplyst')).toEqual(['stav', 'agg']);
+    expect(synligaIds(inn, null)).toEqual(['stav']);
   });
 });

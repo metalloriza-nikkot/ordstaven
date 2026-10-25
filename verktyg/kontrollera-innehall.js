@@ -2,6 +2,7 @@
 // Fel stoppar publiceringen. Varningar skrivs ut till Innehåll men stoppar inget.
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { kontrollera } from './innehall/kontroll.js';
+import { lasKarta } from '../src/karna/karta.js';
 
 const rot = new URL('../content/', import.meta.url);
 const las = (u) => JSON.parse(readFileSync(u, 'utf8'));
@@ -13,7 +14,14 @@ for (const mapp of readdirSync(rot, { withFileTypes: true }).filter((d) => d.isD
   if (!existsSync(new URL('aventyr.json', dir))) continue;
   const aventyr = las(new URL('aventyr.json', dir));
   const kapitel = readdirSync(dir).filter((f) => /^kap-\d\d\.json$/.test(f)).sort().map((f) => las(new URL(f, dir)));
-  const r = kontrollera({ aventyr, kapitel, ordlistor });
+  // Tiled-kartorna ligger i kartor/<äventyr>/<rum>.tmj
+  const kartdir = new URL(`../kartor/${mapp.name}/`, import.meta.url);
+  const kartor = {};
+  if (existsSync(kartdir)) for (const f of readdirSync(kartdir).filter((x) => x.endsWith('.tmj'))) {
+    try { kartor[f.replace(/\.tmj$/, '')] = lasKarta(las(new URL(f, kartdir))); }
+    catch (e) { console.log(`FEL      kartan ${f}: ${e.message}`); fel++; }
+  }
+  const r = kontrollera({ aventyr, kapitel, ordlistor, kartor });
   console.log(`\n== ${mapp.name}: ${kapitel.length} kapitel ==`);
   for (const p of r.pass) console.log(`   ${p.kapitel} pass ${p.pass}: ca ${p.minuter} min, ${p.lasuppgifter} läsuppgifter`);
   for (const f of r.fel) console.log('FEL      ' + f);

@@ -1,0 +1,163 @@
+{
+ "type": "map",
+ "version": "1.10",
+ "tiledversion": "1.11.0",
+ "orientation": "orthogonal",
+ "renderorder": "right-down",
+ "width": 20,
+ "height": 12,
+ "tilewidth": 16,
+ "tileheight": 16,
+ "infinite": false,
+ "compressionlevel": -1,
+ "nextlayerid": 2,
+ "nextobjectid": 10,
+ "properties": [
+  {
+   "name": "rum",
+   "type": "string",
+   "value": "tradgarden"
+  }
+ ],
+ "layers": [
+  {
+   "id": 1,
+   "name": "foremal",
+   "type": "objectgroup",
+   "draworder": "topdown",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 1,
+     "name": "berg",
+     "type": "sak",
+     "x": 100,
+     "y": 2,
+     "width": 140,
+     "height": 20,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 2,
+     "name": "staket",
+     "type": "sak",
+     "x": 236,
+     "y": 24,
+     "width": 8,
+     "height": 118,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 3,
+     "name": "grind",
+     "type": "utgang",
+     "x": 232,
+     "y": 142,
+     "width": 16,
+     "height": 30,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "vanster"
+      }
+     ]
+    },
+    {
+     "id": 4,
+     "name": "stig_skogen",
+     "type": "utgang",
+     "x": 262,
+     "y": 62,
+     "width": 52,
+     "height": 14,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 5,
+     "name": "stig_byn",
+     "type": "utgang",
+     "x": 262,
+     "y": 158,
+     "width": 52,
+     "height": 14,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 6,
+     "name": "skylt_skogen",
+     "type": "sak",
+     "x": 270,
+     "y": 40,
+     "width": 16,
+     "height": 14,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 7,
+     "name": "skylt_byn",
+     "type": "sak",
+     "x": 270,
+     "y": 136,
+     "width": 16,
+     "height": 14,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 8,
+     "name": "tva_buskar",
+     "type": "sak",
+     "x": 96,
+     "y": 96,
+     "width": 44,
+     "height": 22,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 9,
+     "name": "start",
+     "type": "",
+     "x": 40,
+     "y": 150,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    }
+   ]
+  }
+ ],
+ "tilesets": []
+}
