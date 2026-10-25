@@ -39,6 +39,8 @@ Varje projekt kontrollerar:
 
 Dessutom svepet i `tests/enhet/skalning.test.js`: alla fönster från 800×500 till 3840×2160 i dpr 1–3. Varje storlek måste ge hela pixlar, ett helt synligt rum och största möjliga skala. Sämsta fallet (litet fönster, låg pixeltäthet) fyller minst två tredjedelar av skärmen, mitten av spannet 92–98 %.
 
+**Genomspelningen** (`tests/webb/genomspelning.spec.js`) spelar hela prologen i Chromium, WebKit och iPad-läget: rätt svar från innehållet, felsvar på några pussel, en omstart mitt i, och en kontroll att läsplattan aldrig går utanför skärmen.
+
 WebKit i Playwright är Safari-motorn men inte iPad-Safari. Den fångar det mesta, inte allt (ljudspärr, hemskärmsläge, datarensning). Därför finns de manuella stegen nedan.
 
 ## Manuell kontroll vid varje grind

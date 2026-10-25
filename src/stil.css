@@ -117,3 +117,185 @@ html, body {
   font: 18px 'Andika', sans-serif;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
 }
+
+/* ============================================================ gråboxens gränssnitt (fas 2) */
+:root { --t: 1; --reserv: 0px; --guld: #f2c14e; --morkt: #1a1410; }
+
+#varld { transition: left .25s ease, top .25s ease, width .25s ease, height .25s ease; }
+#varld canvas { transition: width .25s ease, height .25s ease; }
+
+#ui { position: fixed; inset: 0; pointer-events: none; font-family: 'Andika', sans-serif; z-index: 5; }
+#ui > * { pointer-events: auto; }
+#ui [hidden] { display: none !important; }
+#etiketter { pointer-events: none !important; position: absolute; inset: 0; }
+.etikett-obj { position: absolute; transform: translate(-50%, -110%); font-size: 12px; color: #2b2420; background: rgba(245, 236, 215, .7); padding: 0 4px; border-radius: 4px; white-space: nowrap; }
+.platta-oppen #etiketter { display: none; }
+
+/* knappar */
+.knapp, .vidare, .kort, .bricka, .hud-knapp, #hud-meny, .tb-tangent, .farg, .menyval {
+  font-family: inherit; cursor: pointer; border: 0; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+}
+.knapp { min-width: 64px; min-height: 64px; font-size: calc(32px * var(--t)); border-radius: 16px; background: var(--papper); color: var(--black); box-shadow: 0 4px 0 #b7a98a; }
+.knapp:active { transform: translateY(3px); box-shadow: 0 1px 0 #b7a98a; }
+.knapp.av { opacity: .35; pointer-events: none; }
+.knapp.stor { min-width: 120px; min-height: 120px; font-size: 56px; border-radius: 28px; }
+
+/* HUD: uppe till vänster, i ramen när det finns plats */
+#hud { position: absolute; left: calc(var(--rum-vanster) + 8px); top: calc(var(--rum-topp) + 8px); display: flex; gap: 8px; pointer-events: none; }
+.hud-knapp { pointer-events: auto; display: inline-flex; align-items: center; gap: 6px; min-width: 56px; min-height: 56px; padding: 0 12px; border-radius: 28px; background: rgba(26, 20, 16, .75); color: var(--papper); font-size: 28px; }
+.hud-knapp .tal { font-size: 28px; font-weight: 700; }
+.hud-knapp.av { opacity: .35; }
+#hud-radio { cursor: default; }
+.nosar #hud-nos { background: var(--guld); color: var(--black); box-shadow: 0 0 0 4px rgba(242, 193, 78, .5); }
+#hud-meny { position: absolute; right: 6px; top: 6px; width: 40px; height: 40px; border-radius: 20px; background: rgba(26, 20, 16, .5); color: rgba(245, 236, 215, .5); font-size: 22px; }
+.puls { animation: puls .5s ease 3; }
+@keyframes puls { 50% { transform: scale(1.25); } }
+
+/* regi (för den vuxne) */
+#regi { position: absolute; left: 50%; top: calc(var(--rum-topp) + 8px); transform: translateX(-50%); max-width: min(90vw, calc(var(--rum-bredd) - 140px)); padding: 6px 14px; border-radius: 10px; background: rgba(26, 20, 16, .82); color: #d8ccb4; font-size: 16px; font-style: italic; pointer-events: none; }
+
+/* läsplattan: ljust papper, mörk text, stor */
+#plattan { position: absolute; left: calc(var(--rum-vanster) + var(--rum-bredd) / 2); transform: translateX(-50%); max-width: min(92vw, var(--rum-bredd)); width: max-content; color: var(--black); }
+#plattan.replik { bottom: calc(100vh - var(--rum-topp) - var(--rum-hojd) + 12px); }
+#plattan.pussel, #plattan.bok, #plattan.formel-luft { top: calc(var(--rum-topp) + var(--rum-hojd) / 2); transform: translate(-50%, -50%); }
+.platta-oppen #varld canvas { filter: brightness(.6) saturate(.7); transition: filter .2s; }
+.replik-ruta, .pussel-ruta, .formel-ruta, .dop-ruta, .bok-ruta, .hjalte-ruta { position: relative; background: var(--papper); border-radius: 18px; box-shadow: 0 8px 28px rgba(0, 0, 0, .5), inset 0 0 0 3px #d9c9a3; }
+.replik-ruta { display: flex; align-items: flex-end; gap: 16px; padding: 16px 16px 16px 20px; }
+.replik-ruta .text { align-self: center; }
+.replik-ruta .vidare, .pussel-ruta > .vidare { position: static; flex: none; }
+.pussel-ruta > .vidare { align-self: flex-end; }
+.replik-ruta .text, .svar-rad .text, .lapp { font-size: calc(48px * var(--t)); line-height: 1.4; letter-spacing: .03em; }
+.rad { display: block; white-space: nowrap; }
+.rad.bryts { white-space: normal; max-width: 16em; }
+.kort-ord.bryts { white-space: normal; max-width: 12em; display: block; }
+.vidare { position: absolute; right: 10px; bottom: 10px; width: 56px; height: 56px; border-radius: 28px; font-size: 26px; background: var(--guld); color: var(--black); opacity: .25; }
+.klar-att-ga .vidare, .vidare.synlig { opacity: 1; animation: guppa 1.2s ease-in-out infinite; }
+@keyframes guppa { 50% { transform: translateX(4px); } }
+
+.portratt { flex: none; width: 48px; height: 48px; border-radius: 24px; background: #c9b896; box-shadow: inset 0 0 0 4px rgba(0, 0, 0, .15); }
+.p-farfar { background: #8a6a4a; } .p-baronen { background: #6b3a8a; } .p-berattare { display: none; }
+.p-klaffen { background: #8a8f96; }
+
+/* pussel */
+.pussel-ruta { padding: 20px 24px 24px; display: flex; flex-direction: column; align-items: center; gap: 18px; min-width: min(80vw, 520px); }
+.lapp { background: #fffaf0; padding: 12px 22px; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,.2); transform: rotate(-1deg); }
+.lapp.p-lila_papper_blackplumpar { background: #e8dcf2; }
+.lapp.p-traskylt { background: #c9a774; border-radius: 4px; }
+.fraga { font-size: calc(64px * var(--t)); }
+.svar-rad { display: flex; align-items: center; gap: 12px; }
+.kortrad { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; }
+.kort { position: relative; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-width: calc(120px * var(--t)); min-height: calc(110px * var(--t)); padding: 12px 18px; border-radius: 14px; background: #fff; color: var(--black); box-shadow: 0 5px 0 #c8bb9c, 0 0 0 3px #e5d9bd; }
+.kort:active { transform: translateY(3px); }
+.kort-etikett { font-size: calc(48px * var(--t)); line-height: 1.1; color: var(--black); }
+.kort.mening .kort-etikett { font-size: calc(40px * var(--t)); }
+.kort.vald { opacity: .45; transform: scale(.92); }
+.kort.ratt { box-shadow: 0 5px 0 #6aa36a, 0 0 0 4px #8fd18f; }
+.kort.pekar { box-shadow: 0 5px 0 #c8bb9c, 0 0 0 5px var(--guld); }
+.nos-pekar { position: absolute; top: -18px; right: -14px; font-size: 32px; animation: guppa 1s infinite; }
+.skakar { animation: skaka .35s; }
+@keyframes skaka { 25% { transform: translateX(-8px) rotate(-2deg); } 75% { transform: translateX(8px) rotate(2deg); } }
+.ryggsack { font-size: 48px; }
+
+.bild { display: inline-flex; align-items: center; justify-content: center; }
+.bild.emoji { font-size: calc(64px * var(--t)); line-height: 1; }
+.bild.form { border-radius: 8px; box-shadow: inset 0 -6px 0 rgba(0, 0, 0, .25), 0 2px 0 rgba(0,0,0,.2); }
+.bild.form.rund { border-radius: 50% / 45%; }
+.bild.form.spetsig { clip-path: polygon(50% 0, 100% 100%, 0 100%); border-radius: 0; }
+.form-emoji { font-size: calc(32px * var(--t)); }
+.bubbla { position: relative; }
+.bubbla-ytter { display: inline-flex; align-items: center; justify-content: center; width: calc(110px * var(--t)); height: calc(90px * var(--t)); border-radius: 50%; background: #fff; box-shadow: 0 0 0 3px #d9c9a3; font-size: calc(56px * var(--t)); }
+.bubbla-prick { position: absolute; left: 10%; bottom: -12px; width: 16px; height: 16px; border-radius: 8px; background: #fff; box-shadow: 0 0 0 3px #d9c9a3; }
+
+/* nosen: ord man kan nosa på */
+.ord { border-radius: 6px; transition: background .15s; }
+.nosar #plattan .ord { cursor: pointer; background: rgba(242, 193, 78, .35); box-shadow: 0 3px 0 var(--guld); }
+#remsa { position: absolute; left: 50%; top: calc(var(--rum-topp) + 16px); transform: translateX(-50%); display: flex; gap: 10px; padding: 14px; border-radius: 18px; background: rgba(26, 20, 16, .85); z-index: 3; }
+.remsa-b { display: inline-flex; align-items: center; justify-content: center; width: 72px; height: 84px; border-radius: 12px; background: #fff; color: var(--black); font-size: 64px; transition: transform .15s, background .15s; }
+.remsa-b.lyser { background: var(--guld); transform: translateY(-8px); }
+
+/* formeln */
+.formel-ruta { padding: 22px 28px; display: flex; flex-direction: column; align-items: center; gap: 22px; }
+.forebild { display: flex; gap: 10px; padding: 10px 26px; border-radius: 40px; background: linear-gradient(#8a6a4a, #6b4c35); box-shadow: inset 0 0 12px rgba(242, 193, 78, .5); }
+.forebild .bokstav { color: #ffe9a8; font-size: calc(56px * var(--t)); text-shadow: 0 0 10px rgba(242, 193, 78, .9); }
+.forebild .bokstav.blinkar, .bricka.tips { animation: blinka .5s ease-in-out 6; }
+@keyframes blinka { 50% { opacity: .2; } }
+.platser { display: flex; gap: 12px; }
+.plats { display: inline-flex; align-items: center; justify-content: center; width: calc(84px * var(--t)); height: calc(96px * var(--t)); border-radius: 12px; border: 4px dashed #b7a98a; font-size: calc(64px * var(--t)); }
+.plats.last { border: 4px solid #6aa36a; background: #e6f4e2; }
+.brickor { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.bricka { width: calc(84px * var(--t)); height: calc(96px * var(--t)); border-radius: 12px; background: #fff; color: var(--black); font-size: calc(64px * var(--t)); box-shadow: 0 6px 0 #c8bb9c, 0 0 0 3px #e5d9bd; }
+.bricka.anvand { visibility: hidden; }
+.bricka.sudda { font-size: 36px; background: #e9dfc8; }
+.formel-i-luften { font-size: calc(96px * var(--t)); color: #ffe9a8; text-shadow: 0 0 24px rgba(242, 193, 78, 1); letter-spacing: .1em; animation: luft 1s ease; }
+@keyframes luft { from { transform: scale(.4); opacity: 0; } }
+
+/* namnet */
+.dop-ruta { padding: 20px 24px; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+.namnrutor { display: flex; gap: 6px; }
+.ruta { display: inline-flex; align-items: center; justify-content: center; width: calc(58px * var(--t)); height: calc(76px * var(--t)); border-bottom: 5px solid #b7a98a; font-size: calc(56px * var(--t)); }
+.ruta.fylld { border-color: var(--black); }
+.dop-knappar { display: flex; gap: 14px; }
+.dop-knappar .klar { background: var(--guld); }
+
+/* skärmtangentbordet: nertill, i skrivläget */
+#tangentbord { position: fixed; left: 0; right: 0; bottom: 0; height: 232px; padding: 10px 8px 12px; display: flex; flex-direction: column; gap: 8px; align-items: center; background: #2a1d16; z-index: 6; animation: in-nerifran .25s ease; }
+#tangentbord[hidden] { display: none; }
+@keyframes in-nerifran { from { transform: translateY(100%); } }
+.tb-rad { display: flex; gap: 6px; width: min(100%, 1100px); justify-content: center; }
+.tb-tangent { flex: 1 1 0; max-width: 104px; min-width: 52px; height: 64px; border-radius: 12px; background: var(--papper); color: var(--black); font-size: 40px; box-shadow: 0 4px 0 #b7a98a; }
+.tb-tangent.nere { transform: translateY(3px); box-shadow: 0 1px 0 #b7a98a; }
+.tb-sudda { background: #e9dfc8; } .tb-klar { background: var(--guld); } .tb-klar.av { opacity: .35; }
+.tb-rad.blinkar .tb-tangent { animation: blinka .5s ease-in-out 4; }
+
+/* boken */
+.bok-ruta { padding: 20px 24px; display: flex; flex-direction: column; align-items: center; gap: 14px; width: min(88vw, calc(var(--rum-bredd) * .85)); background: #f3e6c8; }
+.uppslag { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.bok-bild { cursor: pointer; width: calc(220px * var(--t)); height: calc(140px * var(--t)); display: flex; align-items: center; justify-content: center; background: #c8bfae; border-radius: 8px; }
+.bildtext { font-size: calc(48px * var(--t)); }
+.boktext { font-size: calc(26px * var(--t)); line-height: 1.5; max-width: 34em; text-align: left; }
+.boktext .rad { white-space: normal; }
+.bok-knappar { display: flex; gap: 16px; }
+
+/* hjälten */
+.hjalte-ruta { padding: 20px; display: grid; grid-template-columns: auto auto; align-items: center; gap: 14px 28px; }
+.hjalte-ruta .klar { grid-column: 1 / -1; justify-self: center; }
+.hjalte-bild { display: flex; flex-direction: column; align-items: center; width: 96px; }
+.hb-hatt { width: 84px; height: 18px; border-radius: 4px; }
+.hb-huvud { width: 60px; height: 48px; }
+.hb-klader { width: 96px; height: 96px; display: flex; justify-content: center; padding-top: 12px; box-sizing: border-box; }
+.hb-kropp { width: 72px; height: 48px; }
+.valrader { display: flex; flex-direction: column; gap: 12px; }
+.valrad { display: flex; gap: 12px; }
+.farg { width: 64px; height: 64px; border-radius: 32px; box-shadow: 0 0 0 3px #d9c9a3; }
+.farg.vald { box-shadow: 0 0 0 6px var(--guld); }
+.hjalte-ruta .klar { background: var(--guld); }
+
+/* fest och närbild */
+#fest { position: absolute; left: calc(var(--rum-vanster) + var(--rum-bredd) / 2); top: calc(var(--rum-topp) + var(--rum-hojd) / 2); transform: translate(-50%, -50%); font-size: 120px; pointer-events: none; }
+#fest.pop { animation: pop .9s ease; }
+@keyframes pop { from { transform: translate(-50%, -50%) scale(.2); opacity: 0; } 40% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; } }
+#narbild { position: absolute; left: var(--rum-vanster); top: var(--rum-topp); width: var(--rum-bredd); height: var(--rum-hojd); display: flex; align-items: center; justify-content: center; background: #2b2420; font-size: calc(160px * var(--t)); pointer-events: none; }
+
+/* helskärmar: start, passets slut, meny */
+#skarm { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(20, 14, 10, .92); z-index: 4; }
+#skarm.genomskinlig { background: transparent; pointer-events: none; }
+#skarm.genomskinlig .vidare-hornet { pointer-events: auto; }
+.vidare-hornet { position: absolute; right: calc(100vw - var(--rum-vanster) - var(--rum-bredd) + 12px); bottom: calc(100vh - var(--rum-topp) - var(--rum-hojd) + 12px); width: 72px; height: 72px; border-radius: 36px; border: 0; font-size: 32px; background: var(--guld); color: var(--black); animation: guppa 1.2s infinite; cursor: pointer; }
+.start, .pass-slut { display: flex; flex-direction: column; align-items: center; gap: 32px; }
+.stav-glimt { width: 24px; height: 220px; border-radius: 12px; background: linear-gradient(#8a6a4a, #6b4c35); box-shadow: 0 0 40px 10px rgba(242, 193, 78, .45); transform: rotate(18deg); animation: glimt 2s ease-in-out infinite; }
+@keyframes glimt { 50% { box-shadow: 0 0 60px 18px rgba(242, 193, 78, .75); } }
+.start-knapp { width: 140px; height: 140px; border-radius: 70px; font-size: 64px; background: var(--guld); }
+.stor-ikon { font-size: 140px; }
+.pass-slut .knappar { display: flex; gap: 32px; }
+.vuxen { color: #d8ccb4; font-size: 18px; font-style: italic; }
+.meny { max-height: 90vh; overflow: auto; width: min(92vw, 720px); padding: 20px 24px; border-radius: 16px; background: var(--papper); color: var(--black); font-style: normal; font-size: 18px; }
+.meny h2 { margin: 0 0 10px; font-size: 24px; }
+.menygrupp { margin: 12px 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.menygrupp label { display: block; width: 100%; }
+.menyval { padding: 8px 12px; border-radius: 8px; background: #e9dfc8; font-size: 16px; }
+.menyval.nu { background: var(--guld); }
+.scenlista { flex-direction: column; align-items: stretch; }
+.scenlista .menyval { text-align: left; }
+
+/* testläget: inga animationer, så att testerna kan trycka på knapparna */
+.snabb *, .snabb *::before, .snabb *::after { animation: none !important; transition: none !important; }

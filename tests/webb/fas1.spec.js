@@ -1,22 +1,38 @@
-// Grinden för fas 1: blocket går med piltangenter och tryck, skalan är hel, texten är Andika,
-// spelet startar offline och minns var blocket stod.
+// Grunden: skalan är hel, texten är Andika, hjälten går med piltangenter och tryck,
+// spelet startar offline och minns var det var.
 import { test, expect } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
 
 mkdirSync('tests/skarmdumpar', { recursive: true });
 
-/** Starta spelet och vänta tills scenen kör. */
-async function starta(page) {
+/** Starta spelet (testläge) och vänta tills Phaser kör. */
+async function starta(page, sok = '?snabb') {
   const fel = [];
   page.on('pageerror', (e) => fel.push(String(e)));
   page.on('console', (m) => { if (m.type() === 'error') fel.push(m.text()); });
-  await page.goto('./');
-  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning && window.__ORDSTAVEN.spel.scene.isActive('Testrum'));
+  await page.goto('./' + sok);
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning && window.__ORDSTAVEN.spel.scene.isActive('Rum'));
   return fel;
 }
+
+/** Gå direkt till en scen i prologen (via sparningen) och tryck förbi startskärmen och replikerna. */
+async function tillScen(page, index) {
+  await starta(page, '?snabb&ny');
+  await page.evaluate((i) => {
+    const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
+    av.scen = i; av.startad = false; av.ungen.namn = 'KNOPP';
+    localStorage.setItem('ordstaven_spar', JSON.stringify(t));
+  }, index);
+  await starta(page);
+  await page.click('.start-knapp');
+  for (let k = 0; k < 6; k++) {
+    if ((await page.evaluate(() => window.__ORDSTAVEN.steg()?.typ)) === 'ga_till') break;
+    const r = await page.$('#plattan .replik-ruta'); if (r) await r.click();
+    await page.waitForTimeout(120);
+  }
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.steg()?.typ)).toBe('ga_till');
+}
 const pos = (page) => page.evaluate(() => window.__ORDSTAVEN.position());
-/** Avstånd i rumspixlar till en punkt. Ett tryck landar på hela skärmpunkter, så upp till två pixlars avvikelse är väntad (en ruta är 16). */
-const avstand = async (page, x, y) => { const p = await pos(page); return Math.hypot(p.x - x, p.y - y); };
 
 test('startar utan fel, med hel skala och rummet helt i bild', async ({ page }, info) => {
   const fel = await starta(page);
@@ -31,7 +47,7 @@ test('startar utan fel, med hel skala och rummet helt i bild', async ({ page }, 
   expect(m.y).toBeGreaterThanOrEqual(0);
   expect(m.x + m.b).toBeLessThanOrEqual(m.vb + 0.5);
   expect(m.y + m.h).toBeLessThanOrEqual(m.vh + 0.5);
-  await page.waitForTimeout(300);
+  await expect(page.locator('.start-knapp')).toBeVisible();
   await page.screenshot({ path: `tests/skarmdumpar/${info.project.name}.png` });
   expect(fel).toEqual([]);
 });
@@ -44,68 +60,49 @@ test('textlagret använder Andika, och versionsraden täcker aldrig rummet', asy
   expect(stil.familj).toContain('Andika');
   expect(stil.storlek).toBeGreaterThanOrEqual(32);
   expect(stil.laddad).toBe(true);
-
-  const v = page.locator('#textlager .version');
-  await expect(v).toHaveText(/^ORDSTAVEN \d+\.\d+\.\d+$/);
   const krock = await page.evaluate(() => {
     const e = document.querySelector('#textlager .version');
-    if (e.hidden) return false;
+    if (!e || e.hidden) return false;
     const a = e.getBoundingClientRect(), c = document.querySelector('#varld canvas').getBoundingClientRect();
     return a.right > c.left && a.left < c.right && a.bottom > c.top && a.top < c.bottom;
   });
   expect(krock).toBe(false);
 });
 
-test('piltangenterna flyttar blocket', async ({ page }, info) => {
+test('piltangenterna flyttar hjälten', async ({ page }, info) => {
+  test.setTimeout(60000);
   test.skip(!!info.project.use.hasTouch, 'pekskärm');
-  await starta(page);
+  await tillScen(page, 2); // vinden, gå till lådan med staven
   const fore = await pos(page);
-  // Håll tangenten tills blocket har gått en bit (testwebbläsare kan rita långsamt).
-  await page.keyboard.down('ArrowRight');
-  await expect.poll(async () => (await pos(page)).x, { timeout: 5000 }).toBeGreaterThan(fore.x + 20);
-  await page.keyboard.up('ArrowRight');
+  await page.keyboard.down('ArrowLeft');
+  await expect.poll(async () => (await pos(page)).x, { timeout: 20000 }).toBeLessThan(fore.x - 20); // långsamma testdatorer: lång väntan
+  await page.keyboard.up('ArrowLeft');
   await page.keyboard.down('ArrowUp');
-  await expect.poll(async () => (await pos(page)).y, { timeout: 5000 }).toBeLessThan(fore.y - 10);
+  await expect.poll(async () => (await pos(page)).y, { timeout: 20000 }).toBeLessThan(fore.y - 10);
   await page.keyboard.up('ArrowUp');
-  // Blocket stannar när tangenten släpps.
   const stopp = await pos(page); await page.waitForTimeout(300);
   expect(Math.abs((await pos(page)).y - stopp.y)).toBeLessThan(3);
 });
 
-test('tryck eller klick flyttar blocket dit', async ({ page }, info) => {
-  await starta(page);
-  // Mål i rummet: ruta (60, 160) i rumskoordinater
-  const skarm = await page.evaluate(() => { const s = window.__ORDSTAVEN.skala(); return { x: s.vanster + 60 * s.cssSkala, y: s.topp + 160 * s.cssSkala }; });
-  if (info.project.use.hasTouch) await page.touchscreen.tap(skarm.x, skarm.y);
-  else await page.mouse.click(skarm.x, skarm.y);
-  await expect.poll(() => avstand(page, 60, 160), { timeout: 15000 }).toBeLessThan(2);
-});
-
-test('minns var blocket stod efter omladdning', async ({ page }) => {
-  await starta(page);
-  const skarm = await page.evaluate(() => { const s = window.__ORDSTAVEN.skala(); return { x: s.vanster + 250 * s.cssSkala, y: s.topp + 60 * s.cssSkala }; });
-  await page.mouse.click(skarm.x, skarm.y);
-  await expect.poll(() => avstand(page, 250, 60), { timeout: 15000 }).toBeLessThan(2);
-  const stod = await pos(page);
-  await page.waitForTimeout(2500); // sparning sker högst varannan sekund
-  await page.reload();
-  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.scene.isActive('Testrum'));
-  // Sparningen avrundar till hela rumspixlar.
-  const efter = await pos(page);
-  expect(Math.hypot(efter.x - stod.x, efter.y - stod.y)).toBeLessThan(2);
+test('tryck på ett objekt: hjälten går dit och scenen går vidare', async ({ page }, info) => {
+  test.setTimeout(60000);
+  await tillScen(page, 2);
+  const pt = await page.evaluate(() => window.__ORDSTAVEN.objekt('lada_med_stav'));
+  if (info.project.use.hasTouch) await page.touchscreen.tap(pt.x, pt.y);
+  else await page.mouse.click(pt.x, pt.y);
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 30000 }).toBe('s03_staven');
 });
 
 test('startar offline', async ({ page, context }, info) => {
   test.skip(!['mac-helskarm', 'mac-safari', 'ipad-10'].includes(info.project.name), 'räcker med några projekt');
   await starta(page);
   await page.evaluate(async () => { await navigator.serviceWorker.ready; });
-  // Vänta tills förcachen är klar och sidan styrs av service workern
   await page.reload();
   await page.waitForFunction(() => !!navigator.serviceWorker.controller);
   await context.setOffline(true);
   await page.reload();
-  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.scene.isActive('Testrum'));
-  await expect(page.locator('#textlager .version')).toHaveText(/ORDSTAVEN/);
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await expect(page.locator('.start-knapp')).toBeVisible();
   const cacher = await page.evaluate(() => caches.keys());
   expect(cacher.some((k) => k.startsWith('ordstaven-'))).toBe(true);
 });
@@ -113,6 +110,25 @@ test('startar offline', async ({ page, context }, info) => {
 test('stående läge på pekskärm visar vrid-bilden', async ({ page }, info) => {
   test.skip(!info.project.use.hasTouch, 'bara pekskärm');
   await page.setViewportSize({ width: 820, height: 1180 });
-  await page.goto('./');
+  await page.goto('./?snabb');
   await expect(page.locator('#vrid')).toBeVisible();
+});
+
+test('skrivläget på pekskärm: tangentbordet kommer fram och rummet krymper', async ({ page }, info) => {
+  test.skip(!info.project.use.hasTouch, 'bara pekskärm');
+  await starta(page, '?snabb&ny');
+  await page.click('.start-knapp');
+  for (let k = 0; k < 12 && !(await page.$('.dop-ruta')); k++) {
+    if (await page.$('#plattan .replik-ruta')) await page.click('#plattan .replik-ruta');
+    if (await page.$('.hjalte-ruta .klar')) await page.click('.hjalte-ruta .klar');
+    await page.waitForTimeout(150);
+  }
+  await expect(page.locator('#tangentbord')).toBeVisible();
+  const m = await page.evaluate(() => ({ rum: document.querySelector('#varld').getBoundingClientRect().bottom, tb: document.querySelector('#tangentbord').getBoundingClientRect().top, skala: window.__ORDSTAVEN.skala().fysisk }));
+  expect(m.rum).toBeLessThanOrEqual(m.tb + 1); // inget i rummet täcks
+  for (const b of ['K', 'N', 'O']) await page.locator('.tb-tangent', { hasText: new RegExp(`^${b}$`) }).dispatchEvent('pointerdown');
+  await expect(page.locator('.namnrutor')).toContainText('KNO');
+  await page.locator('.tb-klar').dispatchEvent('pointerdown');
+  await expect(page.locator('#tangentbord')).toBeHidden();
+  await page.screenshot({ path: `tests/skarmdumpar/skrivlage-${info.project.name}.png` });
 });

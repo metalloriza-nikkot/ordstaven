@@ -44,7 +44,7 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   // 'github' gör varje fel till en anteckning på körningen, läsbar via GitHubs API.
   reporter: process.env.CI ? [['github'], ['list'], ['html', { open: 'never' }]] : 'list',
-  use: { baseURL: 'http://localhost:4173/ordstaven/', serviceWorkers: 'allow' },
+  use: { baseURL: 'http://localhost:4173/ordstaven/', serviceWorkers: 'allow', screenshot: 'only-on-failure' },
   projects: lokalChromium ? alla.filter((p) => p.use.browserName === 'chromium') : alla,
   webServer: {
     command: 'npm run preview',

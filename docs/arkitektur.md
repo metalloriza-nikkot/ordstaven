@@ -1,6 +1,6 @@
 # Arkitektur – ORDSTAVEN
 
-Version 0.2 (2026-10-24). Status: **fas 1 byggd (spelversion 0.1.0).**
+Version 0.3 (2026-10-25). Status: **fas 2, gråbox av prologen (spelversion 0.2.0).**
 ❓ = öppen fråga. Designen finns i `docs/design.md`. Testmatrisen i `docs/testmatris.md`.
 
 ## 1. Översikt
@@ -113,7 +113,7 @@ En modul (`karna/inmatning.js`) översätter tangentbord och pekskärm till **ha
 | `interagera` {mål} | Mellanslag / Enter | tryck på skylt, figur, buske |
 | `bokstav` {tecken} | A–Ö (versaler, bara A–Z, Å, Ä, Ö) | eget skärmtangentbord |
 | `sudda` | Backsteg | sudd-tangent |
-| `hjalp` | N | nosknappen |
+| `hjalp` | Tab (inte en bokstav, alla bokstäver ska gå att skriva) | nosknappen |
 | `stang` | Esc | stäng-knapp |
 
 - **Tryck-för-att-gå:** i fas 1 rak linje till punkten, stopp mot kanter. Vägsökning (A* på rutnätet) kommer i fas 2 när Tiled-kartorna har kollisionslager.
@@ -237,3 +237,27 @@ Innehållskontrollen (JSON Schema, Ajv) finns sedan 0.1.3, se `docs/innehallssch
 | Svensk röst saknas på Windows | Inspelade klipp först, pladder som sista reserv. |
 | Delad localStorage-kvot med TURBO-RACE | Liten sparfil, kapad logg, fel vid full kvot fångas och loggas. |
 | Claude Code bryter fungerande delar | Tester som grind i workflowen, en commit per steg, `CLAUDE.md`. |
+
+## 13. Fas 2 – gråboxen av prologen (0.2.0)
+
+```
+content/*.json ──► karna/berattelse.js ──► spel.js ──► scener/Rum.js (Phaser: rum, hjälte, unge, ljus)
+                   (scener och steg i        │      └► grans/ui.js (läsplattan, kort, brickor, bok, HUD, nos)
+                    ordning, tillstånd)      │         grans/tangentbord.js, grans/rost.js, grans/ljud.js
+                   karna/pussel.js ◄─────────┤
+                   karna/lasmotor.js ◄───────┘ (anpassning per pusseltyp, logg per försök)
+```
+
+- **`karna/berattelse.js`** spelar scenerna i ordning och äger tillståndet i äventyret: aktuell scen, rummens lägen (natt, natt_upplyst, morgon), bär, kartbitar, synliga delar av gränssnittet och lappar som kan öppnas igen. Scenens nummer sparas vid varje scenstart. Vid omstart spelas scenens `vid_omstart`.
+- **`karna/pussel.js`** har en tillståndsmaskin per pusseltyp (P1, P27, P11, P12, P26): förenkling efter 2 fel (lägre variant, annars en distraktor bort), ungen pekar efter 3 fel, aldrig automatisk lösning. Krukorna bestämmer innehållet när de slås, så kartbiten kommer alltid sist.
+- **`karna/lasmotor.js`** (porterad från TURBO-RACE): nivå per pusseltyp, läsning och skrivning för sig, gemener för sig. 3 rätt i rad utan hjälp → upp, 2 fel → ned. Varje försök loggas (pussel, nivå, rätt, försök, hjälp, tid), högst 300 i sparningen. Startnivå L2 och S1.
+- **`karna/ljudning.js`** (porterad): bokstavsljud och sedan hela ordet. Helord (lista 5–6, flaggan `helord`) läses som helt ord. Maxtid som i TURBO-RACE.
+- **`karna/rumslayout.js`**: gråboxens rum har inga Tiled-kartor än. Objekten placeras automatiskt från rummets `innehall`: dörrar längs övre väggen, stegar i vänstra kanten, grindar och stigar nertill, övriga saker i ett rutnät. Ersätts av Tiled när stilspåret ritar rummen.
+- **`spel.js`** har en hanterare per stegtyp. Inga innehålls-id:n i koden. Undantag i gråboxen: krukorna placeras där rummets första objekt med "kruk" i namnet står.
+- **Läsplattan** visar text i versaler via `karna/text.js`. En sträng bryts mellan ord vid 16 em (samma som innehållskontrollen), en lista med rader bryts aldrig inom en rad. Världen stannar och dämpas när plattan är öppen.
+- **Nosen** (👃, Tab): tryck på nosen och sedan på ett ord. Ordet ljudas med remsan. Kostar ett bär, gratis vid 0 bär. Räknas som hjälp. Bara i pussel med `hjalp: "ett_ord"` och i lappar.
+- **Skrivläget**: på pekskärm visas skärmtangentbordet när ett namn skrivs. Layouten håller 232 punkter nertill, rummet krymper ett steg och glider upp. På dator skriver man på det fysiska tangentbordet (⌨ visar skärmtangentbordet ändå).
+- **Rösten**: bara datorröst (`grans/rost.js`), med rollröster per talare (`aventyr.json`). Menyn kan låta föräldern läsa Farfars repliker.
+- **Meny för vuxna**: håll inne ⚙ (eller Ctrl+Skift+M). Läsnivå, föräldern läser Farfar, objektens namn, hoppa till scen, spara loggen, börja om.
+- **Testläge**: `?snabb` stänger av rösten, animationerna och kortar pauserna. `?ny` börjar om från början.
+- **Kapitel 1** finns som data och går igenom kontrollen, men spelas inte: P15 och P9 byggs i fas 3. Gråboxen slutar efter prologen.

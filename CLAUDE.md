@@ -31,6 +31,9 @@ Läs- och skriväventyr för barn 6–8 år, byggt för en spelare först. Webba
 - Allt som pratar måste kunna avbrytas och ha en maxtid (lärdom från TURBO-RACE).
 - Service workern aktiverar nya versioner bara på startskärmen, aldrig mitt i spelet.
 - Uppläsningsregeln: instruktioner läses upp (`upplast: true`), ledtrådar aldrig.
+- **Inga råinspelningar av röster i repot.** Ungens läten läggs in bara bearbetade (tonhöjd/filter), så att rösten inte går att känna igen. Gråboxen använder bara datorrösten.
+- Alla bokstäver ska gå att skriva: inga kortkommandon på bokstavstangenter (nosen ligger på Tab).
+- Genomspelningstestet (`tests/webb/genomspelning.spec.js`) spelar hela prologen. Det ska alltid gå igenom.
 
 ## Licenser
 - Koden: alla rättigheter förbehållna (`LICENSE`).
