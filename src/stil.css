@@ -238,7 +238,7 @@ html, body {
 .dop-knappar .klar { background: var(--guld); }
 
 /* skärmtangentbordet: nertill, i skrivläget */
-#tangentbord { position: fixed; left: 0; right: 0; bottom: 0; height: 232px; padding: 10px 8px 12px; display: flex; flex-direction: column; gap: 8px; align-items: center; background: #2a1d16; z-index: 6; animation: in-nerifran .25s ease; }
+#tangentbord { position: fixed; left: 0; right: 0; bottom: 0; height: 232px; box-sizing: border-box; padding: 10px 8px 12px; display: flex; flex-direction: column; gap: 8px; align-items: center; background: #2a1d16; z-index: 6; animation: in-nerifran .25s ease; }
 #tangentbord[hidden] { display: none; }
 @keyframes in-nerifran { from { transform: translateY(100%); } }
 .tb-rad { display: flex; gap: 6px; width: min(100%, 1100px); justify-content: center; }
