@@ -18,6 +18,8 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
   av.kapitelId = av.kapitelId || kapitel.id;
   if (av.kapitelId !== kapitel.id) { av.kapitelId = kapitel.id; av.scen = 0; }
   av.scen = Number.isInteger(av.scen) ? av.scen : 0;
+  // Scenens id sparas också, så att en sparning hamnar rätt även när innehållet har fått nya scener.
+  if (typeof av.scenId === 'string') { const i = kapitel.scener.findIndex((/** @type {any} */ s) => s.id === av.scenId); if (i >= 0) av.scen = i; }
   av.ui = av.ui || {};
   av.rumstillstand = av.rumstillstand || {};
   av.lappar = av.lappar || [];
@@ -33,7 +35,7 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
   function borjaScen() {
     const scen = kapitel.scener[scenIndex];
     if (!scen) return;
-    av.scen = scenIndex;
+    av.scen = scenIndex; av.scenId = scen.id;
     if (scen.rum && scen.tillstand) av.rumstillstand[scen.rum] = scen.tillstand;
     stegIndex = omstart && scen.vid_omstart ? -1 : 0;
     omstart = false;
@@ -105,7 +107,7 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
           const formler = tillstand.spelare.hjalte.formler;
           if (!formler.includes(p.svar)) formler.push(p.svar);
         }
-        if (p && (p.typ === 'P1_las_och_valj' || p.typ === 'P27_packa') && p.kan_oppnas_igen && !av.lappar.includes(p.id)) av.lappar.push(p.id);
+        if (p && (p.typ === 'P1_las_och_valj' || p.typ === 'P28_packa') && p.kan_oppnas_igen && !av.lappar.includes(p.id)) av.lappar.push(p.id);
       }
       effektGjord = false;
       stegIndex++;

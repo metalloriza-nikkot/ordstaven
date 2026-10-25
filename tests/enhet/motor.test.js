@@ -163,6 +163,15 @@ describe('berättelsemotorn', () => {
     expect(igen.aktuellt().text).toBe('Det finns dinomat på vinden.');
   });
 
+  it('en sparning hamnar i samma scen även när innehållet har fått nya scener före den', () => {
+    const t = nyttTillstand('t');
+    const b = skapaBerattelse({ aventyr, kapitel: prolog, tillstand: t, aventyrId: AVENTYR });
+    spela(b, (st, bb) => bb.scen.id === 's11_ladorna');
+    const kopia = JSON.parse(JSON.stringify(t));
+    const fler = { ...prolog, scener: [prolog.scener[0], { id: 's00b_ny', pass: 1, rum: null, steg: [{ typ: 'ljud', id: 'dunk' }] }, ...prolog.scener.slice(1)] };
+    expect(skapaBerattelse({ aventyr, kapitel: fler, tillstand: kopia, aventyrId: AVENTYR }).scen.id).toBe('s11_ladorna');
+  });
+
   it('en helt ny start spelar inte vid_omstart', () => {
     const b = skapaBerattelse({ aventyr, kapitel: prolog, tillstand: nyttTillstand('t'), aventyrId: AVENTYR });
     expect(b.aktuellt().typ).toBe('mellanscen');
