@@ -1,6 +1,6 @@
 # Innehållsschema – format 1
 
-Version 1.0 (2026-10-24). Ägs av teknikspåret. Så skrivs berättelse, pussel och ordlistor som data.
+Version 1.1 (2026-10-25). 1.1: P27_packa, P15_raddning, P9_kodlas. Ägs av teknikspåret. Så skrivs berättelse, pussel och ordlistor som data.
 Schemafilerna finns i `content/schema/`. Kontrollen körs med `npm run kontroll` och i varje publicering.
 
 ## 1. Filerna
@@ -104,6 +104,18 @@ En **replik inuti något annat** (`knuff`, `vid_fel`, `instruktion`, `vid_omstar
 
 `sparas_som` (`hjalte.namn` eller `unge.namn`), `min_bokstaver`, `max_bokstaver`, `vuxen_far_hjalpa`. Bedöms aldrig.
 
+### P27_packa
+
+Som P1, men **flera alternativ har `"ratt": true`** och spelaren väljer alla. Upp till 6 alternativ. Fel val studsar tillbaka (`vid_fel` på pusslet eller `vid_valj` på alternativet).
+
+### P15_raddning (fas 3)
+
+Hänga apan-familjen. `kategori` (text spelaren läser själv), `svar` (ett ord, små bokstäver), `reserv_ord`, `tillatna_fel`, `mjukt_misslyckande`, `variant`, `falt` (beskrivning). Ett fält per bokstav; en rätt bokstav fylls i på alla platser där den finns.
+
+### P9_kodlas (fas 3)
+
+`niva`, `svar` (ett ord, små bokstäver), `brickor`, `chiffer` med `tecken` (på låset, i ordning), `nyckel` (`tecken` → `bokstav`) och `nyckeln_finns_i`. Kontrollen räknar ut ordet ur tecknen och nyckeln och jämför med svaret.
+
 ### P26_krukorna
 
 `innehall` (en post per kruka: `bar`, `tom`, `kartbit_1` …), `kartbit_i_sista`. Vila, påverkar inte nivån.
@@ -126,11 +138,13 @@ Små bokstäver utom formler (`"LJUS"`). Flaggor: `aao`, `helord`, `sparrad`, `b
 - Förbjudna par på samma skärm (lås–läs, hår–här, bår–bär), och rätt svar och distraktor som bara skiljer sig på Å/Ä i L1–L3.
 - Spärrade ord (mjukt G/K, NG, SJ …) i text spelaren läser själv, även böjda former (berget, köket).
 - Formelbrickor som inte räcker till svaret, extra brickor på S1, förebild som inte är svaret.
+- Kodlås där tecknen och nyckeln inte ger svaret. Räddningsord som är spärrade.
+- P27 där alla eller inga alternativ är rätt.
 
 **Varningar (stoppar inget):**
 - **Repliker som blir mer än två rader** på läsplattan. Radbredden är 16 em (768 punkter vid 48 punkters text, i versaler), räknad med Andikas egna teckenbredder.
 - Mer än 8 ord på en rad i text spelaren läser själv.
-- **Färre än två läsuppgifter som avgör något per pass** (läs och välj).
+- **Färre än två läsuppgifter som avgör något per pass.** Räknas: P1, P27, P15 (kategorin läses). Inte P9: kodlåset är avkodning med nyckel.
 - **Pass som uppskattas till mer än 10 minuter.** Uppskattningen: 1,5 s + 0,45 s per ord och replik, 40 s per pussel, 12 s per `ga_till`, 4 s per mellanscen, 6 s + uppläsning per bokuppslag.
 - Pass som inte slutar med en sparpunkt, pussel som inte används, ord i alternativ som inte finns i ordlistorna, meningar som börjar med liten bokstav.
 

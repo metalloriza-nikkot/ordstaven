@@ -1,0 +1,293 @@
+{
+ "$schema": "../schema/kapitel.schema.json",
+ "format": 1,
+ "id": "kap-01",
+ "kapitel": 1,
+ "meta": {
+  "namn": "Skogen",
+  "version": "0.2",
+  "datum": "2026-10-24",
+  "agare": "Innehåll",
+  "kalla": "Manus 15-kapitel1-manus.md v0.2. Format 1 enligt 14-innehallsschema.md.",
+  "nya_pusseltyper": ["P15_raddning", "P9_kodlas"]
+ },
+ "rum": [
+  { "id": "skogsbrynet", "namn": "Skogsbrynet", "innehall": ["vagskal", "hog_sten", "lag_sten", "hog_rund_sten", "hog_spetsig_sten", "lag_rund_sten", "lerpol", "skylt_farfar_1"] },
+  { "id": "lianerna", "namn": "Lianerna", "innehall": ["lianer", "trad_med_formel", "stig_vidare", "stig_buskarna"] },
+  { "id": "buskarna", "namn": "Buskarna", "innehall": ["skylt_farfar_2", "stor_gron_buske", "liten_gron_buske", "stor_gul_buske", "gron_buske", "gul_buske", "rod_buske"] },
+  { "id": "glantan", "namn": "Gläntan", "innehall": ["apan_i_nat", "lovhog", "stig_stort_gammalt", "stig_stort_ungt", "stig_litet_gammalt", "stig_gammalt", "stig_ungt", "skylt_farfar_3"] },
+  { "id": "gamla_tradet", "namn": "Det gamla trädet", "innehall": ["stort_gammalt_trad", "last_lada", "stig_bron", "stig_backen", "skylt_bron", "skylt_backen"] }
+ ],
+ "scener": [
+  {
+   "id": "k1s01_brynet", "pass": 1, "rum": "skogsbrynet",
+   "steg": [
+    { "typ": "mellanscen", "beskrivning": "Hjälten och ungen springer in i skogen. Luftskeppets skugga glider över träden och försvinner. Radion sprakar." },
+    { "typ": "replik", "talare": "farfar", "text": "Bra, ni klarade er!", "upplast": true },
+    { "typ": "replik", "talare": "farfar", "text": "Följ mina gamla skyltar.", "upplast": true },
+    { "typ": "ga_till", "mal": "skylt_farfar_1" },
+    { "typ": "pussel", "pussel_id": "k1_stenen" }
+   ]
+  },
+  {
+   "id": "k1s02_lianerna", "pass": 1, "rum": "lianerna",
+   "steg": [
+    { "typ": "mellanscen", "beskrivning": "Täta lianer över stigen. Ungen sliter och biter, det går inte." },
+    { "typ": "replik", "talare": "berattare", "text": "Lianerna är för täta.", "upplast": true },
+    { "typ": "replik", "talare": "berattare", "text": "Farfar har ristat en formel i trädet.", "upplast": true },
+    { "typ": "pussel", "pussel_id": "k1_svard" },
+    { "typ": "replik", "talare": "berattare", "text": "Svärdet kapar bara växter. Aldrig djur.", "upplast": true }
+   ]
+  },
+  {
+   "id": "k1s03_buskarna", "pass": 1, "rum": "buskarna",
+   "steg": [
+    { "typ": "replik", "talare": "farfar", "text": "Jag gömde en sak åt dig här.", "upplast": true },
+    { "typ": "replik", "talare": "farfar", "text": "Leta efter min skylt.", "upplast": true },
+    { "typ": "pussel", "pussel_id": "k1_busken" },
+    { "typ": "replik", "talare": "berattare", "text": "En hatt! Vill du ha den på dig?", "upplast": true },
+    { "typ": "visa_ui", "element": "hjalteboken" },
+    { "typ": "mellanscen", "beskrivning": "Hatten läggs i garderoben i hjälteboken. Spelaren kan klä om hjälten nu eller senare." }
+   ]
+  },
+  {
+   "id": "k1s04_grat", "pass": 1, "rum": "buskarna",
+   "steg": [
+    { "typ": "ljud", "id": "apa_gnaller" },
+    { "typ": "mellanscen", "beskrivning": "Ungen spetsar öronen och tittar mot gläntan." },
+    { "typ": "replik", "talare": "berattare", "text": "Vad var det? Någon gråter i gläntan.", "upplast": true }
+   ]
+  },
+  {
+   "id": "k1s05_glantan", "pass": 1, "rum": "glantan",
+   "steg": [
+    { "typ": "mellanscen", "beskrivning": "En apa hänger högt upp i ett nät med lila band. Nätet gungar." },
+    { "typ": "replik", "talare": "berattare", "text": "En apa sitter fast i baronens nät!", "upplast": true },
+    { "typ": "replik", "talare": "berattare", "text": "Gissa ordet som räddar apan.", "upplast": true },
+    { "typ": "pussel", "pussel_id": "k1_apan" }
+   ]
+  },
+  {
+   "id": "k1s06_present", "pass": 1, "rum": "glantan",
+   "steg": [
+    { "typ": "mellanscen", "beskrivning": "Apan klättrar ner och kramar ungen. Den räcker fram ett gammalt kort med tecken och bokstäver och Farfars kompassros." },
+    { "typ": "replik", "talare": "farfar", "text": "Min gamla chiffernyckel!", "upplast": true },
+    { "typ": "replik", "talare": "farfar", "text": "Den kommer du att behöva.", "upplast": true },
+    { "typ": "mellanscen", "beskrivning": "Chiffernyckeln läggs i hjälteboken och kan alltid öppnas." },
+    { "typ": "mellanscen", "beskrivning": "Apan somnar i lövhögen. Ungen gäspar." },
+    { "typ": "sparpunkt", "pass_slut": true, "valfri": false }
+   ]
+  },
+  {
+   "id": "k1s07_stigarna", "pass": 2, "rum": "glantan",
+   "vid_omstart": { "typ": "replik", "talare": "farfar", "text": "Nu letar vi efter lådan med kartbiten.", "upplast": true },
+   "steg": [
+    { "typ": "replik", "talare": "berattare", "text": "Var är lådan med kartbiten?", "upplast": true },
+    { "typ": "ga_till", "mal": "skylt_farfar_3" },
+    { "typ": "pussel", "pussel_id": "k1_tradet" }
+   ]
+  },
+  {
+   "id": "k1s08_ladan", "pass": 2, "rum": "gamla_tradet",
+   "steg": [
+    { "typ": "mellanscen", "beskrivning": "Under det stora gamla trädet står en låda med ett lås." },
+    { "typ": "replik", "talare": "berattare", "text": "En låda med ett lås. Det behövs ett ord.", "upplast": true }
+   ]
+  },
+  {
+   "id": "k1s09_luckorna", "pass": 2, "rum": "gamla_tradet",
+   "steg": [
+    { "typ": "mellanscen", "beskrivning": "Lådans lock har tre luckor med en mening var." },
+    { "typ": "replik", "talare": "farfar", "text": "Bara en vän till dalen vet svaret.", "upplast": true },
+    { "typ": "mellanscen", "beskrivning": "Ungen sträcker fram sina blå fötter, utan att någon säger något." },
+    { "typ": "pussel", "pussel_id": "k1_luckorna" }
+   ]
+  },
+  {
+   "id": "k1s10_koden", "pass": 2, "rum": "gamla_tradet",
+   "steg": [
+    { "typ": "replik", "talare": "berattare", "text": "Titta i Farfars nyckel. Vilka bokstäver är det?", "upplast": true },
+    { "typ": "pussel", "pussel_id": "k1_kodlas" },
+    { "typ": "replik", "talare": "farfar", "text": "Hem. Dit ska ni.", "upplast": true }
+   ]
+  },
+  {
+   "id": "k1s11_kartbiten", "pass": 2, "rum": "gamla_tradet", "vy": "narbild",
+   "steg": [
+    { "typ": "mellanscen", "beskrivning": "Kartbit 2 passar ihop med bit 1. En stig från skogen mot ett träsk syns, och mammas skugga är större." },
+    { "typ": "ge_kartbit", "nummer": 2 },
+    { "typ": "ljud", "id": "mammas_rop" },
+    { "typ": "ljud", "id": "unge_svarar" },
+    { "typ": "replik", "talare": "berattare", "text": "Mamma lever. Hon väntar.", "upplast": true },
+    { "typ": "mellanscen", "beskrivning": "Ungen får sitt första tillägg: ett mönster på nosen." },
+    { "typ": "replik", "talare": "berattare", "text": "{unge} kan spåra nu!", "upplast": true }
+   ]
+  },
+  {
+   "id": "k1s12_klaffen", "pass": 2, "rum": "gamla_tradet",
+   "steg": [
+    { "typ": "mellanscen", "beskrivning": "Klaffen flyger rakt in i trädet, studsar och tappar en lila lapp. Den fladdrar iväg yr." },
+    { "typ": "replik", "talare": "berattare", "text": "Klaffen tappade en lapp!", "upplast": true },
+    { "typ": "pussel", "pussel_id": "k1_lappen" }
+   ]
+  },
+  {
+   "id": "k1s13_slutet", "pass": 2, "rum": "gamla_tradet",
+   "steg": [
+    { "typ": "mellanscen", "beskrivning": "Ungen nosar och spårar en dold stig längs bäcken. Långt bort vänder det lila luftskeppet." },
+    { "typ": "replik", "talare": "farfar", "text": "Bra jobbat. Vila nu.", "upplast": true },
+    { "typ": "replik", "talare": "farfar", "text": "Sen går vi vidare.", "upplast": true },
+    { "typ": "replik", "talare": "berattare", "text": "Fortsättning följer.", "upplast": true },
+    { "typ": "sparpunkt", "pass_slut": true, "valfri": false }
+   ]
+  }
+ ],
+ "pussel": [
+  {
+   "id": "k1_stenen", "typ": "P1_las_och_valj", "avsandare": "farfar", "papper": "traskylt", "hjalp": "ett_ord", "kan_oppnas_igen": true,
+   "varianter": {
+    "L2": {
+     "text": "Gå mot den höga stenen.",
+     "alternativ": [
+      { "id": "hog_sten", "bild": "hog_sten", "ratt": true },
+      { "id": "lag_sten", "bild": "lag_sten", "vid_valj": { "reaktion": "stigen slutar i en lerpöl, ungen sjunker ner till magen och tittar surt", "replik": { "typ": "replik", "talare": "berattare", "text": "Plask! Tillbaka till skylten.", "upplast": true } } }
+     ]
+    },
+    "L3": {
+     "text": "Gå mot den höga runda stenen.",
+     "alternativ": [
+      { "id": "hog_rund_sten", "bild": "hog_rund_sten", "ratt": true },
+      { "id": "hog_spetsig_sten", "bild": "hog_spetsig_sten", "vid_valj": { "reaktion": "stigen slutar i en lerpöl", "replik": { "typ": "replik", "talare": "berattare", "text": "Plask! Tillbaka till skylten.", "upplast": true } } },
+      { "id": "lag_rund_sten", "bild": "lag_rund_sten", "vid_valj": { "reaktion": "en groda hoppar upp och kväker", "replik": { "typ": "replik", "talare": "berattare", "text": "Fel sten! Tillbaka till skylten.", "upplast": true } } }
+     ]
+    }
+   },
+   "forenkla": { "efter_fel": 2, "andring": "L3 byts mot L2" },
+   "efter_3_fel": { "handling": "ungen spårar mot rätt sten" },
+   "anteckning": "Vägskylt (P2) byggd som läs och välj: alternativen är stigarna."
+  },
+  {
+   "id": "k1_svard", "typ": "P11_formel", "niva": "S1",
+   "forebild": { "text": "SVÄRD", "upplast": false, "placering": "trad_med_formel", "ligger_kvar": true },
+   "brickor": ["V", "D", "S", "Ä", "R"], "svar": "SVÄRD",
+   "formler": [{ "ord": "SVÄRD", "effekt": "svard_kapar_lianer" }],
+   "hjalp": "ett_ord", "ratt_bokstav_stannar": true,
+   "vid_ratt": { "handling": "ett ljussvärd i stavens ände, ett svep, lianerna faller. Formeln skrivs in i hjälteboken.", "fest": "mellan" },
+   "vid_fel": { "reaktion": "ett litet ljusspö som bara kittlar lianerna, ungen fnissar", "replik": { "typ": "replik", "talare": "berattare", "text": "Nästan! Titta på trädet igen.", "upplast": true } },
+   "knuff": { "handling": "första bokstaven i förebilden blinkar" },
+   "forenkla": { "efter_fel": 2, "andring": "nästa rätta bokstav blinkar" },
+   "anteckning": "Farfars inristade formel, med en liten bild av ett svärd som kapar en lian."
+  },
+  {
+   "id": "k1_busken", "typ": "P1_las_och_valj", "avsandare": "farfar", "papper": "traskylt", "hjalp": "ett_ord", "kan_oppnas_igen": true,
+   "varianter": {
+    "L2": {
+     "text": "Slå på den gröna busken.",
+     "alternativ": [
+      { "id": "gron_buske", "bild": "gron_buske", "ratt": true },
+      { "id": "gul_buske", "bild": "gul_buske", "vid_valj": { "reaktion": "bär trillar ut, men ingen hatt", "replik": { "typ": "replik", "talare": "berattare", "text": "Bara bär. Titta på skylten igen.", "upplast": true } } },
+      { "id": "rod_buske", "bild": "rod_buske", "vid_valj": { "reaktion": "bär trillar ut, men ingen hatt", "replik": { "typ": "replik", "talare": "berattare", "text": "Bara bär. Titta på skylten igen.", "upplast": true } } }
+     ]
+    },
+    "L3": {
+     "text": "Slå på den stora gröna busken.",
+     "alternativ": [
+      { "id": "stor_gron_buske", "bild": "stor_gron_buske", "ratt": true },
+      { "id": "liten_gron_buske", "bild": "liten_gron_buske", "vid_valj": { "reaktion": "bär trillar ut, men ingen hatt", "replik": { "typ": "replik", "talare": "berattare", "text": "Bara bär. Titta på skylten igen.", "upplast": true } } },
+      { "id": "stor_gul_buske", "bild": "stor_gul_buske", "vid_valj": { "reaktion": "bär trillar ut, men ingen hatt", "replik": { "typ": "replik", "talare": "berattare", "text": "Bara bär. Titta på skylten igen.", "upplast": true } } }
+     ]
+    }
+   },
+   "vid_ratt": { "handling": "en gammal hatt flyger upp ur busken", "fest": "liten" },
+   "forenkla": { "efter_fel": 2, "andring": "L3 byts mot L2" },
+   "efter_3_fel": { "handling": "ungen nosar på rätt buske" },
+   "anteckning": "Sidogren. Felval ger bär, så inget är förlorat."
+  },
+  {
+   "id": "k1_apan", "typ": "P15_raddning", "variant": "apan", "kategori": "Man kan klättra på det.", "svar": "stege", "reserv_ord": ["träd", "rep"],
+   "falt": "ett tomt fält per bokstav i ordet; en rätt bokstav fylls i på alla platser där den finns",
+   "tillatna_fel": 7, "hjalp": "ett_ord",
+   "vid_fel": { "reaktion": "nätet släpper en maska, apan glider en bit ner och ser förskräckt ut" },
+   "mjukt_misslyckande": { "reaktion": "apan landar mjukt i lövhögen, skäms lite och vill prova igen", "replik": { "typ": "replik", "talare": "berattare", "text": "Puh! Vi provar ett nytt ord.", "upplast": true } },
+   "vid_ratt": { "handling": "STEGE skrivs i luften, en stege fälls ut upp till nätet, apan klättrar ner", "fest": "mellan" },
+   "knuff": { "handling": "ungen pekar på kategorin" },
+   "anteckning": "NY TYP (förslag till teknik). Kategorin läser spelaren själv. Fem tomma fält för STEGE. E finns två gånger: en rätt gissning fyller båda. Ordet räddar: det gissade ordet blir föremålet. STEGE kommer tillbaka som egen skriven formel i kapitel 2. Vid misslyckande nytt ord ur reserv_ord i samma kategori."
+  },
+  {
+   "id": "k1_tradet", "typ": "P1_las_och_valj", "avsandare": "farfar", "papper": "traskylt", "hjalp": "ett_ord", "kan_oppnas_igen": true,
+   "varianter": {
+    "L2": {
+     "text": "Gå till det gamla trädet.",
+     "alternativ": [
+      { "id": "stig_gammalt", "bild": "gammalt_trad", "ratt": true },
+      { "id": "stig_ungt", "bild": "ungt_trad", "vid_valj": { "reaktion": "en uggla tittar förvånat ner", "replik": { "typ": "replik", "talare": "berattare", "text": "Fel träd! Tillbaka.", "upplast": true } } }
+     ]
+    },
+    "L3": {
+     "text": "Gå till det stora gamla trädet.",
+     "alternativ": [
+      { "id": "stig_stort_gammalt", "bild": "stort_gammalt_trad", "ratt": true },
+      { "id": "stig_stort_ungt", "bild": "stort_ungt_trad", "vid_valj": { "reaktion": "en uggla tittar förvånat ner", "replik": { "typ": "replik", "talare": "berattare", "text": "Fel träd! Tillbaka.", "upplast": true } } },
+      { "id": "stig_litet_gammalt", "bild": "litet_gammalt_trad", "vid_valj": { "reaktion": "en ekorre kastar en kotte", "replik": { "typ": "replik", "talare": "berattare", "text": "Fel träd! Tillbaka.", "upplast": true } } }
+     ]
+    }
+   },
+   "forenkla": { "efter_fel": 2, "andring": "L3 byts mot L2" },
+   "efter_3_fel": { "handling": "apan pekar mot rätt stig" },
+   "anteckning": "Det gamla trädet måste synas: knotig stam och mossa (till Stil)."
+  },
+  {
+   "id": "k1_luckorna", "typ": "P1_las_och_valj", "hjalp": "ett_ord",
+   "varianter": {
+    "L2": {
+     "bild": "ungens_bla_fotter",
+     "alternativ": [
+      { "id": "bla", "ord": "Dalens dinos har blå fötter.", "ratt": true },
+      { "id": "roda", "ord": "Dalens dinos har röda fötter.", "vid_valj": { "reaktion": "en fjäder poppar ut och kittlar hjälten", "replik": { "typ": "replik", "talare": "berattare", "text": "Hihi! Den var inte sann.", "upplast": true } } },
+      { "id": "gula", "ord": "Dalens dinos har gula fötter.", "vid_valj": { "reaktion": "en fjäder poppar ut och kittlar hjälten", "replik": { "typ": "replik", "talare": "berattare", "text": "Hihi! Den var inte sann.", "upplast": true } } }
+     ]
+    }
+   },
+   "vid_ratt": { "handling": "luckan öppnas och visar ett lås med tecken" },
+   "forenkla": { "efter_fel": 2, "andring": "en lucka spikas igen" },
+   "efter_3_fel": { "handling": "ungen ställer sig på luckan med blå fötter" },
+   "anteckning": "Sant eller falskt (P5) byggd som läs och välj. Kontroll mot bild: ungens blå fötter."
+  },
+  {
+   "id": "k1_kodlas", "typ": "P9_kodlas", "niva": "S2",
+   "chiffer": {
+    "tecken": ["stjarna", "blad", "mane"],
+    "nyckel": [
+     { "tecken": "stjarna", "bokstav": "H" },
+     { "tecken": "blad", "bokstav": "E" },
+     { "tecken": "mane", "bokstav": "M" },
+     { "tecken": "sol", "bokstav": "S" },
+     { "tecken": "sten", "bokstav": "A" },
+     { "tecken": "fjader", "bokstav": "O" }
+    ],
+    "nyckeln_finns_i": "hjalteboken"
+   },
+   "brickor": ["H", "E", "M", "S", "A"], "svar": "hem", "ratt_bokstav_stannar": true, "hjalp": "ett_ord",
+   "vid_ratt": { "handling": "låset klickar, lådan öppnas", "fest": "mellan" },
+   "vid_fel": { "reaktion": "låset skakar och säger klonk" },
+   "knuff": { "handling": "chiffernyckeln i hjälteboken lyser" },
+   "forenkla": { "efter_fel": 2, "andring": "nästa rätta bokstav blinkar" },
+   "anteckning": "NY TYP (förslag till teknik): bildchiffer (P10) och kodlås (P9) i ett. Tecknen på låset översätts med nyckeln i hjälteboken. Nyckeln har fler tecken än de som behövs."
+  },
+  {
+   "id": "k1_lappen", "typ": "P1_las_och_valj", "avsandare": "baronen", "papper": "lila_papper_blackplumpar", "hjalp": "ett_ord", "kan_oppnas_igen": true,
+   "varianter": {
+    "L3": {
+     "text": "Jag väntar vid bron.",
+     "alternativ": [
+      { "id": "backen", "ord": "bäcken", "ratt": true },
+      { "id": "bron", "ord": "bron", "vid_valj": { "reaktion": "på andra sidan bron syns baronens hatt bakom en buske, ungen drar i hjälten", "replik": { "typ": "replik", "talare": "berattare", "text": "Där är baronen! Tillbaka!", "upplast": true } } }
+     ]
+    }
+   },
+   "vid_ratt": { "handling": "ungen spårar en dold stig längs bäcken" },
+   "efter_3_fel": { "handling": "ungen drar hjälten mot bäcken" },
+   "anteckning": "Baronens lapp, tappad av Klaffen. Spelaren läser lappen och väljer den andra vägen (slutsats). Skyltarna vid stigarna är Farfars."
+  }
+ ]
+}

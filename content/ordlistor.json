@@ -2,24 +2,27 @@
  "$schema": "schema/ordlistor.schema.json",
  "format": 1,
  "meta": {
-  "kalla": "Innehålls innehall-ordlistor.json v0.1 (2026-10-24), omvandlad till format 1 och vanlig skrift av teknik. Innehåll äger orden.",
-  "agare": "Innehåll"
+  "version": "0.3",
+  "datum": "2026-10-24",
+  "agare": "Innehåll",
+  "textform": "Orden lagras med små bokstäver, formler i versaler. Böjda former (skogen, bron) står med när de används som alternativ.",
+  "beskrivning": "Ordlistor 1-6 for ORDSTAVEN. Bilderna ar platshallare (emoji) for grabox. Ett ord ligger i den hogsta lista som nagot av dess drag kraver."
  },
  "listor": {
-  "1": "Korta ljudenliga ord, 2–3 bokstäver, ingen konsonantgrupp, ingen dubbelteckning",
-  "2": "Längre ljudenliga ord (4–6 bokstäver) eller konsonantgrupp i slutet",
-  "3": "Konsonantgrupp i början",
-  "4": "Kort vokal med dubbelteckning (även CK)",
-  "5": "Svåra ljud (LJ, sj, tj, NG, mjukt G/K). Spärrade i lästext utom formler med förebild",
-  "6": "Småord som ordbilder"
+  "1": "Korta ljudenliga ord, 2-3 bokstaver, ingen konsonantgrupp, ingen dubbelteckning",
+  "2": "Langre ljudenliga ord (4-6 bokstaver) eller konsonantgrupp i slutet",
+  "3": "Konsonantgrupp i borjan",
+  "4": "Kort vokal med dubbelteckning (aven CK)",
+  "5": "Svara ljud (LJ, sj, tj, NG, mjukt G/K). Sparrade i lastext utom formler med forebild",
+  "6": "Smaord som ordbilder"
  },
  "flaggor": {
-  "aao": "Innehåller å, ä eller ö. Se reglerna för distraktorer",
-  "helord": "Läses upp som helt ord, aldrig ljudat bokstav för bokstav",
-  "sparrad": "Får inte förekomma i text spelaren läser själv än",
-  "berattelseord": "Får förekomma tidigt som ordbild trots listan",
-  "formel": "Trollformel, lärs med förebild (S1). Skrivs alltid i versaler",
-  "ordbild": "Småord som lärs som helhet"
+  "aao": "Innehaller A-ring, A-prickar eller O-prickar. Se regler for distraktorer",
+  "helord": "Lases upp som helt ord, aldrig ljudat bokstav for bokstav",
+  "sparrad": "Far inte forekomma i text spelaren laser sjalv annu",
+  "berattelseord": "Far forekomma tidigt som ordbild trots listan",
+  "formel": "Trollformel, lars med forebild (S1)",
+  "ordbild": "Smaord som lars som helhet"
  },
  "forbjudna_par": [
   [
@@ -36,17 +39,31 @@
   ]
  ],
  "regler": [
-  "L1–L3: rätt svar och distraktor får aldrig skilja sig bara på Å/Ä",
-  "Har rätt svar Å, Ä eller Ö väljs distraktorer i L1–L2 helst utan dessa bokstäver",
-  "Å för Ä (och tvärtom) i skrivuppgifter räknas som nära stavning, inte fel",
-  "Ord med flaggan sparrad får bara förekomma i uppläst text"
+  "L1-L3: ratt svar och distraktor far aldrig skilja sig bara pa å/ä",
+  "Har ratt svar å, ä eller ö valjs distraktorer i L1-L2 helst utan dessa bokstaver",
+  "å för ä (och tvartom) i skrivuppgifter raknas som nara stavning, inte fel",
+  "Ord med flaggan sparrad far bara forekomma i uppläst text"
  ],
  "ord": [
   {
-   "ord": "sol",
+   "ord": "apa",
    "lista": 1,
-   "bild": "☀️",
-   "tema": "natur",
+   "bild": "🐒",
+   "tema": "djur",
+   "flaggor": []
+  },
+  {
+   "ord": "bad",
+   "lista": 1,
+   "bild": "🛁",
+   "tema": "hemma",
+   "flaggor": []
+  },
+  {
+   "ord": "ben",
+   "lista": 1,
+   "bild": "🦴",
+   "tema": "dino",
    "flaggor": []
   },
   {
@@ -55,6 +72,68 @@
    "bild": "🚗",
    "tema": "bilar",
    "flaggor": []
+  },
+  {
+   "ord": "byn",
+   "lista": 1,
+   "bild": "🏘️",
+   "tema": "natur",
+   "flaggor": []
+  },
+  {
+   "ord": "bär",
+   "lista": 1,
+   "bild": "🫐",
+   "tema": "mat",
+   "flaggor": [
+    "aao"
+   ]
+  },
+  {
+   "ord": "båt",
+   "lista": 1,
+   "bild": "⛵",
+   "tema": "fordon",
+   "flaggor": [
+    "aao"
+   ]
+  },
+  {
+   "ord": "dal",
+   "lista": 1,
+   "bild": "🏞️",
+   "tema": "natur",
+   "flaggor": []
+  },
+  {
+   "ord": "fot",
+   "lista": 1,
+   "bild": "🦶",
+   "tema": "dino",
+   "flaggor": []
+  },
+  {
+   "ord": "gul",
+   "lista": 1,
+   "bild": "🟨",
+   "tema": "färg",
+   "flaggor": []
+  },
+  {
+   "ord": "hus",
+   "lista": 1,
+   "bild": "🏠",
+   "tema": "hemma",
+   "flaggor": []
+  },
+  {
+   "ord": "hög",
+   "lista": 1,
+   "bild": "⬆️",
+   "tema": "egenskap",
+   "flaggor": [
+    "aao"
+   ]
   },
   {
    "ord": "is",
@@ -71,11 +150,13 @@
    "flaggor": []
   },
   {
-   "ord": "mus",
+   "ord": "lås",
    "lista": 1,
-   "bild": "🐭",
-   "tema": "djur",
-   "flaggor": []
+   "bild": "🔒",
+   "tema": "skatt",
+   "flaggor": [
+    "aao"
+   ]
   },
   {
    "ord": "lök",
@@ -87,35 +168,33 @@
    ]
   },
   {
-   "ord": "båt",
+   "ord": "löv",
    "lista": 1,
-   "bild": "⛵",
-   "tema": "fordon",
+   "bild": "🍂",
+   "tema": "natur",
    "flaggor": [
     "aao"
    ]
   },
   {
-   "ord": "säl",
+   "ord": "mat",
    "lista": 1,
-   "bild": "🦭",
-   "tema": "djur",
-   "flaggor": [
-    "aao"
-   ]
+   "bild": "🍽️",
+   "tema": "mat",
+   "flaggor": []
   },
   {
-   "ord": "apa",
+   "ord": "mus",
    "lista": 1,
-   "bild": "🐒",
+   "bild": "🐭",
    "tema": "djur",
    "flaggor": []
   },
   {
-   "ord": "tåg",
+   "ord": "mål",
    "lista": 1,
-   "bild": "🚂",
-   "tema": "fordon",
+   "bild": "🏁",
+   "tema": "bilar",
    "flaggor": [
     "aao"
    ]
@@ -128,71 +207,11 @@
    "flaggor": []
   },
   {
-   "ord": "ben",
-   "lista": 1,
-   "bild": "🦴",
-   "tema": "dino",
-   "flaggor": []
-  },
-  {
-   "ord": "fot",
-   "lista": 1,
-   "bild": "🦶",
-   "tema": "dino",
-   "flaggor": []
-  },
-  {
-   "ord": "mat",
-   "lista": 1,
-   "bild": "🍽️",
-   "tema": "mat",
-   "flaggor": []
-  },
-  {
-   "ord": "bär",
-   "lista": 1,
-   "bild": "🫐",
-   "tema": "mat",
-   "flaggor": [
-    "aao"
-   ]
-  },
-  {
    "ord": "rep",
    "lista": 1,
    "bild": "🪢",
    "tema": "verktyg",
    "flaggor": []
-  },
-  {
-   "ord": "hus",
-   "lista": 1,
-   "bild": "🏠",
-   "tema": "hemma",
-   "flaggor": []
-  },
-  {
-   "ord": "tak",
-   "lista": 1,
-   "bild": "🏠",
-   "tema": "hemma",
-   "flaggor": []
-  },
-  {
-   "ord": "dal",
-   "lista": 1,
-   "bild": "🏞️",
-   "tema": "natur",
-   "flaggor": []
-  },
-  {
-   "ord": "lås",
-   "lista": 1,
-   "bild": "🔒",
-   "tema": "skatt",
-   "flaggor": [
-    "aao"
-   ]
   },
   {
    "ord": "röd",
@@ -204,27 +223,11 @@
    ]
   },
   {
-   "ord": "gul",
+   "ord": "sol",
    "lista": 1,
-   "bild": "🟨",
-   "tema": "färg",
+   "bild": "☀️",
+   "tema": "natur",
    "flaggor": []
-  },
-  {
-   "ord": "vit",
-   "lista": 1,
-   "bild": "⬜",
-   "tema": "färg",
-   "flaggor": []
-  },
-  {
-   "ord": "hög",
-   "lista": 1,
-   "bild": "⬆️",
-   "tema": "egenskap",
-   "flaggor": [
-    "aao"
-   ]
   },
   {
    "ord": "sur",
@@ -234,28 +237,42 @@
    "flaggor": []
   },
   {
-   "ord": "löv",
+   "ord": "säl",
    "lista": 1,
-   "bild": "🍂",
-   "tema": "natur",
+   "bild": "🦭",
+   "tema": "djur",
    "flaggor": [
     "aao"
    ]
   },
   {
-   "ord": "mål",
+   "ord": "tak",
    "lista": 1,
-   "bild": "🏁",
-   "tema": "bilar",
+   "bild": "🏠",
+   "tema": "hemma",
+   "flaggor": []
+  },
+  {
+   "ord": "toa",
+   "lista": 1,
+   "bild": "🚽",
+   "tema": "hemma",
+   "flaggor": []
+  },
+  {
+   "ord": "tåg",
+   "lista": 1,
+   "bild": "🚂",
+   "tema": "fordon",
    "flaggor": [
     "aao"
    ]
   },
   {
-   "ord": "dino",
-   "lista": 2,
-   "bild": "🦕",
-   "tema": "dino",
+   "ord": "vit",
+   "lista": 1,
+   "bild": "⬜",
+   "tema": "färg",
    "flaggor": []
   },
   {
@@ -266,25 +283,37 @@
    "flaggor": []
   },
   {
-   "ord": "tomat",
+   "ord": "dino",
    "lista": 2,
-   "bild": "🍅",
-   "tema": "mat",
+   "bild": "🦕",
+   "tema": "dino",
    "flaggor": []
   },
   {
-   "ord": "måne",
+   "ord": "dinomat",
    "lista": 2,
-   "bild": "🌙",
-   "tema": "natur",
-   "flaggor": [
-    "aao"
-   ]
+   "bild": "🦕",
+   "tema": "dino",
+   "flaggor": []
   },
   {
-   "ord": "lejon",
+   "ord": "eld",
    "lista": 2,
-   "bild": "🦁",
+   "bild": "🔥",
+   "tema": "natur",
+   "flaggor": []
+  },
+  {
+   "ord": "filt",
+   "lista": 2,
+   "bild": "🧣",
+   "tema": "hemma",
+   "flaggor": []
+  },
+  {
+   "ord": "fisk",
+   "lista": 2,
+   "bild": "🐟",
    "tema": "djur",
    "flaggor": []
   },
@@ -296,10 +325,17 @@
    "flaggor": []
   },
   {
-   "ord": "låda",
+   "ord": "hund",
    "lista": 2,
-   "bild": "📦",
-   "tema": "hemma",
+   "bild": "🐶",
+   "tema": "djur",
+   "flaggor": []
+  },
+  {
+   "ord": "häst",
+   "lista": 2,
+   "bild": "🐴",
+   "tema": "djur",
    "flaggor": [
     "aao"
    ]
@@ -312,24 +348,10 @@
    "flaggor": []
   },
   {
-   "ord": "radio",
+   "ord": "korv",
    "lista": 2,
-   "bild": "📻",
-   "tema": "hemma",
-   "flaggor": []
-  },
-  {
-   "ord": "pirat",
-   "lista": 2,
-   "bild": "🏴‍☠️",
-   "tema": "skatt",
-   "flaggor": []
-  },
-  {
-   "ord": "raket",
-   "lista": 2,
-   "bild": "🚀",
-   "tema": "fordon",
+   "bild": "🌭",
+   "tema": "mat",
    "flaggor": []
   },
   {
@@ -347,10 +369,91 @@
    "flaggor": []
   },
   {
+   "ord": "lejon",
+   "lista": 2,
+   "bild": "🦁",
+   "tema": "djur",
+   "flaggor": []
+  },
+  {
    "ord": "liten",
    "lista": 2,
    "bild": "🤏",
    "tema": "egenskap",
+   "flaggor": []
+  },
+  {
+   "ord": "lysa",
+   "lista": 2,
+   "bild": "✨",
+   "tema": "magi",
+   "flaggor": []
+  },
+  {
+   "ord": "låda",
+   "lista": 2,
+   "bild": "📦",
+   "tema": "hemma",
+   "flaggor": [
+    "aao"
+   ]
+  },
+  {
+   "ord": "moln",
+   "lista": 2,
+   "bild": "☁️",
+   "tema": "natur",
+   "flaggor": []
+  },
+  {
+   "ord": "mynt",
+   "lista": 2,
+   "bild": "🪙",
+   "tema": "skatt",
+   "flaggor": []
+  },
+  {
+   "ord": "måne",
+   "lista": 2,
+   "bild": "🌙",
+   "tema": "natur",
+   "flaggor": [
+    "aao"
+   ]
+  },
+  {
+   "ord": "orm",
+   "lista": 2,
+   "bild": "🐍",
+   "tema": "djur",
+   "flaggor": []
+  },
+  {
+   "ord": "ost",
+   "lista": 2,
+   "bild": "🧀",
+   "tema": "mat",
+   "flaggor": []
+  },
+  {
+   "ord": "pirat",
+   "lista": 2,
+   "bild": "🏴‍☠️",
+   "tema": "skatt",
+   "flaggor": []
+  },
+  {
+   "ord": "radio",
+   "lista": 2,
+   "bild": "📻",
+   "tema": "hemma",
+   "flaggor": []
+  },
+  {
+   "ord": "raket",
+   "lista": 2,
+   "bild": "🚀",
+   "tema": "fordon",
    "flaggor": []
   },
   {
@@ -363,82 +466,17 @@
    ]
   },
   {
-   "ord": "lysa",
+   "ord": "salt",
    "lista": 2,
-   "bild": "✨",
-   "tema": "magi",
-   "flaggor": []
-  },
-  {
-   "ord": "fisk",
-   "lista": 2,
-   "bild": "🐟",
-   "tema": "djur",
-   "flaggor": []
-  },
-  {
-   "ord": "hund",
-   "lista": 2,
-   "bild": "🐶",
-   "tema": "djur",
-   "flaggor": []
-  },
-  {
-   "ord": "korv",
-   "lista": 2,
-   "bild": "🌭",
+   "bild": "🧂",
    "tema": "mat",
    "flaggor": []
   },
   {
-   "ord": "filt",
+   "ord": "tomat",
    "lista": 2,
-   "bild": "🧣",
-   "tema": "hemma",
-   "flaggor": []
-  },
-  {
-   "ord": "mynt",
-   "lista": 2,
-   "bild": "🪙",
-   "tema": "skatt",
-   "flaggor": []
-  },
-  {
-   "ord": "moln",
-   "lista": 2,
-   "bild": "☁️",
-   "tema": "natur",
-   "flaggor": []
-  },
-  {
-   "ord": "häst",
-   "lista": 2,
-   "bild": "🐴",
-   "tema": "djur",
-   "flaggor": [
-    "aao"
-   ]
-  },
-  {
-   "ord": "ost",
-   "lista": 2,
-   "bild": "🧀",
+   "bild": "🍅",
    "tema": "mat",
-   "flaggor": []
-  },
-  {
-   "ord": "orm",
-   "lista": 2,
-   "bild": "🐍",
-   "tema": "djur",
-   "flaggor": []
-  },
-  {
-   "ord": "eld",
-   "lista": 2,
-   "bild": "🔥",
-   "tema": "natur",
    "flaggor": []
   },
   {
@@ -451,135 +489,10 @@
    ]
   },
   {
-   "ord": "salt",
-   "lista": 2,
-   "bild": "🧂",
-   "tema": "mat",
-   "flaggor": []
-  },
-  {
-   "ord": "sten",
-   "lista": 3,
-   "bild": "🪨",
-   "tema": "natur",
-   "flaggor": []
-  },
-  {
-   "ord": "skog",
-   "lista": 3,
-   "bild": "🌲",
-   "tema": "natur",
-   "flaggor": []
-  },
-  {
-   "ord": "kran",
-   "lista": 3,
-   "bild": "🏗️",
-   "tema": "fordon",
-   "flaggor": []
-  },
-  {
-   "ord": "stav",
-   "lista": 3,
-   "bild": "🪄",
-   "tema": "magi",
-   "flaggor": []
-  },
-  {
-   "ord": "bro",
-   "lista": 3,
-   "bild": "🌉",
-   "tema": "verktyg",
-   "flaggor": []
-  },
-  {
-   "ord": "stege",
-   "lista": 3,
-   "bild": "🪜",
-   "tema": "verktyg",
-   "flaggor": []
-  },
-  {
-   "ord": "spade",
-   "lista": 3,
-   "bild": "🪏",
-   "tema": "verktyg",
-   "flaggor": []
-  },
-  {
-   "ord": "kruka",
-   "lista": 3,
-   "bild": "🏺",
-   "tema": "hemma",
-   "flaggor": []
-  },
-  {
-   "ord": "träd",
-   "lista": 3,
-   "bild": "🌳",
-   "tema": "natur",
-   "flaggor": [
-    "aao"
-   ]
-  },
-  {
    "ord": "blad",
    "lista": 3,
    "bild": "🍃",
    "tema": "natur",
-   "flaggor": []
-  },
-  {
-   "ord": "snö",
-   "lista": 3,
-   "bild": "❄️",
-   "tema": "natur",
-   "flaggor": [
-    "aao"
-   ]
-  },
-  {
-   "ord": "spår",
-   "lista": 3,
-   "bild": "🐾",
-   "tema": "dino",
-   "flaggor": [
-    "aao"
-   ]
-  },
-  {
-   "ord": "brev",
-   "lista": 3,
-   "bild": "✉️",
-   "tema": "skatt",
-   "flaggor": []
-  },
-  {
-   "ord": "gris",
-   "lista": 3,
-   "bild": "🐷",
-   "tema": "djur",
-   "flaggor": []
-  },
-  {
-   "ord": "glas",
-   "lista": 3,
-   "bild": "🥛",
-   "tema": "hemma",
-   "flaggor": []
-  },
-  {
-   "ord": "svamp",
-   "lista": 3,
-   "bild": "🍄",
-   "tema": "natur",
-   "flaggor": []
-  },
-  {
-   "ord": "skal",
-   "lista": 3,
-   "bild": "🥚",
-   "tema": "dino",
    "flaggor": []
   },
   {
@@ -592,6 +505,57 @@
    ]
   },
   {
+   "ord": "brev",
+   "lista": 3,
+   "bild": "✉️",
+   "tema": "skatt",
+   "flaggor": []
+  },
+  {
+   "ord": "bro",
+   "lista": 3,
+   "bild": "🌉",
+   "tema": "verktyg",
+   "flaggor": []
+  },
+  {
+   "ord": "bron",
+   "lista": 3,
+   "bild": "🌉",
+   "tema": "natur",
+   "flaggor": []
+  },
+  {
+   "ord": "flod",
+   "lista": 3,
+   "bild": "🏞️",
+   "tema": "natur",
+   "flaggor": []
+  },
+  {
+   "ord": "FLYG",
+   "lista": 3,
+   "bild": "🪶",
+   "tema": "formel",
+   "flaggor": [
+    "formel"
+   ]
+  },
+  {
+   "ord": "glas",
+   "lista": 3,
+   "bild": "🥛",
+   "tema": "hemma",
+   "flaggor": []
+  },
+  {
+   "ord": "gris",
+   "lista": 3,
+   "bild": "🐷",
+   "tema": "djur",
+   "flaggor": []
+  },
+  {
    "ord": "grön",
    "lista": 3,
    "bild": "🟩",
@@ -601,13 +565,6 @@
    ]
   },
   {
-   "ord": "stor",
-   "lista": 3,
-   "bild": "🐘",
-   "tema": "egenskap",
-   "flaggor": []
-  },
-  {
    "ord": "klo",
    "lista": 3,
    "bild": "🦖",
@@ -615,9 +572,44 @@
    "flaggor": []
   },
   {
-   "ord": "flod",
+   "ord": "kran",
    "lista": 3,
-   "bild": "🏞️",
+   "bild": "🏗️",
+   "tema": "fordon",
+   "flaggor": []
+  },
+  {
+   "ord": "kruka",
+   "lista": 3,
+   "bild": "🏺",
+   "tema": "hemma",
+   "flaggor": []
+  },
+  {
+   "ord": "skal",
+   "lista": 3,
+   "bild": "🥚",
+   "tema": "dino",
+   "flaggor": []
+  },
+  {
+   "ord": "sko",
+   "lista": 3,
+   "bild": "👟",
+   "tema": "hemma",
+   "flaggor": []
+  },
+  {
+   "ord": "skog",
+   "lista": 3,
+   "bild": "🌲",
+   "tema": "natur",
+   "flaggor": []
+  },
+  {
+   "ord": "skogen",
+   "lista": 3,
+   "bild": "🌲",
    "tema": "natur",
    "flaggor": []
   },
@@ -636,6 +628,22 @@
    "flaggor": []
   },
   {
+   "ord": "snö",
+   "lista": 3,
+   "bild": "❄️",
+   "tema": "natur",
+   "flaggor": [
+    "aao"
+   ]
+  },
+  {
+   "ord": "spade",
+   "lista": 3,
+   "bild": "🪏",
+   "tema": "verktyg",
+   "flaggor": []
+  },
+  {
    "ord": "spindel",
    "lista": 3,
    "bild": "🕷️",
@@ -643,13 +651,48 @@
    "flaggor": []
   },
   {
-   "ord": "FLYG",
+   "ord": "spår",
    "lista": 3,
-   "bild": "🪶",
-   "tema": "formel",
+   "bild": "🐾",
+   "tema": "dino",
    "flaggor": [
-    "formel"
+    "aao"
    ]
+  },
+  {
+   "ord": "stav",
+   "lista": 3,
+   "bild": "🪄",
+   "tema": "magi",
+   "flaggor": []
+  },
+  {
+   "ord": "stege",
+   "lista": 3,
+   "bild": "🪜",
+   "tema": "verktyg",
+   "flaggor": []
+  },
+  {
+   "ord": "sten",
+   "lista": 3,
+   "bild": "🪨",
+   "tema": "natur",
+   "flaggor": []
+  },
+  {
+   "ord": "stor",
+   "lista": 3,
+   "bild": "🐘",
+   "tema": "egenskap",
+   "flaggor": []
+  },
+  {
+   "ord": "svamp",
+   "lista": 3,
+   "bild": "🍄",
+   "tema": "natur",
+   "flaggor": []
   },
   {
    "ord": "SVÄRD",
@@ -662,14 +705,106 @@
    ]
   },
   {
-   "ord": "ägg",
-   "lista": 4,
-   "bild": "🥚",
-   "tema": "dino",
+   "ord": "träd",
+   "lista": 3,
+   "bild": "🌳",
+   "tema": "natur",
    "flaggor": [
-    "aao",
-    "berattelseord"
+    "aao"
    ]
+  },
+  {
+   "ord": "boll",
+   "lista": 4,
+   "bild": "⚽",
+   "tema": "lek",
+   "flaggor": []
+  },
+  {
+   "ord": "buss",
+   "lista": 4,
+   "bild": "🚌",
+   "tema": "fordon",
+   "flaggor": []
+  },
+  {
+   "ord": "bäcken",
+   "lista": 4,
+   "bild": "🏞️",
+   "tema": "natur",
+   "flaggor": [
+    "aao"
+   ]
+  },
+  {
+   "ord": "dimma",
+   "lista": 4,
+   "bild": "🌫️",
+   "tema": "natur",
+   "flaggor": []
+  },
+  {
+   "ord": "flagga",
+   "lista": 4,
+   "bild": "🚩",
+   "tema": "bilar",
+   "flaggor": []
+  },
+  {
+   "ord": "glass",
+   "lista": 4,
+   "bild": "🍦",
+   "tema": "mat",
+   "flaggor": []
+  },
+  {
+   "ord": "grotta",
+   "lista": 4,
+   "bild": "🕳️",
+   "tema": "natur",
+   "flaggor": []
+  },
+  {
+   "ord": "hatt",
+   "lista": 4,
+   "bild": "🎩",
+   "tema": "hemma",
+   "flaggor": []
+  },
+  {
+   "ord": "katt",
+   "lista": 4,
+   "bild": "🐱",
+   "tema": "djur",
+   "flaggor": []
+  },
+  {
+   "ord": "klocka",
+   "lista": 4,
+   "bild": "⏰",
+   "tema": "hemma",
+   "flaggor": []
+  },
+  {
+   "ord": "klubba",
+   "lista": 4,
+   "bild": "🦴",
+   "tema": "dino",
+   "flaggor": []
+  },
+  {
+   "ord": "kopp",
+   "lista": 4,
+   "bild": "☕",
+   "tema": "hemma",
+   "flaggor": []
+  },
+  {
+   "ord": "lamm",
+   "lista": 4,
+   "bild": "🐑",
+   "tema": "djur",
+   "flaggor": []
   },
   {
    "ord": "mamma",
@@ -681,23 +816,16 @@
    ]
   },
   {
-   "ord": "boll",
+   "ord": "nyckel",
    "lista": 4,
-   "bild": "⚽",
-   "tema": "lek",
+   "bild": "🔑",
+   "tema": "skatt",
    "flaggor": []
   },
   {
-   "ord": "katt",
+   "ord": "penna",
    "lista": 4,
-   "bild": "🐱",
-   "tema": "djur",
-   "flaggor": []
-  },
-  {
-   "ord": "hatt",
-   "lista": 4,
-   "bild": "🎩",
+   "bild": "✏️",
    "tema": "hemma",
    "flaggor": []
   },
@@ -709,9 +837,9 @@
    "flaggor": []
   },
   {
-   "ord": "klubba",
+   "ord": "rygg",
    "lista": 4,
-   "bild": "🦴",
+   "bild": "🦕",
    "tema": "dino",
    "flaggor": []
   },
@@ -723,106 +851,6 @@
    "flaggor": []
   },
   {
-   "ord": "grotta",
-   "lista": 4,
-   "bild": "🕳️",
-   "tema": "natur",
-   "flaggor": []
-  },
-  {
-   "ord": "troll",
-   "lista": 4,
-   "bild": "🧌",
-   "tema": "magi",
-   "flaggor": []
-  },
-  {
-   "ord": "kopp",
-   "lista": 4,
-   "bild": "☕",
-   "tema": "hemma",
-   "flaggor": []
-  },
-  {
-   "ord": "nyckel",
-   "lista": 4,
-   "bild": "🔑",
-   "tema": "skatt",
-   "flaggor": []
-  },
-  {
-   "ord": "klocka",
-   "lista": 4,
-   "bild": "⏰",
-   "tema": "hemma",
-   "flaggor": []
-  },
-  {
-   "ord": "dimma",
-   "lista": 4,
-   "bild": "🌫️",
-   "tema": "natur",
-   "flaggor": []
-  },
-  {
-   "ord": "penna",
-   "lista": 4,
-   "bild": "✏️",
-   "tema": "hemma",
-   "flaggor": []
-  },
-  {
-   "ord": "vatten",
-   "lista": 4,
-   "bild": "💧",
-   "tema": "natur",
-   "flaggor": []
-  },
-  {
-   "ord": "buss",
-   "lista": 4,
-   "bild": "🚌",
-   "tema": "fordon",
-   "flaggor": []
-  },
-  {
-   "ord": "tupp",
-   "lista": 4,
-   "bild": "🐓",
-   "tema": "djur",
-   "flaggor": []
-  },
-  {
-   "ord": "lamm",
-   "lista": 4,
-   "bild": "🐑",
-   "tema": "djur",
-   "flaggor": []
-  },
-  {
-   "ord": "glass",
-   "lista": 4,
-   "bild": "🍦",
-   "tema": "mat",
-   "flaggor": []
-  },
-  {
-   "ord": "flagga",
-   "lista": 4,
-   "bild": "🚩",
-   "tema": "bilar",
-   "flaggor": []
-  },
-  {
-   "ord": "äpple",
-   "lista": 4,
-   "bild": "🍎",
-   "tema": "mat",
-   "flaggor": [
-    "aao"
-   ]
-  },
-  {
    "ord": "SNABB",
    "lista": 4,
    "bild": "💨",
@@ -830,13 +858,6 @@
    "flaggor": [
     "formel"
    ]
-  },
-  {
-   "ord": "rygg",
-   "lista": 4,
-   "bild": "🦕",
-   "tema": "dino",
-   "flaggor": []
   },
   {
    "ord": "säck",
@@ -848,50 +869,55 @@
    ]
   },
   {
-   "ord": "LJUS",
-   "lista": 5,
-   "bild": "💡",
-   "tema": "formel",
-   "flaggor": [
-    "helord",
-    "formel"
-   ],
-   "varfor": "LJ: stumt L"
+   "ord": "troll",
+   "lista": 4,
+   "bild": "🧌",
+   "tema": "magi",
+   "flaggor": []
   },
   {
-   "ord": "SKÖLD",
-   "lista": 5,
-   "bild": "🛡️",
-   "tema": "formel",
+   "ord": "tupp",
+   "lista": 4,
+   "bild": "🐓",
+   "tema": "djur",
+   "flaggor": []
+  },
+  {
+   "ord": "vatten",
+   "lista": 4,
+   "bild": "💧",
+   "tema": "natur",
+   "flaggor": []
+  },
+  {
+   "ord": "ägg",
+   "lista": 4,
+   "bild": "🥚",
+   "tema": "dino",
    "flaggor": [
-    "helord",
-    "formel",
+    "aao",
+    "berattelseord"
+   ]
+  },
+  {
+   "ord": "äpple",
+   "lista": 4,
+   "bild": "🍎",
+   "tema": "mat",
+   "flaggor": [
     "aao"
-   ],
-   "varfor": "SK före Ö: sj-ljud"
+   ]
   },
   {
-   "ord": "lång",
+   "ord": "ballong",
    "lista": 5,
-   "bild": "📏",
-   "tema": "egenskap",
-   "flaggor": [
-    "helord",
-    "sparrad",
-    "aao"
-   ],
-   "varfor": "NG"
-  },
-  {
-   "ord": "kista",
-   "lista": 5,
-   "bild": "🧰",
-   "tema": "skatt",
+   "bild": "🎈",
+   "tema": "fordon",
    "flaggor": [
     "helord",
     "sparrad"
    ],
-   "varfor": "K före I: tj-ljud"
+   "varfor": "NG"
   },
   {
    "ord": "berg",
@@ -905,18 +931,6 @@
    "varfor": "RG: G låter J"
   },
   {
-   "ord": "älg",
-   "lista": 5,
-   "bild": "🫎",
-   "tema": "djur",
-   "flaggor": [
-    "helord",
-    "sparrad",
-    "aao"
-   ],
-   "varfor": "LG: G låter J"
-  },
-  {
    "ord": "giraff",
    "lista": 5,
    "bild": "🦒",
@@ -926,76 +940,6 @@
     "sparrad"
    ],
    "varfor": "G före I: j-ljud"
-  },
-  {
-   "ord": "kök",
-   "lista": 5,
-   "bild": "🍳",
-   "tema": "hemma",
-   "flaggor": [
-    "helord",
-    "sparrad",
-    "aao"
-   ],
-   "varfor": "K före Ö: tj-ljud"
-  },
-  {
-   "ord": "stjärna",
-   "lista": 5,
-   "bild": "⭐",
-   "tema": "natur",
-   "flaggor": [
-    "helord",
-    "sparrad",
-    "aao"
-   ],
-   "varfor": "STJ: sj-ljud"
-  },
-  {
-   "ord": "sjö",
-   "lista": 5,
-   "bild": "🌊",
-   "tema": "natur",
-   "flaggor": [
-    "helord",
-    "sparrad",
-    "aao"
-   ],
-   "varfor": "SJ"
-  },
-  {
-   "ord": "ring",
-   "lista": 5,
-   "bild": "💍",
-   "tema": "hemma",
-   "flaggor": [
-    "helord",
-    "sparrad"
-   ],
-   "varfor": "NG"
-  },
-  {
-   "ord": "säng",
-   "lista": 5,
-   "bild": "🛏️",
-   "tema": "hemma",
-   "flaggor": [
-    "helord",
-    "sparrad",
-    "aao"
-   ],
-   "varfor": "NG"
-  },
-  {
-   "ord": "ballong",
-   "lista": 5,
-   "bild": "🎈",
-   "tema": "fordon",
-   "flaggor": [
-    "helord",
-    "sparrad"
-   ],
-   "varfor": "NG"
   },
   {
    "ord": "gömda",
@@ -1010,18 +954,124 @@
    "varfor": "G före Ö: j-ljud"
   },
   {
-   "ord": "är",
-   "lista": 6,
-   "bild": null,
-   "tema": "smaord",
+   "ord": "kista",
+   "lista": 5,
+   "bild": "🧰",
+   "tema": "skatt",
    "flaggor": [
     "helord",
-    "ordbild",
-    "aao"
-   ]
+    "sparrad"
+   ],
+   "varfor": "K före I: tj-ljud"
   },
   {
-   "ord": "och",
+   "ord": "kök",
+   "lista": 5,
+   "bild": "🍳",
+   "tema": "hemma",
+   "flaggor": [
+    "helord",
+    "sparrad",
+    "aao"
+   ],
+   "varfor": "K före Ö: tj-ljud"
+  },
+  {
+   "ord": "LJUS",
+   "lista": 5,
+   "bild": "💡",
+   "tema": "formel",
+   "flaggor": [
+    "helord",
+    "formel"
+   ],
+   "varfor": "LJ: stumt L"
+  },
+  {
+   "ord": "lång",
+   "lista": 5,
+   "bild": "📏",
+   "tema": "egenskap",
+   "flaggor": [
+    "helord",
+    "sparrad",
+    "aao"
+   ],
+   "varfor": "NG"
+  },
+  {
+   "ord": "ring",
+   "lista": 5,
+   "bild": "💍",
+   "tema": "hemma",
+   "flaggor": [
+    "helord",
+    "sparrad"
+   ],
+   "varfor": "NG"
+  },
+  {
+   "ord": "sjö",
+   "lista": 5,
+   "bild": "🌊",
+   "tema": "natur",
+   "flaggor": [
+    "helord",
+    "sparrad",
+    "aao"
+   ],
+   "varfor": "SJ"
+  },
+  {
+   "ord": "SKÖLD",
+   "lista": 5,
+   "bild": "🛡️",
+   "tema": "formel",
+   "flaggor": [
+    "helord",
+    "formel",
+    "aao"
+   ],
+   "varfor": "SK före Ö: sj-ljud"
+  },
+  {
+   "ord": "stjärna",
+   "lista": 5,
+   "bild": "⭐",
+   "tema": "natur",
+   "flaggor": [
+    "helord",
+    "sparrad",
+    "aao"
+   ],
+   "varfor": "STJ: sj-ljud"
+  },
+  {
+   "ord": "säng",
+   "lista": 5,
+   "bild": "🛏️",
+   "tema": "hemma",
+   "flaggor": [
+    "helord",
+    "sparrad",
+    "aao"
+   ],
+   "varfor": "NG"
+  },
+  {
+   "ord": "älg",
+   "lista": 5,
+   "bild": "🫎",
+   "tema": "djur",
+   "flaggor": [
+    "helord",
+    "sparrad",
+    "aao"
+   ],
+   "varfor": "LG: G låter J"
+  },
+  {
+   "ord": "den",
    "lista": 6,
    "bild": null,
    "tema": "smaord",
@@ -1041,17 +1091,7 @@
    ]
   },
   {
-   "ord": "den",
-   "lista": 6,
-   "bild": null,
-   "tema": "smaord",
-   "flaggor": [
-    "helord",
-    "ordbild"
-   ]
-  },
-  {
-   "ord": "inte",
+   "ord": "du",
    "lista": 6,
    "bild": null,
    "tema": "smaord",
@@ -1081,58 +1121,7 @@
    ]
   },
   {
-   "ord": "på",
-   "lista": 6,
-   "bild": null,
-   "tema": "smaord",
-   "flaggor": [
-    "helord",
-    "ordbild",
-    "aao"
-   ]
-  },
-  {
-   "ord": "i",
-   "lista": 6,
-   "bild": null,
-   "tema": "smaord",
-   "flaggor": [
-    "helord",
-    "ordbild"
-   ]
-  },
-  {
-   "ord": "ta",
-   "lista": 6,
-   "bild": null,
-   "tema": "smaord",
-   "flaggor": [
-    "helord",
-    "ordbild"
-   ]
-  },
-  {
-   "ord": "kan",
-   "lista": 6,
-   "bild": null,
-   "tema": "smaord",
-   "flaggor": [
-    "helord",
-    "ordbild"
-   ]
-  },
-  {
-   "ord": "jag",
-   "lista": 6,
-   "bild": null,
-   "tema": "smaord",
-   "flaggor": [
-    "helord",
-    "ordbild"
-   ]
-  },
-  {
-   "ord": "du",
+   "ord": "har",
    "lista": 6,
    "bild": null,
    "tema": "smaord",
@@ -1153,27 +1142,7 @@
    ]
   },
   {
-   "ord": "med",
-   "lista": 6,
-   "bild": null,
-   "tema": "smaord",
-   "flaggor": [
-    "helord",
-    "ordbild"
-   ]
-  },
-  {
-   "ord": "vill",
-   "lista": 6,
-   "bild": null,
-   "tema": "smaord",
-   "flaggor": [
-    "helord",
-    "ordbild"
-   ]
-  },
-  {
-   "ord": "ut",
+   "ord": "i",
    "lista": 6,
    "bild": null,
    "tema": "smaord",
@@ -1193,6 +1162,67 @@
    ]
   },
   {
+   "ord": "inte",
+   "lista": 6,
+   "bild": null,
+   "tema": "smaord",
+   "flaggor": [
+    "helord",
+    "ordbild"
+   ]
+  },
+  {
+   "ord": "jag",
+   "lista": 6,
+   "bild": null,
+   "tema": "smaord",
+   "flaggor": [
+    "helord",
+    "ordbild"
+   ]
+  },
+  {
+   "ord": "kan",
+   "lista": 6,
+   "bild": null,
+   "tema": "smaord",
+   "flaggor": [
+    "helord",
+    "ordbild"
+   ]
+  },
+  {
+   "ord": "med",
+   "lista": 6,
+   "bild": null,
+   "tema": "smaord",
+   "flaggor": [
+    "helord",
+    "ordbild"
+   ]
+  },
+  {
+   "ord": "och",
+   "lista": 6,
+   "bild": null,
+   "tema": "smaord",
+   "flaggor": [
+    "helord",
+    "ordbild"
+   ]
+  },
+  {
+   "ord": "på",
+   "lista": 6,
+   "bild": null,
+   "tema": "smaord",
+   "flaggor": [
+    "helord",
+    "ordbild",
+    "aao"
+   ]
+  },
+  {
    "ord": "se",
    "lista": 6,
    "bild": null,
@@ -1203,7 +1233,7 @@
    ]
   },
   {
-   "ord": "har",
+   "ord": "ta",
    "lista": 6,
    "bild": null,
    "tema": "smaord",
@@ -1220,6 +1250,37 @@
    "flaggor": [
     "helord",
     "ordbild"
+   ]
+  },
+  {
+   "ord": "ut",
+   "lista": 6,
+   "bild": null,
+   "tema": "smaord",
+   "flaggor": [
+    "helord",
+    "ordbild"
+   ]
+  },
+  {
+   "ord": "vill",
+   "lista": 6,
+   "bild": null,
+   "tema": "smaord",
+   "flaggor": [
+    "helord",
+    "ordbild"
+   ]
+  },
+  {
+   "ord": "är",
+   "lista": 6,
+   "bild": null,
+   "tema": "smaord",
+   "flaggor": [
+    "helord",
+    "ordbild",
+    "aao"
    ]
   }
  ]

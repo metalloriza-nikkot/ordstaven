@@ -4,7 +4,7 @@ import { forSkarm, namnISkrift, ord } from '../../src/karna/text.js';
 import { kontrollera, antalRader } from '../../verktyg/innehall/kontroll.js';
 
 const las = (p) => JSON.parse(readFileSync(new URL('../../content/' + p, import.meta.url), 'utf8'));
-const riktigt = () => ({ aventyr: las('den-gomda-dalen/aventyr.json'), kapitel: [las('den-gomda-dalen/kap-00.json')], ordlistor: las('ordlistor.json') });
+const riktigt = () => ({ aventyr: las('den-gomda-dalen/aventyr.json'), kapitel: [las('den-gomda-dalen/kap-00.json'), las('den-gomda-dalen/kap-01.json')], ordlistor: las('ordlistor.json') });
 const kopia = (x) => JSON.parse(JSON.stringify(x));
 
 describe('textmotorn', () => {
@@ -29,7 +29,7 @@ describe('innehållskontrollen', () => {
   it('prologen går igenom utan fel', () => {
     const r = kontrollera(riktigt());
     expect(r.fel).toEqual([]);
-    expect(r.pass.map((p) => p.pass)).toEqual([1, 2, 3]);
+    expect(r.pass.map((p) => `${p.kapitel}:${p.pass}`)).toEqual(['kap-00:1', 'kap-00:2', 'kap-00:3', 'kap-01:1', 'kap-01:2']);
   });
 
   it('en kort mening ryms på en rad, en lång blir flera', () => {
@@ -77,7 +77,17 @@ describe('innehållskontrollen', () => {
     expect(medFel((k) => { k.pussel[1].id = 'p0_hjaltenamn'; })).toMatch(/används både/);
   });
   it('räknar läsuppgifter per pass och varnar under två', () => {
-    const r = kontrollera(riktigt());
-    expect(r.varningar.join('\n')).toMatch(/pass 3: 0 läsuppgift/);
+    const d = riktigt();
+    expect(kontrollera(d).varningar.join('\n')).not.toMatch(/läsuppgift/);
+    const s07 = d.kapitel[0].scener.find((s) => s.id === 's07_dorrarna');
+    s07.steg = s07.steg.filter((st) => st.typ !== 'pussel');
+    expect(kontrollera(d).varningar.join('\n')).toMatch(/kap-00 pass 1: 1 läsuppgift/);
+  });
+  it('kodlåset: tecknen måste ge svaret med nyckeln', () => {
+    expect(medFel((k, d) => { d.kapitel[1].pussel.find((p) => p.id === 'k1_kodlas').svar = 'hej'; })).toMatch(/tecknen ger HEM/);
+  });
+  it('packa: flera rätt är tillåtet, men inte alla', () => {
+    expect(medFel(() => {})).toBe('');
+    expect(medFel((k) => { k.pussel.find((p) => p.id === 'p0_packlista').varianter.L1.alternativ.forEach((a) => { a.ratt = true; }); })).toMatch(/minst ett fel/);
   });
 });

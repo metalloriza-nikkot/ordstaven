@@ -13,6 +13,8 @@ export const RADBREDD_EM = 16;
 export const MAX_RADER_REPLIK = 2;
 export const MAX_ORD_PER_RAD = 8;
 export const MAX_MINUTER_PER_PASS = 10;
+/** Pusseltyper som räknas som läsuppgifter som avgör något. P9 (kodlåset) är avkodning med nyckel, inte läsförståelse. */
+export const LASUPPGIFTER = new Set(['P1_las_och_valj', 'P27_packa', 'P15_raddning']);
 
 let ajv;
 function validerare() {
@@ -180,7 +182,7 @@ export function kontrollera({ aventyr, kapitel, ordlistor }) {
             if (st.typ === 'pussel') {
               anvanda.add(p.id);
               pp.sek += p.typ === 'P26_krukorna' ? 30 : p.typ === 'P12_dop' ? 45 : 40;
-              if (p.typ === 'P1_las_och_valj') pp.lasuppgifter++;
+              if (LASUPPGIFTER.has(p.typ)) pp.lasuppgifter++;
             } else pp.sek += 10;
             break;
           }
@@ -215,27 +217,30 @@ export function kontrollera({ aventyr, kapitel, ordlistor }) {
       if (p.knuff) replikKontroll(p.knuff.replik, `${plats} knuff`);
       for (const f of ['vid_ratt', 'vid_fel', 'efter_3_fel']) handlingKontroll(p[f], `${plats} ${f}`);
 
-      if (p.typ === 'P1_las_och_valj') {
+      if (p.typ === 'P1_las_och_valj' || p.typ === 'P27_packa') {
+        const flera = p.typ === 'P27_packa';
         for (const [niva, vari] of Object.entries(p.varianter)) {
           const vp = `${plats} ${niva}`;
           if (vari.text) textKontroll(vari.text, `${vp} text`, { lasesSjalv: true });
           if (!vari.text && !vari.bild) fel.push(var_(`${vp}: behöver en text eller en bild som ställer frågan`));
           const ratt = vari.alternativ.filter((a) => a.ratt);
-          if (ratt.length !== 1) fel.push(var_(`${vp}: exakt ett alternativ ska ha "ratt": true (har ${ratt.length})`));
+          if (!flera && ratt.length !== 1) fel.push(var_(`${vp}: exakt ett alternativ ska ha "ratt": true (har ${ratt.length})`));
+          if (flera && (ratt.length < 1 || ratt.length === vari.alternativ.length)) fel.push(var_(`${vp}: minst ett alternativ ska vara rätt och minst ett fel`));
           const ids = vari.alternativ.map((a) => a.id);
           if (new Set(ids).size !== ids.length) fel.push(var_(`${vp}: två alternativ har samma id`));
           const orden = vari.alternativ.filter((a) => a.ord).map((a) => versaler(a.ord));
           for (const a of vari.alternativ) {
             if (a.ord) {
               textKontroll(a.ord, `${vp} alternativ ${a.id}`, { lasesSjalv: true });
-              if (!ordmap.has(versaler(a.ord))) varningar.push(var_(`${vp}: ordet ${a.ord} finns inte i ordlistorna`));
+              // Hela meningar som alternativ (luckor, sant/falskt) kontrolleras som text, inte mot ordlistorna.
+              if (ord(a.ord).length === 1 && !ordmap.has(versaler(a.ord))) varningar.push(var_(`${vp}: ordet ${a.ord} finns inte i ordlistorna`));
             }
             handlingKontroll(a.vid_valj, `${vp} alternativ ${a.id}`);
           }
           for (const [a, b] of forbjudna) if (orden.includes(a) && orden.includes(b)) fel.push(var_(`${vp}: ${a} och ${b} får inte stå på samma skärm`));
           const lagNiva = ['L1', 'L2', 'L3'].includes(niva);
-          if (lagNiva && ratt.length === 1 && ratt[0].ord) {
-            for (const o of orden) if (baraAaSkillnad(versaler(ratt[0].ord), o)) fel.push(var_(`${vp}: ${ratt[0].ord} och ${o} skiljer sig bara på Å/Ä`));
+          if (lagNiva) for (const r of ratt) if (r.ord) {
+            for (const o of orden) if (baraAaSkillnad(versaler(r.ord), o)) fel.push(var_(`${vp}: ${r.ord} och ${o} skiljer sig bara på Å/Ä`));
           }
         }
       }
@@ -249,6 +254,29 @@ export function kontrollera({ aventyr, kapitel, ordlistor }) {
         }
         if (p.forebild && p.forebild.text !== p.svar) fel.push(var_(`${plats}: förebilden ${p.forebild.text} är inte svaret ${p.svar}`));
         for (const f of p.formler) for (const o of f.ord.split(' ')) if (!ordmap.has(o)) varningar.push(var_(`${plats}: formeln ${o} finns inte i ordlistorna`));
+      }
+      if (p.typ === 'P15_raddning') {
+        textKontroll(p.kategori, `${plats} kategori`, { lasesSjalv: true });
+        handlingKontroll(p.mjukt_misslyckande, `${plats} mjukt_misslyckande`);
+        for (const o of [p.svar, ...(p.reserv_ord || [])]) {
+          if (!ordmap.has(versaler(o))) varningar.push(var_(`${plats}: ${o} finns inte i ordlistorna`));
+          else if (ordmap.get(versaler(o)).flaggor.includes('sparrad')) fel.push(var_(`${plats}: ${o} är spärrat och kan inte gissas fram`));
+        }
+      }
+      if (p.typ === 'P9_kodlas') {
+        const svar = versaler(p.svar);
+        if (p.chiffer) {
+          const nyckel = new Map(p.chiffer.nyckel.map((n) => [n.tecken, n.bokstav]));
+          const avkodat = p.chiffer.tecken.map((t) => nyckel.get(t) ?? '?').join('');
+          if (avkodat !== svar) fel.push(var_(`${plats}: tecknen ger ${avkodat} med nyckeln, svaret är ${svar}`));
+          const bokstaver = p.chiffer.nyckel.map((n) => n.bokstav);
+          if (new Set(bokstaver).size !== bokstaver.length) fel.push(var_(`${plats}: två tecken i nyckeln har samma bokstav`));
+        }
+        if (p.brickor) {
+          const kvar = [...p.brickor];
+          for (const ch of svar) { const i = kvar.indexOf(ch); if (i < 0) fel.push(var_(`${plats}: brickorna saknar ${ch} till ${svar}`)); else kvar.splice(i, 1); }
+          if (p.niva === 'S2' && (kvar.length < 2 || kvar.length > 3)) varningar.push(var_(`${plats}: S2 har 2–3 extra brickor, har ${kvar.length}`));
+        }
       }
       if (p.typ === 'P12_dop' && p.min_bokstaver && p.max_bokstaver && p.min_bokstaver > p.max_bokstaver) fel.push(var_(`${plats}: min_bokstaver är större än max_bokstaver`));
     }

@@ -3,16 +3,40 @@
   "format": 1,
   "id": "den-gomda-dalen",
   "titel": "Ordstaven. Den gömda dalen.",
-  "meta": { "agare": "Innehåll (talare och titel), teknik (formatet)" },
+  "meta": {
+    "agare": "Innehåll (talare och titel), teknik (formatet)"
+  },
   "talare": {
-    "berattare": { "namn": "Berättaren", "rost": "datorrost", "rollrost": "berattare" },
-    "farfar": { "namn": "Farfar", "rost": "foraldern_eller_datorrost", "rollrost": "gammal", "portratt": "farfar" },
-    "baronen": { "namn": "Baron Gripklo", "rost": "datorrost", "rollrost": "fanig", "portratt": "baronen" },
-    "klaffen": { "namn": "Klaffen", "rost": "datorrost", "rollrost": "metall", "portratt": "klaffen" }
+    "berattare": {
+      "namn": "Berättaren",
+      "rost": "datorrost",
+      "rollrost": "berattare"
+    },
+    "farfar": {
+      "namn": "Farfar",
+      "rost": "foraldern_eller_datorrost",
+      "rollrost": "gammal",
+      "portratt": "farfar"
+    },
+    "baronen": {
+      "namn": "Baron Gripklo",
+      "rost": "datorrost",
+      "rollrost": "fanig",
+      "portratt": "baronen"
+    },
+    "klaffen": {
+      "namn": "Klaffen",
+      "rost": "datorrost",
+      "rollrost": "metall",
+      "portratt": "klaffen"
+    }
   },
   "platshallare": {
     "{unge}": "unge.namn",
     "{hjalte}": "hjalte.namn"
   },
-  "kapitel": ["kap-00"]
+  "kapitel": [
+    "kap-00",
+    "kap-01"
+  ]
 }

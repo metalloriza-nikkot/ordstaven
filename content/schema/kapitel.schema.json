@@ -664,10 +664,19 @@
           "$ref": "#/$defs/P1_las_och_valj"
         },
         {
+          "$ref": "#/$defs/P27_packa"
+        },
+        {
           "$ref": "#/$defs/P11_formel"
         },
         {
           "$ref": "#/$defs/P12_dop"
+        },
+        {
+          "$ref": "#/$defs/P15_raddning"
+        },
+        {
+          "$ref": "#/$defs/P9_kodlas"
         },
         {
           "$ref": "#/$defs/P26_krukorna"
@@ -1003,6 +1012,303 @@
           "$ref": "#/$defs/knuff"
         },
         "vid_ratt": {
+          "$ref": "#/$defs/handling"
+        },
+        "anteckning": {
+          "$ref": "#/$defs/anteckning"
+        }
+      }
+    },
+    "P27_variant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "alternativ"
+      ],
+      "properties": {
+        "text": {
+          "$ref": "#/$defs/text",
+          "description": "Lästexten (en ledtråd). Läses aldrig upp automatiskt."
+        },
+        "bild": {
+          "$ref": "#/$defs/id",
+          "description": "Bild som ställer frågan, t.ex. en tankebubbla."
+        },
+        "alternativ": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/id"
+              },
+              "ord": {
+                "type": "string",
+                "description": "Ordet på etiketten, som spelaren läser. Vanlig skrift."
+              },
+              "bild": {
+                "$ref": "#/$defs/id"
+              },
+              "ratt": {
+                "type": "boolean"
+              },
+              "vid_valj": {
+                "$ref": "#/$defs/handling"
+              }
+            }
+          }
+        }
+      }
+    },
+    "P27_packa": {
+      "description": "Packa efter en lista: flera alternativ är rätt, spelaren väljer alla. Fel val studsar tillbaka.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "typ",
+        "varianter"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "typ": {
+          "const": "P27_packa"
+        },
+        "instruktion": {
+          "$ref": "#/$defs/replik"
+        },
+        "avsandare": {
+          "$ref": "#/$defs/id",
+          "description": "Vem som skrev texten: styr papperet på läsplattan."
+        },
+        "papper": {
+          "$ref": "#/$defs/id"
+        },
+        "kan_oppnas_igen": {
+          "type": "boolean"
+        },
+        "hjalp": {
+          "enum": [
+            "ett_ord",
+            null
+          ],
+          "description": "ett_ord = nosknappen läser upp ett ord han pekar på."
+        },
+        "varianter": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {
+            "$ref": "#/$defs/niva_l"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/P27_variant"
+          }
+        },
+        "knuff": {
+          "$ref": "#/$defs/knuff"
+        },
+        "forenkla": {
+          "$ref": "#/$defs/forenkla"
+        },
+        "efter_3_fel": {
+          "$ref": "#/$defs/handling"
+        },
+        "vid_ratt": {
+          "$ref": "#/$defs/handling"
+        },
+        "vid_fel": {
+          "$ref": "#/$defs/handling"
+        },
+        "anteckning": {
+          "$ref": "#/$defs/anteckning"
+        }
+      }
+    },
+    "P15_raddning": {
+      "description": "Räddningen (Hänga apan-familjen): kategori i text, ett fält per bokstav, gissa bokstäver. Ordet räddar.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "typ",
+        "kategori",
+        "svar"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "typ": {
+          "const": "P15_raddning"
+        },
+        "variant": {
+          "$ref": "#/$defs/id"
+        },
+        "instruktion": {
+          "$ref": "#/$defs/replik"
+        },
+        "kategori": {
+          "$ref": "#/$defs/text",
+          "description": "Läses av spelaren själv."
+        },
+        "svar": {
+          "type": "string",
+          "pattern": "^[a-zåäöé]+$",
+          "description": "Ett ord i vanlig skrift (små bokstäver)."
+        },
+        "reserv_ord": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zåäöé]+$",
+            "description": "Ett ord i vanlig skrift (små bokstäver)."
+          }
+        },
+        "falt": {
+          "type": "string",
+          "description": "Beskrivning av fälten (fri text). Motorn: ett fält per bokstav, en rätt bokstav fylls i överallt där den finns."
+        },
+        "tillatna_fel": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "hjalp": {
+          "enum": [
+            "ett_ord",
+            null
+          ]
+        },
+        "mjukt_misslyckande": {
+          "$ref": "#/$defs/handling"
+        },
+        "knuff": {
+          "$ref": "#/$defs/knuff"
+        },
+        "forenkla": {
+          "$ref": "#/$defs/forenkla"
+        },
+        "efter_3_fel": {
+          "$ref": "#/$defs/handling"
+        },
+        "vid_ratt": {
+          "$ref": "#/$defs/handling"
+        },
+        "vid_fel": {
+          "$ref": "#/$defs/handling"
+        },
+        "anteckning": {
+          "$ref": "#/$defs/anteckning"
+        }
+      }
+    },
+    "P9_kodlas": {
+      "description": "Kodlåset: ett ord ur ett bildchiffer (nyckel i hjälteboken), byggt med brickor eller skrivet.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "typ",
+        "niva",
+        "svar"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "typ": {
+          "const": "P9_kodlas"
+        },
+        "niva": {
+          "$ref": "#/$defs/niva_s"
+        },
+        "instruktion": {
+          "$ref": "#/$defs/replik"
+        },
+        "chiffer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "tecken",
+            "nyckel"
+          ],
+          "properties": {
+            "tecken": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/id"
+              },
+              "description": "Tecknen på låset, i ordning."
+            },
+            "nyckel": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "tecken",
+                  "bokstav"
+                ],
+                "properties": {
+                  "tecken": {
+                    "$ref": "#/$defs/id"
+                  },
+                  "bokstav": {
+                    "type": "string",
+                    "pattern": "^[A-ZÅÄÖ]$"
+                  }
+                }
+              }
+            },
+            "nyckeln_finns_i": {
+              "$ref": "#/$defs/id"
+            }
+          }
+        },
+        "brickor": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-ZÅÄÖ]$"
+          }
+        },
+        "svar": {
+          "type": "string",
+          "pattern": "^[a-zåäöé]+$",
+          "description": "Ett ord i vanlig skrift (små bokstäver)."
+        },
+        "ratt_bokstav_stannar": {
+          "type": "boolean"
+        },
+        "hjalp": {
+          "enum": [
+            "ett_ord",
+            null
+          ]
+        },
+        "knuff": {
+          "$ref": "#/$defs/knuff"
+        },
+        "forenkla": {
+          "$ref": "#/$defs/forenkla"
+        },
+        "efter_3_fel": {
+          "$ref": "#/$defs/handling"
+        },
+        "vid_ratt": {
+          "$ref": "#/$defs/handling"
+        },
+        "vid_fel": {
           "$ref": "#/$defs/handling"
         },
         "anteckning": {
