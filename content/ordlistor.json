@@ -2,11 +2,12 @@
  "$schema": "schema/ordlistor.schema.json",
  "format": 1,
  "meta": {
-  "version": "0.3",
-  "datum": "2026-10-24",
+  "version": "0.4",
+  "datum": "2026-10-25",
   "agare": "Innehåll",
   "textform": "Orden lagras med små bokstäver, formler i versaler. Böjda former (skogen, bron) står med när de används som alternativ.",
-  "beskrivning": "Ordlistor 1-6 for ORDSTAVEN. Bilderna ar platshallare (emoji) for grabox. Ett ord ligger i den hogsta lista som nagot av dess drag kraver."
+  "beskrivning": "Ordlistor 1-6 for ORDSTAVEN. Bilderna ar platshallare (emoji) for grabox. Ett ord ligger i den hogsta lista som nagot av dess drag kraver.",
+  "bilder": "Emoji är platshållare. Där emojin är missvisande står ett bild-id i stället (filt)."
  },
  "listor": {
   "1": "Korta ljudenliga ord, 2-3 bokstaver, ingen konsonantgrupp, ingen dubbelteckning",
@@ -230,6 +231,13 @@
    "flaggor": []
   },
   {
+   "ord": "sov",
+   "lista": 1,
+   "bild": "🛏️",
+   "tema": "hemma",
+   "flaggor": []
+  },
+  {
    "ord": "sur",
    "lista": 1,
    "bild": "😖",
@@ -306,7 +314,7 @@
   {
    "ord": "filt",
    "lista": 2,
-   "bild": "🧣",
+   "bild": "filt",
    "tema": "hemma",
    "flaggor": []
   },

@@ -4,40 +4,117 @@
   "title": "ORDSTAVEN – ett äventyr (talare, platshållare, kapitelordning)",
   "type": "object",
   "additionalProperties": false,
-  "required": ["format", "id", "titel", "talare", "platshallare", "kapitel"],
+  "required": [
+    "format",
+    "id",
+    "titel",
+    "talare",
+    "platshallare",
+    "kapitel"
+  ],
   "properties": {
-    "$schema": { "type": "string" },
-    "format": { "const": 1 },
-    "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
-    "titel": { "type": "string", "description": "Vanlig skrift. Visas som logga och läses upp." },
-    "meta": { "type": "object", "additionalProperties": true },
+    "$schema": {
+      "type": "string"
+    },
+    "format": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "titel": {
+      "type": "string",
+      "description": "Vanlig skrift. Visas som logga och läses upp."
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": true
+    },
     "talare": {
       "type": "object",
       "description": "Alla som kan säga en replik. Nyckeln är talarens id.",
-      "propertyNames": { "pattern": "^[a-z0-9_]+$" },
+      "propertyNames": {
+        "pattern": "^[a-z0-9_]+$"
+      },
       "additionalProperties": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["namn", "rost"],
+        "required": [
+          "namn",
+          "rost"
+        ],
         "properties": {
-          "namn": { "type": "string" },
-          "rost": { "enum": ["datorrost", "foraldern_eller_datorrost"], "description": "foraldern_eller_datorrost: läses av föräldern när föräldern spelar med, annars datorröst." },
-          "rollrost": { "enum": ["berattare", "gammal", "fanig", "metall", "unge"], "description": "Tonhöjd och tempo för datorrösten." },
-          "portratt": { "type": "string", "pattern": "^[a-z0-9_]+$" }
+          "namn": {
+            "type": "string"
+          },
+          "rost": {
+            "enum": [
+              "datorrost",
+              "foraldern_eller_datorrost"
+            ],
+            "description": "foraldern_eller_datorrost: läses av föräldern när föräldern spelar med, annars datorröst."
+          },
+          "rollrost": {
+            "enum": [
+              "berattare",
+              "gammal",
+              "fanig",
+              "metall",
+              "unge"
+            ],
+            "description": "Tonhöjd och tempo för datorrösten."
+          },
+          "portratt": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]+$"
+          }
         }
       }
     },
     "platshallare": {
       "type": "object",
       "description": "Platshållare i texten, t.ex. {unge}, och var värdet hämtas.",
-      "propertyNames": { "pattern": "^\\{[a-z]+\\}$" },
-      "additionalProperties": { "enum": ["unge.namn", "hjalte.namn"] }
+      "propertyNames": {
+        "pattern": "^\\{[a-z]+\\}$"
+      },
+      "additionalProperties": {
+        "enum": [
+          "unge.namn",
+          "hjalte.namn"
+        ]
+      }
     },
     "kapitel": {
       "type": "array",
       "minItems": 1,
-      "items": { "type": "string", "pattern": "^kap-[0-9]{2}$" },
+      "items": {
+        "type": "string",
+        "pattern": "^kap-[0-9]{2}$"
+      },
       "description": "Kapitelfilernas id i spelordning."
+    },
+    "sluta_for_idag": {
+      "type": "object",
+      "description": "SLUTA FÖR IDAG (fas 3–4): stegen som spelas när spelaren slutar för dagen, före och efter att ungen har kläckts. Sparas redan nu, spelas när funktionen byggs.",
+      "additionalProperties": false,
+      "properties": {
+        "anteckning": {
+          "type": "string"
+        },
+        "fore_ungen": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "med_ungen": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
     }
   }
 }

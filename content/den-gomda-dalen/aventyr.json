@@ -4,7 +4,8 @@
   "id": "den-gomda-dalen",
   "titel": "Ordstaven. Den gömda dalen.",
   "meta": {
-    "agare": "Innehåll (talare och titel), teknik (formatet)"
+    "agare": "Innehåll (talare och titel), teknik (formatet)",
+    "innehall": "2026-10-25: sluta_for_idag tillagt (förslag)."
   },
   "talare": {
     "berattare": {
@@ -38,5 +39,44 @@
   "kapitel": [
     "kap-00",
     "kap-01"
-  ]
+  ],
+  "sluta_for_idag": {
+    "anteckning": "Förslag från Innehåll (brief 9a). Spelas när spelaren väljer SLUTA FÖR IDAG i pausen, från vilken scen som helst. Spelet har redan sparat. Två varianter: före och efter att ungen har kläckts. Teknik bestämmer var i formatet det ska ligga.",
+    "fore_ungen": [
+      {
+        "typ": "mellanscen",
+        "beskrivning": "Hjälten gäspar. Staven glöder svagt."
+      },
+      {
+        "typ": "replik",
+        "talare": "farfar",
+        "text": "Bra jobbat i dag. Vi ses snart!",
+        "upplast": true
+      },
+      {
+        "typ": "replik",
+        "talare": "berattare",
+        "text": "Hej då!",
+        "upplast": true
+      }
+    ],
+    "med_ungen": [
+      {
+        "typ": "mellanscen",
+        "beskrivning": "Ungen gäspar, rullar ihop sig i hjältens famn och somnar med svansklubban runt sig."
+      },
+      {
+        "typ": "replik",
+        "talare": "farfar",
+        "text": "{unge} somnade. Bra jobbat i dag!",
+        "upplast": true
+      },
+      {
+        "typ": "replik",
+        "talare": "farfar",
+        "text": "Vi ses snart. Hej då!",
+        "upplast": true
+      }
+    ]
+  }
 }

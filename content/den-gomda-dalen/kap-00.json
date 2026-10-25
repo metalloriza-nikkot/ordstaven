@@ -3,12 +3,22 @@
  "format": 2,
  "id": "kap-00",
  "kapitel": 0,
+ "nivaer": {
+  "lasning": [
+   "L1",
+   "L3"
+  ],
+  "skrivning": [
+   "S1",
+   "S1"
+  ]
+ },
  "meta": {
   "namn": "Prologen",
-  "version": "0.6",
-  "datum": "2026-10-24",
+  "version": "0.8",
+  "datum": "2026-10-25",
   "agare": "Innehåll",
-  "kalla": "Manus 13 v0.8. Format 1 enligt 14-innehallsschema.md.",
+  "kalla": "Manus 13 v1.0. Byggd på repots kap-00.json (format 2, teknikens id:n).",
   "uppskattning": {
    "metod": "Uppläsning ca 0,4 s per ord plus 1 s per replik. Läsuppgift 45–90 s inklusive ett fel. Namn 60 s. Skapa hjälten 90 s.",
    "pass_1": {
@@ -31,7 +41,8 @@
     ],
     "ovrigt": [
      "p0_krukor (vila)",
-     "bokens bildtexter (frivilliga)"
+     "bokens bildtexter (frivilliga)",
+     "mata ungen med bären (frivilligt)"
     ]
    },
    "pass_3": {
@@ -45,7 +56,8 @@
     ]
    }
   },
-  "teknik": "Teknik har lagt in ledningens beslut 2026-10-25 13:00 i formatet: format 2, P28_packa, syns_i på ägget, i_rummet på FILT med lådorna lada_hyllan, lada_hornet och lada_fonstret i stället för hylla_tre_lador, och ga_till till hyllan i s04 borttaget. Ingen text är ändrad."
+  "teknik": "Teknik har lagt in ledningens beslut 2026-10-25 13:00 i formatet: format 2, P28_packa, syns_i på ägget, i_rummet på FILT med lådorna lada_hyllan, lada_hornet och lada_fonstret i stället för hylla_tre_lador, och ga_till till hyllan i s04 borttaget. Ingen text är ändrad.",
+  "innehall_v08": "Innehåll har utgått från repots fil. Ändrat: nivaer, unge_folj, dunket och lådorna i s04, anteckningen i p0_filt, repliken om bären i s12, luftskeppet i s21, baronen och Klaffen i s22, bild-id för färg och storlek i p0_dinomat, vid_omstart i varje scen. Teknikens id:n och format är orörda."
  },
  "rum": [
   {
@@ -137,6 +149,11 @@
    "id": "s00_start",
    "pass": 1,
    "rum": null,
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Du skulle välja din hjälte.",
+    "upplast": true
+   },
    "steg": [
     {
      "typ": "mellanscen",
@@ -175,6 +192,11 @@
    "pass": 1,
    "rum": null,
    "vy": "sidovy",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Det dunkade på vinden.",
+    "upplast": true
+   },
    "steg": [
     {
      "typ": "mellanscen",
@@ -209,6 +231,11 @@
    "pass": 1,
    "rum": "vinden",
    "tillstand": "natt",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Något glimmar på vinden.",
+    "upplast": true
+   },
    "steg": [
     {
      "typ": "replik",
@@ -243,6 +270,11 @@
    "pass": 1,
    "rum": "vinden",
    "tillstand": "natt",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Du hittade en gammal stav.",
+    "upplast": true
+   },
    "steg": [
     {
      "typ": "replik",
@@ -267,11 +299,32 @@
    "pass": 1,
    "rum": "vinden",
    "tillstand": "natt_upplyst",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Det dunkar på vinden.",
+    "upplast": true
+   },
    "steg": [
+    {
+     "typ": "mellanscen",
+     "beskrivning": "I ljuset syns en låda längre bort, som inte syntes i mörkret."
+    },
+    {
+     "typ": "ga_till",
+     "mal": "lada_med_agg"
+    },
+    {
+     "typ": "ljud",
+     "id": "dunk"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Ägglådan hoppar till med samma dunk som i början. Ett frostigt ägg ligger i halmen."
+    },
     {
      "typ": "replik",
      "talare": "berattare",
-     "text": "Ett ägg i en låda! Det gungar.",
+     "text": "Dunk! Det var ägget som dunkade!",
      "upplast": true
     },
     {
@@ -283,7 +336,7 @@
     {
      "typ": "replik",
      "talare": "berattare",
-     "text": "Hitta rätt låda på hyllan.",
+     "text": "Gå runt och läs på lådorna.",
      "upplast": true
     },
     {
@@ -296,6 +349,11 @@
    "id": "s05_klackningen",
    "pass": 1,
    "rum": "vinden",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Ägget håller på att kläckas!",
+    "upplast": true
+   },
    "steg": [
     {
      "typ": "mellanscen",
@@ -328,6 +386,10 @@
      "upplast": true
     },
     {
+     "typ": "unge_folj",
+     "folj": true
+    },
+    {
      "typ": "mellanscen",
      "beskrivning": "Utanför vindsfönstret: en liten skugga, ett tickande ljud, fladder. Klaffen flyger iväg."
     },
@@ -347,6 +409,11 @@
    "id": "s06_namnet",
    "pass": 1,
    "rum": "vinden",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Ungen behöver ett namn.",
+    "upplast": true
+   },
    "steg": [
     {
      "typ": "replik",
@@ -380,6 +447,11 @@
    "id": "s07_dorrarna",
    "pass": 1,
    "rum": "hallen",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Kom ner till mig!",
+    "upplast": true
+   },
    "steg": [
     {
      "typ": "mellanscen",
@@ -402,6 +474,11 @@
    "pass": 1,
    "rum": "koket",
    "tillstand": "natt",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Just det, du kom ner till mig.",
+    "upplast": true
+   },
    "steg": [
     {
      "typ": "mellanscen",
@@ -517,6 +594,11 @@
    "id": "s10_upp_igen",
    "pass": 2,
    "rum": "hallen",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Dinomaten finns på vinden.",
+    "upplast": true
+   },
    "steg": [
     {
      "typ": "ga_till",
@@ -529,6 +611,11 @@
    "pass": 2,
    "rum": "vinden",
    "tillstand": "natt_upplyst",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Läs min lapp om dinomaten.",
+    "upplast": true
+   },
    "steg": [
     {
      "typ": "replik",
@@ -546,6 +633,11 @@
    "id": "s12_pasarna",
    "pass": 2,
    "rum": "vinden",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? {unge} är hungrig.",
+    "upplast": true
+   },
    "steg": [
     {
      "typ": "replik",
@@ -570,6 +662,12 @@
      "talare": "berattare",
      "text": "Bär är till {unge}.",
      "upplast": true
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Tryck på bären, så får {unge} ett.",
+     "upplast": true
     }
    ]
   },
@@ -577,6 +675,11 @@
    "id": "s13_krukorna",
    "pass": 2,
    "rum": "vinden",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? {unge} nosade på något.",
+    "upplast": true
+   },
    "steg": [
     {
      "typ": "replik",
@@ -601,6 +704,11 @@
    "pass": 2,
    "rum": "vinden",
    "vy": "narbild",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Du hittade ett gammalt papper.",
+    "upplast": true
+   },
    "steg": [
     {
      "typ": "mellanscen",
@@ -642,6 +750,11 @@
    "id": "s15_till_koket",
    "pass": 2,
    "rum": "hallen",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Kom och visa vad du hittade!",
+    "upplast": true
+   },
    "steg": [
     {
      "typ": "ga_till",
@@ -654,6 +767,11 @@
    "pass": 2,
    "rum": "koket",
    "tillstand": "natt",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Just det, sagan!",
+    "upplast": true
+   },
    "steg": [
     {
      "typ": "mellanscen",
@@ -753,6 +871,11 @@
    "id": "s17_sovdags",
    "pass": 2,
    "rum": "hallen",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Det är sängdags. Hitta din säng!",
+    "upplast": true
+   },
    "steg": [
     {
      "typ": "pussel",
@@ -765,6 +888,11 @@
    "pass": 2,
    "rum": "sovrummet",
    "tillstand": "natt",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Det är sängdags.",
+    "upplast": true
+   },
    "steg": [
     {
      "typ": "ga_till",
@@ -793,9 +921,8 @@
    "rum": "sovrummet",
    "tillstand": "morgon",
    "vid_omstart": {
-    "typ": "replik",
-    "talare": "berattare",
-    "text": "God morgon!",
+    "talare": "farfar",
+    "text": "God morgon! Frukosten väntar.",
     "upplast": true
    },
    "steg": [
@@ -825,6 +952,11 @@
    "id": "s20_hallen_morgon",
    "pass": 3,
    "rum": "hallen",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Frukosten väntar i köket.",
+    "upplast": true
+   },
    "steg": [
     {
      "typ": "ga_till",
@@ -837,6 +969,11 @@
    "pass": 3,
    "rum": "koket",
    "tillstand": "morgon",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Jag har något viktigt att säga.",
+    "upplast": true
+   },
    "steg": [
     {
      "typ": "replik",
@@ -870,6 +1007,12 @@
      "typ": "replik",
      "talare": "farfar",
      "text": "Värst är Baron Gripklo. Akta dig för honom!",
+     "upplast": true
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Han flyger ett lila luftskepp.",
      "upplast": true
     },
     {
@@ -912,6 +1055,11 @@
    "id": "s22_tradgarden",
    "pass": 3,
    "rum": "tradgarden",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Du skulle gå mot skogen.",
+    "upplast": true
+   },
    "steg": [
     {
      "typ": "fritt",
@@ -926,12 +1074,26 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Ett lila luftskepp glider fram över trädgården, en mekanisk fågel fladdrar bredvid. Ungen gömmer sig bakom hjälten."
+     "beskrivning": "Ett lila luftskepp glider fram över trädgården. Ungen gömmer sig bakom hjälten."
+    },
+    {
+     "typ": "ljud",
+     "id": "klaffen_tick"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "En mekanisk fågel fladdrar fram med samma tickande som vid vindsfönstret och sätter sig på baronens axel."
     },
     {
      "typ": "replik",
      "talare": "baronen",
-     "text": "En levande dinounge! Den ska bli min!",
+     "text": "Jag är Baron Gripklo! Den ungen ska bli min!",
+     "upplast": true
+    },
+    {
+     "typ": "replik",
+     "talare": "baronen",
+     "text": "Bra spanat i natt, Klaffen!",
      "upplast": true
     },
     {
@@ -941,7 +1103,7 @@
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Spring! Dit listan säger!",
+     "text": "Det är baronen! Spring! Dit listan säger!",
      "upplast": true
     },
     {
@@ -1088,7 +1250,7 @@
     }
    },
    "vid_ratt": {
-    "handling": "filten om ägget, frosten smälter"
+    "handling": "hjälten bär filten till ägget och lägger den om det, frosten smälter"
    },
    "knuff": {
     "handling": "ägget hackar tänder, tankebubblan blinkar"
@@ -1100,7 +1262,7 @@
    "efter_3_fel": {
     "handling": "ägget gungar mot rätt låda"
    },
-   "anteckning": "Lådorna står på hyllan (hylla_tre_lador). Etiketterna är Farfars lappar."
+   "anteckning": "Läsning i världen: tre lådor står på olika platser på vinden (lada_hornet, lada_hyllan, lada_fonstret). Ordet på Farfars lapp syns när hjälten står vid lådan. Alla lådor glimtar lika mycket. Hjälten bär filten till ägget."
   },
   {
    "id": "p0_ungenamn",
@@ -1210,7 +1372,8 @@
      "alternativ": [
       {
        "id": "rod",
-       "ratt": true
+       "ratt": true,
+       "bild": "lada_rod"
       },
       {
        "id": "bla",
@@ -1222,7 +1385,8 @@
          "text": "Hoppsan! Där var ingen mat.",
          "upplast": true
         }
-       }
+       },
+       "bild": "lada_bla"
       },
       {
        "id": "gul",
@@ -1234,7 +1398,8 @@
          "text": "Hoppsan! Där var ingen mat.",
          "upplast": true
         }
-       }
+       },
+       "bild": "lada_gul"
       }
      ]
     },
@@ -1246,7 +1411,8 @@
      "alternativ": [
       {
        "id": "stor_rod",
-       "ratt": true
+       "ratt": true,
+       "bild": "lada_rod_stor"
       },
       {
        "id": "liten_rod",
@@ -1258,7 +1424,8 @@
          "text": "Hoppsan! Där var ingen mat.",
          "upplast": true
         }
-       }
+       },
+       "bild": "lada_rod_liten"
       },
       {
        "id": "stor_bla",
@@ -1270,7 +1437,8 @@
          "text": "Hoppsan! Där var ingen mat.",
          "upplast": true
         }
-       }
+       },
+       "bild": "lada_bla_stor"
       }
      ]
     }
@@ -1285,7 +1453,7 @@
    "efter_3_fel": {
     "handling": "ungen nosar på rätt låda"
    },
-   "anteckning": "Farfar skriver lappen i scen s09_lappen. Färgerna ska skilja sig i ljushet (dokument 10)."
+   "anteckning": "Farfar skriver lappen i scen s09_lappen. Bilden stämmer med texten: färg och storlek syns tydligt (bild-id:t säger egenskapen), och färgerna skiljer sig även i ljushet (dokument 10)."
   },
   {
    "id": "p0_bar",
