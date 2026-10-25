@@ -4,7 +4,8 @@ import { skapaLasmotor, valjVariant } from '../../src/karna/lasmotor.js';
 import { ljudningsdelar } from '../../src/karna/ljudning.js';
 import { skapaValj, skapaFormel, skapaDop, skapaKrukor } from '../../src/karna/pussel.js';
 import { skapaBerattelse } from '../../src/karna/berattelse.js';
-import { nyttTillstand, AVENTYR } from '../../src/karna/sparning.js';
+import { nyttTillstand, aventyrFor } from '../../src/karna/sparning.js';
+const AVENTYR = 'den-gomda-dalen';
 
 const las = (p) => JSON.parse(readFileSync(new URL('../../content/' + p, import.meta.url), 'utf8'));
 const aventyr = las('den-gomda-dalen/aventyr.json');
@@ -206,5 +207,67 @@ describe('formeln med dra och släpp', () => {
     expect(f.s.last[0]).toBe(true);
     expect(f.taBort(0)).toBe(false);
     expect(f.laggPa(id('U'), 0).resultat).toBe('ingen');
+  });
+});
+
+describe('fortsätt där man var, och stabila id:n', () => {
+  const kopiera = (x) => JSON.parse(JSON.stringify(x));
+  const ny = (t, kap = prolog) => skapaBerattelse({ aventyr, kapitel: kap, tillstand: t, aventyrId: AVENTYR });
+  function spelaTill(b, scenId, stegNr) {
+    for (let i = 0; i < 500 && !(b.scen.id === scenId && b.stegIndex === stegNr); i++) {
+      const st = b.aktuellt(); const p = st.typ === 'pussel' ? b.pussel(st.pussel_id) : null;
+      b.klar(p && p.typ === 'P12_dop' ? { namn: 'KNOPP' } : {});
+    }
+  }
+  it('fortsätter på samma steg mitt i en scen, efter "Var var vi?"', () => {
+    const t = nyttTillstand('t'); const b = ny(t);
+    spelaTill(b, 's09_lappen', 4);
+    const igen = ny(kopiera(t));
+    expect(igen.aktuellt()).toMatchObject({ omstart: true });
+    igen.klar();
+    expect(igen.scen.id).toBe('s09_lappen');
+    expect(igen.stegIndex).toBe(4);
+  });
+  it('ett steg som ger något ger det bara en gång, även om spelet startas om mitt i steget', () => {
+    const t = nyttTillstand('t'); const b = ny(t);
+    spelaTill(b, 's12_pasarna', 3); // ge_bar 3
+    b.aktuellt();
+    const bar = aventyrFor(t, AVENTYR).bar;
+    const t2 = kopiera(t); const igen = ny(t2);
+    igen.aktuellt(); // vid_omstart eller steget
+    if (igen.stegIndex === -1) { igen.klar(); igen.aktuellt(); }
+    expect(t2.aventyr[AVENTYR].bar).toBe(bar);
+  });
+  it('ett omdöpt scen-id följer sitt alias, en borttagen scen börjar om i samma pass', () => {
+    const t = nyttTillstand('t'); const b = ny(t);
+    spelaTill(b, 's12_pasarna', 1);
+    const omdopt = { ...prolog, alias: { scener: { s12_pasarna: 's12_paserna' } }, scener: prolog.scener.map((s) => (s.id === 's12_pasarna' ? { ...s, id: 's12_paserna' } : s)) };
+    expect(ny(kopiera(t), omdopt).scen.id).toBe('s12_paserna');
+    const borttagen = { ...prolog, scener: prolog.scener.filter((s) => s.id !== 's12_pasarna') };
+    const forsta2 = prolog.scener.find((s) => s.pass === 2).id;
+    expect(ny(kopiera(t), borttagen).scen.id).toBe(forsta2);
+  });
+  it('lappar med omdöpta id följer sitt alias, borttagna försvinner', () => {
+    const t = nyttTillstand('t'); aventyrFor(t, AVENTYR).lappar = ['p0_dinomat_gammal', 'p0_finnsinte'];
+    const kap = { ...prolog, alias: { pussel: { p0_dinomat_gammal: 'p0_dinomat' } } };
+    ny(t, kap);
+    expect(t.aventyr[AVENTYR].lappar).toEqual(['p0_dinomat']);
+  });
+  it('läser en sparning från en äldre version av innehållet (fixtur)', () => {
+    const gammal = JSON.parse(readFileSync(new URL('../fixturer/spar-aldre-innehall.json', import.meta.url), 'utf8'));
+    const kap = { ...prolog, alias: { scener: { s10_ladorna: 's11_ladorna' } } };
+    const b = ny(gammal, kap);
+    expect(b.scen.id).toBe('s11_ladorna');
+    expect(gammal.aventyr[AVENTYR].lappar).toEqual(['p0_dinomat']);
+  });
+});
+
+describe('ungen följer', () => {
+  it('unge_folj sätter att ungen följer, och kan stängas av', () => {
+    const t = nyttTillstand('t');
+    const kap = { ...prolog, scener: [{ id: 'x', pass: 1, rum: null, steg: [{ typ: 'unge_folj', folj: true }, { typ: 'unge_folj', folj: false }] }] };
+    const b = skapaBerattelse({ aventyr, kapitel: kap, tillstand: t, aventyrId: AVENTYR });
+    b.aktuellt(); expect(t.aventyr[AVENTYR].ungen.folj).toBe(true);
+    b.klar(); b.aktuellt(); expect(t.aventyr[AVENTYR].ungen.folj).toBe(false);
   });
 });

@@ -1,4 +1,5 @@
 // @ts-check
+import { aventyrFor } from './sparning.js';
 // Berättelsemotorn: spelar ett kapitels scener och steg i ordning. Ren logik, inga globaler.
 // Gränssnittet hämtar aktuellt steg med `aktuellt()`, utför det och anropar `klar(resultat)`.
 // Steg som bara ändrar tillståndet (ge_bar, ge_kartbit, ge_grad, visa_ui) utförs här och
@@ -9,20 +10,31 @@
  *   tillstand = hela sparningen (ändras på plats), kapitel = kapitelfilen
  */
 export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }) {
-  const av = tillstand.aventyr[aventyrId];
+  const av = aventyrFor(tillstand, aventyrId);
   const L = (/** @type {string} */ m, /** @type {any} */ d) => logg && logg.handelse('berättelse', m, d);
   const pussel = new Map(kapitel.pussel.map((/** @type {any} */ p) => [p.id, p]));
   const rum = new Map(kapitel.rum.map((/** @type {any} */ r) => [r.id, r]));
 
-  // Var i kapitlet vi är. Sparas vid varje scenstart.
+  // Var i kapitlet vi är: scen (id och nummer), steg och pass. Sparas efter varje steg.
   av.kapitelId = av.kapitelId || kapitel.id;
-  if (av.kapitelId !== kapitel.id) { av.kapitelId = kapitel.id; av.scen = 0; }
+  if (av.kapitelId !== kapitel.id) { av.kapitelId = kapitel.id; av.scen = 0; delete av.scenId; delete av.steg; }
   av.scen = Number.isInteger(av.scen) ? av.scen : 0;
-  // Scenens id sparas också, så att en sparning hamnar rätt även när innehållet har fått nya scener.
-  if (typeof av.scenId === 'string') { const i = kapitel.scener.findIndex((/** @type {any} */ s) => s.id === av.scenId); if (i >= 0) av.scen = i; }
+  const alias = kapitel.alias || {};
+  /** Följ alias (gamla id → nya), även i flera led. @param {Record<string, string> | undefined} tabell @param {string} id */
+  const nytt = (tabell, id) => { let x = id; for (let i = 0; i < 10 && tabell && tabell[x]; i++) x = tabell[x]; return x; };
+  let startSteg = 0;
+  // Scenens id gäller före numret, så att en sparning hamnar rätt även när innehållet har fått nya scener.
+  // Finns scenen inte längre (borttagen, utan alias) börjar spelet i början av samma pass.
+  if (typeof av.scenId === 'string') {
+    const id = nytt(alias.scener, av.scenId);
+    const i = kapitel.scener.findIndex((/** @type {any} */ s) => s.id === id);
+    if (i >= 0) { av.scen = i; if (id === av.scenId && Number.isInteger(av.steg)) startSteg = av.steg; }
+    else if (Number.isInteger(av.pass)) { const j = kapitel.scener.findIndex((/** @type {any} */ s) => s.pass === av.pass); if (j >= 0) av.scen = j; }
+    else av.scen = Math.min(av.scen, kapitel.scener.length - 1);
+  }
   av.ui = av.ui || {};
   av.rumstillstand = av.rumstillstand || {};
-  av.lappar = av.lappar || [];
+  av.lappar = (av.lappar || []).map((/** @type {string} */ id) => nytt(alias.pussel, id)).filter((/** @type {string} */ id) => pussel.has(id));
   av.kartbitar = av.kartbitar || [];
   av.bar = av.bar || 0;
   av.ungen = av.ungen || { namn: '', steg: 1 };
@@ -32,16 +44,20 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
   let omstart = scenIndex > 0 || !!av.startad;
   av.startad = true;
 
-  function borjaScen() {
+  /** Steget att fortsätta på efter "Var var vi?" (vid_omstart). */
+  let aterupptaSteg = 0;
+  /** @param {number} [franSteg] steget att börja på (vid en omstart mitt i scenen) */
+  function borjaScen(franSteg = 0) {
     const scen = kapitel.scener[scenIndex];
     if (!scen) return;
-    av.scen = scenIndex; av.scenId = scen.id;
+    aterupptaSteg = Math.max(0, Math.min(scen.steg.length - 1, franSteg));
+    av.scen = scenIndex; av.scenId = scen.id; av.pass = scen.pass; av.steg = aterupptaSteg;
     if (scen.rum && scen.tillstand) av.rumstillstand[scen.rum] = scen.tillstand;
-    stegIndex = omstart && scen.vid_omstart ? -1 : 0;
+    stegIndex = omstart && scen.vid_omstart ? -1 : aterupptaSteg;
     omstart = false;
     L('scen', scen.id);
   }
-  borjaScen();
+  borjaScen(startSteg);
 
   const varden = () => ({ unge: av.ungen.namn || '', hjalte: tillstand.spelare.hjalte.namn || '' });
 
@@ -59,6 +75,7 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
       case 'ge_kartbit': if (!av.kartbitar.includes(st.nummer)) av.kartbitar.push(st.nummer); break;
       case 'ge_grad': tillstand.spelare.hjalte.grad = st.grad; break;
       case 'visa_ui': av.ui[st.element] = true; break;
+      case 'unge_folj': av.ungen.folj = st.folj; break;
       case 'oppna_lasplatta': { const p = pussel.get(st.pussel_id); if (p && p.kan_oppnas_igen && !av.lappar.includes(p.id)) av.lappar.push(p.id); break; }
       default:
     }
@@ -83,7 +100,12 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
       const scen = kapitel.scener[scenIndex];
       if (!scen) return null;
       const st = stegIndex === -1 ? { typ: 'replik', ...scen.vid_omstart, omstart: true } : scen.steg[stegIndex];
-      if (!effektGjord) { effekt(st); effektGjord = true; }
+      if (!effektGjord) {
+        // effekten görs en gång per steg, även om spelet startas om mitt i steget
+        const nyckel = `${scen.id}/${stegIndex}`;
+        if (stegIndex >= 0 && av.effekt !== nyckel) { effekt(st); av.effekt = nyckel; }
+        effektGjord = true;
+      }
       return st;
     },
 
@@ -110,7 +132,8 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
         if (p && (p.typ === 'P1_las_och_valj' || p.typ === 'P28_packa') && p.kan_oppnas_igen && !av.lappar.includes(p.id)) av.lappar.push(p.id);
       }
       effektGjord = false;
-      stegIndex++;
+      stegIndex = stegIndex === -1 ? aterupptaSteg : stegIndex + 1;
+      av.steg = stegIndex;
       if (stegIndex >= scen.steg.length) {
         scenIndex++;
         borjaScen();

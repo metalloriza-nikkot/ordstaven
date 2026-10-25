@@ -6,7 +6,6 @@
 export const APP = 'ORDSTAVEN';
 export const FORMAT = 1;
 export const HJALTE_FORMAT = 1;
-export const AVENTYR = 'den-gomda-dalen';
 
 export const NYCKEL = 'ordstaven_spar';
 export const NYCKEL_BACKUP = 'ordstaven_spar_backup';
@@ -31,12 +30,21 @@ export function nyttTillstand(spelversion, klocka = () => new Date()) {
       hjalte: { format: HJALTE_FORMAT, id: slumpId(), namn: '', utseende: {}, grad: null, formler: [] },
       larande: { lasning: {}, skrivning: {}, ord: {}, matte: {}, historik: [] },
     },
-    aventyr: {
-      [AVENTYR]: { kapitel: 0, plats: { rum: 'testrum', x: 160, y: 120 }, flaggor: {}, bar: 0, mynt: 0, kartbitar: [], ungen: { namn: '', steg: 1 } },
-    },
+    // ett äventyr läggs till första gången det spelas (aventyrFor)
+    aventyr: {},
     foraldra: { pin: null, veckansBokstav: null, egnaOrd: [] },
     installningar: {},
   };
+}
+
+/**
+ * Sparningens del för ett äventyr, skapas om den saknas. Det som är spelarens (hjälten, lärandet) ligger
+ * i `spelare` och följer med till nästa äventyr. Det som är äventyrets (var man är, bär, kartbitar, ungen) ligger här.
+ * @param {any} tillstand @param {string} aventyrId
+ */
+export function aventyrFor(tillstand, aventyrId) {
+  if (!tillstand.aventyr[aventyrId]) tillstand.aventyr[aventyrId] = { kapitel: 0, flaggor: {}, bar: 0, kartbitar: [], ungen: { namn: '', steg: 1 } };
+  return tillstand.aventyr[aventyrId];
 }
 
 /**

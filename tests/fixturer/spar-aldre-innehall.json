@@ -1,0 +1,63 @@
+{
+ "app": "ORDSTAVEN",
+ "format": 1,
+ "spelversion": "0.2.1",
+ "sparad": "2026-10-25T10:00:00.000Z",
+ "spelare": {
+  "hjalte": {
+   "format": 1,
+   "id": "testid",
+   "namn": "TESTA",
+   "utseende": {},
+   "grad": null,
+   "formler": [
+    "LJUS"
+   ]
+  },
+  "larande": {
+   "lasning": {},
+   "skrivning": {},
+   "ord": {},
+   "matte": {},
+   "historik": []
+  }
+ },
+ "aventyr": {
+  "den-gomda-dalen": {
+   "kapitel": 0,
+   "plats": {
+    "rum": "testrum",
+    "x": 160,
+    "y": 120
+   },
+   "flaggor": {},
+   "bar": 2,
+   "mynt": 0,
+   "kartbitar": [],
+   "ungen": {
+    "namn": "KNOPP",
+    "steg": 1
+   },
+   "kapitelId": "kap-00",
+   "scen": 10,
+   "scenId": "s10_ladorna",
+   "startad": true,
+   "ui": {
+    "nosknappen": true
+   },
+   "rumstillstand": {
+    "vinden": "natt_upplyst"
+   },
+   "lappar": [
+    "p0_dinomat",
+    "p0_gammal_lapp"
+   ]
+  }
+ },
+ "foraldra": {
+  "pin": null,
+  "veckansBokstav": null,
+  "egnaOrd": []
+ },
+ "installningar": {}
+}

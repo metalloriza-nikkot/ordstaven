@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync } from 'node:fs';
-import { skapaSparning, nyttTillstand, migrera, FORMAT, NYCKEL, NYCKEL_TRASIG, AVENTYR } from '../../src/karna/sparning.js';
+import { skapaSparning, nyttTillstand, migrera, FORMAT, NYCKEL, NYCKEL_TRASIG, aventyrFor } from '../../src/karna/sparning.js';
+const AVENTYR = 'den-gomda-dalen';
 import { skapaLogg } from '../../src/karna/logg.js';
 
 const minne = () => {
@@ -15,12 +16,13 @@ describe('sparning', () => {
     expect(t.app).toBe('ORDSTAVEN');
     expect(t.format).toBe(FORMAT);
     expect(t.spelare.hjalte.format).toBe(1);
-    expect(t.aventyr[AVENTYR]).toBeTruthy();
+    expect(t.aventyr).toEqual({});
+    expect(aventyrFor(t, AVENTYR)).toBe(t.aventyr[AVENTYR]);
   });
 
   it('sparar och läser tillbaka', () => {
     const l = minne(); const s = skapaSparning({ lagring: l, spelversion: '0.1.0', klocka: fast });
-    const t = s.las(); t.aventyr[AVENTYR].plats = { rum: 'testrum', x: 42, y: 99 };
+    const t = s.las(); aventyrFor(t, AVENTYR).plats = { rum: 'testrum', x: 42, y: 99 };
     expect(s.spara(t)).toBe(true);
     expect(s.las().aventyr[AVENTYR].plats).toEqual({ rum: 'testrum', x: 42, y: 99 });
   });
