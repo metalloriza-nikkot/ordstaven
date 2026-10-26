@@ -56,7 +56,7 @@
     ]
    }
   },
-  "teknik": "Teknik har lagt in ledningens beslut 2026-10-25 13:00 i formatet: format 2, P28_packa, syns_i på ägget, i_rummet på FILT med lådorna lada_hyllan, lada_hornet och lada_fonstret i stället för hylla_tre_lador, och ga_till till hyllan i s04 borttaget. Ingen text är ändrad.",
+  "teknik": "Teknik har lagt in ledningens beslut i formatet, ingen text är ändrad. 2026-10-25: format 2, P28_packa, syns_i på ägget, i_rummet på FILT med lådorna lada_hyllan, lada_hornet och lada_fonstret i stället för hylla_tre_lador, och ga_till till hyllan i s04 borttaget. 2026-10-26 (val i världen): i_rummet och objekt i p0_dorrar och p0_sangen (dorr_mat, dorr_bad, dorr_toa, dorr_sov), p0_skylten (stig_skogen, stig_byn) och p0_dinomat (lada_lang_overst, lada_lang_mitten, lada_lang_nederst, som ersätter tre_langa_lador), foremal lada_med_agg på dunket i s04, och ga_till grind i s22 borttaget (grinden är en öppning i staketet, valet görs på stigarna).",
   "innehall_v08": "Innehåll har utgått från repots fil. Ändrat: nivaer, unge_folj, dunket och lådorna i s04, anteckningen i p0_filt, repliken om bären i s12, luftskeppet i s21, baronen och Klaffen i s22, bild-id för färg och storlek i p0_dinomat, vid_omstart i varje scen. Teknikens id:n och format är orörda."
  },
  "rum": [
@@ -82,7 +82,9 @@
     "lada_hyllan",
     "lada_hornet",
     "lada_fonstret",
-    "tre_langa_lador",
+    "lada_lang_overst",
+    "lada_lang_mitten",
+    "lada_lang_nederst",
     "fem_krukor",
     "stege_ner"
    ]
@@ -315,7 +317,8 @@
     },
     {
      "typ": "ljud",
-     "id": "dunk"
+     "id": "dunk",
+     "foremal": "lada_med_agg"
     },
     {
      "typ": "mellanscen",
@@ -1107,10 +1110,6 @@
      "upplast": true
     },
     {
-     "typ": "ga_till",
-     "mal": "grind"
-    },
-    {
      "typ": "pussel",
      "pussel_id": "p0_skylten"
     },
@@ -1287,6 +1286,7 @@
    "id": "p0_dorrar",
    "typ": "P1_las_och_valj",
    "hjalp": null,
+   "i_rummet": true,
    "varianter": {
     "L1": {
      "bild": "tankebubbla_tallrik",
@@ -1294,7 +1294,8 @@
       {
        "id": "mat",
        "ord": "mat",
-       "ratt": true
+       "ratt": true,
+       "objekt": "dorr_mat"
       },
       {
        "id": "bad",
@@ -1307,7 +1308,8 @@
          "text": "Hoppsan! Där var bara en badanka.",
          "upplast": true
         }
-       }
+       },
+       "objekt": "dorr_bad"
       },
       {
        "id": "toa",
@@ -1320,7 +1322,8 @@
          "text": "Hoppsan! Fel dörr.",
          "upplast": true
         }
-       }
+       },
+       "objekt": "dorr_toa"
       },
       {
        "id": "sov",
@@ -1333,7 +1336,8 @@
          "text": "Där sover man. Farfar är vaken!",
          "upplast": true
         }
-       }
+       },
+       "objekt": "dorr_sov"
       }
      ]
     }
@@ -1362,6 +1366,7 @@
    "avsandare": "farfar",
    "papper": "anteckningspapper_kompassros",
    "hjalp": "ett_ord",
+   "i_rummet": true,
    "kan_oppnas_igen": true,
    "varianter": {
     "L2": {
@@ -1373,7 +1378,8 @@
       {
        "id": "rod",
        "ratt": true,
-       "bild": "lada_rod"
+       "bild": "lada_rod",
+       "objekt": "lada_lang_mitten"
       },
       {
        "id": "bla",
@@ -1386,7 +1392,8 @@
          "upplast": true
         }
        },
-       "bild": "lada_bla"
+       "bild": "lada_bla",
+       "objekt": "lada_lang_nederst"
       },
       {
        "id": "gul",
@@ -1399,7 +1406,8 @@
          "upplast": true
         }
        },
-       "bild": "lada_gul"
+       "bild": "lada_gul",
+       "objekt": "lada_lang_overst"
       }
      ]
     },
@@ -1412,7 +1420,8 @@
       {
        "id": "stor_rod",
        "ratt": true,
-       "bild": "lada_rod_stor"
+       "bild": "lada_rod_stor",
+       "objekt": "lada_lang_nederst"
       },
       {
        "id": "liten_rod",
@@ -1425,7 +1434,8 @@
          "upplast": true
         }
        },
-       "bild": "lada_rod_liten"
+       "bild": "lada_rod_liten",
+       "objekt": "lada_lang_overst"
       },
       {
        "id": "stor_bla",
@@ -1438,7 +1448,8 @@
          "upplast": true
         }
        },
-       "bild": "lada_bla_stor"
+       "bild": "lada_bla_stor",
+       "objekt": "lada_lang_mitten"
       }
      ]
     }
@@ -1527,6 +1538,7 @@
    "id": "p0_sangen",
    "typ": "P1_las_och_valj",
    "hjalp": "ett_ord",
+   "i_rummet": true,
    "varianter": {
     "L1": {
      "bild": "tankebubbla_sang",
@@ -1534,7 +1546,8 @@
       {
        "id": "sov",
        "ord": "sov",
-       "ratt": true
+       "ratt": true,
+       "objekt": "dorr_sov"
       },
       {
        "id": "mat",
@@ -1547,7 +1560,8 @@
          "text": "Sch! Där sover inte du.",
          "upplast": true
         }
-       }
+       },
+       "objekt": "dorr_mat"
       },
       {
        "id": "bad",
@@ -1560,7 +1574,8 @@
          "text": "Hoppsan! Där sover man inte.",
          "upplast": true
         }
-       }
+       },
+       "objekt": "dorr_bad"
       },
       {
        "id": "toa",
@@ -1573,7 +1588,8 @@
          "text": "Hoppsan! Där sover man inte.",
          "upplast": true
         }
-       }
+       },
+       "objekt": "dorr_toa"
       }
      ]
     }
@@ -1700,6 +1716,7 @@
    "id": "p0_skylten",
    "typ": "P1_las_och_valj",
    "hjalp": "ett_ord",
+   "i_rummet": true,
    "varianter": {
     "L1": {
      "bild": "farfars_lista_sista_raden",
@@ -1707,7 +1724,8 @@
       {
        "id": "skogen",
        "ord": "skogen",
-       "ratt": true
+       "ratt": true,
+       "objekt": "stig_skogen"
       },
       {
        "id": "byn",
@@ -1720,7 +1738,8 @@
          "text": "Fel väg! Tillbaka!",
          "upplast": true
         }
-       }
+       },
+       "objekt": "stig_byn"
       }
      ]
     }

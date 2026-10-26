@@ -1,6 +1,7 @@
 # Innehållsschema – kapitel i format 2
 
-Version 2.1 (2026-10-25). Ägs av teknikspåret.
+Version 2.2 (2026-10-26). Ägs av teknikspåret.
+2.2: val i världen genom utgångar (`i_rummet` där `objekt` är en dörr eller stig), nya gradnamn, kartegenskaperna `riktning`, `klattra`, `ute`, `lapp`, `inomhus` och punkterna `in_<rum>`. Allt är tillägg, filer i 2.1 gäller fortfarande.
 2.1: `nivaer` och `alias` överst i kapitlet, steget `unge_folj`, `foremal` på `ljud`, `visar` i kartorna. Allt är tillägg, filer i 2.0 gäller fortfarande.
 2.0: kapitelfilerna har `"format": 2`. Packa heter `P28_packa` (P27 är Formelresan i pusselkatalogen). Nytt: `syns_i` på föremål, `i_rummet` på läs och välj, Tiled-kartor för rummen (avsnitt 3b).
 1.1: P27_packa, P15_raddning, P9_kodlas. Så skrivs berättelse, pussel och ordlistor som data.
@@ -63,7 +64,7 @@ Kapitelfilerna börjar med `"format": 2`, äventyret och ordlistorna med `"forma
 | `nos_demo` | `ord`, `kostnad` | Ungen visar hur man nosar på ett ord. |
 | `ge_bar` | `antal` | Bär till ungen. |
 | `ge_kartbit` | `nummer` | Kartbit 1–7. |
-| `ge_grad` | `grad`, `fest` | Ny trollkarlsgrad: `Lärling`, `Lögnavslöjare`, `Ordtrollare`, `Stortrollare`, `Mästertrollkarl`. |
+| `ge_grad` | `grad`, `fest` | Ny trollkarlsgrad, i ordning: `Lärling`, `Ordsmed`, `Lögnavslöjare`, `Gåtlösare`, `Berättare` (äventyr 1) och `Mästertrollkarl` (seriens sista, nås inte i äventyr 1). |
 | `bok` | `id`, `talare`, `las_upp_efter_tryck`, `uppslag` | Bläddringsbar bok. Varje uppslag: `bild`, `bildtext` (ett ord), `text`. |
 | `skapa_hjalte` | `delar`, `bara_bilder` | Spelaren väljer hjältens utseende. |
 | `sparpunkt` | `pass_slut`, `valfri` | Spelet sparas. `pass_slut: true` där passet slutar. |
@@ -103,7 +104,10 @@ En **replik inuti något annat** (`knuff`, `vid_fel`, `instruktion`, `vid_omstar
 - Alternativ: `id`, `ord` (etiketten spelaren läser, små bokstäver), `bild`, `ratt: true` på exakt ett, `vid_valj` för den roliga felreaktionen.
 - **Bilden stämmer med texten.** Nämner texten en färg eller storlek ska alternativets `bild` (eller `id`) säga den: `lada_rod_stor`, `filt_bla`, `liten_rod`. Färger: `rod`, `bla`, `gul`, `gron`, `vit`. Storlek: `stor`/`stort`, `liten`/`litet`. Ett test kontrollerar att det rätta alternativet har det texten säger.
 - `hjalp`: `"ett_ord"` (nosknappen) eller `null`.
-- **`i_rummet: true`** (läs i världen): alternativen ligger i föremål runt rummet i stället för kort på läsplattan. Varje alternativ har `objekt` (föremålets id i rummet) och `ord`. Frågan (`bild` eller `text`) syns uppe i rummet. När hjälten står vid föremålet syns ordet ovanför det, och spelaren trycker på ordet (eller på föremålet igen) för att öppna. Fel föremål ger sin `vid_valj` och blir tomt. Förenkling och att ungen pekar fungerar som vanligt.
+- **`i_rummet: true`** (läs i världen): alternativen ligger i föremål runt rummet i stället för kort på läsplattan. Varje alternativ har `objekt` (föremålets id i rummet) och `ord` eller `bild`. Frågan (`bild` eller `text`) syns uppe i rummet.
+  - **En sak** (låda, kruka): när hjälten står vid den syns ordet vid föremålet, och spelaren trycker på ordet (eller på föremålet igen, eller Mellanslag) för att öppna. Ett alternativ utan `ord` (lådor som skiljs åt på färg och storlek, se `visar`) visar handen i stället. Fel föremål ger sin `vid_valj` och blir tomt.
+  - **En utgång** (dörr, stig): ordet syns på skylten när hjälten är inom ungefär en ruta från dörren eller skylten (kartans `lapp`). Att gå igenom utgången är valet. Fel dörr öppnas aldrig: hjälten tar ett steg tillbaka och `vid_valj` spelas vid dörren. Förenklingen spikar igen dörrar och stigar med plankor.
+  - Glimten är lika för alla saker som är kvar och avslöjar aldrig svaret. Utgångar glimtar inte. Förenkling och att ungen pekar fungerar som vanligt.
 
 ```json
 { "id": "p0_filt", "typ": "P1_las_och_valj", "i_rummet": true,
@@ -144,11 +148,19 @@ Innehållet säger **vad** som finns i ett rum, kartan säger **var** det står.
 - Ett objektlager. Varje föremål är en rektangel där **namnet är föremålets id** i rummets `innehall`. Ingen text som spelaren ser.
 - **Typ** (klass): `utgang`, `sak` eller `figur`. Saknas den gissas den av id:t (`dorr_`, `stege_`, `grind`, `stig_` är utgångar).
 - **`visar`** = pusslet vars alternativ föremålet visar i rummet: lådorna i `p0_dinomat` ritas i den variant spelaren får, i rätt färg och storlek, och krukorna (P26) delas ut där `fem_krukor` står.
-- **Egenskaper:** `till` = rummet en utgång leder till (hjälten kommer in där när han kommer från det rummet), `sida` = var hjälten ställer sig (`under`, `over`, `vanster`, `hoger`, annars under), `golv` = man går på föremålet (stigar, grinden).
-- En **punkt** med namnet `start` är där hjälten står när han inte kommer genom en utgång (första gången, eller efter en omstart).
+- **Egenskaper:**
+  - `till` = rummet en utgång leder till (hjälten kommer in där när han kommer från det rummet).
+  - `riktning` = åt vilket håll utgången leder (`vanster`, `hoger`, `upp`, `ned`). Krävs på varje utgång med `till`. Nästa rum glider in från det hållet, och två dörrar mellan samma rum har motsatt riktning (testas).
+  - `sida` = var hjälten ställer sig (`under`, `over`, `vanster`, `hoger`, annars under).
+  - `golv` = man går på föremålet (stigar, grinden).
+  - `klattra` = stegen klättras (`upp` eller `ned`). Hjälten klättrar själv och kommer fram på stegen i nästa rum.
+  - `ute` = utedörren, som ritas ljusare än dörrarna inomhus.
+  - `lapp` = föremålet där ordet visas när utgången är ett val, t.ex. skylten vid en stig.
+- **Kartans egenskap `inomhus`** ger rummet en väggram: bakvägg 3 rutor, sidoväggar 2, främre kant 1. Dörrar sitter i väggarna och möbler står längs dem.
+- En **punkt** med namnet `start` är där hjälten står när han inte kommer genom en utgång (första gången, eller efter en omstart). En punkt `in_<rum>` är där han kommer in från ett rum som inte har någon utgång hit (t.ex. trädgården från köket).
 - Saknas kartan placeras föremålen automatiskt i ett rutnät (kapitel 1 tills vidare).
 
-Kontrollen säger fel om ett föremål saknas i kartan, om kartan har föremål som inte finns i rummet, om något går utanför rummet och om en utgång leder till ett rum som inte finns. Ett enhetstest kontrollerar att varje föremål går att nå från varje ingång i varje tillstånd.
+Kontrollen säger fel om ett föremål saknas i kartan, om kartan har föremål som inte finns i rummet, om något går utanför rummet, om en utgång leder till ett rum som inte finns eller saknar `riktning`, om `klattra` står på något som inte är en utgång, om `lapp` pekar på ett föremål som inte finns i rummet och om `in_<rum>` inte är ett rum. Ett enhetstest kontrollerar att varje föremål går att nå från varje ingång i varje tillstånd.
 
 ## 4. Ordlistor
 
@@ -164,7 +176,7 @@ Små bokstäver utom formler (`"LJUS"`). Flaggor: `aao`, `helord`, `sparrad`, `b
 - Fält som inte finns i schemat (stavfel i fältnamn), fel typ, saknade fält.
 - Text i versaler som inte är en formel. Platshållare i versaler (`{UNGE}`) eller okända platshållare.
 - Okänd talare, rum, objekt (`ga_till`), pussel eller tillstånd. Dubbla id:n, samma föremål två gånger i ett rum.
-- `syns_i` med ett tillstånd som rummet inte har. `i_rummet` där ett alternativ saknar `objekt` eller `ord`, eller där föremålet inte finns i rummet där pusslet spelas.
+- `syns_i` med ett tillstånd som rummet inte har. `i_rummet` där ett alternativ saknar `objekt` eller både `ord` och `bild`, eller där föremålet inte finns i rummet där pusslet spelas.
 - Kartor som inte stämmer med rummen (avsnitt 3b), och `visar` som pekar på ett pussel som inte finns.
 - `alias` som pekar på ett id som inte finns, eller ett gammalt id som finns kvar. `nivaer` där golvet ligger över taket. `ljud` med ett `foremal` som inte finns i rummet.
 - Läs och välj utan exakt ett rätt svar.

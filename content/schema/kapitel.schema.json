@@ -564,9 +564,10 @@
             "grad": {
               "enum": [
                 "Lärling",
+                "Ordsmed",
                 "Lögnavslöjare",
-                "Ordtrollare",
-                "Stortrollare",
+                "Gåtlösare",
+                "Berättare",
                 "Mästertrollkarl"
               ]
             },
