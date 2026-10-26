@@ -266,7 +266,7 @@ export function skapaSpel(d) {
   function skyltPlats(o) {
     const s = layout.skala;
     const ram = { vanster: rumTillSkarm(s, 0, 0).x, hoger: rumTillSkarm(s, RUM.bredd, 0).x };
-    const bas = { rumTopp: s.topp, ram, under: rumTillSkarm(s, 0, o.y + o.h).y };
+    const bas = { rumTopp: s.topp, ram, under: rumTillSkarm(s, 0, o.y + o.h).y, objekt: o.id };
     const mitt = o.y + o.h / 2;
     if (o.sort === 'utgang' && !o.golv && (o.sida === 'under' || o.sida === 'over')) return [rumTillSkarm(s, o.x + o.b / 2, mitt), { ...bas, lage: 'pa' }];
     if (o.sort !== 'utgang' && o.sida === 'hoger' && o.x <= VAGG.sida + 8) return [rumTillSkarm(s, o.x, mitt), { ...bas, lage: 'vanster' }];
@@ -466,9 +466,10 @@ export function skapaSpel(d) {
         ui.ordskylt(null); ui.handknapp(null);
         if (!a || !o) return;
         ljud.spela('klick');
-        // lappen visas ovanför skylten vid en stig, annars ovanför föremålet eller dörren
+        // lappen visas vid skylten vid en stig, annars vid föremålet eller dörren (se skyltPlats)
         const vis = (o.lapp && rum.ruta(o.lapp)) || o;
         const [pt, plats] = skyltPlats(vis);
+        plats.objekt = o.id; // valet gäller utgången, även när lappen sitter på skylten bredvid
         if (a.ord) ui.ordskylt(`<button type="button" class="kort ${v.s.pekar === a.id ? 'pekar' : ''}" data-id="${ui.esc(a.id)}"><span class="kort-etikett">${ui.rader(a.ord, varden(), 'kort-ord')}</span></button>`, pt, () => anvandAlt(a), plats);
         else ui.handknapp(pt, () => anvandAlt(a), plats); // ett föremål utan ord (färg, storlek): handen
       };

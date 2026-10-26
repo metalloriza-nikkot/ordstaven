@@ -188,10 +188,11 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
       expect(skymd, `föremålet ${a.objekt} syns inte`).toBeNull();
       // står han redan vid lappen (t.ex. kom han just in genom dörren) går nästa tryck igenom: tryck inte då
       await page.waitForTimeout(150);
-      const redan = a.ord && await page.locator(`#ordskylt .kort[data-id="${a.id}"]`).isVisible();
+      const redan = await page.locator(`:is(#ordskylt, #handknapp)[data-objekt="${a.objekt}"]`).isVisible();
       if (!redan) await page.mouse.click(pt.x, pt.y);
       // ord: närlappen visar ordet. Utan ord (lådornas färg): handen.
-      const lapp = a.ord ? page.locator('#ordskylt .kort') : page.locator('#handknapp');
+      // vänta på lappen eller handen för just det här föremålet: på vägen dit kan han gå förbi ett annat
+      const lapp = a.ord ? page.locator(`#ordskylt[data-objekt="${a.objekt}"] .kort`) : page.locator(`#handknapp[data-objekt="${a.objekt}"]`);
       await expect(lapp).toBeVisible({ timeout: 20000 });
       if (a.ord) await expect(lapp).toHaveText(a.ord.toLocaleUpperCase('sv-SE'));
       if (dumpa && !sparadeDumpar.has(`${nyckel}-lapp`)) { sparadeDumpar.add(`${nyckel}-lapp`); await page.screenshot({ path: `tests/skarmdumpar/prolog/${String(sparadeDumpar.size).padStart(2, '0')}-${nyckel}-lapp.png` }); }

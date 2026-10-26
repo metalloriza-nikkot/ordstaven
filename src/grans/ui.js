@@ -188,14 +188,16 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
   function visaTanke(html) { const t = $('#tanke'); t.hidden = !html; t.innerHTML = html || ''; }
   function pulseraTanke() { const t = $('#tanke'); t.classList.remove('puls'); void t.offsetWidth; t.classList.add('puls'); }
   /**
-   * @typedef {{ lage?: 'over' | 'pa' | 'vanster' | 'hoger', under?: number, rumTopp: number, ram?: { vanster: number, hoger: number } }} Plats
+   * @typedef {{ lage?: 'over' | 'pa' | 'vanster' | 'hoger', under?: number, rumTopp: number, ram?: { vanster: number, hoger: number }, objekt?: string }} Plats
    * Var lappen eller handen ställs i förhållande till punkten: över (vänds under om den inte ryms nära taket),
    * på (mitt på föremålet), vanster eller hoger (bredvid, vid sidoväggen). ram = rummets kanter på skärmen.
+   * objekt = föremålets id (data-objekt), så att det syns vilket föremål lappen eller handen hör till.
    */
   /** @param {HTMLElement} e @param {{ x: number, y: number }} punkt @param {Plats} [plats] */
   function placera(e, punkt, plats) {
     const lage = plats?.lage || 'over';
     e.classList.remove('under', 'pa', 'vanster', 'hoger');
+    if (plats?.objekt) e.dataset.objekt = plats.objekt; else delete e.dataset.objekt;
     if (lage !== 'over') e.classList.add(lage);
     e.style.left = punkt.x + 'px'; e.style.top = punkt.y + 'px';
     if (lage === 'over' && plats && punkt.y - e.offsetHeight - 6 < plats.rumTopp) { e.classList.add('under'); e.style.top = (plats.under ?? punkt.y) + 'px'; }
