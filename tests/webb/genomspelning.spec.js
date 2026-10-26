@@ -210,7 +210,10 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
         const r = document.querySelector('#plattan .replik-ruta');
         return (!!r && !r.closest('[hidden]') && r.offsetParent !== null) || window.__ORDSTAVEN.steg()?.pussel_id !== id
           || (!ar && !window.__ORDSTAVEN.interaktiva().includes(obj));
-      }, { id: p.id, obj: a.objekt, ar: sort === 'utgang' }, { timeout: 20000 });
+      }, { id: p.id, obj: a.objekt, ar: sort === 'utgang' }, { timeout: 20000 }).catch(async (e) => {
+        const d = await page.evaluate(() => ({ pos: window.__ORDSTAVEN.position(), scen: window.__ORDSTAVEN.scen(), steg: window.__ORDSTAVEN.steg(), pausad: window.__ORDSTAVEN.pausad(), ord: document.querySelector('#ordskylt')?.textContent, hand: !document.querySelector('#handknapp')?.hidden }));
+        throw new Error(`valet ${p.id}/${a.id} (${a.objekt}, ${satt}) blev aldrig gjort: ${JSON.stringify(d)}\n${e.message}`);
+      });
       await page.waitForTimeout(150);
       continue;
     }
@@ -236,6 +239,8 @@ test.describe('genomspelning av prologen', () => {
     test.skip(!['mac-helskarm', 'ipad-10', 'mac-safari'].includes(info.project.name), 'tre projekt räcker');
     test.setTimeout(240000);
     const fel = []; page.on('pageerror', (e) => fel.push(String(e)));
+    // PW_LANGSAM=4 kör processorn fyra gånger långsammare (Chromium), som en långsam CI-maskin
+    if (process.env.PW_LANGSAM) { const c = await page.context().newCDPSession(page); await c.send('Emulation.setCPUThrottlingRate', { rate: Number(process.env.PW_LANGSAM) }); }
     await page.goto('./?snabb&ny');
     await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
     const dumpa = info.project.name === 'mac-helskarm';
