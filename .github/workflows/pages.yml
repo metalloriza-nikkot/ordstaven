@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   testa:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # inte ubuntu-latest: Playwrights --with-deps stöder inte Ubuntu 26 ännu
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -55,7 +55,7 @@ jobs:
     # Publiceras bara från main, och bara om alla tester gick igenom.
     if: github.ref == 'refs/heads/main'
     needs: testa
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment:
       name: github-pages
       url: ${{ steps.publicering.outputs.page_url }}
