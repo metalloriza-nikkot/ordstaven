@@ -148,8 +148,8 @@ OBS: **localStorage-kvoten (ca 5 MB) delas med TURBO-RACE** eftersom ursprunget 
 ```json
 {
   "app": "ORDSTAVEN",
-  "format": 2,
-  "spelversion": "0.5.0",
+  "format": 3,
+  "spelversion": "0.5.2",
   "sparad": "2026-10-24T10:00:00Z",
   "spelare": {
     "hjalte": { "format": 1, "id": "…", "namn": "…", "utseende": {}, "grad": "LARLING", "formler": ["LJUS"] },
@@ -164,6 +164,7 @@ OBS: **localStorage-kvoten (ca 5 MB) delas med TURBO-RACE** eftersom ursprunget 
 }
 ```
 - **`spelare.hjalte` har eget formatfält** och kan exporteras som egen fil till kommande äventyr (briefens krav).
+- **Format 3** (0.5.2): gråboxens etiketter för den vuxne heter `installningar.vuxenEtiketter` och är avstängda från början. Den gamla nyckeln `etiketter` hade förvalet på och tas bort i migreringen 2 → 3.
 - **`spelare.unge` ligger hos spelaren** (format 2): namn, växtsteg och förmågor följer med till nästa äventyr, eller inte, om äventyret säger så. Eget formatfält som hjälten. Migreringen 1 → 2 flyttar `aventyr.<id>.ungen` hit.
 - **`spelare.larande` ligger bredvid hjälten, inte i äventyret.** Barnets nivåer är barnets, inte äventyrets, så nästa äventyr kan starta kalibrerat. ❓ Till ledningen, se rapporten.
 - **Migreringar:** en funktion per steg (`1→2`, `2→3`…). Gamla sparningar läses alltid. Varje format får en fixturfil i `tests/fixturer/` och ett test som laddar den.
@@ -368,3 +369,4 @@ Kvar att göra senare (noterat, inte byggt):
 - **Lampor** (`lampa` i kartan) lyser när rummet är mörkt. Köket har en vid Farfars plats.
 - **Fri lek utan knapp:** se tabellen i avsnitt 14.
 
+**Inget för den vuxne syns under ett pass (0.5.2).** Gråboxens etiketter (föremålens namn) är avstängda från början. Slår den vuxne på dem i menyn syns de bara när spelaren går i rummet, aldrig på utgångar, och aldrig medan ett pussel pågår (`pusselPagar` i `spel.js`). Genomspelningstestet kontrollerar i varje steg att inga etiketter syns, och ett eget test slår på dem och kontrollerar att de är borta under dörrvalet.
