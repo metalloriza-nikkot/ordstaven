@@ -148,21 +148,23 @@ OBS: **localStorage-kvoten (ca 5 MB) delas med TURBO-RACE** eftersom ursprunget 
 ```json
 {
   "app": "ORDSTAVEN",
-  "format": 1,
-  "spelversion": "0.1.0",
+  "format": 2,
+  "spelversion": "0.5.0",
   "sparad": "2026-10-24T10:00:00Z",
   "spelare": {
     "hjalte": { "format": 1, "id": "…", "namn": "…", "utseende": {}, "grad": "LARLING", "formler": ["LJUS"] },
-    "larande": { "lasning": {}, "skrivning": {}, "ord": {}, "matte": {}, "historik": [] }
+    "larande": { "lasning": {}, "skrivning": {}, "ord": {}, "matte": {}, "historik": [] },
+    "unge": { "format": 1, "namn": "…", "steg": 1, "formagor": [] }
   },
   "aventyr": {
-    "den-gomda-dalen": { "kapitel": 0, "rum": "vinden", "flaggor": {}, "bar": 0, "mynt": 0, "kartbitar": [], "ungen": { "namn": "…", "steg": 1 } }
+    "den-gomda-dalen": { "kapitel": 0, "scenId": "…", "steg": 0, "flaggor": {}, "bar": 0, "kartbitar": [] }
   },
   "foraldra": { "pin": null, "veckansBokstav": null, "egnaOrd": [] },
   "installningar": {}
 }
 ```
 - **`spelare.hjalte` har eget formatfält** och kan exporteras som egen fil till kommande äventyr (briefens krav).
+- **`spelare.unge` ligger hos spelaren** (format 2): namn, växtsteg och förmågor följer med till nästa äventyr, eller inte, om äventyret säger så. Eget formatfält som hjälten. Migreringen 1 → 2 flyttar `aventyr.<id>.ungen` hit.
 - **`spelare.larande` ligger bredvid hjälten, inte i äventyret.** Barnets nivåer är barnets, inte äventyrets, så nästa äventyr kan starta kalibrerat. ❓ Till ledningen, se rapporten.
 - **Migreringar:** en funktion per steg (`1→2`, `2→3`…). Gamla sparningar läses alltid. Varje format får en fixturfil i `tests/fixturer/` och ett test som laddar den.
 - Sparning sker automatiskt vid varje löst pussel och rumsbyte. Export/import som fil porteras från TURBO-RACE (`showSaveFilePicker` på Chrome, nedladdning annars). Filexporten är räddningen om iPad-Safari rensar data.
@@ -334,10 +336,27 @@ Motorn vet inget om ett visst äventyr. Allt som är DEN GÖMDA DALEN ligger i d
 Ett nytt äventyr är en ny mapp i `content/` och en i `kartor/`. `main.js` hittar dem själv. Med flera äventyr väljs ett med `?aventyr=<id>` tills startskärmen får ett val (fas 3–4).
 
 **Sparfilen** har två delar:
-- **Spelarens** (`spelare`): hjälten (namn, utseende, grad, formler, eget formatfält så att den kan exporteras) och lärandeprofilen (nivåer per pusseltyp, historik). Följer med till nästa äventyr.
-- **Äventyrets** (`aventyr.<id>`): var man är (kapitel, scen, steg, pass), rummens tillstånd, bär, kartbitar, lappar, ungen, gränssnittet som har visats. Skapas första gången äventyret spelas (`aventyrFor`).
+- **Spelarens** (`spelare`): hjälten (namn, utseende, grad, formler, eget formatfält så att den kan exporteras), ungen (namn, växtsteg, förmågor, eget formatfält) och lärandeprofilen (nivåer per pusseltyp, historik). Följer med till nästa äventyr.
+- **Äventyrets** (`aventyr.<id>`): var man är (kapitel, scen, steg, pass), rummens tillstånd, bär, kartbitar, lappar, gränssnittet som har visats. Ungen ligger hos spelaren sedan format 2. Skapas första gången äventyret spelas (`aventyrFor`).
 
 Kvar att göra senare (noterat, inte byggt):
-- Inställningen `foralderLaserFarfar` har ett äventyrsnamn i nyckeln. Etiketten i menyn hämtar talarnas namn ur `aventyr.json`, men nyckeln byts först när sparformatet ändras av annat skäl.
 - Bärens räknare och nosen hör till serien (ungen), inte till äventyret, och ligger kvar i motorn.
 - Namnkonventionen för utgångar (`dorr_`, `stege_`, `grind`, `stig_`) används bara när kartan inte säger något.
+
+## 17. Huset, rumsbyten och val i världen (0.5.0)
+
+**Husets plan.** Rummen inomhus har en väggram (kartans egenskap `inomhus`): bakvägg 3 rutor (48 px), sidoväggar 2 (32 px), främre kant 1 (16 px), i `karna/rumslayout.js` som `VAGG`. Väggarna är hinder. Dörrar sitter i väggarna och möbler står längs dem. Varje utgång har en `riktning` (åt vilket håll den leder), och två dörrar mellan samma rum sitter på motsatta väggar. Utedörren (`ute`) ritas ljusare än dörrarna inomhus. Ett enhetstest (`husets plan`) kontrollerar riktningarna, stegen (upp från hallen, ner från vinden), att alla innerdörrar har samma färg och utedörren minst 20 steg ljusare, att dörrarna sitter i väggarna och att läsplatsen ligger inne i rummet.
+
+**Att gå igenom en utgång.** `framfor(o)` är tröskeln, `lasplats(o)` en bit (18 px) in i rummet framför den, `genom(o, pos)` säger om hjälten står i tröskeln på väg ut. En utgång räknas först när hjälten har varit borta från den sedan steget började. Står han redan i tröskeln (han kom just in där, eller efter FORTSÄTT) händer inget förrän han går därifrån, trycker på utgången eller använder den.
+
+**Rumsbyten.** Två sätt:
+- **Glida** (gång genom en utgång med `riktning`): det gamla rummet fotograferas (`renderer.snapshot`), det nya ritas, och båda glider i hela rumspixlar åt utgångens håll (`ui.glid`, 500 ms). Hjälten står sedan 200 ms på tröskeln och tar ett steg in i rummet.
+- **Tona** (svart, `ui.tona`): bara mellanscener, sidovy, en ny dag (passets slut) och FORTSÄTT.
+
+**Stegen.** En utgång med `klattra` klättras: hjälten går till stegens fot, vänder ryggen mot kameran och klättrar själv (`Rum.klattra`, ingen styrning) tills huvudet når luckan. Då glider nästa rum in, och han kommer fram på stegen i det rummet (aldrig bredvid) och klättrar de sista pinnarna. Ungen väntar och kommer efter. Testet `stegen` går hallen → vinden → hallen.
+
+**Val i världen** (`i_rummet` med utgångar): ordet står på en skylt när hjälten är inom ungefär en ruta från dörren eller stigens skylt (`lapp`). Ett tryck på dörren går först till läsplatsen, nästa tryck går igenom. Fel dörr öppnas aldrig: hjälten tar ett steg tillbaka till läsplatsen och felreaktionen spelas. Förenklingen spikar igen dörrar med plankor (`Rum.spika`).
+
+**Var skylten och handen står** (`skyltPlats` i `spel.js`): på dörren i bak- och framväggen, ovanför dörren i en sidovägg, bredvid föremål som står mot en sidovägg (ute i väggen, så att grannlådan och hjälten syns), annars ovanför. Den hålls alltid inne i rummet.
+
+**Hjälten i gråboxen** är spelarens egen figur: blått ansikte i en grå hjälm, mörk dräkt och blå skor (standardvalet i skapa hjälten).
