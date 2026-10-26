@@ -4,7 +4,8 @@
 // Hjälten är en egen del med eget formatfält och kan exporteras till kommande äventyr.
 
 export const APP = 'ORDSTAVEN';
-export const FORMAT = 1;
+export const FORMAT = 2;
+export const UNGE_FORMAT = 1;
 export const HJALTE_FORMAT = 1;
 
 export const NYCKEL = 'ordstaven_spar';
@@ -15,7 +16,23 @@ export const NYCKEL_TRASIG = 'ordstaven_spar_trasig';
  * Migreringar: MIGRERINGAR[n] gör om format n till n + 1. Läggs till när formatet ändras.
  * @type {Record<number, (data: any) => any>}
  */
-export const MIGRERINGAR = {};
+export const MIGRERINGAR = {
+  // 1 → 2: ungen flyttar från äventyret till spelaren (den kan följa med till nästa äventyr, eller inte),
+  // och inställningen foralderLaserFarfar byter namn till foralderLaser
+  1: (d) => {
+    const forsta = Object.values(d.aventyr || {}).find((a) => a && a.ungen && a.ungen.namn) || Object.values(d.aventyr || {}).find((a) => a && a.ungen);
+    const gammal = forsta ? forsta.ungen : {};
+    d.spelare.unge = { format: UNGE_FORMAT, namn: gammal.namn || '', steg: gammal.steg || 1, formagor: [], ...(gammal.folj !== undefined ? { folj: gammal.folj } : {}) };
+    for (const a of Object.values(d.aventyr || {})) if (a) delete a.ungen;
+    // inställningen heter inte längre efter en figur i ett visst äventyr: föräldern läser rollerna som har föräldraröst
+    if (d.installningar && 'foralderLaserFarfar' in d.installningar) {
+      d.installningar.foralderLaser = !!d.installningar.foralderLaserFarfar;
+      delete d.installningar.foralderLaserFarfar;
+    }
+    d.format = 2;
+    return d;
+  },
+};
 
 /** @typedef {{ getItem(k: string): string | null, setItem(k: string, v: string): void, removeItem(k: string): void }} Lagring */
 
@@ -28,6 +45,8 @@ export function nyttTillstand(spelversion, klocka = () => new Date()) {
     sparad: klocka().toISOString(),
     spelare: {
       hjalte: { format: HJALTE_FORMAT, id: slumpId(), namn: '', utseende: {}, grad: null, formler: [] },
+      // ungen hör till spelaren: namn, växtsteg och förmågor står öppna för nästa äventyr
+      unge: { format: UNGE_FORMAT, namn: '', steg: 1, formagor: [] },
       larande: { lasning: {}, skrivning: {}, ord: {}, matte: {}, historik: [] },
     },
     // ett äventyr läggs till första gången det spelas (aventyrFor)
@@ -39,11 +58,11 @@ export function nyttTillstand(spelversion, klocka = () => new Date()) {
 
 /**
  * Sparningens del för ett äventyr, skapas om den saknas. Det som är spelarens (hjälten, lärandet) ligger
- * i `spelare` och följer med till nästa äventyr. Det som är äventyrets (var man är, bär, kartbitar, ungen) ligger här.
+ * i `spelare` och följer med till nästa äventyr. Ungen ligger hos spelaren (spelare.unge). Det som är äventyrets (var man är, bär, kartbitar) ligger här.
  * @param {any} tillstand @param {string} aventyrId
  */
 export function aventyrFor(tillstand, aventyrId) {
-  if (!tillstand.aventyr[aventyrId]) tillstand.aventyr[aventyrId] = { kapitel: 0, flaggor: {}, bar: 0, kartbitar: [], ungen: { namn: '', steg: 1 } };
+  if (!tillstand.aventyr[aventyrId]) tillstand.aventyr[aventyrId] = { kapitel: 0, flaggor: {}, bar: 0, kartbitar: [] };
   return tillstand.aventyr[aventyrId];
 }
 

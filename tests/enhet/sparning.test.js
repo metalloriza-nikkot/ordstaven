@@ -64,12 +64,28 @@ describe('sparning', () => {
     expect(h).toMatchObject({ app: 'ORDSTAVEN-HJALTE', format: 1, hjalte: { namn: 'TESTA' } });
   });
 
+  it('format 1 → 2: ungen flyttar från äventyret till spelaren, med namn och växtsteg', () => {
+    const gammal = JSON.parse(readFileSync(new URL('../fixturer/spar-format-1.json', import.meta.url), 'utf8'));
+    gammal.aventyr['den-gomda-dalen'].ungen = { namn: 'KNOPP', steg: 2 };
+    const d = migrera(gammal);
+    expect(d.spelare.unge).toMatchObject({ namn: 'KNOPP', steg: 2, format: 1 });
+  });
+
+  it('format 1 → 2: inställningen foralderLaserFarfar heter foralderLaser och behåller sitt värde', () => {
+    const gammal = JSON.parse(readFileSync(new URL('../fixturer/spar-format-1.json', import.meta.url), 'utf8'));
+    gammal.installningar = { foralderLaserFarfar: true, etiketter: false };
+    const d = migrera(gammal);
+    expect(d.installningar).toEqual({ foralderLaser: true, etiketter: false });
+  });
+
   // Varje gammalt format har en fixturfil som alltid måste gå att läsa.
   for (const fil of readdirSync(new URL('../fixturer/', import.meta.url)).filter((f) => f.startsWith('spar-format-'))) {
     it(`fixturen ${fil} går att läsa`, () => {
       const d = migrera(JSON.parse(readFileSync(new URL('../fixturer/' + fil, import.meta.url), 'utf8')));
       expect(d.format).toBe(FORMAT);
       expect(d.spelare.hjalte).toBeTruthy();
+      expect(d.spelare.unge).toMatchObject({ format: 1 });
+      for (const a of Object.values(d.aventyr)) expect(a.ungen).toBeUndefined();
     });
   }
 });

@@ -37,7 +37,8 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
   av.lappar = (av.lappar || []).map((/** @type {string} */ id) => nytt(alias.pussel, id)).filter((/** @type {string} */ id) => pussel.has(id));
   av.kartbitar = av.kartbitar || [];
   av.bar = av.bar || 0;
-  av.ungen = av.ungen || { namn: '', steg: 1 };
+  // ungen hör till spelaren (sparformat 2)
+  const unge = (tillstand.spelare.unge = tillstand.spelare.unge || { format: 1, namn: '', steg: 1, formagor: [] });
 
   let scenIndex = Math.min(av.scen, kapitel.scener.length);
   let stegIndex = -1; // -1 = vid_omstart (om sådan finns och vi startar om)
@@ -59,7 +60,7 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
   }
   borjaScen(startSteg);
 
-  const varden = () => ({ unge: av.ungen.namn || '', hjalte: tillstand.spelare.hjalte.namn || '' });
+  const varden = () => ({ unge: unge.namn || '', hjalte: tillstand.spelare.hjalte.namn || '' });
 
   /** Tillstånd för ett rum: senast satt, annars rummets första. @param {string | null} rumId */
   function rumsTillstand(rumId) {
@@ -75,7 +76,7 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
       case 'ge_kartbit': if (!av.kartbitar.includes(st.nummer)) av.kartbitar.push(st.nummer); break;
       case 'ge_grad': tillstand.spelare.hjalte.grad = st.grad; break;
       case 'visa_ui': av.ui[st.element] = true; break;
-      case 'unge_folj': av.ungen.folj = st.folj; break;
+      case 'unge_folj': unge.folj = st.folj; break;
       case 'oppna_lasplatta': { const p = pussel.get(st.pussel_id); if (p && p.kan_oppnas_igen && !av.lappar.includes(p.id)) av.lappar.push(p.id); break; }
       default:
     }
@@ -121,7 +122,7 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
         const p = pussel.get(st.pussel_id);
         if (p && p.typ === 'P12_dop' && resultat.namn) {
           if (p.sparas_som === 'hjalte.namn') tillstand.spelare.hjalte.namn = resultat.namn;
-          if (p.sparas_som === 'unge.namn') { av.ungen.namn = resultat.namn; }
+          if (p.sparas_som === 'unge.namn') { unge.namn = resultat.namn; }
         }
         if (p && p.typ === 'P11_formel') {
           const f = p.formler.find((/** @type {any} */ x) => x.ord === p.svar);

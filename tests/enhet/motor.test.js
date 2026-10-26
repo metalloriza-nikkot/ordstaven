@@ -4,7 +4,7 @@ import { skapaLasmotor, valjVariant } from '../../src/karna/lasmotor.js';
 import { ljudningsdelar } from '../../src/karna/ljudning.js';
 import { skapaValj, skapaFormel, skapaDop, skapaKrukor } from '../../src/karna/pussel.js';
 import { skapaBerattelse } from '../../src/karna/berattelse.js';
-import { nyttTillstand, aventyrFor } from '../../src/karna/sparning.js';
+import { nyttTillstand, aventyrFor, migrera } from '../../src/karna/sparning.js';
 const AVENTYR = 'den-gomda-dalen';
 
 const las = (p) => JSON.parse(readFileSync(new URL('../../content/' + p, import.meta.url), 'utf8'));
@@ -132,7 +132,7 @@ describe('berättelsemotorn', () => {
     const av = t.aventyr[AVENTYR];
     expect(b.slut).toBe(true);
     expect(t.spelare.hjalte.namn).toBe('TESTA');
-    expect(av.ungen.namn).toBe('KNOPP');
+    expect(t.spelare.unge.namn).toBe('KNOPP');
     expect(t.spelare.hjalte.formler).toEqual(['LJUS']);
     expect(t.spelare.hjalte.grad).toBe('Lärling');
     expect(av.bar).toBe(3);
@@ -254,7 +254,7 @@ describe('fortsätt där man var, och stabila id:n', () => {
     expect(t.aventyr[AVENTYR].lappar).toEqual(['p0_dinomat']);
   });
   it('läser en sparning från en äldre version av innehållet (fixtur)', () => {
-    const gammal = JSON.parse(readFileSync(new URL('../fixturer/spar-aldre-innehall.json', import.meta.url), 'utf8'));
+    const gammal = migrera(JSON.parse(readFileSync(new URL('../fixturer/spar-aldre-innehall.json', import.meta.url), 'utf8')));
     const kap = { ...prolog, alias: { scener: { s10_ladorna: 's11_ladorna' } } };
     const b = ny(gammal, kap);
     expect(b.scen.id).toBe('s11_ladorna');
@@ -267,7 +267,7 @@ describe('ungen följer', () => {
     const t = nyttTillstand('t');
     const kap = { ...prolog, scener: [{ id: 'x', pass: 1, rum: null, steg: [{ typ: 'unge_folj', folj: true }, { typ: 'unge_folj', folj: false }] }] };
     const b = skapaBerattelse({ aventyr, kapitel: kap, tillstand: t, aventyrId: AVENTYR });
-    b.aktuellt(); expect(t.aventyr[AVENTYR].ungen.folj).toBe(true);
-    b.klar(); b.aktuellt(); expect(t.aventyr[AVENTYR].ungen.folj).toBe(false);
+    b.aktuellt(); expect(t.spelare.unge.folj).toBe(true);
+    b.klar(); b.aktuellt(); expect(t.spelare.unge.folj).toBe(false);
   });
 });
