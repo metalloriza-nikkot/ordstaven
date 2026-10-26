@@ -4,7 +4,7 @@
 import Phaser from 'phaser';
 import { RUM } from '../karna/skalning.js';
 import { FIGUR, steg } from '../karna/rorelse.js';
-import { rumsObjekt, framfor, vidObjekt, hinderFran, vaggar, VAGG, objektFarg } from '../karna/rumslayout.js';
+import { rumsObjekt, framfor, framforFran, vidObjekt, hinderFran, vaggar, VAGG, objektFarg } from '../karna/rumslayout.js';
 import { synligaIds } from '../karna/karta.js';
 import { skapaHinder } from '../karna/vag.js';
 
@@ -43,6 +43,8 @@ export class Rum extends Phaser.Scene {
     this.fryst = false;
     this.harRum = false;
     this.inomhus = false;
+    /** @type {{ x: number, y: number }[]} lampor som lyser när rummet är mörkt */
+    this.lampor = [];
     /** @type {any} */
     this.inkom = null;
     this.klattrar = false;
@@ -98,7 +100,7 @@ export class Rum extends Phaser.Scene {
       if (!o) return;
       // står hjälten redan vid föremålet räknas trycket som att använda det
       if (vidObjekt(this.pos, o) && this.tryckPa) { this.tryckPa(o.id); return; }
-      const f = this.malFor?.(o) ?? framfor(o); this.b.inmatning.sattGaTill(f.x, f.y);
+      const f = this.malFor?.(o) ?? framforFran(o, this.pos, this.inomhus); this.b.inmatning.sattGaTill(f.x, f.y);
     });
     this.sattUtseende({});
     this.ritaUnge();
@@ -217,6 +219,7 @@ export class Rum extends Phaser.Scene {
     this.visaUnge = v.unge;
     this.tillstand = v.tillstand;
     if (v.nyttRum || !this.harRum) this.inomhus = !!v.karta?.inomhus;
+    this.lampor = v.karta?.lampor || [];
     this.ritaGolv(this.harRum);
     // föremål som bara syns i vissa tillstånd (ägget när ljuset är tänt) gör att rummet byggs om
     const synliga = this.harRum ? synligaIds(v.innehall, v.tillstand).join(' ') : '';
@@ -320,6 +323,11 @@ export class Rum extends Phaser.Scene {
     const t = this.tillstand || '';
     const alfa = !this.harRum ? 0 : t === 'natt' ? 0.72 : t === 'natt_upplyst' ? 0.42 : 0;
     if (alfa) g.fillStyle(0x0a0820, alfa).fillRect(0, 0, RUM.bredd, RUM.hojd);
+    // en lampa (läslampan vid Farfars plats) lyser varmt i mörkret: ljusare ringar inåt och en glödande punkt
+    if (alfa) for (const l of this.lampor) {
+      for (const [r, a] of [[60, 0.10], [44, 0.12], [28, 0.16]]) g.fillStyle(FARG.ljus, a).fillCircle(l.x, l.y, r);
+      g.fillStyle(FARG.ljus, 1).fillCircle(l.x, l.y - 14, 3);
+    }
     this.ljusboll.setVisible(this.harRum && t === 'natt_upplyst');
   }
 
@@ -360,7 +368,7 @@ export class Rum extends Phaser.Scene {
     for (let i = 0; i < antal; i++) {
       // inom objektets ruta om de ryms, annars en egen rad mitt i rummet
       const x = ryms && bas ? Math.round(bas.x + ((i + 0.5) * bas.b) / antal) - 9 : Math.round(((i + 1) * RUM.bredd) / (antal + 1)) - 9;
-      const n = { id: `${id}_${i}`, x, y: ryms && bas ? bas.y : 112, b: 18, h: 18, sort: /** @type {'sak'} */ ('sak') };
+      const n = { id: `${id}_${i}`, x, y: ryms && bas ? bas.y : 112, b: 18, h: 18, sort: /** @type {'sak'} */ ('sak'), ...(bas?.sida ? { sida: bas.sida } : {}) };
       this.objekt.push(n); this.ritaObjekt(n); nya.push(n.id);
     }
     this.byggHinder();

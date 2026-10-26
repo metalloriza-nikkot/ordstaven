@@ -70,7 +70,7 @@ describe('nosen och bokstäverna', () => {
 });
 
 import { skapaHinder } from '../../src/karna/vag.js';
-import { framfor, hinderFran, rumsObjekt, vidObjekt, vaggar, genom, lasplats, objektFarg } from '../../src/karna/rumslayout.js';
+import { framfor, framforFran, hinderFran, rumsObjekt, vidObjekt, vaggar, genom, lasplats, objektFarg, VAGG } from '../../src/karna/rumslayout.js';
 
 describe('kollision och vägsökning', () => {
   const lada = { x: 140, y: 80, b: 40, h: 30 };
@@ -193,5 +193,57 @@ describe('husets plan', () => {
     const k = await kartor();
     const d = k.hallen.objekt.find((o) => o.id === 'dorr_mat');
     expect(lasplats(d).x).toBeGreaterThan(framfor(d).x);
+  });
+});
+
+describe('föremål utan framsida (sida alla)', () => {
+  const kruka = { id: 'kruka', x: 100, y: 100, b: 20, h: 18, sort: 'sak', sida: 'alla' };
+  it('hjälten går till närmaste håll, inte alltid runt till undersidan', () => {
+    expect(framforFran(kruka, { x: 110, y: 60 })).toEqual({ x: 110, y: 98 }); // ovanför
+    expect(framforFran(kruka, { x: 60, y: 108 })).toEqual({ x: 90, y: 118 }); // vänster
+    expect(framforFran(kruka, { x: 170, y: 110 })).toEqual({ x: 130, y: 118 }); // höger
+    expect(framforFran(kruka, { x: 110, y: 170 })).toEqual({ x: 110, y: 130 }); // under
+  });
+  it('han står vid föremålet från alla håll', () => {
+    for (const p of [{ x: 110, y: 98 }, { x: 90, y: 118 }, { x: 130, y: 118 }, { x: 110, y: 130 }]) expect(vidObjekt(p, kruka), JSON.stringify(p)).toBe(true);
+    expect(vidObjekt({ x: 110, y: 70 }, kruka)).toBe(false);
+  });
+  it('ett föremål med en framsida nås bara därifrån', () => {
+    const lada = { ...kruka, sida: 'under' };
+    expect(framforFran(lada, { x: 110, y: 60 })).toEqual(framfor(lada));
+    expect(vidObjekt({ x: 110, y: 98 }, lada)).toBe(false);
+  });
+  it('inomhus väljs aldrig en punkt i väggen', () => {
+    const vid = { ...kruka, x: 34, y: 60 }; // står mot vänster vägg
+    const f = framforFran(vid, { x: 10, y: 70 }, true);
+    expect(f.x).toBeGreaterThan(VAGG.sida);
+  });
+  it('i prologen nås krukorna, buskarna och lådan mitt på golvet från minst två håll', async () => {
+    const { readFileSync } = await import('node:fs');
+    const prolog = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-00.json', import.meta.url), 'utf8'));
+    let antal = 0;
+    for (const rum of prolog.rum) {
+      const karta = lasKarta(JSON.parse(readFileSync(new URL(`../../kartor/den-gomda-dalen/${rum.id}.tmj`, import.meta.url), 'utf8')));
+      const obj = rumsObjekt(rum.innehall, (rum.tillstand || [null]).at(-1), karta);
+      const hh = skapaHinder([...hinderFran(obj), ...(karta.inomhus ? vaggar() : [])]);
+      const start = hh.narmasteFria(karta.start);
+      for (const o of obj.filter((x) => x.sida === 'alla')) {
+        antal++;
+        const hall = [{ x: o.x + o.b / 2, y: o.y + o.h + 30 }, { x: o.x + o.b / 2, y: o.y - 30 }, { x: o.x - 30, y: o.y + o.h / 2 }, { x: o.x + o.b + 30, y: o.y + o.h / 2 }];
+        const nas = hall.filter((h) => { const f = framforFran(o, h, karta.inomhus); const v = hh.vag(start, f); return v.length > 0 && vidObjekt(v.at(-1), o); });
+        expect(nas.length, `${rum.id}: ${o.id} nås bara från ${nas.length} håll`).toBeGreaterThanOrEqual(2);
+      }
+    }
+    expect(antal).toBeGreaterThanOrEqual(3);
+  });
+});
+
+describe('lampor', () => {
+  it('en punkt som heter lampa lyser i mörkret, köket har en vid Farfars plats', async () => {
+    const { readFileSync } = await import('node:fs');
+    const k = lasKarta(JSON.parse(readFileSync(new URL('../../kartor/den-gomda-dalen/koket.tmj', import.meta.url), 'utf8')));
+    expect(k.lampor.length).toBe(1);
+    const farfar = k.objekt.find((o) => o.id === 'farfar_vid_bordet');
+    expect(Math.hypot(k.lampor[0].x - (farfar.x + farfar.b / 2), k.lampor[0].y - (farfar.y + farfar.h / 2))).toBeLessThan(40);
   });
 });

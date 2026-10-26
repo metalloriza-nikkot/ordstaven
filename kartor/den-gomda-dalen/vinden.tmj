@@ -99,7 +99,14 @@
      "width": 30,
      "height": 18,
      "rotation": 0,
-     "visible": true
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
     },
     {
      "id": 7,
@@ -160,7 +167,7 @@
      "name": "fem_krukor",
      "type": "sak",
      "x": 100,
-     "y": 150,
+     "y": 124,
      "width": 130,
      "height": 18,
      "rotation": 0,
@@ -170,6 +177,11 @@
        "name": "visar",
        "type": "string",
        "value": "p0_krukor"
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
       }
      ]
     },

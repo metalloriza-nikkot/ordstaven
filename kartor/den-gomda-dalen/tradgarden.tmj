@@ -168,7 +168,14 @@
      "width": 40,
      "height": 22,
      "rotation": 0,
-     "visible": true
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
     },
     {
      "id": 10,

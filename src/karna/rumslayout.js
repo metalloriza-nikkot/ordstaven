@@ -8,9 +8,10 @@ const FIGUR_HOJD = 24;
 
 /**
  * @typedef {{ id: string, x: number, y: number, b: number, h: number, sort: 'utgang' | 'sak' | 'figur',
- *             till?: string, sida?: 'under' | 'over' | 'vanster' | 'hoger', golv?: boolean, visar?: string,
+ *             till?: string, sida?: 'under' | 'over' | 'vanster' | 'hoger' | 'alla', golv?: boolean, visar?: string,
  *             riktning?: 'vanster' | 'hoger' | 'upp' | 'ned', klattra?: 'upp' | 'ned', ute?: boolean, lapp?: string }} Objekt
  * till = rummet en utgång leder till, sida = var hjälten ställer sig, golv = man går på det (stig, grind).
+ * sida 'alla' = föremålet har ingen framsida (krukor, buskar, en låda mitt på golvet): det går att använda från alla håll.
  */
 
 const UTGANG = /^(stege_|dorr_|grind|stig_)/;
@@ -75,8 +76,28 @@ export function framfor(o) {
 
 /** Står hjälten vid objektet? @param {{ x: number, y: number }} pos fötterna @param {Objekt} o */
 export function vidObjekt(pos, o) {
+  // från alla håll: fötterna står i en ring runt föremålet (ovanför står fötterna strax ovanför överkanten)
+  if (o.sida === 'alla') return pos.x >= o.x - 16 && pos.x <= o.x + o.b + 16 && pos.y >= o.y - 6 && pos.y <= o.y + o.h + 16;
   const f = framfor(o);
   return Math.abs(pos.x - f.x) <= 14 && Math.abs(pos.y - f.y) <= 14;
+}
+
+/**
+ * Var hjälten ska gå för att använda föremålet, sett från där han står. Ett föremål med sida 'alla' nås från
+ * närmaste håll (under, ovanför, vänster, höger), annars från sin sida. Punkter i väggarna väljs inte.
+ * @param {Objekt} o @param {{ x: number, y: number }} pos @param {boolean} [inomhus]
+ */
+export function framforFran(o, pos, inomhus = false) {
+  if (o.sida !== 'alla') return framfor(o);
+  const mx = Math.round(o.x + o.b / 2), my = Math.min(RUM.hojd, o.y + o.h);
+  const kandidater = [
+    { x: mx, y: Math.min(RUM.hojd, o.y + o.h + 12) },
+    { x: mx, y: Math.max(FIGUR_HOJD, o.y - 2) },
+    { x: o.x - 10, y: my },
+    { x: o.x + o.b + 10, y: my },
+  ].filter((p) => !inomhus || (p.x > VAGG.sida + 6 && p.x < RUM.bredd - VAGG.sida - 6 && p.y > VAGG.bak + 4 && p.y < RUM.hojd - VAGG.fram));
+  if (!kandidater.length) return framfor(o);
+  return kandidater.sort((a, c) => Math.hypot(a.x - pos.x, a.y - pos.y) - Math.hypot(c.x - pos.x, c.y - pos.y))[0];
 }
 
 /**
