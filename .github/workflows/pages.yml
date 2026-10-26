@@ -24,7 +24,14 @@ jobs:
       - name: Bygg
         run: npm run build
       - name: Installera testwebbläsare
-        run: npx playwright install --with-deps chromium webkit
+        # nedladdningen kan hänga på GitHubs sida: högst 5 minuter per försök, tre försök
+        timeout-minutes: 16
+        run: |
+          for i in 1 2 3; do
+            timeout 300 npx playwright install --with-deps chromium webkit && exit 0
+            echo "försök $i hängde eller misslyckades, provar igen"
+          done
+          exit 1
       - name: Webbläsartester (hela testmatrisen)
         run: npm run test:webb
         env:
