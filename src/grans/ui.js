@@ -15,6 +15,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
   const ui = document.createElement('div');
   ui.id = 'ui';
   ui.innerHTML = `
+    <div id="tona"></div>
     <div id="etiketter"></div>
     <div id="hud">
       <button type="button" id="hud-bar" class="hud-knapp" hidden aria-label="Bär"><span class="ikon">🫐</span><span class="tal">0</span></button>
@@ -187,25 +188,42 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
   function visaTanke(html) { const t = $('#tanke'); t.hidden = !html; t.innerHTML = html || ''; }
   function pulseraTanke() { const t = $('#tanke'); t.classList.remove('puls'); void t.offsetWidth; t.classList.add('puls'); }
   /**
-   * Ordet på föremålet hjälten står vid, som en knapp ovanför föremålet. null döljer.
-   * Ryms skylten inte ovanför föremålet (nära översta väggen) visas den under.
-   * @param {string | null} html @param {{ x: number, y: number }} [punkt] skärmpunkt (föremålets överkant, mitten)
-   * @param {() => void} [vidTryck] @param {{ under: number, rumTopp: number }} [plats] föremålets underkant och rummets överkant på skärmen
+   * @typedef {{ lage?: 'over' | 'pa' | 'vanster' | 'hoger', under?: number, rumTopp: number, ram?: { vanster: number, hoger: number } }} Plats
+   * Var lappen eller handen ställs i förhållande till punkten: över (vänds under om den inte ryms nära taket),
+   * på (mitt på föremålet), vanster eller hoger (bredvid, vid sidoväggen). ram = rummets kanter på skärmen.
+   */
+  /** @param {HTMLElement} e @param {{ x: number, y: number }} punkt @param {Plats} [plats] */
+  function placera(e, punkt, plats) {
+    const lage = plats?.lage || 'over';
+    e.classList.remove('under', 'pa', 'vanster', 'hoger');
+    if (lage !== 'over') e.classList.add(lage);
+    e.style.left = punkt.x + 'px'; e.style.top = punkt.y + 'px';
+    if (lage === 'over' && plats && punkt.y - e.offsetHeight - 6 < plats.rumTopp) { e.classList.add('under'); e.style.top = (plats.under ?? punkt.y) + 'px'; }
+    // alltid helt inne i rummet
+    if (plats?.ram) {
+      const r = e.getBoundingClientRect();
+      if (r.left < plats.ram.vanster) e.style.left = punkt.x + (plats.ram.vanster - r.left) + 'px';
+      else if (r.right > plats.ram.hoger) e.style.left = punkt.x - (r.right - plats.ram.hoger) + 'px';
+    }
+  }
+
+  /**
+   * Ordet på föremålet hjälten står vid, som en knapp vid föremålet (se placera). null döljer.
+   * @param {string | null} html @param {{ x: number, y: number }} [punkt] skärmpunkt
+   * @param {() => void} [vidTryck] @param {Plats} [plats]
    */
   function ordskylt(html, punkt, vidTryck, plats) {
     const e = $('#ordskylt');
     if (!html || !punkt) { e.hidden = true; e.innerHTML = ''; return; }
     e.innerHTML = html; e.hidden = false;
-    e.style.left = punkt.x + 'px'; e.style.top = punkt.y + 'px';
-    e.classList.remove('under');
-    if (plats && punkt.y - e.offsetHeight - 6 < plats.rumTopp) { e.classList.add('under'); e.style.top = plats.under + 'px'; }
+    placera(e, punkt, plats);
     const knapp = e.querySelector('button');
     knapp?.addEventListener('click', () => { if (!nos.aktiv) vidTryck?.(); });
   }
 
   /**
-   * Handen ovanför föremålet hjälten står vid: här kan du göra något. Ett tryck på handen använder föremålet.
-   * @param {{ x: number, y: number } | null} punkt @param {() => void} [vidTryck] @param {{ under: number, rumTopp: number }} [plats]
+   * Handen vid föremålet hjälten står vid: här kan du göra något. Ett tryck på handen använder föremålet.
+   * @param {{ x: number, y: number } | null} punkt @param {() => void} [vidTryck] @param {Plats} [plats]
    */
   const hand = $('#handknapp');
   /** @type {() => void} */
@@ -214,9 +232,8 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
   function handknapp(punkt, vidTryck, plats) {
     if (!punkt) { hand.hidden = true; handTryck = () => {}; return; }
     handTryck = vidTryck || (() => {});
-    hand.hidden = false; hand.classList.remove('under');
-    hand.style.left = punkt.x + 'px'; hand.style.top = punkt.y + 'px';
-    if (plats && punkt.y - hand.offsetHeight - 6 < plats.rumTopp) { hand.classList.add('under'); hand.style.top = plats.under + 'px'; }
+    hand.hidden = false;
+    placera(hand, punkt, plats);
   }
 
   /** Ett bär flyger från räknaren till ungen. @param {{ x: number, y: number }} fran @param {{ x: number, y: number }} till @param {number} ms */
@@ -245,7 +262,48 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     else e.innerHTML = '';
   }
 
+  /**
+   * Glid från förra rummet (en bild) till det nya, i hela rumspixlar. Båda syns sida vid sida.
+   * Nya rummet kommer in från det håll hjälten gick åt.
+   * @param {HTMLElement} varld @param {HTMLImageElement} bild förra rummet
+   * @param {'vanster' | 'hoger' | 'upp' | 'ned'} riktning @param {number} cssSkala @param {number} ms
+   */
+  function glid(varld, bild, riktning, cssSkala, ms) {
+    const canvas = /** @type {HTMLElement | null} */ (varld.querySelector('canvas'));
+    if (!canvas) return Promise.resolve();
+    const forra = document.createElement('img');
+    forra.className = 'forra-rummet'; forra.src = bild.src; forra.alt = '';
+    varld.appendChild(forra);
+    const [ax, ay] = { hoger: [1, 0], vanster: [-1, 0], upp: [0, -1], ned: [0, 1] }[riktning];
+    const B = 320, H = 192;
+    const satt = (/** @type {number} */ t) => {
+      // hela rumspixlar: rörelsen räknas i rummets pixlar och skalas sedan
+      const px = Math.round(t * (ax ? B : H));
+      const nx = ax * (B - px), ny = ay * (H - px);
+      canvas.style.transform = `translate(${nx * cssSkala}px, ${ny * cssSkala}px)`;
+      forra.style.transform = `translate(${(nx - ax * B) * cssSkala}px, ${(ny - ay * H) * cssSkala}px)`;
+    };
+    satt(0);
+    return new Promise((klar) => {
+      const t0 = performance.now();
+      const steg = () => {
+        const t = Math.min(1, (performance.now() - t0) / Math.max(1, ms));
+        satt(t);
+        if (t < 1) requestAnimationFrame(steg);
+        else { canvas.style.transform = ''; forra.remove(); klar(undefined); }
+      };
+      requestAnimationFrame(steg);
+      setTimeout(() => { if (forra.isConnected) { canvas.style.transform = ''; forra.remove(); klar(undefined); } }, ms + 500);
+    });
+  }
+  /** Tona till svart (true) eller tillbaka (false), ca 0,3 s. @param {boolean} svart @param {number} ms */
+  function tona(svart, ms) {
+    $('#tona').classList.toggle('svart', svart);
+    return new Promise((r) => setTimeout(r, ms));
+  }
+
   return {
+    glid, tona,
     styrhjalp,
     flygBar,
     handknapp,

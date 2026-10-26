@@ -135,9 +135,12 @@ const spelet = skapaSpel({
   objekt: (id) => { const o = rum.ruta(id); if (!o) return null; const s = layout.skala; return { x: s.vanster + (o.x + o.b / 2) * s.cssSkala, y: s.topp + (o.y + o.h / 2) * s.cssSkala }; },
   rumsobjekt: () => rum.objekt.map((o) => o.id),
   pausad: () => spelet.pausad,
+  /** Varianten (nivån) i pusslet som pågår, t.ex. "L2". */
+  variant: () => spelet.variant,
   stegIndex: () => spelet.stegIndex,
   /** Föremålets sort (utgang, sak, figur). @param {string} id */
   sort: (id) => rum.ruta(id)?.sort ?? null,
+  klattrar: () => !!rum.klattrar,
   /** Föremålen som går att använda just nu. */
   interaktiva: () => [...rum.interaktiva],
   spel,

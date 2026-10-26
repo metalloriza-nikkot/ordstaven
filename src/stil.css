@@ -44,6 +44,7 @@ html, body {
   width: var(--rum-bredd);
   height: var(--rum-hojd);
   box-shadow: 0 0 0 3px var(--som), 0 6px 24px rgba(0, 0, 0, 0.5);
+  overflow: hidden; /* rummen glider inom rummets ruta */
 }
 
 /* Phaser ritar i 320×192. Uppskalningen görs här, alltid i hela pixlar och utan utjämning. */
@@ -265,10 +266,16 @@ html, body {
 .hjalte-ruta { padding: 20px; display: grid; grid-template-columns: auto auto; align-items: center; gap: 14px 28px; }
 .hjalte-ruta .klar { grid-column: 1 / -1; justify-self: center; }
 .hjalte-bild { display: flex; flex-direction: column; align-items: center; width: 96px; }
-.hb-hatt { width: 84px; height: 18px; border-radius: 4px; }
-.hb-huvud { width: 60px; height: 48px; }
-.hb-klader { width: 96px; height: 96px; display: flex; justify-content: center; padding-top: 12px; box-sizing: border-box; }
-.hb-kropp { width: 72px; height: 48px; }
+.hb-hjalm { width: 92px; height: 92px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 6px 0 rgba(255, 255, 255, .45), 0 2px 0 #1a1e26; }
+.hb-ansikte { position: relative; width: 66px; height: 62px; border-radius: 45%; }
+.hb-ansikte i { position: absolute; top: 24px; width: 12px; height: 6px; border-radius: 6px; background: #12305a; }
+.hb-ansikte i:first-child { left: 14px; } .hb-ansikte i:nth-child(2) { right: 14px; }
+.hb-ansikte b { position: absolute; left: 18px; right: 18px; bottom: 12px; height: 8px; border-radius: 0 0 14px 14px; background: #12305a; }
+.hb-kropp { display: flex; align-items: flex-start; gap: 4px; margin-top: -4px; }
+.hb-drakt { width: 60px; height: 52px; border-radius: 8px; box-shadow: inset 0 0 0 4px rgba(255, 255, 255, .25); }
+.hb-arm { width: 12px; height: 40px; border-radius: 6px; margin-top: 6px; }
+.hb-skor { display: flex; gap: 12px; margin-top: 2px; }
+.hb-skor span { width: 22px; height: 12px; border-radius: 4px; }
 .valrader { display: flex; flex-direction: column; gap: 12px; }
 .valrad { display: flex; gap: 12px; }
 .farg { width: 64px; height: 64px; border-radius: 32px; box-shadow: 0 0 0 3px #d9c9a3; }
@@ -315,11 +322,18 @@ html, body {
 #ordskylt .kort::after { content: ''; position: absolute; left: 50%; bottom: -10px; transform: translateX(-50%); border: 8px solid transparent; border-top-color: #fff; border-bottom: 0; }
 .platta-oppen #ordskylt, .platta-oppen #tanke { display: none; }
 #ordskylt.under { transform: translate(-50%, 6px); }
+#ordskylt.pa { transform: translate(-50%, -50%); }
+#ordskylt.vanster { transform: translate(calc(-100% - 6px), -50%); }
+#ordskylt.hoger { transform: translate(6px, -50%); }
+#ordskylt:is(.pa, .vanster, .hoger) .kort::after { display: none; }
 #ordskylt.under .kort::after { top: -10px; bottom: auto; border-bottom: 8px solid #fff; border-top: 0; }
 
 /* handen: här kan du göra något (tryck på handen, på föremålet igen, eller Mellanslag) */
 #handknapp { position: absolute; transform: translate(-50%, calc(-100% - 4px)); z-index: 5; }
 #handknapp.under { transform: translate(-50%, 4px); }
+#handknapp.pa { transform: translate(-50%, -50%); }
+#handknapp.vanster { transform: translate(calc(-100% - 4px), -50%); }
+#handknapp.hoger { transform: translate(4px, -50%); }
 #handknapp button { width: calc(64px * var(--t)); height: calc(64px * var(--t)); border-radius: 50%; background: var(--guld); font-size: calc(34px * var(--t)); box-shadow: 0 4px 0 #b8892b, 0 0 0 4px rgba(255, 242, 176, .6); animation: handpuls 0.9s ease-in-out infinite; }
 @keyframes handpuls { 50% { transform: translateY(-4px) scale(1.06); } }
 .snabb #handknapp button { animation: none; }
@@ -354,3 +368,9 @@ html, body {
 @keyframes fingertryck { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
 .snabb #styrhjalp * { animation: none; }
 .platta-oppen #styrhjalp { display: none; }
+
+/* rumsbyten: förra rummet som bild bredvid det nya under glidningen, toning för hopp som inte är grannrum */
+#varld .forra-rummet { position: absolute; left: 0; top: 0; width: 100%; height: 100%; image-rendering: pixelated; pointer-events: none; }
+#tona { position: absolute; left: var(--rum-vanster); top: var(--rum-topp); width: var(--rum-bredd); height: var(--rum-hojd); background: #000; opacity: 0; pointer-events: none; transition: opacity .3s linear; z-index: 1; }
+#tona.svart { opacity: 1; }
+.snabb #tona { transition-duration: .02s; }

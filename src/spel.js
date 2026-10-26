@@ -6,7 +6,8 @@ import { skapaLasmotor, valjVariant } from './karna/lasmotor.js';
 import { egenskaper, PALETT } from './karna/egenskaper.js';
 import { skapaValj, skapaFormel, skapaDop, skapaKrukor } from './karna/pussel.js';
 import { forSkarm } from './karna/text.js';
-import { rumTillSkarm } from './karna/skalning.js';
+import { rumTillSkarm, RUM } from './karna/skalning.js';
+import { framfor, lasplats, vidObjekt, genom, VAGG } from './karna/rumslayout.js';
 import { aventyrFor } from './karna/sparning.js';
 import { HJALTE_FARGER } from './scener/Rum.js';
 import { TANGENTBORD_HOJD } from './grans/tangentbord.js';
@@ -25,7 +26,7 @@ export function skapaSpel(d) {
   const { aventyr, kartor = {}, tillstand, sparning, logg, rost, ljud, ui, rum, layout, inmatning, tangentbord, bilder, snabb } = d;
   const AVENTYR = aventyr.id;
   const av = aventyrFor(tillstand, AVENTYR);
-  const inst = (tillstand.installningar = { foralderLaserFarfar: false, etiketter: true, ...tillstand.installningar });
+  const inst = (tillstand.installningar = { foralderLaser: false, etiketter: true, ...tillstand.installningar });
   const lasmotor = skapaLasmotor({ larande: tillstand.spelare.larande, logg });
   /** @type {ReturnType<typeof skapaBerattelse>} */
   let b;
@@ -33,6 +34,8 @@ export function skapaSpel(d) {
   let aktuelltSteg = /** @type {any} */ (null);
 
   const spara = () => { sparning.spara(tillstand); };
+  /** @type {string | null} varianten i pusslet som pågår (för testerna) */
+  let aktuellVariant = null;
   /** Spelet står still (menyn för vuxna är öppen eller fliken är dold). */
   let pausad = false;
   /** @type {Set<string>} orsakerna till pausen */
@@ -73,7 +76,7 @@ export function skapaSpel(d) {
   function sag(r) {
     if (!r || !r.upplast) return Promise.resolve();
     const t = aventyr.talare[r.talare] || {};
-    if (inst.foralderLaserFarfar && t.rost === 'foraldern_eller_datorrost') return Promise.resolve();
+    if (inst.foralderLaser && t.rost === 'foraldern_eller_datorrost') return Promise.resolve();
     const text = forSkarm(r.text, { varden: varden(), skrift: 'vanlig' }).join(' ');
     return rost.saga(text, t.rollrost || 'berattare');
   }
@@ -145,17 +148,44 @@ export function skapaSpel(d) {
       const [, v] = valjVariant(p.varianter, lasniva(p.typ));
       ut[o.id] = delarAv(v.alternativ);
     }
+    // läs i rummet: varje låda har sitt alternativs färg och storlek, i den variant spelaren får
+    const iKartan = new Set((karta?.objekt || []).map((/** @type {any} */ o) => o.id));
+    for (const p of b.kapitel.pussel) {
+      if (!p.i_rummet || !p.varianter) continue;
+      const [, v] = valjVariant(p.varianter, lasniva(p.typ));
+      for (const a of v.alternativ) {
+        const e = egenskaper(a.bild || a.id);
+        if (a.objekt && iKartan.has(a.objekt) && (e.farg || e.storlek)) ut[a.objekt] = delarAv([a]);
+      }
+    }
     return ut;
   }
 
-  function visaScen() {
+  /** Nästa rumsbyte tonas (start, FORTSÄTT, ny dag), i stället för att glida. */
+  let tonaNasta = true;
+  /** Åt vilket håll hjälten klättrade på stegen ut ur förra rummet (han klättrar vidare i nästa). @type {'upp' | 'ned' | null} */
+  let klattrade = null;
+
+  /**
+   * Visa scenens rum. Ett byte till ett grannrum glider (båda rummen syns sida vid sida, ca 0,5 s, världen står
+   * still), och hjälten står en stund på tröskeln eller klättrar de sista pinnarna på stegen. Hopp som inte går
+   * till ett grannrum (mellanscener, sidovy, ny dag, FORTSÄTT) tonas.
+   */
+  async function visaScen() {
     const scen = b.scen;
     if (!scen) return;
     const nytt = scen.rum !== aktuelltRum;
     const franRum = aktuelltRum ?? null;
     aktuelltRum = scen.rum;
     const r = scen.rum ? b.rum(scen.rum) : null;
-    rum.visa({ rum: scen.rum, tillstand: b.rumsTillstand(scen.rum), innehall: r ? r.innehall : [], unge: av.ungen.folj ?? !!av.ungen.namn, nyttRum: nytt,
+    // utgången i förra rummet som leder hit, och åt vilket håll den leder
+    const ut = nytt && franRum && scen.rum ? rum.objekt.find((o) => o.till === scen.rum) : null;
+    const glida = !!(ut && ut.riktning) && !tonaNasta;
+    const tonas = (nytt && !glida) || (tonaNasta && !!scen.rum);
+    let forra = null;
+    if (glida) { rum.frys(true); forra = await rum.bild(); }
+    if (tonas) { rum.frys(true); await ui.tona(true, tid(300)); }
+    rum.visa({ rum: scen.rum, tillstand: b.rumsTillstand(scen.rum), innehall: r ? r.innehall : [], unge: tillstand.spelare.unge?.folj ?? !!tillstand.spelare.unge?.namn, nyttRum: nytt,
       karta: scen.rum ? kartor[scen.rum] ?? null : null, franRum, delar: scen.rum ? delarIRummet(kartor[scen.rum]) : {} });
     // närbilden (t.ex. kartbiten) visas tills spelaren ska röra sig i rummet igen
     const st = b.aktuellt();
@@ -164,6 +194,16 @@ export function skapaSpel(d) {
     ui.$('#narbild').hidden = scen.vy !== 'narbild' || !!iRummet;
     ui.uppdateraHud(av);
     visaEtiketter();
+    if (glida && forra && ut?.riktning) await ui.glid(/** @type {HTMLElement} */ (document.getElementById('varld')), forra, ut.riktning, layout.skala.cssSkala, tid(500));
+    if (tonas) { await ui.tona(false, tid(300)); tonaNasta = false; }
+    if (nytt && rum.inkom) {
+      // hjälten kommer in vid motsvarande utgång: på stegen klättrar han själv de sista pinnarna, annars står han
+      // ett ögonblick på tröskeln så att det syns var han kom ifrån
+      if (rum.inkom.klattra && klattrade) await rum.klattra(rum.inkom.id, klattrade, 'av', tid(600));
+      else { await vanta(tid(200)); await rum.ga(lasplats(rum.inkom), tid(250)); } // sedan ett steg in i rummet
+    }
+    klattrade = null;
+    if ((nytt || tonas) && scen.rum) rum.frys(false);
   }
   function visaEtiketter() {
     const s = layout.skala;
@@ -214,6 +254,26 @@ export function skapaSpel(d) {
    * @param {string[]} ids
    * @returns {Promise<string> & { avbryt(): void }}
    */
+  /**
+   * Var lappen eller handen visas för ett föremål, så att den inte täcker hjälten, grannföremålet eller det man ska läsa:
+   * - en dörr i bakväggen: skylten sitter på dörren
+   * - en dörr i en sidovägg: ovanför dörren
+   * - ett föremål mot en sidovägg (lådorna längs väggen, sängen): bredvid, ute i väggen
+   * - annars ovanför föremålet.
+   * Den hålls alltid inne i rummet.
+   * @param {any} o @returns {[{ x: number, y: number }, import('./grans/ui.js').Plats]}
+   */
+  function skyltPlats(o) {
+    const s = layout.skala;
+    const ram = { vanster: rumTillSkarm(s, 0, 0).x, hoger: rumTillSkarm(s, RUM.bredd, 0).x };
+    const bas = { rumTopp: s.topp, ram, under: rumTillSkarm(s, 0, o.y + o.h).y };
+    const mitt = o.y + o.h / 2;
+    if (o.sort === 'utgang' && !o.golv && (o.sida === 'under' || o.sida === 'over')) return [rumTillSkarm(s, o.x + o.b / 2, mitt), { ...bas, lage: 'pa' }];
+    if (o.sort !== 'utgang' && o.sida === 'hoger' && o.x <= VAGG.sida + 8) return [rumTillSkarm(s, o.x, mitt), { ...bas, lage: 'vanster' }];
+    if (o.sort !== 'utgang' && o.sida === 'vanster' && o.x + o.b >= RUM.bredd - VAGG.sida - 8) return [rumTillSkarm(s, o.x + o.b, mitt), { ...bas, lage: 'hoger' }];
+    return [rumTillSkarm(s, o.x + o.b / 2, o.y), bas];
+  }
+
   function anvand(ids) {
     let avbryt = () => {};
     const lova = /** @type {Promise<string> & { avbryt(): void }} */ (new Promise((klar) => {
@@ -228,16 +288,25 @@ export function skapaSpel(d) {
         const o = id ? rum.ruta(id) : null;
         if (!o) { ui.handknapp(null); return; }
         ljud.spela('klick');
-        ui.handknapp(rumTillSkarm(layout.skala, o.x + o.b / 2, o.y), () => gor(o.id), { under: rumTillSkarm(layout.skala, 0, o.y + o.h).y, rumTopp: layout.skala.topp });
+        const [pt, plats] = skyltPlats(o);
+        ui.handknapp(pt, () => gor(o.id), plats);
       };
+      // en utgång räknas när hjälten går dit. Står han redan där när steget börjar (t.ex. efter FORTSÄTT) väntar
+      // spelet tills han gått därifrån, eller tills spelaren trycker på utgången eller använder den.
+      const framme = (/** @type {string} */ id) => { const o = rum.ruta(id); return !!o && (vidObjekt(rum.pos, o) || genom(o, rum.pos)); };
+      const vapnade = new Set();
       const tick = window.setInterval(() => {
         if (rum.fryst) { visaNara(null); return; }
+        for (const id of utgangar) if (!framme(id)) vapnade.add(id);
         visaNara(rum.starVid(saker));
-        const ut = utgangar.length ? rum.starVid(utgangar) : null;
+        const ut = utgangar.find((id) => vapnade.has(id) && framme(id));
         if (ut) gor(ut);
       }, 60);
-      const sluta = lyssnaHandling((h) => { if (h.typ === 'interagera' && nara && !rum.fryst) gor(nara); });
-      rum.tryckPa = (id) => { if (id === nara) gor(id); };
+      const sluta = lyssnaHandling((h) => {
+        if (h.typ !== 'interagera' || rum.fryst) return;
+        if (nara) gor(nara); else { const ut = utgangar.find(framme); if (ut) gor(ut); }
+      });
+      rum.tryckPa = (id) => { if (id === nara || (utgangar.includes(id) && framme(id))) gor(id); };
       let gjort = false;
       const stada = () => { gjort = true; window.clearInterval(tick); sluta(); rum.tryckPa = null; visaNara(null); rum.sattInteraktiva([]); };
       function gor(/** @type {string} */ id) { if (gjort) return; stada(); inmatning.rensaGaTill(); klar(id); }
@@ -264,6 +333,9 @@ export function skapaSpel(d) {
     await anvand([st.mal]);
     window.clearInterval(styr); ui.styrhjalp(null);
     k.stopp(); rum.markera(st.mal, false); ui.doljRegi();
+    // stegen: hjälten klättrar själv upp eller ned tills huvudet når luckan, sedan glider nästa rum in
+    const o = rum.ruta(st.mal);
+    if (o?.klattra) { klattrade = o.klattra; await rum.klattra(o.id, o.klattra, 'pa', tid(700)); }
   }
 
   // ------------------------------------------------------------------ pussel
@@ -347,62 +419,111 @@ export function skapaSpel(d) {
   }
 
   /**
-   * Läs och välj i rummet (P1 med i_rummet): alternativen ligger i föremål runt rummet. Frågan syns uppe i rummet.
-   * När hjälten står vid ett föremål syns ordet ovanför det. Ett tryck på ordet (eller på föremålet igen, eller
-   * Mellanslag) öppnar det. Fel föremål ger sin reaktion och blir tomt. Regler som P1: förenkling, ungen pekar.
+   * Läs och välj i rummet (P1 med i_rummet): alternativen ligger i föremål eller utgångar runt rummet.
+   * Frågan syns uppe i rummet. Närlappen med ordet syns när hjälten står vid föremålet, eller inom ungefär en ruta
+   * från en dörr eller en skylt. Ett föremål öppnas med ett tryck på lappen (eller på föremålet igen, eller Mellanslag).
+   * En utgång väljs genom att gå igenom den: ett tryck på dörren går först fram till lappen, ett tryck till går igenom.
+   * Fel dörr öppnas aldrig: hjälten tar ett steg tillbaka och felreaktionen spelas vid dörren. Förenkling och
+   * ungens pekning som i P1. Glimten är lika för alla alternativ.
    * @param {any} p
    */
   async function valjIRummet(p) {
     const niva = lasniva(p.typ);
     const v = skapaValj(p, { niva });
+    aktuellVariant = v.s.variantNyckel;
     const spar = { hjalp: false };
     if (p.instruktion) await replik(p.instruktion);
-    /** @type {Set<string>} alternativ som är öppnade eller borttagna */
+    /** @type {Set<string>} alternativ som är använda (fel) eller borttagna */
     const borta = new Set();
     const altFor = (/** @type {string} */ objekt) => v.s.alternativ.find((a) => a.objekt === objekt && !borta.has(a.id));
-    const kvar = () => v.s.alternativ.filter((a) => !borta.has(a.id)).map((a) => a.objekt);
+    const kvarAlt = () => v.s.alternativ.filter((a) => !borta.has(a.id));
+    const arUtgang = (/** @type {string} */ id) => rum.ruta(id)?.sort === 'utgang';
+    const kvarSaker = () => kvarAlt().map((a) => a.objekt).filter((id) => !arUtgang(id));
+    const kvarUtgangar = () => kvarAlt().map((a) => a.objekt).filter((id) => arUtgang(id));
     const fraga = () => ui.visaTanke(v.s.bild ? bilder.html(v.s.bild) : v.s.text ? ui.rader(v.s.text, varden()) : null);
+    const avst = (/** @type {{ x: number, y: number }} */ a, /** @type {{ x: number, y: number }} */ b2) => Math.hypot(a.x - b2.x, a.y - b2.y);
+    /** Står hjälten nära utgången (inom ungefär en ruta från dörren, läsplatsen eller skylten)? @param {any} o */
+    const naraUtgang = (o) => {
+      if (avst(rum.pos, framfor(o)) <= 22 || avst(rum.pos, lasplats(o)) <= 16) return true;
+      const l = o.lapp ? rum.ruta(o.lapp) : null;
+      return !!l && vidObjekt(rum.pos, l);
+    };
     rum.frys(false);
-    rum.sattInteraktiva(kvar());
+    rum.sattInteraktiva(kvarSaker());
     fraga();
     tillatNos(p, spar);
     return new Promise((klar) => {
       let upptagen = false;
-      /** @type {string | null} föremålet hjälten står vid och vars ord syns */
+      /** @type {string | null} föremålet eller utgången hjälten står vid och vars lapp syns */
       let vid = null;
       const k = knuffKlocka(p.knuff, () => ui.pulseraTanke());
-      const visaOrd = () => {
-        const id = upptagen ? null : rum.starVid(kvar());
+      const visaLappen = (/** @type {string | null} */ id) => {
         if (id === vid) return;
         vid = id;
-        rum.nara(id);
+        rum.nara(id && !arUtgang(id) ? id : null);
         const a = id ? altFor(id) : null;
         const o = id ? rum.ruta(id) : null;
-        if (!a || !o) { ui.ordskylt(null); return; }
+        ui.ordskylt(null); ui.handknapp(null);
+        if (!a || !o) return;
         ljud.spela('klick');
-        const pt = rumTillSkarm(layout.skala, o.x + o.b / 2, o.y);
-        const under = rumTillSkarm(layout.skala, o.x + o.b / 2, o.y + o.h).y;
-        ui.ordskylt(`<button type="button" class="kort ${v.s.pekar === a.id ? 'pekar' : ''}" data-id="${ui.esc(a.id)}"><span class="kort-etikett">${ui.rader(a.ord || '', varden(), 'kort-ord')}</span></button>`, pt, () => oppna(a.id), { under, rumTopp: layout.skala.topp });
+        // lappen visas ovanför skylten vid en stig, annars ovanför föremålet eller dörren
+        const vis = (o.lapp && rum.ruta(o.lapp)) || o;
+        const [pt, plats] = skyltPlats(vis);
+        if (a.ord) ui.ordskylt(`<button type="button" class="kort ${v.s.pekar === a.id ? 'pekar' : ''}" data-id="${ui.esc(a.id)}"><span class="kort-etikett">${ui.rader(a.ord, varden(), 'kort-ord')}</span></button>`, pt, () => anvandAlt(a), plats);
+        else ui.handknapp(pt, () => anvandAlt(a), plats); // ett föremål utan ord (färg, storlek): handen
       };
-      const tick = window.setInterval(visaOrd, 80);
-      const sluta = lyssnaHandling((h) => { if (h.typ === 'interagera' && vid) { const a = altFor(vid); if (a) oppna(a.id); } });
-      rum.tryckPa = (/** @type {string} */ id) => { if (id === vid) { const a = altFor(id); if (a) oppna(a.id); } };
-      const oppna = async (/** @type {string} */ altId) => {
+      /** Lappen eller handen: en sak öppnas, en utgång går hjälten igenom. @param {any} a */
+      const anvandAlt = (a) => {
         if (upptagen || ui.nosAktiv) return;
+        const o = rum.ruta(a.objekt); if (!o) return;
+        if (arUtgang(o.id)) { const f = framfor(o); inmatning.sattGaTill(f.x, f.y); }
+        else valj(a.id);
+      };
+      /** utgångar hjälten har varit borta från sedan valet började: att stå kvar på tröskeln räknas inte som att gå igenom */
+      const vapnade = new Set();
+      const tick = window.setInterval(() => {
+        if (upptagen || rum.fryst) return;
+        for (const id of kvarUtgangar()) { const o = rum.ruta(id); if (o && !genom(o, rum.pos)) vapnade.add(id); }
+        const sak = rum.starVid(kvarSaker());
+        const ut = kvarUtgangar().map((id) => rum.ruta(id)).find((o) => o && naraUtgang(o)) ?? null;
+        visaLappen(sak ?? ut?.id ?? null);
+        // att gå igenom utgången är valet
+        if (ut && vapnade.has(ut.id) && genom(ut, rum.pos)) { const a = altFor(ut.id); if (a) valj(a.id); }
+      }, 60);
+      const sluta = lyssnaHandling((h) => { if (h.typ === 'interagera' && vid) { const a = altFor(vid); if (a) anvandAlt(a); } });
+      rum.tryckPa = (/** @type {string} */ id) => { if (id === vid) { const a = altFor(id); if (a) anvandAlt(a); } };
+      // ett tryck på en dörr i valet går först fram till lappen, och först nästa tryck går igenom
+      rum.malFor = (/** @type {any} */ o) => {
+        const a = o.sort === 'utgang' ? altFor(o.id) : null;
+        if (!a) return null;
+        return vid === o.id ? framfor(o) : lasplats(o);
+      };
+      const stada = () => { window.clearInterval(tick); sluta(); k.stopp(); rum.tryckPa = null; rum.malFor = null; rum.nara(null); rum.sattInteraktiva([]); ui.ordskylt(null); ui.handknapp(null); };
+      const valj = async (/** @type {string} */ altId) => {
+        if (upptagen) return;
         k.nollstall();
         const alt = v.s.alternativ.find((a) => a.id === altId);
+        const o = alt ? rum.ruta(alt.objekt) : null;
+        const utgang = !!o && o.sort === 'utgang';
         const r = v.valj(altId);
-        upptagen = true; vid = null; ui.ordskylt(null);
-        rum.frys(true);
+        upptagen = true; visaLappen(null);
         if (r.resultat === 'fel') {
+          rum.frys(true);
           ljud.spela('fel');
-          borta.add(altId); if (alt?.objekt) rum.tomt(alt.objekt);
+          borta.add(altId); aktuellVariant = v.s.variantNyckel;
+          if (utgang && o) {
+            // dörren öppnas aldrig: hjälten tar ett steg tillbaka in i rummet
+            const l = lasplats(o);
+            await rum.ga(l, tid(250));
+          } else if (alt?.objekt) rum.tomt(alt.objekt);
           await reaktion(r.reaktion);
-          // förenklingen kan ha tagit bort ett alternativ: det föremålet blir tomt också
+          // förenklingen kan ha tagit bort alternativ: lådor blir tomma, dörrar och stigar spikas igen
           for (const a of /** @type {any[]} */ (Object.values(p.varianter).flatMap((x) => /** @type {any} */ (x).alternativ))) {
-            if (!v.s.alternativ.some((x) => x.id === a.id) && a.objekt) rum.tomt(a.objekt);
+            if (!v.s.alternativ.some((x) => x.id === a.id) && a.objekt) { if (arUtgang(a.objekt)) rum.spika(a.objekt); else rum.tomt(a.objekt); }
           }
-          rum.sattInteraktiva(kvar());
+          // varianten kan ha bytts (förenkling): lådorna visar de nya alternativens färg och storlek
+          for (const a of v.s.alternativ) { const e = egenskaper(a.bild || a.id); if (a.objekt && (e.farg || e.storlek)) rum.visaDelar(a.objekt, delarAv([a])); }
+          rum.sattInteraktiva(kvarSaker());
           const pekar = v.s.pekar ? v.s.alternativ.find((a) => a.id === v.s.pekar) : null;
           if (pekar?.objekt) rum.markera(pekar.objekt, true);
           fraga();
@@ -410,9 +531,10 @@ export function skapaSpel(d) {
           return;
         }
         ljud.spela('ratt');
-        window.clearInterval(tick); sluta(); k.stopp(); rum.tryckPa = null; rum.nara(null); rum.sattInteraktiva([]);
+        stada();
         ui.visaTanke(null);
         for (const a of v.s.alternativ) if (a.objekt) rum.markera(a.objekt, false);
+        rum.frys(true);
         await reaktion(r.reaktion);
         klar({ niva: v.s.variantNyckel, forstaForsoket: v.forstaForsoket, forsok: v.s.forsok, hjalp: spar.hjalp });
       };
@@ -635,7 +757,8 @@ export function skapaSpel(d) {
         const rader = st.delar.filter((/** @type {string} */ del) => del in HJALTE_FARGER).map((/** @type {keyof HJALTE_FARGER} */ del) =>
           `<div class="valrad" data-del="${del}">${HJALTE_FARGER[del].map((f, i) => `<button type="button" class="farg ${(val[del] ?? 0) === i ? 'vald' : ''}" data-i="${i}" style="background:${hex(f)}" aria-label="${del} ${i + 1}"></button>`).join('')}</div>`).join('');
         const f = (/** @type {keyof HJALTE_FARGER} */ del) => hex(HJALTE_FARGER[del][val[del] ?? 0]);
-        const bild = `<div class="hjalte-bild" aria-hidden="true"><span style="background:${f('hatt')}" class="hb-hatt"></span><span style="background:${f('hudton')}" class="hb-huvud"></span><span style="background:${f('klader')}" class="hb-klader"><span style="background:${f('kropp')}" class="hb-kropp"></span></span></div>`;
+        // spelarens figur: rund hjälm runt ett stort ansikte, dräkt, armar i hudfärgen, skor
+        const bild = `<div class="hjalte-bild" aria-hidden="true"><span class="hb-hjalm" style="background:${f('hatt')}"><span class="hb-ansikte" style="background:${f('hudton')}"><i></i><i></i><b></b></span></span><span class="hb-kropp"><span class="hb-arm" style="background:${f('hudton')}"></span><span class="hb-drakt" style="background:${f('klader')}"></span><span class="hb-arm" style="background:${f('hudton')}"></span></span><span class="hb-skor"><span style="background:${f('kropp')}"></span><span style="background:${f('kropp')}"></span></span></div>`;
         ui.visaPlatta(`<div class="hjalte-ruta">${bild}<div class="valrader">${rader}</div><button type="button" class="knapp klar" aria-label="Klar">✓</button></div>`, 'pussel hjalte');
         ui.plattan.querySelectorAll('.farg').forEach((el) => el.addEventListener('click', () => {
           const e = /** @type {HTMLElement} */ (el); const del = /** @type {HTMLElement} */ (e.parentElement).dataset.del || '';
@@ -682,6 +805,7 @@ export function skapaSpel(d) {
   /** Passets slut: föreslå en paus, men tvinga inte. */
   async function passSlut() {
     rum.frys(true);
+    tonaNasta = true; // nästa pass börjar en ny stund (ny dag): tona in
     ljud.spela('fest');
     const s = ui.visaSkarm(`<div class="pass-slut"><div class="stor-ikon">🌙</div><div class="knappar"><button type="button" class="knapp stor fortsatt" aria-label="Fortsätt">▶</button><button type="button" class="knapp stor paus" aria-label="Paus">💤</button></div></div>`);
     await new Promise((klar) => {
@@ -714,7 +838,7 @@ export function skapaSpel(d) {
       b = skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId: AVENTYR, logg });
       logg.registrera('berättelse', () => ({ kapitel: kapitel.id, scen: b.scen?.id, steg: b.stegIndex, typ: aktuelltSteg?.typ }));
       while (!b.slut) {
-        visaScen();
+        await visaScen();
         const st = b.aktuellt();
         if (!st) break;
         const res = await utfor(st);
@@ -759,12 +883,12 @@ export function skapaSpel(d) {
     const scener = !b ? '' : b.kapitel.scener.map((/** @type {any} */ s, i) => `<button type="button" class="menyval scen ${i === b.scenIndex ? 'nu' : ''}" data-i="${i}">${i + 1}. ${ui.esc(s.id)} <small>(pass ${s.pass})</small></button>`).join('');
     const s = ui.visaMeny(`<div class="meny vuxen"><h2>Gråboxen <small>${ui.esc(String(d.version))}</small></h2>
       <div class="menygrupp"><b>Läsnivå (läs och välj):</b> ${[1, 2, 3, 4].map((n) => `<button type="button" class="menyval niva ${n === niva ? 'nu' : ''}" data-n="${n}">L${n}</button>`).join('')}</div>
-      <div class="menygrupp"><label><input type="checkbox" class="foralder" ${inst.foralderLaserFarfar ? 'checked' : ''}> Föräldern läser ${ui.esc(Object.values(aventyr.talare).filter((/** @type {any} */ t) => t.rost === 'foraldern_eller_datorrost').map((/** @type {any} */ t) => t.namn).join(' och ') || 'rollernas')} repliker</label>
+      <div class="menygrupp"><label><input type="checkbox" class="foralder" ${inst.foralderLaser ? 'checked' : ''}> Föräldern läser ${ui.esc(Object.values(aventyr.talare).filter((/** @type {any} */ t) => t.rost === 'foraldern_eller_datorrost').map((/** @type {any} */ t) => t.namn).join(' och ') || 'rollernas')} repliker</label>
       <label><input type="checkbox" class="etiketter" ${inst.etiketter ? 'checked' : ''}> Visa objektens namn</label></div>
       <div class="menygrupp scenlista"><b>Hoppa till scen:</b>${scener}</div>
       <div class="menygrupp"><button type="button" class="menyval logg">Spara loggen</button><button type="button" class="menyval nollstall">Börja om från början</button><button type="button" class="menyval stang">Stäng</button></div></div>`);
     s.querySelectorAll('.niva').forEach((el) => el.addEventListener('click', () => { lasmotor.sattNiva('L', 'P1_las_och_valj', Number(/** @type {HTMLElement} */ (el).dataset.n)); lasmotor.sattNiva('L', 'P28_packa', Number(/** @type {HTMLElement} */ (el).dataset.n)); spara(); oppnaMeny(); }));
-    s.querySelector('.foralder')?.addEventListener('change', (e) => { inst.foralderLaserFarfar = /** @type {HTMLInputElement} */ (e.target).checked; spara(); });
+    s.querySelector('.foralder')?.addEventListener('change', (e) => { inst.foralderLaser = /** @type {HTMLInputElement} */ (e.target).checked; spara(); });
     s.querySelector('.etiketter')?.addEventListener('change', (e) => { inst.etiketter = /** @type {HTMLInputElement} */ (e.target).checked; spara(); visaEtiketter(); });
     s.querySelectorAll('.scen').forEach((el) => el.addEventListener('click', () => {
       const i = Number(/** @type {HTMLElement} */ (el).dataset.i);
@@ -783,6 +907,7 @@ export function skapaSpel(d) {
     get scen() { return b?.scen?.id ?? null; },
     get steg() { return aktuelltSteg; },
     get pausad() { return pausad; },
+    get variant() { return aktuellVariant; },
     get stegIndex() { return b?.stegIndex ?? null; },
     lasmotor,
   };

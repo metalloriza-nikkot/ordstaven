@@ -20,7 +20,7 @@ async function tillScen(page, index, extra = {}) {
   await starta(page, '?snabb&ny');
   await page.evaluate(([i, x]) => {
     const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
-    av.scen = i; delete av.scenId; delete av.steg; av.startad = false; av.ungen.namn = 'KNOPP';
+    av.scen = i; delete av.scenId; delete av.steg; av.startad = false; t.spelare.unge.namn = 'KNOPP';
     Object.assign(av, x.av || {}); av.ui = { ...av.ui, ...(x.ui || {}) };
     localStorage.setItem('ordstaven_spar', JSON.stringify(t));
   }, [index, extra]);
@@ -206,4 +206,52 @@ test('bärräknaren matar ungen, och vid 0 bär rycker ungen på axlarna', async
   if (info.project.use.hasTouch) await bar.tap(); else await bar.click();
   await expect(bar.locator('.tal')).toHaveText('0');
   expect(await page.evaluate(() => window.__ORDSTAVEN.tillstand().aventyr['den-gomda-dalen'].bar)).toBe(0);
+});
+
+/** Följ hjälten genom ett rumsbyte på stegen: var han är, om han klättrar och om förra rummet glider undan. */
+async function folj(page, ms) {
+  return page.evaluate(async (tid) => {
+    const O = window.__ORDSTAVEN; const ut = []; const slut = performance.now() + tid;
+    while (performance.now() < slut) {
+      ut.push({ pos: O.position(), klattrar: O.klattrar(), rum: O.rumsobjekt().includes('stege_ner') ? 'vinden' : O.rumsobjekt().includes('stege_upp') ? 'hallen' : '?', glider: !!document.querySelector('#varld .forra-rummet'), tona: getComputedStyle(document.querySelector('#tona')).opacity });
+      await new Promise((r) => setTimeout(r, 25));
+    }
+    return ut;
+  }, ms);
+}
+
+test('stegen: hallen → vinden → hallen, han klättrar själv och kommer fram på stegen', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  // upp: hallen (s10), gå till stegen
+  await tillScen(page, 10);
+  const upp = await page.evaluate(() => window.__ORDSTAVEN.objekt('stege_upp'));
+  await page.mouse.click(upp.x, upp.y);
+  let spar = await folj(page, 5000);
+  const uppfard = spar.filter((s) => s.klattrar && s.rum === 'hallen');
+  expect(uppfard.length, 'han klättrar uppför stegen i hallen').toBeGreaterThan(0);
+  expect(new Set(uppfard.map((s) => s.pos.x)), 'mitt på stegen, ingen styrning').toEqual(new Set([160]));
+  expect(spar.some((s) => s.glider), 'rummen glider, de tonas inte').toBe(true);
+  expect(spar.every((s) => Number(s.tona) < 0.01)).toBe(true);
+  const forstaPaVinden = spar.find((s) => s.rum === 'vinden');
+  expect(forstaPaVinden.klattrar, 'han kommer fram på stegen').toBe(true);
+  expect(forstaPaVinden.pos.x).toBe(52);
+  expect(spar.at(-1).rum).toBe('vinden');
+  expect(spar.at(-1).klattrar).toBe(false);
+
+  // ner: vinden (s06, sista steget), gå till luckan
+  await tillScen(page, 6, { av: { scenId: 's06_namnet', steg: 4 } });
+  // efter FORTSÄTT står han vid luckan: att stå där räcker inte, han klättrar först när spelaren trycker på stegen
+  await page.waitForTimeout(600);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('s06_namnet');
+  const ner = await page.evaluate(() => window.__ORDSTAVEN.objekt('stege_ner'));
+  await page.mouse.click(ner.x, ner.y);
+  spar = await folj(page, 5000);
+  expect(spar.filter((s) => s.klattrar && s.rum === 'vinden').length, 'han klättrar ner genom luckan').toBeGreaterThan(0);
+  const forstaIHallen = spar.find((s) => s.rum === 'hallen');
+  expect(forstaIHallen.klattrar).toBe(true);
+  expect(forstaIHallen.pos.x).toBe(160);
+  expect(spar.some((s) => s.glider)).toBe(true);
+  expect(spar.at(-1).rum).toBe('hallen');
+  expect(spar.at(-1).klattrar).toBe(false);
+  await page.screenshot({ path: 'tests/skarmdumpar/stegen-hallen.png' });
 });
