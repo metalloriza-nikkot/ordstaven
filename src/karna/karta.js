@@ -4,14 +4,23 @@
 // Ett objektlager med rutor: namn = föremålets id, typ = utgang, sak eller figur (frivilligt).
 // Egenskaper: "till" (rummet en utgång leder till), "sida" (var hjälten ställer sig: under, over, vanster, hoger),
 // "golv" (man går på det) och "visar" (pusslet vars alternativ föremålet visar, t.ex. lådorna eller krukorna).
+// "riktning" (vanster, hoger, upp, ned: åt vilket håll utgången leder, nästa rum glider in därifrån),
+// "klattra" (upp, ned: stegen klättras), "ute" (utedörren ritas ljusare) och "lapp" (föremålet där ordet visas
+// när utgången är ett val, t.ex. skylten vid en stig). Kartans egenskap "inomhus" ger rummet väggram.
 // En punkt med namnet "start" är där hjälten står när rummet visas utan att hjälten kom genom en utgång.
 import { RUM } from './skalning.js';
 
 /** @typedef {import('./rumslayout.js').Objekt} Objekt */
-/** @typedef {{ objekt: Objekt[], start: { x: number, y: number } | null }} Karta */
+/**
+ * @typedef {{ objekt: Objekt[], start: { x: number, y: number } | null, inomhus: boolean,
+ *             in: Record<string, { x: number, y: number }> }} Karta
+ * inomhus = rummet har väggram (bakvägg, sidoväggar, främre kant). in = var hjälten kommer in från ett rum
+ * som inte har någon utgång hit (punkter som heter in_<rum>, t.ex. trädgården från köket).
+ */
 
 const UTGANG = /^(stege_|dorr_|grind|stig_)/;
 const SIDOR = new Set(['under', 'over', 'vanster', 'hoger']);
+const RIKTNINGAR = new Set(['vanster', 'hoger', 'upp', 'ned']);
 
 /** Objektets id i rummets innehåll (ett id eller { id, syns_i }). @param {string | { id: string }} x */
 export const innehallsId = (x) => (typeof x === 'string' ? x : x.id);
@@ -40,11 +49,18 @@ export function lasKarta(tmj) {
   /** @type {Objekt[]} */
   const objekt = [];
   let start = null;
+  /** @type {Record<string, { x: number, y: number }>} */
+  const inpunkter = {};
+  const kartegen = Object.fromEntries((tmj.properties || []).map((/** @type {any} */ p) => [p.name, p.value]));
   for (const lager of tmj.layers || []) {
     if (lager.type !== 'objectgroup') continue;
     for (const o of lager.objects || []) {
       const egen = Object.fromEntries((o.properties || []).map((/** @type {any} */ p) => [p.name, p.value]));
-      if (o.point || o.name === 'start') { if (o.name === 'start') start = { x: Math.round(o.x), y: Math.round(o.y) }; continue; }
+      if (o.point || o.name === 'start' || /^in_/.test(o.name)) {
+        const p = { x: Math.round(o.x), y: Math.round(o.y) };
+        if (o.name === 'start') start = p; else if (/^in_/.test(o.name)) inpunkter[o.name.slice(3)] = p;
+        continue;
+      }
       const typ = o.type || o.class || '';
       /** @type {Objekt} */
       const ut = {
@@ -56,8 +72,12 @@ export function lasKarta(tmj) {
       if (SIDOR.has(egen.sida)) ut.sida = egen.sida;
       if (egen.golv) ut.golv = true;
       if (egen.visar) ut.visar = String(egen.visar);
+      if (RIKTNINGAR.has(egen.riktning)) ut.riktning = egen.riktning;
+      if (egen.klattra === 'upp' || egen.klattra === 'ned') ut.klattra = egen.klattra;
+      if (egen.ute) ut.ute = true;
+      if (egen.lapp) ut.lapp = String(egen.lapp);
       objekt.push(ut);
     }
   }
-  return { objekt, start };
+  return { objekt, start, inomhus: !!kartegen.inomhus, in: inpunkter };
 }

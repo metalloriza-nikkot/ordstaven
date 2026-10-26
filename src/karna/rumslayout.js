@@ -8,7 +8,8 @@ const FIGUR_HOJD = 24;
 
 /**
  * @typedef {{ id: string, x: number, y: number, b: number, h: number, sort: 'utgang' | 'sak' | 'figur',
- *             till?: string, sida?: 'under' | 'over' | 'vanster' | 'hoger', golv?: boolean, visar?: string }} Objekt
+ *             till?: string, sida?: 'under' | 'over' | 'vanster' | 'hoger', golv?: boolean, visar?: string,
+ *             riktning?: 'vanster' | 'hoger' | 'upp' | 'ned', klattra?: 'upp' | 'ned', ute?: boolean, lapp?: string }} Objekt
  * till = rummet en utgång leder till, sida = var hjälten ställer sig, golv = man går på det (stig, grind).
  */
 
@@ -55,6 +56,14 @@ export function placeraObjekt(innehall) {
 /** Punkten framför ett objekt där hjälten ska stå (fötterna). @param {Objekt} o */
 export function framfor(o) {
   const x = Math.round(o.x + o.b / 2);
+  // en stig som leder ut ur rummet: hjälten går ut på den, ända till kanten
+  if (o.golv && o.riktning) {
+    const y = Math.round(o.y + o.h / 2 + 3);
+    if (o.riktning === 'hoger') return { x: Math.min(RUM.bredd - 8, o.x + o.b - 4), y };
+    if (o.riktning === 'vanster') return { x: Math.max(8, o.x + 4), y };
+    if (o.riktning === 'upp') return { x, y: Math.max(FIGUR_HOJD, o.y + 8) };
+    return { x, y: Math.min(RUM.hojd, o.y + o.h - 2) };
+  }
   if (o.sida === 'over') return { x, y: Math.max(FIGUR_HOJD, o.y - 2) };
   if (o.sida === 'vanster') return { x: o.x - 10, y: Math.min(RUM.hojd, o.y + o.h) };
   if (o.sida === 'hoger') return { x: o.x + o.b + 10, y: Math.min(RUM.hojd, o.y + o.h) };
@@ -68,6 +77,44 @@ export function framfor(o) {
 export function vidObjekt(pos, o) {
   const f = framfor(o);
   return Math.abs(pos.x - f.x) <= 14 && Math.abs(pos.y - f.y) <= 14;
+}
+
+/**
+ * Går hjälten igenom utgången just nu? Han ska stå i dörröppningen (mot väggen), på stegen eller ute på stigen.
+ * @param {Objekt} o @param {{ x: number, y: number }} pos fötterna
+ */
+export function genom(o, pos) {
+  const f = framfor(o);
+  if (o.golv && o.riktning) {
+    const iBand = pos.y >= o.y - 2 && pos.y <= o.y + o.h + 8;
+    return iBand && (o.riktning === 'hoger' || o.riktning === 'vanster' ? Math.abs(pos.x - f.x) <= 6 : Math.abs(pos.y - f.y) <= 6);
+  }
+  const r = o.riktning || /** @type {Record<string, string>} */ ({ hoger: 'vanster', vanster: 'hoger', under: 'upp', over: 'ned' })[o.sida || 'under'];
+  if (r === 'vanster' || r === 'hoger') return Math.abs(pos.x - f.x) <= 6 && pos.y >= o.y + 10 && pos.y <= o.y + o.h + 6;
+  return Math.abs(pos.y - f.y) <= 8 && pos.x >= o.x - 2 && pos.x <= o.x + o.b + 2;
+}
+
+/** Väggramen inomhus (stilguiden, avsnitt 1): bakvägg 3 rutor, sidoväggar 2, främre kant 1. */
+export const VAGG = Object.freeze({ bak: 48, sida: 32, fram: 16 });
+
+/** Väggarna som rutor (hinder) i ett rum med väggram. */
+export function vaggar() {
+  return [
+    { x: 0, y: 0, b: RUM.bredd, h: VAGG.bak },
+    { x: 0, y: 0, b: VAGG.sida, h: RUM.hojd },
+    { x: RUM.bredd - VAGG.sida, y: 0, b: VAGG.sida, h: RUM.hojd },
+    { x: 0, y: RUM.hojd - VAGG.fram, b: RUM.bredd, h: VAGG.fram },
+  ];
+}
+
+/** Punkten en ruta in i rummet från en utgång: där hjälten står och läser lappen innan han väljer. @param {Objekt} o */
+export function lasplats(o) {
+  const f = framfor(o);
+  const d = 18;
+  const in_ = { hoger: [-1, 0], vanster: [1, 0], upp: [0, 1], ned: [0, -1] }[o.riktning || ''] ||
+    ({ hoger: [1, 0], vanster: [-1, 0], under: [0, 1], over: [0, -1] }[o.sida || 'under'] || [0, 1]);
+  // sida = var hjälten står i förhållande till föremålet, alltså åt vilket håll rummet ligger
+  return { x: f.x + in_[0] * d, y: f.y + in_[1] * d };
 }
 
 /**
@@ -91,4 +138,17 @@ export function rumsObjekt(innehall, tillstand, karta) {
   const iKartan = karta.objekt.filter((o) => ids.includes(o.id)).map((o) => ({ ...o }));
   const saknas = ids.filter((id) => !iKartan.some((o) => o.id === id));
   return [...iKartan, ...placeraObjekt(saknas)];
+}
+
+/**
+ * Gråboxens färg för ett föremål. Utedörren är ljusare än innedörrarna (dagsljus genom glaset),
+ * och alla innedörrar har samma färg, så att bara lappen skiljer dem åt (stilguiden, Husets plan).
+ * @param {Objekt} o @returns {number}
+ */
+export function objektFarg(o) {
+  if (o.sort === 'utgang' && o.ute) return 0xd8c49a;
+  if (o.sort === 'utgang' && o.klattra) return 0x9a8f80;
+  if (o.sort === 'utgang') return 0x6d5a45;
+  if (o.sort === 'figur') return 0xc9a27a;
+  return 0xb9b2a4;
 }

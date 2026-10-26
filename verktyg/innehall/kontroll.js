@@ -80,11 +80,15 @@ function kontrolleraKartor(k, kartor, fel, varningar) {
     const ids = r.innehall.map(objId);
     const iKartan = new Set(karta.objekt.map((o) => o.id));
     for (const id of ids) if (!iKartan.has(id)) fel.push(`${k.id} rum ${r.id}: ${id} saknas i kartan`);
+    for (const fran of Object.keys(karta.in || {})) if (!allaRum.has(fran)) fel.push(`kartan ${r.id}: in_${fran} gäller ett rum som inte finns i ${k.id}`);
     for (const o of karta.objekt) {
       if (!ids.includes(o.id)) fel.push(`kartan ${r.id}: ${o.id} finns inte i rummets innehåll`);
       if (o.x < 0 || o.y < 0 || o.x + o.b > 320 || o.y + o.h > 192) fel.push(`kartan ${r.id}: ${o.id} går utanför rummet`);
       if (o.till && !allaRum.has(o.till)) fel.push(`kartan ${r.id}: ${o.id} leder till ${o.till}, som inte finns i ${k.id}`);
       if (o.visar && !k.pussel.some((p) => p.id === o.visar)) fel.push(`kartan ${r.id}: ${o.id} visar ${o.visar}, som inte finns i ${k.id}`);
+      if (o.lapp && !ids.includes(o.lapp)) fel.push(`kartan ${r.id}: ${o.id} har lappen på ${o.lapp}, som inte finns i rummet`);
+      if (o.till && !o.riktning) fel.push(`kartan ${r.id}: ${o.id} leder till ${o.till} men saknar riktning`);
+      if (o.klattra && o.sort !== 'utgang') fel.push(`kartan ${r.id}: ${o.id} klättras men är ingen utgång`);
     }
   }
 }
@@ -245,7 +249,7 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
                 for (const vari of Object.values(p.varianter)) for (const a of vari.alternativ) {
                   if (!a.objekt) fel.push(var_(`${sp}: ${p.id} har i_rummet, men alternativet ${a.id} saknar objekt`));
                   else if (!ids.includes(a.objekt)) fel.push(var_(`${sp}: ${p.id} alternativet ${a.id} ligger i ${a.objekt}, som inte finns i rummet ${s.rum}`));
-                  if (!a.ord) fel.push(var_(`${sp}: ${p.id} har i_rummet, men alternativet ${a.id} saknar ord att läsa`));
+                  if (!a.ord && !a.bild) fel.push(var_(`${sp}: ${p.id} har i_rummet, men alternativet ${a.id} saknar ord att läsa (eller en bild som visar egenskapen)`));
                 }
               }
               pp.sek += p.typ === 'P26_krukorna' ? 30 : p.typ === 'P12_dop' ? 45 : 40;

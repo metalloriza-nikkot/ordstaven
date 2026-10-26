@@ -17,6 +17,11 @@
    "name": "rum",
    "type": "string",
    "value": "sovrummet"
+  },
+  {
+   "name": "inomhus",
+   "type": "bool",
+   "value": true
   }
  ],
  "layers": [
@@ -34,10 +39,10 @@
      "id": 1,
      "name": "dorr_hallen",
      "type": "utgang",
-     "x": 80,
-     "y": 4,
+     "x": 6,
+     "y": 92,
      "width": 26,
-     "height": 32,
+     "height": 36,
      "rotation": 0,
      "visible": true,
      "properties": [
@@ -45,6 +50,16 @@
        "name": "till",
        "type": "string",
        "value": "hallen"
+      },
+      {
+       "name": "riktning",
+       "type": "string",
+       "value": "vanster"
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "hoger"
       }
      ]
     },
@@ -52,10 +67,10 @@
      "id": 2,
      "name": "fonster",
      "type": "sak",
-     "x": 144,
-     "y": 2,
+     "x": 150,
+     "y": 8,
      "width": 40,
-     "height": 18,
+     "height": 24,
      "rotation": 0,
      "visible": true
     },
@@ -63,8 +78,8 @@
      "id": 3,
      "name": "sang",
      "type": "sak",
-     "x": 236,
-     "y": 56,
+     "x": 220,
+     "y": 58,
      "width": 64,
      "height": 44,
      "rotation": 0,
@@ -81,8 +96,8 @@
      "id": 4,
      "name": "start",
      "type": "",
-     "x": 214,
-     "y": 112,
+     "x": 200,
+     "y": 120,
      "width": 0,
      "height": 0,
      "rotation": 0,

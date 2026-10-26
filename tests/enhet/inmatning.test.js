@@ -70,7 +70,7 @@ describe('nosen och bokstäverna', () => {
 });
 
 import { skapaHinder } from '../../src/karna/vag.js';
-import { framfor, hinderFran, rumsObjekt, vidObjekt } from '../../src/karna/rumslayout.js';
+import { framfor, hinderFran, rumsObjekt, vidObjekt, vaggar, genom, lasplats, objektFarg } from '../../src/karna/rumslayout.js';
 
 describe('kollision och vägsökning', () => {
   const lada = { x: 140, y: 80, b: 40, h: 30 };
@@ -102,15 +102,19 @@ describe('kollision och vägsökning', () => {
       const karta = lasKarta(JSON.parse(readFileSync(new URL(`../../kartor/den-gomda-dalen/${rum.id}.tmj`, import.meta.url), 'utf8')));
       for (const t of rum.tillstand || [null]) {
         const obj = rumsObjekt(rum.innehall, t, karta);
-        const hh = skapaHinder(hinderFran(obj));
-        // alla ingångar: kartans start och varje utgång
-        const starter = [karta.start, ...obj.filter((o) => o.till).map(framfor)].filter(Boolean).map((p) => hh.narmasteFria(p));
-        for (const start of starter) for (const o of obj) {
+        const hh = skapaHinder([...hinderFran(obj), ...(karta.inomhus ? vaggar() : [])]);
+        // alla ingångar: kartans start, in-punkterna och varje utgång
+        const starter = [karta.start, ...Object.values(karta.in), ...obj.filter((o) => o.till).map(framfor)].filter(Boolean).map((p) => hh.narmasteFria(p));
+        // fönster och annat som sitter högt upp på bakväggen är bara utsmyckning, man går inte fram till dem
+        const iVaggen = (o) => karta.inomhus && o.sort !== 'utgang' && o.y + o.h <= 30;
+        for (const start of starter) for (const o of obj.filter((x) => !iVaggen(x))) {
           const f = framfor(o);
           const v = hh.vag(start, f);
           expect(v.length, `${rum.id}/${t}: ${o.id}`).toBeGreaterThan(0);
           const slut = v.at(-1);
-          expect(vidObjekt(slut, o), `${rum.id}/${t}: ${o.id} nås inte (hamnar ${slut.x},${slut.y}, mål ${f.x},${f.y})`).toBe(true);
+          const nar = vidObjekt(slut, o) || (o.sort === 'utgang' && genom(o, slut));
+          expect(nar, `${rum.id}/${t}: ${o.id} nås inte (hamnar ${slut.x},${slut.y}, mål ${f.x},${f.y})`).toBe(true);
+          if (o.sort === 'utgang' && !o.golv) expect(genom(o, slut) || vidObjekt(slut, o), `${rum.id}: går inte att gå igenom ${o.id}`).toBe(true);
         }
       }
     }
@@ -141,5 +145,53 @@ describe('Tiled-kartor och synliga föremål', () => {
     expect(synligaIds(inn, 'natt')).toEqual(['stav']);
     expect(synligaIds(inn, 'natt_upplyst')).toEqual(['stav', 'agg']);
     expect(synligaIds(inn, null)).toEqual(['stav']);
+  });
+});
+
+describe('husets plan', () => {
+  const MOT = { vanster: 'hoger', hoger: 'vanster', upp: 'ned', ned: 'upp' };
+  const kartor = async () => {
+    const { readFileSync, readdirSync } = await import('node:fs');
+    const dir = new URL('../../kartor/den-gomda-dalen/', import.meta.url);
+    return Object.fromEntries(readdirSync(dir).filter((f) => f.endsWith('.tmj')).map((f) => [f.slice(0, -4), lasKarta(JSON.parse(readFileSync(new URL(f, dir), 'utf8')))]));
+  };
+  it('två rum som hänger ihop har sina utgångar på motsatta väggar, och varje utgång har en riktning', async () => {
+    const k = await kartor();
+    for (const [rum, karta] of Object.entries(k)) for (const o of karta.objekt.filter((x) => x.till)) {
+      expect(o.riktning, `${rum}: ${o.id} saknar riktning`).toBeTruthy();
+      const tillbaka = k[o.till]?.objekt.find((x) => x.till === rum);
+      if (tillbaka) expect(tillbaka.riktning, `${rum}.${o.id} (${o.riktning}) och ${o.till}.${tillbaka.id}`).toBe(MOT[o.riktning]);
+    }
+  });
+  it('stegen klättras upp från hallen och ned från vinden', async () => {
+    const k = await kartor();
+    expect(k.hallen.objekt.find((o) => o.till === 'vinden')).toMatchObject({ klattra: 'upp', riktning: 'upp' });
+    expect(k.vinden.objekt.find((o) => o.till === 'hallen')).toMatchObject({ klattra: 'ned', riktning: 'ned' });
+  });
+  it('utedörren är ljusare än innedörrarna, och alla innedörrar har samma färg', async () => {
+    const { ljushet } = await import('../../src/karna/egenskaper.js');
+    const hex = (n) => '#' + n.toString(16).padStart(6, '0');
+    const k = await kartor();
+    const dorrar = Object.values(k).flatMap((x) => x.objekt).filter((o) => /^dorr_/.test(o.id));
+    const ute = dorrar.filter((o) => o.ute), inne = dorrar.filter((o) => !o.ute);
+    expect(ute.length).toBeGreaterThan(0);
+    expect(new Set(inne.map(objektFarg)).size).toBe(1);
+    for (const u of ute) expect(ljushet(hex(objektFarg(u))) - ljushet(hex(objektFarg(inne[0])))).toBeGreaterThan(20);
+  });
+  it('inomhus har rummen väggram, och dörrarna sitter i väggarna', async () => {
+    const k = await kartor();
+    for (const rum of ['vinden', 'hallen', 'koket', 'sovrummet']) {
+      expect(k[rum].inomhus, rum).toBe(true);
+      for (const o of k[rum].objekt.filter((x) => /^dorr_/.test(x.id))) {
+        const iVagg = o.y + o.h <= 48 || o.x + o.b <= 32 || o.x >= 288 || o.y >= 176;
+        expect(iVagg, `${rum}: ${o.id} sitter inte i väggen`).toBe(true);
+      }
+    }
+    expect(k.tradgarden.inomhus).toBe(false);
+  });
+  it('läsplatsen ligger en ruta in i rummet från dörren', async () => {
+    const k = await kartor();
+    const d = k.hallen.objekt.find((o) => o.id === 'dorr_mat');
+    expect(lasplats(d).x).toBeGreaterThan(framfor(d).x);
   });
 });
