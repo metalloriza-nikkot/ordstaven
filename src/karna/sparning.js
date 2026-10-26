@@ -4,7 +4,7 @@
 // Hjälten är en egen del med eget formatfält och kan exporteras till kommande äventyr.
 
 export const APP = 'ORDSTAVEN';
-export const FORMAT = 2;
+export const FORMAT = 3;
 export const UNGE_FORMAT = 1;
 export const HJALTE_FORMAT = 1;
 
@@ -30,6 +30,14 @@ export const MIGRERINGAR = {
       delete d.installningar.foralderLaserFarfar;
     }
     d.format = 2;
+    return d;
+  },
+  // 2 → 3: gråboxens etiketter för den vuxne (föremålens namn) är avstängda från början. Den gamla nyckeln
+  // "etiketter" hade förvalet på, så värdet säger inget om vad den vuxne har valt: den tas bort, och den nya
+  // nyckeln vuxenEtiketter börjar avstängd.
+  2: (d) => {
+    if (d.installningar) delete d.installningar.etiketter;
+    d.format = 3;
     return d;
   },
 };

@@ -1,0 +1,52 @@
+{
+ "app": "ORDSTAVEN",
+ "format": 2,
+ "spelversion": "0.5.1",
+ "sparad": "2026-10-24T10:00:00.000Z",
+ "spelare": {
+  "hjalte": {
+   "format": 1,
+   "id": "fixtur-1",
+   "namn": "TESTA",
+   "utseende": {},
+   "grad": null,
+   "formler": []
+  },
+  "larande": {
+   "lasning": {},
+   "skrivning": {},
+   "ord": {},
+   "matte": {},
+   "historik": []
+  },
+  "unge": {
+   "format": 1,
+   "namn": "KNOPP",
+   "steg": 2,
+   "formagor": []
+  }
+ },
+ "aventyr": {
+  "den-gomda-dalen": {
+   "kapitel": 0,
+   "plats": {
+    "rum": "testrum",
+    "x": 120,
+    "y": 80
+   },
+   "flaggor": {},
+   "bar": 0,
+   "mynt": 0,
+   "kartbitar": []
+  }
+ },
+ "foraldra": {
+  "pin": null,
+  "veckansBokstav": null,
+  "egnaOrd": []
+ },
+ "installningar": {
+  "foralderLaser": false,
+  "etiketter": true
+ }
+}

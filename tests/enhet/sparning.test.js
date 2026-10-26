@@ -75,7 +75,16 @@ describe('sparning', () => {
     const gammal = JSON.parse(readFileSync(new URL('../fixturer/spar-format-1.json', import.meta.url), 'utf8'));
     gammal.installningar = { foralderLaserFarfar: true, etiketter: false };
     const d = migrera(gammal);
-    expect(d.installningar).toEqual({ foralderLaser: true, etiketter: false });
+    expect(d.installningar).toEqual({ foralderLaser: true });
+  });
+
+  it('format 2 → 3: den gamla etikettinställningen (förvalet på) tas bort, föremålens namn är avstängda från början', () => {
+    const gammal = JSON.parse(readFileSync(new URL('../fixturer/spar-format-2.json', import.meta.url), 'utf8'));
+    expect(gammal.installningar.etiketter).toBe(true);
+    const d = migrera(gammal);
+    expect(d.format).toBe(3);
+    expect(d.installningar).toEqual({ foralderLaser: false });
+    expect(d.spelare.unge.namn).toBe('KNOPP');
   });
 
   // Varje gammalt format har en fixturfil som alltid måste gå att läsa.
