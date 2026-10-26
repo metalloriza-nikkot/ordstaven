@@ -255,3 +255,25 @@ test('stegen: hallen → vinden → hallen, han klättrar själv och kommer fram
   expect(spar.at(-1).klattrar).toBe(false);
   await page.screenshot({ path: 'tests/skarmdumpar/stegen-hallen.png' });
 });
+
+test('fri lek utan knapp: går hjälten mot grinden går berättelsen vidare', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  await starta(page, '?snabb&ny');
+  await page.evaluate(() => {
+    const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
+    av.scen = 22; delete av.scenId; delete av.steg; av.startad = false; t.spelare.unge.namn = 'KNOPP';
+    localStorage.setItem('ordstaven_spar', JSON.stringify(t));
+  });
+  await starta(page);
+  await page.click('.start-knapp');
+  for (let k = 0; k < 10 && (await page.evaluate(() => window.__ORDSTAVEN.steg()?.typ)) !== 'fritt'; k++) {
+    const r = await page.$('#plattan .replik-ruta'); if (r) await r.click(); await page.waitForTimeout(150);
+  }
+  expect(await page.evaluate(() => window.__ORDSTAVEN.steg()?.typ)).toBe('fritt');
+  expect(await page.locator('.vidare-hornet').count()).toBe(0); // ingen knapp
+  await page.waitForTimeout(1500);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.steg()?.typ), 'står han still händer inget på en stund').toBe('fritt');
+  const g = await page.evaluate(() => window.__ORDSTAVEN.objekt('grind'));
+  await page.mouse.click(g.x, g.y);
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.steg()?.typ), { timeout: 10000 }).not.toBe('fritt');
+});

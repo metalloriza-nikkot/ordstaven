@@ -205,9 +205,12 @@ export function skapaSpel(d) {
     klattrade = null;
     if ((nytt || tonas) && scen.rum) rum.frys(false);
   }
+  /** Föremål vars etikett inte visas just nu: alternativen i ett val i världen (etiketten får inte avslöja svaret). */
+  const doljEtikett = new Set();
+  /** Gråboxens etiketter (föremålens id) för den vuxne. Aldrig på utgångar: "dorr sov" vore svaret på dörrvalet. */
   function visaEtiketter() {
     const s = layout.skala;
-    ui.etiketter(rum.objekt, (x, y) => rumTillSkarm(s, x, y), inst.etiketter && rum.harRum);
+    ui.etiketter(rum.objekt.filter((o) => o.sort !== 'utgang' && !doljEtikett.has(o.id)), (x, y) => rumTillSkarm(s, x, y), inst.etiketter && rum.harRum);
   }
   layout.vidAndring(() => visaEtiketter());
 
@@ -450,6 +453,8 @@ export function skapaSpel(d) {
     };
     rum.frys(false);
     rum.sattInteraktiva(kvarSaker());
+    for (const a of v.s.alternativ) { if (a.objekt) doljEtikett.add(a.objekt); const l = a.objekt && rum.ruta(a.objekt)?.lapp; if (l) doljEtikett.add(l); }
+    visaEtiketter();
     fraga();
     tillatNos(p, spar);
     return new Promise((klar) => {
@@ -499,7 +504,7 @@ export function skapaSpel(d) {
         if (!a) return null;
         return vid === o.id ? framfor(o) : lasplats(o);
       };
-      const stada = () => { window.clearInterval(tick); sluta(); k.stopp(); rum.tryckPa = null; rum.malFor = null; rum.nara(null); rum.sattInteraktiva([]); ui.ordskylt(null); ui.handknapp(null); };
+      const stada = () => { window.clearInterval(tick); sluta(); k.stopp(); rum.tryckPa = null; rum.malFor = null; rum.nara(null); rum.sattInteraktiva([]); ui.ordskylt(null); ui.handknapp(null); doljEtikett.clear(); visaEtiketter(); };
       const valj = async (/** @type {string} */ altId) => {
         if (upptagen) return;
         k.nollstall();
@@ -776,31 +781,53 @@ export function skapaSpel(d) {
   }
 
   /** Fri lek: svinga staven mot föremålen tills spelaren går vidare. @param {any} st */
+  /**
+   * Fritt: spelaren får svinga staven mot föremålen (bär trillar ut), men behöver inte. Ingen knapp:
+   * steget tar slut när föremålen har gett sina bär, när hjälten går mot en utgång eller genom en öppning (grinden),
+   * eller när inget har hänt på en stund. Mellanslag svingar staven.
+   * @param {any} st
+   */
   async function fritt(st) {
     rum.frys(false);
-    const knapp = ui.visaSkarm('<button type="button" class="vidare-hornet" aria-label="Vidare">▶</button>');
-    knapp.classList.add('genomskinlig');
-    let fortsatt = false;
-    // bara knappen går vidare: Mellanslag används till att svinga staven mot buskarna
-    const vidare = ui.vantaFortsatt(/** @type {HTMLElement} */ (knapp.querySelector('button')), () => () => {}).then(() => { fortsatt = true; });
+    const foremal = /** @type {string[]} */ (st.foremal || []);
+    // väntetiden är spelarens tid, inte en animation: den kortas inte i snabbläget
+    const BAR_PER = 2, STILLA_MS = 25000;
     const slagna = new Map();
+    let senast = performance.now();
     /** @type {ReturnType<typeof anvand> | null} */
     let vantar = null;
+    let klar = false;
+    /** @type {() => void} */
+    let slut = () => {};
+    const slutat = new Promise((r) => { slut = () => { klar = true; r(undefined); }; });
+    // går hjälten mot en utgång, eller står stilla länge, går berättelsen vidare
+    const nara = (/** @type {any} */ o) => vidObjekt(rum.pos, o) || genom(o, rum.pos) || Math.hypot(rum.pos.x - framfor(o).x, rum.pos.y - framfor(o).y) <= 24;
+    const vakt = window.setInterval(() => {
+      if (rum.fryst || pausad) { senast = performance.now(); return; }
+      // på väg ut: vid en utgång, eller i en öppning man går genom (grinden, en stig)
+      const iOppning = (/** @type {any} */ o) => o.golv && rum.pos.x >= o.x - 4 && rum.pos.x <= o.x + o.b + 4 && rum.pos.y >= o.y - 4 && rum.pos.y <= o.y + o.h + 8;
+      if (rum.objekt.some((o) => (o.sort === 'utgang' && nara(o)) || iOppning(o))) slut();
+      else if (performance.now() - senast > STILLA_MS) slut();
+    }, 100);
+    // har hjälten rört sig räknas det som att något händer
+    let forra = { ...rum.pos };
+    const rorelse = window.setInterval(() => { if (Math.hypot(rum.pos.x - forra.x, rum.pos.y - forra.y) > 2) senast = performance.now(); forra = { ...rum.pos }; }, 250);
     (async () => {
-      while (!fortsatt) {
-        vantar = anvand(st.foremal || []);
-        const id = await Promise.race([vantar, vidare.then(() => null)]);
-        if (!id || fortsatt) break;
+      while (!klar) {
+        vantar = anvand(foremal);
+        const id = await Promise.race([vantar, slutat.then(() => null)]);
+        if (!id || klar) break;
+        senast = performance.now();
         const n = (slagna.get(id) || 0) + 1; slagna.set(id, n);
         ljud.spela('sla');
-        if (n <= 2) { av.bar++; ui.uppdateraHud(av); ljud.spela('bar'); await ui.visaFest('🫐', tid(500)); }
+        if (n <= BAR_PER) { av.bar++; ui.uppdateraHud(av); ljud.spela('bar'); await ui.visaFest('🫐', tid(500)); }
         await vanta(tid(300));
+        if (foremal.every((f) => (slagna.get(f) || 0) >= BAR_PER)) slut();
       }
     })();
-    await vidare;
+    await slutat;
+    window.clearInterval(vakt); window.clearInterval(rorelse);
     vantar?.avbryt();
-    knapp.classList.remove('genomskinlig');
-    ui.doljSkarm();
   }
 
   /** Passets slut: föreslå en paus, men tvinga inte. */

@@ -90,7 +90,7 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
         scen: O.scen(), typ: st?.typ, pusselId: st?.pussel_id ?? null, mal: st?.mal ?? null,
         start: synlig('.start-knapp'), replik: synlig('#plattan .replik-ruta'), hjalte: synlig('.hjalte-ruta'),
         kort: synlig('#plattan .kortrad'), lapp: synlig('#plattan.lapp-vy'), formel: synlig('.formel-ruta'), dop: synlig('.dop-ruta'),
-        bok: synlig('.bok-ruta'), passSlut: synlig('.pass-slut .fortsatt'), vidareHornet: synlig('.vidare-hornet'),
+        bok: synlig('.bok-ruta'), passSlut: synlig('.pass-slut .fortsatt'),
         slut: synlig('.pass-slut .om'), objekt: O.rumsobjekt(),
       };
     });
@@ -125,7 +125,13 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
     if (lage.hjalte) { await page.click('.hjalte-ruta .farg >> nth=1'); await page.click('.hjalte-ruta .klar'); continue; }
     if (lage.lapp) { await page.click('#plattan .vidare'); continue; }
     if (lage.bok) { await page.click('.bok-ruta .fram'); continue; }
-    if (lage.vidareHornet) { await page.click('.vidare-hornet'); continue; }
+    if (lage.typ === 'fritt') {
+      // fri lek utan knapp: när buskarna har gett sina bär (två slag var) går berättelsen vidare av sig själv
+      const st = await page.evaluate(() => window.__ORDSTAVEN.steg());
+      for (const f of st.foremal || []) for (let n = 0; n < 2; n++) if ((await page.evaluate(() => window.__ORDSTAVEN.steg()?.typ)) === 'fritt') await anvand(page, f, satt);
+      await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.steg()?.typ), { timeout: 10000 }).not.toBe('fritt');
+      continue;
+    }
     if (lage.dop) { await page.keyboard.type(lage.pusselId === 'p0_ungenamn' ? 'KNOPP' : 'TESTA'); await page.keyboard.press('Enter'); await page.waitForTimeout(100); continue; }
     if (lage.formel) { await draFormel(page, pussel.get(lage.pusselId).svar.replace(/ /g, ''), dumpa); continue; }
     if (lage.kort) {

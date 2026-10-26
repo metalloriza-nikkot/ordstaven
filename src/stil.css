@@ -291,8 +291,6 @@ html, body {
 /* helskärmar: start, passets slut, meny */
 #skarm { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(20, 14, 10, .92); z-index: 4; }
 #skarm.genomskinlig { background: transparent; pointer-events: none; }
-#skarm.genomskinlig .vidare-hornet { pointer-events: auto; }
-.vidare-hornet { position: absolute; right: calc(100vw - var(--rum-vanster) - var(--rum-bredd) + 12px); bottom: calc(100vh - var(--rum-topp) - var(--rum-hojd) + 12px); width: 72px; height: 72px; border-radius: 36px; border: 0; font-size: 32px; background: var(--guld); color: var(--black); animation: guppa 1.2s infinite; cursor: pointer; }
 .start, .pass-slut { display: flex; flex-direction: column; align-items: center; gap: 32px; }
 .stav-glimt { width: 24px; height: 220px; border-radius: 12px; background: linear-gradient(#8a6a4a, #6b4c35); box-shadow: 0 0 40px 10px rgba(242, 193, 78, .45); transform: rotate(18deg); animation: glimt 2s ease-in-out infinite; }
 @keyframes glimt { 50% { box-shadow: 0 0 60px 18px rgba(242, 193, 78, .75); } }
@@ -319,6 +317,9 @@ html, body {
 @keyframes tankepuls { 50% { transform: translateX(-50%) scale(1.15); } }
 #ordskylt { position: absolute; transform: translate(-50%, calc(-100% - 6px)); z-index: 5; }
 #ordskylt .kort { min-width: calc(96px * var(--t)); min-height: calc(72px * var(--t)); padding: 6px 14px; animation: luft .25s ease; }
+/* en hand i hörnet: tryck på lappen (eller föremålet igen) så händer det. Samma hand som vid föremålen. */
+#ordskylt .kort::before { content: '✋'; position: absolute; right: calc(-18px * var(--t)); top: calc(-18px * var(--t)); width: calc(40px * var(--t)); height: calc(40px * var(--t)); display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--guld); font-size: calc(22px * var(--t)); box-shadow: 0 3px 0 #b8892b; animation: handpuls 0.9s ease-in-out infinite; pointer-events: none; }
+.snabb #ordskylt .kort::before { animation: none; }
 #ordskylt .kort::after { content: ''; position: absolute; left: 50%; bottom: -10px; transform: translateX(-50%); border: 8px solid transparent; border-top-color: #fff; border-bottom: 0; }
 .platta-oppen #ordskylt, .platta-oppen #tanke { display: none; }
 #ordskylt.under { transform: translate(-50%, 6px); }
