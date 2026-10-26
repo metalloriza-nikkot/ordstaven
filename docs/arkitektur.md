@@ -305,7 +305,7 @@ Spelet är byggt i lager. Djupnumren (CSS `z-index`, med luckor för det som kom
 | Lapp, bok | ▶ / ✓, Mellanslag |
 | Ljudning | Tryck på remsan, på nosen eller Escape. Maxtid som säkerhetsnät |
 | Passets slut, paus | ▶ (💤 visar en pausbild med ▶) |
-| Fri lek | ▶ i hörnet |
+| Fri lek | Tar slut av sig själv: när föremålen har gett sina bär, när hjälten går mot en utgång eller genom en öppning (grinden), eller efter en stund utan att något händer (0.5.1) |
 | Namn med skärmtangentbord | ✓ (minst en bokstav) |
 | Menyn för vuxna | Stäng, Escape |
 | Dold flik | Visa fliken igen |
@@ -360,3 +360,11 @@ Kvar att göra senare (noterat, inte byggt):
 **Var skylten och handen står** (`skyltPlats` i `spel.js`): på dörren i bak- och framväggen, ovanför dörren i en sidovägg, bredvid föremål som står mot en sidovägg (ute i väggen, så att grannlådan och hjälten syns), annars ovanför. Den hålls alltid inne i rummet.
 
 **Hjälten i gråboxen** är spelarens egen figur: blått ansikte i en grå hjälm, mörk dräkt och blå skor (standardvalet i skapa hjälten).
+
+**Rättelser efter test av 0.5.0 (0.5.1):**
+- **Skylten har en hand.** Ett tryck på en dörr går till skylten. Där visar skylten ordet och en pulserande hand, samma tecken som vid föremålen. Ett tryck på skylten, på dörren igen, Mellanslag eller att gå vidare tar hjälten igenom. Förut fanns inget som sa att ett tryck till behövdes, och dörren såg obrukbar ut.
+- **Etiketterna avslöjar inget.** Gråboxens etiketter (föremålens id för den vuxne) visas aldrig på utgångar, och inte på alternativen eller deras skyltar medan ett val pågår.
+- **Föremål utan framsida** (`sida: alla`) används från närmaste håll: `framforFran(o, pos, inomhus)` väljer under, ovanför, vänster eller höger (aldrig i väggen), och `vidObjekt` godtar en ring runt föremålet. Krukorna, buskarna och lådan med staven. Krukorna står längre från främre kanten.
+- **Lampor** (`lampa` i kartan) lyser när rummet är mörkt. Köket har en vid Farfars plats.
+- **Fri lek utan knapp:** se tabellen i avsnitt 14.
+

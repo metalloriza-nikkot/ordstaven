@@ -1,6 +1,7 @@
 # Innehållsschema – kapitel i format 2
 
-Version 2.2 (2026-10-26). Ägs av teknikspåret.
+Version 2.3 (2026-10-26). Ägs av teknikspåret.
+2.3: `sida: alla` och lampor i kartorna, `fritt` utan knapp. Allt är tillägg.
 2.2: val i världen genom utgångar (`i_rummet` där `objekt` är en dörr eller stig), nya gradnamn, kartegenskaperna `riktning`, `klattra`, `ute`, `lapp`, `inomhus` och punkterna `in_<rum>`. Allt är tillägg, filer i 2.1 gäller fortfarande.
 2.1: `nivaer` och `alias` överst i kapitlet, steget `unge_folj`, `foremal` på `ljud`, `visar` i kartorna. Allt är tillägg, filer i 2.0 gäller fortfarande.
 2.0: kapitelfilerna har `"format": 2`. Packa heter `P28_packa` (P27 är Formelresan i pusselkatalogen). Nytt: `syns_i` på föremål, `i_rummet` på läs och välj, Tiled-kartor för rummen (avsnitt 3b).
@@ -68,7 +69,7 @@ Kapitelfilerna börjar med `"format": 2`, äventyret och ordlistorna med `"forma
 | `bok` | `id`, `talare`, `las_upp_efter_tryck`, `uppslag` | Bläddringsbar bok. Varje uppslag: `bild`, `bildtext` (ett ord), `text`. |
 | `skapa_hjalte` | `delar`, `bara_bilder` | Spelaren väljer hjältens utseende. |
 | `sparpunkt` | `pass_slut`, `valfri` | Spelet sparas. `pass_slut: true` där passet slutar. |
-| `fritt` | `beskrivning`, `foremal` | Fri lek, t.ex. buskar att svinga staven mot. |
+| `fritt` | `beskrivning`, `foremal` | Fri lek, t.ex. buskar att svinga staven mot. Ingen knapp: steget tar slut när varje föremål har gett sina två bär, när hjälten går mot en utgång eller genom en öppning (grinden), eller efter 25 sekunder utan att något händer. |
 
 En **replik inuti något annat** (`knuff`, `vid_fel`, `instruktion`, `vid_omstart`) skrivs utan `typ`: `{ "talare": "berattare", "text": "Där. I lådan.", "upplast": true }`.
 
@@ -151,12 +152,13 @@ Innehållet säger **vad** som finns i ett rum, kartan säger **var** det står.
 - **Egenskaper:**
   - `till` = rummet en utgång leder till (hjälten kommer in där när han kommer från det rummet).
   - `riktning` = åt vilket håll utgången leder (`vanster`, `hoger`, `upp`, `ned`). Krävs på varje utgång med `till`. Nästa rum glider in från det hållet, och två dörrar mellan samma rum har motsatt riktning (testas).
-  - `sida` = var hjälten ställer sig (`under`, `over`, `vanster`, `hoger`, annars under).
+  - `sida` = var hjälten ställer sig (`under`, `over`, `vanster`, `hoger`, annars under). `alla` = föremålet har ingen framsida (krukor, buskar, en låda mitt på golvet) och används från närmaste håll.
   - `golv` = man går på föremålet (stigar, grinden).
   - `klattra` = stegen klättras (`upp` eller `ned`). Hjälten klättrar själv och kommer fram på stegen i nästa rum.
   - `ute` = utedörren, som ritas ljusare än dörrarna inomhus.
   - `lapp` = föremålet där ordet visas när utgången är ett val, t.ex. skylten vid en stig.
 - **Kartans egenskap `inomhus`** ger rummet en väggram: bakvägg 3 rutor, sidoväggar 2, främre kant 1. Dörrar sitter i väggarna och möbler står längs dem.
+- En **punkt** som heter `lampa` (eller `lampa_…`) lyser varmt när rummet är mörkt, t.ex. läslampan vid Farfars plats i köket.
 - En **punkt** med namnet `start` är där hjälten står när han inte kommer genom en utgång (första gången, eller efter en omstart). En punkt `in_<rum>` är där han kommer in från ett rum som inte har någon utgång hit (t.ex. trädgården från köket).
 - Saknas kartan placeras föremålen automatiskt i ett rutnät (kapitel 1 tills vidare).
 
