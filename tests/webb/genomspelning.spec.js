@@ -91,9 +91,11 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
         start: synlig('.start-knapp'), replik: synlig('#plattan .replik-ruta'), hjalte: synlig('.hjalte-ruta'),
         kort: synlig('#plattan .kortrad'), lapp: synlig('#plattan.lapp-vy'), formel: synlig('.formel-ruta'), dop: synlig('.dop-ruta'),
         bok: synlig('.bok-ruta'), passSlut: synlig('.pass-slut .fortsatt'),
-        slut: synlig('.pass-slut .om'), objekt: O.rumsobjekt(),
+        slut: synlig('.pass-slut .om'), objekt: O.rumsobjekt(), vuxen: !!document.querySelector('#etiketter:not([hidden]) .etikett-obj'),
       };
     });
+    // inget som är till för den vuxne syns under ett pass (gråboxens etiketter är avstängda från början)
+    expect(lage.vuxen, `etiketter för den vuxne syns i ${lage.scen}`).toBe(false);
     if (lage.slut) return sett;
     if (stoppVid && lage.scen === stoppVid) return sett;
     sett.add(lage.scen);

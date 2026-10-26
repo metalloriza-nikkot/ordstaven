@@ -21,7 +21,7 @@ async function tillScen(page, index, extra = {}) {
   await page.evaluate(([i, x]) => {
     const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
     av.scen = i; delete av.scenId; delete av.steg; av.startad = false; t.spelare.unge.namn = 'KNOPP';
-    Object.assign(av, x.av || {}); av.ui = { ...av.ui, ...(x.ui || {}) };
+    Object.assign(av, x.av || {}); av.ui = { ...av.ui, ...(x.ui || {}) }; t.installningar = { ...t.installningar, ...(x.inst || {}) };
     localStorage.setItem('ordstaven_spar', JSON.stringify(t));
   }, [index, extra]);
   await starta(page);
@@ -276,4 +276,39 @@ test('fri lek utan knapp: går hjälten mot grinden går berättelsen vidare', a
   const g = await page.evaluate(() => window.__ORDSTAVEN.objekt('grind'));
   await page.mouse.click(g.x, g.y);
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.steg()?.typ), { timeout: 10000 }).not.toBe('fritt');
+});
+
+test('etiketterna för den vuxne: avstängda från början och aldrig under ett pussel', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  const synliga = () => page.locator('#etiketter:not([hidden]) .etikett-obj').count();
+  // från början: avstängda, i rummet och i menyn
+  await tillScen(page, 2);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.tillstand().installningar.vuxenEtiketter)).toBe(false);
+  expect(await synliga()).toBe(0);
+  // den vuxne slår på dem, och dörrvalet börjar
+  await page.evaluate(() => {
+    const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
+    av.scen = 7; delete av.scenId; delete av.steg; av.startad = false; t.installningar.vuxenEtiketter = true;
+    localStorage.setItem('ordstaven_spar', JSON.stringify(t));
+  });
+  await starta(page);
+  await page.click('.start-knapp');
+  // s07: mellanscen och replik, sedan dörrvalet. Under hela valet syns inga etiketter, inte ens på annat än dörrarna.
+  let iPussel = 0;
+  for (let k = 0; k < 60; k++) {
+    const l = await page.evaluate(() => ({ typ: window.__ORDSTAVEN.steg()?.typ, n: document.querySelectorAll('#etiketter:not([hidden]) .etikett-obj').length, dorr: [...document.querySelectorAll('#etiketter .etikett-obj')].some((e) => /dorr/.test(e.textContent)) }));
+    expect(l.dorr, 'aldrig etiketter på dörrar').toBe(false);
+    if (l.typ === 'pussel') { iPussel++; expect(l.n, 'inga etiketter under pusslet').toBe(0); }
+    if (iPussel > 10) break;
+    const r = await page.$('#plattan .replik-ruta'); if (r) await r.click().catch(() => {});
+    await page.waitForTimeout(100);
+  }
+  expect(iPussel).toBeGreaterThan(10);
+});
+
+test('etiketterna syns när den vuxne har slagit på dem och spelaren går i rummet', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  await tillScen(page, 2, { inst: { vuxenEtiketter: true } });
+  await expect(page.locator('#etiketter:not([hidden]) .etikett-obj').first()).toBeVisible();
+  expect(await page.locator('#etiketter .etikett-obj', { hasText: 'stege' }).count(), 'aldrig på utgångar').toBe(0);
 });

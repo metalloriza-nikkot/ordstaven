@@ -26,7 +26,8 @@ export function skapaSpel(d) {
   const { aventyr, kartor = {}, tillstand, sparning, logg, rost, ljud, ui, rum, layout, inmatning, tangentbord, bilder, snabb } = d;
   const AVENTYR = aventyr.id;
   const av = aventyrFor(tillstand, AVENTYR);
-  const inst = (tillstand.installningar = { foralderLaser: false, etiketter: true, ...tillstand.installningar });
+  // vuxenEtiketter: föremålens namn i gråboxen, för den vuxne. Avstängt från början (inget för den vuxne syns under ett pass).
+  const inst = (tillstand.installningar = { foralderLaser: false, vuxenEtiketter: false, ...tillstand.installningar });
   const lasmotor = skapaLasmotor({ larande: tillstand.spelare.larande, logg });
   /** @type {ReturnType<typeof skapaBerattelse>} */
   let b;
@@ -207,10 +208,15 @@ export function skapaSpel(d) {
   }
   /** Föremål vars etikett inte visas just nu: alternativen i ett val i världen (etiketten får inte avslöja svaret). */
   const doljEtikett = new Set();
-  /** Gråboxens etiketter (föremålens id) för den vuxne. Aldrig på utgångar: "dorr sov" vore svaret på dörrvalet. */
+  /** Pågår ett pussel? Då syns inga etiketter alls, även om den vuxne har slagit på dem. */
+  let pusselPagar = false;
+  /**
+   * Gråboxens etiketter (föremålens id) för den vuxne. Avstängda från början (menyn: Visa objektens namn).
+   * Aldrig på utgångar ("dorr sov" vore svaret på dörrvalet), och aldrig medan ett pussel pågår.
+   */
   function visaEtiketter() {
     const s = layout.skala;
-    ui.etiketter(rum.objekt.filter((o) => o.sort !== 'utgang' && !doljEtikett.has(o.id)), (x, y) => rumTillSkarm(s, x, y), inst.etiketter && rum.harRum);
+    ui.etiketter(rum.objekt.filter((o) => o.sort !== 'utgang' && !doljEtikett.has(o.id)), (x, y) => rumTillSkarm(s, x, y), inst.vuxenEtiketter && !pusselPagar && rum.harRum);
   }
   layout.vidAndring(() => visaEtiketter());
 
@@ -346,6 +352,7 @@ export function skapaSpel(d) {
   async function pussel(p) {
     if (!p) return;
     rum.frys(true);
+    pusselPagar = true; visaEtiketter();
     const start = performance.now();
     logg.handelse('pussel', p.id);
     let res;
@@ -359,6 +366,7 @@ export function skapaSpel(d) {
         await ui.visaRegi(`(${p.typ} byggs i fas 3)`, tid(1500)); ui.doljRegi(); res = {};
     }
     ui.doljPlatta(); rum.frys(false);
+    pusselPagar = false; visaEtiketter();
     if (res && res.niva) {
       lasmotor.registrera({ pussel_id: p.id, typ: p.typ, niva: res.niva, ratt: res.forstaForsoket, antal_forsok: res.forsok, hjalp_anvand: res.hjalp, tid: performance.now() - start });
     }
@@ -912,12 +920,12 @@ export function skapaSpel(d) {
     const s = ui.visaMeny(`<div class="meny vuxen"><h2>Gråboxen <small>${ui.esc(String(d.version))}</small></h2>
       <div class="menygrupp"><b>Läsnivå (läs och välj):</b> ${[1, 2, 3, 4].map((n) => `<button type="button" class="menyval niva ${n === niva ? 'nu' : ''}" data-n="${n}">L${n}</button>`).join('')}</div>
       <div class="menygrupp"><label><input type="checkbox" class="foralder" ${inst.foralderLaser ? 'checked' : ''}> Föräldern läser ${ui.esc(Object.values(aventyr.talare).filter((/** @type {any} */ t) => t.rost === 'foraldern_eller_datorrost').map((/** @type {any} */ t) => t.namn).join(' och ') || 'rollernas')} repliker</label>
-      <label><input type="checkbox" class="etiketter" ${inst.etiketter ? 'checked' : ''}> Visa objektens namn</label></div>
+      <label><input type="checkbox" class="etiketter" ${inst.vuxenEtiketter ? 'checked' : ''}> Visa objektens namn (inte under pussel)</label></div>
       <div class="menygrupp scenlista"><b>Hoppa till scen:</b>${scener}</div>
       <div class="menygrupp"><button type="button" class="menyval logg">Spara loggen</button><button type="button" class="menyval nollstall">Börja om från början</button><button type="button" class="menyval stang">Stäng</button></div></div>`);
     s.querySelectorAll('.niva').forEach((el) => el.addEventListener('click', () => { lasmotor.sattNiva('L', 'P1_las_och_valj', Number(/** @type {HTMLElement} */ (el).dataset.n)); lasmotor.sattNiva('L', 'P28_packa', Number(/** @type {HTMLElement} */ (el).dataset.n)); spara(); oppnaMeny(); }));
     s.querySelector('.foralder')?.addEventListener('change', (e) => { inst.foralderLaser = /** @type {HTMLInputElement} */ (e.target).checked; spara(); });
-    s.querySelector('.etiketter')?.addEventListener('change', (e) => { inst.etiketter = /** @type {HTMLInputElement} */ (e.target).checked; spara(); visaEtiketter(); });
+    s.querySelector('.etiketter')?.addEventListener('change', (e) => { inst.vuxenEtiketter = /** @type {HTMLInputElement} */ (e.target).checked; spara(); visaEtiketter(); });
     s.querySelectorAll('.scen').forEach((el) => el.addEventListener('click', () => {
       const i = Number(/** @type {HTMLElement} */ (el).dataset.i);
       av.scen = i; av.scenId = b.kapitel.scener[i]?.id; av.startad = false; spara();
