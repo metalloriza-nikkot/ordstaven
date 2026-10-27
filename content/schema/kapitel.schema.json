@@ -188,6 +188,14 @@
         "upplast": {
           "type": "boolean",
           "description": "true = läses alltid upp (instruktioner, berättare). false = spelaren läser själv."
+        },
+        "vantar_pa": {
+          "enum": ["mata_ungen"],
+          "description": "En instruktion som ber om en handling väntar tills den är gjord. Repliken visas uppe i rummet medan världen går, upprepas med en styrbild efter ca 8 s, och nästa steg kommer först efter handlingen."
+        },
+        "via": {
+          "enum": ["radio"],
+          "description": "Repliken hörs genom radion (radioramen lyser), fast talaren kan stå i rummet."
         }
       }
     },
@@ -442,7 +450,50 @@
             },
             "knuff": {
               "$ref": "#/$defs/knuff"
+            },
+            "vid_annan_utgang": {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "De andra utgångarna i rummet är låsta under steget. Går hjälten till en av dem öppnas den inte: ljudet spelas, hjälten tittar upp och målet lyser.",
+              "properties": {
+                "ljud": { "$ref": "#/$defs/id" },
+                "handling": { "type": "string" },
+                "replik": { "$ref": "#/$defs/replik" }
+              }
             }
+          }
+        },
+        {
+          "description": "Hjälten bär en sak (filten) som svävar efter honom, och lägger den på målet när han når fram.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["typ", "bild", "till"],
+          "properties": {
+            "typ": { "const": "bara" },
+            "bild": { "$ref": "#/$defs/id" },
+            "till": { "$ref": "#/$defs/id" }
+          }
+        },
+        {
+          "description": "Dialogregeln: figuren kallar på avstånd (högst tre ord), och samtalet börjar när hjälten kommer inom ca 1,5 rutor. Stegen efter detta är samtalet.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["typ", "figur"],
+          "properties": {
+            "typ": { "const": "prata" },
+            "figur": { "$ref": "#/$defs/id" },
+            "kalla": { "$ref": "#/$defs/replik" }
+          }
+        },
+        {
+          "description": "Figuren räcker fram en sak (lappen). Den glimtar i figurens hand, och hjälten tar den själv med ett tryck.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["typ", "fran", "bild"],
+          "properties": {
+            "typ": { "const": "ta_emot" },
+            "fran": { "$ref": "#/$defs/id" },
+            "bild": { "$ref": "#/$defs/id" }
           }
         },
         {
@@ -671,6 +722,10 @@
             },
             "valfri": {
               "type": "boolean"
+            },
+            "fraga": {
+              "$ref": "#/$defs/replik",
+              "description": "Frågan som läses upp vid passets slut, t.ex. \"Vill du fortsätta? Eller sluta för idag?\". Visas ovanför de två bilderna."
             }
           }
         },

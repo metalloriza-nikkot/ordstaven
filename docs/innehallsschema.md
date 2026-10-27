@@ -1,6 +1,7 @@
 # Innehållsschema – kapitel i format 2
 
-Version 2.4 (2026-10-27). Ägs av teknikspåret.
+Version 2.5 (2026-10-27). Ägs av teknikspåret.
+2.5: stegen `bara`, `prata` och `ta_emot`; `vantar_pa` och `via` på repliker; `vid_annan_utgang` på `ga_till`; `fraga` på `sparpunkt`; kartans `vagg_bak`, `vagg_sida`, `vagg_fram` och `talare`. Tillägg.
 2.4: `pekar` på knuffar (hjälp som pekar på svaret kommer senare). Tillägg.
 2.3: `sida: alla` och lampor i kartorna, `fritt` utan knapp. Allt är tillägg.
 2.2: val i världen genom utgångar (`i_rummet` där `objekt` är en dörr eller stig), nya gradnamn, kartegenskaperna `riktning`, `klattra`, `ute`, `lapp`, `inomhus` och punkterna `in_<rum>`. Allt är tillägg, filer i 2.1 gäller fortfarande.
@@ -55,11 +56,11 @@ Kapitelfilerna börjar med `"format": 2`, äventyret och ordlistorna med `"forma
 
 | `typ` | Fält | Vad som händer |
 |---|---|---|
-| `replik` | `talare`, `text`, `upplast` | Någon säger något. Visas på läsplattan eller i en pratbubbla. |
+| `replik` | `talare`, `text`, `upplast`, `vantar_pa`, `via` | Någon säger något. Visas på läsplattan. **`vantar_pa: "mata_ungen"`**: en instruktion som ber om en handling väntar tills den är gjord. Den står uppe i rummet medan världen går, upprepas med en styrbild efter ca 8 s, och nästa steg kommer först efter handlingen. **`via: "radio"`**: repliken hörs genom radion. |
 | `mellanscen` | `beskrivning`, `bild` | Något händer i bild. Gråboxen visar beskrivningen för den vuxne. |
 | `ljud` | `id`, `foremal` | Ett ljud spelas. Med `foremal` hoppar föremålet till i bild (ägglådan som dunkar). Samma `id` ger alltid samma ljud. |
 | `unge_folj` | `folj` | Ungen börjar (`true`) eller slutar (`false`) följa hjälten. |
-| `ga_till` | `mal`, `visa_styrhjalp`, `knuff` | Spelaren ska gå till ett objekt i rummet. |
+| `ga_till` | `mal`, `visa_styrhjalp`, `knuff`, `vid_annan_utgang` | Spelaren ska gå till ett objekt i rummet. **`vid_annan_utgang`** (`ljud`, `handling`, `replik`): de andra utgångarna är låsta under steget. Går hjälten till en av dem öppnas den inte, ljudet spelas, hjälten tittar upp och målet lyser (hallen före kläckningen: `{ "ljud": "dunk" }`). |
 | `pussel` | `pussel_id` | Ett pussel startar. Scenen fortsätter när det är löst. |
 | `oppna_lasplatta` | `pussel_id` | Visar pusslets lästext utan att pusslet startar (farfars lapp). |
 | `visa_ui` | `element` | `nosknappen`, `barraknaren`, `radioramen` eller `hjalteboken` visas första gången. |
@@ -69,14 +70,19 @@ Kapitelfilerna börjar med `"format": 2`, äventyret och ordlistorna med `"forma
 | `ge_grad` | `grad`, `fest` | Ny trollkarlsgrad, i ordning: `Lärling`, `Ordsmed`, `Lögnavslöjare`, `Gåtlösare`, `Berättare` (äventyr 1) och `Mästertrollkarl` (seriens sista, nås inte i äventyr 1). |
 | `bok` | `id`, `talare`, `las_upp_efter_tryck`, `uppslag` | Bläddringsbar bok. Varje uppslag: `bild`, `bildtext` (ett ord), `text`. |
 | `skapa_hjalte` | `delar`, `bara_bilder` | Spelaren väljer hjältens utseende. |
-| `sparpunkt` | `pass_slut`, `valfri` | Spelet sparas. `pass_slut: true` där passet slutar. |
+| `sparpunkt` | `pass_slut`, `valfri`, `fraga` | Spelet sparas. `pass_slut: true` där passet slutar: två bilder, ▶ för att fortsätta och den sovande ungen för att sluta för idag. **`fraga`** (replik) läses upp och står ovanför bilderna. |
 | `fritt` | `beskrivning`, `foremal` | Fri lek, t.ex. buskar att svinga staven mot. Ingen knapp: steget tar slut när varje föremål har gett sina två bär, när hjälten går mot en utgång eller genom en öppning (grinden), eller efter 25 sekunder utan att något händer. |
+| `bara` | `bild`, `till` | Hjälten bär en sak (filten): den svävar efter honom som ljusbollen och läggs på `till` när han når fram själv. |
+| `prata` | `figur`, `kalla` | Dialogregeln: figuren kallar på avstånd (vinkar, `kalla` är högst tre ord och läses upp), och samtalet börjar när hjälten kommer inom ca 1,5 rutor. Stegen efter `prata` är samtalet. |
+| `ta_emot` | `fran`, `bild` | Figuren räcker fram en sak (lappen). Hjälten tar den själv med ett tryck när han står vid figuren. |
 
 En **replik inuti något annat** (`knuff`, `vid_fel`, `instruktion`, `vid_omstart`) skrivs utan `typ`: `{ "talare": "berattare", "text": "Där. I lådan.", "upplast": true }`.
 
 ### Fält som alla pussel kan ha
 
 `id`, `typ`, `instruktion` (replik), `knuff` (`handling`, `replik`, `efter_sek`, standard 9 s), `forenkla` (`efter_fel`, `andring`), `efter_3_fel`, `vid_ratt`, `vid_fel`, `anteckning`.
+
+**Fråga igen** (dialogregeln): en figur med `talare` i kartan upprepar sin senaste upplästa replik i scenen när spelaren trycker på den. Farfar i köket har `talare: farfar`.
 
 **Knuffar som pekar på svaret** får `"pekar": true` (till exempel "ungen lutar sig mot rätt dörr"). De kommer tidigast efter första felet, eller efter 4 sekunder per alternativ och minst 12 sekunder, så att det aldrig lönar sig att vänta i stället för att läsa. Knuffar som upprepar frågan (tankebubblan blinkar, Farfar ropar igen) har inget `pekar` och kommer efter 9 sekunder som förut. Kontrollen varnar när en knuff i ett läsval nämner "rätt" eller "mot" utan `pekar`.
 `vid_ratt`, `vid_fel`, `efter_3_fel` och `vid_valj` har `handling` eller `reaktion` (vad som händer i bild, fri text i gråboxen), `replik` och `fest` (`liten`, `mellan`, `mellan_dampad`, `stor`).
@@ -159,8 +165,9 @@ Innehållet säger **vad** som finns i ett rum, kartan säger **var** det står.
   - `golv` = man går på föremålet (stigar, grinden).
   - `klattra` = stegen klättras (`upp` eller `ned`). Hjälten klättrar själv och kommer fram på stegen i nästa rum.
   - `ute` = utedörren, som ritas ljusare än dörrarna inomhus.
-  - `lapp` = föremålet där ordet visas när utgången är ett val, t.ex. skylten vid en stig.
-- **Kartans egenskap `inomhus`** ger rummet en väggram: bakvägg 3 rutor, sidoväggar 2, främre kant 1. Dörrar sitter i väggarna och möbler står längs dem.
+  - `lapp` = föremålet där ordet visas när utgången är ett val, t.ex. skylten vid en stig. Skyltarna på dörrar och stigar i ett val syns hela tiden.
+  - `talare` (på en figur) = figurens talare: ett tryck på figuren upprepar dess senaste instruktion.
+- **Kartans egenskap `inomhus`** ger rummet en väggram: bakvägg 3 rutor, sidoväggar 2, främre kant 1. Dörrar sitter i väggarna och möbler står längs dem. Egenskaperna `vagg_bak`, `vagg_sida` och `vagg_fram` (pixlar) ger andra mått, t.ex. den smala hallen med tjocka sidoväggar.
 - En **punkt** som heter `lampa` (eller `lampa_…`) lyser varmt när rummet är mörkt, t.ex. läslampan vid Farfars plats i köket.
 - En **punkt** med namnet `start` är där hjälten står när han inte kommer genom en utgång (första gången, eller efter en omstart). En punkt `in_<rum>` är där han kommer in från ett rum som inte har någon utgång hit (t.ex. trädgården från köket).
 - Saknas kartan placeras föremålen automatiskt i ett rutnät (kapitel 1 tills vidare).

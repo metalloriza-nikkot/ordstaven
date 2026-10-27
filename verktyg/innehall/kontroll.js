@@ -242,6 +242,21 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
             if (s.rum === null) fel.push(var_(`${sp}: scenen har inget rum att gå i`));
             else if (rum.has(s.rum) && !rum.get(s.rum).innehall.map(objId).includes(st.mal)) fel.push(var_(`${sp}: ${st.mal} finns inte i rummet ${s.rum}`));
             if (st.knuff) replikKontroll(st.knuff.replik, `${sp} knuff`);
+            if (st.vid_annan_utgang?.replik) replikKontroll(st.vid_annan_utgang.replik, `${sp} vid_annan_utgang`);
+            break;
+          }
+          case 'bara':
+          case 'prata':
+          case 'ta_emot': {
+            pp.sek += st.typ === 'prata' ? 6 : 8;
+            const mal = st.typ === 'bara' ? st.till : st.typ === 'prata' ? st.figur : st.fran;
+            if (s.rum === null) fel.push(var_(`${sp}: scenen har inget rum`));
+            else if (rum.has(s.rum) && !rum.get(s.rum).innehall.map(objId).includes(mal)) fel.push(var_(`${sp}: ${mal} finns inte i rummet ${s.rum}`));
+            if (st.kalla) {
+              replikKontroll(st.kalla, `${sp} kalla`);
+              const n = ord(rader(st.kalla.text).join(' ')).length;
+              if (n > 3) varningar.push(var_(`${sp}: att kalla är högst tre ord ("${rader(st.kalla.text).join(' ')}" har ${n})`));
+            }
             break;
           }
           case 'pussel':
