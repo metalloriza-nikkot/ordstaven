@@ -395,3 +395,14 @@ Efter den externa granskningen: det ska aldrig löna sig att gissa eller vänta 
 - **Nya steg:** `bara` (filten följer hjälten, `Rum.bara`, `Rum.lagg`), `prata` (figuren kallar, `#rop`), `ta_emot`, `vantar_pa` på repliker (`handlingGjord('mata_ungen')`), `via: radio`, och `vid_annan_utgang` på `ga_till` (låsta dörrar: ljud, hjälten tittar upp, målet lyser). **Fråga igen:** `rum.fragaIgen` upprepar figurens senaste replik i scenen.
 - **Provscener i testerna:** med `?snabb&testscen` läggs en scen ur `localStorage` (`ordstaven_testscen`) till i kapitlet, så att stegen kan provas innan innehållet använder dem (`tests/webb/steg.spec.js`).
 
+
+## 20. Prologen v0.10 och nosen på tangentbordet (0.6.1)
+
+- **Nosen på datorn** (beslut 10): Tab tänder nosen och markerar första ordet, Tab igen går till nästa ord, Mellanslag eller Enter läser det markerade ordet och Escape släcker. Tab medan ett ord läses avbryter och går vidare från det ordet. På iPad trycker man på ordet. Orden som går att markera står på läsplattan, i tankebubblan, på lappen vid föremålet och på skyltarna.
+- **Fångare i inmatningen:** `inmatning.fanga(f)` får handlingen före alla lyssnare, och returnerar `f` true stoppas den där. Nosen fångar Mellanslag, Enter och Escape medan den är tänd, så att de inte går vidare till ▶ eller rummet. Kärnan rör fortfarande inte DOM: fångaren ligger i `grans/ui.js` (`ui.fanga`).
+- **Spelaren nosar själv** (`nos_demo`): lappen öppnas med nosen tänd och ordet glimtar (på datorn är det redan markerat). ▶ syns först när han har hört ordet, eller efter 20 s. Gratis. `vantar_pa: "nosen"` väntar tills nosen tänds (`ui.vidNos`).
+- **`vid: "ungen"`** på en replik: texten står i en bubbla ovanför ungen (`#rop`) och läses upp, i stället för på läsplattan (namnet i s08).
+- **Skyltarna syns utanför valen också** (`visaUtgangsSkyltar`), i `ga_till` och `fritt`. Ordet hämtas från kapitlets läsval i rummet som har utgången som alternativ, eftersom kartan bara har id:n. Ett tryck på en skylt går dit. I hallen före kläckningen är dörrarna låsta.
+- **`prata` när hjälten redan står vid figuren:** figuren kallar ändå ("Här!"), och samtalet börjar direkt. Ett tryck på en figur som är stegets mål går dit i stället för att upprepa figurens senaste replik.
+- **Sparpunktens fråga** läses från `aventyr.json` (`sparpunkt_fraga`), om sparpunkten inte har en egen `fraga`.
+- Ett tryck på ▶ som avslutar ett steg får inte bubbla vidare till nästa replik på samma läsplatta (`vanta(0)` före `doljPlatta`).

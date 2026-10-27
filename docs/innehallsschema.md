@@ -1,6 +1,7 @@
 # Innehållsschema – kapitel i format 2
 
-Version 2.5 (2026-10-27). Ägs av teknikspåret.
+Version 2.6 (2026-10-27). Ägs av teknikspåret.
+2.6: `vantar_pa: "nosen"` och `vid: "ungen"` på replik-steget (och `vantar_pa`, `via`, `vid` gäller bara repliker som är egna steg), `nos_demo` görs av spelaren, `sparpunkt_fraga` i `aventyr.json`, `kalla` får vara fyra korta ord. Tillägg.
 2.5: stegen `bara`, `prata` och `ta_emot`; `vantar_pa` och `via` på repliker; `vid_annan_utgang` på `ga_till`; `fraga` på `sparpunkt`; kartans `vagg_bak`, `vagg_sida`, `vagg_fram` och `talare`. Tillägg.
 2.4: `pekar` på knuffar (hjälp som pekar på svaret kommer senare). Tillägg.
 2.3: `sida: alla` och lampor i kartorna, `fritt` utan knapp. Allt är tillägg.
@@ -15,7 +16,7 @@ Schemafilerna finns i `content/schema/`. Kontrollen körs med `npm run kontroll`
 | Fil | Innehåll | Schema |
 |---|---|---|
 | `content/ordlistor.json` | Ordlistor 1–6, flaggor, förbjudna par | `ordlistor.schema.json` |
-| `content/<äventyr>/aventyr.json` | Titel, talare, platshållare, kapitelordning | `aventyr.schema.json` |
+| `content/<äventyr>/aventyr.json` | Titel, talare, platshållare, kapitelordning, `sluta_for_idag`, `sparpunkt_fraga` (frågan vid varje sparpunkt) | `aventyr.schema.json` |
 | `content/<äventyr>/kap-00.json` … `kap-07.json` | Ett kapitel: rum, scener, pussel | `kapitel.schema.json` |
 
 Kapitelfilerna börjar med `"format": 2`, äventyret och ordlistorna med `"format": 1`. Ändras formatet höjs numret, och teknik skriver om gamla filer. En kapitelfil i format 1 godtas inte längre: byt `P27_packa` mot `P28_packa` och `format` mot 2.
@@ -56,7 +57,7 @@ Kapitelfilerna börjar med `"format": 2`, äventyret och ordlistorna med `"forma
 
 | `typ` | Fält | Vad som händer |
 |---|---|---|
-| `replik` | `talare`, `text`, `upplast`, `vantar_pa`, `via` | Någon säger något. Visas på läsplattan. **`vantar_pa: "mata_ungen"`**: en instruktion som ber om en handling väntar tills den är gjord. Den står uppe i rummet medan världen går, upprepas med en styrbild efter ca 8 s, och nästa steg kommer först efter handlingen. **`via: "radio"`**: repliken hörs genom radion. |
+| `replik` | `talare`, `text`, `upplast`, `vantar_pa`, `via`, `vid` | Någon säger något. Visas på läsplattan. **`vantar_pa`** (`"mata_ungen"`: ungen har ätit, `"nosen"`: spelaren har tänt nosen): en instruktion som ber om en handling väntar tills den är gjord. Den står uppe i rummet medan världen går, upprepas med en styrbild efter ca 8 s, och nästa steg kommer först efter handlingen. **`via: "radio"`**: repliken hörs genom radion. **`vid: "ungen"`**: texten står i en bubbla ovanför ungen i stället för på läsplattan och läses upp (namnet i s08). De tre fälten finns bara på repliker som är egna steg. |
 | `mellanscen` | `beskrivning`, `bild` | Något händer i bild. Gråboxen visar beskrivningen för den vuxne. |
 | `ljud` | `id`, `foremal` | Ett ljud spelas. Med `foremal` hoppar föremålet till i bild (ägglådan som dunkar). Samma `id` ger alltid samma ljud. |
 | `unge_folj` | `folj` | Ungen börjar (`true`) eller slutar (`false`) följa hjälten. |
@@ -64,13 +65,13 @@ Kapitelfilerna börjar med `"format": 2`, äventyret och ordlistorna med `"forma
 | `pussel` | `pussel_id` | Ett pussel startar. Scenen fortsätter när det är löst. |
 | `oppna_lasplatta` | `pussel_id` | Visar pusslets lästext utan att pusslet startar (farfars lapp). |
 | `visa_ui` | `element` | `nosknappen`, `barraknaren`, `radioramen` eller `hjalteboken` visas första gången. |
-| `nos_demo` | `ord`, `kostnad` | Ungen visar hur man nosar på ett ord. |
+| `nos_demo` | `ord`, `kostnad` | Spelaren nosar själv: senaste lappen öppnas med nosen tänd, och `ord` glimtar (på datorn redan markerat, Mellanslag läser). Han går vidare när han har hört ordet. `kostnad: 0` = gratis. Föregås av "Tryck på nosen." med `vantar_pa: "nosen"`. |
 | `ge_bar` | `antal` | Bär till ungen. |
 | `ge_kartbit` | `nummer` | Kartbit 1–7. |
 | `ge_grad` | `grad`, `fest` | Ny trollkarlsgrad, i ordning: `Lärling`, `Ordsmed`, `Lögnavslöjare`, `Gåtlösare`, `Berättare` (äventyr 1) och `Mästertrollkarl` (seriens sista, nås inte i äventyr 1). |
 | `bok` | `id`, `talare`, `las_upp_efter_tryck`, `uppslag` | Bläddringsbar bok. Varje uppslag: `bild`, `bildtext` (ett ord), `text`. |
 | `skapa_hjalte` | `delar`, `bara_bilder` | Spelaren väljer hjältens utseende. |
-| `sparpunkt` | `pass_slut`, `valfri`, `fraga` | Spelet sparas. `pass_slut: true` där passet slutar: två bilder, ▶ för att fortsätta och den sovande ungen för att sluta för idag. **`fraga`** (replik) läses upp och står ovanför bilderna. |
+| `sparpunkt` | `pass_slut`, `valfri`, `fraga` | Spelet sparas. `pass_slut: true` där passet slutar: två bilder, ▶ för att fortsätta och den sovande ungen för att sluta för idag. **`fraga`** (replik) läses upp och står ovanför bilderna. Utan `fraga` används `sparpunkt_fraga.text` i `aventyr.json`. |
 | `fritt` | `beskrivning`, `foremal` | Fri lek, t.ex. buskar att svinga staven mot. Ingen knapp: steget tar slut när varje föremål har gett sina två bär, när hjälten går mot en utgång eller genom en öppning (grinden), eller efter 25 sekunder utan att något händer. |
 | `bara` | `bild`, `till` | Hjälten bär en sak (filten): den svävar efter honom som ljusbollen och läggs på `till` när han når fram själv. |
 | `prata` | `figur`, `kalla` | Dialogregeln: figuren kallar på avstånd (vinkar, `kalla` är högst fyra korta ord och läses upp), och samtalet börjar när hjälten kommer inom ca 1,5 rutor. Stegen efter `prata` är samtalet. |
