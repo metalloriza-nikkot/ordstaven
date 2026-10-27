@@ -4,7 +4,7 @@
 import Phaser from 'phaser';
 import { RUM } from '../karna/skalning.js';
 import { FIGUR, steg } from '../karna/rorelse.js';
-import { rumsObjekt, framfor, framforFran, vidObjekt, hinderFran, vaggar, VAGG, objektFarg } from '../karna/rumslayout.js';
+import { rumsObjekt, framfor, framforFran, vidObjekt, hinderFran, vaggar, VAGG, objektFarg, lasplats } from '../karna/rumslayout.js';
 import { synligaIds } from '../karna/karta.js';
 import { skapaHinder } from '../karna/vag.js';
 
@@ -50,6 +50,8 @@ export class Rum extends Phaser.Scene {
     this.klattrar = false;
     this.synliga = '';
     this.visaUnge = false;
+    /** @type {{ x: number, y: number, mot: number } | null} dit ungen går för att peka (knuff), annars följer den hjälten */
+    this.ungeMal = null;
     this.tillstand = /** @type {string | null} */ (null);
     /** @type {{ ids: string[], klar: (id: string) => void } | null} */
     this.vantar = null;
@@ -217,6 +219,7 @@ export class Rum extends Phaser.Scene {
   visa(v) {
     this.harRum = !!v.rum;
     this.visaUnge = v.unge;
+    if (v.nyttRum) this.ungeMal = null;
     this.tillstand = v.tillstand;
     if (v.nyttRum || !this.harRum) this.inomhus = !!v.karta?.inomhus;
     this.lampor = v.karta?.lampor || [];
@@ -333,7 +336,10 @@ export class Rum extends Phaser.Scene {
 
   placera() {
     this.hjalte.setPosition(Math.round(this.pos.x - FIGUR.bredd / 2), Math.round(this.pos.y - FIGUR.hojd));
-    this.unge.setPosition(Math.round(this.ungePos.x - 6), Math.round(this.ungePos.y - 12));
+    // pekar ungen nosar den mot föremålet: små ryck åt dess håll
+    const m = this.ungeMal;
+    const nos = m && Math.hypot(m.x - this.ungePos.x, m.y - this.ungePos.y) < 3 ? Math.max(0, Math.sin(this.time.now / 110)) * 3 : 0;
+    this.unge.setPosition(Math.round(this.ungePos.x - 6 + (m ? Math.cos(m.mot) * nos : 0)), Math.round(this.ungePos.y - 12 + (m ? Math.sin(m.mot) * nos : 0)));
     const l = this.ljusboll; l.clear();
     if (l.visible) {
       const cx = Math.round(this.pos.x), cy = Math.round(this.pos.y - 30);
@@ -389,6 +395,23 @@ export class Rum extends Phaser.Scene {
     const y = u.y, x = u.x;
     if (glad) this.tweens.add({ targets: u, y: y - 8, duration: 140, yoyo: true, repeat: 1, ease: 'Quad.easeOut', onComplete: () => { u.y = y; } });
     else this.tweens.add({ targets: u, x: x + 2, duration: 70, yoyo: true, repeat: 2, onComplete: () => { u.x = x; } });
+  }
+
+  /**
+   * Ungen pekar på ett föremål eller en utgång: den springer dit, ställer sig vid det och nosar mot det,
+   * tills pekningen tas bort (null). Gråboxens sätt att visa "ungen lutar sig mot rätt dörr".
+   * @param {string | null} id @returns {boolean} om ungen kunde peka
+   */
+  ungePekar(id) {
+    if (!id) { this.ungeMal = null; this.placera(); return false; }
+    const o = this.ruta(id);
+    if (!o || !this.unge.visible) return false;
+    // ställ ungen en bit in i rummet från föremålet, på sidan mot hjälten, och låt den nosa mot det
+    const f = o.sort === 'utgang' ? lasplats(o) : framforFran(o, this.pos, this.inomhus);
+    const p = this.hinder.narmasteFria({ x: f.x, y: f.y });
+    const cx = o.x + o.b / 2, cy = o.y + o.h / 2;
+    this.ungeMal = { x: p.x, y: p.y, mot: Math.atan2(cy - p.y, cx - p.x) };
+    return true;
   }
 
   /** Ungens position på skärmen i rumspixlar (för att låta ett bär flyga dit). */
@@ -454,10 +477,13 @@ export class Rum extends Phaser.Scene {
     else { this.malKors.setVisible(false); if (ny.framme) { inm.rensaGaTill(); this.vag = []; this.vagMal = null; } }
     const flyttad = ny.x !== this.pos.x || ny.y !== this.pos.y;
     this.pos = { x: ny.x, y: ny.y };
-    // ungen följer efter på avstånd
-    const dx = this.pos.x - 16 - this.ungePos.x, dy = this.pos.y - this.ungePos.y, l = Math.hypot(dx, dy);
-    if (l > 6) { const v = Math.min(l - 6, (dtMs / 1000) * 90); this.ungePos = { x: this.ungePos.x + (dx / l) * v, y: this.ungePos.y + (dy / l) * v }; }
-    if (flyttad || l > 6) this.placera();
+    // ungen följer efter på avstånd, eller springer dit den pekar
+    const m = this.ungeMal;
+    const tx = m ? m.x : this.pos.x - 16, ty = m ? m.y : this.pos.y;
+    const dx = tx - this.ungePos.x, dy = ty - this.ungePos.y, l = Math.hypot(dx, dy);
+    const narmare = m ? 1 : 6;
+    if (l > narmare) { const v = Math.min(l - narmare, (dtMs / 1000) * (m ? 110 : 90)); this.ungePos = { x: this.ungePos.x + (dx / l) * v, y: this.ungePos.y + (dy / l) * v }; }
+    if (flyttad || l > narmare || m) this.placera();
     if (this.vantar) {
       const o = this.objekt.find((x) => this.vantar && this.vantar.ids.includes(x.id) && vidObjekt(this.pos, x));
       if (o) { const v = this.vantar; this.vantar = null; inm.rensaGaTill(); v.klar(o.id); }

@@ -120,16 +120,18 @@ export function skapaSpel(d) {
    * En knuff med pekar: true pekar på svaret (ungen lutar sig mot rätt dörr). Med en vakt väntar den tills
    * pekningen är tillåten (karna/hjalp.js): efter första felet, eller efter 4 s per alternativ och minst 12 s.
    * @param {any} knuff @param {() => void} [extra]
-   * @param {{ pekOmMs: () => number, spar: ReturnType<typeof skapaHjalpSpar> }} [vakt]
+   * @param {{ pekOmMs: () => number, spar: ReturnType<typeof skapaHjalpSpar>, peka?: () => boolean }} [vakt]
+   * peka = visa pekningen i världen (ungen springer till rätt dörr). Då visas inte knuffens beskrivning, som är skriven för den vuxne.
    */
   function knuffKlocka(knuff, extra, vakt) {
     if (!knuff) return { nollstall() {}, stopp() {} };
     let t = 0, t2 = 0;
     const visa = async () => {
       if (pausad) { t2 = window.setTimeout(visa, 500); return; }
-      logg.handelse('knuff', knuff.handling, { pekar: !!knuff.pekar });
+      const visad = !!knuff.pekar && !!vakt?.peka?.();
+      logg.handelse('knuff', knuff.handling, { pekar: !!knuff.pekar, ungenPekar: visad });
       vakt?.spar.knuff(!!knuff.pekar);
-      if (knuff.handling) ui.visaRegi(knuff.handling, 0);
+      if (knuff.handling && !visad) ui.visaRegi(knuff.handling, 0);
       if (knuff.replik) await sag(knuff.replik); else await vanta(2500);
       ui.doljRegi();
     };
@@ -505,7 +507,8 @@ export function skapaSpel(d) {
       /** @type {string | null} föremålet eller utgången hjälten står vid och vars lapp syns */
       let vid = null;
       const hjalpSpar = skapaHjalpSpar(() => performance.now());
-      const vakt = { spar: hjalpSpar, pekOmMs: () => pekningOmMs({ antalAlternativ: kvarAlt().length, antalFel: v.s.fel, sedanStartMs: hjalpSpar.sedanStart() }) };
+      const peka = () => { const r = kvarAlt().find((a) => a.ratt); return !!r?.objekt && rum.ungePekar(r.objekt); };
+      const vakt = { spar: hjalpSpar, pekOmMs: () => pekningOmMs({ antalAlternativ: kvarAlt().length, antalFel: v.s.fel, sedanStartMs: hjalpSpar.sedanStart() }), peka };
       const k = knuffKlocka(p.knuff, () => ui.pulseraTanke(), vakt);
       // Tröskeln: en utgång väljs bara om skylten syntes innan rörelsen som tar honom igenom började
       // (en piltangent som hålls nere hela vägen går inte rakt igenom), eller om spelaren använder skylten.
@@ -567,7 +570,7 @@ export function skapaSpel(d) {
         if (!a) return null;
         return vid === o.id ? framfor(o) : lasplats(o);
       };
-      const stada = () => { window.clearInterval(tick); sluta(); k.stopp(); rum.tryckPa = null; rum.malFor = null; rum.nara(null); rum.sattInteraktiva([]); ui.ordskylt(null); ui.handknapp(null); doljEtikett.clear(); visaEtiketter(); };
+      const stada = () => { window.clearInterval(tick); sluta(); k.stopp(); rum.tryckPa = null; rum.malFor = null; rum.nara(null); rum.sattInteraktiva([]); ui.ordskylt(null); ui.handknapp(null); doljEtikett.clear(); visaEtiketter(); rum.ungePekar(null); };
       const valj = async (/** @type {string} */ altId) => {
         if (upptagen) return;
         k.nollstall();
@@ -575,7 +578,7 @@ export function skapaSpel(d) {
         const o = alt ? rum.ruta(alt.objekt) : null;
         const utgang = !!o && o.sort === 'utgang';
         if (v.s.pekar) hjalpSpar.pekning();
-        bekraftad = null;
+        bekraftad = null; rum.ungePekar(null);
         const r = v.valj(altId);
         loggaVal(p, altId, r.resultat, hjalpSpar);
         upptagen = true; visaLappen(null);
@@ -597,7 +600,7 @@ export function skapaSpel(d) {
           for (const a of v.s.alternativ) { const e = egenskaper(a.bild || a.id); if (a.objekt && (e.farg || e.storlek)) rum.visaDelar(a.objekt, delarAv([a])); }
           rum.sattInteraktiva(kvarSaker());
           const pekar = v.s.pekar ? v.s.alternativ.find((a) => a.id === v.s.pekar) : null;
-          if (pekar?.objekt) rum.markera(pekar.objekt, true);
+          if (pekar?.objekt) { rum.markera(pekar.objekt, true); rum.ungePekar(pekar.objekt); }
           fraga();
           rum.frys(false); upptagen = false;
           return;

@@ -371,3 +371,24 @@ test('tröskeln med tryck: ett tryck på dörren går dit, ett tryck till går i
   await page.mouse.click(d.x, d.y);
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText(/BADANKA/, { timeout: 5000 });
 });
+
+test('pekningen: står spelaren still vid dörrarna springer ungen till rätt dörr först efter 16 sekunder', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(60000);
+  await startaScen(page, 7);
+  for (let k = 0; k < 20 && (await page.evaluate(() => window.__ORDSTAVEN.steg()?.pussel_id)) !== 'p0_dorrar'; k++) {
+    const r = await page.$('#plattan .replik-ruta'); if (r) await r.click(); await page.waitForTimeout(150);
+  }
+  const t0 = Date.now();
+  // frågan blinkar efter 9 s, men ungen pekar inte än
+  await page.waitForTimeout(12000);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.ungeMal()), 'ingen pekning före 16 s').toBeNull();
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.ungeMal()), { timeout: 8000 }).not.toBeNull();
+  expect(Date.now() - t0).toBeGreaterThan(15000);
+  const mal = await page.evaluate(() => window.__ORDSTAVEN.ungeMal());
+  expect(mal.x, 'vid MAT-dörren (vänster vägg)').toBeLessThan(80);
+  // knuffens beskrivning (för den vuxne) visas inte när ungen själv pekar
+  expect(await page.locator('#regi:not([hidden])').count()).toBe(0);
+  await page.waitForTimeout(1200);
+  await page.screenshot({ path: 'tests/skarmdumpar/ungen-pekar.png' });
+});
