@@ -12,6 +12,8 @@
 // vagg_bak, vagg_sida och vagg_fram ger väggarnas mått i pixlar (annars 48, 32 och 16; en smal hall har tjocka sidoväggar).
 // En punkt med namnet "start" är där hjälten står när rummet visas utan att hjälten kom genom en utgång.
 // Punkter som heter "lampa" (eller lampa_…) lyser när rummet är mörkt, t.ex. en läslampa vid Farfars plats.
+// "last_i" på en utgång (tillstånd med komma emellan, t.ex. natt): utgången är låst då, och hjälten känner på
+// handtaget (ytterdörren på natten). Kartans "morker" (0–1) säger hur mörkt rummet är på natten (annars 0,72).
 import { RUM } from './skalning.js';
 import { VAGG } from './rumslayout.js';
 
@@ -19,7 +21,7 @@ import { VAGG } from './rumslayout.js';
 /**
  * @typedef {{ objekt: Objekt[], start: { x: number, y: number } | null, inomhus: boolean,
  *             in: Record<string, { x: number, y: number }>, lampor: { x: number, y: number }[],
- *             vagg: { bak: number, sida: number, fram: number } }} Karta
+ *             vagg: { bak: number, sida: number, fram: number }, morker: number | null }} Karta
  * inomhus = rummet har väggram (bakvägg, sidoväggar, främre kant). in = var hjälten kommer in från ett rum
  * som inte har någon utgång hit (punkter som heter in_<rum>, t.ex. trädgården från köket). lampor = där det lyser i mörkret.
  */
@@ -86,10 +88,13 @@ export function lasKarta(tmj) {
       if (egen.ute) ut.ute = true;
       if (egen.lapp) ut.lapp = String(egen.lapp);
       if (egen.talare) ut.talare = String(egen.talare);
+      if (egen.last_i) ut.lastI = String(egen.last_i).split(',').map((t) => t.trim()).filter(Boolean);
       objekt.push(ut);
     }
   }
   const tal = (/** @type {any} */ x, /** @type {number} */ d) => (Number.isFinite(Number(x)) && x !== '' && x !== undefined ? Math.round(Number(x)) : d);
   const vagg = { bak: tal(kartegen.vagg_bak, VAGG.bak), sida: tal(kartegen.vagg_sida, VAGG.sida), fram: tal(kartegen.vagg_fram, VAGG.fram) };
-  return { objekt, start, inomhus: !!kartegen.inomhus, in: inpunkter, lampor, vagg };
+  const m = Number(kartegen.morker);
+  const morker = kartegen.morker !== undefined && Number.isFinite(m) ? Math.max(0, Math.min(1, m)) : null;
+  return { objekt, start, inomhus: !!kartegen.inomhus, in: inpunkter, lampor, vagg, morker };
 }

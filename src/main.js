@@ -65,6 +65,8 @@ const varld = /** @type {HTMLElement} */ (document.getElementById('varld'));
 const textlager = /** @type {HTMLElement} */ (document.getElementById('textlager'));
 const layout = skapaLayout({ varld, logg });
 logg.registrera('skala', () => layout.skala);
+// hur världen ritas (webgl eller canvas): MacBooken vid grind A saknade WebGL
+logg.registrera('ritning', () => { try { return spel.renderer.type === Phaser.CANVAS ? 'canvas' : 'webgl'; } catch (e) { return 'startar'; } });
 
 const inmatning = skapaInmatning();
 kopplaInmatning({ inmatning, layout, yta: /** @type {HTMLElement} */ (document.getElementById('ram')), logg });
@@ -86,7 +88,8 @@ const tangentbord = skapaTangentbord({
 
 const rum = new Rum({ inmatning, logg });
 const spel = new Phaser.Game({
-  type: Phaser.AUTO,
+  // ?canvas tvingar canvas-ritningen (som när datorn saknar WebGL), för att kunna testa den
+  type: parametrar.has('canvas') ? Phaser.CANVAS : Phaser.AUTO,
   parent: varld,
   width: RUM.bredd,
   height: RUM.hojd,
@@ -158,4 +161,6 @@ const spelet = skapaSpel({
   /** Föremålen som går att använda just nu. */
   interaktiva: () => [...rum.interaktiva],
   spel,
+  /** 'webgl' eller 'canvas': hur världen ritas just nu */
+  ritning: () => (spel.renderer && spel.renderer.type === Phaser.CANVAS ? 'canvas' : 'webgl'),
 };

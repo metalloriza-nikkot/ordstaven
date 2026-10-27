@@ -141,7 +141,7 @@ test('menyn för vuxna: ett kort tryck visar "håll inne", att hålla öppnar me
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('s08_farfar');
 });
 
-test('nosen: skakar när det inte finns något att nosa på, ljudningen går att avbryta', async ({ page }, info) => {
+test('nosen: skakar när det inte finns något att nosa på, och läser hela ordet', async ({ page }, info) => {
   test.setTimeout(60000);
   test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
   await tillScen(page, 3);
@@ -149,7 +149,7 @@ test('nosen: skakar när det inte finns något att nosa på, ljudningen går att
   await page.evaluate(() => document.querySelector('#hud-nos').hidden = false);
   await page.click('#hud-nos');
   await expect(page.locator('#hud-nos')).toHaveClass(/nej/);
-  // på en replik: nosen på ett ord ljudar det, och ett tryck på remsan avbryter
+  // på en replik: nosen läser hela ordet direkt, utan ljudningsremsan (till fas 4), och repliken går inte vidare
   await page.goto('./?snabb&ny');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.click('.start-knapp');
@@ -157,8 +157,7 @@ test('nosen: skakar när det inte finns något att nosa på, ljudningen går att
   await page.evaluate(() => document.querySelector('#hud-nos').hidden = false);
   await page.click('#hud-nos');
   await page.locator('#plattan .ord').first().click();
-  await expect(page.locator('#remsa')).toBeVisible();
-  await page.click('#remsa');
+  await expect.poll(async () => (await page.evaluate(() => window.__ORDSTAVEN.logg())).includes('"helord":true')).toBe(true);
   await expect(page.locator('#remsa')).toBeHidden();
   await expect(page.locator('#plattan .replik-ruta')).toBeVisible(); // repliken gick inte vidare
 });
@@ -270,7 +269,7 @@ test('fri lek utan knapp: går hjälten mot grinden går berättelsen vidare', a
   await starta(page, '?snabb&ny');
   await page.evaluate(() => {
     const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
-    av.scen = 23; delete av.scenId; delete av.steg; av.startad = false; t.spelare.unge.namn = 'KNOPP';
+    av.scen = 24; delete av.scenId; delete av.steg; av.startad = false; t.spelare.unge.namn = 'KNOPP';
     localStorage.setItem('ordstaven_spar', JSON.stringify(t));
   });
   await starta(page);
@@ -502,4 +501,67 @@ test('passets slut: den sovande ungen betyder sluta för idag, ingen dörr', asy
   await expect(page.locator('.pass-slut .paus .unge-sover')).toBeVisible();
   expect(await page.locator('.pass-slut').textContent()).not.toMatch(/🚪/);
   await page.screenshot({ path: 'tests/skarmdumpar/pass-slut.png' });
+});
+
+test('dinomatens lådor: hjälten står vid en låda från olika håll, bara den är markerad, och just den öppnas (grind A)', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(180000);
+  const s11 = 12; // s11_ladorna
+  // lådans id i kartan → alternativets id i varianten L2 (spelarens startnivå)
+  const alt = { lada_lang_overst: 'gul', lada_lang_mitten: 'rod', lada_lang_nederst: 'bla' };
+  // platser runt varje låda (rumspixlar, fötterna): från sidan, ovanför och nedanför där det går att stå
+  const platser = {
+    lada_lang_overst: [{ x: 80, y: 66 }, { x: 52, y: 88 }],
+    lada_lang_mitten: [{ x: 112, y: 60 }, { x: 170, y: 60 }, { x: 141, y: 82 }],
+    lada_lang_nederst: [{ x: 242, y: 108 }, { x: 271, y: 130 }],
+  };
+  for (const [lada, lista] of Object.entries(platser)) {
+    for (const p of lista) {
+      await startaScen(page, s11);
+      await framTill(page, async () => (await page.evaluate(() => window.__ORDSTAVEN.steg()?.pussel_id)) === 'p0_dinomat');
+      const s = await page.evaluate(() => window.__ORDSTAVEN.skala());
+      await page.mouse.click(s.vanster + p.x * s.cssSkala, s.topp + p.y * s.cssSkala);
+      // markeringen (handen) syns vid just den här lådan innan han trycker
+      await expect(page.locator(`#handknapp[data-objekt="${lada}"]`), `${lada} från (${p.x},${p.y})`).toBeVisible({ timeout: 15000 });
+      await expect(page.locator('#handknapp:not([hidden])')).toHaveCount(1);
+      await page.keyboard.press('Space');
+      await expect.poll(async () => (await page.evaluate(() => window.__ORDSTAVEN.logg())).match(/\[val\] p0_dinomat: (\w+)/)?.[1], { timeout: 8000 }).toBe(alt[lada]);
+    }
+  }
+});
+
+test('utan WebGL: canvas-ritningen visar rummet, mörkret, skyltarna och rumsbytet, och håller farten på en långsam dator', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(150000);
+  const fel = [];
+  page.on('pageerror', (e) => fel.push(String(e)));
+  await page.goto('./?snabb&ny&canvas');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.ritning())).toBe('canvas');
+  await page.click('.start-knapp');
+  // förbi skapa hjälten och namnet
+  for (let k = 0; k < 60 && (await page.evaluate(() => window.__ORDSTAVEN.steg()?.typ)) !== 'ga_till'; k++) {
+    if (await page.locator('.hjalte-ruta').isVisible()) { await page.click('.hjalte-ruta .farg >> nth=1'); await page.click('.hjalte-ruta .klar'); }
+    else if (await page.locator('.dop-ruta').isVisible()) { await page.keyboard.type('TESTA'); await page.keyboard.press('Enter'); }
+    else { const r = await page.$('#plattan .replik-ruta'); if (r) await r.click().catch(() => {}); }
+    await page.waitForTimeout(150);
+  }
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.steg()?.typ), { timeout: 20000 }).toBe('ga_till');
+  // långsam dator: processorn fyra gånger långsammare, och hjälten går en stund
+  const c = await page.context().newCDPSession(page);
+  await c.send('Emulation.setCPUThrottlingRate', { rate: 4 });
+  const mat = () => page.evaluate(() => new Promise((r) => { let n = 0; const t0 = performance.now(); const f = () => { n++; if (performance.now() - t0 < 2000) requestAnimationFrame(f); else r(n / 2); }; requestAnimationFrame(f); }));
+  const f1 = await mat(), fps = await mat(); // den första mätningen värmer upp
+  console.log('canvas, 4× långsammare: bildrutor per sekund', f1, fps);
+  await c.send('Emulation.setCPUThrottlingRate', { rate: 1 });
+  await page.screenshot({ path: 'tests/skarmdumpar/canvas-sovrummet.png' });
+  // bara en röktest: testmaskinen ritar i mjukvara och delas med andra tester, så gränsen är låg
+  expect(fps, 'bildrutor per sekund med canvas, 4× långsammare processor').toBeGreaterThan(15);
+  // rumsbytet (glidningen använder en bild av rummet) fungerar med canvas: gå ut genom dörren till vänster
+  await page.keyboard.down('ArrowLeft');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 60000 }).toBe('s01b_hallen');
+  await page.keyboard.up('ArrowLeft');
+  await expect(page.locator('#skyltar .skylt')).toHaveCount(4, { timeout: 8000 });
+  await page.screenshot({ path: 'tests/skarmdumpar/canvas-hallen.png' });
+  expect(fel).toEqual([]);
 });

@@ -179,3 +179,21 @@ test('passets slut läser äventyrets fråga (sparpunkt_fraga)', async ({ page }
   await expect(page.locator('.pass-slut .fraga-text')).toHaveText('VILL DU FORTSÄTTA? ELLER SLUTA FÖR IDAG?', { timeout: 5000 });
   await page.click('.pass-slut .fortsatt');
 });
+
+test('ytterdörren i hallen är låst på natten: hjälten känner på handtaget, ingen dunk; stegen nås snett från sidan', async ({ page }) => {
+  await provscen(page, { id: 't_ut', pass: 1, rum: 'hallen', tillstand: 'natt', steg: [{ typ: 'ga_till', mal: 'stege_upp', vid_annan_utgang: { ljud: 'dunk' } }, R('Uppe.')] });
+  await tryckPa(page, 'dorr_ut');
+  await expect.poll(async () => (await page.evaluate(() => window.__ORDSTAVEN.logg())).includes('[låst] dorr_ut (handtaget)'), { timeout: 8000 }).toBe(true);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).not.toContain('[låst] dorr_ut\n');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt())).toContain('stege_upp'); // fortfarande i hallen
+  // nära nog räcker vid stegen: han ställer sig själv mitt för den och klättrar
+  const s = await page.evaluate(() => window.__ORDSTAVEN.skala());
+  await page.mouse.click(s.vanster + 132 * s.cssSkala, s.topp + 66 * s.cssSkala); // snett nedanför stegens vänstra kant
+  await expect.poll(async () => (await steg(page))?.typ, { timeout: 10000 }).toBe('replik');
+});
+
+test('ytterdörren på morgonen: ett tryck går ut i trädgården', async ({ page }) => {
+  await provscen(page, { id: 't_ut2', pass: 3, rum: 'hallen', tillstand: 'morgon', steg: [{ typ: 'ga_till', mal: 'dorr_ut' }] }, (t) => { t.aventyr['den-gomda-dalen'].scenId = undefined; });
+  await tryckPa(page, 'dorr_ut');
+  await expect.poll(async () => (await page.evaluate(() => window.__ORDSTAVEN.scen())), { timeout: 10000 }).not.toBe('t_ut2');
+});

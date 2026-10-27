@@ -433,3 +433,7 @@ html, body {
 .ord.glimtar { animation: ordglimt 1.4s ease-in-out infinite; }
 @keyframes ordglimt { 0%, 100% { box-shadow: 0 3px 0 var(--guld), 0 0 0 0 rgba(242, 193, 78, 0); } 50% { box-shadow: 0 3px 0 var(--guld), 0 0 0 8px rgba(242, 193, 78, .55); } }
 .snabb .ord.glimtar { animation: none; }
+
+/* pilskylten vid en stig: pilen pekar längs stigen, efter ordet */
+.kort.stigskylt { flex-direction: row; gap: calc(10px * var(--t)); }
+.kort.stigskylt .pil { font-size: calc(44px * var(--t)); line-height: 1; color: #6d5a45; }

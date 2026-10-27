@@ -64,39 +64,6 @@
      ]
     },
     {
-     "id": 2,
-     "name": "dorr_ut",
-     "type": "utgang",
-     "x": 44,
-     "y": 176,
-     "width": 32,
-     "height": 16,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "till",
-       "type": "string",
-       "value": "tradgarden"
-      },
-      {
-       "name": "riktning",
-       "type": "string",
-       "value": "ned"
-      },
-      {
-       "name": "sida",
-       "type": "string",
-       "value": "over"
-      },
-      {
-       "name": "ute",
-       "type": "bool",
-       "value": true
-      }
-     ]
-    },
-    {
      "id": 3,
      "name": "expeditionsbok",
      "type": "sak",

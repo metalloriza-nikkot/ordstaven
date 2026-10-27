@@ -4,7 +4,7 @@
 import Phaser from 'phaser';
 import { RUM } from '../karna/skalning.js';
 import { FIGUR, steg } from '../karna/rorelse.js';
-import { rumsObjekt, framfor, framforFran, vidObjekt, hinderFran, vaggar, VAGG, objektFarg, lasplats } from '../karna/rumslayout.js';
+import { rumsObjekt, framfor, framforFran, vidObjekt, aktivSak, hinderFran, vaggar, VAGG, objektFarg, lasplats } from '../karna/rumslayout.js';
 import { synligaIds } from '../karna/karta.js';
 import { skapaHinder } from '../karna/vag.js';
 
@@ -47,6 +47,8 @@ export class Rum extends Phaser.Scene {
     this.vagg = VAGG;
     /** @type {{ x: number, y: number }[]} lampor som lyser när rummet är mörkt */
     this.lampor = [];
+    /** @type {number | null} hur mörkt rummet är på natten (kartans morker) */
+    this.morkerNatt = null;
     /** @type {any} */
     this.inkom = null;
     this.klattrar = false;
@@ -65,7 +67,10 @@ export class Rum extends Phaser.Scene {
     /** @type {Map<string, any[]>} */
     this.ritadeDelar = new Map();
     /** @type {((id: string) => void) | null} anropas när spelaren trycker på föremålet hjälten står vid */
+    /** @type {((id: string) => boolean) | null} ett tryck på ett föremål hjälten står vid; true = det användes */
     this.tryckPa = null;
+    /** Åt vilket håll hjälten är vänd (senaste rörelsen). Avgör vilken sak som är aktiv när två står lika nära. */
+    this.vand = { x: 0, y: 1 };
     /** @type {((o: any) => { x: number, y: number } | null) | null} var ett tryck på ett föremål leder (val med dörrar) */
     this.malFor = null;
     /** @type {((o: any) => boolean) | null} ett tryck på en figur: upprepa dess senaste instruktion */
@@ -108,8 +113,9 @@ export class Rum extends Phaser.Scene {
       const avst = (/** @type {any} */ x) => Math.hypot(h.x - (x.x + x.b / 2), h.y - (x.y + x.h / 2));
       const o = traffar.sort((a, c) => avst(a) - avst(c))[0];
       if (!o) return;
-      // står hjälten redan vid föremålet räknas trycket som att använda det
-      if (vidObjekt(this.pos, o) && this.tryckPa) { this.tryckPa(o.id); return; }
+      // står hjälten redan vid föremålet, och det är det aktiva, räknas trycket som att använda det.
+      // Är det en annan sak än den aktiva går han närmare den, så att den blir aktiv.
+      if (vidObjekt(this.pos, o) && this.tryckPa && this.tryckPa(o.id)) return;
       // dialogregeln: ett tryck på en figur upprepar dess senaste instruktion (fråga igen)
       if (o.sort === 'figur' && this.fragaIgen?.(o)) return;
       const f = this.malFor?.(o) ?? framforFran(o, this.pos, this.inomhus, this.vagg); this.b.inmatning.sattGaTill(f.x, f.y);
@@ -233,6 +239,7 @@ export class Rum extends Phaser.Scene {
     this.tillstand = v.tillstand;
     if (v.nyttRum || !this.harRum) this.inomhus = !!v.karta?.inomhus;
     this.lampor = v.karta?.lampor || [];
+    this.morkerNatt = v.karta?.morker ?? null;
     if (v.nyttRum || !this.harRum) this.vagg = v.karta?.vagg || VAGG;
     this.ritaGolv(this.harRum);
     // föremål som bara syns i vissa tillstånd (ägget när ljuset är tänt) gör att rummet byggs om
@@ -296,7 +303,7 @@ export class Rum extends Phaser.Scene {
     const r = this.add.rectangle(o.x, o.y, o.b, o.h, fyll, delar ? 0 : 1).setOrigin(0, 0).setStrokeStyle(1, FARG.sakKant, delar ? 0 : 1);
     this.lagerObjekt.add(r);
     this.ritade.set(o.id, r);
-    if (o.ute || o.klattra) this.ritaDetaljer(o);
+    if (o.ute || o.klattra || (o.sort === 'utgang' && !o.golv)) this.ritaDetaljer(o);
     this.ritadeDelar.get(o.id)?.forEach((x) => x.destroy());
     this.ritadeDelar.delete(o.id);
     if (!delar) return;
@@ -324,10 +331,21 @@ export class Rum extends Phaser.Scene {
     this.ritaObjekt(o);
   }
 
-  /** Utedörren får en dörrmatta, stegen pinnar (gråbox). @param {import('../karna/rumslayout.js').Objekt} o */
+  /**
+   * Dörrarna får en tydlig karm och ett handtag, utedörren en dörrmatta på insidan, stegen pinnar (gråbox).
+   * @param {import('../karna/rumslayout.js').Objekt} o
+   */
   ritaDetaljer(o) {
     const g = this.add.graphics();
-    if (o.ute) g.fillStyle(0xa0663a).fillRect(o.x + 2, o.y - 6, o.b - 4, 5);
+    if (o.sort === 'utgang' && !o.golv && !o.klattra) {
+      g.lineStyle(2, o.ute ? 0xf4e6c4 : 0xc9a46a, 1).strokeRect(o.x + 1, o.y + 1, o.b - 2, o.h - 2);
+      // handtaget på den sida som vetter in i rummet
+      const hx = o.riktning === 'vanster' ? o.x + o.b - 6 : o.riktning === 'hoger' ? o.x + 4 : o.x + o.b - 7;
+      const hy = o.riktning === 'ned' || o.riktning === 'upp' ? o.y + o.h / 2 - 1 : o.y + o.h / 2;
+      g.fillStyle(0xe8d38a).fillRect(hx, hy, 3, 3);
+    }
+    // dörrmattan ligger på insidan: ovanför en dörr i främre väggen, nedanför en i bakväggen
+    if (o.ute) { const my = o.riktning === 'ned' ? o.y - 7 : o.y + o.h + 1; g.fillStyle(0xa0663a).fillRect(o.x + 2, my, o.b - 4, 6); }
     if (o.klattra) { g.fillStyle(0x5a4f42); for (let y = o.y + 4; y < o.y + o.h - 2; y += 6) g.fillRect(o.x + 2, y, o.b - 4, 2); }
     this.lagerObjekt.add(g);
   }
@@ -335,7 +353,7 @@ export class Rum extends Phaser.Scene {
   ritaLjus() {
     const g = this.morker; g.clear();
     const t = this.tillstand || '';
-    const alfa = !this.harRum ? 0 : t === 'natt' ? 0.72 : t === 'natt_upplyst' ? 0.42 : 0;
+    const alfa = !this.harRum ? 0 : t === 'natt' ? (this.morkerNatt ?? 0.72) : t === 'natt_upplyst' ? 0.42 : 0;
     if (alfa) g.fillStyle(0x0a0820, alfa).fillRect(0, 0, RUM.bredd, RUM.hojd);
     // en lampa (läslampan vid Farfars plats) lyser varmt i mörkret: ljusare ringar inåt och en glödande punkt
     if (alfa) for (const l of this.lampor) {
@@ -481,7 +499,8 @@ export class Rum extends Phaser.Scene {
 
   /** Vilket av objekten står hjälten vid just nu? @param {string[]} ids @returns {string | null} */
   starVid(ids) {
-    const o = this.objekt.find((x) => ids.includes(x.id) && vidObjekt(this.pos, x));
+    // bara den närmaste (eller den han är vänd mot) är aktiv
+    const o = aktivSak(this.pos, this.objekt.filter((x) => ids.includes(x.id)), this.vand);
     return o ? o.id : null;
   }
 
@@ -515,6 +534,7 @@ export class Rum extends Phaser.Scene {
     if (mal && !ny.framme && sista) this.malKors.setPosition(Math.round(sista.x), Math.round(sista.y)).setVisible(true);
     else { this.malKors.setVisible(false); if (ny.framme) { inm.rensaGaTill(); this.vag = []; this.vagMal = null; } }
     const flyttad = ny.x !== this.pos.x || ny.y !== this.pos.y;
+    if (flyttad) { const vx = ny.x - this.pos.x, vy = ny.y - this.pos.y, l = Math.hypot(vx, vy); if (l > 0.01) this.vand = { x: vx / l, y: vy / l }; }
     this.pos = { x: ny.x, y: ny.y };
     // ungen följer efter på avstånd, eller springer dit den pekar
     const m = this.ungeMal;
@@ -524,7 +544,7 @@ export class Rum extends Phaser.Scene {
     if (l > narmare) { const v = Math.min(l - narmare, (dtMs / 1000) * (m ? 110 : 90)); this.ungePos = { x: this.ungePos.x + (dx / l) * v, y: this.ungePos.y + (dy / l) * v }; }
     if (flyttad || l > narmare || m || this.buren) this.placera();
     if (this.vantar) {
-      const o = this.objekt.find((x) => this.vantar && this.vantar.ids.includes(x.id) && vidObjekt(this.pos, x));
+      const o = aktivSak(this.pos, this.objekt.filter((x) => this.vantar && this.vantar.ids.includes(x.id)), this.vand);
       if (o) { const v = this.vantar; this.vantar = null; inm.rensaGaTill(); v.klar(o.id); }
     }
   }

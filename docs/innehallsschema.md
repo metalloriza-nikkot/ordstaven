@@ -1,6 +1,7 @@
 # Innehållsschema – kapitel i format 2
 
-Version 2.6 (2026-10-27). Ägs av teknikspåret.
+Version 2.7 (2026-10-27). Ägs av teknikspåret.
+2.7: kartans `last_i` (en utgång är låst i ett tillstånd) och `morker` (hur mörkt rummet är på natten). Räckvidden: saker, figurer och stegar nås från alla håll inom ca 1,5 rutor, och bara den närmaste är aktiv. Kapitelfilerna är oförändrade.
 2.6: `vantar_pa: "nosen"` och `vid: "ungen"` på replik-steget (och `vantar_pa`, `via`, `vid` gäller bara repliker som är egna steg), `nos_demo` görs av spelaren, `sparpunkt_fraga` i `aventyr.json`, `kalla` får vara fyra korta ord. Tillägg.
 2.5: stegen `bara`, `prata` och `ta_emot`; `vantar_pa` och `via` på repliker; `vid_annan_utgang` på `ga_till`; `fraga` på `sparpunkt`; kartans `vagg_bak`, `vagg_sida`, `vagg_fram` och `talare`. Tillägg.
 2.4: `pekar` på knuffar (hjälp som pekar på svaret kommer senare). Tillägg.
@@ -162,15 +163,18 @@ Innehållet säger **vad** som finns i ett rum, kartan säger **var** det står.
 - **Egenskaper:**
   - `till` = rummet en utgång leder till (hjälten kommer in där när han kommer från det rummet).
   - `riktning` = åt vilket håll utgången leder (`vanster`, `hoger`, `upp`, `ned`). Krävs på varje utgång med `till`. Nästa rum glider in från det hållet, och två dörrar mellan samma rum har motsatt riktning (testas).
-  - `sida` = var hjälten ställer sig (`under`, `over`, `vanster`, `hoger`, annars under). `alla` = föremålet har ingen framsida (krukor, buskar, en låda mitt på golvet) och används från närmaste håll.
+  - `sida` = var hjälten ställer sig när han går dit med ett tryck (`under`, `over`, `vanster`, `hoger`, annars under). `alla` = föremålet har ingen framsida (krukor, buskar, en låda mitt på golvet) och han går till närmaste håll. **Nära nog räcker:** saker, figurer och stegar går att använda från alla håll inom ca 1,5 rutor (24 pixlar) från kanten, och bara den närmaste är aktiv (lika nära: den han är vänd mot). Vid stegen ställer han sig själv mitt för den.
   - `golv` = man går på föremålet (stigar, grinden).
   - `klattra` = stegen klättras (`upp` eller `ned`). Hjälten klättrar själv och kommer fram på stegen i nästa rum.
-  - `ute` = utedörren, som ritas ljusare än dörrarna inomhus.
+  - `ute` = utedörren, som ritas ljusare än dörrarna inomhus och har en dörrmatta på insidan.
+  - `last_i` = tillstånd då utgången är låst, med komma emellan (ytterdörren: `natt`). Hjälten känner på handtaget och tar ett steg tillbaka, ingen text.
   - `lapp` = föremålet där ordet visas när utgången är ett val, t.ex. skylten vid en stig. Skyltarna på dörrar och stigar i ett val syns hela tiden.
   - `talare` (på en figur) = figurens talare: ett tryck på figuren upprepar dess senaste instruktion.
+- **Alternativen i ett val** (lådorna i FILT och dinomaten) står minst 3 rutor isär, så att ingen plats når två av dem (testas).
+- **Kartans egenskap `morker`** (0–1) säger hur mörkt rummet är på natten (annars 0,72). Hallen har 0,55.
 - **Kartans egenskap `inomhus`** ger rummet en väggram: bakvägg 3 rutor, sidoväggar 2, främre kant 1. Dörrar sitter i väggarna och möbler står längs dem. Egenskaperna `vagg_bak`, `vagg_sida` och `vagg_fram` (pixlar) ger andra mått, t.ex. den smala hallen med tjocka sidoväggar.
 - En **punkt** som heter `lampa` (eller `lampa_…`) lyser varmt när rummet är mörkt, t.ex. läslampan vid Farfars plats i köket.
-- En **punkt** med namnet `start` är där hjälten står när han inte kommer genom en utgång (första gången, eller efter en omstart). En punkt `in_<rum>` är där han kommer in från ett rum som inte har någon utgång hit (t.ex. trädgården från köket).
+- En **punkt** med namnet `start` är där hjälten står när han inte kommer genom en utgång (första gången, eller efter en omstart). En punkt `in_<rum>` är där han kommer in från ett rum som inte har någon utgång hit (t.ex. trädgården från hallen).
 - Saknas kartan placeras föremålen automatiskt i ett rutnät (kapitel 1 tills vidare).
 
 Kontrollen säger fel om ett föremål saknas i kartan, om kartan har föremål som inte finns i rummet, om något går utanför rummet, om en utgång leder till ett rum som inte finns eller saknar `riktning`, om `klattra` står på något som inte är en utgång, om `lapp` pekar på ett föremål som inte finns i rummet och om `in_<rum>` inte är ett rum. Ett enhetstest kontrollerar att varje föremål går att nå från varje ingång i varje tillstånd.

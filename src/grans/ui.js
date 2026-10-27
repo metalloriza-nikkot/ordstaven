@@ -63,6 +63,11 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
   }
 
   // ---------------------------------------------------------------- nosen och ljudningen
+  /**
+   * Ljudning bokstav för bokstav med remsan. Av tills fas 4: datorrösten ljudar för dåligt för att vara hjälp
+   * (grind A), så nosen läser hela ordet. Koden står kvar och slås på med inspelade ljud.
+   */
+  const LJUDNING_BOKSTAVSVIS = false;
   const nos = {
     tillaten: false, aktiv: false, /** @type {() => boolean} */ betala: () => true, /** @type {() => void} */ anvand: () => {},
     /** @type {HTMLElement | null} ordet som Tab har markerat */ markerad: null,
@@ -162,13 +167,14 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
   }
   remsa.addEventListener('click', (e) => { e.stopPropagation(); avbrytLjudning(); });
 
-  /** Ljuda ett ord med remsan där aktuell bokstav lyser. @param {string} ord */
+  /** Ljuda ett ord med remsan där aktuell bokstav lyser (fas 4). Till dess läser nosen hela ordet direkt. @param {string} ord */
   async function ljuda(ord) {
     const visat = versaler(ord);
-    const delar = ljudningsdelar(visat, { helord: arHelord(visat) });
+    const helord = !LJUDNING_BOKSTAVSVIS || arHelord(visat);
+    const delar = ljudningsdelar(visat, { helord });
     remsa.innerHTML = [...visat].map((b, i) => `<span class="remsa-b" data-i="${i}">${esc(b)}</span>`).join('');
-    remsa.hidden = false;
-    logg.handelse('nos', visat, { helord: arHelord(visat) });
+    remsa.hidden = !LJUDNING_BOKSTAVSVIS;
+    logg.handelse('nos', visat, { helord });
     ljudning.pagar = true;
     ljudning.vakt = setTimeout(() => { ljudning.pagar = false; remsa.hidden = true; }, maxtidMs(delar));
     const hur = await rost.sekvens(delar.map((d) => d.text), (i) => {

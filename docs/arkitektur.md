@@ -406,3 +406,16 @@ Efter den externa granskningen: det ska aldrig löna sig att gissa eller vänta 
 - **`prata` när hjälten redan står vid figuren:** figuren kallar ändå ("Här!"), och samtalet börjar direkt. Ett tryck på en figur som är stegets mål går dit i stället för att upprepa figurens senaste replik.
 - **Sparpunktens fråga** läses från `aventyr.json` (`sparpunkt_fraga`), om sparpunkten inte har en egen `fraga`.
 - Ett tryck på ▶ som avslutar ett steg får inte bubbla vidare till nästa replik på samma läsplatta (`vanta(0)` före `doljPlatta`).
+
+## 21. Grind A: rättelser efter första körningen (0.6.2)
+
+- **Nära nog räcker** (`karna/rumslayout.js`): `vidObjekt` för saker, figurer och stegar är avståndet från fötterna till föremålets ruta, högst `RACKVIDD` (1,5 rutor), från alla håll. Dörrar och stigar väljs fortfarande genom att gå igenom dem.
+- **En sak i taget:** `aktivSak` väljer den närmaste inom räckvidden. Lika nära (inom 2 px) vinner den hjälten är vänd mot (`Rum.vand`, senaste rörelsen). Bara den får ramen och handen, och Mellanslag och ett tryck går till den. Ett tryck på en annan sak inom räckvidden går närmare den i stället för att öppna den aktiva (`tryckPa` returnerar om trycket användes).
+- **Alternativen står minst 3 rutor isär** (`glipa`), testat för varje val i prologen, och ett test ställer hjälten vid varje låda från åtta håll.
+- **Stegen:** inom räckvidd ställer sig hjälten själv mitt för stegen och klättrar.
+- **Låsta utgångar** (kartans `last_i`): en vakt i `spel.js` ser när hjälten går till en utgång som är låst i rummets tillstånd. Han känner på handtaget (dörren skakar och klickar) och tar ett steg tillbaka. Gäller i alla steg.
+- **Hallen:** skyltarna sitter ovanför dörrarna och täcker dem aldrig (testas i genomspelningen). Dörrarna har karm och handtag. Hallen är ljusare på natten (kartans `morker`). Ytterdörren sitter i hallens främre vägg, med dörrmatta.
+- **Pilskyltar** vid stigarna: skylten har en pil längs stigen.
+- **Nosen läser hela ordet** (`LJUDNING_BOKSTAVSVIS = false` i `grans/ui.js`). Ljudningen med remsan står kvar till fas 4.
+- **Rösten** (`grans/rost.js`): yttrandet hålls kvar i `pagaende` tills det är klart. Annars kan Chrome släppa det, och då kommer aldrig `onend`. Som reserv räknas talet som klart när talsyntesen har varit tyst i ca 0,3 s efter att ha börjat. Maxtiden finns kvar för en talsyntes som hänger sig. Loggen säger `slut utan onend` (högst tre gånger) när reserven behövdes.
+- **Canvas utan WebGL:** `?canvas` tvingar canvas-ritningen, och loggen säger hur världen ritas (`ritning`). Ett test spelar början med canvas och en fyra gånger långsammare processor (ca 60 bilder per sekund efter uppvärmning), och `PW_CANVAS=1` spelar hela prologen med canvas. Loggens fråga om grafikkortet görs bara en gång per session (ett nytt WebGL-sammanhang kan ta sekunder).

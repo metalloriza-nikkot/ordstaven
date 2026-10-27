@@ -257,6 +257,8 @@ export function skapaSpel(d) {
    * hämtas från kapitlets läsval i rummet som har utgången som alternativ, i den variant spelaren får.
    * @param {string} id
    */
+  /** Pilskylt vid en stig: pilen pekar längs stigen (grind A). Ingen pil på dörrar. @param {any} o */
+  const pilFor = (o) => (o.golv && o.riktning ? `<span class="pil" aria-hidden="true">${{ hoger: '→', vanster: '←', upp: '↑', ned: '↓' }[/** @type {string} */ (o.riktning)] || ''}</span>` : '');
   function skyltOrd(id) {
     for (const p of b.kapitel.pussel) {
       if (!p.i_rummet || !p.varianter) continue;
@@ -279,7 +281,7 @@ export function skapaSpel(d) {
         if (!ord) continue;
         const [punkt, plats] = skyltPlats((o.lapp && rum.ruta(o.lapp)) || o);
         lista.push({ objekt: o.id, punkt, plats, vidTryck: () => { if (rum.fryst) return; const f = framfor(o); inmatning.sattGaTill(f.x, f.y); },
-          html: `<button type="button" class="kort" data-id="${ui.esc(o.id)}"><span class="kort-etikett">${ui.rader(ord, varden(), 'kort-ord')}</span></button>` });
+          html: `<button type="button" class="kort${o.golv ? ' stigskylt' : ''}" data-id="${ui.esc(o.id)}"><span class="kort-etikett">${ui.rader(ord, varden(), 'kort-ord')}</span>${pilFor(o)}</button>` });
       }
       ui.skyltar(lista);
     };
@@ -359,6 +361,41 @@ export function skapaSpel(d) {
     replik({ ...r, vantar_pa: undefined }).finally(() => { fragar = false; rum.frys(varFryst); });
     return true;
   };
+  /** Utgången är låst i rummets tillstånd (kartans last_i): ytterdörren på natten. @param {any} o */
+  const lastNu = (o) => !!o?.lastI && !!rum.tillstand && o.lastI.includes(rum.tillstand);
+  /**
+   * Går hjälten till en låst utgång känner han på handtaget: dörren skakar och klickar, och han tar ett steg
+   * tillbaka. Ingen text. Gäller i alla steg, eftersom dörren är låst hela natten.
+   * @param {any} o
+   */
+  async function kannaPaHandtaget(o) {
+    logg.handelse('låst', `${o.id} (handtaget)`);
+    inmatning.rensaGaTill();
+    rum.frys(true);
+    ljud.spela('klick'); rum.hoppa(o.id); await vanta(tid(260));
+    ljud.spela('klick'); rum.hoppa(o.id); await vanta(tid(360));
+    await rum.ga(lasplats(o), tid(250));
+    rum.frys(false);
+  }
+  {
+    /** utgångar hjälten har varit borta från: att komma in i rummet vid dörren räknas inte */
+    const vapnade = new Set();
+    let upptagen = false;
+    /** @type {any} */
+    let rummet = null;
+    window.setInterval(() => {
+      if (!b || !rum.harRum || rum.fryst || rum.klattrar || pausad || upptagen) return;
+      if (rummet !== rum.objekt) { vapnade.clear(); rummet = rum.objekt; }
+      for (const o of rum.objekt) {
+        if (o.sort !== 'utgang' || !lastNu(o)) continue;
+        if (!genom(o, rum.pos) && !vidObjekt(rum.pos, o)) { vapnade.add(o.id); continue; }
+        if (!vapnade.has(o.id)) continue;
+        vapnade.delete(o.id); upptagen = true;
+        kannaPaHandtaget(o).finally(() => { upptagen = false; });
+        return;
+      }
+    }, 60);
+  }
   /** @type {(() => void) | null} skyltarna i valet som pågår, ritas om när layouten ändras */
   let skyltarNu = null;
   layout.vidAndring(() => { visaEtiketter(); skyltarNu?.(); });
@@ -420,7 +457,8 @@ export function skapaSpel(d) {
     const ram = { vanster: rumTillSkarm(s, 0, 0).x, hoger: rumTillSkarm(s, RUM.bredd, 0).x };
     const bas = { rumTopp: s.topp, ram, under: rumTillSkarm(s, 0, o.y + o.h).y, objekt: o.id };
     const mitt = o.y + o.h / 2;
-    if (o.sort === 'utgang' && !o.golv) return [rumTillSkarm(s, o.x + o.b / 2, mitt), { ...bas, lage: 'pa' }];
+    // dörrens skylt sitter ovanför dörren och täcker den aldrig (grind A), och den går att läsa från mitten av rummet
+    if (o.sort === 'utgang' && !o.golv) return [rumTillSkarm(s, o.x + o.b / 2, o.y - 1), bas];
     if (o.sort !== 'utgang' && o.sida === 'hoger' && o.x <= rum.vagg.sida + 8) return [rumTillSkarm(s, o.x, mitt), { ...bas, lage: 'vanster' }];
     if (o.sort !== 'utgang' && o.sida === 'vanster' && o.x + o.b >= RUM.bredd - rum.vagg.sida - 8) return [rumTillSkarm(s, o.x + o.b, mitt), { ...bas, lage: 'hoger' }];
     return [rumTillSkarm(s, o.x + o.b / 2, o.y), bas];
@@ -474,7 +512,8 @@ export function skapaSpel(d) {
       // spelet tills han gått därifrån, eller tills spelaren trycker på utgången eller använder den.
       const framme = (/** @type {string} */ id) => { const o = rum.ruta(id); return !!o && (vidObjekt(rum.pos, o) || genom(o, rum.pos)); };
       const vapnade = new Set();
-      const andra = last ? rum.objekt.filter((o) => o.sort === 'utgang' && !ids.includes(o.id)).map((o) => o.id) : [];
+      // en utgång som är låst hela natten (ytterdörren) har sin egen reaktion: han känner på handtaget
+      const andra = last ? rum.objekt.filter((o) => o.sort === 'utgang' && !ids.includes(o.id) && !lastNu(o)).map((o) => o.id) : [];
       const vapnadeAndra = new Set();
       let lastUpptagen = false;
       const lastDorr = async (/** @type {string} */ id) => {
@@ -506,7 +545,7 @@ export function skapaSpel(d) {
         if (h.typ !== 'interagera' || rum.fryst) return;
         if (nara) gor(nara); else { const ut = utgangar.find(framme); if (ut) gor(ut); }
       });
-      rum.tryckPa = (id) => { if (id === nara || (utgangar.includes(id) && framme(id))) gor(id); };
+      rum.tryckPa = (id) => { if (id === nara || (utgangar.includes(id) && framme(id))) { gor(id); return true; } return false; };
       let gjort = false;
       const stada = () => { gjort = true; window.clearInterval(tick); sluta(); rum.tryckPa = null; visaNara(null); rum.sattInteraktiva([]); };
       function gor(/** @type {string} */ id) { if (gjort) return; if (saker.includes(id)) styrGjort(verb); stada(); inmatning.rensaGaTill(); klar(id); }
@@ -537,7 +576,11 @@ export function skapaSpel(d) {
     k.stopp(); rum.markera(st.mal, false); ui.doljRegi();
     // stegen: hjälten klättrar själv upp eller ned tills huvudet når luckan, sedan glider nästa rum in
     const o = rum.ruta(st.mal);
-    if (o?.klattra) { klattrade = o.klattra; await rum.klattra(o.id, o.klattra, 'pa', tid(700)); }
+    if (o?.klattra) {
+      // nära nog räcker: hjälten ställer sig själv mitt för stegen och klättrar
+      await rum.ga(framfor(o), tid(300));
+      klattrade = o.klattra; await rum.klattra(o.id, o.klattra, 'pa', tid(700));
+    }
   }
 
   // ------------------------------------------------------------------ pussel
@@ -711,7 +754,7 @@ export function skapaSpel(d) {
           const [punkt, plats] = skyltPlats(vis);
           const provad = borta.has(a.id);
           lista.push({ objekt: o.id, punkt, plats, vidTryck: () => { if (!provad) anvandAlt(a); },
-            html: `<button type="button" class="kort ${provad ? 'provad' : ''} ${v.s.pekar === a.id ? 'pekar' : ''}" data-id="${ui.esc(a.id)}"${provad ? ' tabindex="-1"' : ''}><span class="kort-etikett">${ui.rader(a.ord, varden(), 'kort-ord')}</span></button>` });
+            html: `<button type="button" class="kort ${provad ? 'provad' : ''} ${v.s.pekar === a.id ? 'pekar' : ''}${o.golv ? ' stigskylt' : ''}" data-id="${ui.esc(a.id)}"${provad ? ' tabindex="-1"' : ''}><span class="kort-etikett">${ui.rader(a.ord, varden(), 'kort-ord')}</span>${pilFor(o)}</button>` });
         }
         ui.skyltar(lista);
         ui.skyltNara(vid && arUtgang(vid) ? vid : null);
@@ -754,7 +797,7 @@ export function skapaSpel(d) {
         if (ut) { const a = altFor(ut.id); if (a) valj(a.id); }
       }, 60);
       const sluta = lyssnaHandling((h) => { if (h.typ === 'interagera' && vid) { const a = altFor(vid); if (a) anvandAlt(a); } });
-      rum.tryckPa = (/** @type {string} */ id) => { if (id === vid) { const a = altFor(id); if (a) anvandAlt(a); } };
+      rum.tryckPa = (/** @type {string} */ id) => { if (id !== vid) return false; const a = altFor(id); if (a) anvandAlt(a); return true; };
       // ett tryck på en dörr i valet går igenom den (skylten syns redan)
       rum.malFor = (/** @type {any} */ o) => (o.sort === 'utgang' && altFor(o.id) ? framfor(o) : null);
       ritaSkyltar();

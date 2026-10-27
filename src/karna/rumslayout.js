@@ -10,7 +10,7 @@ const FIGUR_HOJD = 24;
  * @typedef {{ id: string, x: number, y: number, b: number, h: number, sort: 'utgang' | 'sak' | 'figur',
  *             till?: string, sida?: 'under' | 'over' | 'vanster' | 'hoger' | 'alla', golv?: boolean, visar?: string,
  *             riktning?: 'vanster' | 'hoger' | 'upp' | 'ned', klattra?: 'upp' | 'ned', ute?: boolean, lapp?: string,
- *             talare?: string }} Objekt
+ *             talare?: string, lastI?: string[] }} Objekt
  * till = rummet en utgång leder till, sida = var hjälten ställer sig, golv = man går på det (stig, grind).
  * sida 'alla' = föremålet har ingen framsida (krukor, buskar, en låda mitt på golvet): det går att använda från alla håll.
  */
@@ -75,12 +75,53 @@ export function framfor(o) {
   return { x, y: Math.min(RUM.hojd, o.y + o.h + 12) };
 }
 
-/** Står hjälten vid objektet? @param {{ x: number, y: number }} pos fötterna @param {Objekt} o */
+/** Nära nog räcker (grind A): saker, figurer och stegen nås från alla håll inom ca 1,5 rutor från kanten. */
+export const RACKVIDD = Math.round(RUM.ruta * 1.5);
+
+/** Avståndet från fötterna till objektets ruta (0 om fötterna står på den). @param {{ x: number, y: number }} pos @param {Objekt} o */
+export function avstandTill(pos, o) {
+  const dx = Math.max(o.x - pos.x, 0, pos.x - (o.x + o.b));
+  const dy = Math.max(o.y - pos.y, 0, pos.y - (o.y + o.h));
+  return Math.hypot(dx, dy);
+}
+
+/**
+ * Når hjälten objektet? Saker, figurer och stegar: inom räckvidden från alla håll. Dörrar och stigar väljs
+ * genom att gå igenom dem (se genom), och "vid" betyder att han står framför dem.
+ * @param {{ x: number, y: number }} pos fötterna @param {Objekt} o
+ */
 export function vidObjekt(pos, o) {
-  // från alla håll: fötterna står i en ring runt föremålet (ovanför står fötterna strax ovanför överkanten)
-  if (o.sida === 'alla') return pos.x >= o.x - 16 && pos.x <= o.x + o.b + 16 && pos.y >= o.y - 6 && pos.y <= o.y + o.h + 16;
+  if (o.sort !== 'utgang' || o.klattra) return avstandTill(pos, o) <= RACKVIDD;
   const f = framfor(o);
   return Math.abs(pos.x - f.x) <= 14 && Math.abs(pos.y - f.y) <= 14;
+}
+
+/**
+ * Den enda saken hjälten använder just nu: den närmaste inom räckvidden. Står två lika nära (inom 2 px)
+ * vinner den han är vänd mot. Det får aldrig vara oklart vilken sak som används (grind A).
+ * @param {{ x: number, y: number }} pos fötterna @param {Objekt[]} objekt kandidaterna
+ * @param {{ x: number, y: number }} [vand] åt vilket håll han tittar (enhetsvektor)
+ * @returns {Objekt | null}
+ */
+export function aktivSak(pos, objekt, vand = { x: 0, y: 1 }) {
+  const nara = objekt.map((o) => ({ o, d: avstandTill(pos, o) })).filter((x) => vidObjekt(pos, x.o));
+  if (!nara.length) return null;
+  const mot = (/** @type {Objekt} */ o) => {
+    const cx = o.x + o.b / 2 - pos.x, cy = o.y + o.h / 2 - pos.y, l = Math.hypot(cx, cy) || 1;
+    return (cx * vand.x + cy * vand.y) / l;
+  };
+  nara.sort((a, b) => (Math.abs(a.d - b.d) <= 2 ? mot(b.o) - mot(a.o) : a.d - b.d));
+  return nara[0].o;
+}
+
+/**
+ * Minsta glipan mellan två objekts rutor. Alternativen i ett val står minst 3 rutor isär, så att ingen plats
+ * når två av dem. @param {Objekt} a @param {Objekt} b
+ */
+export function glipa(a, b) {
+  const dx = Math.max(b.x - (a.x + a.b), 0, a.x - (b.x + b.b));
+  const dy = Math.max(b.y - (a.y + a.h), 0, a.y - (b.y + b.h));
+  return Math.hypot(dx, dy);
 }
 
 /**

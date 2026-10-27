@@ -11,7 +11,7 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 8,
+ "nextobjectid": 9,
  "properties": [
   {
    "name": "rum",
@@ -37,6 +37,11 @@
    "name": "vagg_fram",
    "type": "int",
    "value": 16
+  },
+  {
+   "name": "morker",
+   "type": "float",
+   "value": 0.55
   }
  ],
  "layers": [
@@ -88,7 +93,7 @@
      "name": "dorr_mat",
      "type": "utgang",
      "x": 78,
-     "y": 64,
+     "y": 54,
      "width": 26,
      "height": 36,
      "properties": [
@@ -116,7 +121,7 @@
      "name": "dorr_bad",
      "type": "utgang",
      "x": 78,
-     "y": 124,
+     "y": 130,
      "width": 26,
      "height": 36,
      "properties": [
@@ -139,7 +144,7 @@
      "name": "dorr_toa",
      "type": "utgang",
      "x": 216,
-     "y": 64,
+     "y": 54,
      "width": 26,
      "height": 36,
      "properties": [
@@ -162,7 +167,7 @@
      "name": "dorr_sov",
      "type": "utgang",
      "x": 216,
-     "y": 124,
+     "y": 130,
      "width": 26,
      "height": 36,
      "properties": [
@@ -190,7 +195,7 @@
      "name": "start",
      "type": "",
      "x": 160,
-     "y": 150,
+     "y": 118,
      "width": 0,
      "height": 0,
      "point": true,
@@ -202,10 +207,48 @@
      "name": "lampa",
      "type": "",
      "x": 160,
-     "y": 112,
+     "y": 110,
      "width": 0,
      "height": 0,
      "point": true,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 8,
+     "name": "dorr_ut",
+     "type": "utgang",
+     "x": 146,
+     "y": 176,
+     "width": 28,
+     "height": 16,
+     "properties": [
+      {
+       "name": "till",
+       "type": "string",
+       "value": "tradgarden"
+      },
+      {
+       "name": "riktning",
+       "type": "string",
+       "value": "ned"
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "over"
+      },
+      {
+       "name": "ute",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "last_i",
+       "type": "string",
+       "value": "natt"
+      }
+     ],
      "rotation": 0,
      "visible": true
     }

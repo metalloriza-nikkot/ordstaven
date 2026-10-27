@@ -1,8 +1,10 @@
 // Spelar hela prologen i webbläsaren, som en spelare: trycker på det som syns på skärmen.
 // Rätt svar tas från innehållet. Testläget (?snabb) stänger av rösten och kortar pauserna.
 import { test, expect } from '@playwright/test';
-import { readFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 
+// PW_CANVAS=1 spelar med canvas-ritningen (som en dator utan WebGL)
+const CANVAS = process.env.PW_CANVAS ? '&canvas' : '';
 const prolog = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-00.json', import.meta.url), 'utf8'));
 const pussel = new Map(prolog.pussel.map((p) => [p.id, p]));
 const rattaId = (p) => new Set(Object.values(p.varianter || {}).flatMap((v) => v.alternativ.filter((a) => a.ratt).map((a) => a.id)));
@@ -67,7 +69,7 @@ async function menyOchTillbaka(page, var_) {
 /** Stäng fliken mitt i en scen och öppna igen: spelet ska fortsätta i samma scen och på samma steg. */
 async function stangOchOppna(page) {
   const fore = await page.evaluate(() => ({ scen: window.__ORDSTAVEN.scen(), steg: window.__ORDSTAVEN.stegIndex() }));
-  await page.goto('./?snabb');
+  await page.goto('./?snabb' + CANVAS);
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.click('.start-knapp');
   const efter = await page.evaluate(() => ({ scen: window.__ORDSTAVEN.scen(), steg: window.__ORDSTAVEN.stegIndex() }));
@@ -76,6 +78,7 @@ async function stangOchOppna(page) {
   return fore;
 }
 
+const T0 = Date.now();
 async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid = null, satt = 'mellanslag', stangI = new Set() } = {}) {
   const sett = new Set();
   const lagerSett = new Set();
@@ -99,6 +102,7 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
     expect(lage.vuxen, `etiketter för den vuxne syns i ${lage.scen}`).toBe(false);
     if (lage.slut) return sett;
     if (stoppVid && lage.scen === stoppVid) return sett;
+    if (process.env.PW_TIDER && !sett.has(lage.scen)) console.log('tid', ((Date.now() - T0) / 1000).toFixed(1), lage.scen);
     sett.add(lage.scen);
     const nyckel = `${lage.scen}-${lage.typ}-${lage.pusselId || ''}`;
     if (dumpa && !sparadeDumpar.has(nyckel) && (lage.replik || lage.kort || lage.formel || lage.dop || lage.bok || lage.hjalte || lage.lapp)) {
@@ -244,13 +248,19 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
         // dörrar och stigar: skyltarna syns hela tiden, så han kan läsa från mitten av rummet och gå raka vägen
         const skylt = page.locator(`#skyltar .skylt[data-objekt="${a.objekt}"] .kort`);
         await expect(skylt).toBeVisible({ timeout: 5000 });
-        await expect(skylt).toHaveText(a.ord.toLocaleUpperCase('sv-SE'));
-        // ingen skylt täcker en annan, och alla ryms i rummet
+        await expect(skylt.locator('.kort-etikett')).toHaveText(a.ord.toLocaleUpperCase('sv-SE'));
+        // ingen skylt täcker en annan eller en dörr, och alla ryms i rummet
         const krock = await page.evaluate(() => {
+          const O = window.__ORDSTAVEN, s = O.skala();
           const r = [...document.querySelectorAll('#skyltar .skylt .kort')].map((e) => e.getBoundingClientRect());
-          const s = window.__ORDSTAVEN.skala();
           for (const x of r) if (x.left < s.vanster - 1 || x.right > s.vanster + s.cssBredd + 1) return 'utanför rummet';
-          for (let i = 0; i < r.length; i++) for (let j = i + 1; j < r.length; j++) if (r[i].left < r[j].right && r[j].left < r[i].right && r[i].top < r[j].bottom && r[j].top < r[i].bottom) return 'överlappar';
+          const over = (a, b) => a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1;
+          for (let i = 0; i < r.length; i++) for (let j = i + 1; j < r.length; j++) if (over(r[i], r[j])) return 'överlappar';
+          for (const id of O.rumsobjekt()) {
+            const o = O.ruta(id); if (!o || o.sort !== 'utgang' || o.golv) continue;
+            const d = { left: s.vanster + o.x * s.cssSkala, right: s.vanster + (o.x + o.b) * s.cssSkala, top: s.topp + o.y * s.cssSkala, bottom: s.topp + (o.y + o.h) * s.cssSkala };
+            for (const x of r) if (over(x, d)) return `en skylt täcker ${id}`;
+          }
           return null;
         });
         expect(krock, `skyltarna i ${p.id}`).toBeNull();
@@ -306,18 +316,19 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
 test.describe('genomspelning av prologen', () => {
   test('hela prologen går att spela, med fel svar och omstart mitt i', async ({ page }, info) => {
     test.skip(!['mac-helskarm', 'ipad-10', 'mac-safari'].includes(info.project.name), 'tre projekt räcker');
-    test.setTimeout(240000);
+    test.setTimeout(420000); // hela prologen, två gånger halva: långsamma CI-maskiner behöver marginal
     const fel = []; page.on('pageerror', (e) => fel.push(String(e)));
     // PW_LANGSAM=4 kör processorn fyra gånger långsammare (Chromium), som en långsam CI-maskin
     if (process.env.PW_LANGSAM) { const c = await page.context().newCDPSession(page); await c.send('Emulation.setCPUThrottlingRate', { rate: Number(process.env.PW_LANGSAM) }); }
-    await page.goto('./?snabb&ny');
+    await page.goto('./?snabb&ny' + CANVAS);
     await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
-    const dumpa = info.project.name === 'mac-helskarm';
+    // skärmdumpar med canvas tar flera sekunder i testmaskinens mjukvarurendering: hoppa över dem då
+    const dumpa = info.project.name === 'mac-helskarm' && !CANVAS;
     // pass 1 och en bit in i pass 2, med fel svar på FILT och dörrarna
     const satt = { 'mac-helskarm': 'mellanslag', 'ipad-10': 'igen', 'mac-safari': 'hand' }[info.project.name];
     const forstaSett = await spelaProlog(page, { dumpa, satt, felFor: new Set(['p0_filt', 'p0_dorrar']), stoppVid: 's09_lappen', stangI: new Set(['s04_agget']) });
     // starta om (utan ?ny): spelet ska fortsätta där det var, med Farfars "Var var vi?"
-    await page.goto('./?snabb');
+    await page.goto('./?snabb' + CANVAS);
     await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
     const omstartRepliker = [];
     page.on('console', () => {});
@@ -329,6 +340,7 @@ test.describe('genomspelning av prologen', () => {
     expect(omstartRepliker.some((t) => /VAR VAR VI/.test(t))).toBe(true);
     // loggen visar varje val, och om en knuff eller pekning kom före det
     const loggen = await page.evaluate(() => window.__ORDSTAVEN.logg());
+    writeFileSync(`tests/skarmdumpar/prolog-logg-${info.project.name}.txt`, loggen);
     const val = loggen.split('\n').filter((r) => r.includes('[val]'));
     expect(val.length, 'valen står i loggen').toBeGreaterThan(5);
     for (const r of val) expect(r, r).toMatch(/"knuff_fore":(true|false),"pekning_fore":(true|false)/);

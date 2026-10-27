@@ -102,7 +102,7 @@ describe('nosen och bokstäverna', () => {
 });
 
 import { skapaHinder } from '../../src/karna/vag.js';
-import { framfor, framforFran, hinderFran, rumsObjekt, vidObjekt, vaggar, genom, lasplats, objektFarg, VAGG } from '../../src/karna/rumslayout.js';
+import { framfor, framforFran, hinderFran, rumsObjekt, vidObjekt, vaggar, genom, lasplats, objektFarg, VAGG, RACKVIDD, aktivSak, glipa, avstandTill } from '../../src/karna/rumslayout.js';
 
 describe('kollision och vägsökning', () => {
   const lada = { x: 140, y: 80, b: 40, h: 30 };
@@ -241,10 +241,15 @@ describe('föremål utan framsida (sida alla)', () => {
     for (const p of [{ x: 110, y: 98 }, { x: 90, y: 118 }, { x: 130, y: 118 }, { x: 110, y: 130 }]) expect(vidObjekt(p, kruka), JSON.stringify(p)).toBe(true);
     expect(vidObjekt({ x: 110, y: 70 }, kruka)).toBe(false);
   });
-  it('ett föremål med en framsida nås bara därifrån', () => {
+  it('nära nog räcker: ett föremål nås från alla håll inom ca 1,5 rutor, även med en framsida (grind A)', () => {
     const lada = { ...kruka, sida: 'under' };
-    expect(framforFran(lada, { x: 110, y: 60 })).toEqual(framfor(lada));
-    expect(vidObjekt({ x: 110, y: 98 }, lada)).toBe(false);
+    expect(framforFran(lada, { x: 110, y: 60 })).toEqual(framfor(lada)); // ett tryck går fortfarande till framsidan
+    const mitt = { x: lada.x + lada.b / 2, y: lada.y + lada.h / 2 };
+    for (const [dx, dy] of [[0, -1], [0, 1], [-1, 0], [1, 0]]) {
+      const kant = { x: dx < 0 ? lada.x : dx > 0 ? lada.x + lada.b : mitt.x, y: dy < 0 ? lada.y : dy > 0 ? lada.y + lada.h : mitt.y };
+      expect(vidObjekt({ x: kant.x + dx * (RACKVIDD - 2), y: kant.y + dy * (RACKVIDD - 2) }, lada)).toBe(true);
+      expect(vidObjekt({ x: kant.x + dx * (RACKVIDD + 4), y: kant.y + dy * (RACKVIDD + 4) }, lada)).toBe(false);
+    }
   });
   it('inomhus väljs aldrig en punkt i väggen', () => {
     const vid = { ...kruka, x: 34, y: 60 }; // står mot vänster vägg
@@ -278,5 +283,57 @@ describe('lampor', () => {
     expect(k.lampor.length).toBe(1);
     const farfar = k.objekt.find((o) => o.id === 'farfar_vid_bordet');
     expect(Math.hypot(k.lampor[0].x - (farfar.x + farfar.b / 2), k.lampor[0].y - (farfar.y + farfar.h / 2))).toBeLessThan(40);
+  });
+});
+
+describe('vilken sak används (grind A)', () => {
+  const sak = (id, x, y) => ({ id, x, y, b: 30, h: 18, sort: 'sak' });
+  it('bara den närmaste saken inom räckvidden är aktiv', () => {
+    const rod = sak('rod', 40, 60), bla = sak('bla', 40, 90);
+    expect(aktivSak({ x: 80, y: 70 }, [rod, bla])?.id).toBe('rod');
+    expect(aktivSak({ x: 80, y: 100 }, [rod, bla])?.id).toBe('bla');
+    expect(aktivSak({ x: 200, y: 100 }, [rod, bla])).toBeNull();
+  });
+  it('står två saker lika nära vinner den han är vänd mot', () => {
+    const vanster = sak('v', 20, 60), hoger = sak('h', 90, 60);
+    const mitt = { x: 70, y: 69 }; // 20 px från båda
+    expect(avstandTill(mitt, vanster)).toBeCloseTo(avstandTill(mitt, hoger), 0);
+    expect(aktivSak(mitt, [vanster, hoger], { x: -1, y: 0 })?.id).toBe('v');
+    expect(aktivSak(mitt, [vanster, hoger], { x: 1, y: 0 })?.id).toBe('h');
+  });
+
+  // prologens val i rummet: alternativen står minst 3 rutor isär, och från varje håll öppnas just den saken
+  it('i prologen står alternativen i varje val minst 3 rutor isär, och varje låda nås och väljs från alla håll den går att stå på', async () => {
+    const { readFileSync } = await import('node:fs');
+    const prolog = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-00.json', import.meta.url), 'utf8'));
+    let provat = 0;
+    for (const p of prolog.pussel.filter((x) => x.i_rummet)) {
+      // rummet där pusslet spelas
+      const scen = prolog.scener.find((s) => s.steg.some((st) => st.pussel_id === p.id));
+      const rum = prolog.rum.find((r) => r.id === scen.rum);
+      const karta = lasKarta(JSON.parse(readFileSync(new URL(`../../kartor/den-gomda-dalen/${rum.id}.tmj`, import.meta.url), 'utf8')));
+      const obj = rumsObjekt(rum.innehall, scen.tillstand ?? (rum.tillstand || [null])[0], karta);
+      const hh = skapaHinder([...hinderFran(obj), ...(karta.inomhus ? vaggar(karta.vagg) : [])]);
+      for (const [niva, v] of Object.entries(p.varianter)) {
+        const alt = v.alternativ.map((a) => obj.find((o) => o.id === a.objekt)).filter((o) => o && o.sort !== 'utgang');
+        for (let i = 0; i < alt.length; i++) for (let j = i + 1; j < alt.length; j++) {
+          expect(glipa(alt[i], alt[j]), `${p.id} ${niva}: ${alt[i].id} och ${alt[j].id}`).toBeGreaterThanOrEqual(48); // 3 rutor
+        }
+        for (const o of alt) {
+          let fran = 0;
+          for (const [dx, dy] of [[0, 1], [0, -1], [-1, 0], [1, 0], [-1, 1], [1, 1], [-1, -1], [1, -1]]) {
+            for (const avst of [4, 12, 20]) {
+              const d = dx && dy ? avst / Math.SQRT2 : avst; // snett: lika långt från hörnet
+              const pos = { x: (dx < 0 ? o.x : dx > 0 ? o.x + o.b : o.x + o.b / 2) + dx * d, y: (dy < 0 ? o.y : dy > 0 ? o.y + o.h : o.y + o.h / 2) + dy * d };
+              if (!hh.fri(pos)) continue;
+              fran++; provat++;
+              expect(aktivSak(pos, alt, { x: -dx, y: -dy })?.id, `${p.id}: hjälten vid ${o.id} (${dx},${dy}) avstånd ${d}`).toBe(o.id);
+            }
+          }
+          expect(fran, `${p.id}: ${o.id} går inte att stå vid`).toBeGreaterThan(0);
+        }
+      }
+    }
+    expect(provat).toBeGreaterThan(20);
   });
 });
