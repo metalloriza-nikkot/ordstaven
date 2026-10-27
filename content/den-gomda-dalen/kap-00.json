@@ -15,8 +15,8 @@
  },
  "meta": {
   "namn": "Prologen",
-  "version": "0.8",
-  "datum": "2026-10-25",
+  "version": "0.9",
+  "datum": "2026-10-26",
   "agare": "Innehåll",
   "kalla": "Manus 13 v1.0. Byggd på repots kap-00.json (format 2, teknikens id:n).",
   "uppskattning": {
@@ -57,7 +57,8 @@
    }
   },
   "teknik": "Teknik har lagt in ledningens beslut i formatet, ingen text är ändrad. 2026-10-25: format 2, P28_packa, syns_i på ägget, i_rummet på FILT med lådorna lada_hyllan, lada_hornet och lada_fonstret i stället för hylla_tre_lador, och ga_till till hyllan i s04 borttaget. 2026-10-26 (val i världen): i_rummet och objekt i p0_dorrar och p0_sangen (dorr_mat, dorr_bad, dorr_toa, dorr_sov), p0_skylten (stig_skogen, stig_byn) och p0_dinomat (lada_lang_overst, lada_lang_mitten, lada_lang_nederst, som ersätter tre_langa_lador), foremal lada_med_agg på dunket i s04, och ga_till grind i s22 borttaget (grinden är en öppning i staketet, valet görs på stigarna).",
-  "innehall_v08": "Innehåll har utgått från repots fil. Ändrat: nivaer, unge_folj, dunket och lådorna i s04, anteckningen i p0_filt, repliken om bären i s12, luftskeppet i s21, baronen och Klaffen i s22, bild-id för färg och storlek i p0_dinomat, vid_omstart i varje scen. Teknikens id:n och format är orörda."
+  "innehall_v08": "Innehåll har utgått från repots fil. Ändrat: nivaer, unge_folj, dunket och lådorna i s04, anteckningen i p0_filt, repliken om bären i s12, luftskeppet i s21, baronen och Klaffen i s22, bild-id för färg och storlek i p0_dinomat, vid_omstart i varje scen. Teknikens id:n och format är orörda.",
+  "innehall_v09": "Innehåll har granskat teknikens val i världen (0.5.1). Ändrat, bara beskrivningar: felreaktionerna vid dörrarna (dörren öppnas aldrig, ljudet hörs genom dörren), stigen mot byn (ett steg ut, sedan tillbaka), leksaksbilen i FILT (lådorna står långt från ägget), ungen pekar inte längre mot bergen i s22 (det kunde avslöja vägen), baronen högt upp i gondolen, och Klaffen som putsar fjädrarna. Inga repliker, scener eller id:n är ändrade."
  },
  "rum": [
   {
@@ -1073,11 +1074,11 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Ungen springer till grinden och pekar mot bergen."
+     "beskrivning": "Ungen springer till grinden och väntar."
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Ett lila luftskepp glider fram över trädgården. Ungen gömmer sig bakom hjälten."
+     "beskrivning": "Ett lila luftskepp glider fram över trädgården. Baronen står högt upp i gondolen. Ungen gömmer sig bakom hjälten."
     },
     {
      "typ": "ljud",
@@ -1098,6 +1099,10 @@
      "talare": "baronen",
      "text": "Bra spanat i natt, Klaffen!",
      "upplast": true
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Klaffen putsar fjädrarna, nöjd."
     },
     {
      "typ": "mellanscen",
@@ -1221,7 +1226,7 @@
        "id": "bil",
        "ord": "bil",
        "vid_valj": {
-        "reaktion": "leksaksbil rullar ut, tutar, knuffar ägget",
+        "reaktion": "en leksaksbil rullar ut ur lådan och tutar",
         "replik": {
          "typ": "replik",
          "talare": "berattare",
@@ -1301,7 +1306,7 @@
        "id": "bad",
        "ord": "bad",
        "vid_valj": {
-        "reaktion": "dörren öppnas, en badanka piper",
+        "reaktion": "dörren förblir stängd, en badanka piper ut genom springan under dörren",
         "replik": {
          "typ": "replik",
          "talare": "berattare",
@@ -1315,7 +1320,7 @@
        "id": "toa",
        "ord": "toa",
        "vid_valj": {
-        "reaktion": "toaletten spolar av sig själv, ungen hoppar högt",
+        "reaktion": "det spolar bakom den stängda dörren, ungen hoppar högt",
         "replik": {
          "typ": "replik",
          "talare": "berattare",
@@ -1329,7 +1334,7 @@
        "id": "sov",
        "ord": "sov",
        "vid_valj": {
-        "reaktion": "ett sovrum med en tom säng, ungen gäspar",
+        "reaktion": "dörren förblir stängd, ungen gäspar och lutar sig mot den",
         "replik": {
          "typ": "replik",
          "talare": "berattare",
@@ -1553,7 +1558,7 @@
        "id": "mat",
        "ord": "mat",
        "vid_valj": {
-        "reaktion": "köket är redan släckt, Farfar snarkar i fåtöljen",
+        "reaktion": "snarkningar hörs bakom den stängda dörren: Farfar har somnat i fåtöljen",
         "replik": {
          "typ": "replik",
          "talare": "berattare",
@@ -1567,7 +1572,7 @@
        "id": "bad",
        "ord": "bad",
        "vid_valj": {
-        "reaktion": "badankan piper igen, ungen piper tillbaka",
+        "reaktion": "badankan piper igen genom springan, ungen piper tillbaka",
         "replik": {
          "typ": "replik",
          "talare": "berattare",
@@ -1581,7 +1586,7 @@
        "id": "toa",
        "ord": "toa",
        "vid_valj": {
-        "reaktion": "toaletten spolar av sig själv igen, ungen hoppar högt",
+        "reaktion": "det spolar igen bakom den stängda dörren, ungen hoppar högt",
         "replik": {
          "typ": "replik",
          "talare": "berattare",
@@ -1731,7 +1736,7 @@
        "id": "byn",
        "ord": "byn",
        "vid_valj": {
-        "reaktion": "några steg mot byn, Klaffen fladdrar ner och blockerar stigen, ungen backar",
+        "reaktion": "hjälten tar ett steg ut på stigen, Klaffen fladdrar ner och blockerar den, ungen backar",
         "replik": {
          "typ": "replik",
          "talare": "berattare",
