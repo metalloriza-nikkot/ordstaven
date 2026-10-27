@@ -370,3 +370,13 @@ Kvar att göra senare (noterat, inte byggt):
 - **Fri lek utan knapp:** se tabellen i avsnitt 14.
 
 **Inget för den vuxne syns under ett pass (0.5.2).** Gråboxens etiketter (föremålens namn) är avstängda från början. Slår den vuxne på dem i menyn syns de bara när spelaren går i rummet, aldrig på utgångar, och aldrig medan ett pussel pågår (`pusselPagar` i `spel.js`). Genomspelningstestet kontrollerar i varje steg att inga etiketter syns, och ett eget test slår på dem och kontrollerar att de är borta under dörrvalet.
+
+## 18. Läsningen ska löna sig (0.5.3)
+
+Efter den externa granskningen: det ska aldrig löna sig att gissa eller vänta på ungen i stället för att läsa.
+
+- **Hjälpens timing** (`karna/hjalp.js`): hjälp som pekar på svaret (en knuff med `pekar: true`) kommer tidigast efter första felet, eller efter 4 sekunder per alternativ och minst 12 sekunder (`PEKNING`). Hjälp som upprepar frågan (tankebubblan blinkar) kommer efter 9 sekunder som förut. `knuffKlocka` i `spel.js` tar en vakt som säger hur länge pekningen ska vänta.
+- **Loggen** har en rad `[val]` för varje val: pusslet, alternativet, resultatet, sekunder sedan pusslet började och om en knuff (`knuff_fore`) eller en pekning (`pekning_fore`) kom före valet. Hjälten som stannar på tröskeln loggas som `[tröskel]`.
+- **Tröskeln:** en utgång i ett val i världen väljs bara om skylten syntes innan rörelsen som tar hjälten igenom började. En nedhållen piltangent går alltså inte rakt igenom en dörr: han stannar på tröskeln med skylten synlig, och en ny piltangent, Mellanslag, ett tryck på skylten eller på dörren tar honom igenom. Inmatningen skickar handlingen `ga` för varje ny piltangent (inte tangentrepetition). På iPad betyder ett tryck på dörren "gå dit" (till skylten) och ett tryck till "gå igenom".
+- **Dörrens band** är brett: står han med fötterna strax nedanför eller bredvid dörren och trycker mot den, räknas det som att gå igenom.
+
