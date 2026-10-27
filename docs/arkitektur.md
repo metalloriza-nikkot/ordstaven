@@ -381,3 +381,17 @@ Efter den externa granskningen: det ska aldrig löna sig att gissa eller vänta 
 - **Pekningen syns i gråboxen** (0.5.4): en knuff med `pekar` får ungen att springa till rätt dörr eller låda och nosa mot den (`Rum.ungePekar`), tills spelaren väljer. Knuffens beskrivning, som är skriven för den vuxne, visas då inte. Efter tre fel pekar ungen på samma sätt.
 - **Dörrens band** är brett: står han med fötterna strax nedanför eller bredvid dörren och trycker mot den, räknas det som att gå igenom.
 
+## 19. Före grind A: granskningen och Niklas speltest (0.6.0)
+
+- **Skyltarna på dörrar och stigar syns hela tiden** i ett val (`#skyltar`, `ui.skyltar`). Han läser från mitten av rummet och går raka vägen, och ett tryck på dörren eller skylten går rakt igenom. Tröskelstoppet är borta: regeln att skylten ska ha synts före rörelsen uppfylls av sig själv. En prövad dörr behåller sin skylt nedtonad. Lådorna behåller närlappen. Genomspelningstestet kontrollerar att skyltarna aldrig överlappar och ryms i rummet.
+- **Hallen** är smal, hög och mörk: tjocka sidoväggar (kartans `vagg_sida`), stegen mitt på bakväggen, två dörrar på varje sida, och en nattlampa mitt i hallen, lika långt från alla dörrar. Hallen har tillstånden natt och morgon. Sovrummet har ett nattljus vid sängen.
+- **Förenklingen** tar först bort de fel alternativ han redan har prövat (dörrarna spikas igen) och lämnar minst två (`karna/pussel.js`).
+- **Lappen i världen:** ett pussel som spelaren har fått som en lapp (dinomaten) visar lappen i tankebubblan, inte texten. Lappen glimtar när han kommer in, ett tryck öppnar den, och knuffen är att lappen lyser.
+- **Styrbilder:** första gången han står vid något som går att använda visas Mellanslag (dator) eller ett finger (pekskärm), och likaså vid första krukan (svinga). Den försvinner när han har gjort det en gång (`av.ui.styrAnvand`, `styrSvinga`).
+- **Packlistan** får en bock per packad rad. När allt är packat lyser raden som inte är en sak, sakerna tonas ut, och reaktionen spelas medan listan syns.
+- **Passets slut:** ▶ och den sovande ungen (aldrig en dörr). `fraga` läses upp.
+- **Boken:** uppslag 1 läses av sig själv och sedan glimtar sidhörnet. Från uppslag 2 bläddrar spelaren själv.
+- **Regianvisningen** (mellanscener i gråboxen) är liten, i vanlig skrift, uppe till höger, aldrig på läsplattan och inte uppläst.
+- **Nya steg:** `bara` (filten följer hjälten, `Rum.bara`, `Rum.lagg`), `prata` (figuren kallar, `#rop`), `ta_emot`, `vantar_pa` på repliker (`handlingGjord('mata_ungen')`), `via: radio`, och `vid_annan_utgang` på `ga_till` (låsta dörrar: ljud, hjälten tittar upp, målet lyser). **Fråga igen:** `rum.fragaIgen` upprepar figurens senaste replik i scenen.
+- **Provscener i testerna:** med `?snabb&testscen` läggs en scen ur `localStorage` (`ordstaven_testscen`) till i kapitlet, så att stegen kan provas innan innehållet använder dem (`tests/webb/steg.spec.js`).
+
