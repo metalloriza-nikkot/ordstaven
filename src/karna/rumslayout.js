@@ -9,7 +9,8 @@ const FIGUR_HOJD = 24;
 /**
  * @typedef {{ id: string, x: number, y: number, b: number, h: number, sort: 'utgang' | 'sak' | 'figur',
  *             till?: string, sida?: 'under' | 'over' | 'vanster' | 'hoger' | 'alla', golv?: boolean, visar?: string,
- *             riktning?: 'vanster' | 'hoger' | 'upp' | 'ned', klattra?: 'upp' | 'ned', ute?: boolean, lapp?: string }} Objekt
+ *             riktning?: 'vanster' | 'hoger' | 'upp' | 'ned', klattra?: 'upp' | 'ned', ute?: boolean, lapp?: string,
+ *             talare?: string }} Objekt
  * till = rummet en utgång leder till, sida = var hjälten ställer sig, golv = man går på det (stig, grind).
  * sida 'alla' = föremålet har ingen framsida (krukor, buskar, en låda mitt på golvet): det går att använda från alla håll.
  */
@@ -86,8 +87,9 @@ export function vidObjekt(pos, o) {
  * Var hjälten ska gå för att använda föremålet, sett från där han står. Ett föremål med sida 'alla' nås från
  * närmaste håll (under, ovanför, vänster, höger), annars från sin sida. Punkter i väggarna väljs inte.
  * @param {Objekt} o @param {{ x: number, y: number }} pos @param {boolean} [inomhus]
+ * @param {{ bak: number, sida: number, fram: number }} [v] väggarnas mått
  */
-export function framforFran(o, pos, inomhus = false) {
+export function framforFran(o, pos, inomhus = false, v = VAGG) {
   if (o.sida !== 'alla') return framfor(o);
   const mx = Math.round(o.x + o.b / 2), my = Math.min(RUM.hojd, o.y + o.h);
   const kandidater = [
@@ -95,7 +97,7 @@ export function framforFran(o, pos, inomhus = false) {
     { x: mx, y: Math.max(FIGUR_HOJD, o.y - 2) },
     { x: o.x - 10, y: my },
     { x: o.x + o.b + 10, y: my },
-  ].filter((p) => !inomhus || (p.x > VAGG.sida + 6 && p.x < RUM.bredd - VAGG.sida - 6 && p.y > VAGG.bak + 4 && p.y < RUM.hojd - VAGG.fram));
+  ].filter((p) => !inomhus || (p.x > v.sida + 6 && p.x < RUM.bredd - v.sida - 6 && p.y > v.bak + 4 && p.y < RUM.hojd - v.fram));
   if (!kandidater.length) return framfor(o);
   return kandidater.sort((a, c) => Math.hypot(a.x - pos.x, a.y - pos.y) - Math.hypot(c.x - pos.x, c.y - pos.y))[0];
 }
@@ -120,13 +122,16 @@ export function genom(o, pos) {
 /** Väggramen inomhus (stilguiden, avsnitt 1): bakvägg 3 rutor, sidoväggar 2, främre kant 1. */
 export const VAGG = Object.freeze({ bak: 48, sida: 32, fram: 16 });
 
-/** Väggarna som rutor (hinder) i ett rum med väggram. */
-export function vaggar() {
+/**
+ * Väggarna som rutor (hinder) i ett rum med väggram. Kartan kan ge egna mått (en smal hall har tjocka sidoväggar).
+ * @param {{ bak: number, sida: number, fram: number }} [v]
+ */
+export function vaggar(v = VAGG) {
   return [
-    { x: 0, y: 0, b: RUM.bredd, h: VAGG.bak },
-    { x: 0, y: 0, b: VAGG.sida, h: RUM.hojd },
-    { x: RUM.bredd - VAGG.sida, y: 0, b: VAGG.sida, h: RUM.hojd },
-    { x: 0, y: RUM.hojd - VAGG.fram, b: RUM.bredd, h: VAGG.fram },
+    { x: 0, y: 0, b: RUM.bredd, h: v.bak },
+    { x: 0, y: 0, b: v.sida, h: RUM.hojd },
+    { x: RUM.bredd - v.sida, y: 0, b: v.sida, h: RUM.hojd },
+    { x: 0, y: RUM.hojd - v.fram, b: RUM.bredd, h: v.fram },
   ];
 }
 

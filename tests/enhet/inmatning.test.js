@@ -110,7 +110,7 @@ describe('kollision och vägsökning', () => {
       const karta = lasKarta(JSON.parse(readFileSync(new URL(`../../kartor/den-gomda-dalen/${rum.id}.tmj`, import.meta.url), 'utf8')));
       for (const t of rum.tillstand || [null]) {
         const obj = rumsObjekt(rum.innehall, t, karta);
-        const hh = skapaHinder([...hinderFran(obj), ...(karta.inomhus ? vaggar() : [])]);
+        const hh = skapaHinder([...hinderFran(obj), ...(karta.inomhus ? vaggar(karta.vagg) : [])]);
         // alla ingångar: kartans start, in-punkterna och varje utgång
         const starter = [karta.start, ...Object.values(karta.in), ...obj.filter((o) => o.till).map(framfor)].filter(Boolean).map((p) => hh.narmasteFria(p));
         // fönster och annat som sitter högt upp på bakväggen är bara utsmyckning, man går inte fram till dem
@@ -191,7 +191,8 @@ describe('husets plan', () => {
     for (const rum of ['vinden', 'hallen', 'koket', 'sovrummet']) {
       expect(k[rum].inomhus, rum).toBe(true);
       for (const o of k[rum].objekt.filter((x) => /^dorr_/.test(x.id))) {
-        const iVagg = o.y + o.h <= 48 || o.x + o.b <= 32 || o.x >= 288 || o.y >= 176;
+        const v = k[rum].vagg;
+        const iVagg = o.y + o.h <= v.bak || o.x + o.b <= v.sida || o.x >= 320 - v.sida || o.y >= 192 - v.fram;
         expect(iVagg, `${rum}: ${o.id} sitter inte i väggen`).toBe(true);
       }
     }
@@ -233,12 +234,12 @@ describe('föremål utan framsida (sida alla)', () => {
     for (const rum of prolog.rum) {
       const karta = lasKarta(JSON.parse(readFileSync(new URL(`../../kartor/den-gomda-dalen/${rum.id}.tmj`, import.meta.url), 'utf8')));
       const obj = rumsObjekt(rum.innehall, (rum.tillstand || [null]).at(-1), karta);
-      const hh = skapaHinder([...hinderFran(obj), ...(karta.inomhus ? vaggar() : [])]);
+      const hh = skapaHinder([...hinderFran(obj), ...(karta.inomhus ? vaggar(karta.vagg) : [])]);
       const start = hh.narmasteFria(karta.start);
       for (const o of obj.filter((x) => x.sida === 'alla')) {
         antal++;
         const hall = [{ x: o.x + o.b / 2, y: o.y + o.h + 30 }, { x: o.x + o.b / 2, y: o.y - 30 }, { x: o.x - 30, y: o.y + o.h / 2 }, { x: o.x + o.b + 30, y: o.y + o.h / 2 }];
-        const nas = hall.filter((h) => { const f = framforFran(o, h, karta.inomhus); const v = hh.vag(start, f); return v.length > 0 && vidObjekt(v.at(-1), o); });
+        const nas = hall.filter((h) => { const f = framforFran(o, h, karta.inomhus, karta.vagg); const v = hh.vag(start, f); return v.length > 0 && vidObjekt(v.at(-1), o); });
         expect(nas.length, `${rum.id}: ${o.id} nås bara från ${nas.length} håll`).toBeGreaterThanOrEqual(2);
       }
     }

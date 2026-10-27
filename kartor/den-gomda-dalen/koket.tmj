@@ -144,6 +144,11 @@
        "name": "sida",
        "type": "string",
        "value": "vanster"
+      },
+      {
+       "name": "talare",
+       "type": "string",
+       "value": "farfar"
       }
      ]
     },

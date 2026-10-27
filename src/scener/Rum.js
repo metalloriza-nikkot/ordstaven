@@ -43,6 +43,8 @@ export class Rum extends Phaser.Scene {
     this.fryst = false;
     this.harRum = false;
     this.inomhus = false;
+    /** väggarnas mått i rummet (kartan) */
+    this.vagg = VAGG;
     /** @type {{ x: number, y: number }[]} lampor som lyser när rummet är mörkt */
     this.lampor = [];
     /** @type {any} */
@@ -52,6 +54,8 @@ export class Rum extends Phaser.Scene {
     this.visaUnge = false;
     /** @type {{ x: number, y: number, mot: number } | null} dit ungen går för att peka (knuff), annars följer den hjälten */
     this.ungeMal = null;
+    /** @type {any[]} saker som hjälten har lagt ifrån sig i rummet */
+    this.lagda = [];
     this.tillstand = /** @type {string | null} */ (null);
     /** @type {{ ids: string[], klar: (id: string) => void } | null} */
     this.vantar = null;
@@ -64,6 +68,10 @@ export class Rum extends Phaser.Scene {
     this.tryckPa = null;
     /** @type {((o: any) => { x: number, y: number } | null) | null} var ett tryck på ett föremål leder (val med dörrar) */
     this.malFor = null;
+    /** @type {((o: any) => boolean) | null} ett tryck på en figur: upprepa dess senaste instruktion */
+    this.fragaIgen = null;
+    /** @type {any} saken hjälten bär (filten), som svävar efter honom */
+    this.buren = null;
     /** @type {string[]} föremål som går att använda just nu */
     this.interaktiva = [];
     /** @type {string | null} föremålet hjälten står vid och kan använda */
@@ -102,7 +110,9 @@ export class Rum extends Phaser.Scene {
       if (!o) return;
       // står hjälten redan vid föremålet räknas trycket som att använda det
       if (vidObjekt(this.pos, o) && this.tryckPa) { this.tryckPa(o.id); return; }
-      const f = this.malFor?.(o) ?? framforFran(o, this.pos, this.inomhus); this.b.inmatning.sattGaTill(f.x, f.y);
+      // dialogregeln: ett tryck på en figur upprepar dess senaste instruktion (fråga igen)
+      if (o.sort === 'figur' && this.fragaIgen?.(o)) return;
+      const f = this.malFor?.(o) ?? framforFran(o, this.pos, this.inomhus, this.vagg); this.b.inmatning.sattGaTill(f.x, f.y);
     });
     this.sattUtseende({});
     this.ritaUnge();
@@ -121,7 +131,7 @@ export class Rum extends Phaser.Scene {
     g.fillStyle(FARG.kant).fillRect(0, 0, RUM.bredd, 2).fillRect(0, RUM.hojd - 2, RUM.bredd, 2).fillRect(0, 0, 2, RUM.hojd).fillRect(RUM.bredd - 2, 0, 2, RUM.hojd);
     if (!this.inomhus) return;
     // väggramen: bakvägg 3 rutor, sidoväggar 2 med sneda hörn, främre kant 1, och en ljus list överst
-    const B = RUM.bredd, H = RUM.hojd, { bak, sida, fram } = VAGG;
+    const B = RUM.bredd, H = RUM.hojd, { bak, sida, fram } = this.vagg;
     g.fillStyle(0x7a6a58).fillRect(sida, 0, B - 2 * sida, bak);
     g.fillStyle(0x5e5244);
     g.fillTriangle(0, 0, sida, bak, 0, H).fillTriangle(0, 0, sida, 0, sida, bak);
@@ -219,10 +229,11 @@ export class Rum extends Phaser.Scene {
   visa(v) {
     this.harRum = !!v.rum;
     this.visaUnge = v.unge;
-    if (v.nyttRum) this.ungeMal = null;
+    if (v.nyttRum) { this.ungeMal = null; for (const g of this.lagda) g.destroy(); this.lagda = []; }
     this.tillstand = v.tillstand;
     if (v.nyttRum || !this.harRum) this.inomhus = !!v.karta?.inomhus;
     this.lampor = v.karta?.lampor || [];
+    if (v.nyttRum || !this.harRum) this.vagg = v.karta?.vagg || VAGG;
     this.ritaGolv(this.harRum);
     // föremål som bara syns i vissa tillstånd (ägget när ljuset är tänt) gör att rummet byggs om
     const synliga = this.harRum ? synligaIds(v.innehall, v.tillstand).join(' ') : '';
@@ -276,7 +287,7 @@ export class Rum extends Phaser.Scene {
     if (o.sort === 'sak') g.fillStyle(0xfff2b0, 0.9).fillRect(o.x + 2, o.y - 4, o.b - 4, 2);
   }
 
-  byggHinder() { this.hinder = skapaHinder([...hinderFran(this.objekt), ...(this.inomhus ? vaggar() : [])]); this.vag = []; this.vagMal = null; }
+  byggHinder() { this.hinder = skapaHinder([...hinderFran(this.objekt), ...(this.inomhus ? vaggar(this.vagg) : [])]); this.vag = []; this.vagMal = null; }
 
   /** @param {import('../karna/rumslayout.js').Objekt} o */
   ritaObjekt(o) {
@@ -336,6 +347,7 @@ export class Rum extends Phaser.Scene {
 
   placera() {
     this.hjalte.setPosition(Math.round(this.pos.x - FIGUR.bredd / 2), Math.round(this.pos.y - FIGUR.hojd));
+    if (this.buren) this.buren.setPosition(Math.round(this.pos.x + 6), Math.round(this.pos.y - FIGUR.hojd - 6 + Math.sin(this.time.now / 300) * 1.5));
     // pekar ungen nosar den mot föremålet: små ryck åt dess håll
     const m = this.ungeMal;
     const nos = m && Math.hypot(m.x - this.ungePos.x, m.y - this.ungePos.y) < 3 ? Math.max(0, Math.sin(this.time.now / 110)) * 3 : 0;
@@ -407,12 +419,39 @@ export class Rum extends Phaser.Scene {
     const o = this.ruta(id);
     if (!o || !this.unge.visible) return false;
     // ställ ungen en bit in i rummet från föremålet, på sidan mot hjälten, och låt den nosa mot det
-    const f = o.sort === 'utgang' ? lasplats(o) : framforFran(o, this.pos, this.inomhus);
+    const f = o.sort === 'utgang' ? lasplats(o) : framforFran(o, this.pos, this.inomhus, this.vagg);
     const p = this.hinder.narmasteFria({ x: f.x, y: f.y });
     const cx = o.x + o.b / 2, cy = o.y + o.h / 2;
     this.ungeMal = { x: p.x, y: p.y, mot: Math.atan2(cy - p.y, cx - p.x) };
     return true;
   }
+
+  /**
+   * Hjälten bär en sak som svävar efter honom (som ljusbollen), eller null. @param {number | null} farg
+   */
+  bara(farg) {
+    this.buren?.destroy(); this.buren = null;
+    if (farg === null) return;
+    const g = this.add.container(0, 0);
+    g.add(this.add.rectangle(0, 0, 12, 8, farg).setOrigin(0, 0).setStrokeStyle(1, 0x4a3f34));
+    for (let x = 1; x < 12; x += 3) g.add(this.add.rectangle(x, 8, 1, 2, farg).setOrigin(0, 0)); // fransar
+    this.buren = g; this.placera();
+  }
+  /** Lägg saken hjälten bär på ett föremål (filten om ägget). Den ligger kvar där. @param {string} id */
+  lagg(id) {
+    const o = this.ruta(id), g = this.buren; if (!o || !g) return;
+    this.buren = null;
+    this.tweens.add({ targets: g, x: Math.round(o.x + o.b / 2 - 6), y: Math.round(o.y + o.h / 2 - 4), duration: 250, ease: 'Quad.easeOut' });
+    this.lagda.push(g);
+  }
+  /** Hjälten tittar upp (ryggen mot kameran) en stund, t.ex. när det dunkar ovanifrån. @param {number} ms */
+  tittaUpp(ms) {
+    if (this.klattrar) return;
+    this.sattRygg(true);
+    this.time.delayedCall(ms, () => { if (!this.klattrar) this.sattRygg(false); });
+  }
+  /** En figur vinkar (kallar på hjälten). @param {string} id */
+  vinka(id) { this.hoppa(id); this.time.delayedCall(260, () => this.hoppa(id)); }
 
   /** Ungens position på skärmen i rumspixlar (för att låta ett bär flyga dit). */
   get ungePunkt() { return { x: this.ungePos.x, y: this.ungePos.y - 6 }; }
@@ -483,7 +522,7 @@ export class Rum extends Phaser.Scene {
     const dx = tx - this.ungePos.x, dy = ty - this.ungePos.y, l = Math.hypot(dx, dy);
     const narmare = m ? 1 : 6;
     if (l > narmare) { const v = Math.min(l - narmare, (dtMs / 1000) * (m ? 110 : 90)); this.ungePos = { x: this.ungePos.x + (dx / l) * v, y: this.ungePos.y + (dy / l) * v }; }
-    if (flyttad || l > narmare || m) this.placera();
+    if (flyttad || l > narmare || m || this.buren) this.placera();
     if (this.vantar) {
       const o = this.objekt.find((x) => this.vantar && this.vantar.ids.includes(x.id) && vidObjekt(this.pos, x));
       if (o) { const v = this.vantar; this.vantar = null; inm.rensaGaTill(); v.klar(o.id); }

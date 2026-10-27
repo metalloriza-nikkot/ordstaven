@@ -11,7 +11,7 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 7,
+ "nextobjectid": 8,
  "properties": [
   {
    "name": "rum",
@@ -22,6 +22,21 @@
    "name": "inomhus",
    "type": "bool",
    "value": true
+  },
+  {
+   "name": "vagg_sida",
+   "type": "int",
+   "value": 104
+  },
+  {
+   "name": "vagg_bak",
+   "type": "int",
+   "value": 48
+  },
+  {
+   "name": "vagg_fram",
+   "type": "int",
+   "value": 16
   }
  ],
  "layers": [
@@ -43,8 +58,6 @@
      "y": 6,
      "width": 24,
      "height": 54,
-     "rotation": 0,
-     "visible": true,
      "properties": [
       {
        "name": "till",
@@ -66,54 +79,18 @@
        "type": "string",
        "value": "under"
       }
-     ]
-    },
-    {
-     "id": 2,
-     "name": "dorr_bad",
-     "type": "utgang",
-     "x": 70,
-     "y": 12,
-     "width": 28,
-     "height": 36,
+     ],
      "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "sida",
-       "type": "string",
-       "value": "under"
-      }
-     ]
-    },
-    {
-     "id": 3,
-     "name": "dorr_toa",
-     "type": "utgang",
-     "x": 222,
-     "y": 12,
-     "width": 28,
-     "height": 36,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "sida",
-       "type": "string",
-       "value": "under"
-      }
-     ]
+     "visible": true
     },
     {
      "id": 4,
      "name": "dorr_mat",
      "type": "utgang",
-     "x": 6,
-     "y": 92,
+     "x": 78,
+     "y": 64,
      "width": 26,
      "height": 36,
-     "rotation": 0,
-     "visible": true,
      "properties": [
       {
        "name": "till",
@@ -130,18 +107,64 @@
        "type": "string",
        "value": "hoger"
       }
-     ]
+     ],
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 2,
+     "name": "dorr_bad",
+     "type": "utgang",
+     "x": 78,
+     "y": 124,
+     "width": 26,
+     "height": 36,
+     "properties": [
+      {
+       "name": "riktning",
+       "type": "string",
+       "value": "vanster"
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "hoger"
+      }
+     ],
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 3,
+     "name": "dorr_toa",
+     "type": "utgang",
+     "x": 216,
+     "y": 64,
+     "width": 26,
+     "height": 36,
+     "properties": [
+      {
+       "name": "riktning",
+       "type": "string",
+       "value": "hoger"
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "vanster"
+      }
+     ],
+     "rotation": 0,
+     "visible": true
     },
     {
      "id": 5,
      "name": "dorr_sov",
      "type": "utgang",
-     "x": 288,
-     "y": 92,
+     "x": 216,
+     "y": 124,
      "width": 26,
      "height": 36,
-     "rotation": 0,
-     "visible": true,
      "properties": [
       {
        "name": "till",
@@ -158,19 +181,33 @@
        "type": "string",
        "value": "vanster"
       }
-     ]
+     ],
+     "rotation": 0,
+     "visible": true
     },
     {
      "id": 6,
      "name": "start",
      "type": "",
      "x": 160,
-     "y": 140,
+     "y": 150,
      "width": 0,
      "height": 0,
+     "point": true,
      "rotation": 0,
-     "visible": true,
-     "point": true
+     "visible": true
+    },
+    {
+     "id": 7,
+     "name": "lampa",
+     "type": "",
+     "x": 160,
+     "y": 112,
+     "width": 0,
+     "height": 0,
+     "point": true,
+     "rotation": 0,
+     "visible": true
     }
    ]
   }

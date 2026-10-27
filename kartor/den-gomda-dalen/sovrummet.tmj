@@ -11,7 +11,7 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 5,
+ "nextobjectid": 6,
  "properties": [
   {
    "name": "rum",
@@ -103,6 +103,18 @@
      "rotation": 0,
      "visible": true,
      "point": true
+    },
+    {
+     "id": 5,
+     "name": "lampa",
+     "type": "",
+     "x": 208,
+     "y": 70,
+     "width": 0,
+     "height": 0,
+     "point": true,
+     "rotation": 0,
+     "visible": true
     }
    ]
   }

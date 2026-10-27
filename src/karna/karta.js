@@ -7,15 +7,19 @@
 // "golv" (man går på det) och "visar" (pusslet vars alternativ föremålet visar, t.ex. lådorna eller krukorna).
 // "riktning" (vanster, hoger, upp, ned: åt vilket håll utgången leder, nästa rum glider in därifrån),
 // "klattra" (upp, ned: stegen klättras), "ute" (utedörren ritas ljusare) och "lapp" (föremålet där ordet visas
-// när utgången är ett val, t.ex. skylten vid en stig). Kartans egenskap "inomhus" ger rummet väggram.
+// när utgången är ett val, t.ex. skylten vid en stig), "talare" (figurens talare: ett tryck på figuren upprepar
+// dess senaste instruktion). Kartans egenskap "inomhus" ger rummet väggram, och
+// vagg_bak, vagg_sida och vagg_fram ger väggarnas mått i pixlar (annars 48, 32 och 16; en smal hall har tjocka sidoväggar).
 // En punkt med namnet "start" är där hjälten står när rummet visas utan att hjälten kom genom en utgång.
 // Punkter som heter "lampa" (eller lampa_…) lyser när rummet är mörkt, t.ex. en läslampa vid Farfars plats.
 import { RUM } from './skalning.js';
+import { VAGG } from './rumslayout.js';
 
 /** @typedef {import('./rumslayout.js').Objekt} Objekt */
 /**
  * @typedef {{ objekt: Objekt[], start: { x: number, y: number } | null, inomhus: boolean,
- *             in: Record<string, { x: number, y: number }>, lampor: { x: number, y: number }[] }} Karta
+ *             in: Record<string, { x: number, y: number }>, lampor: { x: number, y: number }[],
+ *             vagg: { bak: number, sida: number, fram: number } }} Karta
  * inomhus = rummet har väggram (bakvägg, sidoväggar, främre kant). in = var hjälten kommer in från ett rum
  * som inte har någon utgång hit (punkter som heter in_<rum>, t.ex. trädgården från köket). lampor = där det lyser i mörkret.
  */
@@ -81,8 +85,11 @@ export function lasKarta(tmj) {
       if (egen.klattra === 'upp' || egen.klattra === 'ned') ut.klattra = egen.klattra;
       if (egen.ute) ut.ute = true;
       if (egen.lapp) ut.lapp = String(egen.lapp);
+      if (egen.talare) ut.talare = String(egen.talare);
       objekt.push(ut);
     }
   }
-  return { objekt, start, inomhus: !!kartegen.inomhus, in: inpunkter, lampor };
+  const tal = (/** @type {any} */ x, /** @type {number} */ d) => (Number.isFinite(Number(x)) && x !== '' && x !== undefined ? Math.round(Number(x)) : d);
+  const vagg = { bak: tal(kartegen.vagg_bak, VAGG.bak), sida: tal(kartegen.vagg_sida, VAGG.sida), fram: tal(kartegen.vagg_fram, VAGG.fram) };
+  return { objekt, start, inomhus: !!kartegen.inomhus, in: inpunkter, lampor, vagg };
 }
