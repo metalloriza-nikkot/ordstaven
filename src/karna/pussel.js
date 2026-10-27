@@ -34,6 +34,8 @@ export function skapaValj(pussel, { niva, slump = Math.random }) {
     valda: new Set(),
     fel: 0,
     forsok: 0,
+    /** @type {Set<string>} fel alternativ som spelaren redan har prövat */
+    provade: new Set(),
     forenklad: false,
     /** id som ungen pekar på efter 3 fel */
     pekar: /** @type {string | null} */ (null),
@@ -50,10 +52,18 @@ export function skapaValj(pussel, { niva, slump = Math.random }) {
       s.alternativ = blanda(variant.alternativ, slump);
       return;
     }
-    // ta bort fel alternativ: ett i P1 (två kvar), två i P28
-    const antal = flera ? 2 : 1;
-    const fel = s.alternativ.filter((a) => !a.ratt);
-    const bort = new Set(blanda(fel, slump).slice(0, Math.min(antal, Math.max(0, fel.length - (flera ? 0 : 1)))).map((a) => a.id));
+    if (flera) {
+      // P28: två fel saker försvinner
+      const fel = s.alternativ.filter((a) => !a.ratt);
+      const bort = new Set(blanda(fel, slump).slice(0, Math.min(2, fel.length)).map((a) => a.id));
+      s.alternativ = s.alternativ.filter((a) => !bort.has(a.id));
+      return;
+    }
+    // P1: de fel alternativ han redan har prövat tas bort (dörrarna spikas igen), men minst två finns kvar,
+    // så att han fortfarande måste läsa. Har han inte prövat något tas ett fel alternativ bort.
+    const kanTas = Math.max(0, s.alternativ.length - 2);
+    const provade = s.alternativ.filter((a) => !a.ratt && s.provade.has(a.id));
+    const bort = new Set((provade.length ? provade : blanda(s.alternativ.filter((a) => !a.ratt), slump).slice(0, 1)).slice(0, kanTas).map((a) => a.id));
     s.alternativ = s.alternativ.filter((a) => !bort.has(a.id));
   }
 
@@ -80,6 +90,7 @@ export function skapaValj(pussel, { niva, slump = Math.random }) {
         return { resultat: 'klar', reaktion: pussel.vid_ratt ?? null, forenklad: false };
       }
       s.fel++;
+      s.provade.add(id);
       let forenklad = false;
       if (pussel.forenkla && s.fel === pussel.forenkla.efter_fel && !s.forenklad) { forenkla(); forenklad = true; }
       if (s.fel >= 3) s.pekar = flera ? rattaKvar()[0]?.id ?? null : s.alternativ.find((x) => x.ratt)?.id ?? null;

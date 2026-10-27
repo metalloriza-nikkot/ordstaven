@@ -68,6 +68,19 @@ describe('pusslen', () => {
     expect(p.s.alternativ).toHaveLength(2);
     expect(p.s.alternativ.some((a) => a.id === 'filt')).toBe(true);
   });
+  it('dörrarna: förenklingen spikar igen de dörrar han redan har prövat, två dörrar finns kvar', () => {
+    for (const slump of [fast, () => 0.99, () => 0.5]) {
+      const p = skapaValj(P('p0_dorrar'), { niva: 1, slump });
+      p.valj('bad'); const r = p.valj('toa');
+      expect(r.forenklad).toBe(true);
+      expect(p.s.alternativ.map((a) => a.id).sort()).toEqual(['mat', 'sov']); // den oprövade fel dörren står kvar
+    }
+  });
+  it('förenklingen tar aldrig bort så många att bara det rätta är kvar', () => {
+    const p = skapaValj(P('p0_filt'), { niva: 1, slump: fast });
+    p.valj('bil'); p.valj('bil');
+    expect(p.s.alternativ.length).toBeGreaterThanOrEqual(2);
+  });
   it('felreaktionen kommer från alternativet', () => {
     const p = skapaValj(P('p0_filt'), { niva: 1, slump: fast });
     expect(p.valj('bil').reaktion.reaktion).toMatch(/leksaksbil/);
