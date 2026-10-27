@@ -11,7 +11,11 @@ concurrency:
   cancel-in-progress: true
 jobs:
   testa:
-    runs-on: ubuntu-24.04 # inte ubuntu-latest: Playwrights --with-deps stöder inte Ubuntu 26 ännu
+    runs-on: ubuntu-24.04
+    # Playwrights egen bild med samma version som package.json: webbläsarna och deras systempaket finns redan.
+    # Att installera dem i varje körning hängde flera gånger hos GitHub (apt och nedladdningen).
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -23,15 +27,6 @@ jobs:
         run: npm run kontroll
       - name: Bygg
         run: npm run build
-      - name: Installera testwebbläsare
-        # nedladdningen kan hänga på GitHubs sida: högst 5 minuter per försök, tre försök
-        timeout-minutes: 16
-        run: |
-          for i in 1 2 3; do
-            timeout 300 npx playwright install --with-deps chromium webkit && exit 0
-            echo "försök $i hängde eller misslyckades, provar igen"
-          done
-          exit 1
       - name: Webbläsartester (hela testmatrisen)
         run: npm run test:webb
         env:
