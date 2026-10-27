@@ -56,7 +56,7 @@
     ]
    }
   },
-  "teknik": "Teknik har lagt in ledningens beslut i formatet, ingen text är ändrad. 2026-10-25: format 2, P28_packa, syns_i på ägget, i_rummet på FILT med lådorna lada_hyllan, lada_hornet och lada_fonstret i stället för hylla_tre_lador, och ga_till till hyllan i s04 borttaget. 2026-10-26 (val i världen): i_rummet och objekt i p0_dorrar och p0_sangen (dorr_mat, dorr_bad, dorr_toa, dorr_sov), p0_skylten (stig_skogen, stig_byn) och p0_dinomat (lada_lang_overst, lada_lang_mitten, lada_lang_nederst, som ersätter tre_langa_lador), foremal lada_med_agg på dunket i s04, och ga_till grind i s22 borttaget (grinden är en öppning i staketet, valet görs på stigarna).",
+  "teknik": "Teknik har lagt in ledningens beslut i formatet, ingen text är ändrad. 2026-10-25: format 2, P28_packa, syns_i på ägget, i_rummet på FILT med lådorna lada_hyllan, lada_hornet och lada_fonstret i stället för hylla_tre_lador, och ga_till till hyllan i s04 borttaget. 2026-10-26 (val i världen): i_rummet och objekt i p0_dorrar och p0_sangen (dorr_mat, dorr_bad, dorr_toa, dorr_sov), p0_skylten (stig_skogen, stig_byn) och p0_dinomat (lada_lang_overst, lada_lang_mitten, lada_lang_nederst, som ersätter tre_langa_lador), foremal lada_med_agg på dunket i s04, och ga_till grind i s22 borttaget (grinden är en öppning i staketet, valet görs på stigarna). 2026-10-27 (hjälpens timing): \"pekar\": true på knuffarna i p0_dorrar (ungen nosar mot dörren med matdoft) och p0_sangen (ungen lutar sig mot rätt dörr). De pekar på svaret och kommer tidigast efter första felet, eller efter 4 s per alternativ och minst 12 s. Övriga knuffar upprepar frågan (p0_filt, p0_skylten) eller hör till uppgifter som inte är läsval (p0_ljus förebild, p0_ungenamn, p0_krukor, gå till lådan i s02) och kommer som förut. Ungens pekning efter tre fel och efter_3_fel kommer efter fel och påverkas inte.",
   "innehall_v08": "Innehåll har utgått från repots fil. Ändrat: nivaer, unge_folj, dunket och lådorna i s04, anteckningen i p0_filt, repliken om bären i s12, luftskeppet i s21, baronen och Klaffen i s22, bild-id för färg och storlek i p0_dinomat, vid_omstart i varje scen. Teknikens id:n och format är orörda.",
   "innehall_v09": "Innehåll har granskat teknikens val i världen (0.5.1). Ändrat, bara beskrivningar: felreaktionerna vid dörrarna (dörren öppnas aldrig, ljudet hörs genom dörren), stigen mot byn (ett steg ut, sedan tillbaka), leksaksbilen i FILT (lådorna står långt från ägget), ungen pekar inte längre mot bergen i s22 (det kunde avslöja vägen), baronen högt upp i gondolen, och Klaffen som putsar fjädrarna. Inga repliker, scener eller id:n är ändrade."
  },
@@ -1354,7 +1354,8 @@
      "talare": "farfar",
      "text": "Där vi äter!",
      "upplast": true
-    }
+    },
+    "pekar": true
    },
    "forenkla": {
     "efter_fel": 2,
@@ -1600,7 +1601,8 @@
     }
    },
    "knuff": {
-    "handling": "ungen gäspar och lutar sig mot rätt dörr"
+    "handling": "ungen gäspar och lutar sig mot rätt dörr",
+    "pekar": true
    },
    "forenkla": {
     "efter_fel": 2,

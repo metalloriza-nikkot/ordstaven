@@ -228,6 +228,10 @@
           "type": "number",
           "minimum": 3,
           "maximum": 30
+        },
+        "pekar": {
+          "type": "boolean",
+          "description": "Knuffen pekar på svaret (ungen lutar sig mot rätt dörr). Kommer tidigast efter första felet, eller efter 4 s per alternativ och minst 12 s."
         }
       }
     },

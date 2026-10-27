@@ -134,6 +134,13 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
     const var_ = (s) => `${k.id} ${s}`;
     const rum = new Map(k.rum.map((r) => [r.id, r]));
     const pussel = new Map(k.pussel.map((p) => [p.id, p]));
+    // en knuff i ett läsval som verkar peka på svaret ska ha pekar: true, annars kommer den för tidigt
+    const PEKORD = /\b(rätt|mot)\b/i;
+    for (const p of k.pussel) {
+      if (!['P1_las_och_valj', 'P28_packa'].includes(p.typ) || !p.knuff || p.knuff.pekar) continue;
+      const m = (p.knuff.handling || '').match(PEKORD);
+      if (m) varningar.push(`${k.id} ${p.id}: knuffen "${p.knuff.handling}" verkar peka på svaret (${m[0]}). Lägg till "pekar": true, så kommer den inte före läsningen.`);
+    }
     const anvanda = new Set();
 
     // Formler i kapitlet (får stå i versaler i text)
