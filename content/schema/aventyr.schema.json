@@ -115,6 +115,22 @@
           }
         }
       }
+    },
+    "sparpunkt_fraga": {
+      "type": "object",
+      "description": "Frågan som läses upp vid varje sparpunkt med pass_slut. Gäller alla kapitel. En sparpunkt kan ha en egen fråga (fraga), som då går före.",
+      "additionalProperties": false,
+      "required": [
+        "text"
+      ],
+      "properties": {
+        "anteckning": {
+          "type": "string"
+        },
+        "text": {
+          "$ref": "kapitel.schema.json#/$defs/replik"
+        }
+      }
     }
   }
 }

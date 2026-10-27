@@ -188,14 +188,6 @@
         "upplast": {
           "type": "boolean",
           "description": "true = läses alltid upp (instruktioner, berättare). false = spelaren läser själv."
-        },
-        "vantar_pa": {
-          "enum": ["mata_ungen"],
-          "description": "En instruktion som ber om en handling väntar tills den är gjord. Repliken visas uppe i rummet medan världen går, upprepas med en styrbild efter ca 8 s, och nästa steg kommer först efter handlingen."
-        },
-        "via": {
-          "enum": ["radio"],
-          "description": "Repliken hörs genom radion (radioramen lyser), fast talaren kan stå i rummet."
         }
       }
     },
@@ -475,7 +467,7 @@
           }
         },
         {
-          "description": "Dialogregeln: figuren kallar på avstånd (högst tre ord), och samtalet börjar när hjälten kommer inom ca 1,5 rutor. Stegen efter detta är samtalet.",
+          "description": "Dialogregeln: figuren kallar på avstånd (högst fyra korta ord), och samtalet börjar när hjälten kommer inom ca 1,5 rutor. Stegen efter detta är samtalet.",
           "type": "object",
           "additionalProperties": false,
           "required": ["typ", "figur"],
@@ -792,6 +784,18 @@
         },
         "upplast": {
           "type": "boolean"
+        },
+        "vantar_pa": {
+          "enum": ["mata_ungen", "nosen"],
+          "description": "En instruktion som ber om en handling väntar tills den är gjord (mata_ungen: ungen har ätit ett bär, nosen: spelaren har tänt nosen). Repliken visas uppe i rummet medan världen går, upprepas med en styrbild efter ca 8 s, och nästa steg kommer först efter handlingen."
+        },
+        "via": {
+          "enum": ["radio"],
+          "description": "Repliken hörs genom radion (radioramen lyser), fast talaren kan stå i rummet."
+        },
+        "vid": {
+          "enum": ["ungen"],
+          "description": "Repliken visas i en bubbla ovanför figuren i rummet i stället för på läsplattan och läses upp (namnet som hjälten svarar med)."
         }
       }
     },

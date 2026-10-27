@@ -1064,7 +1064,7 @@ export function skapaSpel(d) {
   const avstandTill = (p, o) => Math.hypot(Math.max(o.x - p.x, 0, p.x - (o.x + o.b)), Math.max(o.y - p.y, 0, p.y - (o.y + o.h)));
 
   /**
-   * Dialogregeln: figuren kallar på avstånd (vinkar och ropar högst tre ord), och samtalet börjar när hjälten
+   * Dialogregeln: figuren kallar på avstånd (vinkar och ropar högst fyra korta ord), och samtalet börjar när hjälten
    * kommer inom ca 1,5 rutor. Då stannar världen, och stegen efter detta (repliker) är samtalet.
    * @param {any} st
    */

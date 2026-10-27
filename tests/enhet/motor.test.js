@@ -174,7 +174,7 @@ describe('berättelsemotorn', () => {
     const forsta = igen.aktuellt();
     expect(forsta).toMatchObject({ typ: 'replik', omstart: true, talare: 'farfar' });
     igen.klar();
-    expect(igen.aktuellt().text).toBe('Det finns dinomat på vinden.');
+    expect(igen.aktuellt().text).toBe('Dinomaten är på vinden.');
   });
 
   it('en sparning hamnar i samma scen även när innehållet har fått nya scener före den', () => {

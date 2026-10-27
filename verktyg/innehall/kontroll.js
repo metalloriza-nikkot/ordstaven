@@ -255,7 +255,7 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
             if (st.kalla) {
               replikKontroll(st.kalla, `${sp} kalla`);
               const n = ord(rader(st.kalla.text).join(' ')).length;
-              if (n > 3) varningar.push(var_(`${sp}: att kalla är högst tre ord ("${rader(st.kalla.text).join(' ')}" har ${n})`));
+              if (n > 4) varningar.push(var_(`${sp}: att kalla är högst fyra ord ("${rader(st.kalla.text).join(' ')}" har ${n})`));
             }
             break;
           }

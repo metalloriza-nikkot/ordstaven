@@ -46,17 +46,17 @@ describe('innehållskontrollen', () => {
     expect(medFel((k) => { k.scener[1].steg[1].text = 'Staven säger LJUS.'; })).toBe('');
   });
   it('fångar gamla platshållare i versaler och okända platshållare', () => {
-    expect(medFel((k) => { k.scener[6].steg[2].text = 'Hej, {UNGE}!'; })).toMatch(/små bokstäver/);
-    expect(medFel((k) => { k.scener[6].steg[2].text = 'Hej, {katt}!'; })).toMatch(/okänd platshållare/);
+    expect(medFel((k) => { k.scener[7].steg[2].text = 'Hej, {UNGE}!'; })).toMatch(/små bokstäver/);
+    expect(medFel((k) => { k.scener[7].steg[2].text = 'Hej, {katt}!'; })).toMatch(/okänd platshållare/);
   });
   it('fångar okänd talare, saknat rum, saknat mål och saknat pussel', () => {
     expect(medFel((k) => { k.scener[1].steg[1].talare = 'tomten'; })).toMatch(/okänd talare/);
-    expect(medFel((k) => { k.scener[2].rum = 'kallaren'; })).toMatch(/rummet kallaren finns inte/);
-    expect(medFel((k) => { k.scener[2].steg[2].mal = 'garderob'; })).toMatch(/garderob finns inte i rummet/);
-    expect(medFel((k) => { k.scener[3].steg[2].pussel_id = 'p0_finns_inte'; })).toMatch(/pusslet p0_finns_inte finns inte/);
+    expect(medFel((k) => { k.scener[3].rum = 'kallaren'; })).toMatch(/rummet kallaren finns inte/);
+    expect(medFel((k) => { k.scener[3].steg[2].mal = 'garderob'; })).toMatch(/garderob finns inte i rummet/);
+    expect(medFel((k) => { k.scener[4].steg[2].pussel_id = 'p0_finns_inte'; })).toMatch(/pusslet p0_finns_inte finns inte/);
   });
   it('fångar ett tillstånd som aldrig kan uppstå', () => {
-    expect(medFel((k) => { k.scener[4].tillstand = 'kvall'; })).toMatch(/tillståndet kvall/);
+    expect(medFel((k) => { k.scener[5].tillstand = 'kvall'; })).toMatch(/tillståndet kvall/);
   });
   it('fångar läs och välj utan exakt ett rätt svar', () => {
     expect(medFel((k) => { k.pussel.find((p) => p.id === 'p0_filt').varianter.L1.alternativ[1].ratt = true; })).toMatch(/exakt ett alternativ/);
@@ -148,9 +148,9 @@ describe('kontrollen: enhet, alias, nivåer', () => {
   const medVarning = (andra) => { const d = riktigt(); andra(d.kapitel[0]); return kontrollera(d).varningar.join('\n'); };
   const medFel = (andra) => { const d = riktigt(); andra(d.kapitel[0]); return kontrollera(d).fel.join('\n'); };
   it('varnar för instruktioner som nämner en enhet', () => {
-    expect(medVarning((k) => { k.scener[2].steg[0].text = 'Använd piltangenterna.'; })).toMatch(/nämner en enhet \(piltangenterna\)/);
-    expect(medVarning((k) => { k.scener[2].steg[0].text = 'Klicka på lådan.'; })).toMatch(/nämner en enhet/);
-    expect(medVarning((k) => { k.scener[2].steg[0].text = 'Tryck på lådan.'; })).not.toMatch(/nämner en enhet/);
+    expect(medVarning((k) => { k.scener[3].steg[0].text = 'Använd piltangenterna.'; })).toMatch(/nämner en enhet \(piltangenterna\)/);
+    expect(medVarning((k) => { k.scener[3].steg[0].text = 'Klicka på lådan.'; })).toMatch(/nämner en enhet/);
+    expect(medVarning((k) => { k.scener[3].steg[0].text = 'Tryck på lådan.'; })).not.toMatch(/nämner en enhet/);
   });
   it('alias pekar på id:n som finns, och golvet ligger under taket', () => {
     expect(medFel((k) => { k.alias = { scener: { s99_gammal: 's99_finnsinte' } }; })).toMatch(/pekar på s99_finnsinte/);

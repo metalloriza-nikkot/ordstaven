@@ -73,7 +73,7 @@ Kapitelfilerna börjar med `"format": 2`, äventyret och ordlistorna med `"forma
 | `sparpunkt` | `pass_slut`, `valfri`, `fraga` | Spelet sparas. `pass_slut: true` där passet slutar: två bilder, ▶ för att fortsätta och den sovande ungen för att sluta för idag. **`fraga`** (replik) läses upp och står ovanför bilderna. |
 | `fritt` | `beskrivning`, `foremal` | Fri lek, t.ex. buskar att svinga staven mot. Ingen knapp: steget tar slut när varje föremål har gett sina två bär, när hjälten går mot en utgång eller genom en öppning (grinden), eller efter 25 sekunder utan att något händer. |
 | `bara` | `bild`, `till` | Hjälten bär en sak (filten): den svävar efter honom som ljusbollen och läggs på `till` när han når fram själv. |
-| `prata` | `figur`, `kalla` | Dialogregeln: figuren kallar på avstånd (vinkar, `kalla` är högst tre ord och läses upp), och samtalet börjar när hjälten kommer inom ca 1,5 rutor. Stegen efter `prata` är samtalet. |
+| `prata` | `figur`, `kalla` | Dialogregeln: figuren kallar på avstånd (vinkar, `kalla` är högst fyra korta ord och läses upp), och samtalet börjar när hjälten kommer inom ca 1,5 rutor. Stegen efter `prata` är samtalet. |
 | `ta_emot` | `fran`, `bild` | Figuren räcker fram en sak (lappen). Hjälten tar den själv med ett tryck när han står vid figuren. |
 
 En **replik inuti något annat** (`knuff`, `vid_fel`, `instruktion`, `vid_omstart`) skrivs utan `typ`: `{ "talare": "berattare", "text": "Där. I lådan.", "upplast": true }`.
