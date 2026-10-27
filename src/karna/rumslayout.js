@@ -111,8 +111,10 @@ export function genom(o, pos) {
     return iBand && (o.riktning === 'hoger' || o.riktning === 'vanster' ? Math.abs(pos.x - f.x) <= 6 : Math.abs(pos.y - f.y) <= 6);
   }
   const r = o.riktning || /** @type {Record<string, string>} */ ({ hoger: 'vanster', vanster: 'hoger', under: 'upp', over: 'ned' })[o.sida || 'under'];
-  if (r === 'vanster' || r === 'hoger') return Math.abs(pos.x - f.x) <= 6 && pos.y >= o.y + 10 && pos.y <= o.y + o.h + 6;
-  return Math.abs(pos.y - f.y) <= 8 && pos.x >= o.x - 2 && pos.x <= o.x + o.b + 2;
+  // bandet är lika brett som dörren och lite till: står han med fötterna strax nedanför eller bredvid dörren
+  // och trycker mot den, och skylten syns, ska han komma igenom (annars ser dörren obrukbar ut)
+  if (r === 'vanster' || r === 'hoger') return Math.abs(pos.x - f.x) <= 6 && pos.y >= o.y + 10 && pos.y <= o.y + o.h + 14;
+  return Math.abs(pos.y - f.y) <= 8 && pos.x >= o.x - 6 && pos.x <= o.x + o.b + 6;
 }
 
 /** Väggramen inomhus (stilguiden, avsnitt 1): bakvägg 3 rutor, sidoväggar 2, främre kant 1. */

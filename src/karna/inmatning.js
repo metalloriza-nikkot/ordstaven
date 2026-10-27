@@ -33,7 +33,13 @@ export function skapaInmatning() {
   return {
     /** @param {string} kod KeyboardEvent.code @param {string} [tecken] KeyboardEvent.key @returns {boolean} om tangenten användes */
     tangentNer(kod, tecken = '') {
-      if (kod in RIKTNINGAR) { nere.add(kod); gaTill = null; return true; }
+      if (kod in RIKTNINGAR) {
+        // en ny piltangent (inte tangentrepetition) är ett nytt tryck: handlingen "ga"
+        const ny = !nere.has(kod);
+        nere.add(kod); gaTill = null;
+        if (ny) skicka({ typ: 'ga', kod });
+        return true;
+      }
       if (kod in KNAPPAR) { skicka({ typ: KNAPPAR[/** @type {keyof KNAPPAR} */ (kod)] }); return true; }
       // Nosen ligger på Tab, inte på en bokstav: alla bokstäver måste gå att skriva (N i ett namn).
       if (kod === 'Tab') { skicka({ typ: 'hjalp' }); return true; }

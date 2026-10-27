@@ -9,6 +9,7 @@ import { forSkarm } from './karna/text.js';
 import { rumTillSkarm, RUM } from './karna/skalning.js';
 import { framfor, lasplats, vidObjekt, genom, VAGG } from './karna/rumslayout.js';
 import { aventyrFor } from './karna/sparning.js';
+import { pekningOmMs, skapaHjalpSpar } from './karna/hjalp.js';
 import { HJALTE_FARGER } from './scener/Rum.js';
 import { TANGENTBORD_HOJD } from './grans/tangentbord.js';
 
@@ -113,13 +114,43 @@ export function skapaSpel(d) {
     ui.doljRegi();
   }
 
-  /** Knuff efter en stunds tvekan. Returnerar en funktion som nollställer klockan. @param {any} knuff @param {() => void} [extra] */
-  function knuffKlocka(knuff, extra) {
+  /**
+   * Knuff efter en stunds tvekan. Returnerar en funktion som nollställer klockan.
+   * extra = hjälp som upprepar frågan (tankebubblan blinkar): den kommer alltid efter tvekan.
+   * En knuff med pekar: true pekar på svaret (ungen lutar sig mot rätt dörr). Med en vakt väntar den tills
+   * pekningen är tillåten (karna/hjalp.js): efter första felet, eller efter 4 s per alternativ och minst 12 s.
+   * @param {any} knuff @param {() => void} [extra]
+   * @param {{ pekOmMs: () => number, spar: ReturnType<typeof skapaHjalpSpar> }} [vakt]
+   */
+  function knuffKlocka(knuff, extra, vakt) {
     if (!knuff) return { nollstall() {}, stopp() {} };
-    let t = 0;
-    const starta = () => { clearTimeout(t); t = window.setTimeout(async () => { if (pausad) { starta(); return; } logg.handelse('knuff', knuff.handling); extra?.(); if (knuff.handling) ui.visaRegi(knuff.handling, 0); if (knuff.replik) await sag(knuff.replik); else await vanta(2500); ui.doljRegi(); }, (knuff.efter_sek ? knuff.efter_sek * 1000 : KNUFF_MS)); };
+    let t = 0, t2 = 0;
+    const visa = async () => {
+      if (pausad) { t2 = window.setTimeout(visa, 500); return; }
+      logg.handelse('knuff', knuff.handling, { pekar: !!knuff.pekar });
+      vakt?.spar.knuff(!!knuff.pekar);
+      if (knuff.handling) ui.visaRegi(knuff.handling, 0);
+      if (knuff.replik) await sag(knuff.replik); else await vanta(2500);
+      ui.doljRegi();
+    };
+    const starta = () => {
+      clearTimeout(t); clearTimeout(t2);
+      t = window.setTimeout(() => {
+        if (pausad) { starta(); return; }
+        extra?.(); vakt?.spar.knuff(false);
+        if (!knuff.handling && !knuff.replik) return;
+        const om = knuff.pekar && vakt ? vakt.pekOmMs() : 0;
+        if (om > 0) { logg.handelse('knuff', 'pekningen väntar', { ms: om }); t2 = window.setTimeout(visa, om); }
+        else visa();
+      }, (knuff.efter_sek ? knuff.efter_sek * 1000 : KNUFF_MS));
+    };
     starta();
-    return { nollstall: starta, stopp() { clearTimeout(t); } };
+    return { nollstall: starta, stopp() { clearTimeout(t); clearTimeout(t2); } };
+  }
+
+  /** Loggen: varje val, och om en knuff eller pekning kom före det. @param {any} p @param {string} altId @param {string} resultat @param {ReturnType<typeof skapaHjalpSpar>} spar */
+  function loggaVal(p, altId, resultat, spar) {
+    logg.handelse('val', `${p.id}: ${altId}`, { resultat, sek: Math.round(spar.sedanStart() / 100) / 10, ...spar.fore() });
   }
 
   /** Nosen: tillåten i pussel med hjälp "ett_ord". Kostar ett bär, gratis vid 0 bär. @param {any} pussel @param {{ hjalp: boolean }} spar */
@@ -384,7 +415,9 @@ export function skapaSpel(d) {
     rum.frys(true);
     return new Promise((klar) => {
       let upptagen = false;
-      const k = knuffKlocka(p.knuff, () => plattan().querySelector('.fraga')?.classList.add('puls'));
+      const hjalpSpar = skapaHjalpSpar(() => performance.now());
+      const vakt = { spar: hjalpSpar, pekOmMs: () => pekningOmMs({ antalAlternativ: v.s.alternativ.length, antalFel: v.s.fel, sedanStartMs: hjalpSpar.sedanStart() }) };
+      const k = knuffKlocka(p.knuff, () => plattan().querySelector('.fraga')?.classList.add('puls'), vakt);
       const plattan = () => ui.plattan;
       const kortHtml = (/** @type {any} */ a) => {
         const bild = flera ? bilder.html(a.bild || a.id) : a.ord ? '' : bilder.html(a.bild || a.id);
@@ -404,8 +437,10 @@ export function skapaSpel(d) {
       const tryck = async (/** @type {string} */ id) => {
         if (upptagen || ui.nosAktiv) return;
         k.nollstall();
+        if (v.s.pekar) hjalpSpar.pekning();
         const r = v.valj(id);
         if (r.resultat === 'redan') return;
+        loggaVal(p, id, r.resultat, hjalpSpar);
         upptagen = true;
         const kort = /** @type {HTMLElement | null} */ (plattan().querySelector(`.kort[data-id="${CSS.escape(id)}"]`));
         if (r.resultat === 'fel') {
@@ -469,7 +504,19 @@ export function skapaSpel(d) {
       let upptagen = false;
       /** @type {string | null} föremålet eller utgången hjälten står vid och vars lapp syns */
       let vid = null;
-      const k = knuffKlocka(p.knuff, () => ui.pulseraTanke());
+      const hjalpSpar = skapaHjalpSpar(() => performance.now());
+      const vakt = { spar: hjalpSpar, pekOmMs: () => pekningOmMs({ antalAlternativ: kvarAlt().length, antalFel: v.s.fel, sedanStartMs: hjalpSpar.sedanStart() }) };
+      const k = knuffKlocka(p.knuff, () => ui.pulseraTanke(), vakt);
+      // Tröskeln: en utgång väljs bara om skylten syntes innan rörelsen som tar honom igenom började
+      // (en piltangent som hålls nere hela vägen går inte rakt igenom), eller om spelaren använder skylten.
+      /** när rörelsen började: en ny piltangent eller ett tryck */
+      let rorelseStart = performance.now();
+      /** @type {Map<string, number>} när utgångens skylt syntes första gången */
+      const lappSyntes = new Map();
+      /** @type {string | null} utgången spelaren valde med skylten, Mellanslag eller ett tryck till */
+      let bekraftad = null;
+      /** @type {Set<string>} utgångar där hjälten har stannat på tröskeln (loggas en gång) */
+      const stannat = new Set();
       const visaLappen = (/** @type {string | null} */ id) => {
         if (id === vid) return;
         vid = id;
@@ -478,6 +525,7 @@ export function skapaSpel(d) {
         const o = id ? rum.ruta(id) : null;
         ui.ordskylt(null); ui.handknapp(null);
         if (!a || !o) return;
+        if (arUtgang(o.id) && !lappSyntes.has(o.id)) lappSyntes.set(o.id, performance.now());
         ljud.spela('klick');
         // lappen visas vid skylten vid en stig, annars vid föremålet eller dörren (se skyltPlats)
         const vis = (o.lapp && rum.ruta(o.lapp)) || o;
@@ -490,7 +538,7 @@ export function skapaSpel(d) {
       const anvandAlt = (a) => {
         if (upptagen || ui.nosAktiv) return;
         const o = rum.ruta(a.objekt); if (!o) return;
-        if (arUtgang(o.id)) { const f = framfor(o); inmatning.sattGaTill(f.x, f.y); }
+        if (arUtgang(o.id)) { bekraftad = o.id; const f = framfor(o); inmatning.sattGaTill(f.x, f.y); }
         else valj(a.id);
       };
       /** utgångar hjälten har varit borta från sedan valet började: att stå kvar på tröskeln räknas inte som att gå igenom */
@@ -501,10 +549,17 @@ export function skapaSpel(d) {
         const sak = rum.starVid(kvarSaker());
         const ut = kvarUtgangar().map((id) => rum.ruta(id)).find((o) => o && naraUtgang(o)) ?? null;
         visaLappen(sak ?? ut?.id ?? null);
-        // att gå igenom utgången är valet
-        if (ut && vapnade.has(ut.id) && genom(ut, rum.pos)) { const a = altFor(ut.id); if (a) valj(a.id); }
+        // att gå igenom utgången är valet, om skylten hann synas (annars stannar han på tröskeln)
+        if (ut && vapnade.has(ut.id) && genom(ut, rum.pos)) {
+          const sedd = lappSyntes.get(ut.id);
+          if (bekraftad === ut.id || (sedd !== undefined && sedd < rorelseStart)) { const a = altFor(ut.id); if (a) valj(a.id); }
+          else if (!stannat.has(ut.id)) { stannat.add(ut.id); inmatning.rensaGaTill(); logg.handelse('tröskel', `${p.id}: ${ut.id}`, { skyltenSyntes: sedd !== undefined }); }
+        }
       }, 60);
-      const sluta = lyssnaHandling((h) => { if (h.typ === 'interagera' && vid) { const a = altFor(vid); if (a) anvandAlt(a); } });
+      const sluta = lyssnaHandling((h) => {
+        if (h.typ === 'ga' || h.typ === 'tryck') { rorelseStart = performance.now(); stannat.clear(); }
+        if (h.typ === 'interagera' && vid) { const a = altFor(vid); if (a) anvandAlt(a); }
+      });
       rum.tryckPa = (/** @type {string} */ id) => { if (id === vid) { const a = altFor(id); if (a) anvandAlt(a); } };
       // ett tryck på en dörr i valet går först fram till lappen, och först nästa tryck går igenom
       rum.malFor = (/** @type {any} */ o) => {
@@ -519,7 +574,10 @@ export function skapaSpel(d) {
         const alt = v.s.alternativ.find((a) => a.id === altId);
         const o = alt ? rum.ruta(alt.objekt) : null;
         const utgang = !!o && o.sort === 'utgang';
+        if (v.s.pekar) hjalpSpar.pekning();
+        bekraftad = null;
         const r = v.valj(altId);
+        loggaVal(p, altId, r.resultat, hjalpSpar);
         upptagen = true; visaLappen(null);
         if (r.resultat === 'fel') {
           rum.frys(true);

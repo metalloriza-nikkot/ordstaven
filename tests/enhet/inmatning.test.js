@@ -11,6 +11,14 @@ describe('inmatning', () => {
     i.tangentUpp('ArrowRight'); i.tangentUpp('ArrowDown'); expect(i.riktning()).toEqual({ x: 0, y: 0 });
   });
 
+  it('en ny piltangent är handlingen ga, tangentrepetition är det inte', () => {
+    const i = skapaInmatning(); const h = [];
+    i.lyssna((x) => h.push(x.typ));
+    i.tangentNer('ArrowLeft'); i.tangentNer('ArrowLeft'); i.tangentNer('ArrowLeft');
+    expect(h).toEqual(['ga']);
+    i.tangentUpp('ArrowLeft'); i.tangentNer('ArrowLeft');
+    expect(h).toEqual(['ga', 'ga']);
+  });
   it('motsatta tangenter tar ut varandra', () => {
     const i = skapaInmatning(); i.tangentNer('ArrowLeft'); i.tangentNer('ArrowRight');
     expect(i.riktning()).toEqual({ x: 0, y: 0 });

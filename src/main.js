@@ -141,6 +141,7 @@ const spelet = skapaSpel({
   /** Föremålets sort (utgang, sak, figur). @param {string} id */
   sort: (id) => rum.ruta(id)?.sort ?? null,
   klattrar: () => !!rum.klattrar,
+  logg: () => logg.text(),
   /** Föremålen som går att använda just nu. */
   interaktiva: () => [...rum.interaktiva],
   spel,

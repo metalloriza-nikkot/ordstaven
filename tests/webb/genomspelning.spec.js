@@ -266,6 +266,12 @@ test.describe('genomspelning av prologen', () => {
     clearInterval(samla);
     expect([...sett].filter(Boolean)[0]).toBe('s09_lappen');
     expect(omstartRepliker.some((t) => /VAR VAR VI/.test(t))).toBe(true);
+    // loggen visar varje val, och om en knuff eller pekning kom före det
+    const loggen = await page.evaluate(() => window.__ORDSTAVEN.logg());
+    const val = loggen.split('\n').filter((r) => r.includes('[val]'));
+    expect(val.length, 'valen står i loggen').toBeGreaterThan(5);
+    for (const r of val) expect(r, r).toMatch(/"knuff_fore":(true|false),"pekning_fore":(true|false)/);
+    expect(val.some((r) => r.includes('p0_sangen: mat') && r.includes('"resultat":"fel"'))).toBe(true);
     const t = await page.evaluate(() => window.__ORDSTAVEN.tillstand());
     const av = t.aventyr['den-gomda-dalen'];
     expect(t.spelare.hjalte.namn).toBe('TESTA');
