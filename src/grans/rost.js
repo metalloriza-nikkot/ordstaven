@@ -22,6 +22,13 @@ export function skapaRost({ logg, tyst = () => false }) {
   /** @type {SpeechSynthesisVoice | null} */
   let rost = null;
   let token = 0;
+  /**
+   * Yttranden som pågår. Chrome släpper annars yttrandet när funktionen har returnerat, och då kommer aldrig
+   * onend: spelet väntade ut maxtiden efter varje replik (loggen från 2026-10-27, Chrome 156 på Mac).
+   * @type {Set<SpeechSynthesisUtterance>}
+   */
+  const pagaende = new Set();
+  let utanSlut = 0;
 
   function valj() {
     if (!synt) return;
@@ -48,12 +55,27 @@ export function skapaRost({ logg, tyst = () => false }) {
     }
     return new Promise((r) => {
       let klar = false;
-      const sluta = (/** @type {'klar' | 'avbruten'} */ hur) => { if (!klar) { klar = true; clearInterval(vakt); clearTimeout(max); r(hur); } };
       const u = new SpeechSynthesisUtterance(text);
+      const sluta = (/** @type {'klar' | 'avbruten'} */ hur) => { if (!klar) { klar = true; pagaende.delete(u); clearInterval(vakt); clearTimeout(max); r(hur); } };
+      pagaende.add(u);
       const rr = ROLLER[/** @type {keyof ROLLER} */ (roll)] || ROLLER.berattare;
       u.lang = 'sv-SE'; u.voice = rost; u.pitch = rr.pitch; u.rate = rr.rate;
+      // talet har börjat: onstart, eller att talsyntesen pratar en stund efter att vi bad den
+      const t0 = Date.now();
+      let startad = false, tyst = 0;
+      u.onstart = () => { startad = true; };
       u.onend = () => sluta('klar'); u.onerror = () => sluta('avbruten');
-      const vakt = setInterval(() => { if (min !== token) sluta('avbruten'); }, 100);
+      const vakt = setInterval(() => {
+        if (min !== token) { sluta('avbruten'); return; }
+        if (!startad && synt.speaking && Date.now() - t0 > 300) startad = true;
+        // reserv om onend ändå uteblir: talet har börjat och talsyntesen har varit tyst i ca 0,3 s
+        if (startad && !synt.speaking && !synt.pending) {
+          if (++tyst >= 3) {
+            if (utanSlut++ < 3) logg?.handelse('röst', 'slut utan onend', text.slice(0, 40));
+            sluta('klar');
+          }
+        } else tyst = 0;
+      }, 100);
       const max = setTimeout(() => { logg?.handelse('röst', 'maxtid', text.slice(0, 40)); sluta('klar'); }, 2000 + uppskattad(text) * 2.5);
       try { synt.speak(u); } catch (e) { sluta('avbruten'); }
     });

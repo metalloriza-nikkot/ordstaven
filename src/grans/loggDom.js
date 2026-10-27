@@ -60,15 +60,19 @@ function meddelande(text) {
 
 /** @type {string | null} */
 let gpu = null;
-/** Vilket grafikkort webbläsaren använder ("SwiftShader" = ingen grafikacceleration). */
+/**
+ * Vilket grafikkort webbläsaren använder ("SwiftShader" = ingen grafikacceleration). Frågas en gång: ett nytt
+ * WebGL-sammanhang är dyrt, och ett tomt svar fick förut frågan att göras om vid varje ögonblicksbild av loggen.
+ */
 function grafikkort() {
-  if (gpu) return gpu;
+  if (gpu !== null) return gpu;
+  gpu = 'okänt';
   try {
     const c = document.createElement('canvas');
     const gl = /** @type {WebGLRenderingContext | null} */ (c.getContext('webgl'));
     if (!gl) return (gpu = 'ingen webgl');
     const ext = gl.getExtension('WEBGL_debug_renderer_info');
-    gpu = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER));
+    gpu = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)) || 'webgl (okänt kort)';
     const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext();
   } catch (e) { gpu = 'okänt'; }
   return gpu;
