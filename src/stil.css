@@ -153,7 +153,10 @@ html, body {
 @keyframes puls { 50% { transform: scale(1.25); } }
 
 /* regi (för den vuxne) */
-#regi { position: absolute; left: 50%; top: calc(var(--rum-topp) + 8px); transform: translateX(-50%); max-width: min(90vw, calc(var(--rum-bredd) - 140px)); padding: 6px 14px; border-radius: 10px; background: rgba(26, 20, 16, .82); color: #d8ccb4; font-size: 16px; font-style: italic; pointer-events: none; }
+/* regianvisning för den vuxne (mellanscener i gråboxen): liten, i vanlig skrift, uppe till höger i rummet.
+   Den läses inte upp och står aldrig på läsplattan. Den vuxne kan läsa den högt. Försvinner när mellanscenerna får bild. */
+#regi { position: absolute; right: calc(100vw - var(--rum-vanster) - var(--rum-bredd) + 64px); top: calc(var(--rum-topp) + 10px); max-width: min(40vw, calc(var(--rum-bredd) / 2.6)); padding: 4px 10px 5px; border-radius: 6px; border: 1px dashed rgba(216, 204, 180, .55); background: rgba(26, 20, 16, .72); color: #d8ccb4; font-size: 13px; line-height: 1.3; font-style: italic; text-transform: none; pointer-events: none; z-index: 3; }
+#regi::before { content: '🎬 '; font-style: normal; }
 
 /* läsplattan: ljust papper, mörk text, stor */
 #plattan { position: absolute; left: calc(var(--rum-vanster) + var(--rum-bredd) / 2); transform: translateX(-50%); max-width: min(92vw, var(--rum-bredd)); width: max-content; color: var(--black); }
@@ -180,6 +183,10 @@ html, body {
 /* pussel */
 .pussel-ruta { padding: 20px 24px 24px; display: flex; flex-direction: column; align-items: center; gap: 18px; min-width: min(80vw, 520px); }
 .lapp { background: #fffaf0; padding: 12px 22px; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,.2); transform: rotate(-1deg); }
+/* packlistan: en bock per packad rad; när allt är packat lyser raden som inte är en sak, och sakerna tonas ut */
+.lapp .rad.bockad::after { content: ' ✔'; color: #2f8a3a; font-weight: 700; }
+.lapp .rad.lyser { background: rgba(242, 193, 78, .5); border-radius: 6px; box-shadow: 0 0 0 4px rgba(242, 193, 78, .5); animation: puls .6s ease 3; }
+.kortrad.packat .kort { opacity: .3; transition: opacity .4s; }
 .lapp.p-lila_papper_blackplumpar { background: #e8dcf2; }
 .lapp.p-traskylt { background: #c9a774; border-radius: 4px; }
 .fraga { font-size: calc(64px * var(--t)); }
@@ -313,9 +320,24 @@ html, body {
 /* läs i rummet: frågan uppe i rummet, ordet ovanför föremålet hjälten står vid */
 #tanke { position: absolute; left: calc(var(--rum-vanster) + var(--rum-bredd) / 2); top: calc(var(--rum-topp) + 10px); transform: translateX(-50%); padding: 6px 18px; border-radius: 40px; background: rgba(255, 255, 255, .92); box-shadow: 0 4px 14px rgba(0, 0, 0, .35); pointer-events: none; font-size: calc(48px * var(--t)); line-height: 1; }
 #tanke .bild.bubbla { font-size: inherit; }
+#tanke .tanke-lapp { pointer-events: auto; font-size: inherit; background: none; border: 0; cursor: pointer; padding: 0 4px; }
 #tanke.puls { animation: tankepuls .6s ease-in-out 3; }
 @keyframes tankepuls { 50% { transform: translateX(-50%) scale(1.15); } }
 #ordskylt { position: absolute; transform: translate(-50%, calc(-100% - 6px)); z-index: 5; }
+/* skyltarna på dörrar och stigar i ett val: syns hela tiden, handen bara på den han står vid */
+#skyltar { position: absolute; inset: 0; pointer-events: none; z-index: 4; }
+.platta-oppen #skyltar { display: none; }
+.skylt { position: absolute; transform: translate(-50%, calc(-100% - 6px)); pointer-events: auto; }
+.skylt.pa { transform: translate(-50%, -50%); }
+.skylt.under { transform: translate(-50%, 6px); }
+.skylt.vanster { transform: translate(calc(-100% - 6px), -50%); }
+.skylt.hoger { transform: translate(6px, -50%); }
+.skylt .kort { min-width: calc(80px * var(--t)); min-height: calc(56px * var(--t)); padding: 4px 12px; }
+.skylt .kort.provad { opacity: .5; cursor: default; }
+.skylt.nara .kort:not(.provad) { box-shadow: 0 5px 0 #c8bb9c, 0 0 0 4px var(--guld); }
+.skylt.nara .kort:not(.provad)::before { content: '✋'; position: absolute; right: calc(-18px * var(--t)); top: calc(-18px * var(--t)); width: calc(40px * var(--t)); height: calc(40px * var(--t)); display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--guld); font-size: calc(22px * var(--t)); box-shadow: 0 3px 0 #b8892b; animation: handpuls 0.9s ease-in-out infinite; pointer-events: none; }
+.snabb .skylt.nara .kort:not(.provad)::before { animation: none; }
+.nosar .skylt .ord { cursor: pointer; background: rgba(242, 193, 78, .35); box-shadow: 0 3px 0 var(--guld); }
 #ordskylt .kort { min-width: calc(96px * var(--t)); min-height: calc(72px * var(--t)); padding: 6px 14px; animation: luft .25s ease; }
 /* en hand i hörnet: tryck på lappen (eller föremålet igen) så händer det. Samma hand som vid föremålen. */
 #ordskylt .kort::before { content: '✋'; position: absolute; right: calc(-18px * var(--t)); top: calc(-18px * var(--t)); width: calc(40px * var(--t)); height: calc(40px * var(--t)); display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--guld); font-size: calc(22px * var(--t)); box-shadow: 0 3px 0 #b8892b; animation: handpuls 0.9s ease-in-out infinite; pointer-events: none; }
@@ -365,6 +387,9 @@ html, body {
 #styrhjalp .ner { grid-column: 2; grid-row: 2; animation-delay: .8s; } #styrhjalp .hoger { grid-column: 3; grid-row: 2; animation-delay: 1.2s; }
 @keyframes tangentpuls { 0%, 70%, 100% { transform: none; } 80% { transform: translateY(4px); box-shadow: 0 1px 0 #b7a98a; } }
 #styrhjalp.tryck { transform: translate(-30%, 10%); }
+#styrhjalp.mellanslag { left: calc(var(--rum-vanster) + var(--rum-bredd) / 2); bottom: calc(100vh - var(--rum-topp) - var(--rum-hojd) + 16px); transform: translateX(-50%); }
+#styrhjalp .tangent.mellanslag { width: 220px; height: 48px; animation: mellanslagpuls 1.2s ease-in-out infinite; }
+@keyframes mellanslagpuls { 0%, 60%, 100% { transform: translateY(0); box-shadow: 0 5px 0 #b7a98a; } 30% { transform: translateY(4px); box-shadow: 0 1px 0 #b7a98a; } }
 #styrhjalp .finger { display: block; font-size: 56px; animation: fingertryck 1.2s ease-in-out infinite; }
 @keyframes fingertryck { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
 .snabb #styrhjalp * { animation: none; }
@@ -375,3 +400,26 @@ html, body {
 #tona { position: absolute; left: var(--rum-vanster); top: var(--rum-topp); width: var(--rum-bredd); height: var(--rum-hojd); background: #000; opacity: 0; pointer-events: none; transition: opacity .3s linear; z-index: 1; }
 #tona.svart { opacity: 1; }
 .snabb #tona { transition-duration: .02s; }
+
+/* passets slut: den sovande ungen betyder "sluta för idag" (gråboxens unge, grön, med z z) */
+.unge-sover { position: relative; display: inline-block; width: 64px; height: 40px; }
+.unge-sover .kropp { position: absolute; left: 0; bottom: 0; width: 64px; height: 32px; border-radius: 18px 18px 10px 10px; background: #5fae6a; box-shadow: inset 10px -6px 0 #9fd4a0; }
+.unge-sover .zz { position: absolute; right: -10px; top: -18px; font-size: 22px; font-weight: 700; font-style: italic; color: #4a3f34; letter-spacing: .1em; }
+.pass-slut .fraga-text { font-size: calc(40px * var(--t)); color: #f5ecd7; margin-bottom: 18px; text-align: center; }
+
+/* boken: sidhörnet glimtar när det är dags att bläddra */
+.bok-knappar .fram.glimtar { animation: hornglimt 1s ease-in-out infinite; box-shadow: 0 0 0 4px rgba(242, 193, 78, .7); }
+@keyframes hornglimt { 50% { transform: scale(1.12) rotate(-4deg); } }
+.snabb .bok-knappar .fram.glimtar { animation: none; }
+
+/* en figur kallar (dialogregeln): en liten pratbubbla ovanför figuren */
+#rop { position: absolute; transform: translate(-50%, calc(-100% - 10px)); z-index: 4; padding: 4px 14px; border-radius: 16px; background: #fff; color: var(--black); font-size: calc(36px * var(--t)); box-shadow: 0 3px 0 #c8bb9c; pointer-events: none; }
+#rop::after { content: ''; position: absolute; left: 50%; bottom: -9px; transform: translateX(-50%); border: 8px solid transparent; border-top-color: #fff; border-bottom: 0; }
+#rop.pop { animation: luft .25s ease; }
+.platta-oppen #rop { display: none; }
+/* radioramen glider in vid provsändningen */
+#hud-radio.glider-in { animation: radioin .7s cubic-bezier(.2, .9, .3, 1.2); }
+@keyframes radioin { from { transform: translateX(-160%); opacity: 0; } to { transform: none; opacity: 1; } }
+.via-radio { margin-right: 6px; font-size: .8em; }
+/* en instruktion som väntar på handlingen står uppe i rummet medan världen går */
+#tanke .instruktion { font-size: calc(36px * var(--t)); line-height: 1.3; padding: 4px 6px; display: block; }

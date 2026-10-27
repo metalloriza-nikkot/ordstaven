@@ -178,6 +178,8 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
       if (fel) felFor.delete(p.id);
       oppnade.add(`${p.id}/${a.id}`);
       await expect(page.locator('#tanke')).toBeVisible();
+      // ett pussel på en lapp (dinomaten): bubblan visar lappen, inte texten. Han läser lappen eller minns den.
+      if (p.kan_oppnas_igen) await expect(page.locator('#tanke .tanke-lapp')).toBeVisible();
       const sort = await page.evaluate((m) => window.__ORDSTAVEN.sort(m), a.objekt);
       // glimten avslöjar aldrig svaret: alla föremål som är kvar glimtar lika, utgångar glimtar inte
       const glimtar = await page.evaluate(() => window.__ORDSTAVEN.interaktiva());
@@ -194,25 +196,39 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
         return null;
       }, pt);
       expect(skymd, `föremålet ${a.objekt} syns inte`).toBeNull();
-      // står han redan vid lappen (t.ex. kom han just in genom dörren) går nästa tryck igenom: tryck inte då
-      await page.waitForTimeout(150);
-      const redan = await page.locator(`:is(#ordskylt, #handknapp)[data-objekt="${a.objekt}"]`).isVisible();
-      if (!redan) await page.mouse.click(pt.x, pt.y);
-      // ord: närlappen visar ordet. Utan ord (lådornas färg): handen.
-      // vänta på lappen eller handen för just det här föremålet: på vägen dit kan han gå förbi ett annat
-      const lapp = a.ord ? page.locator(`#ordskylt[data-objekt="${a.objekt}"] .kort`) : page.locator(`#handknapp[data-objekt="${a.objekt}"]`);
-      await expect(lapp).toBeVisible({ timeout: 20000 });
-      if (a.ord) await expect(lapp).toHaveText(a.ord.toLocaleUpperCase('sv-SE'));
-      if (dumpa && !sparadeDumpar.has(`${nyckel}-lapp`)) { sparadeDumpar.add(`${nyckel}-lapp`); await page.screenshot({ path: `tests/skarmdumpar/prolog/${String(sparadeDumpar.size).padStart(2, '0')}-${nyckel}-lapp.png` }); }
       if (sort === 'utgang') {
-        // att stå vid dörren och läsa räcker inte: han har inte gått igenom
-        await page.waitForTimeout(200);
-        expect(await page.evaluate(() => window.__ORDSTAVEN.steg()?.pussel_id)).toBe(p.id);
+        // dörrar och stigar: skyltarna syns hela tiden, så han kan läsa från mitten av rummet och gå raka vägen
+        const skylt = page.locator(`#skyltar .skylt[data-objekt="${a.objekt}"] .kort`);
+        await expect(skylt).toBeVisible({ timeout: 5000 });
+        await expect(skylt).toHaveText(a.ord.toLocaleUpperCase('sv-SE'));
+        // ingen skylt täcker en annan, och alla ryms i rummet
+        const krock = await page.evaluate(() => {
+          const r = [...document.querySelectorAll('#skyltar .skylt .kort')].map((e) => e.getBoundingClientRect());
+          const s = window.__ORDSTAVEN.skala();
+          for (const x of r) if (x.left < s.vanster - 1 || x.right > s.vanster + s.cssBredd + 1) return 'utanför rummet';
+          for (let i = 0; i < r.length; i++) for (let j = i + 1; j < r.length; j++) if (r[i].left < r[j].right && r[j].left < r[i].right && r[i].top < r[j].bottom && r[j].top < r[i].bottom) return 'överlappar';
+          return null;
+        });
+        expect(krock, `skyltarna i ${p.id}`).toBeNull();
+        if (dumpa && !sparadeDumpar.has(`${nyckel}-lapp`)) { sparadeDumpar.add(`${nyckel}-lapp`); await page.screenshot({ path: `tests/skarmdumpar/prolog/${String(sparadeDumpar.size).padStart(2, '0')}-${nyckel}-lapp.png` }); }
+        // ett tryck på dörren (iPad och dator) eller på skylten (Safari) går rakt igenom
+        if (satt === 'hand') await skylt.click(); else await page.mouse.click(pt.x, pt.y);
+      } else {
+        // föremål: närlappen syns när han står vid det. Står han redan där går nästa tryck igenom: tryck inte då
+        await page.waitForTimeout(150);
+        const redan = await page.locator(`:is(#ordskylt, #handknapp)[data-objekt="${a.objekt}"]`).isVisible();
+        if (!redan) await page.mouse.click(pt.x, pt.y);
+        // ord: närlappen visar ordet. Utan ord (lådornas färg): handen. Vänta på just det här föremålets lapp:
+        // på vägen dit kan han gå förbi ett annat
+        const lapp = a.ord ? page.locator(`#ordskylt[data-objekt="${a.objekt}"] .kort`) : page.locator(`#handknapp[data-objekt="${a.objekt}"]`);
+        await expect(lapp).toBeVisible({ timeout: 20000 });
+        if (a.ord) await expect(lapp).toHaveText(a.ord.toLocaleUpperCase('sv-SE'));
+        if (dumpa && !sparadeDumpar.has(`${nyckel}-lapp`)) { sparadeDumpar.add(`${nyckel}-lapp`); await page.screenshot({ path: `tests/skarmdumpar/prolog/${String(sparadeDumpar.size).padStart(2, '0')}-${nyckel}-lapp.png` }); }
+        if (satt === 'mellanslag') await page.keyboard.press('Space');
+        else if (satt === 'igen') await page.mouse.click(pt.x, pt.y);
+        else if (a.ord) await lapp.click();
+        else await lapp.locator('button').click();
       }
-      if (satt === 'mellanslag') await page.keyboard.press('Space');
-      else if (satt === 'igen') await page.mouse.click(pt.x, pt.y);
-      else if (a.ord) await lapp.click();
-      else await lapp.locator('button').click();
       // vänta tills valet är gjort: felreaktionen syns, eller pusslet är löst
       // (en tom låda slutar glimta, en fel dörr ger en replik)
       await page.waitForFunction(({ id, obj, ar }) => {

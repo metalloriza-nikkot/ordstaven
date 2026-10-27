@@ -38,7 +38,15 @@ const parametrar = new URLSearchParams(location.search);
 const allaAventyr = Object.entries(aventyrsfiler).map(([fil, a]) => ({ mapp: mappAv(fil), data: /** @type {any} */ (a) })).sort((x, y) => x.mapp.localeCompare(y.mapp));
 const valt = allaAventyr.find((a) => a.data.id === parametrar.get('aventyr')) ?? allaAventyr[0];
 const aventyr = valt.data;
-const kapitel = Object.entries(kapitelfiler).filter(([fil]) => mappAv(fil) === valt.mapp).map(([, k]) => /** @type {any} */ (k));
+const kapitel = Object.entries(kapitelfiler).filter(([fil]) => mappAv(fil) === valt.mapp).map(([, k]) => /** @type {any} */ (structuredClone(k)));
+// Bara för webbläsartesterna (?snabb&testscen): en provscen ur localStorage läggs till i första kapitlet, så att
+// motorns steg kan provas innan innehållet använder dem. Påverkar aldrig ett vanligt spel.
+{
+  const q = new URLSearchParams(location.search);
+  if (q.has('snabb') && q.has('testscen')) {
+    try { const t = JSON.parse(localStorage.getItem('ordstaven_testscen') || 'null'); if (t && kapitel[0]) kapitel[0].scener.splice(t.index ?? kapitel[0].scener.length, 0, t.scen); } catch (e) { /* ingen provscen */ }
+  }
+}
 /** Testläge: ingen röst, korta pauser. */
 const snabb = parametrar.has('snabb');
 const pek = window.matchMedia('(pointer: coarse)');
@@ -142,6 +150,9 @@ const spelet = skapaSpel({
   sort: (id) => rum.ruta(id)?.sort ?? null,
   klattrar: () => !!rum.klattrar,
   ungeMal: () => rum.ungeMal,
+  buren: () => !!rum.buren,
+  lagda: () => rum.lagda.length,
+  ruta: (id) => { const o = rum.ruta(id); return o ? { ...o } : null; },
   logg: () => logg.text(),
   /** Föremålen som går att använda just nu. */
   interaktiva: () => [...rum.interaktiva],

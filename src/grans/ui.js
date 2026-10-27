@@ -25,6 +25,8 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     </div>
     <button type="button" id="hud-meny" aria-label="Meny för vuxna (håll inne)">⚙</button>
     <div id="tanke" hidden></div>
+    <div id="skyltar"></div>
+    <div id="rop" hidden></div>
     <div id="ordskylt" hidden></div>
     <div id="styrhjalp" hidden></div>
     <div id="handknapp" hidden><button type="button" aria-label="Använd">✋</button></div>
@@ -224,6 +226,38 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
   }
 
   /**
+   * Skyltarna på dörrar och stigar i ett val: de syns hela tiden, så att han kan läsa från mitten av rummet
+   * och gå raka vägen. Ett tryck på en skylt går igenom. Den han står vid får handen (klassen nara).
+   * @param {{ objekt: string, html: string, punkt: { x: number, y: number }, plats: Plats, vidTryck: () => void }[]} lista
+   */
+  function skyltar(lista) {
+    const e = $('#skyltar');
+    e.innerHTML = '';
+    for (const s of lista) {
+      const d = document.createElement('div');
+      d.className = 'skylt'; d.innerHTML = s.html;
+      e.appendChild(d);
+      placera(d, s.punkt, { ...s.plats, objekt: s.objekt });
+      d.querySelector('button')?.addEventListener('click', () => { if (!nos.aktiv) s.vidTryck(); });
+    }
+  }
+  /**
+   * En figur kallar på hjälten på avstånd (högst tre ord): en pratbubbla ovanför figuren. null döljer.
+   * @param {string | null} html @param {{ x: number, y: number }} [punkt] figurens överkant på skärmen
+   */
+  function ropa(html, punkt) {
+    const e = $('#rop');
+    if (!html || !punkt) { e.hidden = true; e.innerHTML = ''; return; }
+    e.innerHTML = html; e.hidden = false;
+    e.style.left = punkt.x + 'px'; e.style.top = punkt.y + 'px';
+    e.classList.remove('pop'); void e.offsetWidth; e.classList.add('pop');
+  }
+  /** Skylten vid utgången hjälten står vid får handen. @param {string | null} objekt */
+  function skyltNara(objekt) {
+    for (const d of /** @type {NodeListOf<HTMLElement>} */ ($('#skyltar').querySelectorAll('.skylt'))) d.classList.toggle('nara', d.dataset.objekt === objekt);
+  }
+
+  /**
    * Handen vid föremålet hjälten står vid: här kan du göra något. Ett tryck på handen använder föremålet.
    * @param {{ x: number, y: number } | null} punkt @param {() => void} [vidTryck] @param {Plats} [plats]
    */
@@ -261,6 +295,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     e.hidden = !typ; e.className = typ || '';
     if (typ === 'pilar') e.innerHTML = '<span class="tangent upp">▲</span><span class="tangent vanster">◀</span><span class="tangent ner">▼</span><span class="tangent hoger">▶</span>';
     else if (typ === 'tryck' && punkt) { e.innerHTML = '<span class="finger">👆</span>'; e.style.left = punkt.x + 'px'; e.style.top = punkt.y + 'px'; }
+    else if (typ === 'mellanslag') e.innerHTML = '<span class="tangent mellanslag" aria-hidden="true"></span>'; // en bred tangent som trycks ned
     else e.innerHTML = '';
   }
 
@@ -309,7 +344,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     styrhjalp,
     flygBar,
     handknapp,
-    visaTanke, pulseraTanke, ordskylt,
+    visaTanke, pulseraTanke, ordskylt, skyltar, skyltNara, ropa,
     ui, $, plattan, rader, esc, visaPlatta, doljPlatta, vantaFortsatt, visaRegi, doljRegi, visaFest,
     uppdateraHud, pulsera, visaSkarm, doljSkarm, visaMeny, doljMeny, etiketter, sattNos, vaxlaNos, ljuda, arHelord,
     handling,
