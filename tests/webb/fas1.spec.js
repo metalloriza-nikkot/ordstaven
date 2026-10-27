@@ -73,7 +73,7 @@ test('textlagret använder Andika, och versionsraden täcker aldrig rummet', asy
 test('piltangenterna flyttar hjälten', async ({ page }, info) => {
   test.setTimeout(60000);
   test.skip(!!info.project.use.hasTouch, 'pekskärm');
-  await tillScen(page, 2); // vinden, gå till lådan med staven
+  await tillScen(page, 3); // vinden, gå till lådan med staven
   const fore = await pos(page);
   // åt höger: hjälten börjar vid stegen, till vänster är väggen
   await page.keyboard.down('ArrowRight');
@@ -88,18 +88,14 @@ test('piltangenterna flyttar hjälten', async ({ page }, info) => {
 
 test('tryck på ett föremål: hjälten går dit, handen visas, och först ett tryck till öppnar', async ({ page }, info) => {
   test.setTimeout(60000);
-  await tillScen(page, 2);
+  await tillScen(page, 3);
   const pt = await page.evaluate(() => window.__ORDSTAVEN.objekt('lada_med_stav'));
   const tryck = () => (info.project.use.hasTouch ? page.touchscreen.tap(pt.x, pt.y) : page.mouse.click(pt.x, pt.y));
-  // styrhjälpen visar hur man går på just den här enheten
-  await expect(page.locator(info.project.use.hasTouch ? '#styrhjalp.tryck' : '#styrhjalp.pilar')).toBeVisible();
-  await page.screenshot({ path: `tests/skarmdumpar/styrhjalp-${info.project.name}.png` });
   // på avstånd glimtar det som går att använda
   expect(await page.evaluate(() => window.__ORDSTAVEN.interaktiva())).toContain('lada_med_stav');
   await expect(page.locator('#handknapp')).toBeHidden();
   await tryck();
   await expect(page.locator('#handknapp')).toBeVisible({ timeout: 30000 });
-  await expect(page.locator('#styrhjalp.pilar')).toBeHidden(); // gå-bilden försvinner när hjälten går
   // första gången han står vid något som går att använda: styrbilden för att använda (Mellanslag eller ett tryck)
   await expect(page.locator(info.project.use.hasTouch ? '#styrhjalp.tryck' : '#styrhjalp.mellanslag')).toBeVisible();
   // att stå vid lådan räcker inte
@@ -108,6 +104,17 @@ test('tryck på ett föremål: hjälten går dit, handen visas, och först ett t
   await page.screenshot({ path: `tests/skarmdumpar/nara-${info.project.name}.png` });
   await tryck();
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 10000 }).toBe('s03_staven');
+});
+
+test('styrbilden för att gå visas i spelets första steg (sovrummet) och försvinner när hjälten går', async ({ page }, info) => {
+  test.setTimeout(60000);
+  await tillScen(page, 1);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('s01_natten');
+  await expect(page.locator(info.project.use.hasTouch ? '#styrhjalp.tryck' : '#styrhjalp.pilar')).toBeVisible();
+  await page.screenshot({ path: `tests/skarmdumpar/styrhjalp-${info.project.name}.png` });
+  const pt = await page.evaluate(() => window.__ORDSTAVEN.objekt('dorr_hallen'));
+  if (info.project.use.hasTouch) await page.touchscreen.tap(pt.x, pt.y); else await page.mouse.click(pt.x, pt.y);
+  await expect(page.locator('#styrhjalp')).toBeHidden({ timeout: 10000 });
 });
 
 test('menyn för vuxna: ett kort tryck visar "håll inne", att hålla öppnar menyn, och scenhoppet fungerar', async ({ page }, info) => {
@@ -128,7 +135,7 @@ test('menyn för vuxna: ett kort tryck visar "håll inne", att hålla öppnar me
   // i spelet: hoppa till köket
   await page.click('.start-knapp');
   await page.keyboard.press('Control+Shift+KeyM');
-  await page.click('#vuxenmeny .scen[data-i="8"]');
+  await page.click('#vuxenmeny .scen[data-i="9"]');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.click('.start-knapp');
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('s08_farfar');
@@ -137,7 +144,7 @@ test('menyn för vuxna: ett kort tryck visar "håll inne", att hålla öppnar me
 test('nosen: skakar när det inte finns något att nosa på, ljudningen går att avbryta', async ({ page }, info) => {
   test.setTimeout(60000);
   test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
-  await tillScen(page, 2);
+  await tillScen(page, 3);
   await page.evaluate(() => { const t = window.__ORDSTAVEN.tillstand(); t.aventyr['den-gomda-dalen'].ui.nosknappen = true; });
   await page.evaluate(() => document.querySelector('#hud-nos').hidden = false);
   await page.click('#hud-nos');
@@ -198,7 +205,7 @@ test('skrivläget på pekskärm: tangentbordet kommer fram och rummet krymper', 
 
 test('bärräknaren matar ungen, och vid 0 bär rycker ungen på axlarna', async ({ page }, info) => {
   test.setTimeout(60000);
-  await tillScen(page, 2, { av: { bar: 1 }, ui: { barraknaren: true } });
+  await tillScen(page, 3, { av: { bar: 1 }, ui: { barraknaren: true } });
   const bar = page.locator('#hud-bar');
   await expect(bar).toBeVisible();
   await expect(bar.locator('.tal')).toHaveText('1');
@@ -225,7 +232,7 @@ async function folj(page, ms) {
 test('stegen: hallen → vinden → hallen, han klättrar själv och kommer fram på stegen', async ({ page }, info) => {
   test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
   // upp: hallen (s10), gå till stegen
-  await tillScen(page, 10);
+  await tillScen(page, 11);
   const upp = await page.evaluate(() => window.__ORDSTAVEN.objekt('stege_upp'));
   await page.mouse.click(upp.x, upp.y);
   let spar = await folj(page, 5000);
@@ -241,7 +248,7 @@ test('stegen: hallen → vinden → hallen, han klättrar själv och kommer fram
   expect(spar.at(-1).klattrar).toBe(false);
 
   // ner: vinden (s06, sista steget), gå till luckan
-  await tillScen(page, 6, { av: { scenId: 's06_namnet', steg: 4 } });
+  await tillScen(page, 7, { av: { scenId: 's06_namnet', steg: 4 } });
   // efter FORTSÄTT står han vid luckan: att stå där räcker inte, han klättrar först när spelaren trycker på stegen
   await page.waitForTimeout(600);
   expect(await page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('s06_namnet');
@@ -263,7 +270,7 @@ test('fri lek utan knapp: går hjälten mot grinden går berättelsen vidare', a
   await starta(page, '?snabb&ny');
   await page.evaluate(() => {
     const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
-    av.scen = 22; delete av.scenId; delete av.steg; av.startad = false; t.spelare.unge.namn = 'KNOPP';
+    av.scen = 23; delete av.scenId; delete av.steg; av.startad = false; t.spelare.unge.namn = 'KNOPP';
     localStorage.setItem('ordstaven_spar', JSON.stringify(t));
   });
   await starta(page);
@@ -284,13 +291,13 @@ test('etiketterna för den vuxne: avstängda från början och aldrig under ett 
   test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
   const synliga = () => page.locator('#etiketter:not([hidden]) .etikett-obj').count();
   // från början: avstängda, i rummet och i menyn
-  await tillScen(page, 2);
+  await tillScen(page, 3);
   expect(await page.evaluate(() => window.__ORDSTAVEN.tillstand().installningar.vuxenEtiketter)).toBe(false);
   expect(await synliga()).toBe(0);
   // den vuxne slår på dem, och dörrvalet börjar
   await page.evaluate(() => {
     const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
-    av.scen = 7; delete av.scenId; delete av.steg; av.startad = false; t.installningar.vuxenEtiketter = true;
+    av.scen = 8; delete av.scenId; delete av.steg; av.startad = false; t.installningar.vuxenEtiketter = true;
     localStorage.setItem('ordstaven_spar', JSON.stringify(t));
   });
   await starta(page);
@@ -310,7 +317,7 @@ test('etiketterna för den vuxne: avstängda från början och aldrig under ett 
 
 test('etiketterna syns när den vuxne har slagit på dem och spelaren går i rummet', async ({ page }, info) => {
   test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
-  await tillScen(page, 2, { inst: { vuxenEtiketter: true } });
+  await tillScen(page, 3, { inst: { vuxenEtiketter: true } });
   await expect(page.locator('#etiketter:not([hidden]) .etikett-obj').first()).toBeVisible();
   expect(await page.locator('#etiketter .etikett-obj', { hasText: 'stege' }).count(), 'aldrig på utgångar').toBe(0);
 });
@@ -337,7 +344,7 @@ async function hall(page, tangent, ms, klar = () => false) {
 
 test('skyltarna syns hela tiden: han läser från mitten av hallen och går rakt igenom med piltangenten', async ({ page }, info) => {
   test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
-  await startaScen(page, 7); // hallen, dörrvalet (rätt dörr: MAT)
+  await startaScen(page, 8); // hallen, dörrvalet (rätt dörr: MAT)
   for (let k = 0; k < 20 && (await page.evaluate(() => window.__ORDSTAVEN.steg()?.pussel_id)) !== 'p0_dorrar'; k++) {
     const r = await page.$('#plattan .replik-ruta'); if (r) await r.click(); await page.waitForTimeout(150);
   }
@@ -359,7 +366,7 @@ test('skyltarna syns hela tiden: han läser från mitten av hallen och går rakt
 
 test('skyltarna: ett tryck på en dörr går rakt igenom, en prövad dörr behåller sin skylt nedtonad', async ({ page }, info) => {
   test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
-  await startaScen(page, 7);
+  await startaScen(page, 8);
   for (let k = 0; k < 20 && (await page.evaluate(() => window.__ORDSTAVEN.steg()?.pussel_id)) !== 'p0_dorrar'; k++) {
     const r = await page.$('#plattan .replik-ruta'); if (r) await r.click(); await page.waitForTimeout(150);
   }
@@ -374,7 +381,7 @@ test('skyltarna: ett tryck på en dörr går rakt igenom, en prövad dörr behå
 test('pekningen: står spelaren still vid dörrarna springer ungen till rätt dörr först efter 16 sekunder', async ({ page }, info) => {
   test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
   test.setTimeout(60000);
-  await startaScen(page, 7);
+  await startaScen(page, 8);
   for (let k = 0; k < 20 && (await page.evaluate(() => window.__ORDSTAVEN.steg()?.pussel_id)) !== 'p0_dorrar'; k++) {
     const r = await page.$('#plattan .replik-ruta'); if (r) await r.click(); await page.waitForTimeout(150);
   }
@@ -395,7 +402,7 @@ test('pekningen: står spelaren still vid dörrarna springer ungen till rätt d�
 
 test('formeln: en bokstavstangent lägger motsvarande bricka (LJUS på datorn)', async ({ page }, info) => {
   test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
-  await startaScen(page, 3);
+  await startaScen(page, 4);
   for (let k = 0; k < 20 && !(await page.locator('.formel-ruta').isVisible()); k++) {
     const r = await page.$('#plattan .replik-ruta'); if (r) await r.click(); await page.waitForTimeout(150);
   }
@@ -411,7 +418,7 @@ test('mellanscenens text är en regianvisning: liten, i vanlig skrift, aldrig p�
   await starta(page, '?snabb&ny');
   await page.evaluate(() => {
     const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
-    av.scen = 7; delete av.scenId; delete av.steg; av.startad = false; t.spelare.unge.namn = 'KNOPP';
+    av.scen = 8; delete av.scenId; delete av.steg; av.startad = false; t.spelare.unge.namn = 'KNOPP';
     localStorage.setItem('ordstaven_spar', JSON.stringify(t));
   });
   await starta(page);
@@ -437,6 +444,9 @@ async function framTill(page, villkor, varv = 60) {
   for (let k = 0; k < varv; k++) {
     if (await villkor()) return;
     const r = await page.$('#plattan .replik-ruta'); if (r) await r.click().catch(() => {});
+    // prata: gå fram till figuren som kallar
+    const st = await page.evaluate(() => window.__ORDSTAVEN.steg());
+    if (st?.typ === 'prata') { const o = await page.evaluate((m) => window.__ORDSTAVEN.objekt(m), st.figur); if (o) await page.mouse.click(o.x, o.y); await page.waitForTimeout(400); }
     await page.waitForTimeout(120);
   }
   throw new Error('kom inte fram');
@@ -444,7 +454,7 @@ async function framTill(page, villkor, varv = 60) {
 
 test('styrbilden för att använda: Mellanslag första gången, sedan aldrig igen', async ({ page }, info) => {
   test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
-  await tillScen(page, 2); // gå till lådan med staven
+  await tillScen(page, 3); // gå till lådan med staven
   const l = await page.evaluate(() => window.__ORDSTAVEN.objekt('lada_med_stav'));
   await page.mouse.click(l.x, l.y);
   await expect(page.locator('#handknapp')).toBeVisible({ timeout: 8000 });
@@ -456,7 +466,7 @@ test('styrbilden för att använda: Mellanslag första gången, sedan aldrig ige
 
 test('packlistan: en bock per packad rad, sista raden lyser och sakerna tonas ut när allt är packat', async ({ page }, info) => {
   test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
-  await startaScen(page, 21);
+  await startaScen(page, 22);
   await framTill(page, () => page.locator('#plattan .kortrad').isVisible());
   const ratt = ['filt', 'rod_filt', 'bar', 'rep'];
   let n = 0;
@@ -474,7 +484,7 @@ test('packlistan: en bock per packad rad, sista raden lyser och sakerna tonas ut
 
 test('boken: uppslag 1 läses av sig själv och sedan glimtar sidhörnet', async ({ page }, info) => {
   test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
-  await startaScen(page, 16);
+  await startaScen(page, 17);
   for (let k = 0; k < 80 && !(await page.locator('.bok-ruta').isVisible()); k++) {
     const st = await page.evaluate(() => window.__ORDSTAVEN.steg());
     if (st?.typ === 'ga_till') { const o = await page.evaluate((m) => window.__ORDSTAVEN.objekt(m), st.mal); await page.mouse.click(o.x, o.y); await page.waitForTimeout(800); const h = page.locator('#handknapp'); if (await h.isVisible()) await page.keyboard.press('Space'); }
@@ -487,7 +497,7 @@ test('boken: uppslag 1 läses av sig själv och sedan glimtar sidhörnet', async
 
 test('passets slut: den sovande ungen betyder sluta för idag, ingen dörr', async ({ page }, info) => {
   test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
-  await startaScen(page, 8);
+  await startaScen(page, 9);
   await framTill(page, () => page.locator('.pass-slut .fortsatt').isVisible());
   await expect(page.locator('.pass-slut .paus .unge-sover')).toBeVisible();
   expect(await page.locator('.pass-slut').textContent()).not.toMatch(/🚪/);

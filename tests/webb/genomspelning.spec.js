@@ -87,7 +87,8 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
       const O = window.__ORDSTAVEN; const st = O.steg();
       const synlig = (s) => { const e = document.querySelector(s); return !!e && !e.closest('[hidden]') && e.offsetParent !== null; };
       return {
-        scen: O.scen(), typ: st?.typ, pusselId: st?.pussel_id ?? null, mal: st?.mal ?? null,
+        scen: O.scen(), typ: st?.typ, pusselId: st?.pussel_id ?? null, mal: st?.mal ?? null, vantarPa: st?.vantar_pa ?? null,
+        nosDemo: synlig('#plattan.nos-demo'), instruktion: synlig('#tanke .instruktion'),
         start: synlig('.start-knapp'), replik: synlig('#plattan .replik-ruta'), hjalte: synlig('.hjalte-ruta'),
         kort: synlig('#plattan .kortrad'), lapp: synlig('#plattan.lapp-vy'), formel: synlig('.formel-ruta'), dop: synlig('.dop-ruta'),
         bok: synlig('.bok-ruta'), passSlut: synlig('.pass-slut .fortsatt'),
@@ -122,7 +123,40 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
     // varje sorts lager: menyn går att öppna över det, och det finns en väg ut
     const lager = lage.replik ? 'replik' : lage.kort ? 'kort' : lage.formel ? 'formel' : lage.dop ? 'dop' : lage.bok ? 'bok' : lage.lapp ? 'lapp' : lage.passSlut ? 'passSlut' : lage.hjalte ? 'hjalte' : lage.typ === 'ga_till' ? 'rummet' : null;
     if (lager && !lagerSett.has(lager)) { lagerSett.add(lager); await menyOchTillbaka(page, `${lage.scen} (${lager})`); }
-    if (lage.passSlut) { await page.click('.pass-slut .fortsatt'); continue; }
+    if (lage.passSlut) {
+      // frågan vid passets slut (sparpunkt_fraga) står ovanför bilderna
+      await expect(page.locator('.pass-slut .fraga-text')).toHaveText('VILL DU FORTSÄTTA? ELLER SLUTA FÖR IDAG?');
+      await page.click('.pass-slut .fortsatt'); continue;
+    }
+    // en instruktion som väntar på en handling (s09 nosen, s12 bären): ingen ▶, han gör det som står
+    if (lage.typ === 'replik' && lage.vantarPa && lage.instruktion) {
+      await page.waitForTimeout(300);
+      expect((await page.evaluate(() => window.__ORDSTAVEN.steg()))?.vantar_pa, `instruktionen i ${lage.scen} väntar`).toBe(lage.vantarPa);
+      if (lage.vantarPa === 'nosen') { if (satt === 'mellanslag') await page.keyboard.press('Tab'); else await page.click('#hud-nos'); }
+      else if (lage.vantarPa === 'mata_ungen') await page.click('#hud-bar');
+      await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.steg()?.vantar_pa ?? null), { timeout: 5000 }).not.toBe(lage.vantarPa);
+      continue;
+    }
+    // spelaren nosar själv på DINOMAT (s09): ▶ syns först när han har hört ordet
+    if (lage.nosDemo) {
+      await expect(page.locator('#plattan.nos-demo .vidare')).toBeHidden();
+      if (dumpa) await page.screenshot({ path: 'tests/skarmdumpar/prolog/nos-demo.png' });
+      if (satt === 'mellanslag') await page.keyboard.press('Space'); // ordet är redan markerat
+      else await page.locator('#plattan.nos-demo .ord.glimtar').click();
+      await expect.poll(async () => (await page.evaluate(() => window.__ORDSTAVEN.logg())).includes('[nos] DINOMAT'), { timeout: 5000 }).toBe(true);
+      await page.locator('#plattan.nos-demo .vidare').click({ timeout: 8000 });
+      await expect(page.locator('#plattan.nos-demo')).toHaveCount(0, { timeout: 5000 });
+      continue;
+    }
+    // bära (filten till ägget), prata (gå fram till Farfar) och ta emot (lappen)
+    if (lage.typ === 'bara' || lage.typ === 'prata' || lage.typ === 'ta_emot') {
+      const st = await page.evaluate(() => window.__ORDSTAVEN.steg());
+      const mal = st.till || st.figur || st.fran;
+      if (lage.typ === 'ta_emot') await anvand(page, mal, satt);
+      else { const pt = await page.evaluate((m) => window.__ORDSTAVEN.objekt(m), mal); if (pt) await page.mouse.click(pt.x, pt.y); }
+      await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.steg()?.typ), { timeout: 15000 }).not.toBe(lage.typ);
+      continue;
+    }
     if (lage.replik) { await page.click('#plattan .replik-ruta'); continue; }
     if (lage.hjalte) { await page.click('.hjalte-ruta .farg >> nth=1'); await page.click('.hjalte-ruta .klar'); continue; }
     if (lage.lapp) { await page.click('#plattan .vidare'); continue; }
@@ -162,6 +196,16 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
       }, pt);
       expect(skymd, `målet ${lage.mal} i ${lage.scen} syns inte`).toBeNull();
       if (dumpa && !sparadeDumpar.has(nyckel)) { sparadeDumpar.add(nyckel); await page.screenshot({ path: `tests/skarmdumpar/prolog/${String(sparadeDumpar.size).padStart(2, '0')}-${nyckel}-${lage.mal}.png` }); }
+      // hallen före kläckningen (s01b): skyltarna syns redan, men en dörr är låst. Det dunkar, och han går till stegen.
+      if (lage.scen === 's01b_hallen' && !oppnade.has('s01b')) {
+        oppnade.add('s01b');
+        await expect(page.locator('#skyltar .skylt')).toHaveCount(4, { timeout: 5000 });
+        const dorr = await page.evaluate(() => window.__ORDSTAVEN.objekt('dorr_toa'));
+        await page.mouse.click(dorr.x, dorr.y);
+        await expect.poll(async () => (await page.evaluate(() => window.__ORDSTAVEN.logg())).includes('[låst] dorr_toa'), { timeout: 10000 }).toBe(true);
+        expect(await page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('s01b_hallen');
+        continue;
+      }
       const utgang = await page.evaluate((m) => window.__ORDSTAVEN.sort(m), lage.mal);
       if (utgang === 'utgang') await page.mouse.click(pt.x, pt.y); // utgångar: det räcker att gå dit
       else await anvand(page, lage.mal, satt);
@@ -271,7 +315,7 @@ test.describe('genomspelning av prologen', () => {
     const dumpa = info.project.name === 'mac-helskarm';
     // pass 1 och en bit in i pass 2, med fel svar på FILT och dörrarna
     const satt = { 'mac-helskarm': 'mellanslag', 'ipad-10': 'igen', 'mac-safari': 'hand' }[info.project.name];
-    await spelaProlog(page, { dumpa, satt, felFor: new Set(['p0_filt', 'p0_dorrar']), stoppVid: 's09_lappen', stangI: new Set(['s04_agget']) });
+    const forstaSett = await spelaProlog(page, { dumpa, satt, felFor: new Set(['p0_filt', 'p0_dorrar']), stoppVid: 's09_lappen', stangI: new Set(['s04_agget']) });
     // starta om (utan ?ny): spelet ska fortsätta där det var, med Farfars "Var var vi?"
     await page.goto('./?snabb');
     await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
@@ -281,6 +325,7 @@ test.describe('genomspelning av prologen', () => {
     const sett = await spelaProlog(page, { dumpa, satt, felFor: new Set(['p0_packlista', 'p0_skylten', 'p0_sangen']), stangI: new Set(['s12_pasarna', 's21_uppdraget']) });
     clearInterval(samla);
     expect([...sett].filter(Boolean)[0]).toBe('s09_lappen');
+    expect(forstaSett.has('s01b_hallen') && forstaSett.has('s01_natten')).toBe(true);
     expect(omstartRepliker.some((t) => /VAR VAR VI/.test(t))).toBe(true);
     // loggen visar varje val, och om en knuff eller pekning kom före det
     const loggen = await page.evaluate(() => window.__ORDSTAVEN.logg());

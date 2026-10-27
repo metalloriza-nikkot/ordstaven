@@ -75,6 +75,30 @@ describe('nosen och bokstäverna', () => {
     i.tangentNer('KeyN', 'n'); i.tangentNer('Tab', 'Tab');
     expect(i.hamtaHandlingar()).toEqual([{ typ: 'bokstav', tecken: 'N' }, { typ: 'hjalp' }]);
   });
+  it('en fångare (nosen) tar Mellanslag före lyssnarna, och släpper när den är klar', () => {
+    const i = skapaInmatning();
+    const fick = [];
+    i.lyssna((h) => fick.push(h.typ));
+    let tand = true;
+    const sluta = i.fanga((h) => tand && (h.typ === 'interagera' || h.typ === 'stang'));
+    i.tangentNer('Space'); i.tangentNer('Escape');
+    expect(fick).toEqual([]);
+    expect(i.hamtaHandlingar()).toEqual([]);
+    tand = false;
+    i.tangentNer('Space');
+    expect(fick).toEqual(['interagera']);
+    sluta(); tand = true;
+    i.tangentNer('Enter');
+    expect(fick).toEqual(['interagera', 'interagera']);
+  });
+  it('en fångare som kastar ett fel stoppar inte inmatningen', () => {
+    const i = skapaInmatning();
+    const fick = [];
+    i.lyssna((h) => fick.push(h.typ));
+    i.fanga(() => { throw new Error('trasig'); });
+    i.tangentNer('Tab');
+    expect(fick).toEqual(['hjalp']);
+  });
 });
 
 import { skapaHinder } from '../../src/karna/vag.js';

@@ -393,7 +393,11 @@ html, body {
 #styrhjalp .finger { display: block; font-size: 56px; animation: fingertryck 1.2s ease-in-out infinite; }
 @keyframes fingertryck { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
 .snabb #styrhjalp * { animation: none; }
-.platta-oppen #styrhjalp { display: none; }
+.platta-oppen #styrhjalp:not(.over-platta) { display: none; }
+#styrhjalp.over-platta { z-index: 30; }
+/* Tab under nosknappen: tangenten som tänder nosen på datorn */
+#styrhjalp.tab { transform: translate(-50%, 10px); }
+#styrhjalp .tangent.tab { width: 86px; height: 50px; font-size: 30px; animation: mellanslagpuls 1.2s ease-in-out infinite; }
 
 /* rumsbyten: förra rummet som bild bredvid det nya under glidningen, toning för hopp som inte är grannrum */
 #varld .forra-rummet { position: absolute; left: 0; top: 0; width: 100%; height: 100%; image-rendering: pixelated; pointer-events: none; }
@@ -423,3 +427,9 @@ html, body {
 .via-radio { margin-right: 6px; font-size: .8em; }
 /* en instruktion som väntar på handlingen står uppe i rummet medan världen går */
 #tanke .instruktion { font-size: calc(36px * var(--t)); line-height: 1.3; padding: 4px 6px; display: block; }
+
+/* nosen på tangentbordet: ordet som Tab har markerat, och ordet som glimtar när spelaren ska nosa själv (s09) */
+.nosar .ord.markerad { outline: 4px solid var(--guld); outline-offset: 3px; background: rgba(242, 193, 78, .7); }
+.ord.glimtar { animation: ordglimt 1.4s ease-in-out infinite; }
+@keyframes ordglimt { 0%, 100% { box-shadow: 0 3px 0 var(--guld), 0 0 0 0 rgba(242, 193, 78, 0); } 50% { box-shadow: 0 3px 0 var(--guld), 0 0 0 8px rgba(242, 193, 78, .55); } }
+.snabb .ord.glimtar { animation: none; }

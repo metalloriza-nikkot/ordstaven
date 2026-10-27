@@ -63,12 +63,50 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
   }
 
   // ---------------------------------------------------------------- nosen och ljudningen
-  const nos = { tillaten: false, aktiv: false, /** @type {() => boolean} */ betala: () => true, /** @type {() => void} */ anvand: () => {} };
+  const nos = {
+    tillaten: false, aktiv: false, /** @type {() => boolean} */ betala: () => true, /** @type {() => void} */ anvand: () => {},
+    /** @type {HTMLElement | null} ordet som Tab har markerat */ markerad: null,
+    /** @type {HTMLElement | null} ordet nosen läste senast: Tab fortsätter därifrån */ senast: null,
+  };
   const nosKnapp = $('#hud-nos');
+  /** @type {Set<(vad: 'tand' | 'ord', ord?: string) => void>} spelet får veta när nosen tänds och vilket ord den läser */
+  const nosLyssnare = new Set();
+  const nosHande = (/** @type {'tand' | 'ord'} */ vad, /** @type {string} */ ord = '') => { for (const f of nosLyssnare) { try { f(vad, ord); } catch (e) { /* får inte stoppa nosen */ } } };
+  /** @param {HTMLElement | null} e */
+  function markeraOrd(e) {
+    nos.markerad?.classList.remove('markerad');
+    nos.markerad = e;
+    e?.classList.add('markerad');
+  }
+  function slackNos() { nos.aktiv = false; ui.classList.remove('nosar'); markeraOrd(null); }
   function sattNos(/** @type {boolean} */ tillaten, opt = /** @type {{ betala?: () => boolean, anvand?: () => void }} */ ({})) {
-    nos.tillaten = tillaten; nos.aktiv = false;
+    nos.tillaten = tillaten; slackNos(); nos.senast = null;
     nos.betala = opt.betala || (() => true); nos.anvand = opt.anvand || (() => {});
-    nosKnapp.classList.toggle('av', !tillaten); ui.classList.remove('nosar');
+    nosKnapp.classList.toggle('av', !tillaten);
+  }
+  /** Tänd nosen utan klick (nos_demo: den är redan tänd när lappen öppnas). */
+  function tandNos() { if (!nos.tillaten) return; nos.aktiv = true; ui.classList.add('nosar'); }
+  /** Orden nosen kan läsa just nu, i ordning: läsplattan, tankebubblan, lappen vid föremålet, skyltarna. */
+  const synligaOrd = () => /** @type {HTMLElement[]} */ ([...ui.querySelectorAll('#plattan .ord, #tanke .ord, #ordskylt .ord, #skyltar .ord')])
+    .filter((e) => e.getClientRects().length > 0 && !e.closest('[hidden]') && !e.closest('.provad'));
+  /** Tab: markera nästa ord (det första när nosen just tänts). @returns {boolean} om det fanns något ord */
+  function markeraNasta() {
+    const lista = synligaOrd();
+    if (!lista.length) { markeraOrd(null); return false; }
+    const fran = nos.markerad ?? nos.senast;
+    const i = fran ? lista.indexOf(fran) : -1;
+    markeraOrd(lista[(i + 1) % lista.length]);
+    return true;
+  }
+  /** Nosen läser ett ord (tryck på ordet, eller Mellanslag/Enter på det markerade). @param {HTMLElement} o */
+  function nosaPa(o) {
+    slackNos();
+    nos.senast = o;
+    if (!nos.betala()) return;
+    nos.anvand();
+    const ord = o.dataset.ord || '';
+    nosHande('ord', ord);
+    ljuda(ord);
   }
   function vaxlaNos() {
     if (nosKnapp.hidden) return;
@@ -80,21 +118,38 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
       ljud.spela('klick');
       return;
     }
-    nos.aktiv = !nos.aktiv; ui.classList.toggle('nosar', nos.aktiv);
+    if (nos.aktiv) slackNos(); else { nos.aktiv = true; ui.classList.add('nosar'); nosHande('tand'); }
     ljud.spela('klick');
   }
   nosKnapp.addEventListener('click', vaxlaNos);
-  /** Tab-tangenten (handlingen hjalp) växlar nosen. @param {any} h */
-  const handling = (h) => { if (h.typ === 'hjalp') vaxlaNos(); if (h.typ === 'stang' && ljudning.pagar) avbrytLjudning(); };
+  /**
+   * Nosen på tangentbordet (beslut 10). Tab tänder nosen och markerar första ordet, Tab igen går till nästa ord,
+   * Mellanslag eller Enter läser det markerade ordet, och Escape släcker. Medan nosen är tänd går Mellanslag,
+   * Enter och Escape bara till nosen (inte till ▶ eller rummet). På iPad trycker man på ordet.
+   * @param {any} h @returns {boolean} om handlingen togs om hand här
+   */
+  function fanga(h) {
+    if (h.typ === 'hjalp') {
+      // Tab medan ett ord läses: avbryt och gå vidare till nästa ord
+      if (ljudning.pagar) { avbrytLjudning(); if (!nos.tillaten) return true; }
+      if (!nos.aktiv) { vaxlaNos(); if (nos.aktiv) markeraNasta(); return true; }
+      if (!markeraNasta()) { slackNos(); ljud.spela('klick'); }
+      return true;
+    }
+    if (!nos.aktiv) {
+      if (h.typ === 'stang' && ljudning.pagar) { avbrytLjudning(); return true; }
+      return false;
+    }
+    if (h.typ === 'interagera') { if (nos.markerad) nosaPa(nos.markerad); return true; }
+    if (h.typ === 'stang') { slackNos(); ljud.spela('klick'); return true; }
+    return false;
+  }
   ui.addEventListener('click', (e) => {
     const t = /** @type {HTMLElement} */ (e.target);
     const o = t.closest && /** @type {HTMLElement | null} */ (t.closest('.ord'));
     if (!o || !nos.aktiv) return;
     e.stopPropagation();
-    nos.aktiv = false; ui.classList.remove('nosar');
-    if (!nos.betala()) return;
-    nos.anvand();
-    ljuda(o.dataset.ord || '');
+    nosaPa(o);
   }, true);
 
   // Ljudningen kan avbrytas: tryck på remsan, på nosen eller Escape.
@@ -288,7 +343,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
 
   /**
    * Styrhjälpen, utan text: piltangenter (dator) eller ett finger som trycker på målet (pekskärm). null döljer.
-   * @param {'pilar' | 'tryck' | null} typ @param {{ x: number, y: number } | null} [punkt] målet på skärmen
+   * @param {'pilar' | 'tryck' | 'mellanslag' | 'tab' | null} typ @param {{ x: number, y: number } | null} [punkt] målet på skärmen
    */
   function styrhjalp(typ, punkt) {
     const e = $('#styrhjalp');
@@ -296,6 +351,10 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     if (typ === 'pilar') e.innerHTML = '<span class="tangent upp">▲</span><span class="tangent vanster">◀</span><span class="tangent ner">▼</span><span class="tangent hoger">▶</span>';
     else if (typ === 'tryck' && punkt) { e.innerHTML = '<span class="finger">👆</span>'; e.style.left = punkt.x + 'px'; e.style.top = punkt.y + 'px'; }
     else if (typ === 'mellanslag') e.innerHTML = '<span class="tangent mellanslag" aria-hidden="true"></span>'; // en bred tangent som trycks ned
+    else if (typ === 'tab') { // Tab-tangenten, som tänder nosen, under nosknappen
+      e.innerHTML = '<span class="tangent tab" aria-hidden="true">⇥</span>';
+      if (punkt) { e.style.left = punkt.x + 'px'; e.style.top = punkt.y + 'px'; }
+    }
     else e.innerHTML = '';
   }
 
@@ -347,7 +406,9 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     visaTanke, pulseraTanke, ordskylt, skyltar, skyltNara, ropa,
     ui, $, plattan, rader, esc, visaPlatta, doljPlatta, vantaFortsatt, visaRegi, doljRegi, visaFest,
     uppdateraHud, pulsera, visaSkarm, doljSkarm, visaMeny, doljMeny, etiketter, sattNos, vaxlaNos, ljuda, arHelord,
-    handling,
+    fanga, tandNos, markeraOrd,
+    /** @param {(vad: 'tand' | 'ord', ord?: string) => void} f @returns {() => void} */
+    vidNos(f) { nosLyssnare.add(f); return () => nosLyssnare.delete(f); },
     get nosAktiv() { return nos.aktiv; },
     get ljudar() { return ljudning.pagar; },
     avbrytLjudning,

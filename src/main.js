@@ -74,7 +74,8 @@ const ljud = skapaLjud({ tyst: () => snabb });
 const ui = skapaUi({ ordlistor, rost, ljud, logg });
 const platshallare = /** @type {any} */ (Object.entries(platshallarfiler).find(([fil]) => mappAv(fil) === valt.mapp)?.[1])?.bilder ?? {};
 const bilder = skapaBilder(ordlistor, platshallare);
-inmatning.lyssna((h) => { if (!spelet?.pausad) ui.handling(h); });
+// nosen (Tab, och Mellanslag/Enter/Escape medan den är tänd) tar handlingen före stegen och rummet
+inmatning.fanga((h) => !spelet?.pausad && ui.fanga(h));
 // Skärmtangentbordet skickar sina tryck genom inmatningslagret, som det fysiska tangentbordet.
 const tangentbord = skapaTangentbord({
   rot: document.body,

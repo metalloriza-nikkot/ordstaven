@@ -24,8 +24,12 @@ export function skapaInmatning() {
   let ko = [];
   /** @type {Set<(h: Handling) => void>} */
   const lyssnare = new Set();
+  /** @type {Set<(h: Handling) => boolean>} fångare som får handlingen först (nosen) */
+  const fangare = new Set();
   /** @param {Handling} h */
   const skicka = (h) => {
+    // en fångare som tar hand om handlingen stoppar den: ingen lyssnare och ingen kö får den
+    for (const f of fangare) { try { if (f(h)) return; } catch (e) { /* en fångare får inte stoppa inmatningen */ } }
     ko.push(h); if (ko.length > 50) ko.shift();
     for (const f of lyssnare) { try { f(h); } catch (e) { /* en lyssnare får inte stoppa de andra */ } }
   };
@@ -57,6 +61,11 @@ export function skapaInmatning() {
     sattGaTill(x, y) { gaTill = { x, y }; },
     /** Lyssna på alla handlingar. Returnerar en funktion som slutar lyssna. @param {(h: Handling) => void} f */
     lyssna(f) { lyssnare.add(f); return () => lyssnare.delete(f); },
+    /**
+     * Ta handlingar före alla lyssnare. Returnerar f true stoppas handlingen där (nosen tar Mellanslag medan den är tänd).
+     * Returnerar en funktion som slutar fånga. @param {(h: Handling) => boolean} f
+     */
+    fanga(f) { fangare.add(f); return () => fangare.delete(f); },
     /** Målet är nått eller avbrutet. */
     rensaGaTill() { gaTill = null; },
     /** Aktuell riktning från tangenterna, normaliserad (diagonal går lika fort). */
