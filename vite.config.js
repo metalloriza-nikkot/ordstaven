@@ -13,6 +13,8 @@ export default defineConfig({
     // Golvet är Safari 15 (macOS Monterey) och iPadOS 15.
     target: ['es2020', 'safari15'],
     chunkSizeWarningLimit: 2000,
+    // två sidor: spelet och provsidan för textgrammatiken (beslut 13.3)
+    rollupOptions: { input: { main: 'index.html', textprov: 'textprov.html' } },
   },
   test: {
     include: ['tests/enhet/**/*.test.js'],
@@ -47,6 +49,8 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         cleanupOutdatedCaches: true,
         navigateFallback: 'index.html',
+        // provsidan och dess ramar (textprov.html?form=…) ska aldrig få spelet i stället
+        navigateFallbackDenylist: [/textprov/],
       },
     }),
   ],

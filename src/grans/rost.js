@@ -42,9 +42,12 @@ export function skapaRost({ logg, tyst = () => false }) {
 
   /**
    * Säg en text. Löser sig när den är uppläst, avbruten eller maxtiden gått.
-   * @param {string} text @param {string} [roll] @returns {Promise<'klar' | 'avbruten' | 'tyst'>}
+   * vidOrd(teckenIndex) anropas när rösten börjar på ett nytt ord, om webbläsaren säger det (onboundary).
+   * Alla webbläsare och röster gör inte det, så den som visar texten ord för ord måste klara sig utan.
+   * @param {string} text @param {string} [roll] @param {(teckenIndex: number) => void} [vidOrd]
+   * @returns {Promise<'klar' | 'avbruten' | 'tyst'>}
    */
-  function saga(text, roll = 'berattare') {
+  function saga(text, roll = 'berattare', vidOrd) {
     const min = ++token;
     try { synt?.cancel(); } catch (e) { /* ok */ }
     if (!text) return Promise.resolve('klar');
@@ -65,6 +68,7 @@ export function skapaRost({ logg, tyst = () => false }) {
       let startad = false, tyst = 0;
       u.onstart = () => { startad = true; };
       u.onend = () => sluta('klar'); u.onerror = () => sluta('avbruten');
+      if (vidOrd) u.onboundary = (e) => { if (!klar && min === token && (!e.name || e.name === 'word')) { startad = true; try { vidOrd(e.charIndex); } catch (fel) { /* får inte stoppa rösten */ } } };
       const vakt = setInterval(() => {
         if (min !== token) { sluta('avbruten'); return; }
         if (!startad && synt.speaking && Date.now() - t0 > 300) startad = true;

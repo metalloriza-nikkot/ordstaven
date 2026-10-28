@@ -41,6 +41,8 @@ Dessutom svepet i `tests/enhet/skalning.test.js`: alla fönster från 800×500 t
 
 **Genomspelningen** (`tests/webb/genomspelning.spec.js`) spelar hela prologen i Chromium, WebKit och iPad-läget: rätt svar från innehållet, felsvar på några pussel, en omstart mitt i, och en kontroll att läsplattan aldrig går utanför skärmen.
 
+**Provsidan** (`tests/webb/textprov.spec.js`): alla textformer laddas utan fel, ord för ord visar ett ord i taget, allt på en gång visar allt direkt, ett tryck visar allt, och en ny ▶ avbryter den förra.
+
 WebKit i Playwright är Safari-motorn men inte iPad-Safari. Den fångar det mesta, inte allt (ljudspärr, hemskärmsläge, datarensning). Därför finns de manuella stegen nedan.
 
 ## Manuell kontroll vid varje grind

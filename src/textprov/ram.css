@@ -1,0 +1,65 @@
+/* Provsidan: det som bara finns på provsidan. Allt annat är spelets egen stil.css.
+   Former som ännu inte finns i spelet (märkta "skiss") får en enkel stil här, som Stil ersätter. */
+
+#varld .kuliss { display: block; width: 100%; height: 100%; }
+/* läsplattan dämpar världen, som i spelet (där är världen en canvas) */
+.textprov-ram:has(#ui.platta-oppen) #varld .kuliss { filter: brightness(.6) saturate(.7); }
+
+/* framskrivningen: ord som inte har kommit än tar sin plats, så att texten aldrig hoppar */
+.ord.dold, .tecken.dold { visibility: hidden; }
+.ord.lases { background: rgba(242, 193, 78, .55); box-shadow: 0 0 0 3px rgba(242, 193, 78, .55); }
+.lases-upp { cursor: pointer; }
+
+/* frågan ovanför korten (i spelet en egen replik före korten) */
+.fraga-rad { align-self: stretch; justify-content: center; }
+.fraga-rad .portratt.p-berattare { display: none; }
+
+/* skiss: tavlan utan pil, som inte går att trycka på */
+.kort.tavla { cursor: default; background: #c9a774; box-shadow: 0 4px 0 #8a6a4a, 0 0 0 3px #a58a5a; min-width: calc(80px * var(--t)); min-height: calc(56px * var(--t)); padding: 4px 14px; }
+
+/* skiss: baronens lila papper med fjäderhatten som underskrift */
+.lapp.p-lila_papper_fjaderhatt { background: #e8dcf2; position: relative; padding-bottom: calc(40px * var(--t)); }
+.prov-underskrift { position: absolute; right: 14px; bottom: 4px; font-size: calc(40px * var(--t)); transform: rotate(-10deg); }
+
+/* skiss: inristningen längs staven */
+.prov-stav { position: absolute; left: calc(var(--rum-vanster) + var(--rum-bredd) * .5); top: calc(var(--rum-topp) + var(--rum-hojd) * .18); transform: translateX(-50%) rotate(-4deg); display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 40px; border-radius: 40px; background: linear-gradient(#8a6a4a, #6b4c35); box-shadow: 0 0 30px rgba(242, 193, 78, .45); }
+.prov-stav-ord { color: #ffe9a8; font-size: calc(44px * var(--t)); letter-spacing: .12em; text-shadow: 0 0 10px rgba(242, 193, 78, .9); }
+.prov-stav-ord:not(.ny) { opacity: .7; font-size: calc(32px * var(--t)); }
+
+/* skiss: förebilden inristad i trädet, som tonas bort (titta, täck) */
+.prov-ristat { position: absolute; transform: translate(-50%, -50%); color: #ffe9a8; font-size: calc(56px * var(--t)); letter-spacing: .1em; text-shadow: 0 0 14px rgba(242, 193, 78, 1); transition: opacity 1s ease; z-index: 2; }
+.prov-ristat.tonad { opacity: 0; }
+#plattan.prov-nere { top: auto; bottom: calc(100vh - var(--rum-topp) - var(--rum-hojd) + 12px); transform: translateX(-50%); }
+.brickor.prov-tomt { height: calc(96px * var(--t)); }
+
+/* skiss: räddningen, med staven för kasta-läget */
+.prov-raddning { position: relative; }
+.prov-kasta { position: absolute; right: -18px; top: -18px; width: calc(72px * var(--t)); height: calc(72px * var(--t)); border-radius: 50%; border: 0; background: var(--guld); font-size: calc(40px * var(--t)); line-height: 1; box-shadow: 0 4px 0 #b8892b; }
+
+/* skiss: kodlåset och nyckeln på samma skärm */
+.prov-kodrad { display: flex; gap: 28px; align-items: stretch; }
+.prov-kodkort { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 16px 20px; border-radius: 14px; background: #d8cfbf; box-shadow: inset 0 0 0 4px #9b8f7c; }
+.prov-tecken { display: flex; gap: 12px; }
+.prov-tecken .bild.emoji { width: calc(84px * var(--t)); justify-content: center; font-size: calc(56px * var(--t)); }
+.prov-nyckel { position: relative; display: grid; grid-template-columns: repeat(3, auto); gap: 8px 18px; background: #f5ecd7; box-shadow: inset 0 0 0 3px #d9c9a3; }
+.prov-par { display: inline-flex; align-items: center; gap: 6px; }
+.prov-par .bild.emoji { font-size: calc(36px * var(--t)); }
+.prov-bokstav { font-size: calc(48px * var(--t)); line-height: 1; }
+.prov-ros { position: absolute; right: -10px; top: -14px; font-size: 26px; }
+
+/* skiss: Farfars lista på packlistans baksida */
+.prov-lista { display: flex; flex-direction: column; gap: 6px; }
+.prov-listrad { display: flex; align-items: center; gap: 16px; padding: 2px 10px; border-radius: 8px; cursor: pointer; }
+.prov-listrad .bild.emoji { font-size: calc(44px * var(--t)); }
+.prov-listrad.rubrik { border-bottom: 3px solid #b7a98a; font-weight: 700; margin-bottom: 4px; }
+.prov-listrad.bockad .prov-listord::after { content: ' ✔'; color: #2f8a3a; font-weight: 700; }
+.prov-listord .rad { display: inline; }
+
+/* felet om en källa i innehållet inte finns längre */
+.prov-fel { position: fixed; left: 20px; top: 20px; right: 20px; z-index: 50; padding: 16px; border-radius: 10px; background: #fbe3e0; color: #7a1a10; font: 20px var(--typsnitt); }
+
+/* den vuxnes knappar när en form är öppnad ensam */
+.prov-knappar { position: fixed; left: 8px; bottom: 6px; z-index: 40; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; padding: 6px 12px; border-radius: 10px; background: rgba(26, 20, 16, .85); color: #f5ecd7; font: 15px var(--typsnitt); }
+.prov-knappar a { color: #f2c14e; }
+.prov-knappar button { font: inherit; padding: 4px 12px; border-radius: 8px; border: 0; background: var(--guld); cursor: pointer; }
+.prov-knappar button:disabled { opacity: .4; }

@@ -2,6 +2,7 @@
 
 | Version | Datum | Vad |
 |---|---|---|
+| 0.6.5 | 2026-10-28 | Provsidan för textgrammatiken (`textprov.html`, beslut 13.3): alla textformer i prologen och kapitel 1 sida vid sida, i spelets eget textlager, med framskrivningen ord för ord eller allt på en gång. Rösten säger vilket ord den är på när webbläsaren kan. Kapitel 1 v0.6 från Innehåll i repot (ingen text ändrad). Platshållarbilder för kapitel 1:s kort. |
 | 0.6.4 | 2026-10-28 | Typsnittet är Lexend (beslut 13) i textlagret och på bokstavsbrickorna, utan extra bokstavsavstånd. Innehållskontrollen räknar rader med Lexends bredder. Ägglådan säger DUNK direkt när ljuset tänds (s04). |
 | 0.6.3 | 2026-10-28 | Dörrarna i sidoväggarna ritas som öppningar i väggen, snett uppifrån (karm, dörrblad, golvremsa), inte som dörrar som ligger ned. Kapitel 1 v0.5 från Innehåll i repot (format 2, ingen text ändrad). Kapitel 1 spelas inte än. |
 | 0.6.2 | 2026-10-27 | Grind A, rättelserna (2f): nära nog räcker, saker, Farfar och stegen nås från alla håll inom 1,5 rutor, och bara den närmaste saken är aktiv och markerad (lika nära: den hjälten är vänd mot). Dinomatens lådor står minst 3 rutor isär. Vid stegen ställer sig hjälten själv mitt för den. Hallen: skyltarna ovanför dörrarna, ljusare, tydliga karmar, och ytterdörren i hallen (låst på natten, hjälten känner på handtaget). Pilskyltar vid stigarna. Nosen läser hela ordet. Rösten väntar inte längre ut maxtiden efter varje replik i Chrome. Canvas-ritningen testad. Schema 2.7 (kartorna). |

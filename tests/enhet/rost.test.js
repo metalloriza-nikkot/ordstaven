@@ -60,4 +60,17 @@ describe('datorrösten', () => {
     await vi.advanceTimersByTimeAsync(200);
     expect(hur).toBe('avbruten');
   });
+  it('säger vilket ord rösten är på när webbläsaren ger ordsignalen (framskrivning ord för ord)', async () => {
+    vi.useFakeTimers();
+    const s = falskSynt({ ms: 400 });
+    const tala = s.speak;
+    s.speak = (u) => { tala(u); setTimeout(() => u.onboundary?.({ name: 'word', charIndex: 0 }), 30); setTimeout(() => u.onboundary?.({ name: 'word', charIndex: 4 }), 150); setTimeout(() => u.onboundary?.({ name: 'sentence', charIndex: 0 }), 160); };
+    installera(s);
+    const r = skapaRost({});
+    const ord = [];
+    let hur = null; r.saga('Bra jobbat.', 'berattare', (i) => ord.push(i)).then((h) => { hur = h; });
+    await vi.advanceTimersByTimeAsync(600);
+    expect(hur).toBe('klar');
+    expect(ord).toEqual([0, 4]);
+  });
 });

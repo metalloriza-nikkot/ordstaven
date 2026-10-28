@@ -1,0 +1,55 @@
+/* Provsidan för textgrammatiken: en sida för den vuxne (Niklas, Stil). Vanlig skrift, Lexend, läderramen som i spelet. */
+:root {
+  --typsnitt: 'Lexend', sans-serif;
+  --ram: #2a1d16; --papper: #f5ecd7; --black: #2b2420; --guld: #f2c14e; --som: #6b4c35; --dimma: #d8ccb4;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--ram); color: var(--papper); font: 16px/1.5 var(--typsnitt); }
+.huvud, main, .reglage { max-width: 1680px; margin: 0 auto; padding-inline: 16px; }
+.huvud { padding-top: 20px; }
+h1 { margin: 0 0 6px; font-size: 30px; }
+h1 small { font-size: 15px; font-weight: 400; opacity: .6; margin-left: 10px; }
+.huvud p { max-width: 70ch; margin: 0 0 10px; color: var(--dimma); }
+.grundregel { max-width: 70ch; margin: 0 0 14px; padding: 8px 14px; border-radius: 10px; background: rgba(245, 236, 215, .07); }
+.grundregel summary { cursor: pointer; font-weight: 700; }
+.grundregel ul { margin: 6px 0 2px; padding-left: 20px; }
+
+.reglage { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 22px; padding-block: 10px; background: var(--ram); border-bottom: 2px solid var(--som); }
+.reglage fieldset { display: flex; gap: 12px; margin: 0; padding: 0; border: 0; }
+.reglage legend { float: left; margin-right: 10px; font-weight: 700; }
+.reglage label { cursor: pointer; white-space: nowrap; }
+.reglage input { accent-color: var(--guld); }
+
+.grupp { margin: 26px 0 10px; }
+.grupp h2 { margin: 0; font-size: 22px; }
+.grupptext { margin: 2px 0 12px; color: var(--dimma); }
+.kortlista { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap: 18px; }
+.form { display: flex; flex-direction: column; border-radius: 14px; overflow: hidden; background: var(--papper); color: var(--black); box-shadow: 0 6px 18px rgba(0, 0, 0, .35); }
+.form[hidden] { display: none; }
+.form.spelar { box-shadow: 0 0 0 4px var(--guld), 0 6px 18px rgba(0, 0, 0, .35); }
+.form.fel { box-shadow: 0 0 0 4px #c0392b; }
+.ramyta { --k: .33; position: relative; width: 100%; aspect-ratio: 5 / 3; overflow: hidden; background: #1a1410; }
+.ramyta iframe { position: absolute; left: 0; top: 0; border: 0; transform-origin: 0 0; transform: scale(var(--k)); }
+.om { padding: 10px 14px 12px; }
+.om h3 { margin: 0; font-size: 18px; }
+.nr { font-size: 13px; color: #6d5a45; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.tagg { padding: 0 8px; border-radius: 10px; font-size: 12px; }
+.tagg.ny { background: #f2c14e; color: var(--black); }
+.tagg.skiss { background: #6b4c35; color: var(--papper); }
+.tagg.exempel { background: #e0d3f0; color: #4a2a6a; }
+.om dl { display: grid; grid-template-columns: auto 1fr; gap: 0 10px; margin: 8px 0 4px; font-size: 14px; }
+.om dt { font-weight: 700; }
+.om dd { margin: 0; }
+.not { margin: 4px 0; font-size: 13px; color: #5e5244; }
+.knappar { display: flex; align-items: center; gap: 14px; margin-top: 8px; }
+.knappar .spela { font: inherit; font-weight: 700; padding: 6px 16px; border: 0; border-radius: 10px; background: var(--guld); color: var(--black); cursor: pointer; box-shadow: 0 3px 0 #b8892b; }
+.knappar .spela:active { transform: translateY(2px); box-shadow: 0 1px 0 #b8892b; }
+.knappar a { color: #6b4c35; }
+.status { font-size: 13px; color: #6d5a45; }
+.form.fel .status { color: #a02a1a; }
+
+.tabell { width: 100%; border-collapse: collapse; background: var(--papper); color: var(--black); border-radius: 10px; overflow: hidden; font-size: 14px; }
+.tabell th, .tabell td { padding: 6px 10px; text-align: left; border-bottom: 1px solid #e0d4b8; vertical-align: top; }
+.tabell th { background: #e9dfc8; }
+main { padding-bottom: 40px; }
+.grupp > .not { color: var(--dimma); }
