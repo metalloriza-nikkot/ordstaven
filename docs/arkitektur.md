@@ -11,7 +11,7 @@ Version 0.3 (2026-10-25). Status: **fas 2, gråbox av prologen (spelversion 0.2.
 │   ┌───────────────── #varld (canvas, Phaser 4) ───────────────┐  │
 │   │  Rum 320×192 pixlar, uppskalat i hela pixelsteg           │  │
 │   └───────────────────────────────────────────────────────────┘  │
-│   #textlager (DOM ovanpå canvasen, full upplösning, Andika)      │
+│   #textlager (DOM ovanpå canvasen, full upplösning, Lexend)      │
 │   #grans (bär, mynt, nosknapp)    #tangentbord (iPad, i ramen)   │
 └──────────────────────────────────────────────────────────────────┘
           ▲ händelser                     ▲ händelser
@@ -95,12 +95,12 @@ ordstaven/
 
 ### Textlagret (beslut: DOM, inte Phaser-text)
 All läsbar text ritas som vanlig HTML ovanpå canvasen.
-- **Skarp på alla skärmar** utan att räkna upplösning själva. Browsern ritar Andika med sin egen textrendering.
+- **Skarp på alla skärmar** utan att räkna upplösning själva. Browsern ritar typsnittet (Lexend) med sin egen textrendering.
 - **Storlekar i CSS-punkter** precis som stilguiden anger dem (64 / 48 / 32), oberoende av rummets skala.
 - **Testbart:** Playwright kan läsa och klicka på texten, och kontrollera att den aldrig bryts mitt i "UNDER STENEN" (`white-space: nowrap` på fraser).
 - Läsplattan, pratbubblor, bokstavstangentbordet, ljudningsremsan och föräldravyn är DOM.
 - Pratbubblor som pekar på en figur placeras med en enkel omräkning rumskoordinat → skärmkoordinat (`skalning.rumTillSkarm(x, y)`).
-- Andika kommer från npm-paketet `@fontsource/andika` (latin, 400 och 700), byggs in av Vite och förcachas. Textlagret visas först när typsnittet är laddat.
+- Typsnittet är Lexend (beslut 13, 2026-10-28; Andika fram till 0.6.3). Det kommer från npm-paketet `@fontsource/lexend` (latin, 400 och 700), byggs in av Vite och förcachas. Textlagret visas först när typsnittet är laddat. Bytet görs i `main.js` (importen) och i `stil.css` (`--typsnitt`), och innehållskontrollen räknar rader med `verktyg/lexend-bredder.json`.
 
 ## 5. Inmatning
 
@@ -180,7 +180,7 @@ Källa: `metalloriza-nikkot/turbo-race` v16.12 (3e9935a). Vi lyfter logik och l�
 | **Logg** | `00_log.js` | `logg.handelse(typ, text, data)`, `logg.exportera()`, `logg.ogonblick(fn)` | Ögonblicksbilden byggs av registrerade funktioner i stället för att läsa globaler. Ctrl+Skift+L behålls. Prestandamätningen följer med. | 1 |
 | **Sparning** | `06s_save.js` | `sparning.las()`, `.spara(tillstand)`, `.exporteraFil()`, `.importeraFil(fil)`, `.angraLaddning()`, `.exporteraHjalte()` | Nytt format med migreringar. Turneringslogiken tas bort. | 1 (grund), 2 (filer) |
 | **Läsmotor** | `04w_words.js` | `lasmotor.valjOrd(opt)`, `.distraktorer(ratt, n)`, `.registrera(resultat)`, `.niva(pusseltyp)` | Ordets svårighet och förståelsenivå hålls isär. Anpassningen (3 rätt i rad upp, 2 fel ned) per pusseltyp, inom kapitlets golv och tak. Slumpen injiceras så att testerna blir förutsägbara. Ordbanken blir data. Emojis ersätts med bild-id. | 2 |
-| **Ljudning** | `04w_words.js` (`soundOut`) | `ljudning.ljuda(ord)` → händelser `bokstav(i)`, `klar`, `avbruten` | Remsan ritas i textlagret (DOM, Andika). Säkerhetsnätet (maxtid, avbrott från annan röst) behålls oförändrat, det är en buggfix från v16.3. | 2 |
+| **Ljudning** | `04w_words.js` (`soundOut`) | `ljudning.ljuda(ord)` → händelser `bokstav(i)`, `klar`, `avbruten` | Remsan ritas i textlagret (DOM, i spelets typsnitt). Säkerhetsnätet (maxtid, avbrott från annan röst) behålls oförändrat, det är en buggfix från v16.3. | 2 |
 | **Röst** | `04_audio.js` (Voice) | `rost.saga(nyckel eller text, roll)`, `.sekvens(delar)`, `.tyst()` | **Först inspelat klipp för repliknyckeln, annars datorröst, annars pladder.** Det täcker båda svaren på röstfrågan i stilguiden. Rollröster för Professor Kompass, baronen, Klaffen. Varje uppläsning har avbrottstoken och maxtid. | 2 |
 | **Ljud och musik** | `04_audio.js` (Snd) | `ljud.spela(namn)`, `.musik(zon)`, `.dampa(på/av)` | Nya klanger enligt stilguiden (triangel och sinus, ingen skarp fyrkant som ledstämma). Musiken sänks ca 12 dB när läsplattan är öppen. Motorljud och tutor tas bort. Ljudet startas av första trycket (iPad). | 2 |
 | **Matte** | `04m_math.js` | `matte.fraga(niva)`, `.alternativ(svar)`, `.registrera()` | Som den är, minus globalerna. Används för att räkna mynt. | 3 |

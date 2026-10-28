@@ -1,7 +1,8 @@
 // @ts-check
 // Startar spelet och kopplar ihop modulerna. Inga globaler: allt skickas som argument.
-import '@fontsource/andika/latin-400.css';
-import '@fontsource/andika/latin-700.css';
+// Typsnittet är Lexend (beslut 13). Andika finns kvar som paket, så att ett byte tillbaka är två rader här och en i stil.css.
+import '@fontsource/lexend/latin-400.css';
+import '@fontsource/lexend/latin-700.css';
 import './stil.css';
 import Phaser from 'phaser';
 
@@ -105,7 +106,7 @@ const spel = new Phaser.Game({
 });
 
 // Versionsraden: information till den vuxne, bara där den inte täcker rummet.
-document.fonts.load('32px Andika').finally(() => {
+document.fonts.load('32px Lexend').finally(() => {
   const prov = document.createElement('div');
   prov.className = 'etikett typsnittsprov'; prov.textContent = 'ÅÄÖ';
   textlager.appendChild(prov);

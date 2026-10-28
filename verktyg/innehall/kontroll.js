@@ -6,7 +6,8 @@ import { readFileSync } from 'node:fs';
 import { rader, versaler, ord, PLATSHALLARE } from '../../src/karna/text.js';
 
 const schema = (namn) => JSON.parse(readFileSync(new URL(`../../content/schema/${namn}.schema.json`, import.meta.url), 'utf8'));
-const BREDDER = JSON.parse(readFileSync(new URL('../andika-bredder.json', import.meta.url), 'utf8')).tecken;
+// teckenbredderna för typsnittet i textlagret (Lexend, beslut 13)
+const BREDDER = JSON.parse(readFileSync(new URL('../lexend-bredder.json', import.meta.url), 'utf8')).tecken;
 
 /** Läsplattans radbredd i em (16 em = 768 punkter vid 48 punkters text). Stilspåret kan justera. */
 export const RADBREDD_EM = 16;

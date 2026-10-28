@@ -1,4 +1,4 @@
-// Grunden: skalan är hel, texten är Andika, hjälten går med piltangenter och tryck,
+// Grunden: skalan är hel, texten är Lexend, hjälten går med piltangenter och tryck,
 // spelet startar offline och minns var det var.
 import { test, expect } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
@@ -53,12 +53,12 @@ test('startar utan fel, med hel skala och rummet helt i bild', async ({ page }, 
   expect(fel).toEqual([]);
 });
 
-test('textlagret använder Andika, och versionsraden täcker aldrig rummet', async ({ page }) => {
+test('textlagret använder Lexend, och versionsraden täcker aldrig rummet', async ({ page }) => {
   await starta(page);
   const prov = page.locator('#textlager .typsnittsprov');
   await expect(prov).toHaveText('ÅÄÖ');
-  const stil = await prov.evaluate((e) => ({ familj: getComputedStyle(e).fontFamily, storlek: parseFloat(getComputedStyle(e).fontSize), laddad: document.fonts.check('32px Andika') }));
-  expect(stil.familj).toContain('Andika');
+  const stil = await prov.evaluate((e) => ({ familj: getComputedStyle(e).fontFamily, storlek: parseFloat(getComputedStyle(e).fontSize), laddad: document.fonts.check('32px Lexend') }));
+  expect(stil.familj).toContain('Lexend');
   expect(stil.storlek).toBeGreaterThanOrEqual(32);
   expect(stil.laddad).toBe(true);
   const krock = await page.evaluate(() => {

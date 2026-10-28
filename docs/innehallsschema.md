@@ -204,7 +204,7 @@ Små bokstäver utom formler (`"LJUS"`). Flaggor: `aao`, `helord`, `sparrad`, `b
 - P28 där alla eller inga alternativ är rätt.
 
 **Varningar (stoppar inget):**
-- **Repliker som blir mer än två rader** på läsplattan. Radbredden är 16 em (768 punkter vid 48 punkters text, i versaler), räknad med Andikas egna teckenbredder.
+- **Repliker som blir mer än två rader** på läsplattan. Radbredden är 16 em (768 punkter vid 48 punkters text, i versaler), räknad med Lexends egna teckenbredder (`verktyg/lexend-bredder.json`, utan extra bokstavsavstånd).
 - Mer än 8 ord på en rad i text spelaren läser själv.
 - **Färre än två läsuppgifter som avgör något per pass.** Räknas: P1, P28, P15 (kategorin läses). Inte P9: kodlåset är avkodning med nyckel.
 - **Pass som uppskattas till mer än 10 minuter.** Uppskattningen: 1,5 s + 0,45 s per ord och replik, 40 s per pussel, 12 s per `ga_till`, 4 s per mellanscen, 6 s + uppläsning per bokuppslag.

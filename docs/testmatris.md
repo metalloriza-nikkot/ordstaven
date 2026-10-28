@@ -33,7 +33,7 @@ Version 0.1 (2026-10-24). Princip: spelet ska fungera i en modern webbläsare p�
 Varje projekt kontrollerar:
 1. Skalan är ett heltal i **fysiska** pixlar och rummet syns helt.
 2. Blocket rör sig med piltangenterna (dator) eller tryck (pek).
-3. Text i textlagret är Andika och minst angiven storlek.
+3. Text i textlagret är Lexend och minst angiven storlek.
 4. Inga fel i konsolen.
 5. (Ett projekt räcker) Service workern registreras, och spelet startar igen utan nät.
 

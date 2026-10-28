@@ -12,7 +12,7 @@ Första äventyret i en tänkt serie. Hjälten (utseende, namn, grad, formler) f
 2. **Instruktioner läses alltid upp. Ledtrådar läses aldrig upp automatiskt.** Hjälpknappen (ungens nos) läser upp ett ord i taget och kostar ett bär (gratis vid 0 bär).
 3. **Fel är roliga, aldrig straff.** Ingen tidspress, inga liv, ingen förlorad progress, inga röda kryss.
 4. **Versaler som standard.** Gemener införs senare.
-5. **Texten är aldrig pixlig.** All läsbar text i ett typsnitt (Andika), i ett skarpt lager ovanpå pixelvärlden.
+5. **Texten är aldrig pixlig.** All läsbar text i ett typsnitt (Lexend), i ett skarpt lager ovanpå pixelvärlden.
 6. **Innehåll är data.** Ett nytt kapitel = nya JSON-filer och kartor, ingen ny kod.
 7. **Korta pass**, 5–10 minuter. Spelet föreslår att sluta men tvingar inte.
 8. **Inga vapen mot figurer.** Staven svingas mot buskar och krukor.

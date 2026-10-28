@@ -2,6 +2,8 @@
    Pixelvärlden placeras av src/grans/layout.js via CSS-variablerna --rum-*. */
 
 :root {
+  /* typsnittet (beslut 13: Lexend). Byts här och i main.js */
+  --typsnitt: 'Lexend', sans-serif;
   --ram: #2a1d16;
   --ram-ljus: #3a2a20;
   --som: #6b4c35;
@@ -23,7 +25,7 @@ html, body {
     radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.025) 1px, transparent 1.5px),
     radial-gradient(circle at 75% 60%, rgba(0, 0, 0, 0.12) 1px, transparent 1.5px);
   background-size: 7px 7px, 11px 11px;
-  font-family: 'Andika', sans-serif;
+  font-family: var(--typsnitt);
   -webkit-text-size-adjust: 100%;
 }
 
@@ -63,7 +65,7 @@ html, body {
 }
 
 .etikett {
-  font-family: 'Andika', sans-serif;
+  font-family: var(--typsnitt);
   font-size: 32px;
   line-height: 1.4;
   letter-spacing: 0.04em;
@@ -81,7 +83,7 @@ html, body {
 }
 .version[hidden] { display: none; }
 
-/* Osynlig provtext: ser till att Andika laddas och går att kontrollera i testerna */
+/* Osynlig provtext: ser till att typsnittet laddas och går att kontrollera i testerna */
 .typsnittsprov {
   position: absolute;
   left: -9999px;
@@ -115,7 +117,7 @@ html, body {
   border-radius: 12px;
   background: var(--papper);
   color: var(--black);
-  font: 18px 'Andika', sans-serif;
+  font: 18px var(--typsnitt);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
 }
 
@@ -125,7 +127,7 @@ html, body {
 #varld { transition: left .25s ease, top .25s ease, width .25s ease, height .25s ease; }
 #varld canvas { transition: width .25s ease, height .25s ease; }
 
-#ui { position: fixed; inset: 0; pointer-events: none; font-family: 'Andika', sans-serif; z-index: 5; }
+#ui { position: fixed; inset: 0; pointer-events: none; font-family: var(--typsnitt); z-index: 5; }
 #ui > * { pointer-events: auto; }
 #ui [hidden] { display: none !important; }
 #etiketter { pointer-events: none !important; position: absolute; inset: 0; }
@@ -168,7 +170,7 @@ html, body {
 .replik-ruta .text { align-self: center; }
 .replik-ruta .vidare, .pussel-ruta > .vidare { position: static; flex: none; }
 .pussel-ruta > .vidare { align-self: flex-end; }
-.replik-ruta .text, .svar-rad .text, .lapp { font-size: calc(48px * var(--t)); line-height: 1.4; letter-spacing: .03em; }
+.replik-ruta .text, .svar-rad .text, .lapp { font-size: calc(48px * var(--t)); line-height: 1.4; letter-spacing: 0; } /* Lexend har redan luftigt avstånd */
 .rad { display: block; white-space: nowrap; }
 .rad.bryts { white-space: normal; max-width: 16em; }
 .kort-ord.bryts { white-space: normal; max-width: 12em; display: block; }

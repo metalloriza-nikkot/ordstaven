@@ -1,6 +1,6 @@
 // @ts-check
 // Gränssnittets byggstenar i DOM: läsplattan, regirutan, HUD (bär, nos, lappar, radio), ljudningsremsan,
-// helskärmar (start, passets slut) och etiketter över rummets objekt. All läsbar text här, i Andika.
+// helskärmar (start, passets slut) och etiketter över rummets objekt. All läsbar text här, i Lexend.
 import { forSkarm, versaler } from '../karna/text.js';
 import { ljudningsdelar, maxtidMs } from '../karna/ljudning.js';
 
