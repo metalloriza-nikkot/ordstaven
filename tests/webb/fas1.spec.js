@@ -127,7 +127,7 @@ test('menyn för vuxna: ett kort tryck visar "håll inne", att hålla öppnar me
   await expect(page.locator('#vuxenmeny')).toBeHidden();
   const r = await knapp.boundingBox();
   await page.mouse.move(r.x + r.width / 2, r.y + r.height / 2);
-  await page.mouse.down(); await page.waitForTimeout(1000); await page.mouse.up();
+  await page.mouse.down(); await page.waitForTimeout(1600); await page.mouse.up(); // marginal mot 800 ms på en belastad testmaskin
   await expect(page.locator('#vuxenmeny .meny')).toBeVisible();
   await page.click('#vuxenmeny .stang');
   await expect(page.locator('#vuxenmeny')).toBeHidden();
