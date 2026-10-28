@@ -4,7 +4,7 @@
 import Phaser from 'phaser';
 import { RUM } from '../karna/skalning.js';
 import { FIGUR, steg } from '../karna/rorelse.js';
-import { rumsObjekt, framfor, framforFran, vidObjekt, aktivSak, hinderFran, vaggar, VAGG, objektFarg, lasplats } from '../karna/rumslayout.js';
+import { rumsObjekt, framfor, framforFran, vidObjekt, aktivSak, hinderFran, vaggar, VAGG, objektFarg, lasplats, arSidodorr } from '../karna/rumslayout.js';
 import { synligaIds } from '../karna/karta.js';
 import { skapaHinder } from '../karna/vag.js';
 
@@ -298,9 +298,11 @@ export class Rum extends Phaser.Scene {
 
   /** @param {import('../karna/rumslayout.js').Objekt} o */
   ritaObjekt(o) {
-    const fyll = objektFarg(o);
+    // en dörr i en sidovägg är en mörk öppning i väggen; dörrbladet, karmen och golvremsan ritas i ritaDetaljer
+    const sidodorr = arSidodorr(o);
+    const fyll = sidodorr ? 0x2b241e : objektFarg(o);
     const delar = this.delar[o.id];
-    const r = this.add.rectangle(o.x, o.y, o.b, o.h, fyll, delar ? 0 : 1).setOrigin(0, 0).setStrokeStyle(1, FARG.sakKant, delar ? 0 : 1);
+    const r = this.add.rectangle(o.x, o.y, o.b, o.h, fyll, delar ? 0 : 1).setOrigin(0, 0).setStrokeStyle(1, sidodorr ? 0x3a3129 : FARG.sakKant, delar ? 0 : 1);
     this.lagerObjekt.add(r);
     this.ritade.set(o.id, r);
     if (o.ute || o.klattra || (o.sort === 'utgang' && !o.golv)) this.ritaDetaljer(o);
@@ -337,7 +339,18 @@ export class Rum extends Phaser.Scene {
    */
   ritaDetaljer(o) {
     const g = this.add.graphics();
-    if (o.sort === 'utgang' && !o.golv && !o.klattra) {
+    if (arSidodorr(o)) {
+      // snett uppifrån (som i A Link to the Past): öppningen går genom väggen, karmen syns som två stolpar
+      // överst och nederst, dörrbladet står vid väggens insida, och en ljusare golvremsa leder in i rummet
+      const inne = o.riktning === 'vanster' ? o.x + o.b : o.x; // väggens insida
+      const ut = o.riktning === 'vanster' ? -1 : 1; // åt vilket håll väggen ligger från insidan
+      g.fillStyle(0xc9a46a).fillRect(o.x, o.y, o.b, 3).fillRect(o.x, o.y + o.h - 3, o.b, 3);
+      const bladX = ut < 0 ? inne - 7 : inne + 2;
+      g.fillStyle(FARG.utgang).fillRect(bladX, o.y + 3, 5, o.h - 6);
+      g.fillStyle(0x8a7258).fillRect(ut < 0 ? bladX + 4 : bladX, o.y + 3, 1, o.h - 6);
+      g.fillStyle(0xe8d38a).fillRect(ut < 0 ? inne - 2 : inne + 1, o.y + Math.round(o.h / 2) - 1, 1, 3); // handtaget mot rummet
+      g.fillStyle(0xb4aea2, 0.55).fillRect(ut < 0 ? inne : inne - 8, o.y + 3, 8, o.h - 6); // golvremsan
+    } else if (o.sort === 'utgang' && !o.golv && !o.klattra) {
       g.lineStyle(2, o.ute ? 0xf4e6c4 : 0xc9a46a, 1).strokeRect(o.x + 1, o.y + 1, o.b - 2, o.h - 2);
       // handtaget på den sida som vetter in i rummet
       const hx = o.riktning === 'vanster' ? o.x + o.b - 6 : o.riktning === 'hoger' ? o.x + 4 : o.x + o.b - 7;

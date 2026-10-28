@@ -210,6 +210,12 @@ export function rumsObjekt(innehall, tillstand, karta) {
 }
 
 /**
+ * En dörr i en sidovägg (leder åt vänster eller höger). Snett uppifrån syns den som en öppning i väggen,
+ * inte som en dörr framifrån (stilguiden, Så syns en väg att gå). @param {Objekt} o
+ */
+export const arSidodorr = (o) => o.sort === 'utgang' && !o.golv && !o.klattra && (o.riktning === 'vanster' || o.riktning === 'hoger');
+
+/**
  * Gråboxens färg för ett föremål. Utedörren är ljusare än innedörrarna (dagsljus genom glaset),
  * och alla innedörrar har samma färg, så att bara lappen skiljer dem åt (stilguiden, Husets plan).
  * @param {Objekt} o @returns {number}
