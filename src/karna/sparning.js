@@ -4,9 +4,9 @@
 // Hjälten är en egen del med eget formatfält och kan exporteras till kommande äventyr.
 
 export const APP = 'ORDSTAVEN';
-export const FORMAT = 3;
+export const FORMAT = 4;
 export const UNGE_FORMAT = 1;
-export const HJALTE_FORMAT = 1;
+export const HJALTE_FORMAT = 2;
 
 export const NYCKEL = 'ordstaven_spar';
 export const NYCKEL_BACKUP = 'ordstaven_spar_backup';
@@ -40,6 +40,25 @@ export const MIGRERINGAR = {
     d.format = 3;
     return d;
   },
+  // 3 → 4: hjältens lager (T2). Hjälten är spelarens figur: formen är fast, huden och dräkten är palettbyten
+  // (utseende.hudfarg, utseende.drakt), och hjälmdekoren och ryggsäcken är saker han hittar (lager, garderob).
+  // De gamla valen hudton och klader blir hudfarg och drakt. Hjälmens och skornas färg (hatt, kropp) går inte
+  // längre att välja (ledningen 2026-10-26: färger men inte form, hjälmen är grå).
+  3: (d) => {
+    const h = d.spelare.hjalte;
+    if (h && (h.format ?? 1) < 2) {
+      const u = h.utseende || {};
+      h.utseende = {
+        ...(Number.isInteger(u.hudton) ? { hudfarg: u.hudton } : {}),
+        ...(Number.isInteger(u.klader) ? { drakt: u.klader } : {}),
+      };
+      h.lager = { hjalmdekor: null, ryggsack: null, ...(h.lager || {}) };
+      h.garderob = h.garderob || [];
+      h.format = 2;
+    }
+    d.format = 4;
+    return d;
+  },
 };
 
 /** @typedef {{ getItem(k: string): string | null, setItem(k: string, v: string): void, removeItem(k: string): void }} Lagring */
@@ -52,7 +71,9 @@ export function nyttTillstand(spelversion, klocka = () => new Date()) {
     spelversion,
     sparad: klocka().toISOString(),
     spelare: {
-      hjalte: { format: HJALTE_FORMAT, id: slumpId(), namn: '', utseende: {}, grad: null, formler: [] },
+      // hjälten: utseende = palettbyten (hudfarg, drakt), lager = det han har på sig (hjalmdekor, ryggsack),
+      // garderob = allt han har hittat att ha på sig
+      hjalte: { format: HJALTE_FORMAT, id: slumpId(), namn: '', utseende: {}, lager: { hjalmdekor: null, ryggsack: null }, garderob: [], grad: null, formler: [] },
       // ungen hör till spelaren: namn, växtsteg och förmågor står öppna för nästa äventyr
       unge: { format: UNGE_FORMAT, namn: '', steg: 1, formagor: [] },
       larande: { lasning: {}, skrivning: {}, ord: {}, matte: {}, historik: [] },

@@ -14,16 +14,16 @@ const FARG = {
   unge: 0x5fae6a, ungeMage: 0x9fd4a0, ljus: 0xfff2b0,
 };
 /**
- * Hjältens färger. Förvalet (index 0) är spelarens egen figur: blå hud, rund grå hjälm, mörkgrå dräkt,
- * mörkblå skor (stilguiden, avsnitt 5). Formen är alltid densamma, färgerna går att byta.
- * Nycklarna är sparningens: kropp = skorna, hudton = huden, klader = dräkten, hatt = hjälmen.
+ * Hjältens färger. Förvalet (index 0) är spelarens egen figur: blå hud, mörkgrå dräkt (stilguiden, avsnitt 5).
+ * Formen är alltid densamma. Huden och dräkten går att byta (sparningens utseende.hudfarg och utseende.drakt),
+ * hjälmen och skorna har fasta färger.
  */
 export const HJALTE_FARGER = {
-  hudton: [0x2e8bd8, 0x4fae6a, 0xd8a24a, 0x9a6ad8],
-  hatt: [0xc9ccd2, 0xd8b04a, 0x8a909c, 0xc05a4a],
-  klader: [0x3a3e48, 0x2f4f6f, 0x6e3a3a, 0x3f5f3a],
-  kropp: [0x1e4fa0, 0x3a3e48, 0x6b4c35, 0x2e8bd8],
+  hudfarg: [0x2e8bd8, 0x4fae6a, 0xd8a24a, 0x9a6ad8],
+  drakt: [0x3a3e48, 0x2f4f6f, 0x6e3a3a, 0x3f5f3a],
 };
+/** Det som inte går att välja: den runda grå hjälmen och de mörkblå skorna. */
+export const HJALTE_FAST = Object.freeze({ hjalm: 0xc9ccd2, skor: 0x1e4fa0 });
 
 export class Rum extends Phaser.Scene {
   /**
@@ -152,18 +152,18 @@ export class Rum extends Phaser.Scene {
   /** Hjältens färger efter valen i skapa hjälten. @param {Record<string, number>} val */
   sattUtseende(val) {
     this.utseende = val;
-    const f = (/** @type {keyof HJALTE_FARGER} */ del) => HJALTE_FARGER[del][val[del] ?? 0];
+    const f = (/** @type {'hudfarg' | 'drakt' | 'hjalm' | 'skor'} */ del) => (del === 'hjalm' || del === 'skor' ? HJALTE_FAST[del] : HJALTE_FARGER[del][val[del] ?? 0] ?? HJALTE_FARGER[del][0]);
     this.hjalte.removeAll(true);
     // gråboxens version av spelarens figur: stort huvud med rund grå hjälm runt ett blått ansikte,
     // mörkgrå dräkt, blå armar, mörkblå skor
-    this.ansikte = this.add.rectangle(4, 3, 8, 7, f('hudton')).setOrigin(0, 0);
+    this.ansikte = this.add.rectangle(4, 3, 8, 7, f('hudfarg')).setOrigin(0, 0);
     this.hjalte.add([
-      this.add.rectangle(4, 21, 3, 3, f('kropp')).setOrigin(0, 0),
-      this.add.rectangle(9, 21, 3, 3, f('kropp')).setOrigin(0, 0),
-      this.add.rectangle(1, 13, 2, 6, f('hudton')).setOrigin(0, 0),
-      this.add.rectangle(13, 13, 2, 6, f('hudton')).setOrigin(0, 0),
-      this.add.rectangle(3, 12, 10, 9, f('klader')).setOrigin(0, 0),
-      this.add.rectangle(2, 0, 12, 12, f('hatt')).setOrigin(0, 0),
+      this.add.rectangle(4, 21, 3, 3, f('skor')).setOrigin(0, 0),
+      this.add.rectangle(9, 21, 3, 3, f('skor')).setOrigin(0, 0),
+      this.add.rectangle(1, 13, 2, 6, f('hudfarg')).setOrigin(0, 0),
+      this.add.rectangle(13, 13, 2, 6, f('hudfarg')).setOrigin(0, 0),
+      this.add.rectangle(3, 12, 10, 9, f('drakt')).setOrigin(0, 0),
+      this.add.rectangle(2, 0, 12, 12, f('hjalm')).setOrigin(0, 0),
       this.add.rectangle(3, 0, 10, 1, 0xffffff, 0.5).setOrigin(0, 0),
       this.ansikte,
     ]);
@@ -172,8 +172,8 @@ export class Rum extends Phaser.Scene {
 
   /** Ryggen mot kameran (på stegen): ansiktet döljs bakom hjälmen. @param {boolean} pa */
   sattRygg(pa) {
-    const f = (/** @type {keyof HJALTE_FARGER} */ del) => HJALTE_FARGER[del][(this.utseende || {})[del] ?? 0];
-    this.ansikte?.setFillStyle(pa ? f('hatt') : f('hudton'));
+    const hud = HJALTE_FARGER.hudfarg[(this.utseende || {}).hudfarg ?? 0] ?? HJALTE_FARGER.hudfarg[0];
+    this.ansikte?.setFillStyle(pa ? HJALTE_FAST.hjalm : hud);
   }
 
   /**

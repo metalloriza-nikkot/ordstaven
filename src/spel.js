@@ -4,13 +4,13 @@
 import { skapaBerattelse } from './karna/berattelse.js';
 import { skapaLasmotor, valjVariant } from './karna/lasmotor.js';
 import { egenskaper, PALETT } from './karna/egenskaper.js';
-import { skapaValj, skapaFormel, skapaDop, skapaKrukor } from './karna/pussel.js';
+import { skapaValj, skapaFormel, skapaDop, skapaKrukor, skapaRaddning } from './karna/pussel.js';
 import { forSkarm, versaler } from './karna/text.js';
 import { rumTillSkarm, RUM } from './karna/skalning.js';
 import { framfor, lasplats, vidObjekt, genom } from './karna/rumslayout.js';
 import { aventyrFor } from './karna/sparning.js';
-import { pekningOmMs, skapaHjalpSpar } from './karna/hjalp.js';
-import { HJALTE_FARGER } from './scener/Rum.js';
+import { pekningOmMs, skapaHjalpSpar, knufftidMs } from './karna/hjalp.js';
+import { HJALTE_FARGER, HJALTE_FAST } from './scener/Rum.js';
 import { TANGENTBORD_HOJD } from './grans/tangentbord.js';
 
 const KNUFF_MS = 9000;
@@ -21,7 +21,7 @@ const vanta = (/** @type {number} */ ms) => new Promise((r) => setTimeout(r, ms)
  *           ui: ReturnType<typeof import('./grans/ui.js').skapaUi>, rum: import('./scener/Rum.js').Rum, layout: any,
  *           inmatning: any, tangentbord: ReturnType<typeof import('./grans/tangentbord.js').skapaTangentbord>,
  *           bilder: ReturnType<typeof import('./grans/bilder.js').skapaBilder>, snabb: boolean, pek: () => boolean,
- *           uppdatering: { tillampa(): void } }} d
+ *           uppdatering: { tillampa(): void }, valtKapitel?: string | null, version?: string, exporteraLogg?: () => void }} d
  */
 export function skapaSpel(d) {
   const { aventyr, kartor = {}, tillstand, sparning, logg, rost, ljud, ui, rum, layout, inmatning, tangentbord, bilder, snabb } = d;
@@ -179,8 +179,9 @@ export function skapaSpel(d) {
    * @param {any} knuff @param {() => void} [extra]
    * @param {{ pekOmMs: () => number, spar: ReturnType<typeof skapaHjalpSpar>, peka?: () => boolean }} [vakt]
    * peka = visa pekningen i världen (ungen springer till rätt dörr). Då visas inte knuffens beskrivning, som är skriven för den vuxne.
+   * @param {number} [efterMs] tiden när knuffen inte har efter_sek (läsplattan: efter textmängden)
    */
-  function knuffKlocka(knuff, extra, vakt) {
+  function knuffKlocka(knuff, extra, vakt, efterMs = KNUFF_MS) {
     if (!knuff) return { nollstall() {}, stopp() {} };
     let t = 0, t2 = 0;
     const visa = async () => {
@@ -201,7 +202,7 @@ export function skapaSpel(d) {
         const om = knuff.pekar && vakt ? vakt.pekOmMs() : 0;
         if (om > 0) { logg.handelse('knuff', 'pekningen väntar', { ms: om }); t2 = window.setTimeout(visa, om); }
         else visa();
-      }, (knuff.efter_sek ? knuff.efter_sek * 1000 : KNUFF_MS));
+      }, (knuff.efter_sek ? knuff.efter_sek * 1000 : efterMs));
     };
     starta();
     return { nollstall: starta, stopp() { clearTimeout(t); clearTimeout(t2); } };
@@ -597,6 +598,8 @@ export function skapaSpel(d) {
       case 'P11_formel': res = await formel(p); break;
       case 'P12_dop': res = await dop(p); break;
       case 'P26_krukorna': res = await krukor(p); break;
+      case 'P15_raddning': res = await raddning(p); break;
+      case 'P9_kodlas': res = await kodlas(p); break;
       default:
         // P15, P9 och andra typer byggs i fas 3. Gråboxen hoppar över dem.
         await ui.visaRegi(`(${p.typ} byggs i fas 3)`, tid(1500)); ui.doljRegi(); res = {};
@@ -622,7 +625,8 @@ export function skapaSpel(d) {
       let upptagen = false;
       const hjalpSpar = skapaHjalpSpar(() => performance.now());
       const vakt = { spar: hjalpSpar, pekOmMs: () => pekningOmMs({ antalAlternativ: v.s.alternativ.length, antalFel: v.s.fel, sedanStartMs: hjalpSpar.sedanStart() }) };
-      const k = knuffKlocka(p.knuff, () => plattan().querySelector('.fraga')?.classList.add('puls'), vakt);
+      // knufftiden på läsplattan följer textmängden: ca 11 s per mening (granskningen av kapitel 1)
+      const k = knuffKlocka(p.knuff, () => plattan().querySelector('.fraga, .lapp')?.classList.add('puls'), vakt, knufftidMs({ text: v.s.text, alternativ: v.s.alternativ }));
       const plattan = () => ui.plattan;
       const kortHtml = (/** @type {any} */ a) => {
         const bild = flera ? bilder.html(a.bild || a.id) : a.ord ? '' : bilder.html(a.bild || a.id);
@@ -848,21 +852,41 @@ export function skapaSpel(d) {
     });
   }
 
-  /** Formel med brickor (P11). @param {any} p */
+  /**
+   * Formel med brickor (P11). Med titta–täck (forebild.tacks, SVÄRD): förebilden syns, brickorna glider in efter en
+   * stund, och förebilden tonas bort när första brickan läggs medan ungen håller för ögonen. Vid fel eller knuff tänds
+   * den igen och står kvar resten av försöket. Vid rätt lyser den en sekund ovanför hans ord.
+   * @param {any} p
+   */
   async function formel(p) {
     const f = skapaFormel(p);
-    const spar = { hjalp: false };
+    const spar = { hjalp: false, forebild: false };
     if (p.instruktion) await replik(p.instruktion);
     rum.frys(true);
+    const tt = p.forebild?.tacks === 'forsta_brickan';
+    /** titta–täck: syns förebilden, och står den kvar (efter fel eller knuff)? */
+    const fb = { syns: true, kvar: false, brickor: !tt || !(p.forebild?.brickor_efter_sek > 0) };
     return new Promise((klar) => {
       let upptagen = false;
-      const k = knuffKlocka(p.knuff, () => ui.plattan.querySelector('.forebild .bokstav')?.classList.add('blinkar'));
+      const tandForebild = (/** @type {string} */ varfor) => {
+        if (!tt || fb.kvar) return;
+        fb.syns = true; fb.kvar = true; spar.forebild = true;
+        logg.handelse('formel', `${p.id}: förebilden tänds (${varfor}) och står kvar`);
+      };
+      const k = knuffKlocka(p.knuff, () => { tandForebild('knuff'); rita(); ui.plattan.querySelector('.forebild .bokstav')?.classList.add('blinkar'); });
+      if (!fb.brickor) window.setTimeout(() => { fb.brickor = true; if (!upptagen) rita(); }, tid(p.forebild.brickor_efter_sek * 1000));
+      const tack = () => {
+        if (!tt || !fb.syns || fb.kvar) return;
+        fb.syns = false; logg.handelse('formel', `${p.id}: förebilden tonas bort (täck)`);
+      };
       const rita = () => {
         const bokstav = (/** @type {number | null} */ id) => (id === null ? '' : f.s.brickor.find((x) => x.id === id)?.bokstav ?? '');
-        const forebild = p.forebild ? `<div class="forebild" aria-label="Förebild">${[...p.forebild.text].map((c) => `<span class="bokstav">${ui.esc(c)}</span>`).join('')}</div>` : '';
+        const forebild = p.forebild ? `<div class="forebild ${fb.syns ? '' : 'tonad'}" aria-label="Förebild">${[...p.forebild.text].map((c) => `<span class="bokstav">${ui.esc(c)}</span>`).join('')}</div>` : '';
+        // ungen håller tassarna för ögonen medan förebilden är borta (titta–täck)
+        const tacker = tt && !fb.syns ? '<span class="unge-tacker" aria-hidden="true"><span class="kropp"></span><span class="tass"></span><span class="tass"></span></span>' : '';
         const platser = `<div class="platser">${f.s.platser.map((id, i) => `<span class="plats ${f.s.last[i] ? 'last' : ''} ${id !== null && !f.s.last[i] ? 'flyttbar' : ''}" data-plats="${i}" ${id !== null ? `data-id="${id}"` : ''}>${ui.esc(bokstav(id))}</span>`).join('')}</div>`;
-        const brickor = `<div class="brickor">${f.s.brickor.map((x) => `<button type="button" class="bricka ${f.s.platser.includes(x.id) ? 'anvand' : ''} ${f.s.tips === x.id ? 'tips' : ''}" data-id="${x.id}">${ui.esc(x.bokstav)}</button>`).join('')}<button type="button" class="bricka sudda" aria-label="Ta tillbaka">⌫</button></div>`;
-        ui.visaPlatta(`<div class="formel-ruta">${forebild}${platser}${brickor}</div>`, 'pussel P11_formel');
+        const brickor = `<div class="brickor ${fb.brickor ? '' : 'vantar'}">${f.s.brickor.map((x) => `<button type="button" class="bricka ${f.s.platser.includes(x.id) ? 'anvand' : ''} ${f.s.tips === x.id ? 'tips' : ''}" data-id="${x.id}">${ui.esc(x.bokstav)}</button>`).join('')}<button type="button" class="bricka sudda" aria-label="Ta tillbaka">⌫</button></div>`;
+        ui.visaPlatta(`<div class="formel-ruta">${tacker}${forebild}${platser}${brickor}</div>`, 'pussel P11_formel');
         tillatNos(p, spar);
         ui.plattan.querySelectorAll('.bricka[data-id]').forEach((el) => {
           el.addEventListener('click', () => { if (!dra.nyss) svar(f.lagg(Number(/** @type {HTMLElement} */ (el).dataset.id))); });
@@ -917,14 +941,166 @@ export function skapaSpel(d) {
         if (upptagen || r.resultat === 'ingen') return;
         k.nollstall();
         upptagen = true;
-        if (r.resultat === 'lagd') { ljud.spela('bricka'); rita(); upptagen = false; return; }
+        if (r.resultat === 'lagd') { tack(); ljud.spela('bricka'); rita(); upptagen = false; return; }
         rita();
-        if (r.resultat === 'fel') { ljud.spela('fel'); ui.plattan.querySelector('.platser')?.classList.add('skakar'); await vanta(tid(400)); await reaktion(r.reaktion); rita(); upptagen = false; return; }
+        if (r.resultat === 'fel') { tandForebild('fel'); ljud.spela('fel'); ui.plattan.querySelector('.platser')?.classList.add('skakar'); await vanta(tid(400)); await reaktion(r.reaktion); rita(); upptagen = false; return; }
         k.stopp(); sluta();
         ljud.spela('ratt');
-        const ordet = `<div class="formel-i-luften">${ui.esc(p.svar)}</div>`;
+        // kolla: förebilden lyser en sekund ovanför hans ord (titta–täck)
+        const kolla = tt ? `<div class="forebild kolla">${[...p.forebild.text].map((c) => `<span class="bokstav">${ui.esc(c)}</span>`).join('')}</div>` : '';
+        const ordet = `<div class="formel-luft-ruta">${kolla}<div class="formel-i-luften">${ui.esc(p.svar)}</div></div>`;
         ui.visaPlatta(ordet, 'formel-luft');
         await vanta(tid(1000)); ui.doljPlatta();
+        if (tt) logg.handelse('formel', `${p.id}: klar ${spar.forebild ? 'med' : 'utan'} förebild`);
+        await reaktion(r.reaktion);
+        klar({ niva: p.niva, forstaForsoket: f.forstaForsoket, forsok: f.s.fel + 1, hjalp: spar.hjalp });
+      };
+      const sluta = lyssnaHandling((h) => {
+        if (h.typ === 'bokstav' && fb.brickor) svar(f.skriv(h.tecken));
+        if (h.typ === 'sudda' && !upptagen && f.sudda()) rita();
+      });
+      rita();
+    });
+  }
+
+  /**
+   * Räddningen (P15, apan i nätet): kategorin läser han själv, ett fält per bokstav och bokstavsbrickor.
+   * Ett tryck i taget: reaktionen spelas klart innan nästa tryck tas emot. En rätt bokstav fylls i överallt där den
+   * finns, en fel bricka tonas ut och apan glider en bit. Efter första rätta bokstaven lyser staven: ett tryck på den
+   * ger kasta-läget, som formelvyn (fälten får guldkant och nästa tomma lyser). Där studsar en fel bricka tillbaka
+   * ("pff"), de rätta ligger kvar, och efter två fel på samma plats blinkar rätt bricka. Inget fel räknas där.
+   * Mellanslag trycker på staven, och en bokstavstangent trycker på brickan.
+   * @param {any} p
+   */
+  async function raddning(p) {
+    const r = skapaRaddning(p);
+    const spar = { hjalp: false };
+    if (p.instruktion) await replik(p.instruktion);
+    rum.frys(true);
+    return new Promise((klar) => {
+      let upptagen = false, stavGlimtar = false;
+      const k = knuffKlocka(p.knuff, () => ui.plattan.querySelector('.lapp')?.classList.add('puls'), undefined, knufftidMs({ text: p.kategori }));
+      const rita = () => {
+        const falt = `<div class="platser">${r.s.falt.map((b, i) => `<span class="plats ${b ? 'last' : ''} ${r.s.kastar && i === r.nasta ? 'nasta' : ''}" data-plats="${i}">${ui.esc(b || '')}</span>`).join('')}</div>`;
+        // i kasta-läget går alla brickor att använda utom de fel gissade (E behövs kanske två gånger)
+        const dold = (/** @type {number} */ id) => !r.s.kastar && r.s.provade.has(id) && !r.s.fela.has(id);
+        const brickor = `<div class="brickor">${r.s.brickor.map((x) => `<button type="button" class="bricka ${r.s.fela.has(x.id) ? 'tonad' : ''} ${dold(x.id) ? 'anvand' : ''} ${r.s.tips === x.id ? 'tips' : ''}" data-id="${x.id}"${r.s.fela.has(x.id) ? ' disabled' : ''}>${ui.esc(x.bokstav)}</button>`).join('')}</div>`;
+        const stav = r.s.kastaErbjuden ? `<button type="button" class="stav-knapp ${r.s.kastar ? 'lyft' : ''} ${stavGlimtar ? 'glimtar' : ''}" aria-label="Staven"><span class="stav-ikon"></span></button>` : '';
+        ui.visaPlatta(`<div class="formel-ruta raddning-ruta ${r.s.kastar ? 'kastar' : ''}">${stav}<div class="lapp p-${ui.esc(p.papper || 'lapp')}">${ui.rader(p.kategori, varden())}</div>${falt}${brickor}</div>`, 'pussel P15_raddning');
+        tillatNos(p, spar);
+        ui.plattan.querySelectorAll('.bricka[data-id]').forEach((el) => el.addEventListener('click', () => tryck(Number(/** @type {HTMLElement} */ (el).dataset.id))));
+        ui.plattan.querySelector('.stav-knapp')?.addEventListener('click', () => vaxla());
+      };
+      const vaxla = () => {
+        if (upptagen || !r.vaxlaKasta()) return;
+        stavGlimtar = false; ljud.spela('klick');
+        logg.handelse('räddning', r.s.kastar ? 'kasta-läget' : 'ut ur kasta-läget');
+        rita();
+      };
+      const studsa = (/** @type {number} */ id) => {
+        const el = ui.plattan.querySelector(`.bricka[data-id="${id}"]`);
+        el?.classList.remove('studsar'); void (/** @type {HTMLElement | null} */ (el))?.offsetWidth; el?.classList.add('studsar');
+      };
+      const tryck = async (/** @type {number} */ id) => {
+        if (upptagen || ui.nosAktiv) return;
+        k.nollstall();
+        if (r.s.kastar) {
+          const res = r.kasta(id);
+          if (res.resultat === 'ingen') return;
+          logg.handelse('val', `${p.id}: kasta ${r.s.brickor.find((x) => x.id === id)?.bokstav} på plats ${res.plats + 1}`, { resultat: res.resultat });
+          if (res.resultat === 'studs') { ljud.spela('pff'); rita(); studsa(id); return; }
+          ljud.spela('bricka'); rita();
+          if (res.resultat === 'klar') await fardig();
+          return;
+        }
+        const res = r.gissa(id);
+        if (res.resultat === 'ingen') return;
+        logg.handelse('val', `${p.id}: ${r.s.brickor.find((x) => x.id === id)?.bokstav}`, { resultat: res.resultat });
+        upptagen = true;
+        if (res.resultat === 'fel') {
+          ljud.spela('fel'); rita();
+          await reaktion(p.vid_fel);
+          upptagen = false; rita(); return;
+        }
+        ljud.spela('ratt'); rita();
+        if (res.resultat === 'klar') { await fardig(); return; }
+        if (res.erbjud) {
+          // staven lyser stilla, och erbjudandet läses upp utan att vänta (det är ett erbjudande, inget krav)
+          stavGlimtar = true; rita();
+          if (p.kasta?.erbjudande) sag(p.kasta.erbjudande).then(() => {}, () => {});
+        }
+        await vanta(tid(350));
+        upptagen = false;
+      };
+      const fardig = async () => {
+        upptagen = true; k.stopp(); sluta();
+        ljud.spela('ratt');
+        ui.visaPlatta(`<div class="formel-i-luften">${ui.esc(r.s.svar)}</div>`, 'formel-luft');
+        await vanta(tid(1000)); ui.doljPlatta();
+        logg.handelse('räddning', r.s.kastat ? 'klar i kasta-läget' : 'klar genom att gissa', { fel: r.s.fel });
+        await reaktion(r.s.kastat ? (p.kasta?.vid_ratt ?? p.vid_ratt) : p.vid_ratt);
+        // bara kasta-läget räknas som skrivning på S2 (granskningen, B)
+        klar({ niva: r.s.kastat ? 'S2' : null, forstaForsoket: r.forstaForsoket, forsok: r.s.fel + 1, hjalp: spar.hjalp });
+      };
+      const sluta = lyssnaHandling((h) => {
+        if (h.typ === 'interagera') { vaxla(); return; }
+        if (h.typ !== 'bokstav') return;
+        const b = r.s.brickor.find((x) => x.bokstav === versaler(h.tecken) && !r.s.fela.has(x.id) && (r.s.kastar || !r.s.provade.has(x.id)));
+        if (b) tryck(b.id);
+      });
+      rita();
+    });
+  }
+
+  /**
+   * Kodlåset (P9): låset med tecken och chiffernyckeln står på samma skärm, och han lägger bokstäverna med brickor.
+   * Låset kontrolleras först när alla fälten är fyllda (kontroll: hela_ordet). Rätta bokstäver stannar, och varje rätt
+   * avkodat tecken lyser på låset. Med visa_forsta visar ungen det första tecknet: det lyser på låset och på nyckeln,
+   * och det räknas inte som hjälp. Efter två fel lyser tecknet för nästa saknade bokstav på nyckeln. Ordet lyser en
+   * stund (svar_lyser_sek) innan locket flyger upp.
+   * @param {any} p
+   */
+  async function kodlas(p) {
+    const f = skapaFormel({ ...p, svar: versaler(p.svar) });
+    const spar = { hjalp: false };
+    if (p.instruktion) await replik(p.instruktion);
+    rum.frys(true);
+    const c = p.chiffer || { tecken: [], nyckel: [] };
+    let visar = p.visa_forsta ? 0 : -1;
+    if (visar >= 0) logg.handelse('kodlås', 'ungen visar första tecknet (inte hjälp)');
+    return new Promise((klar) => {
+      let upptagen = false;
+      const k = knuffKlocka(p.knuff, () => ui.plattan.querySelector('.kod-nyckel')?.classList.add('puls'));
+      const tipsBokstav = () => (f.s.tips === null ? null : f.s.brickor.find((x) => x.id === f.s.tips)?.bokstav ?? null);
+      const rita = () => {
+        const bokstav = (/** @type {number | null} */ id) => (id === null ? '' : f.s.brickor.find((x) => x.id === id)?.bokstav ?? '');
+        const las = `<div class="kod-kort kod-las"><div class="kod-tecken">${c.tecken.map((t, i) => `<span class="kod-tecken-ruta ${f.s.last[i] ? 'ratt' : ''} ${i === visar ? 'visar' : ''}">${bilder.html(t)}</span>`).join('')}</div>
+          <div class="platser">${f.s.platser.map((id, i) => `<span class="plats ${f.s.last[i] ? 'last' : ''} ${id !== null && !f.s.last[i] ? 'flyttbar' : ''}" data-plats="${i}">${ui.esc(bokstav(id))}</span>`).join('')}</div></div>`;
+        const tb = tipsBokstav();
+        const nyckel = `<div class="kod-kort kod-nyckel">${c.nyckel.map((n) => `<span class="kod-par ${visar >= 0 && n.tecken === c.tecken[visar] ? 'visar' : ''} ${tb && n.bokstav === tb ? 'tips' : ''}">${bilder.html(n.tecken)}<span class="kod-bokstav">${ui.esc(n.bokstav)}</span></span>`).join('')}</div>`;
+        const brickor = `<div class="brickor">${f.s.brickor.map((x) => `<button type="button" class="bricka ${f.s.platser.includes(x.id) ? 'anvand' : ''}" data-id="${x.id}">${ui.esc(x.bokstav)}</button>`).join('')}<button type="button" class="bricka sudda" aria-label="Ta tillbaka">⌫</button></div>`;
+        ui.visaPlatta(`<div class="pussel-ruta kod-ruta"><div class="kod-rad">${las}${nyckel}</div>${brickor}</div>`, 'pussel P9_kodlas');
+        tillatNos(p, spar);
+        ui.plattan.querySelectorAll('.bricka[data-id]').forEach((el) => el.addEventListener('click', () => svar(f.lagg(Number(/** @type {HTMLElement} */ (el).dataset.id)))));
+        ui.plattan.querySelectorAll('.plats.flyttbar').forEach((el) => el.addEventListener('click', () => { if (!upptagen && f.taBort(Number(/** @type {HTMLElement} */ (el).dataset.plats))) { ljud.spela('klick'); rita(); } }));
+        ui.plattan.querySelector('.sudda')?.addEventListener('click', () => { if (!upptagen && f.sudda()) { ljud.spela('klick'); rita(); } });
+      };
+      const svar = async (/** @type {{ resultat: string, reaktion: any }} */ r) => {
+        if (upptagen || r.resultat === 'ingen') return;
+        k.nollstall(); upptagen = true;
+        if (r.resultat === 'lagd') { visar = -1; ljud.spela('bricka'); rita(); upptagen = false; return; }
+        if (r.resultat === 'fel') {
+          logg.handelse('val', `${p.id}: fel ord`, { ratt: f.s.senastRatt });
+          ljud.spela('klonk'); rita(); ui.plattan.querySelector('.kod-las')?.classList.add('skakar');
+          await vanta(tid(400)); await reaktion(r.reaktion); rita(); upptagen = false; return;
+        }
+        k.stopp(); sluta();
+        logg.handelse('val', `${p.id}: ${f.s.svar}`, { resultat: 'klar' });
+        ljud.spela('ratt'); rita();
+        // ordet lyser en stund innan låset klickar upp (han ska hinna läsa det innan Farfar säger det)
+        ui.visaPlatta(`<div class="formel-i-luften">${ui.esc(f.s.svar)}</div>`, 'formel-luft');
+        await vanta(tid((p.svar_lyser_sek ?? 1) * 1000));
+        ljud.spela('klick_las'); ui.doljPlatta();
         await reaktion(r.reaktion);
         klar({ niva: p.niva, forstaForsoket: f.forstaForsoket, forsok: f.s.fel + 1, hjalp: spar.hjalp });
       };
@@ -974,27 +1150,42 @@ export function skapaSpel(d) {
     });
   }
 
-  /** Krukorna (P26): svinga staven mot krukorna i rummet. @param {any} p */
+  /**
+   * Krukorna (P26): svinga staven mot krukorna i rummet, eller mot rummets föremål (foremal: buskarna, lövhögarna).
+   * Det sista som hittas är alltid sak_i_sista (skattlådan, lådan) eller kartbiten. Vila, ingen text.
+   * @param {any} p
+   */
   async function krukor(p) {
     const k = skapaKrukor(p);
     rum.frys(false);
-    // kartan säger vilket föremål som är krukorna (visar: pusslets id)
-    const bas = visarFor(p.id)?.id ?? rum.objekt.find((o) => o.sort === 'sak')?.id ?? '';
-    if (!visarFor(p.id)) logg.handelse('FEL', `ingen karta visar ${p.id}, krukorna hamnar vid ${bas}`);
-    const ids = rum.dela(bas, k.s.antal);
+    /** @type {string[]} */
+    let ids;
+    if (p.foremal) {
+      ids = p.foremal.filter((/** @type {string} */ id) => rum.ruta(id));
+      if (ids.length !== p.foremal.length) logg.handelse('FEL', `${p.id}: ${p.foremal.length - ids.length} föremål saknas i rummet`);
+    } else {
+      // kartan säger vilket föremål som är krukorna (visar: pusslets id)
+      const bas = visarFor(p.id)?.id ?? rum.objekt.find((o) => o.sort === 'sak')?.id ?? '';
+      if (!visarFor(p.id)) logg.handelse('FEL', `ingen karta visar ${p.id}, krukorna hamnar vid ${bas}`);
+      ids = rum.dela(bas, k.s.antal);
+    }
     visaEtiketter();
-    const knuff = knuffKlocka(p.knuff, () => { const i = k.s.slagna.findIndex((x) => x === null); if (i >= 0) rum.markera(ids[i], true); });
-    while (!k.s.klar) {
+    const knuff = knuffKlocka(p.knuff, () => { const i = k.s.slagna.findIndex((x) => x === null); if (i >= 0 && ids[i]) rum.markera(ids[i], true); });
+    while (!k.s.klar && ids.length) {
       const kvar = ids.filter((_, i) => k.s.slagna[i] === null);
+      if (!kvar.length) break;
       const id = await anvand(kvar, { verb: 'svinga' });
       knuff.nollstall(); rum.markera(id, false);
       const fynd = k.sla(ids.indexOf(id));
-      ljud.spela('sla'); rum.slagen(id);
+      ljud.spela(p.foremal ? 'prassel' : 'sla'); rum.slagen(id);
+      logg.handelse('svinga', `${id}: ${fynd}`);
       if (fynd === 'bar') { av.bar++; ui.uppdateraHud(av); ljud.spela('bar'); await ui.visaFest('🫐', tid(600)); }
-      else if (fynd && fynd.startsWith('kartbit')) { await ui.visaFest('📜', tid(900)); }
+      else if (fynd && fynd === k.sista) { ljud.spela('fest'); await ui.visaFest(bilder.emoji(fynd) || (fynd.startsWith('kartbit') ? '📜' : '✨'), tid(900)); }
+      else if (fynd && fynd !== 'tom') { ljud.spela('allmant'); await ui.visaFest(bilder.emoji(fynd) || '✨', tid(700)); }
       else await vanta(tid(300));
     }
     knuff.stopp();
+    if (p.vid_ratt) await reaktion(p.vid_ratt);
     return {};
   }
 
@@ -1134,9 +1325,9 @@ export function skapaSpel(d) {
       const rita = () => {
         const rader = st.delar.filter((/** @type {string} */ del) => del in HJALTE_FARGER).map((/** @type {keyof HJALTE_FARGER} */ del) =>
           `<div class="valrad" data-del="${del}">${HJALTE_FARGER[del].map((f, i) => `<button type="button" class="farg ${(val[del] ?? 0) === i ? 'vald' : ''}" data-i="${i}" style="background:${hex(f)}" aria-label="${del} ${i + 1}"></button>`).join('')}</div>`).join('');
-        const f = (/** @type {keyof HJALTE_FARGER} */ del) => hex(HJALTE_FARGER[del][val[del] ?? 0]);
-        // spelarens figur: rund hjälm runt ett stort ansikte, dräkt, armar i hudfärgen, skor
-        const bild = `<div class="hjalte-bild" aria-hidden="true"><span class="hb-hjalm" style="background:${f('hatt')}"><span class="hb-ansikte" style="background:${f('hudton')}"><i></i><i></i><b></b></span></span><span class="hb-kropp"><span class="hb-arm" style="background:${f('hudton')}"></span><span class="hb-drakt" style="background:${f('klader')}"></span><span class="hb-arm" style="background:${f('hudton')}"></span></span><span class="hb-skor"><span style="background:${f('kropp')}"></span><span style="background:${f('kropp')}"></span></span></div>`;
+        const f = (/** @type {keyof HJALTE_FARGER} */ del) => hex(HJALTE_FARGER[del][val[del] ?? 0] ?? HJALTE_FARGER[del][0]);
+        // spelarens figur: rund hjälm runt ett stort ansikte, dräkt, armar i hudfärgen, skor (hjälmen och skorna går inte att välja)
+        const bild = `<div class="hjalte-bild" aria-hidden="true"><span class="hb-hjalm" style="background:${hex(HJALTE_FAST.hjalm)}"><span class="hb-ansikte" style="background:${f('hudfarg')}"><i></i><i></i><b></b></span></span><span class="hb-kropp"><span class="hb-arm" style="background:${f('hudfarg')}"></span><span class="hb-drakt" style="background:${f('drakt')}"></span><span class="hb-arm" style="background:${f('hudfarg')}"></span></span><span class="hb-skor"><span style="background:${hex(HJALTE_FAST.skor)}"></span><span style="background:${hex(HJALTE_FAST.skor)}"></span></span></div>`;
         ui.visaPlatta(`<div class="hjalte-ruta">${bild}<div class="valrader">${rader}</div><button type="button" class="knapp klar" aria-label="Klar">✓</button></div>`, 'pussel hjalte');
         ui.plattan.querySelectorAll('.farg').forEach((el) => el.addEventListener('click', () => {
           const e = /** @type {HTMLElement} */ (el); const del = /** @type {HTMLElement} */ (e.parentElement).dataset.del || '';
@@ -1322,6 +1513,8 @@ export function skapaSpel(d) {
       const kapitel = d.kapitel.find((k) => k.id === kapitelId);
       if (!kapitel) continue;
       if (av.kapitelId && av.kapitelId !== kapitelId && aventyr.kapitel.indexOf(av.kapitelId) > aventyr.kapitel.indexOf(kapitelId)) continue;
+      // ?kapitel=<id>: hoppa till det kapitlet (för den vuxne, innan kapitlet har kartor)
+      if (d.valtKapitel && aventyr.kapitel.includes(d.valtKapitel) && aventyr.kapitel.indexOf(kapitelId) < aventyr.kapitel.indexOf(d.valtKapitel)) continue;
       if (!stodsAvGrabox(kapitel)) break;
       b = skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId: AVENTYR, logg });
       logg.registrera('berättelse', () => ({ kapitel: kapitel.id, scen: b.scen?.id, steg: b.stegIndex, typ: aktuelltSteg?.typ }));
@@ -1336,8 +1529,13 @@ export function skapaSpel(d) {
     }
     slutskarm();
   }
-  /** Fas 2 spelar bara kapitel vars alla pusseltyper finns. @param {any} kapitel */
-  const stodsAvGrabox = (kapitel) => kapitel.pussel.every((/** @type {any} */ p) => ['P1_las_och_valj', 'P28_packa', 'P11_formel', 'P12_dop', 'P26_krukorna'].includes(p.typ));
+  /**
+   * Gråboxen spelar bara kapitel vars alla pusseltyper finns och vars alla rum har en karta (kapitel 1 får sina
+   * kartor i T5). Med ?kapitel=<id> spelas ett kapitel ändå, med föremålen placerade automatiskt (för den vuxne).
+   * @param {any} kapitel
+   */
+  const stodsAvGrabox = (kapitel) => kapitel.pussel.every((/** @type {any} */ p) => ['P1_las_och_valj', 'P28_packa', 'P11_formel', 'P12_dop', 'P26_krukorna', 'P15_raddning', 'P9_kodlas'].includes(p.typ))
+    && (d.valtKapitel === kapitel.id || kapitel.rum.every((/** @type {any} */ r) => !!kartor[r.id]));
 
 
   function slutskarm() {

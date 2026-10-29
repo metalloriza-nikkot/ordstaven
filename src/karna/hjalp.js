@@ -36,3 +36,31 @@ export function skapaHjalpSpar(nu) {
     fore: () => ({ knuff_fore: knuff, pekning_fore: pekning }),
   };
 }
+
+/** Knufftiden på läsplattan följer textmängden (granskningen av kapitel 1): ca 11 sekunder per mening, minst 9. */
+export const KNUFFTID = Object.freeze({ minMs: 9000, perMeningMs: 11000 });
+
+/**
+ * Hur många meningar en text har: varje rad som slutar med punkt, utrop eller fråga räknas, och en rad med
+ * flera ord utan skiljetecken räknas som en. Enstaka ord (BÄR, FILT) räknas inte.
+ * @param {string | string[] | null | undefined} text
+ */
+export function antalMeningar(text) {
+  if (!text) return 0;
+  let n = 0;
+  for (const rad of Array.isArray(text) ? text : [text]) {
+    const delar = rad.split(/[.!?…]+/).map((d) => d.trim()).filter(Boolean);
+    for (const d of delar) if (d.split(/\s+/).length > 1) n++;
+  }
+  return n;
+}
+
+/**
+ * Millisekunder tills en knuff på läsplattan får komma: 11 s per mening i lästexten och i alternativen, minst 9 s.
+ * @param {{ text?: string | string[] | null, alternativ?: { ord?: string }[] }} plattan
+ * @param {{ minMs: number, perMeningMs: number }} [regel]
+ */
+export function knufftidMs({ text, alternativ = [] }, regel = KNUFFTID) {
+  const n = antalMeningar(text) + alternativ.reduce((s, a) => s + antalMeningar(a.ord), 0);
+  return Math.max(regel.minMs, n * regel.perMeningMs);
+}

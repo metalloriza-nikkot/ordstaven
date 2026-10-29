@@ -787,18 +787,16 @@
               "type": "array",
               "items": {
                 "enum": [
-                  "kropp",
-                  "hudton",
-                  "klader",
-                  "hatt",
-                  "ryggsack"
+                  "hudfarg",
+                  "drakt"
                 ]
               }
             },
             "bara_bilder": {
               "type": "boolean"
             }
-          }
+          },
+          "description": "Spelaren väljer hjältens palettbyten (huden och dräkten). Formen är fast."
         },
         {
           "type": "object",

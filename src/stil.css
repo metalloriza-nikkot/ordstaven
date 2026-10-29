@@ -439,3 +439,48 @@ html, body {
 /* pilskylten vid en stig: pilen pekar längs stigen, efter ordet */
 .kort.stigskylt { flex-direction: row; gap: calc(10px * var(--t)); }
 .kort.stigskylt .pil { font-size: calc(44px * var(--t)); line-height: 1; color: #6d5a45; }
+
+/* ============================================================ kapitel 1 (T2): formlerna, räddningen och kodlåset */
+/* brickorna glider in efter en stund (titta–täck): platsen hålls, så att inget hoppar */
+.brickor.vantar { visibility: hidden; }
+/* förebilden tonas bort när första brickan läggs, och tänds igen vid fel eller knuff */
+.forebild { transition: opacity .6s ease; }
+.forebild.tonad { opacity: 0; }
+.forebild.kolla { animation: luft .4s ease; }
+.formel-luft-ruta { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+/* ungen håller tassarna för ögonen (gråbox): en grön unge med två tassar över ögonen */
+.unge-tacker { position: absolute; left: 16px; top: 14px; width: 56px; height: 40px; }
+.unge-tacker .kropp { position: absolute; inset: 8px 0 0 0; border-radius: 18px 18px 10px 10px; background: #5fae6a; box-shadow: inset 10px -6px 0 #9fd4a0; }
+.unge-tacker .tass { position: absolute; top: 4px; width: 18px; height: 14px; border-radius: 8px; background: #4f9a59; }
+.unge-tacker .tass:nth-child(2) { left: 6px; } .unge-tacker .tass:nth-child(3) { right: 6px; }
+.formel-ruta { position: relative; }
+
+/* räddningen: staven för kasta-läget, uppe till höger */
+.raddning-ruta { padding-top: 30px; }
+.stav-knapp { position: absolute; right: -18px; top: -18px; width: calc(72px * var(--t)); height: calc(72px * var(--t)); border-radius: 50%; border: 0; background: #e9dfc8; box-shadow: 0 4px 0 #b7a98a; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.stav-ikon { display: block; width: calc(12px * var(--t)); height: calc(52px * var(--t)); border-radius: 6px; background: linear-gradient(#8a6a4a, #3a2a20); transform: rotate(25deg); box-shadow: 0 0 0 2px rgba(242, 193, 78, .4); }
+.stav-knapp.glimtar { background: var(--guld); box-shadow: 0 4px 0 #b8892b, 0 0 0 6px rgba(242, 193, 78, .45); }
+.stav-knapp.lyft { background: var(--guld); transform: translateY(-6px); box-shadow: 0 10px 0 #b8892b, 0 0 24px rgba(242, 193, 78, .8); }
+/* kasta-läget ser ut som formelvyn: fälten får guldkant och nästa tomma lyser */
+.kastar .plats { border-color: var(--guld); }
+.kastar .plats.nasta { background: #fff6d8; box-shadow: 0 0 0 4px rgba(242, 193, 78, .6); }
+.bricka.tonad { opacity: .25; cursor: default; }
+.bricka.studsar { animation: studsa .35s ease; }
+@keyframes studsa { 30% { transform: translateY(-18px); } 60% { transform: translateY(4px); } }
+
+/* kodlåset: låset och nyckeln sida vid sida */
+.kod-ruta { gap: 20px; }
+.kod-rad { display: flex; gap: 28px; align-items: stretch; }
+.kod-kort { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 16px 20px; border-radius: 14px; }
+.kod-las { background: #d8cfbf; box-shadow: inset 0 0 0 4px #9b8f7c; }
+.kod-tecken { display: flex; gap: 12px; }
+.kod-tecken-ruta { display: inline-flex; width: calc(84px * var(--t)); justify-content: center; border-radius: 12px; transition: background .3s; }
+.kod-tecken-ruta .bild.emoji { font-size: calc(56px * var(--t)); }
+.kod-tecken-ruta.ratt { background: rgba(242, 193, 78, .55); box-shadow: 0 0 12px rgba(242, 193, 78, .8); }
+.kod-nyckel { display: grid; grid-template-columns: repeat(3, auto); gap: 8px 18px; background: #f5ecd7; box-shadow: inset 0 0 0 3px #d9c9a3; }
+.kod-par { display: inline-flex; align-items: center; gap: 6px; padding: 2px 6px; border-radius: 10px; }
+.kod-par .bild.emoji { font-size: calc(36px * var(--t)); }
+.kod-bokstav { font-size: calc(48px * var(--t)); line-height: 1; }
+/* ungen visar första tecknet, och efter två fel lyser nästa saknade bokstav på nyckeln */
+.visar { box-shadow: 0 0 0 4px #5fae6a; background: rgba(95, 174, 106, .25); }
+.kod-par.tips { box-shadow: 0 0 0 4px var(--guld); animation: puls .6s ease 3; }

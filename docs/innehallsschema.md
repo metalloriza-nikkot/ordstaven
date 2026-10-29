@@ -84,7 +84,7 @@ Kapitelfilerna börjar med `"format": 2`, äventyret och ordlistorna med `"forma
 | `ge_kartbit` | `nummer` | Kartbit 1–7. |
 | `ge_grad` | `grad`, `fest` | Ny trollkarlsgrad, i ordning: `Lärling`, `Ordsmed`, `Lögnavslöjare`, `Gåtlösare`, `Berättare` (äventyr 1) och `Mästertrollkarl` (seriens sista, nås inte i äventyr 1). |
 | `bok` | `id`, `talare`, `las_upp_efter_tryck`, `uppslag` | Bläddringsbar bok. Varje uppslag: `bild`, `bildtext` (ett ord), `text`. |
-| `skapa_hjalte` | `delar`, `bara_bilder` | Spelaren väljer hjältens utseende. |
+| `skapa_hjalte` | `delar` (`hudfarg`, `drakt`), `bara_bilder` | Spelaren väljer hjältens palettbyten. Formen är fast, hjälmdekor och ryggsäck kommer som gåvor (`ge_sak`). |
 | `sparpunkt` | `pass_slut`, `valfri`, `fraga` | Spelet sparas. `pass_slut: true` där passet slutar: två bilder, ▶ för att fortsätta och den sovande ungen för att sluta för idag. **`fraga`** (replik) läses upp och står ovanför bilderna. Utan `fraga` används `sparpunkt_fraga.text` i `aventyr.json`. |
 | `fritt` | `beskrivning`, `foremal` | Fri lek, t.ex. buskar att svinga staven mot. Ingen knapp: steget tar slut när varje föremål har gett sina två bär, när hjälten går mot en utgång eller genom en öppning (grinden), eller efter 25 sekunder utan att något händer. |
 | `bara` | `bild`, `till` | Hjälten bär en sak (filten): den svävar efter honom som ljusbollen och läggs på `till` när han når fram själv. |

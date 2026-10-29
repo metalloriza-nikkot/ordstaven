@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { geSak, bytLager, lagerFor } from '../../src/karna/hjalte.js';
 import { readFileSync, readdirSync } from 'node:fs';
 import { skapaSparning, nyttTillstand, migrera, FORMAT, NYCKEL, NYCKEL_TRASIG, aventyrFor } from '../../src/karna/sparning.js';
 const AVENTYR = 'den-gomda-dalen';
@@ -15,7 +16,7 @@ describe('sparning', () => {
     const t = nyttTillstand('0.1.0', fast);
     expect(t.app).toBe('ORDSTAVEN');
     expect(t.format).toBe(FORMAT);
-    expect(t.spelare.hjalte.format).toBe(1);
+    expect(t.spelare.hjalte.format).toBe(2);
     expect(t.aventyr).toEqual({});
     expect(aventyrFor(t, AVENTYR)).toBe(t.aventyr[AVENTYR]);
   });
@@ -61,7 +62,7 @@ describe('sparning', () => {
     const s = skapaSparning({ lagring: minne(), spelversion: '0.1.0', klocka: fast });
     const t = nyttTillstand('0.1.0', fast); t.spelare.hjalte.namn = 'TESTA';
     const h = JSON.parse(s.hjalteTillText(t));
-    expect(h).toMatchObject({ app: 'ORDSTAVEN-HJALTE', format: 1, hjalte: { namn: 'TESTA' } });
+    expect(h).toMatchObject({ app: 'ORDSTAVEN-HJALTE', format: 2, hjalte: { namn: 'TESTA', lager: { hjalmdekor: null, ryggsack: null }, garderob: [] } });
   });
 
   it('format 1 → 2: ungen flyttar från äventyret till spelaren, med namn och växtsteg', () => {
@@ -82,9 +83,28 @@ describe('sparning', () => {
     const gammal = JSON.parse(readFileSync(new URL('../fixturer/spar-format-2.json', import.meta.url), 'utf8'));
     expect(gammal.installningar.etiketter).toBe(true);
     const d = migrera(gammal);
-    expect(d.format).toBe(3);
+    expect(d.format).toBe(FORMAT);
     expect(d.installningar).toEqual({ foralderLaser: false });
     expect(d.spelare.unge.namn).toBe('KNOPP');
+  });
+
+  it('format 3 → 4: hjältens hud och dräkt blir palettbyten, och hjälten får lager och garderob', () => {
+    const gammal = JSON.parse(readFileSync(new URL('../fixturer/spar-format-3.json', import.meta.url), 'utf8'));
+    expect(gammal.spelare.hjalte.utseende).toEqual({ hudton: 2, klader: 1, hatt: 3, kropp: 1 });
+    const d = migrera(gammal);
+    expect(d.spelare.hjalte).toMatchObject({ format: 2, utseende: { hudfarg: 2, drakt: 1 }, lager: { hjalmdekor: null, ryggsack: null }, garderob: [] });
+    expect(d.spelare.hjalte.utseende).not.toHaveProperty('hatt');
+    expect(d.spelare.hjalte.namn).toBe('TESTA');
+  });
+  it('gåvor tas på direkt och hamnar i garderoben en gång, och garderoben byter tillbaka', () => {
+    const t = nyttTillstand('t'); const h = t.spelare.hjalte;
+    expect(geSak(h, 'hjalmdekor', 'taggkam')).toBe(true);
+    expect(geSak(h, 'hjalmdekor', 'taggkam')).toBe(false);
+    expect(lagerFor(h)).toEqual({ hjalmdekor: 'taggkam', ryggsack: null });
+    expect(bytLager(h, 'hjalmdekor', null)).toBe(true);
+    expect(bytLager(h, 'ryggsack', 'finns_inte')).toBe(false);
+    expect(bytLager(h, 'hjalmdekor', 'taggkam')).toBe(true);
+    expect(h.garderob).toEqual([{ sort: 'hjalmdekor', id: 'taggkam' }]);
   });
 
   // Varje gammalt format har en fixturfil som alltid måste gå att läsa.

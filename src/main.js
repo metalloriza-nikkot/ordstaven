@@ -45,7 +45,17 @@ const kapitel = Object.entries(kapitelfiler).filter(([fil]) => mappAv(fil) === v
 {
   const q = new URLSearchParams(location.search);
   if (q.has('snabb') && q.has('testscen')) {
-    try { const t = JSON.parse(localStorage.getItem('ordstaven_testscen') || 'null'); if (t && kapitel[0]) kapitel[0].scener.splice(t.index ?? kapitel[0].scener.length, 0, t.scen); } catch (e) { /* ingen provscen */ }
+    try {
+      const t = JSON.parse(localStorage.getItem('ordstaven_testscen') || 'null');
+      if (t && kapitel[0]) {
+        const k = kapitel[0];
+        k.scener.splice(t.index ?? k.scener.length, 0, t.scen);
+        // provpussel, fler scener (frivilliga) och fält i rummen, så att kapitel 1:s steg kan provas i prologens rum
+        for (const p of t.pussel || []) k.pussel.push(p);
+        for (const sc of t.scener || []) k.scener.push(sc);
+        for (const [id, falt] of Object.entries(t.rum || {})) { const r = k.rum.find((x) => x.id === id); if (r) Object.assign(r, falt); }
+      }
+    } catch (e) { /* ingen provscen */ }
   }
 }
 /** Testläge: ingen röst, korta pauser. */
@@ -132,6 +142,8 @@ const kartor = Object.fromEntries(Object.entries(kartfiler).filter(([fil]) => ma
 const spelet = skapaSpel({
   aventyr, kartor, kapitel, ordlistor, tillstand, sparning, logg, rost, ljud, ui, rum, layout, inmatning, tangentbord, bilder,
   snabb, pek: () => pek.matches, version: VERSION, exporteraLogg: () => exportera(logg),
+  // ?kapitel=kap-01: börja i ett kapitel som ännu saknar kartor (gråbox för den vuxne)
+  valtKapitel: parametrar.get('kapitel'),
   uppdatering: { tillampa: () => { uppdatering.tillampa(); startlage = false; } },
 });
 /** @type {any} */ (rum).redo.then(() => spelet.spela());

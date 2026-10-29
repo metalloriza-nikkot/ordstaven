@@ -2,7 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { skapaLasmotor, valjVariant } from '../../src/karna/lasmotor.js';
 import { ljudningsdelar } from '../../src/karna/ljudning.js';
-import { skapaValj, skapaFormel, skapaDop, skapaKrukor } from '../../src/karna/pussel.js';
+import { skapaValj, skapaFormel, skapaDop, skapaKrukor, skapaRaddning, iBokstavsordning } from '../../src/karna/pussel.js';
+import { antalMeningar, knufftidMs } from '../../src/karna/hjalp.js';
 import { skapaBerattelse } from '../../src/karna/berattelse.js';
 import { nyttTillstand, aventyrFor, migrera } from '../../src/karna/sparning.js';
 const AVENTYR = 'den-gomda-dalen';
@@ -50,7 +51,8 @@ describe('ljudningen', () => {
 
 describe('pusslen', () => {
   it('läs och välj: fel, förenkling efter 2 fel, ungen pekar efter 3, aldrig automatisk lösning', () => {
-    const p = skapaValj(P('p0_dinomat'), { niva: 3, slump: fast });
+    // på läsplattan (inte i rummet) får förenklingen byta till en lägre variant
+    const p = skapaValj({ ...P('p0_dinomat'), i_rummet: false }, { niva: 3, slump: fast });
     expect(p.s.variantNyckel).toBe('L3');
     expect(p.valj('liten_rod').resultat).toBe('fel');
     const andra = p.valj('stor_bla');
@@ -61,6 +63,15 @@ describe('pusslen', () => {
     expect(p.s.klar).toBe(false);
     expect(p.valj('rod').resultat).toBe('klar');
     expect(p.forstaForsoket).toBe(false);
+  });
+  it('i rummet byts aldrig varianten: förenklingen spärrar de prövade (granskningen, punkt 18)', () => {
+    const p = skapaValj(P('p0_dinomat'), { niva: 3, slump: fast });
+    p.valj('liten_rod'); const andra = p.valj('stor_bla');
+    expect(andra.forenklad).toBe(true);
+    expect(p.s.variantNyckel).toBe('L3');
+    // en av de prövade spärras, och två lådor står kvar: den rätta och en prövad (som redan är tom i rummet)
+    expect(p.s.alternativ).toHaveLength(2);
+    expect(p.s.alternativ.map((a) => a.id)).toContain('stor_rod');
   });
   it('läs och välj utan lägre variant: en distraktor tas bort, två alternativ kvar', () => {
     const p = skapaValj(P('p0_filt'), { niva: 2, slump: fast });
@@ -112,6 +123,72 @@ describe('pusslen', () => {
     for (const b of 'XXXXX') d.skriv(b);
     expect(d.s.namn).toHaveLength(10);
     expect(d.klar()).toBe('KNOPPÅSAXX');
+  });
+  it('brickorna ligger alltid i bokstavsordning, också Å, Ä och Ö sist', () => {
+    const f = skapaFormel(P('p0_ljus'), { slump: () => 0.9 });
+    expect(f.s.brickor.map((b) => b.bokstav).join('')).toBe('JLSU');
+    const k1 = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-01.json', import.meta.url), 'utf8'));
+    const svard = skapaFormel(k1.pussel.find((p) => p.id === 'k1_svard'));
+    expect(svard.s.brickor.map((b) => b.bokstav).join('')).toBe('DRSVÄ');
+    expect(iBokstavsordning([{ bokstav: 'Ö' }, { bokstav: 'Å' }, { bokstav: 'Z' }, { bokstav: 'Ä' }]).map((b) => b.bokstav).join('')).toBe('ZÅÄÖ');
+  });
+  it('kodlåset: hela ordet kontrolleras först när alla fält är fyllda, rätta stannar', () => {
+    const k1 = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-01.json', import.meta.url), 'utf8'));
+    const f = skapaFormel(k1.pussel.find((p) => p.id === 'k1_kodlas'));
+    expect(f.s.brickor.map((b) => b.bokstav).join('')).toBe('AEHMS');
+    expect(f.skriv('H').resultat).toBe('lagd');
+    expect(f.skriv('A').resultat).toBe('lagd'); // fel, men ingen kontroll än
+    expect(f.skriv('M').resultat).toBe('fel');
+    expect(f.s.senastRatt).toEqual([true, false, true]);
+    expect(f.s.platser.map((x) => x !== null)).toEqual([true, false, true]);
+    expect(f.skriv('E').resultat).toBe('klar');
+  });
+  it('räddningen: rätt bokstav fyller alla sina fält, fel tonas ut, kasta-läget erbjuds efter första rätta', () => {
+    const k1 = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-01.json', import.meta.url), 'utf8'));
+    const r = skapaRaddning(k1.pussel.find((p) => p.id === 'k1_apan'));
+    const id = (b) => r.s.brickor.find((x) => x.bokstav === b).id;
+    expect(r.s.brickor.map((b) => b.bokstav).join('')).toBe('AEGORST');
+    expect(r.gissa(id('O'))).toMatchObject({ resultat: 'fel' });
+    expect(r.gissa(id('O')).resultat).toBe('ingen'); // samma bricka går inte att trycka igen
+    const e = r.gissa(id('E'));
+    expect(e).toMatchObject({ resultat: 'ratt', nya: [2, 4], erbjud: true });
+    expect(r.s.falt.join(',')).toBe(',,E,,E');
+    expect(r.gissa(id('S')).erbjud).toBe(false); // erbjuds bara en gång
+    // kasta-läget: nästa tomma fält är T (plats 1)
+    expect(r.vaxlaKasta()).toBe(true);
+    expect(r.nasta).toBe(1);
+    expect(r.kasta(id('A')).resultat).toBe('studs');
+    expect(r.kasta(id('R')).resultat).toBe('studs');
+    expect(r.s.tips).toBe(id('T')); // två fel på samma plats: rätt bricka blinkar
+    expect(r.s.fel).toBe(1); // inget fel räknas i kasta-läget
+    expect(r.kasta(id('T')).resultat).toBe('lagd');
+    expect(r.kasta(id('G'))).toMatchObject({ resultat: 'klar', plats: 3 });
+    expect(r.s.kastat).toBe(true);
+  });
+  it('räddningen utan kasta: alla rätta bokstäver gissade', () => {
+    const k1 = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-01.json', import.meta.url), 'utf8'));
+    const r = skapaRaddning(k1.pussel.find((p) => p.id === 'k1_apan'));
+    const id = (b) => r.s.brickor.find((x) => x.bokstav === b).id;
+    for (const b of 'STG') expect(r.gissa(id(b)).resultat).toBe('ratt');
+    expect(r.gissa(id('E')).resultat).toBe('klar');
+    expect(r.forstaForsoket).toBe(true);
+    expect(r.s.kastat).toBe(false);
+  });
+  it('buskarna och lövhögarna: saken i sista kommer alltid sist', () => {
+    const k1 = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-01.json', import.meta.url), 'utf8'));
+    for (const [pid, sist] of [['k1_busken', 'skattlada'], ['k1_loven', 'lada']]) {
+      for (const ordning of [[0, 1, 2, 3], [3, 2, 1, 0], [1, 3, 0, 2]]) {
+        const k = skapaKrukor(k1.pussel.find((p) => p.id === pid));
+        expect(ordning.map((i) => k.sla(i)).at(-1)).toBe(sist);
+        expect(k.s.klar).toBe(true);
+      }
+    }
+  });
+  it('knufftiden följer textmängden: 11 s per mening, minst 9', () => {
+    expect(antalMeningar(['Dinomat.', 'Ta den röda lådan.'])).toBe(1);
+    expect(antalMeningar('Jag väntar vid bron.')).toBe(1);
+    expect(knufftidMs({ text: null, alternativ: [{ ord: 'bär' }] })).toBe(9000);
+    expect(knufftidMs({ text: null, alternativ: [{ ord: 'Dalens dinos har blå fötter.' }, { ord: 'Dalens dinos har vita fötter.' }, { ord: 'Dalens dinos har gula fötter.' }] })).toBe(33000);
   });
   it('krukorna: kartbiten kommer alltid sist', () => {
     for (const ordning of [[0, 1, 2, 3, 4], [4, 3, 2, 1, 0], [2, 0, 4, 1, 3]]) {
