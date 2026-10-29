@@ -23,7 +23,7 @@
    "P15_raddning",
    "P9_kodlas"
   ],
-  "teknik": "Teknik har lagt in projektets innehall-kapitel1.json (Innehålls v0.5, meta.version säger fortfarande 0.2) i repot, och ingen text är ändrad. 2026-10-28 (T1): format 1 → 2 (kapitlen är i format 2 sedan P28_packa). Inget annat i strukturen är ändrat.",
+  "teknik": "Teknik har lagt in projektets innehall-kapitel1.json (Innehålls v0.5, meta.version säger fortfarande 0.2) i repot, och ingen text är ändrad. 2026-10-28 (T1): format 1 → 2 (kapitlen är i format 2 sedan P28_packa). Inget annat i strukturen är ändrat. 2026-10-29 (T2): Innehålls förslag 2–14 som struktur, med texterna ur anteckningarna ordagrant. Skyltarna och tavlan står i rummens fält skyltar (beslut 15.2). k1s01: ga_till och mellanscenen vid skylten blir las_skylt. k1s02: fritt och ga_till blir ett ga_till med fri_vag. k1s03 är frivillig och startar i buskarna. Ryggsäcken och taggkammen är ge_sak. Frivilligt per rum (rum.frivilligt). last_lada, lila_lapp och stig_backen är dolda tills visa_foremal. k1s13: paminnelse och unge_tillagg. Pusslen: skylt på stenen och träden, forebild.tacks i SVÄRD, brickor och kasta i apan, visa_forsta, kontroll och svar_lyser_sek i kodlåset, sak_i_sista och foremal i busken och löven, och luckornas knufftid räknas av motorn (efter_sek 30 borttaget). Listan (förslag 1) kommer i T3.",
   "innehall_v06": "v0.6 (Innehåll 2026-10-28): F1 och F5 enligt 15 v0.7. Val i världen med i_rummet och objekt (stenarna, träden), skylten vid ingången, Farfars lista, titta–täck för SVÄRD, apan med brickor och kasta-läget, nyckeln från apan, lövhögarna, luckorna med VITA, kodlåset, kartbiten med bron, lappen med fjäderhatten, omsorgen och slutet på ungen. vid_omstart i varje scen. Det som saknar steg i schemat 2.7 står som FÖRSLAG i scenens eller pusslets anteckning, och samlat i Innehålls rapport 2026-10-28."
  },
  "rum": [
@@ -48,7 +48,24 @@
     "gren",
     "barbuske_brynet"
    ],
-   "anteckning": "Rumsplan i 15 v0.7. In från söder, skylt_ingang vid ingången. Norrut en stig per sten (stig_<sten>), som böjer av bakom täta buskar 3–4 rutor in. Valet räknas vid kurvan, vägskälet är en fri zon. Bara den rätta stigen leder till lianerna. L2 har två stenar, L3 tre; varianten bestäms när han kommer in i rummet. gren spärrar prövade stigar efter 2 fel. FÖRSLAG rum.frivilligt: barbuske_brynet (svinga, 2 bär)."
+   "anteckning": "Rumsplan i 15 v0.7. In från söder, skylt_ingang vid ingången. Norrut en stig per sten (stig_<sten>), som böjer av bakom täta buskar 3–4 rutor in. Valet räknas vid kurvan, vägskälet är en fri zon. Bara den rätta stigen leder till lianerna. L2 har två stenar, L3 tre; varianten bestäms när han kommer in i rummet. gren spärrar prövade stigar efter 2 fel. FÖRSLAG rum.frivilligt: barbuske_brynet (svinga, 2 bär).",
+   "skyltar": {
+    "skylt_ingang": {
+     "text": "Följ mina skyltar.",
+     "papper": "traskylt"
+    }
+   },
+   "frivilligt": [
+    {
+     "foremal": "barbuske_brynet",
+     "steg": [
+      {
+       "typ": "ge_bar",
+       "antal": 2
+      }
+     ]
+    }
+   ]
   },
   {
    "id": "lianerna",
@@ -62,7 +79,27 @@
     "liten_lian",
     "stubbe"
    ],
-   "anteckning": "Lianväggen tvärs över rummet, trad_med_formel söder om den. Bakom väggen stig_glantan norrut och stig_buskarna österut med skylt_bar (ett ord, pil österut, syns hela tiden). FÖRSLAG rum.frivilligt: liten_lian framför stubbe, pussel k1_svard_igen, 2 bär i stubben."
+   "anteckning": "Lianväggen tvärs över rummet, trad_med_formel söder om den. Bakom väggen stig_glantan norrut och stig_buskarna österut med skylt_bar (ett ord, pil österut, syns hela tiden). FÖRSLAG rum.frivilligt: liten_lian framför stubbe, pussel k1_svard_igen, 2 bär i stubben.",
+   "skyltar": {
+    "skylt_bar": {
+     "text": "bär"
+    }
+   },
+   "frivilligt": [
+    {
+     "foremal": "liten_lian",
+     "steg": [
+      {
+       "typ": "pussel",
+       "pussel_id": "k1_svard_igen"
+      },
+      {
+       "typ": "ge_bar",
+       "antal": 2
+      }
+     ]
+    }
+   ]
   },
   {
    "id": "buskarna",
@@ -118,7 +155,27 @@
     "fangen",
     "raddad"
    ],
-   "anteckning": "Stilprovet. In från söder. Norrut tre stigar som böjer av bakom buskar; ovanför varje stig syns en trädkrona över norra kanten (krona_<stig>). Den rätta kronan är samma träd som stort_gammalt_trad i rummet gamla_tradet. apan_i_nat högt uppe (tillstand fangen); efter räddningen står stegen kvar upp till apans_bo på en plattform, och apan är kvar i gläntan (tillstand raddad). FÖRSLAG rum.frivilligt: stege → apans_bo, fossilet ger Dinobokens sida 1 (FOSSIL). Ungen klättrar efter."
+   "anteckning": "Stilprovet. In från söder. Norrut tre stigar som böjer av bakom buskar; ovanför varje stig syns en trädkrona över norra kanten (krona_<stig>). Den rätta kronan är samma träd som stort_gammalt_trad i rummet gamla_tradet. apan_i_nat högt uppe (tillstand fangen); efter räddningen står stegen kvar upp till apans_bo på en plattform, och apan är kvar i gläntan (tillstand raddad). FÖRSLAG rum.frivilligt: stege → apans_bo, fossilet ger Dinobokens sida 1 (FOSSIL). Ungen klättrar efter.",
+   "frivilligt": [
+    {
+     "foremal": "fossil",
+     "steg": [
+      {
+       "typ": "replik",
+       "talare": "berattare",
+       "text": "Ett fossil! Samma svans som {unge}.",
+       "upplast": true
+      },
+      {
+       "typ": "dinobok",
+       "sida": {
+        "bild": "fossil_och_ungen",
+        "bildtext": "fossil"
+       }
+      }
+     ]
+    }
+   ]
   },
   {
    "id": "gamla_tradet",
@@ -131,16 +188,41 @@
     "lovhog_2",
     "lovhog_3",
     "lovhog_4",
-    "last_lada",
+    {
+     "id": "last_lada",
+     "dold": true
+    },
     "rothal",
-    "lila_lapp",
+    {
+     "id": "lila_lapp",
+     "dold": true
+    },
     "backen",
     "bron",
     "tavla_bron",
     "buske_vid_bron",
-    "stig_backen"
+    {
+     "id": "stig_backen",
+     "dold": true
+    }
    ],
-   "anteckning": "In från söder. Kullen med trappa på södra sidan. Krönet minst 10 × 6 rutor, minst 2 rutor mellan sakerna. backen längs östra och norra kanten. bron långt borta på andra sidan bäcken, med tavla_bron (ett ord, BRON, utan pil) och buske_vid_bron; ingen utgång dit. stig_backen går ut genom norra kanten. FÖRSLAG (motorn): last_lada syns först när den sista lövhögen är svingad (k1s08), lila_lapp när Klaffen tappar den (k1s12) och stig_backen när ungen har spårat (k1s13). FÖRSLAG rum.frivilligt: rothal (ungen nosar fram 3 bär)."
+   "anteckning": "In från söder. Kullen med trappa på södra sidan. Krönet minst 10 × 6 rutor, minst 2 rutor mellan sakerna. backen längs östra och norra kanten. bron långt borta på andra sidan bäcken, med tavla_bron (ett ord, BRON, utan pil) och buske_vid_bron; ingen utgång dit. stig_backen går ut genom norra kanten. FÖRSLAG (motorn): last_lada syns först när den sista lövhögen är svingad (k1s08), lila_lapp när Klaffen tappar den (k1s12) och stig_backen när ungen har spårat (k1s13). FÖRSLAG rum.frivilligt: rothal (ungen nosar fram 3 bär).",
+   "skyltar": {
+    "tavla_bron": {
+     "text": "bron"
+    }
+   },
+   "frivilligt": [
+    {
+     "foremal": "rothal",
+     "steg": [
+      {
+       "typ": "ge_bar",
+       "antal": 3
+      }
+     ]
+    }
+   ]
   }
  ],
  "scener": [
@@ -184,12 +266,8 @@
      "via": "radio"
     },
     {
-     "typ": "ga_till",
-     "mal": "skylt_ingang"
-    },
-    {
-     "typ": "mellanscen",
-     "beskrivning": "Läsplattan visar skylten vid ingången. Inget val."
+     "typ": "las_skylt",
+     "foremal": "skylt_ingang"
     },
     {
      "typ": "ga_till",
@@ -278,17 +356,9 @@
      "upplast": true
     },
     {
-     "typ": "fritt",
-     "beskrivning": "Fritt vägval: stigen norrut mot gråten, och stigen österut med Farfars skylt BÄR. Inget är fel. Frivilligt: den lilla lianen vid stubben (k1_svard_igen).",
-     "foremal": [
-      "stig_glantan",
-      "stig_buskarna",
-      "liten_lian"
-     ]
-    },
-    {
      "typ": "ga_till",
-     "mal": "stig_glantan"
+     "mal": "stig_glantan",
+     "fri_vag": true
     }
    ],
    "anteckning": "FÖRSLAG listan: mellanscenen blir {\"typ\": \"delmal\", \"bocka\": \"svard\"}, och \"Titta på listan!\" får vantar_pa: \"listan\". FÖRSLAG fritt vägval: fritt slutar inte av sig själv; scenen går vidare när han går ut genom stig_glantan. stig_buskarna leder till den frivilliga scenen k1s03 (kan tas nu eller senare, även i pass 2). k1_svard_igen startar när han använder liten_lian (rum.frivilligt)."
@@ -312,8 +382,9 @@
      "pussel_id": "k1_busken"
     },
     {
-     "typ": "mellanscen",
-     "beskrivning": "Skattlådans lock flyger upp. I den ligger en ny ryggsäck, och hjälten har den på sig direkt. Pausknappen glimtar."
+     "typ": "ge_sak",
+     "sort": "ryggsack",
+     "id": "ryggsack_skog"
     },
     {
      "typ": "replik",
@@ -322,7 +393,9 @@
      "upplast": true
     }
    ],
-   "anteckning": "FÖRSLAG frivillig gren: {\"frivillig\": true, \"startar_i_rum\": \"buskarna\"}. Spelas när hjälten går in i buskarna, högst en gång, annars hoppas den över. Efteråt går han själv tillbaka västerut. FÖRSLAG ge en sak: mellanscenen med ryggsäcken blir {\"typ\": \"ge_sak\", \"sort\": \"ryggsack\", \"id\": \"ryggsack_skog\"} (tas på direkt, pausknappen glimtar)."
+   "anteckning": "FÖRSLAG frivillig gren: {\"frivillig\": true, \"startar_i_rum\": \"buskarna\"}. Spelas när hjälten går in i buskarna, högst en gång, annars hoppas den över. Efteråt går han själv tillbaka västerut. FÖRSLAG ge en sak: mellanscenen med ryggsäcken blir {\"typ\": \"ge_sak\", \"sort\": \"ryggsack\", \"id\": \"ryggsack_skog\"} (tas på direkt, pausknappen glimtar).",
+   "frivillig": true,
+   "startar_i_rum": "buskarna"
   },
   {
    "id": "k1s05_glantan",
@@ -385,8 +458,9 @@
      "beskrivning": "Apan klättrar ner och kramar ungen."
     },
     {
-     "typ": "mellanscen",
-     "beskrivning": "Apan sätter en kam av taggar på hjälmen. Hjälten har den på sig direkt. Pausknappen glimtar."
+     "typ": "ge_sak",
+     "sort": "hjalmdekor",
+     "id": "taggkam"
     },
     {
      "typ": "replik",
@@ -495,6 +569,10 @@
     {
      "typ": "pussel",
      "pussel_id": "k1_loven"
+    },
+    {
+     "typ": "visa_foremal",
+     "foremal": "last_lada"
     },
     {
      "typ": "mellanscen",
@@ -627,6 +705,10 @@
      "beskrivning": "Klaffen flyger rakt in i trädet, studsar och tappar en lila lapp på krönet. Den fladdrar iväg, yr."
     },
     {
+     "typ": "visa_foremal",
+     "foremal": "lila_lapp"
+    },
+    {
      "typ": "replik",
      "talare": "berattare",
      "text": "Klaffen tappade en lapp!",
@@ -661,11 +743,27 @@
      "talare": "berattare",
      "text": "{unge} är rädd.",
      "upplast": true,
-     "vantar_pa": "mata_ungen"
+     "vantar_pa": "mata_ungen",
+     "paminnelse": {
+      "efter_sek": 8,
+      "replik": {
+       "talare": "berattare",
+       "text": "Ge {unge} ett bär.",
+       "upplast": true
+      }
+     }
     },
     {
      "typ": "mellanscen",
      "beskrivning": "Ungen äter och trycker sig mot hjälten. Den lugnar sig och sätter nosen i marken. Mönstret på nosen tänds, och en hemlig stig längs bäcken syns."
+    },
+    {
+     "typ": "unge_tillagg",
+     "id": "nosmonster"
+    },
+    {
+     "typ": "visa_foremal",
+     "foremal": "stig_backen"
     },
     {
      "typ": "replik",
@@ -816,7 +914,8 @@
    "efter_3_fel": {
     "handling": "ungen springer till rätt stig och nosar"
    },
-   "anteckning": "Val i världen: objekt är stigen vid stenen. Varianten bestäms när han kommer in i rummet. Valet räknas vid kurvan, och reaktionen spelas bakom kurvan. Fel stig leder aldrig vidare. efter_3_fel pekar på svaret."
+   "anteckning": "Val i världen: objekt är stigen vid stenen. Varianten bestäms när han kommer in i rummet. Valet räknas vid kurvan, och reaktionen spelas bakom kurvan. Fel stig leder aldrig vidare. efter_3_fel pekar på svaret.",
+   "skylt": "skylt_farfar_1"
   },
   {
    "id": "k1_svard",
@@ -826,7 +925,9 @@
     "text": "SVÄRD",
     "upplast": false,
     "placering": "trad_med_formel",
-    "ligger_kvar": false
+    "ligger_kvar": false,
+    "tacks": "forsta_brickan",
+    "brickor_efter_sek": 2
    },
    "brickor": [
     "D",
@@ -874,7 +975,9 @@
     "text": "SVÄRD",
     "upplast": false,
     "placering": "staven",
-    "ligger_kvar": false
+    "ligger_kvar": false,
+    "tacks": "forsta_brickan",
+    "brickor_efter_sek": 2
    },
    "brickor": [
     "D",
@@ -919,12 +1022,18 @@
     "bar",
     "skattlada"
    ],
-   "kartbit_i_sista": false,
    "vid_ratt": {
     "handling": "skattlådans lock flyger upp",
     "fest": "liten"
    },
-   "anteckning": "Vila i sidogrenen: svinga staven mot buske_1–buske_4, ingen text att läsa. Skattlådan ligger alltid i den sista. FÖRSLAG: \"sak_i_sista\": \"skattlada\" i stället för kartbit_i_sista, och \"foremal\": [\"buske_1\", \"buske_2\", \"buske_3\", \"buske_4\"]."
+   "anteckning": "Vila i sidogrenen: svinga staven mot buske_1–buske_4, ingen text att läsa. Skattlådan ligger alltid i den sista. FÖRSLAG: \"sak_i_sista\": \"skattlada\" i stället för kartbit_i_sista, och \"foremal\": [\"buske_1\", \"buske_2\", \"buske_3\", \"buske_4\"].",
+   "sak_i_sista": "skattlada",
+   "foremal": [
+    "buske_1",
+    "buske_2",
+    "buske_3",
+    "buske_4"
+   ]
   },
   {
    "id": "k1_apan",
@@ -945,7 +1054,32 @@
    "knuff": {
     "handling": "ungen pekar på kategorin"
    },
-   "anteckning": "Brickor A E G O R S T (bokstavsordning), tre extra, nivå S2. Ett tryck i taget: reaktionen spelas klart innan nästa tryck tas emot. Med tre extra brickor kan det bli högst tre fel, sedan finns bara rätt brickor kvar, så inget misslyckande kan hända. Rätt bokstav: apan klappar i händerna. Kasta-läget: efter första rätta bokstaven lyser staven stilla, och berättaren säger \"Vet du ordet? Tryck på staven!\" (väntar inte). Läget ser ut som formelvyn: staven lyfts, fälten får guldkant och nästa tomma fält lyser. Han fyller bara de tomma fälten. Fel bricka studsar tillbaka med \"pff\", och rätta ligger kvar. Efter två fel på samma plats blinkar rätt bricka. Ett nytt tryck på staven lämnar läget. Inget fel räknas. Rätt i kasta-läget: stor fest, apan gör en volt, och berättaren säger \"Du visste ordet!\". FÖRSLAG: \"brickor\": [\"A\",\"E\",\"G\",\"O\",\"R\",\"S\",\"T\"], \"kasta\": {\"erbjudande\": {\"talare\": \"berattare\", \"text\": \"Vet du ordet? Tryck på staven!\", \"upplast\": true}, \"vid_ratt\": {\"handling\": \"stor fest, apan gör en volt\", \"fest\": \"stor\", \"replik\": {\"talare\": \"berattare\", \"text\": \"Du visste ordet!\", \"upplast\": true}}}."
+   "anteckning": "Brickor A E G O R S T (bokstavsordning), tre extra, nivå S2. Ett tryck i taget: reaktionen spelas klart innan nästa tryck tas emot. Med tre extra brickor kan det bli högst tre fel, sedan finns bara rätt brickor kvar, så inget misslyckande kan hända. Rätt bokstav: apan klappar i händerna. Kasta-läget: efter första rätta bokstaven lyser staven stilla, och berättaren säger \"Vet du ordet? Tryck på staven!\" (väntar inte). Läget ser ut som formelvyn: staven lyfts, fälten får guldkant och nästa tomma fält lyser. Han fyller bara de tomma fälten. Fel bricka studsar tillbaka med \"pff\", och rätta ligger kvar. Efter två fel på samma plats blinkar rätt bricka. Ett nytt tryck på staven lämnar läget. Inget fel räknas. Rätt i kasta-läget: stor fest, apan gör en volt, och berättaren säger \"Du visste ordet!\". FÖRSLAG: \"brickor\": [\"A\",\"E\",\"G\",\"O\",\"R\",\"S\",\"T\"], \"kasta\": {\"erbjudande\": {\"talare\": \"berattare\", \"text\": \"Vet du ordet? Tryck på staven!\", \"upplast\": true}, \"vid_ratt\": {\"handling\": \"stor fest, apan gör en volt\", \"fest\": \"stor\", \"replik\": {\"talare\": \"berattare\", \"text\": \"Du visste ordet!\", \"upplast\": true}}}.",
+   "brickor": [
+    "A",
+    "E",
+    "G",
+    "O",
+    "R",
+    "S",
+    "T"
+   ],
+   "kasta": {
+    "erbjudande": {
+     "talare": "berattare",
+     "text": "Vet du ordet? Tryck på staven!",
+     "upplast": true
+    },
+    "vid_ratt": {
+     "handling": "stor fest, apan gör en volt",
+     "fest": "stor",
+     "replik": {
+      "talare": "berattare",
+      "text": "Du visste ordet!",
+      "upplast": true
+     }
+    }
+   }
   },
   {
    "id": "k1_tradet",
@@ -1035,7 +1169,8 @@
    "efter_3_fel": {
     "handling": "apan hoppar till rätt stig och pekar"
    },
-   "anteckning": "Val i världen: objekt är stigen, och bilden är trädkronan ovanför norra kanten. Den rätta kronan är samma träd som på kullen. Varianten bestäms när han kommer in i rummet, valet räknas vid kurvan, och fel stig leder aldrig vidare. efter_3_fel pekar på svaret."
+   "anteckning": "Val i världen: objekt är stigen, och bilden är trädkronan ovanför norra kanten. Den rätta kronan är samma träd som på kullen. Varianten bestäms när han kommer in i rummet, valet räknas vid kurvan, och fel stig leder aldrig vidare. efter_3_fel pekar på svaret.",
+   "skylt": "skylt_farfar_3"
   },
   {
    "id": "k1_loven",
@@ -1046,12 +1181,18 @@
     "bar",
     "lada"
    ],
-   "kartbit_i_sista": false,
    "vid_ratt": {
     "handling": "löven yr, och lådan kommer fram",
     "fest": "liten"
    },
-   "anteckning": "Vila: svinga staven mot lovhog_1–lovhog_4. Ekorren hoppar ut och skäller. Lådan ligger alltid i den sista. FÖRSLAG: \"sak_i_sista\": \"last_lada\", \"foremal\": [\"lovhog_1\", \"lovhog_2\", \"lovhog_3\", \"lovhog_4\"]."
+   "anteckning": "Vila: svinga staven mot lovhog_1–lovhog_4. Ekorren hoppar ut och skäller. Lådan ligger alltid i den sista. FÖRSLAG: \"sak_i_sista\": \"last_lada\", \"foremal\": [\"lovhog_1\", \"lovhog_2\", \"lovhog_3\", \"lovhog_4\"].",
+   "sak_i_sista": "lada",
+   "foremal": [
+    "lovhog_1",
+    "lovhog_2",
+    "lovhog_3",
+    "lovhog_4"
+   ]
   },
   {
    "id": "k1_luckorna",
@@ -1106,8 +1247,7 @@
     "fest": "liten"
    },
    "knuff": {
-    "handling": "ungen sträcker fram fötterna igen",
-    "efter_sek": 30
+    "handling": "ungen sträcker fram fötterna igen"
    },
    "forenkla": {
     "efter_fel": 2,
@@ -1186,7 +1326,10 @@
     "efter_fel": 2,
     "andring": "tecknet för nästa saknade bokstav lyser på nyckeln"
    },
-   "anteckning": "Låset och nyckeln står på samma skärm (två kort på läsplattan). Ungen visar första tecknet: nosen på stjärnan på låset och sedan på stjärnan på nyckeln, och H lyser. Han lägger H själv och gör E och M på egen hand. Det är ett visat steg och loggas inte som hjälp. Låset kontrolleras först när alla tre fälten är fyllda. Rätta bokstäver stannar, och varje rätt avkodat tecken lyser upp på låset. forenkla pekar på svaret. Hjälteboken får en kopia av nyckeln. FÖRSLAG: \"visa_forsta\": true, \"kontroll\": \"hela_ordet\", \"svar_lyser_sek\": 2."
+   "anteckning": "Låset och nyckeln står på samma skärm (två kort på läsplattan). Ungen visar första tecknet: nosen på stjärnan på låset och sedan på stjärnan på nyckeln, och H lyser. Han lägger H själv och gör E och M på egen hand. Det är ett visat steg och loggas inte som hjälp. Låset kontrolleras först när alla tre fälten är fyllda. Rätta bokstäver stannar, och varje rätt avkodat tecken lyser upp på låset. forenkla pekar på svaret. Hjälteboken får en kopia av nyckeln. FÖRSLAG: \"visa_forsta\": true, \"kontroll\": \"hela_ordet\", \"svar_lyser_sek\": 2.",
+   "visa_forsta": true,
+   "kontroll": "hela_ordet",
+   "svar_lyser_sek": 2
   },
   {
    "id": "k1_lappen",

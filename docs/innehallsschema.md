@@ -1,6 +1,7 @@
 # Innehållsschema – kapitel i format 2
 
-Version 2.7 (2026-10-27). Ägs av teknikspåret.
+Version 2.8 (2026-10-29). Ägs av teknikspåret.
+2.8: kapitel 1:s steg och fält (T2). Rummen får `skyltar` (text som står i världen, beslut 15.2), `frivilligt` (föremål som ger något en gång) och `dold` på föremål. Scenerna får `frivillig` och `startar_i_rum`. Nya steg: `las_skylt`, `visa_foremal`, `ge_sak`, `dinobok`, `unge_tillagg`, `fri_vag` på `ga_till` och `paminnelse` på repliker som väntar. Pusslen: `skylt` på läs och välj, titta–täck i formeln, brickor och kasta-läge i räddningen, kodlåsets kontroll, och svingning mot rummets föremål i P26. Allt är tillägg, filer i 2.7 gäller fortfarande.
 2.7: kartans `last_i` (en utgång är låst i ett tillstånd) och `morker` (hur mörkt rummet är på natten). Räckvidden: saker, figurer och stegar nås från alla håll inom ca 1,5 rutor, och bara den närmaste är aktiv. Kapitelfilerna är oförändrade.
 2.6: `vantar_pa: "nosen"` och `vid: "ungen"` på replik-steget (och `vantar_pa`, `via`, `vid` gäller bara repliker som är egna steg), `nos_demo` görs av spelaren, `sparpunkt_fraga` i `aventyr.json`, `kalla` får vara fyra korta ord. Tillägg.
 2.5: stegen `bara`, `prata` och `ta_emot`; `vantar_pa` och `via` på repliker; `vid_annan_utgang` på `ga_till`; `fraga` på `sparpunkt`; kartans `vagg_bak`, `vagg_sida`, `vagg_fram` och `talare`. Tillägg.
@@ -46,9 +47,21 @@ Kapitelfilerna börjar med `"format": 2`, äventyret och ordlistorna med `"forma
 }
 ```
 
-- **Rum:** `id`, `namn` (vanlig skrift), `tillstand` (frivilligt), `innehall` = objekten i rummet. Tiled-kartan använder samma objekt-id:n.
+- **Rum:** `id`, `namn` (vanlig skrift), `tillstand` (frivilligt), `innehall` = objekten i rummet, `skyltar`, `frivilligt`. Tiled-kartan använder samma objekt-id:n.
   Ett föremål som bara ska synas i vissa lägen skrivs `{ "id": "lada_med_agg", "syns_i": ["natt_upplyst", "morgon"] }`. Det syns inte, och går inte att gå till, i andra tillstånd. Lägena måste finnas i rummets `tillstand`.
-- **Scen:** `id`, `pass` (1, 2, 3 …), `rum` (eller `null` för scener utanför rummen), `tillstand`, `vy` (`uppifran`, `sidovy`, `narbild`), `vid_omstart` (en replik när spelet startar om här), `steg`.
+  Ett föremål som ska dyka upp mitt i en scen skrivs `{ "id": "last_lada", "dold": true }`. Det syns först efter steget `visa_foremal`, och sedan står det kvar.
+- **`skyltar`** (beslut 15.2): text som står i världen hör till rummet, inte till ett steg. Nyckeln är föremålets id:
+  ```json
+  "skyltar": { "skylt_bar": { "text": "bär" }, "skylt_ingang": { "text": "Följ mina skyltar.", "papper": "traskylt" } }
+  ```
+  **Ett ord** syns hela tiden på skylten eller tavlan (pilen sätts i kartan). **En mening** har en markering, ett litet papper, vid skylten. Hjälten går dit, och läsplattan visar texten på `papper`. Skyltar läses aldrig upp. Ett steg behövs bara när scenen ska vänta tills han har läst skylten (`las_skylt`).
+- **`frivilligt`**: föremål som går att använda när som helst i rummet och ger något en gång. Stegen spelas när hjälten använder föremålet:
+  ```json
+  "frivilligt": [ { "foremal": "liten_lian", "steg": [ { "typ": "pussel", "pussel_id": "k1_svard_igen" }, { "typ": "ge_bar", "antal": 2 } ] } ]
+  ```
+  Stegen får inte vara `sparpunkt`, `ga_till`, `las_skylt` eller `prata`.
+- **Scen:** `id`, `pass` (1, 2, 3 …), `rum` (eller `null` för scener utanför rummen), `tillstand`, `vy` (`uppifran`, `sidovy`, `narbild`), `vid_omstart` (en replik när spelet startar om här), `steg`, `frivillig`, `startar_i_rum`.
+- **En frivillig scen** (`"frivillig": true, "startar_i_rum": "buskarna"`) spelas inte i tur och ordning. Den spelas första gången hjälten går in i rummet medan ett `ga_till` med `fri_vag` pågår, högst en gång. Efteråt går han tillbaka själv. Den räknas inte in i passets tid.
 - **Scenerna spelas i ordning.** Ett `pussel`-steg väntar tills pusslet är löst. Det behövs alltså ingen `nasta_scen`.
 - `meta` och `anteckning` är fria fält för versionsnummer och noter. De påverkar inte spelet.
 - **`nivaer`** (frivilligt): golv och tak i kapitlet, `{ "lasning": ["L1", "L3"], "skrivning": ["S1", "S1"] }`. Anpassningen håller sig inom dem.
@@ -58,11 +71,11 @@ Kapitelfilerna börjar med `"format": 2`, äventyret och ordlistorna med `"forma
 
 | `typ` | Fält | Vad som händer |
 |---|---|---|
-| `replik` | `talare`, `text`, `upplast`, `vantar_pa`, `via`, `vid` | Någon säger något. Visas på läsplattan. **`vantar_pa`** (`"mata_ungen"`: ungen har ätit, `"nosen"`: spelaren har tänt nosen): en instruktion som ber om en handling väntar tills den är gjord. Den står uppe i rummet medan världen går, upprepas med en styrbild efter ca 8 s, och nästa steg kommer först efter handlingen. **`via: "radio"`**: repliken hörs genom radion. **`vid: "ungen"`**: texten står i en bubbla ovanför ungen i stället för på läsplattan och läses upp (namnet i s08). De tre fälten finns bara på repliker som är egna steg. |
+| `replik` | `talare`, `text`, `upplast`, `vantar_pa`, `via`, `vid`, `paminnelse` | Någon säger något. Visas på läsplattan. **`vantar_pa`** (`"mata_ungen"`: ungen har ätit, `"nosen"`: spelaren har tänt nosen): en instruktion som ber om en handling väntar tills den är gjord. Den står uppe i rummet medan världen går, upprepas med en styrbild efter ca 8 s, och nästa steg kommer först efter handlingen. **`via: "radio"`**: repliken hörs genom radion. **`vid: "ungen"`**: texten står i en bubbla ovanför ungen i stället för på läsplattan och läses upp (namnet i s08). **`paminnelse`** (`efter_sek`, `replik`), bara med `vantar_pa`: efter så många sekunder kommer en annan replik i stället för samma instruktion igen ("{unge} är rädd.", sedan "Ge {unge} ett bär."). Fälten finns bara på repliker som är egna steg. |
 | `mellanscen` | `beskrivning`, `bild` | Något händer i bild. Gråboxen visar beskrivningen för den vuxne. |
 | `ljud` | `id`, `foremal` | Ett ljud spelas. Med `foremal` hoppar föremålet till i bild (ägglådan som dunkar). Samma `id` ger alltid samma ljud. |
 | `unge_folj` | `folj` | Ungen börjar (`true`) eller slutar (`false`) följa hjälten. |
-| `ga_till` | `mal`, `visa_styrhjalp`, `knuff`, `vid_annan_utgang` | Spelaren ska gå till ett objekt i rummet. **`vid_annan_utgang`** (`ljud`, `handling`, `replik`): de andra utgångarna är låsta under steget. Går hjälten till en av dem öppnas den inte, ljudet spelas, hjälten tittar upp och målet lyser (hallen före kläckningen: `{ "ljud": "dunk" }`). |
+| `ga_till` | `mal`, `visa_styrhjalp`, `knuff`, `vid_annan_utgang`, `fri_vag` | Spelaren ska gå till ett objekt i rummet. **`fri_vag: true`** (fritt vägval): de andra utgångarna går också att gå igenom, och rummet bakom visas (med en frivillig scen första gången). Steget är klart när han går genom målet. **`vid_annan_utgang`** (`ljud`, `handling`, `replik`): de andra utgångarna är låsta under steget. Går hjälten till en av dem öppnas den inte, ljudet spelas, hjälten tittar upp och målet lyser (hallen före kläckningen: `{ "ljud": "dunk" }`). |
 | `pussel` | `pussel_id` | Ett pussel startar. Scenen fortsätter när det är löst. |
 | `oppna_lasplatta` | `pussel_id` | Visar pusslets lästext utan att pusslet startar (farfars lapp). |
 | `visa_ui` | `element` | `nosknappen`, `barraknaren`, `radioramen` eller `hjalteboken` visas första gången. |
@@ -77,6 +90,11 @@ Kapitelfilerna börjar med `"format": 2`, äventyret och ordlistorna med `"forma
 | `bara` | `bild`, `till` | Hjälten bär en sak (filten): den svävar efter honom som ljusbollen och läggs på `till` när han når fram själv. |
 | `prata` | `figur`, `kalla` | Dialogregeln: figuren kallar på avstånd (vinkar, `kalla` är högst fyra korta ord och läses upp), och samtalet börjar när hjälten kommer inom ca 1,5 rutor. Stegen efter `prata` är samtalet. |
 | `ta_emot` | `fran`, `bild` | Figuren räcker fram en sak (lappen). Hjälten tar den själv med ett tryck när han står vid figuren. |
+| `las_skylt` | `foremal` | Scenen väntar tills spelaren har läst skylten: hjälten går dit, och läsplattan visar meningen i rummets `skyltar`. Inget val, ingen nivå. |
+| `visa_foremal` | `foremal` | Ett dolt föremål (`dold` i rummets innehåll) syns från och med nu och står kvar. |
+| `ge_sak` | `sort`, `id` | Hjälten får något att ha på sig (`hjalmdekor` eller `ryggsack`). Det tas på direkt, pausknappen glimtar en gång, och garderoben i hjälteboken har det. |
+| `dinobok` | `sida` (`bild`, `bildtext`) | En ny sida i Dinoboken, fliken i hjälteboken. Pausknappen glimtar. Bildtexten läses upp efter tryck. |
+| `unge_tillagg` | `id` | Ungen får ett tillägg (mönstret på nosen). Stubbe i gråboxen. |
 
 En **replik inuti något annat** (`knuff`, `vid_fel`, `instruktion`, `vid_omstart`) skrivs utan `typ`: `{ "talare": "berattare", "text": "Där. I lådan.", "upplast": true }`.
 
@@ -120,6 +138,9 @@ En **replik inuti något annat** (`knuff`, `vid_fel`, `instruktion`, `vid_omstar
   - **En sak** (låda, kruka): när hjälten står vid den syns ordet vid föremålet, och spelaren trycker på ordet (eller på föremålet igen, eller Mellanslag) för att öppna. Ett alternativ utan `ord` (lådor som skiljs åt på färg och storlek, se `visar`) visar handen i stället. Fel föremål ger sin `vid_valj` och blir tomt.
   - **En utgång** (dörr, stig): ordet syns på skylten när hjälten är inom ungefär en ruta från dörren eller skylten (kartans `lapp`). Att gå igenom utgången är valet. Fel dörr öppnas aldrig: hjälten tar ett steg tillbaka och `vid_valj` spelas vid dörren. Förenklingen spikar igen dörrar och stigar med plankor.
   - Glimten är lika för alla saker som är kvar och avslöjar aldrig svaret. Utgångar glimtar inte. Förenkling och att ungen pekar fungerar som vanligt.
+  - **Inget nivåbyte i världen** (granskningen, punkt 18): varianten bestäms när hjälten kommer in i rummet. Förenklingen spärrar prövade dörrar och stigar (med plankor eller en gren) och byter aldrig variant, eftersom föremålen i rummet då skulle bytas framför honom.
+- **`skylt`** (frivilligt): lästexten står på ett föremål i rummet, Farfars träskylt. En markering (ett papper) sitter vid skylten, och läsplattan öppnas när hjälten går dit. Han kan gå tillbaka och läsa igen.
+- **Knufftiden** på läsplattan följer textmängden: ca 11 sekunder per mening i lästexten och alternativen, minst 9. `efter_sek` på knuffen går före.
 
 ```json
 { "id": "p0_filt", "typ": "P1_las_och_valj", "i_rummet": true,
@@ -130,7 +151,11 @@ En **replik inuti något annat** (`knuff`, `vid_fel`, `instruktion`, `vid_omstar
 
 ### P11_formel
 
-`niva` (S1–S5), `svar` (versaler), `formler` (`ord`, `effekt`, `tillstand_efter`), `nastan` (`ord`, `effekt`), `forebild` (`text`, `placering`, `ligger_kvar`), `brickor` (en versal per bricka), `helord`, `ratt_bokstav_stannar`, `forsta_formel`.
+`niva` (S1–S5), `svar` (versaler), `formler` (`ord`, `effekt`, `tillstand_efter`), `nastan` (`ord`, `effekt`), `forebild` (`text`, `placering`, `ligger_kvar`, `tacks`, `brickor_efter_sek`), `brickor` (en versal per bricka), `helord`, `ratt_bokstav_stannar`, `forsta_formel`.
+
+**Brickor ligger alltid i bokstavsordning** (granskningen), i alla pussel med brickor. Ordningen i datan spelar ingen roll.
+
+**Titta–täck** (`"tacks": "forsta_brickan"`): förebilden syns, brickorna glider in efter `brickor_efter_sek` sekunder, och förebilden tonas bort när första brickan läggs (ungen håller för ögonen). Vid fel eller knuff tänds den igen och står kvar resten av försöket, och försöket loggas med förebild. Vid rätt lyser förebilden en sekund ovanför hans ord.
 
 ### P12_dop
 
@@ -142,15 +167,19 @@ Som P1, men **flera alternativ har `"ratt": true`** och spelaren väljer alla. U
 
 ### P15_raddning (fas 3)
 
-Hänga apan-familjen. `kategori` (text spelaren läser själv), `svar` (ett ord, små bokstäver), `reserv_ord`, `tillatna_fel`, `mjukt_misslyckande`, `variant`, `falt` (beskrivning). Ett fält per bokstav; en rätt bokstav fylls i på alla platser där den finns.
+Hänga apan-familjen. `kategori` (text spelaren läser själv), `svar` (ett ord, små bokstäver), `brickor`, `kasta`, `reserv_ord`, `tillatna_fel`, `mjukt_misslyckande`, `variant`, `falt` (beskrivning). Ett fält per bokstav; en rätt bokstav fylls i på alla platser där den finns. Ett tryck i taget: reaktionen spelas klart innan nästa tryck tas emot. En fel bricka tonas ut.
+
+**`kasta`** (`erbjudande`, `vid_ratt`): efter första rätta bokstaven lyser staven, och `erbjudande` läses upp (det väntar inte). Ett tryck på staven ger formelvyn: fälten får guldkant, och nästa tomma fält lyser. Han fyller bara de tomma fälten. En fel bricka studsar tillbaka, de rätta ligger kvar, och efter två fel på samma plats blinkar rätt bricka. Inget fel räknas. Ett nytt tryck på staven lämnar läget. Rätt i kasta-läget ger `kasta.vid_ratt`.
 
 ### P9_kodlas (fas 3)
 
-`niva`, `svar` (ett ord, små bokstäver), `brickor`, `chiffer` med `tecken` (på låset, i ordning), `nyckel` (`tecken` → `bokstav`) och `nyckeln_finns_i`. Kontrollen räknar ut ordet ur tecknen och nyckeln och jämför med svaret.
+`niva`, `svar` (ett ord, små bokstäver), `brickor`, `chiffer` med `tecken` (på låset, i ordning), `nyckel` (`tecken` → `bokstav`) och `nyckeln_finns_i`, `visa_forsta`, `kontroll`, `svar_lyser_sek`. Kontrollen räknar ut ordet ur tecknen och nyckeln och jämför med svaret.
+
+Låset och nyckeln står på samma skärm. **`visa_forsta`**: ungen visar det första tecknet (på låset och på nyckeln, och bokstaven lyser), och det räknas inte som hjälp. **`kontroll: "hela_ordet"`**: låset kontrolleras först när alla fälten är fyllda, och rätta bokstäver stannar. **`svar_lyser_sek`**: ordet lyser så länge innan låset öppnas.
 
 ### P26_krukorna
 
-`innehall` (en post per kruka: `bar`, `tom`, `kartbit_1` …), `kartbit_i_sista`. Vila, påverkar inte nivån.
+`innehall` (en post per kruka eller buske: `bar`, `tom`, `kartbit_1`, `ekorre`, `skattlada` …), `kartbit_i_sista`, `sak_i_sista` (posten som alltid hittas sist), `foremal` (föremålen i rummet att svinga mot, ett per post; utan `foremal` delas föremålet som visar pusslet upp i krukor). Vila, påverkar inte nivån.
 
 ## 3b. Rummens kartor (Tiled)
 
@@ -195,6 +224,8 @@ Små bokstäver utom formler (`"LJUS"`). Flaggor: `aao`, `helord`, `sparrad`, `b
 - Okänd talare, rum, objekt (`ga_till`), pussel eller tillstånd. Dubbla id:n, samma föremål två gånger i ett rum.
 - `syns_i` med ett tillstånd som rummet inte har. `i_rummet` där ett alternativ saknar `objekt` eller både `ord` och `bild`, eller där föremålet inte finns i rummet där pusslet spelas.
 - Kartor som inte stämmer med rummen (avsnitt 3b), och `visar` som pekar på ett pussel som inte finns.
+- Skyltar, frivilliga föremål, `las_skylt`, `visa_foremal`, `skylt` och `foremal` som pekar på föremål som inte finns i rummet. En frivillig scen utan `startar_i_rum`, och `paminnelse` utan `vantar_pa`.
+- Räddningens brickor som inte räcker till ordet, och `sak_i_sista` som inte finns i `innehall`.
 - `alias` som pekar på ett id som inte finns, eller ett gammalt id som finns kvar. `nivaer` där golvet ligger över taket. `ljud` med ett `foremal` som inte finns i rummet.
 - Läs och välj utan exakt ett rätt svar.
 - Förbjudna par på samma skärm (lås–läs, hår–här, bår–bär), och rätt svar och distraktor som bara skiljer sig på Å/Ä i L1–L3.

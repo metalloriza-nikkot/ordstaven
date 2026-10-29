@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ordstaven/schema/kapitel.schema.json",
   "title": "ORDSTAVEN – ett kapitel (rum, scener, pussel)",
-  "description": "Format 1. Beskrivs i docs/innehallsschema.md. All text lagras i vanlig skrift; spelet visar versaler tills nivån säger annat.",
+  "description": "Format 2. Beskrivs i docs/innehallsschema.md (version 2.8). All text lagras i vanlig skrift; spelet visar versaler tills nivån säger annat.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -299,15 +299,69 @@
                       "$ref": "#/$defs/id"
                     },
                     "description": "Föremålet syns bara i de här tillstånden av rummet, t.ex. först när ljuset är tänt."
+                  },
+                  "dold": {
+                    "type": "boolean",
+                    "description": "Föremålet syns inte förrän steget visa_foremal visar det (lådan under löven, lappen som Klaffen tappar). Sedan står det kvar."
                   }
                 }
               }
             ]
           },
-          "description": "Objekt i rummet: ett id, eller { id, syns_i }. Tiled-kartan använder samma id:n."
+          "description": "Objekt i rummet: ett id, eller { id, syns_i, dold }. Tiled-kartan använder samma id:n."
         },
         "anteckning": {
           "$ref": "#/$defs/anteckning"
+        },
+        "skyltar": {
+          "type": "object",
+          "description": "Text som står i världen och hör till rummet (beslut 15.2): skyltar och tavlor. Nyckeln är föremålets id. Ett ord syns hela tiden på skylten. En mening har en markering (ett papper) vid skylten och öppnar läsplattan när hjälten går dit. Läses aldrig upp.",
+          "propertyNames": {
+            "$ref": "#/$defs/id"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "text"
+            ],
+            "properties": {
+              "text": {
+                "$ref": "#/$defs/text"
+              },
+              "papper": {
+                "$ref": "#/$defs/id",
+                "description": "Papperet på läsplattan för en mening (traskylt för Farfars träskyltar)."
+              }
+            }
+          }
+        },
+        "frivilligt": {
+          "type": "array",
+          "description": "Föremål som går att använda när som helst i rummet och ger något en gång (bär, en sida i Dinoboken, ett frivilligt pussel). Stegen spelas när hjälten använder föremålet, högst en gång.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "foremal",
+              "steg"
+            ],
+            "properties": {
+              "foremal": {
+                "$ref": "#/$defs/id"
+              },
+              "steg": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/$defs/steg"
+                }
+              },
+              "anteckning": {
+                "$ref": "#/$defs/anteckning"
+              }
+            }
+          }
         }
       }
     },
@@ -362,6 +416,14 @@
         },
         "anteckning": {
           "$ref": "#/$defs/anteckning"
+        },
+        "frivillig": {
+          "type": "boolean",
+          "description": "Scenen spelas inte i tur och ordning, utan första gången hjälten går in i rummet startar_i_rum medan ett steg med fri_vag pågår. Högst en gång."
+        },
+        "startar_i_rum": {
+          "$ref": "#/$defs/id",
+          "description": "Rummet där den frivilliga scenen startar."
         }
       }
     },
@@ -448,10 +510,20 @@
               "additionalProperties": false,
               "description": "De andra utgångarna i rummet är låsta under steget. Går hjälten till en av dem öppnas den inte: ljudet spelas, hjälten tittar upp och målet lyser.",
               "properties": {
-                "ljud": { "$ref": "#/$defs/id" },
-                "handling": { "type": "string" },
-                "replik": { "$ref": "#/$defs/replik" }
+                "ljud": {
+                  "$ref": "#/$defs/id"
+                },
+                "handling": {
+                  "type": "string"
+                },
+                "replik": {
+                  "$ref": "#/$defs/replik"
+                }
               }
+            },
+            "fri_vag": {
+              "type": "boolean",
+              "description": "Fritt vägval: de andra utgångarna går också att gå igenom, och rummet bakom visas (med en frivillig scen första gången). Steget är klart när hjälten går genom målet."
             }
           }
         },
@@ -459,33 +531,62 @@
           "description": "Hjälten bär en sak (filten) som svävar efter honom, och lägger den på målet när han når fram.",
           "type": "object",
           "additionalProperties": false,
-          "required": ["typ", "bild", "till"],
+          "required": [
+            "typ",
+            "bild",
+            "till"
+          ],
           "properties": {
-            "typ": { "const": "bara" },
-            "bild": { "$ref": "#/$defs/id" },
-            "till": { "$ref": "#/$defs/id" }
+            "typ": {
+              "const": "bara"
+            },
+            "bild": {
+              "$ref": "#/$defs/id"
+            },
+            "till": {
+              "$ref": "#/$defs/id"
+            }
           }
         },
         {
           "description": "Dialogregeln: figuren kallar på avstånd (högst fyra korta ord), och samtalet börjar när hjälten kommer inom ca 1,5 rutor. Stegen efter detta är samtalet.",
           "type": "object",
           "additionalProperties": false,
-          "required": ["typ", "figur"],
+          "required": [
+            "typ",
+            "figur"
+          ],
           "properties": {
-            "typ": { "const": "prata" },
-            "figur": { "$ref": "#/$defs/id" },
-            "kalla": { "$ref": "#/$defs/replik" }
+            "typ": {
+              "const": "prata"
+            },
+            "figur": {
+              "$ref": "#/$defs/id"
+            },
+            "kalla": {
+              "$ref": "#/$defs/replik"
+            }
           }
         },
         {
           "description": "Figuren räcker fram en sak (lappen). Den glimtar i figurens hand, och hjälten tar den själv med ett tryck.",
           "type": "object",
           "additionalProperties": false,
-          "required": ["typ", "fran", "bild"],
+          "required": [
+            "typ",
+            "fran",
+            "bild"
+          ],
           "properties": {
-            "typ": { "const": "ta_emot" },
-            "fran": { "$ref": "#/$defs/id" },
-            "bild": { "$ref": "#/$defs/id" }
+            "typ": {
+              "const": "ta_emot"
+            },
+            "fran": {
+              "$ref": "#/$defs/id"
+            },
+            "bild": {
+              "$ref": "#/$defs/id"
+            }
           }
         },
         {
@@ -760,6 +861,111 @@
               "type": "boolean"
             }
           }
+        },
+        {
+          "description": "Scenen väntar tills spelaren har läst skylten (en mening i rummets skyltar): hjälten går dit och läsplattan visar texten. Inget val och ingen nivå.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "typ",
+            "foremal"
+          ],
+          "properties": {
+            "typ": {
+              "const": "las_skylt"
+            },
+            "foremal": {
+              "$ref": "#/$defs/id"
+            }
+          }
+        },
+        {
+          "description": "Ett dolt föremål i rummet (innehall med dold) syns från och med nu.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "typ",
+            "foremal"
+          ],
+          "properties": {
+            "typ": {
+              "const": "visa_foremal"
+            },
+            "foremal": {
+              "$ref": "#/$defs/id"
+            }
+          }
+        },
+        {
+          "description": "Hjälten får en sak han har på sig, och den tas på direkt. Pausknappen glimtar, och garderoben har den.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "typ",
+            "sort",
+            "id"
+          ],
+          "properties": {
+            "typ": {
+              "const": "ge_sak"
+            },
+            "sort": {
+              "enum": [
+                "hjalmdekor",
+                "ryggsack"
+              ]
+            },
+            "id": {
+              "$ref": "#/$defs/id"
+            }
+          }
+        },
+        {
+          "description": "En ny sida i Dinoboken (fliken i hjälteboken). Pausknappen glimtar. Bildtexten läses upp efter tryck.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "typ",
+            "sida"
+          ],
+          "properties": {
+            "typ": {
+              "const": "dinobok"
+            },
+            "sida": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "bild",
+                "bildtext"
+              ],
+              "properties": {
+                "bild": {
+                  "$ref": "#/$defs/id"
+                },
+                "bildtext": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        {
+          "description": "Ungen får ett tillägg (mönstret på nosen). Stubbe i gråboxen.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "typ",
+            "id"
+          ],
+          "properties": {
+            "typ": {
+              "const": "unge_tillagg"
+            },
+            "id": {
+              "$ref": "#/$defs/id"
+            }
+          }
         }
       ]
     },
@@ -786,16 +992,42 @@
           "type": "boolean"
         },
         "vantar_pa": {
-          "enum": ["mata_ungen", "nosen"],
+          "enum": [
+            "mata_ungen",
+            "nosen"
+          ],
           "description": "En instruktion som ber om en handling väntar tills den är gjord (mata_ungen: ungen har ätit ett bär, nosen: spelaren har tänt nosen). Repliken visas uppe i rummet medan världen går, upprepas med en styrbild efter ca 8 s, och nästa steg kommer först efter handlingen."
         },
         "via": {
-          "enum": ["radio"],
+          "enum": [
+            "radio"
+          ],
           "description": "Repliken hörs genom radion (radioramen lyser), fast talaren kan stå i rummet."
         },
         "vid": {
-          "enum": ["ungen"],
+          "enum": [
+            "ungen"
+          ],
           "description": "Repliken visas i en bubbla ovanför figuren i rummet i stället för på läsplattan och läses upp (namnet som hjälten svarar med)."
+        },
+        "paminnelse": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "efter_sek",
+            "replik"
+          ],
+          "description": "Bara med vantar_pa: efter efter_sek sekunder kommer en annan replik i stället för att samma instruktion upprepas (omsorgen i k1s13).",
+          "properties": {
+            "efter_sek": {
+              "type": "number",
+              "minimum": 3,
+              "maximum": 30
+            },
+            "replik": {
+              "$ref": "#/$defs/replik"
+            }
+          }
         }
       }
     },
@@ -907,6 +1139,10 @@
         "i_rummet": {
           "type": "boolean",
           "description": "Alternativen ligger i rummet (fältet objekt). Ordet syns när hjälten står vid föremålet, och spelaren öppnar det som stämmer."
+        },
+        "skylt": {
+          "$ref": "#/$defs/id",
+          "description": "Lästexten står på det här föremålet i rummet (Farfars träskylt): en markering (ett papper) vid skylten, och läsplattan öppnas när hjälten går dit."
         }
       }
     },
@@ -1006,6 +1242,18 @@
             },
             "ligger_kvar": {
               "type": "boolean"
+            },
+            "tacks": {
+              "enum": [
+                "forsta_brickan"
+              ],
+              "description": "Titta–täck: förebilden tonas bort när första brickan läggs (ungen håller för ögonen). Den tänds igen vid fel och knuff och står sedan kvar resten av försöket."
+            },
+            "brickor_efter_sek": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10,
+              "description": "Brickorna glider in efter så många sekunder, medan förebilden syns."
             }
           }
         },
@@ -1181,6 +1429,18 @@
         },
         "anteckning": {
           "$ref": "#/$defs/anteckning"
+        },
+        "sak_i_sista": {
+          "$ref": "#/$defs/id",
+          "description": "Posten i innehall som alltid hittas sist, oavsett ordning (skattlådan, lådan)."
+        },
+        "foremal": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "description": "Föremålen i rummet att svinga mot, ett per post i innehall (buskarna, lövhögarna). Utan foremal delas föremålet som visar pusslet upp i krukor."
         }
       }
     },
@@ -1372,6 +1632,27 @@
         },
         "anteckning": {
           "$ref": "#/$defs/anteckning"
+        },
+        "brickor": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-ZÅÄÖ]$"
+          },
+          "description": "Bokstavsbrickorna (visas i bokstavsordning). Ett tryck i taget."
+        },
+        "kasta": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Kasta-läget: efter första rätta bokstaven kan han trycka på staven och skriva resten av ordet i de tomma fälten.",
+          "properties": {
+            "erbjudande": {
+              "$ref": "#/$defs/replik"
+            },
+            "vid_ratt": {
+              "$ref": "#/$defs/handling"
+            }
+          }
         }
       }
     },
@@ -1478,6 +1759,22 @@
         },
         "anteckning": {
           "$ref": "#/$defs/anteckning"
+        },
+        "visa_forsta": {
+          "type": "boolean",
+          "description": "Ungen visar det första tecknet (nosen på låset och på nyckeln, bokstaven lyser). Räknas inte som hjälp."
+        },
+        "kontroll": {
+          "enum": [
+            "hela_ordet"
+          ],
+          "description": "Låset kontrolleras först när alla fälten är fyllda. Rätta bokstäver stannar."
+        },
+        "svar_lyser_sek": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5,
+          "description": "Ordet lyser så länge innan låset öppnas och nästa replik kommer."
         }
       }
     }

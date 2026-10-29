@@ -163,3 +163,42 @@ describe('kontrollen: enhet, alias, nivåer', () => {
     expect(medFel((k) => { k.scener.find((s) => s.id === 's04_agget').steg.unshift({ typ: 'ljud', id: 'dunk', foremal: 'pianot' }); })).toMatch(/pianot finns inte/);
   });
 });
+
+describe('kapitel 1: rummens text, frivilligt och nya steg (schema 2.8)', () => {
+  const medFel = (andra) => { const d = riktigt(); andra(d.kapitel[1], d); return kontrollera(d).fel.join('\n'); };
+  const rum = (k, id) => k.rum.find((r) => r.id === id);
+  const scen = (k, id) => k.scener.find((s) => s.id === id);
+  it('skyltarna hör till rummet: föremålet ska finnas, och texten kontrolleras som lästext', () => {
+    expect(medFel(() => {})).toBe('');
+    expect(medFel((k) => { rum(k, 'lianerna').skyltar.skylt_saknas = { text: 'bär' }; })).toMatch(/skylten skylt_saknas finns inte/);
+    expect(medFel((k) => { rum(k, 'lianerna').skyltar.skylt_bar.text = 'BÄR'; })).toMatch(/vanlig skrift/);
+    expect(medFel((k) => { rum(k, 'skogsbrynet').skyltar.skylt_ingang.text = 'Gå till berget.'; })).toMatch(/berget är spärrat/);
+  });
+  it('las_skylt pekar på en skylt i rummet', () => {
+    expect(medFel((k) => { scen(k, 'k1s01_brynet').steg.find((s) => s.typ === 'las_skylt').foremal = 'skylt_farfar_1'; })).toMatch(/har ingen skylt/);
+  });
+  it('frivilligt: föremålet ska finnas, stegen kontrolleras, och pusslet räknas som använt', () => {
+    const d = riktigt();
+    expect(kontrollera(d).varningar.join('\n')).not.toMatch(/k1_svard_igen används inte/);
+    expect(medFel((k) => { rum(k, 'lianerna').frivilligt[0].foremal = 'stubbe_borta'; })).toMatch(/stubbe_borta finns inte/);
+    expect(medFel((k) => { rum(k, 'lianerna').frivilligt[0].steg[0].pussel_id = 'k1_finns_inte'; })).toMatch(/pusslet k1_finns_inte finns inte/);
+    expect(medFel((k) => { rum(k, 'glantan').frivilligt[0].steg.push({ typ: 'sparpunkt', pass_slut: true }); })).toMatch(/hör inte hemma i ett frivilligt/);
+  });
+  it('en frivillig scen behöver ett rum att starta i, och räknas inte in i passets tid', () => {
+    expect(medFel((k) => { delete scen(k, 'k1s03_buskarna').startar_i_rum; })).toMatch(/startar_i_rum/);
+    const d = riktigt();
+    const fore = kontrollera(d).pass.find((p) => p.kapitel === 'kap-01' && p.pass === 1).minuter;
+    scen(d.kapitel[1], 'k1s03_buskarna').steg.push(...Array(20).fill({ typ: 'mellanscen', beskrivning: 'Ungen nosar.' }));
+    expect(kontrollera(d).pass.find((p) => p.kapitel === 'kap-01' && p.pass === 1).minuter).toBe(fore);
+  });
+  it('visa_foremal, paminnelse och skylt på pusslet kontrolleras', () => {
+    expect(medFel((k) => { scen(k, 'k1s08_loven').steg.find((s) => s.typ === 'visa_foremal').foremal = 'lada_borta'; })).toMatch(/lada_borta finns inte/);
+    expect(medFel((k) => { const r = scen(k, 'k1s13_slutet').steg.find((s) => s.paminnelse); delete r.vantar_pa; })).toMatch(/paminnelse gäller bara/);
+    expect(medFel((k) => { k.pussel.find((p) => p.id === 'k1_stenen').skylt = 'skylt_borta'; })).toMatch(/skylten skylt_borta, som inte finns/);
+  });
+  it('räddningens brickor räcker till ordet, och lövhögarnas sista sak finns', () => {
+    expect(medFel((k) => { k.pussel.find((p) => p.id === 'k1_apan').brickor = ['A', 'E', 'G', 'O', 'R', 'T']; })).toMatch(/saknar S till STEGE/);
+    expect(medFel((k) => { k.pussel.find((p) => p.id === 'k1_loven').sak_i_sista = 'kartbit_2'; })).toMatch(/sak_i_sista kartbit_2/);
+    expect(medFel((k) => { k.pussel.find((p) => p.id === 'k1_loven').foremal.pop(); })).toMatch(/3 föremål men 4 poster/);
+  });
+});
