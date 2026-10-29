@@ -4,9 +4,10 @@
 import Phaser from 'phaser';
 import { RUM } from '../karna/skalning.js';
 import { FIGUR, steg } from '../karna/rorelse.js';
-import { rumsObjekt, framfor, framforFran, vidObjekt, aktivSak, hinderFran, vaggar, VAGG, objektFarg, lasplats, arSidodorr } from '../karna/rumslayout.js';
+import { rumsObjekt, framfor, framforFran, vidObjekt, aktivSak, hinderFran, vaggar, VAGG, objektFarg, lasplats, arSidodorr, stigStart } from '../karna/rumslayout.js';
 import { synligaIds } from '../karna/karta.js';
 import { skapaHinder } from '../karna/vag.js';
+import { skapaNivaer } from '../karna/nivaer.js';
 
 const FARG = {
   golv: 0x8c8a86, rutnat: 0x7f7d79, kant: 0x5d5b58,
@@ -24,6 +25,11 @@ export const HJALTE_FARGER = {
 };
 /** Det som inte går att välja: den runda grå hjälmen och de mörkblå skorna. */
 export const HJALTE_FAST = Object.freeze({ hjalm: 0xc9ccd2, skor: 0x1e4fa0 });
+/**
+ * Gråboxens bild av sakerna han kan ha på sig (lager): en färg per sak. Okända saker ritas i en neutral färg.
+ * Riktig grafik kommer med Stil (stilguiden §5).
+ */
+const LAGER_FARG = { taggkam: 0x5fae6a, ryggsack_skog: 0x8a5a2b };
 
 export class Rum extends Phaser.Scene {
   /**
@@ -35,6 +41,12 @@ export class Rum extends Phaser.Scene {
     super({ key: 'Rum' });
     this.b = b;
     this.pos = { x: RUM.bredd / 2, y: RUM.hojd - 12 };
+    /**
+     * Kamerans läge i världen (beslut 14): punkten i skärmens övre vänstra hörn, i hela pixlar. Kapitel 1:s rum ryms
+     * på en skärm, så den står i (0, 0). Kameran som följer hjälten byggs i T6; textlagret räknar redan med den.
+     * @type {import('../karna/skalning.js').Kamera}
+     */
+    this.kamera = { x: 0, y: 0 };
     this.ungePos = { x: this.pos.x - 18, y: this.pos.y };
     /** @type {import('../karna/rumslayout.js').Objekt[]} */
     this.objekt = [];
@@ -56,6 +68,8 @@ export class Rum extends Phaser.Scene {
     this.visaUnge = false;
     /** @type {{ x: number, y: number, mot: number } | null} dit ungen går för att peka (knuff), annars följer den hjälten */
     this.ungeMal = null;
+    /** @type {Set<string>} stigar som är spärrade med en gren (förenklingen): man kan inte gå på dem */
+    this.sparrade = new Set();
     /** @type {any[]} saker som hjälten har lagt ifrån sig i rummet */
     this.lagda = [];
     this.tillstand = /** @type {string | null} */ (null);
@@ -83,6 +97,13 @@ export class Rum extends Phaser.Scene {
     this.naraId = null;
     this.redo = new Promise((r) => { this._redo = r; });
     this.hinder = skapaHinder([]);
+    /** Höjdnivåerna i rummet (kullen, trappan), och nivån hjälten är på (0 = marken). */
+    this.nivaer = skapaNivaer([]);
+    this.niva = 0;
+    /** @type {Map<number, ReturnType<typeof skapaHinder>>} hindren på varje nivå */
+    this.hinderPer = new Map([[0, this.hinder]]);
+    /** Står han på en stege mellan nivåerna (styrbar klättring)? */
+    this.paStege = false;
     /** @type {{ x: number, y: number }[]} vägen hjälten går just nu */
     this.vag = [];
     /** @type {{ x: number, y: number } | null} målet som vägen räknades till */
@@ -108,8 +129,9 @@ export class Rum extends Phaser.Scene {
     // tryck på ett objekt = gå fram till det
     this.b.inmatning.lyssna((h) => {
       if (h.typ !== 'tryck' || !this.harRum || this.fryst || this.klattrar) return;
-      // närmaste objekt vars ruta (med lite marginal) innehåller trycket
-      const traffar = this.objekt.filter((x) => h.x >= x.x - 4 && h.x <= x.x + x.b + 4 && h.y >= x.y - 4 && h.y <= x.y + x.h + 4);
+      // närmaste objekt vars ruta (med lite marginal) innehåller trycket. En yta (kullen, trappan) är golv:
+      // ett tryck där går dit, som på golvet.
+      const traffar = this.objekt.filter((x) => x.sort !== 'yta' && h.x >= x.x - 4 && h.x <= x.x + x.b + 4 && h.y >= x.y - 4 && h.y <= x.y + x.h + 4);
       const avst = (/** @type {any} */ x) => Math.hypot(h.x - (x.x + x.b / 2), h.y - (x.y + x.h / 2));
       const o = traffar.sort((a, c) => avst(a) - avst(c))[0];
       if (!o) return;
@@ -120,6 +142,8 @@ export class Rum extends Phaser.Scene {
       if (o.sort === 'figur' && this.fragaIgen?.(o)) return;
       const f = this.malFor?.(o) ?? framforFran(o, this.pos, this.inomhus, this.vagg); this.b.inmatning.sattGaTill(f.x, f.y);
     });
+    /** @type {{ hjalmdekor: string | null, ryggsack: string | null }} det han har på sig */
+    this.lager = { hjalmdekor: null, ryggsack: null };
     this.sattUtseende({});
     this.ritaUnge();
     this.ritaGolv(false);
@@ -160,6 +184,8 @@ export class Rum extends Phaser.Scene {
     this.hjalte.add([
       this.add.rectangle(4, 21, 3, 3, f('skor')).setOrigin(0, 0),
       this.add.rectangle(9, 21, 3, 3, f('skor')).setOrigin(0, 0),
+      // ryggsäcken syns som en kant bakom ryggen
+      ...(this.lager?.ryggsack ? [this.add.rectangle(11, 12, 4, 8, LAGER_FARG[/** @type {keyof LAGER_FARG} */ (this.lager.ryggsack)] ?? 0x9a8f80).setOrigin(0, 0)] : []),
       this.add.rectangle(1, 13, 2, 6, f('hudfarg')).setOrigin(0, 0),
       this.add.rectangle(13, 13, 2, 6, f('hudfarg')).setOrigin(0, 0),
       this.add.rectangle(3, 12, 10, 9, f('drakt')).setOrigin(0, 0),
@@ -167,13 +193,26 @@ export class Rum extends Phaser.Scene {
       this.add.rectangle(3, 0, 10, 1, 0xffffff, 0.5).setOrigin(0, 0),
       this.ansikte,
     ]);
+    // hjälmdekoren: taggar längs hjälmens topp
+    const dekor = this.lager?.hjalmdekor;
+    if (dekor) { const fd = LAGER_FARG[/** @type {keyof LAGER_FARG} */ (dekor)] ?? 0x9a8f80; for (const x of [4, 7, 10]) this.hjalte.add(this.add.rectangle(x, -3, 2, 3, fd).setOrigin(0, 0)); }
+    // ryggsäcken mitt på ryggen, när han vänder ryggen mot kameran (stegen)
+    this.ryggBak = this.lager?.ryggsack ? this.add.rectangle(4, 12, 8, 8, LAGER_FARG[/** @type {keyof LAGER_FARG} */ (this.lager.ryggsack)] ?? 0x9a8f80).setOrigin(0, 0).setVisible(false) : null;
+    if (this.ryggBak) this.hjalte.add(this.ryggBak);
     this.sattRygg(this.klattrar);
+  }
+
+  /** Det han har på sig (hjältens lager: hjälmdekor, ryggsäck). @param {{ hjalmdekor: string | null, ryggsack: string | null }} lager */
+  sattLager(lager) {
+    this.lager = { ...lager };
+    this.sattUtseende(this.utseende || {});
   }
 
   /** Ryggen mot kameran (på stegen): ansiktet döljs bakom hjälmen. @param {boolean} pa */
   sattRygg(pa) {
     const hud = HJALTE_FARGER.hudfarg[(this.utseende || {}).hudfarg ?? 0] ?? HJALTE_FARGER.hudfarg[0];
     this.ansikte?.setFillStyle(pa ? HJALTE_FAST.hjalm : hud);
+    this.ryggBak?.setVisible(pa);
   }
 
   /**
@@ -230,12 +269,13 @@ export class Rum extends Phaser.Scene {
    * Visa ett rum (eller inget rum, för scener utan rum).
    * @param {{ rum: string | null, tillstand: string | null, innehall: (string | { id: string, syns_i?: string[] })[], unge: boolean, nyttRum: boolean,
    *           karta?: import('../karna/karta.js').Karta | null, franRum?: string | null,
-   *           delar?: Record<string, { farg: number | null, storlek: string | null }[]> }} v
+   *           delar?: Record<string, { farg: number | null, storlek: string | null }[]>, visade?: string[] }} v
+   * visade = dolda föremål som ett steg har visat (visa_foremal)
    */
   visa(v) {
     this.harRum = !!v.rum;
     this.visaUnge = v.unge;
-    if (v.nyttRum) { this.ungeMal = null; for (const g of this.lagda) g.destroy(); this.lagda = []; }
+    if (v.nyttRum) { this.ungeMal = null; for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); }
     this.tillstand = v.tillstand;
     if (v.nyttRum || !this.harRum) this.inomhus = !!v.karta?.inomhus;
     this.lampor = v.karta?.lampor || [];
@@ -243,14 +283,15 @@ export class Rum extends Phaser.Scene {
     if (v.nyttRum || !this.harRum) this.vagg = v.karta?.vagg || VAGG;
     this.ritaGolv(this.harRum);
     // föremål som bara syns i vissa tillstånd (ägget när ljuset är tänt) gör att rummet byggs om
-    const synliga = this.harRum ? synligaIds(v.innehall, v.tillstand).join(' ') : '';
+    const synliga = this.harRum ? synligaIds(v.innehall, v.tillstand, v.visade).join(' ') : '';
     const andrat = synliga !== this.synliga;
     this.synliga = synliga;
     if (v.nyttRum || !this.harRum || andrat) {
-      this.objekt = this.harRum ? rumsObjekt(v.innehall, v.tillstand, v.karta) : [];
+      this.objekt = this.harRum ? rumsObjekt(v.innehall, v.tillstand, v.karta, v.visade) : [];
       this.lagerObjekt.removeAll(true); this.ritade.clear(); this.markerade.clear(); this.ritadeDelar.clear();
       this.delar = { ...(v.delar || {}) };
-      for (const o of this.objekt) this.ritaObjekt(o);
+      for (const o of [...this.objekt.filter((x) => x.sort === 'yta'), ...this.objekt.filter((x) => x.sort !== 'yta')]) this.ritaObjekt(o);
+      for (const id of this.sparrade) { const o = this.ruta(id); if (o) this.ritaGren(o); }
       this.byggHinder();
       this.sattInteraktiva(this.interaktiva.filter((id) => this.ruta(id))); this.nara(null);
       if (v.nyttRum || !this.harRum) {
@@ -259,6 +300,7 @@ export class Rum extends Phaser.Scene {
         /** @type {import('../karna/rumslayout.js').Objekt | null} utgången hjälten kom in genom */
         this.inkom = dorr ?? null;
         const start = dorr ? framfor(dorr) : (v.franRum && v.karta?.in?.[v.franRum]) || v.karta?.start || { x: RUM.bredd / 2, y: RUM.hojd - 12 };
+        this.niva = 0; this.paStege = false; this.byggHinder(); this.sattNivaVid(start);
         this.pos = this.hinder.narmasteFria(start);
         this.ungePos = { x: this.pos.x - 18, y: this.pos.y };
         this.b.inmatning.rensaGaTill();
@@ -294,7 +336,31 @@ export class Rum extends Phaser.Scene {
     if (o.sort === 'sak') g.fillStyle(0xfff2b0, 0.9).fillRect(o.x + 2, o.y - 4, o.b - 4, 2);
   }
 
-  byggHinder() { this.hinder = skapaHinder([...hinderFran(this.objekt), ...(this.inomhus ? vaggar(this.vagg) : [])]); this.vag = []; this.vagMal = null; }
+  byggHinder() {
+    const sparrade = this.objekt.filter((o) => this.sparrade.has(o.id));
+    const rutor = [...hinderFran(this.objekt), ...sparrade, ...(this.inomhus ? vaggar(this.vagg) : [])];
+    // en uppsättning hinder per nivå: på marken går det inte att gå upp på kullen utom på trappan, och tvärtom
+    const n = (this.nivaer = skapaNivaer(this.objekt));
+    this.hinderPer = new Map(n.nivaer.map((niva) => [niva, skapaHinder(rutor, n.finns ? (p) => n.tillaten(p, niva) : undefined)]));
+    // på trappan eller stegen gäller båda nivåerna: han kan gå av uppe eller nere (men aldrig över kanten)
+    this.hinderForbindelse = n.finns ? skapaHinder(rutor, (p) => n.nivaer.some((niva) => n.tillaten(p, niva))) : null;
+    if (!this.hinderPer.has(this.niva)) this.niva = 0;
+    this.hinder = /** @type {ReturnType<typeof skapaHinder>} */ (this.hinderPer.get(this.niva));
+    this.vag = []; this.vagMal = null;
+  }
+
+  /** Hjälten är på nivån där punkten ligger (när han kommer in i rummet). @param {{ x: number, y: number }} p */
+  sattNivaVid(p) {
+    const n = this.nivaer.forbindelse(p) ? this.niva : this.nivaer.nivaVid(p);
+    if (n === this.niva || !this.hinderPer.has(n)) return;
+    this.niva = n; this.hinder = /** @type {ReturnType<typeof skapaHinder>} */ (this.hinderPer.get(n)); this.vag = []; this.vagMal = null;
+    this.b.logg.handelse('nivå', String(n));
+  }
+
+  /** Föremål han når från sin nivå (ett föremål på kullen nås bara uppifrån). @param {import('../karna/rumslayout.js').Objekt[]} lista */
+  paNivan(lista) {
+    return this.nivaer.finns ? lista.filter((o) => o.sort === 'yta' || this.nivaer.nivaFor(o) === this.niva) : lista;
+  }
 
   /** @param {import('../karna/rumslayout.js').Objekt} o */
   ritaObjekt(o) {
@@ -305,7 +371,7 @@ export class Rum extends Phaser.Scene {
     const r = this.add.rectangle(o.x, o.y, o.b, o.h, fyll, delar ? 0 : 1).setOrigin(0, 0).setStrokeStyle(1, sidodorr ? 0x3a3129 : FARG.sakKant, delar ? 0 : 1);
     this.lagerObjekt.add(r);
     this.ritade.set(o.id, r);
-    if (o.ute || o.klattra || (o.sort === 'utgang' && !o.golv)) this.ritaDetaljer(o);
+    if (o.ute || o.klattra || (o.sort === 'utgang' && !o.golv) || o.sort === 'yta') this.ritaDetaljer(o);
     this.ritadeDelar.get(o.id)?.forEach((x) => x.destroy());
     this.ritadeDelar.delete(o.id);
     if (!delar) return;
@@ -359,7 +425,10 @@ export class Rum extends Phaser.Scene {
     }
     // dörrmattan ligger på insidan: ovanför en dörr i främre väggen, nedanför en i bakväggen
     if (o.ute) { const my = o.riktning === 'ned' ? o.y - 7 : o.y + o.h + 1; g.fillStyle(0xa0663a).fillRect(o.x + 2, my, o.b - 4, 6); }
-    if (o.klattra) { g.fillStyle(0x5a4f42); for (let y = o.y + 4; y < o.y + o.h - 2; y += 6) g.fillRect(o.x + 2, y, o.b - 4, 2); }
+    if (o.klattra || o.forbinder === 'stege') { g.fillStyle(0x5a4f42); for (let y = o.y + 4; y < o.y + o.h - 2; y += 6) g.fillRect(o.x + 2, y, o.b - 4, 2); }
+    // kullen: en mörkare kant i söder (branten), och trappans steg
+    if (o.sort === 'yta' && !o.forbinder) { g.fillStyle(0x6e685e).fillRect(o.x, o.y + o.h - 5, o.b, 5); g.fillStyle(0xbdb8ae).fillRect(o.x, o.y, o.b, 2); }
+    if (o.forbinder === 'trappa') { g.fillStyle(0x6e685e); for (let y = o.y + 3; y < o.y + o.h - 1; y += 4) g.fillRect(o.x + 1, y, o.b - 2, 1); }
     this.lagerObjekt.add(g);
   }
 
@@ -487,12 +556,42 @@ export class Rum extends Phaser.Scene {
   /** Ungens position på skärmen i rumspixlar (för att låta ett bär flyga dit). */
   get ungePunkt() { return { x: this.ungePos.x, y: this.ungePos.y - 6 }; }
 
-  /** En fel dörr eller stig spikas igen med två plankor (förenklingen). @param {string} id */
+  /**
+   * En fel dörr spikas igen med två plankor (förenklingen). En stig man går på spärras i stället med en
+   * omkullfallen gren, och den går inte längre att gå på. @param {string} id
+   */
   spika(id) {
     const o = this.ruta(id); if (!o) return;
+    if (o.golv) {
+      if (this.sparrade.has(id)) return;
+      this.sparrade.add(id); this.ritaGren(o); this.byggHinder();
+      this.pos = this.hinder.narmasteFria(this.pos); this.placera();
+      return;
+    }
     const g = this.add.graphics();
     g.fillStyle(0xa07a4a).fillRect(o.x - 2, o.y + Math.round(o.h * 0.3), o.b + 4, 3).fillRect(o.x - 2, o.y + Math.round(o.h * 0.65), o.b + 4, 3);
     this.lagerObjekt.add(g);
+  }
+
+  /** Grenen tvärs över stigens början (gråbox: en brun stock med gröna blad). @param {import('../karna/rumslayout.js').Objekt} o */
+  ritaGren(o) {
+    const g = this.add.graphics();
+    // grenen ligger inne på stigen, strax efter vägskälet (stigens början), så att man ser att den är spärrad
+    const tvars = o.riktning === 'hoger' || o.riktning === 'vanster';
+    const x = !tvars ? o.x - 4 : o.riktning === 'hoger' ? o.x + 6 : o.x + o.b - 11;
+    const y = tvars ? o.y - 4 : o.riktning === 'ned' ? o.y + 6 : o.y + o.h - 11;
+    const b = tvars ? 5 : o.b + 8, h = tvars ? o.h + 8 : 5;
+    g.fillStyle(0x6b4a2a).fillRect(x, y, b, h);
+    g.fillStyle(0x4f8a3a);
+    for (let i = 2; i < Math.max(b, h) - 2; i += 6) g.fillRect(tvars ? x - 2 : x + i, tvars ? y + i : y - 2, 3, 3);
+    this.lagerObjekt.add(g);
+  }
+
+  /** Hjälten (och ungen) syns inte en stund: han är bakom kurvan på en stig. @param {boolean} pa */
+  gom(pa) {
+    this.hjalte.setVisible(!pa && this.harRum);
+    this.unge.setVisible(!pa && this.harRum && this.visaUnge);
+    if (!pa) { this.ungePos = { x: this.pos.x - 16, y: this.pos.y }; this.placera(); }
   }
 
   /** Gå till en punkt (rörelse som spelet styr, t.ex. ett steg tillbaka från en fel dörr). @param {{ x: number, y: number }} mal @param {number} ms */
@@ -513,8 +612,36 @@ export class Rum extends Phaser.Scene {
   /** Vilket av objekten står hjälten vid just nu? @param {string[]} ids @returns {string | null} */
   starVid(ids) {
     // bara den närmaste (eller den han är vänd mot) är aktiv
-    const o = aktivSak(this.pos, this.objekt.filter((x) => ids.includes(x.id)), this.vand);
+    const o = aktivSak(this.pos, this.paNivan(this.objekt.filter((x) => ids.includes(x.id))), this.vand);
     return o ? o.id : null;
+  }
+
+  /**
+   * Vägen till en punkt. Ligger punkten på en annan nivå går vägen över närmaste trappa eller stege.
+   * @param {{ x: number, y: number }} mal
+   */
+  vagTill(mal) {
+    const malNiva = this.nivaer.finns ? this.nivaer.nivaVid(mal) : this.niva;
+    if (malNiva === this.niva || !this.hinderPer.has(malNiva)) return this.hinder.vag(this.pos, mal);
+    const over = this.nivaer.passage(this.pos);
+    if (!over) return this.hinder.vag(this.pos, mal);
+    const dit = this.hinder.vag(this.pos, over);
+    if (!dit.length) return [];
+    return [...dit, .../** @type {ReturnType<typeof skapaHinder>} */ (this.hinderPer.get(malNiva)).vag(over, mal)];
+  }
+
+  /** Han byter nivå när han lämnar trappan eller stegen. På stegen har han ryggen mot kameran. */
+  foljNivan() {
+    const f = this.nivaer.forbindelse(this.pos);
+    const h = f && this.hinderForbindelse ? this.hinderForbindelse : /** @type {ReturnType<typeof skapaHinder>} */ (this.hinderPer.get(this.niva));
+    if (h && h !== this.hinder) this.hinder = h;
+    const stege = f?.forbinder === 'stege';
+    if (stege) this.pos = { x: Math.round(/** @type {any} */ (f).x + /** @type {any} */ (f).b / 2), y: this.pos.y };
+    if (stege !== this.paStege) {
+      this.paStege = stege; this.sattRygg(stege);
+      if (!stege) { this.ungePos = { x: this.pos.x - 14, y: this.pos.y }; this.placera(); } // ungen skuttar efter
+    }
+    if (!f) this.sattNivaVid(this.pos);
   }
 
   /** Objektets ruta i rumskoordinater. @param {string} id */
@@ -532,10 +659,11 @@ export class Rum extends Phaser.Scene {
       // piltangenterna: glid längs hindren
       this.vag = []; this.vagMal = null;
       const d = Math.min(dtMs / 1000, 0.1) * FIGUR.fart;
-      ny = { ...this.hinder.glid(this.pos, riktning.x * d, riktning.y * d), framme: false };
+      // på stegen klättrar han bara upp och ned
+      ny = { ...this.hinder.glid(this.pos, this.paStege ? 0 : riktning.x * d, riktning.y * d), framme: false };
     } else if (mal) {
       // tryck: räkna en väg runt hindren när målet är nytt, gå sedan punkt för punkt
-      if (!this.vagMal || this.vagMal.x !== mal.x || this.vagMal.y !== mal.y) { this.vagMal = mal; this.vag = this.hinder.vag(this.pos, mal); }
+      if (!this.vagMal || this.vagMal.x !== mal.x || this.vagMal.y !== mal.y) { this.vagMal = mal; this.vag = this.vagTill(mal); }
       const nasta = this.vag[0];
       if (!nasta) { ny = { ...this.pos, framme: true }; }
       else {
@@ -549,15 +677,23 @@ export class Rum extends Phaser.Scene {
     const flyttad = ny.x !== this.pos.x || ny.y !== this.pos.y;
     if (flyttad) { const vx = ny.x - this.pos.x, vy = ny.y - this.pos.y, l = Math.hypot(vx, vy); if (l > 0.01) this.vand = { x: vx / l, y: vy / l }; }
     this.pos = { x: ny.x, y: ny.y };
+    if (this.nivaer.finns) this.foljNivan();
     // ungen följer efter på avstånd, eller springer dit den pekar
     const m = this.ungeMal;
     const tx = m ? m.x : this.pos.x - 16, ty = m ? m.y : this.pos.y;
     const dx = tx - this.ungePos.x, dy = ty - this.ungePos.y, l = Math.hypot(dx, dy);
     const narmare = m ? 1 : 6;
+    // ungen klättrar inte på stegen: den väntar nedanför och kommer efter med ett skutt
+    if (this.paStege && !m) { if (flyttad) this.placera(); return this.vantaPaHandling(inm); }
     if (l > narmare) { const v = Math.min(l - narmare, (dtMs / 1000) * (m ? 110 : 90)); this.ungePos = { x: this.ungePos.x + (dx / l) * v, y: this.ungePos.y + (dy / l) * v }; }
     if (flyttad || l > narmare || m || this.buren) this.placera();
+    this.vantaPaHandling(inm);
+  }
+
+  /** Står han vid något som ett steg väntar på (vantaPa)? @param {any} inm */
+  vantaPaHandling(inm) {
     if (this.vantar) {
-      const o = aktivSak(this.pos, this.objekt.filter((x) => this.vantar && this.vantar.ids.includes(x.id)), this.vand);
+      const o = aktivSak(this.pos, this.paNivan(this.objekt.filter((x) => this.vantar && this.vantar.ids.includes(x.id))), this.vand);
       if (o) { const v = this.vantar; this.vantar = null; inm.rensaGaTill(); v.klar(o.id); }
     }
   }

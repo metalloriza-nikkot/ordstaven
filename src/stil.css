@@ -329,6 +329,14 @@ html, body {
 /* skyltarna på dörrar och stigar i ett val: syns hela tiden, handen bara på den han står vid */
 #skyltar { position: absolute; inset: 0; pointer-events: none; z-index: 4; }
 .platta-oppen #skyltar { display: none; }
+/* rummets egna skyltar och tavlor (rum.skyltar), under valens skyltar */
+#rumsskyltar { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+.platta-oppen #rumsskyltar { display: none; }
+#rumsskyltar .kort { cursor: pointer; }
+/* en skylt med en mening: ett papper, som öppnas på läsplattan när han går dit (granskningen, punkt 14) */
+.kort.mening-skylt { min-width: calc(56px * var(--t)); font-size: calc(36px * var(--t)); line-height: 1; padding: 6px 10px; }
+.skylt.puls .kort { animation: skyltpuls .6s ease-in-out 3; }
+@keyframes skyltpuls { 50% { transform: scale(1.15); } }
 .skylt { position: absolute; transform: translate(-50%, calc(-100% - 6px)); pointer-events: auto; }
 .skylt.pa { transform: translate(-50%, -50%); }
 .skylt.under { transform: translate(-50%, 6px); }
@@ -484,3 +492,33 @@ html, body {
 /* ungen visar första tecknet, och efter två fel lyser nästa saknade bokstav på nyckeln */
 .visar { box-shadow: 0 0 0 4px #5fae6a; background: rgba(95, 174, 106, .25); }
 .kod-par.tips { box-shadow: 0 0 0 4px var(--guld); animation: puls .6s ease 3; }
+
+/* ---------------------------------------------------------------- pausmenyn (T2, stilguiden §6) */
+/* pausknappen: spelarens egen, uppe till höger i rummet (⚙ är den vuxnes) */
+#hud-paus { position: absolute; left: calc(var(--rum-vanster) + var(--rum-bredd) - 120px); top: calc(var(--rum-topp) + 8px); z-index: 5; justify-content: center; padding: 0; width: 56px; }
+.paus-ikon { display: inline-flex; gap: 6px; }
+.paus-ikon i { display: block; width: 7px; height: 22px; border-radius: 2px; background: var(--papper); }
+/* nytt i hjälteboken: pausknappen glimtar en gång */
+#hud-paus.glimt { animation: pausglimt .5s ease-in-out 2; }
+@keyframes pausglimt { 50% { background: var(--guld); box-shadow: 0 0 0 6px rgba(242, 193, 78, .5); transform: scale(1.12); } }
+.snabb #hud-paus.glimt { animation-duration: .05s; }
+#pausmeny { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(20, 14, 10, .88); z-index: 6; font-style: normal; }
+.pausmeny { position: relative; display: flex; flex-direction: column; align-items: center; gap: 20px; width: min(92vw, calc(var(--rum-bredd) * .9)); max-height: 92vh; padding: 24px; border-radius: 20px; background: var(--papper); color: var(--black); }
+.paus-start { display: flex; gap: 32px; }
+.paus-val { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 160px; padding: 16px 20px; border: 0; border-radius: 18px; background: #fffaf0; box-shadow: 0 5px 0 #c8bb9c; cursor: pointer; font-family: inherit; color: inherit; }
+.paus-bild { font-size: 72px; line-height: 1; }
+.paus-ord { font-size: calc(36px * var(--t, 1)); font-weight: 700; }
+.paus-val.ny::after { content: '⭐'; position: absolute; right: -10px; top: -12px; font-size: 32px; }
+.paus-flikar { display: flex; gap: 12px; }
+.paus-flikar .paus-val { min-width: 110px; padding: 10px 14px; }
+.paus-flikar .paus-bild { font-size: 44px; }
+.paus-flikar .paus-val.vald { background: var(--guld); box-shadow: 0 5px 0 #b8892b; }
+.paus-flikar .stav-ikon { display: inline-block; width: 12px; height: 48px; }
+.paus-sida { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; min-height: 120px; }
+.paus-sida > div { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+.paus-sida .kort.vald { box-shadow: 0 5px 0 #b8892b, 0 0 0 4px var(--guld); }
+.paus-karta { display: flex; gap: 14px; min-height: 120px; align-items: center; }
+.kartbit { position: relative; font-size: 72px; }
+.kartbit b { position: absolute; right: -4px; bottom: -4px; font-size: 28px; background: var(--papper); border-radius: 50%; padding: 0 8px; }
+.paus-stang { align-self: flex-end; }
+.paus-tillbaka { position: absolute; left: 16px; top: 16px; }

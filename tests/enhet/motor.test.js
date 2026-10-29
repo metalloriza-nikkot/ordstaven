@@ -361,3 +361,36 @@ describe('ungen följer', () => {
     b.klar(); b.aktuellt(); expect(t.spelare.unge.folj).toBe(false);
   });
 });
+
+describe('kapitel 1: frivilligt, dolda föremål och gåvor', () => {
+  const kap1 = las('den-gomda-dalen/kap-01.json');
+  const ny = () => { const t = nyttTillstand('t'); return { t, b: skapaBerattelse({ aventyr, kapitel: kap1, tillstand: t, aventyrId: AVENTYR }) }; };
+  const spelaScen = (b) => { const id = b.scen.id; while (!b.slut && b.scen.id === id) { b.aktuellt(); b.klar({}); } };
+  it('den frivilliga scenen (buskarna) spelas aldrig i tur och ordning', () => {
+    const { b } = ny();
+    expect(b.scen.id).toBe('k1s01_brynet');
+    spelaScen(b); expect(b.scen.id).toBe('k1s02_lianerna');
+    spelaScen(b); expect(b.scen.id).toBe('k1s05_glantan');
+  });
+  it('den frivilliga scenen startar i sitt rum en gång', () => {
+    const { b } = ny();
+    expect(b.frivilligScen('buskarna')?.id).toBe('k1s03_buskarna');
+    expect(b.frivilligScen('lianerna')).toBeNull();
+    b.frivilligtKlart('k1s03_buskarna');
+    expect(b.frivilligScen('buskarna')).toBeNull();
+  });
+  it('gåvan tas på direkt, och ett dolt föremål syns när steget har visat det', () => {
+    const { t, b } = ny();
+    b.effektUtanfor({ typ: 'ge_sak', sort: 'ryggsack', id: 'ryggsack_skog' }, 'buskarna');
+    expect(t.spelare.hjalte.lager.ryggsack).toBe('ryggsack_skog');
+    expect(t.spelare.hjalte.garderob).toEqual([{ sort: 'ryggsack', id: 'ryggsack_skog' }]);
+    expect(b.visade('gamla_tradet')).toEqual([]);
+    b.effektUtanfor({ typ: 'visa_foremal', foremal: 'last_lada' }, 'gamla_tradet');
+    expect(b.visade('gamla_tradet')).toEqual(['last_lada']);
+    b.effektUtanfor({ typ: 'dinobok', sida: { bild: 'fossil_och_ungen', bildtext: 'fossil' } }, 'glantan');
+    b.effektUtanfor({ typ: 'dinobok', sida: { bild: 'fossil_och_ungen', bildtext: 'fossil' } }, 'glantan');
+    expect(t.spelare.dinobok).toHaveLength(1);
+    b.effektUtanfor({ typ: 'unge_tillagg', id: 'nosmonster' }, 'gamla_tradet');
+    expect(t.spelare.unge.tillagg).toEqual(['nosmonster']);
+  });
+});

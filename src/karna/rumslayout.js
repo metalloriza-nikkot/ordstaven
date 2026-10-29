@@ -7,12 +7,15 @@ import { synligaIds } from './karta.js';
 const FIGUR_HOJD = 24;
 
 /**
- * @typedef {{ id: string, x: number, y: number, b: number, h: number, sort: 'utgang' | 'sak' | 'figur',
+ * @typedef {{ id: string, x: number, y: number, b: number, h: number, sort: 'utgang' | 'sak' | 'figur' | 'yta',
+ *             niva?: number, forbinder?: 'trappa' | 'stege',
  *             till?: string, sida?: 'under' | 'over' | 'vanster' | 'hoger' | 'alla', golv?: boolean, visar?: string,
  *             riktning?: 'vanster' | 'hoger' | 'upp' | 'ned', klattra?: 'upp' | 'ned', ute?: boolean, lapp?: string,
  *             talare?: string, lastI?: string[] }} Objekt
  * till = rummet en utgång leder till, sida = var hjälten ställer sig, golv = man går på det (stig, grind).
  * sida 'alla' = föremålet har ingen framsida (krukor, buskar, en låda mitt på golvet): det går att använda från alla håll.
+ * sort 'yta' = en del av golvet: en upphöjd yta (niva, kullen) eller en förbindelse mellan nivåerna (forbinder:
+ * trappa eller stege). Se karna/nivaer.js.
  */
 
 const UTGANG = /^(stege_|dorr_|grind|stig_)/;
@@ -31,17 +34,19 @@ export function placeraObjekt(innehall) {
   }
   /** @type {Objekt[]} */
   const ut = [];
+  // utan karta leder en utgång till rummet i sitt id (stig_buskarna → buskarna), om det rummet finns
+  const till = (/** @type {string} */ id) => { const m = /^(?:stig|dorr|stege|grind)_(.+)$/.exec(id); return m ? { till: m[1] } : {}; };
   // dörrar jämnt längs översta väggen
   uppe.forEach((id, i) => {
     const x = Math.round(((i + 1) * RUM.bredd) / (uppe.length + 1)) - 12;
-    ut.push({ id, x, y: 4, b: 24, h: 30, sort: 'utgang' });
+    ut.push({ id, x, y: 4, b: 24, h: 30, sort: 'utgang', ...till(id) });
   });
   // stegar i vänstra kanten, uppifrån
-  sidor.forEach((id, i) => ut.push({ id, x: 6, y: 40 + i * 44, b: 18, h: 36, sort: 'utgang' }));
+  sidor.forEach((id, i) => ut.push({ id, x: 6, y: 40 + i * 44, b: 18, h: 36, sort: 'utgang', ...till(id) }));
   // grindar och stigar längs nedre kanten
   nere.forEach((id, i) => {
     const x = Math.round(((i + 1) * RUM.bredd) / (nere.length + 1)) - 14;
-    ut.push({ id, x, y: RUM.hojd - 22, b: 28, h: 18, sort: 'utgang' });
+    ut.push({ id, x, y: RUM.hojd - 22, b: 28, h: 18, sort: 'utgang', ...till(id) });
   });
   // övriga saker i ett rutnät i rummets övre och mittre del, med fri gång i mitten nertill
   const kolumner = Math.max(3, Math.min(5, Math.ceil(saker.length / 2)));
@@ -150,8 +155,9 @@ export function framforFran(o, pos, inomhus = false, v = VAGG) {
 export function genom(o, pos) {
   const f = framfor(o);
   if (o.golv && o.riktning) {
-    const iBand = pos.y >= o.y - 2 && pos.y <= o.y + o.h + 8;
-    return iBand && (o.riktning === 'hoger' || o.riktning === 'vanster' ? Math.abs(pos.x - f.x) <= 6 : Math.abs(pos.y - f.y) <= 6);
+    // han ska stå på just den här stigen: inom stigens bredd, och vid dess slut (kurvan eller kanten)
+    if (o.riktning === 'hoger' || o.riktning === 'vanster') return pos.y >= o.y - 2 && pos.y <= o.y + o.h + 8 && Math.abs(pos.x - f.x) <= 6;
+    return pos.x >= o.x - 4 && pos.x <= o.x + o.b + 4 && Math.abs(pos.y - f.y) <= 6;
   }
   const r = o.riktning || /** @type {Record<string, string>} */ ({ hoger: 'vanster', vanster: 'hoger', under: 'upp', over: 'ned' })[o.sida || 'under'];
   // bandet är lika brett som dörren och lite till: står han med fötterna strax nedanför eller bredvid dörren
@@ -187,11 +193,25 @@ export function lasplats(o) {
 }
 
 /**
+ * Där en stig börjar, sett från rummet: vägskälet framför stigen. Stigen i kartan går från vägskälet till kurvan,
+ * där den försvinner bakom buskarna (granskningen, punkt 16): valet räknas vid kurvan, och en fel stig leder
+ * tillbaka hit. @param {Objekt} o
+ */
+export function stigStart(o) {
+  const cx = Math.round(o.x + o.b / 2), cy = Math.round(o.y + o.h / 2) + 3;
+  if (o.riktning === 'upp') return { x: cx, y: Math.min(RUM.hojd, o.y + o.h + 10) };
+  if (o.riktning === 'ned') return { x: cx, y: Math.max(FIGUR_HOJD, o.y - 4) };
+  if (o.riktning === 'hoger') return { x: Math.max(8, o.x - 10), y: cy };
+  if (o.riktning === 'vanster') return { x: Math.min(RUM.bredd - 8, o.x + o.b + 10), y: cy };
+  return lasplats(o);
+}
+
+/**
  * Objekt som hjälten inte kan gå igenom. Grindar och stigar nertill är golv man går på.
  * @param {Objekt[]} objekt
  */
 export function hinderFran(objekt) {
-  return objekt.filter((o) => !o.golv && !/^(stig_|grind)/.test(o.id));
+  return objekt.filter((o) => !o.golv && o.sort !== 'yta' && !/^(stig_|grind)/.test(o.id));
 }
 
 /**
@@ -199,10 +219,11 @@ export function hinderFran(objekt) {
  * @param {(string | { id: string, syns_i?: string[] })[]} innehall
  * @param {string | null} tillstand
  * @param {import('./karta.js').Karta | null | undefined} karta
+ * @param {string[]} [visade] dolda föremål som har visats (visa_foremal)
  * @returns {Objekt[]}
  */
-export function rumsObjekt(innehall, tillstand, karta) {
-  const ids = synligaIds(innehall, tillstand);
+export function rumsObjekt(innehall, tillstand, karta, visade = []) {
+  const ids = synligaIds(innehall, tillstand, visade);
   if (!karta) return placeraObjekt(ids);
   const iKartan = karta.objekt.filter((o) => ids.includes(o.id)).map((o) => ({ ...o }));
   const saknas = ids.filter((id) => !iKartan.some((o) => o.id === id));
@@ -221,6 +242,7 @@ export const arSidodorr = (o) => o.sort === 'utgang' && !o.golv && !o.klattra &&
  * @param {Objekt} o @returns {number}
  */
 export function objektFarg(o) {
+  if (o.sort === 'yta') return o.forbinder === 'trappa' ? 0x9b958a : o.forbinder === 'stege' ? 0x9a8f80 : 0xa6a198;
   if (o.sort === 'utgang' && o.ute) return 0xd8c49a;
   if (o.sort === 'utgang' && o.klattra) return 0x9a8f80;
   if (o.sort === 'utgang') return 0x6d5a45;

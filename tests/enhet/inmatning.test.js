@@ -337,3 +337,25 @@ describe('vilken sak används (grind A)', () => {
     expect(provat).toBeGreaterThan(20);
   });
 });
+
+describe('dolda föremål', () => {
+  it('ett dolt föremål syns först när det är visat, och tillståndet gäller ändå', () => {
+    const inn = ['krona', { id: 'lada', dold: true }, { id: 'apa', syns_i: ['raddad'], dold: true }];
+    expect(synligaIds(inn, null)).toEqual(['krona']);
+    expect(synligaIds(inn, null, ['lada'])).toEqual(['krona', 'lada']);
+    expect(synligaIds(inn, 'fangen', ['apa'])).toEqual(['krona']);
+    expect(synligaIds(inn, 'raddad', ['apa'])).toEqual(['krona', 'apa']);
+  });
+});
+
+describe('stigar', () => {
+  it('han går igenom bara den stig han står på, vid dess slut', async () => {
+    const { genom, stigStart } = await import('../../src/karna/rumslayout.js');
+    const a = { id: 'stig_a', x: 30, y: 30, b: 28, h: 70, sort: 'utgang', golv: true, riktning: 'upp' };
+    const b2 = { ...a, id: 'stig_b', x: 146 };
+    expect(genom(b2, { x: 160, y: 38 })).toBe(true);
+    expect(genom(a, { x: 160, y: 38 })).toBe(false);
+    expect(genom(b2, { x: 160, y: 80 })).toBe(false); // på stigen men inte vid kurvan
+    expect(stigStart(b2)).toEqual({ x: 160, y: 110 });
+  });
+});

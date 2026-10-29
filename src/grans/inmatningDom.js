@@ -1,13 +1,15 @@
 // @ts-check
 // Kopplar webbläsarens tangent- och pekhändelser till inmatningslagret (src/karna/inmatning.js).
-import { skarmTillRum, RUM } from '../karna/skalning.js';
+import { skarmTillVarld } from '../karna/skalning.js';
 
 /**
  * @param {{ inmatning: ReturnType<typeof import('../karna/inmatning.js').skapaInmatning>,
  *           layout: { readonly skala: ReturnType<typeof import('../karna/skalning.js').beraknaSkala> },
- *           yta: HTMLElement, logg?: { tangent(k: string): void, handelse(t: string, m: string, d?: any): void } }} opt
+ *           yta: HTMLElement, logg?: { tangent(k: string): void, handelse(t: string, m: string, d?: any): void },
+ *           kamera?: () => import('../karna/skalning.js').Kamera }} opt
+ * kamera = kamerans läge: ett tryck på skärmen blir en punkt i världen (beslut 14)
  */
-export function kopplaInmatning({ inmatning, layout, yta, logg }) {
+export function kopplaInmatning({ inmatning, layout, yta, logg, kamera = () => ({ x: 0, y: 0 }) }) {
   window.addEventListener('keydown', (e) => {
     if (e.ctrlKey || e.metaKey || e.altKey) return; // genvägar (Ctrl+Skift+L m.fl.) hanteras på annat håll
     if (logg) logg.tangent(e.code);
@@ -20,8 +22,8 @@ export function kopplaInmatning({ inmatning, layout, yta, logg }) {
   // Tryck och klick. Pekpenna, finger och mus behandlas lika. Bara tryck inne i rummet räknas.
   yta.addEventListener('pointerdown', (e) => {
     if (e.button !== undefined && e.button > 0) return;
-    const p = skarmTillRum(layout.skala, e.clientX, e.clientY);
-    if (p.x < 0 || p.y < 0 || p.x >= RUM.bredd || p.y >= RUM.hojd) return;
+    const p = skarmTillVarld(layout.skala, kamera(), e.clientX, e.clientY);
+    if (!p.inne) return;
     e.preventDefault();
     inmatning.tryck(p.x, p.y);
     if (logg) logg.handelse('tryck', `${Math.round(p.x)},${Math.round(p.y)}`, e.pointerType);

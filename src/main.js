@@ -19,7 +19,7 @@ const mappAv = (/** @type {string} */ fil) => fil.split('/').at(-2);
 import { skapaLogg } from './karna/logg.js';
 import { skapaSparning } from './karna/sparning.js';
 import { skapaInmatning } from './karna/inmatning.js';
-import { RUM } from './karna/skalning.js';
+import { RUM, varldTillSkarm } from './karna/skalning.js';
 import { lasKarta } from './karna/karta.js';
 import { skapaLagring, begarBestandigLagring } from './grans/lagring.js';
 import { skapaLayout } from './grans/layout.js';
@@ -42,6 +42,8 @@ const aventyr = valt.data;
 const kapitel = Object.entries(kapitelfiler).filter(([fil]) => mappAv(fil) === valt.mapp).map(([, k]) => /** @type {any} */ (structuredClone(k)));
 // Bara för webbläsartesterna (?snabb&testscen): en provscen ur localStorage läggs till i första kapitlet, så att
 // motorns steg kan provas innan innehållet använder dem. Påverkar aldrig ett vanligt spel.
+/** @type {Record<string, any>} provkartor (Tiled-JSON per rum) för webbläsartesterna */
+let testkartor = {};
 {
   const q = new URLSearchParams(location.search);
   if (q.has('snabb') && q.has('testscen')) {
@@ -53,7 +55,8 @@ const kapitel = Object.entries(kapitelfiler).filter(([fil]) => mappAv(fil) === v
         // provpussel, fler scener (frivilliga) och fält i rummen, så att kapitel 1:s steg kan provas i prologens rum
         for (const p of t.pussel || []) k.pussel.push(p);
         for (const sc of t.scener || []) k.scener.push(sc);
-        for (const [id, falt] of Object.entries(t.rum || {})) { const r = k.rum.find((x) => x.id === id); if (r) Object.assign(r, falt); }
+        for (const [id, falt] of Object.entries(t.rum || {})) { const r = k.rum.find((x) => x.id === id); if (r) Object.assign(r, falt); else k.rum.push({ id, namn: id, innehall: [], ...falt }); }
+        testkartor = t.kartor || {};
       }
     } catch (e) { /* ingen provscen */ }
   }
@@ -80,7 +83,7 @@ logg.registrera('skala', () => layout.skala);
 logg.registrera('ritning', () => { try { return spel.renderer.type === Phaser.CANVAS ? 'canvas' : 'webgl'; } catch (e) { return 'startar'; } });
 
 const inmatning = skapaInmatning();
-kopplaInmatning({ inmatning, layout, yta: /** @type {HTMLElement} */ (document.getElementById('ram')), logg });
+kopplaInmatning({ inmatning, layout, yta: /** @type {HTMLElement} */ (document.getElementById('ram')), logg, kamera: () => rum.kamera });
 
 const rost = skapaRost({ logg, tyst: () => snabb });
 const ljud = skapaLjud({ tyst: () => snabb });
@@ -138,6 +141,7 @@ begarBestandigLagring().then((ok) => logg.handelse('lagring', ok ? 'beständig' 
 /** @type {Record<string, import('./karna/karta.js').Karta>} */
 const kartor = Object.fromEntries(Object.entries(kartfiler).filter(([fil]) => mappAv(fil) === valt.mapp)
   .map(([fil, text]) => [fil.replace(/^.*\/|\.tmj$/g, ''), lasKarta(JSON.parse(/** @type {string} */ (text)))]));
+for (const [id, tmj] of Object.entries(testkartor)) kartor[id] = lasKarta(tmj);
 
 const spelet = skapaSpel({
   aventyr, kartor, kapitel, ordlistor, tillstand, sparning, logg, rost, ljud, ui, rum, layout, inmatning, tangentbord, bilder,
@@ -157,7 +161,7 @@ const spelet = skapaSpel({
   steg: () => spelet.steg,
   tillstand: () => tillstand,
   /** Skärmpunkt mitt på ett objekt i rummet (för att trycka på det). @param {string} id */
-  objekt: (id) => { const o = rum.ruta(id); if (!o) return null; const s = layout.skala; return { x: s.vanster + (o.x + o.b / 2) * s.cssSkala, y: s.topp + (o.y + o.h / 2) * s.cssSkala }; },
+  objekt: (id) => { const o = rum.ruta(id); if (!o) return null; return varldTillSkarm(layout.skala, rum.kamera, o.x + o.b / 2, o.y + o.h / 2); },
   rumsobjekt: () => rum.objekt.map((o) => o.id),
   pausad: () => spelet.pausad,
   /** Varianten (nivån) i pusslet som pågår, t.ex. "L2". */
@@ -173,6 +177,16 @@ const spelet = skapaSpel({
   logg: () => logg.text(),
   /** Föremålen som går att använda just nu. */
   interaktiva: () => [...rum.interaktiva],
+  /** Stigar som är spärrade med en gren. */
+  sparrade: () => [...rum.sparrade],
+  /** Står världen still (läsplattan, en reaktion, han går tillbaka)? */
+  fryst: () => !!rum.fryst,
+  /** Syns hjälten (inte bakom kurvan)? */
+  synlig: () => !!rum.hjalte?.visible,
+  /** Nivån hjälten är på (0 = marken), och om han står på en stege. */
+  niva: () => ({ niva: rum.niva, stege: rum.paStege }),
+  /** Det hjälten har på sig. */
+  lager: () => ({ ...rum.lager }),
   spel,
   /** 'webgl' eller 'canvas': hur världen ritas just nu */
   ritning: () => (spel.renderer && spel.renderer.type === Phaser.CANVAS ? 'canvas' : 'webgl'),

@@ -18,7 +18,8 @@ async function provscen(page, scen, stall, extra = {}) {
     if (fn) (0, eval)(`(${fn})`)(t);
     localStorage.setItem('ordstaven_spar', JSON.stringify(t));
   }, [scen, stall ? String(stall) : null, extra]);
-  await page.goto('./?snabb&testscen');
+  // kapitel=kap-00: provrummen har ingen karta, och kapitlet spelas ändå
+  await page.goto('./?snabb&testscen&kapitel=kap-00');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.click('.start-knapp');
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen())).toBe(scen.id);
@@ -249,6 +250,7 @@ test('kodlåset: ungen visar första tecknet, låset kontrolleras när hela orde
   await bricka(page, 'M').click();
   await expect.poll(() => page.locator('#plattan .plats.last').count(), { timeout: 8000 }).toBe(2); // H och M stannar
   expect(await page.locator('#plattan .kod-tecken-ruta.ratt').count()).toBe(2);
+  await expect(page.locator('#plattan .kod-las.skakar')).toHaveCount(0, { timeout: 8000 }); // felreaktionen är klar
   await bricka(page, 'E').click();
   await expect(page.locator('#plattan .formel-i-luften')).toHaveText('HEM', { timeout: 5000 });
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('ÖPPET.', { timeout: 10000 });
@@ -284,4 +286,201 @@ test('svinga mot rummets föremål: saken i sista kommer alltid sist', async ({ 
   const logg = await page.evaluate(() => window.__ORDSTAVEN.logg());
   expect(logg).toContain(`[svinga] lada_hornet: skattlada`);
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('HITTAT.', { timeout: 10000 });
+});
+
+// ---------------------------------------------------------------- kapitel 1:s värld (T2)
+/** En provkarta (Tiled-JSON) för ett provrum. objekt: { name, type, x, y, width, height, properties: { ... } } */
+const provkarta = (objekt, start = { x: 160, y: 180 }) => ({
+  type: 'map', width: 20, height: 12, tilewidth: 16, tileheight: 16, properties: [],
+  layers: [{ type: 'objectgroup', objects: [{ name: 'start', point: true, x: start.x, y: start.y }, ...objekt.map((o) => ({ ...o, properties: Object.entries(o.properties || {}).map(([name, value]) => ({ name, value })) }))] }],
+});
+const vidare = (page) => page.locator('#plattan .vidare.synlig').click();
+
+test('skyltar i rummet: ett ord syns i världen, en mening öppnas på läsplattan när han går dit (las_skylt väntar)', async ({ page }) => {
+  await provscen(page, { id: 't_skylt', pass: 1, rum: 'provskogen', steg: [{ typ: 'las_skylt', foremal: 'skylt_mening' }, R('Läst.')] }, null,
+    { rum: { provskogen: { innehall: ['skylt_ord', 'skylt_mening', 'sten'], skyltar: { skylt_ord: { text: 'bär' }, skylt_mening: { text: 'Följ mina skyltar.', papper: 'traskylt' } } } } });
+  await expect(page.locator('#rumsskyltar .skylt[data-objekt="skylt_ord"] .kort')).toHaveText('BÄR');
+  await expect(page.locator('#rumsskyltar .skylt[data-objekt="skylt_mening"] .mening-skylt')).toBeVisible();
+  expect(await page.locator('#plattan').isHidden()).toBe(true);
+  await page.click('#rumsskyltar .skylt[data-objekt="skylt_mening"] .kort'); // går dit
+  await expect(page.locator('#plattan .lapp.p-traskylt')).toHaveText('FÖLJ MINA SKYLTAR.', { timeout: 8000 });
+  await vidare(page);
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('LÄST.', { timeout: 8000 });
+});
+
+test('det frivilliga i rummet: buskens bär går att ta en gång medan han går någon annanstans', async ({ page }) => {
+  await provscen(page, { id: 't_fri', pass: 1, rum: 'provskogen', steg: [{ typ: 'ga_till', mal: 'sten' }, R('Framme.')] }, null,
+    { rum: { provskogen: { innehall: ['barbuske', 'sten'], frivilligt: [{ foremal: 'barbuske', steg: [{ typ: 'ge_bar', antal: 2 }] }] } } });
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.interaktiva())).toContain('barbuske');
+  const bar = () => page.evaluate(() => window.__ORDSTAVEN.tillstand().aventyr['den-gomda-dalen'].bar);
+  const fore = await bar();
+  await tryckPa(page, 'barbuske');
+  await expect(page.locator('#handknapp')).toBeVisible({ timeout: 8000 });
+  await page.keyboard.press('Space');
+  await expect.poll(bar, { timeout: 5000 }).toBe(fore + 2);
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.interaktiva())).not.toContain('barbuske');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.tillstand().aventyr['den-gomda-dalen'].frivilligt)).toContain('provskogen/barbuske');
+  await tryckPa(page, 'sten');
+  await expect(page.locator('#handknapp')).toBeVisible({ timeout: 8000 });
+  await page.keyboard.press('Space');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('FRAMME.', { timeout: 8000 });
+});
+
+test('dolda föremål: lådan syns först när steget visar den, och sedan resten av äventyret', async ({ page }) => {
+  await provscen(page, { id: 't_dold', pass: 1, rum: 'provskogen', steg: [R('Före.'), { typ: 'visa_foremal', foremal: 'lada' }, R('Efter.')] }, null,
+    { rum: { provskogen: { innehall: ['sten', { id: 'lada', dold: true }] } } });
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('FÖRE.', { timeout: 8000 });
+  expect(await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt())).not.toContain('lada');
+  await page.click('#plattan .vidare');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('EFTER.', { timeout: 8000 });
+  expect(await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt())).toContain('lada');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.tillstand().aventyr['den-gomda-dalen'].visade.provskogen)).toEqual(['lada']);
+});
+
+test('fri väg: en sidogren (frivillig scen) spelas en gång, han går själv tillbaka, och steget står kvar', async ({ page }) => {
+  test.setTimeout(60000);
+  await provscen(page, { id: 't_vag', pass: 1, rum: 'provA', steg: [{ typ: 'ga_till', mal: 'stig_provc', fri_vag: true }, R('Vidare.')] }, null, {
+    rum: { provA: { innehall: ['stig_provB', 'stig_provc'] }, provB: { innehall: ['kista', 'stig_provA'] } },
+    scener: [{ id: 't_sido', pass: 1, rum: 'provB', frivillig: true, startar_i_rum: 'provB', steg: [R('Sidogren.')] }],
+  });
+  await tryckPa(page, 'stig_provB');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('SIDOGREN.', { timeout: 8000 });
+  await page.click('#plattan .vidare');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.rumsobjekt())).toContain('kista');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.tillstand().aventyr['den-gomda-dalen'].frivilligt)).toContain('t_sido');
+  await tryckPa(page, 'stig_provA');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.rumsobjekt())).toContain('stig_provc');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('t_vag');
+  await tryckPa(page, 'stig_provc');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('VIDARE.', { timeout: 8000 });
+});
+
+test('stigarna: frågan står på skylten, valet räknas vid kurvan, felet händer bakom kurvan, och förenklingen spärrar med en gren', async ({ page }) => {
+  test.setTimeout(90000);
+  const stig = (name, x) => ({ name, type: 'utgang', x, y: 30, width: 28, height: 70, properties: { golv: true, riktning: 'upp' } });
+  const pussel = {
+    id: 't_stigar', typ: 'P1_las_och_valj', i_rummet: true, skylt: 'skylt_fraga', papper: 'traskylt', hjalp: 'ett_ord', forenkla: { efter_fel: 2 },
+    varianter: { L2: { text: 'Gå mot den höga stenen.', alternativ: [
+      { id: 'a', objekt: 'stig_a', bild: 'hog_sten', ratt: true },
+      { id: 'b', objekt: 'stig_b', bild: 'lag_sten', vid_valj: { reaktion: 'en kotte', replik: R('Plupp!') } },
+      { id: 'c', objekt: 'stig_c', bild: 'lag_rund_sten', vid_valj: { reaktion: 'en kotte till' } },
+    ] } },
+    vid_ratt: { handling: 'rätt' },
+  };
+  await provscen(page, { id: 't_stig', pass: 1, rum: 'provstigar', steg: [{ typ: 'ga_till', mal: 'skylt_fraga' }, { typ: 'pussel', pussel_id: 't_stigar' }, R('Rätt stig.')] }, null, {
+    pussel: [pussel],
+    rum: { provstigar: { innehall: ['skylt_fraga', 'stig_a', 'stig_b', 'stig_c'] } },
+    kartor: { provstigar: provkarta([{ name: 'skylt_fraga', type: 'sak', x: 136, y: 150, width: 48, height: 12 }, stig('stig_a', 30), stig('stig_b', 146), stig('stig_c', 262)], { x: 60, y: 180 }) },
+  });
+  // skylten med frågan syns som ett papper; han går dit, och den öppnas
+  await page.click('#rumsskyltar .skylt[data-objekt="skylt_fraga"] .kort');
+  await expect(page.locator('#plattan .lapp.p-traskylt')).toHaveText('GÅ MOT DEN HÖGA STENEN.', { timeout: 8000 });
+  await vidare(page);
+  await expect(page.locator('#tanke .tanke-skylt')).toBeVisible();
+  // fel stig: bakom kurvan syns han inte, och han kommer tillbaka till vägskälet
+  await tryckPa(page, 'stig_b');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('PLUPP!', { timeout: 8000 });
+  expect(await page.evaluate(() => window.__ORDSTAVEN.synlig())).toBe(false);
+  await page.click('#plattan .vidare');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.synlig())).toBe(true);
+  await expect.poll(() => page.evaluate(() => !window.__ORDSTAVEN.fryst() && window.__ORDSTAVEN.position().y > 104), { timeout: 8000 }).toBe(true);
+  // ett tryck på papperet i bubblan öppnar skylten igen
+  await page.click('#tanke .tanke-skylt');
+  await expect(page.locator('#plattan .lapp.p-traskylt')).toHaveText('GÅ MOT DEN HÖGA STENEN.', { timeout: 5000 });
+  await vidare(page);
+  // andra felet: förenklingen spärrar en prövad stig med en gren
+  await tryckPa(page, 'stig_c');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.sparrade().length), { timeout: 10000 }).toBe(1);
+  const kvar = (await page.evaluate(() => window.__ORDSTAVEN.sparrade()))[0] === 'stig_b' ? 'stig_c' : 'stig_b';
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.synlig())).toBe(true);
+  // den prövade stigen som inte är spärrad: samma sak händer igen, men det räknas inte
+  await expect.poll(() => page.evaluate(() => !window.__ORDSTAVEN.fryst() && window.__ORDSTAVEN.position().y > 104), { timeout: 8000 }).toBe(true);
+  await tryckPa(page, kvar);
+  if (kvar === 'stig_b') { await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('PLUPP!', { timeout: 8000 }); await page.click('#plattan .vidare'); }
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 8000 }).toContain('igen (räknas inte)');
+  await expect.poll(() => page.evaluate(() => !window.__ORDSTAVEN.fryst() && window.__ORDSTAVEN.position().y > 104), { timeout: 8000 }).toBe(true);
+  await tryckPa(page, 'stig_a');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('RÄTT STIG.', { timeout: 10000 });
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toMatch(/t_stigar: a .*"resultat":"klar"/);
+});
+
+test('påminnelsen: egen text efter en stund, och har han inga bär trillar ett ner först', async ({ page }) => {
+  await provscen(page, { id: 't_pam', pass: 1, rum: 'provskogen', steg: [R('{unge} är rädd.', 'berattare', { vantar_pa: 'mata_ungen', paminnelse: { efter_sek: 1, replik: R('Ge {unge} ett bär.') } }), R('Tack.')] },
+    (t) => { t.aventyr['den-gomda-dalen'].bar = 0; }, { rum: { provskogen: { innehall: ['sten'] } } });
+  await expect(page.locator('#tanke')).toHaveText('KNOPP ÄR RÄDD.', { timeout: 8000 });
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.tillstand().aventyr['den-gomda-dalen'].bar)).toBe(1);
+  await expect(page.locator('#tanke')).toHaveText('GE KNOPP ETT BÄR.', { timeout: 5000 });
+  await page.click('#hud-bar');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('TACK.', { timeout: 8000 });
+});
+
+test('höjdnivåer: han går upp för trappan själv, kanten går inte att gå över, och på stegen klättrar han med ryggen mot kameran', async ({ page }) => {
+  test.setTimeout(60000);
+  const karta = provkarta([
+    { name: 'kronet', type: 'yta', x: 80, y: 40, width: 160, height: 70, properties: { niva: 1 } },
+    { name: 'trappa', type: 'trappa', x: 110, y: 100, width: 24, height: 30 },
+    { name: 'stege', type: 'stege', x: 190, y: 100, width: 16, height: 30 },
+    { name: 'lovhog_1', type: 'sak', x: 100, y: 56, width: 20, height: 14 },
+  ], { x: 160, y: 170 });
+  await provscen(page, { id: 't_niva', pass: 1, rum: 'provkullen', steg: [{ typ: 'ga_till', mal: 'kronet' }, R('Uppe.'), { typ: 'ga_till', mal: 'lovhog_1' }, R('Löven.')] }, null,
+    { rum: { provkullen: { innehall: ['kronet', 'trappa', 'stege', 'lovhog_1'] } }, kartor: { provkullen: karta } });
+  const niva = () => page.evaluate(() => window.__ORDSTAVEN.niva());
+  const pos = () => page.evaluate(() => window.__ORDSTAVEN.position());
+  // rakt upp mot kanten: han stannar nedanför
+  await page.keyboard.down('ArrowUp'); await page.waitForTimeout(900); await page.keyboard.up('ArrowUp');
+  expect((await pos()).y).toBeGreaterThan(110);
+  expect((await niva()).niva).toBe(0);
+  // stegen: in under den, och uppåt
+  const s = await page.evaluate(() => window.__ORDSTAVEN.skala());
+  await page.mouse.click(s.vanster + 198 * s.cssSkala, s.topp + 140 * s.cssSkala);
+  await expect.poll(async () => Math.abs((await pos()).x - 198) < 3 && (await pos()).y > 130, { timeout: 5000 }).toBe(true);
+  await page.keyboard.down('ArrowUp');
+  await expect.poll(async () => (await niva()).stege, { timeout: 3000 }).toBe(true);
+  await page.keyboard.down('ArrowLeft'); await page.waitForTimeout(200); await page.keyboard.up('ArrowLeft');
+  expect(Math.abs((await pos()).x - 198)).toBeLessThan(1); // på stegen går det bara upp och ned
+  await expect.poll(async () => (await niva()).niva, { timeout: 4000 }).toBe(1);
+  await page.keyboard.up('ArrowUp');
+  expect((await niva()).stege).toBe(false);
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('UPPE.', { timeout: 8000 });
+  await page.click('#plattan .vidare');
+  // ned igen med trappan, och upp igen av sig själv när han trycker på lövhögen (vägen går över trappan)
+  await page.mouse.click(s.vanster + 122 * s.cssSkala, s.topp + 160 * s.cssSkala);
+  await expect.poll(async () => (await niva()).niva, { timeout: 6000 }).toBe(0);
+  await expect.poll(async () => (await pos()).y, { timeout: 6000 }).toBeGreaterThan(150);
+  await tryckPa(page, 'lovhog_1');
+  await expect(page.locator('#handknapp')).toBeVisible({ timeout: 8000 });
+  expect((await niva()).niva).toBe(1);
+  await page.keyboard.press('Space');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('LÖVEN.', { timeout: 8000 });
+});
+
+test('gåvor tas på direkt, pausknappen glimtar, och hjälteboken har garderoben och Dinoboken med en stjärna på det nya', async ({ page }) => {
+  await provscen(page, { id: 't_gava', pass: 1, rum: 'provskogen', steg: [
+    { typ: 'ge_sak', sort: 'hjalmdekor', id: 'taggkam' }, { typ: 'dinobok', sida: { bild: 'fossil_och_ungen', bildtext: 'fossil' } }, { typ: 'ga_till', mal: 'sten' }, R('Klart.'),
+  ] }, null, { rum: { provskogen: { innehall: ['sten'] } } });
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.lager().hjalmdekor), { timeout: 5000 }).toBe('taggkam');
+  await expect(page.locator('#hud-paus')).toBeVisible();
+  await expect(page.locator('#hud-paus')).toHaveClass(/glimt/);
+  await expect.poll(() => steg(page).then((s) => s?.typ), { timeout: 5000 }).toBe('ga_till');
+  await page.click('#hud-paus');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.pausad())).toBe(true);
+  await expect(page.locator('#pausmeny .paus-val[data-val="kartan"]')).toBeVisible();
+  await expect(page.locator('#pausmeny .paus-val[data-val="hjalteboken"]')).toHaveClass(/ny/);
+  // hjälteboken öppnas på den nya fliken: garderoben, där han kan byta tillbaka
+  await page.click('#pausmeny .paus-val[data-val="hjalteboken"]');
+  await expect(page.locator('#pausmeny .paus-val.flik.vald')).toHaveAttribute('data-val', 'garderoben');
+  await expect(page.locator('#pausmeny .paus-val[data-val="dinoboken"]')).toHaveClass(/ny/);
+  await page.click('#pausmeny .paus-garderob .sak');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.lager().hjalmdekor)).toBe(null);
+  await page.click('#pausmeny .paus-garderob .sak');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.lager().hjalmdekor)).toBe('taggkam');
+  await page.click('#pausmeny .paus-val[data-val="dinoboken"]');
+  await expect(page.locator('#pausmeny .dinosida .kort-etikett')).toHaveText('FOSSIL');
+  await expect(page.locator('#pausmeny .paus-val[data-val="dinoboken"]')).not.toHaveClass(/ny/);
+  await page.click('#pausmeny .paus-tillbaka');
+  await expect(page.locator('#pausmeny .paus-val[data-val="hjalteboken"]')).not.toHaveClass(/ny/);
+  await page.click('#pausmeny .paus-stang');
+  await expect(page.locator('#pausmeny')).toBeHidden();
+  expect(await page.evaluate(() => window.__ORDSTAVEN.pausad())).toBe(false);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.tillstand().spelare.sett)).toMatchObject({ garderoben: 1, dinoboken: 1 });
 });

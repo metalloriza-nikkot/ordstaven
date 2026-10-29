@@ -131,6 +131,37 @@
           "$ref": "kapitel.schema.json#/$defs/replik"
         }
       }
+    },
+    "gransnitt": {
+      "type": "object",
+      "description": "Orden i spelarens gränssnitt (stilguiden §6, pausmenyn): varje knapp och flik är en bild och ett ord, och ordet läses upp vid tryck. Saknas ett ord visas bara bilden.",
+      "additionalProperties": false,
+      "properties": {
+        "anteckning": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kartan": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hjalteboken": {
+          "type": "string",
+          "minLength": 1
+        },
+        "staven": {
+          "type": "string",
+          "minLength": 1
+        },
+        "garderoben": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dinoboken": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
     }
   }
 }

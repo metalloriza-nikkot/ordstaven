@@ -1,9 +1,12 @@
 // @ts-check
 import { aventyrFor } from './sparning.js';
+import { geSak } from './hjalte.js';
 // Berättelsemotorn: spelar ett kapitels scener och steg i ordning. Ren logik, inga globaler.
 // Gränssnittet hämtar aktuellt steg med `aktuellt()`, utför det och anropar `klar(resultat)`.
-// Steg som bara ändrar tillståndet (ge_bar, ge_kartbit, ge_grad, visa_ui) utförs här och
-// lämnas sedan till gränssnittet för att visas.
+// Steg som bara ändrar tillståndet (ge_bar, ge_kartbit, ge_grad, visa_ui, ge_sak, visa_foremal, dinobok,
+// unge_tillagg) utförs här och lämnas sedan till gränssnittet för att visas.
+// En frivillig scen (frivillig: true, t.ex. buskarna) spelas aldrig i tur och ordning: den startar när hjälten går
+// in i sitt rum (startar_i_rum) under en fri väg, och gränssnittet spelar den med frivilligScen().
 
 /**
  * @param {{ aventyr: any, kapitel: any, tillstand: any, aventyrId: string, logg?: { handelse(t: string, m: string, d?: any): void } }} opt
@@ -36,11 +39,17 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
   av.rumstillstand = av.rumstillstand || {};
   av.lappar = (av.lappar || []).map((/** @type {string} */ id) => nytt(alias.pussel, id)).filter((/** @type {string} */ id) => pussel.has(id));
   av.kartbitar = av.kartbitar || [];
+  /** @type {Record<string, string[]>} dolda föremål som har visats, per rum */
+  av.visade = av.visade || {};
+  /** @type {string[]} frivilliga scener och föremål som är gjorda (scenens id, eller rum/föremål) */
+  av.frivilligt = av.frivilligt || [];
   av.bar = av.bar || 0;
   // ungen hör till spelaren (sparformat 2)
   const unge = (tillstand.spelare.unge = tillstand.spelare.unge || { format: 1, namn: '', steg: 1, formagor: [] });
 
-  let scenIndex = Math.min(av.scen, kapitel.scener.length);
+  /** Första scenen från i som inte är frivillig. @param {number} i */
+  const inteFrivillig = (i) => { let j = i; while (kapitel.scener[j]?.frivillig) j++; return j; };
+  let scenIndex = inteFrivillig(Math.min(av.scen, kapitel.scener.length));
   let stegIndex = -1; // -1 = vid_omstart (om sådan finns och vi startar om)
   let omstart = scenIndex > 0 || !!av.startad;
   av.startad = true;
@@ -69,9 +78,20 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
     return av.rumstillstand[rumId] ?? (r && r.tillstand ? r.tillstand[0] : null);
   }
 
-  /** Utför stegets effekt på tillståndet (en gång, när steget blir aktuellt). @param {any} st */
-  function effekt(st) {
+  /**
+   * Utför stegets effekt på tillståndet (en gång, när steget blir aktuellt).
+   * @param {any} st @param {string | null} [rumId] rummet steget spelas i (visa_foremal)
+   */
+  function effekt(st, rumId = kapitel.scener[scenIndex]?.rum ?? null) {
     switch (st.typ) {
+      case 'ge_sak': geSak(tillstand.spelare.hjalte, st.sort, st.id); break;
+      case 'visa_foremal': if (rumId) { const v = (av.visade[rumId] = av.visade[rumId] || []); if (!v.includes(st.foremal)) v.push(st.foremal); } break;
+      case 'dinobok': {
+        const sidor = (tillstand.spelare.dinobok = tillstand.spelare.dinobok || []);
+        if (!sidor.some((/** @type {any} */ x) => x.bild === st.sida.bild)) sidor.push({ ...st.sida });
+        break;
+      }
+      case 'unge_tillagg': { const t = (unge.tillagg = unge.tillagg || []); if (!t.includes(st.id)) t.push(st.id); break; }
       case 'ge_bar': av.bar += st.antal; break;
       case 'ge_kartbit': if (!av.kartbitar.includes(st.nummer)) av.kartbitar.push(st.nummer); break;
       case 'ge_grad': tillstand.spelare.hjalte.grad = st.grad; break;
@@ -136,12 +156,27 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
       stegIndex = stegIndex === -1 ? aterupptaSteg : stegIndex + 1;
       av.steg = stegIndex;
       if (stegIndex >= scen.steg.length) {
-        scenIndex++;
+        scenIndex = inteFrivillig(scenIndex + 1);
         borjaScen();
         if (scenIndex >= kapitel.scener.length) av.scen = scenIndex;
       }
     },
 
+    /** Dolda föremål som har visats i ett rum (visa_foremal). @param {string} rumId @returns {string[]} */
+    visade(rumId) { return av.visade[rumId] || []; },
+    /**
+     * Den frivilliga scen som startar när hjälten går in i ett rum, om den inte redan är spelad.
+     * @param {string} rumId
+     */
+    frivilligScen(rumId) {
+      return kapitel.scener.find((/** @type {any} */ s) => s.frivillig && (s.startar_i_rum || s.rum) === rumId && !av.frivilligt.includes(s.id)) ?? null;
+    },
+    /** Ett frivilligt steg eller föremål utanför scenernas ordning (rum.frivilligt, en frivillig scen). Effekten görs här. @param {any} st @param {string | null} rumId */
+    effektUtanfor(st, rumId) { effekt(st, rumId); },
+    /** Är det frivilliga (scenens id, eller rum/föremål) gjort? @param {string} id */
+    frivilligtGjort(id) { return av.frivilligt.includes(id); },
+    /** Det frivilliga är gjort, och görs inte igen. @param {string} id */
+    frivilligtKlart(id) { if (!av.frivilligt.includes(id)) av.frivilligt.push(id); },
     /** Hoppa till en scen (gråboxens meny). @param {number} i */
     hoppaTill(i) { scenIndex = Math.max(0, Math.min(kapitel.scener.length - 1, i)); effektGjord = false; omstart = false; borjaScen(); },
   };

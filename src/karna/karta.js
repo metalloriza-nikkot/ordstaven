@@ -14,6 +14,9 @@
 // Punkter som heter "lampa" (eller lampa_…) lyser när rummet är mörkt, t.ex. en läslampa vid Farfars plats.
 // "last_i" på en utgång (tillstånd med komma emellan, t.ex. natt): utgången är låst då, och hjälten känner på
 // handtaget (ytterdörren på natten). Kartans "morker" (0–1) säger hur mörkt rummet är på natten (annars 0,72).
+// Höjdnivåer: en ruta med typen "yta" och egenskapen "niva" (1, 2 …) är upphöjd (kullen, krönet), och dess kanter
+// går inte att gå över. En ruta med typen "trappa" eller "stege" förbinder nivåerna och ska ligga över kanten.
+// Saker på ytan (lövhögarna) når han bara uppifrån. Se karna/nivaer.js.
 import { RUM } from './skalning.js';
 import { VAGG } from './rumslayout.js';
 
@@ -34,11 +37,13 @@ const RIKTNINGAR = new Set(['vanster', 'hoger', 'upp', 'ned']);
 export const innehallsId = (x) => (typeof x === 'string' ? x : x.id);
 
 /**
- * Föremålen som syns i ett visst tillstånd av rummet.
- * @param {(string | { id: string, syns_i?: string[] })[]} innehall @param {string | null} tillstand
+ * Föremålen som syns i ett visst tillstånd av rummet. Ett dolt föremål (dold: true, t.ex. lådan under löven)
+ * syns först när ett steg har visat det (visa_foremal), och sedan resten av äventyret.
+ * @param {(string | { id: string, syns_i?: string[], dold?: boolean })[]} innehall @param {string | null} tillstand
+ * @param {string[]} [visade] dolda föremål som har visats
  */
-export function synligaIds(innehall, tillstand) {
-  return innehall.filter((x) => typeof x === 'string' || !x.syns_i || (tillstand !== null && x.syns_i.includes(tillstand))).map(innehallsId);
+export function synligaIds(innehall, tillstand, visade = []) {
+  return innehall.filter((x) => typeof x === 'string' || ((!x.syns_i || (tillstand !== null && x.syns_i.includes(tillstand))) && (!x.dold || visade.includes(x.id)))).map(innehallsId);
 }
 
 /** Sort efter id när kartan inte säger något. @param {string} id @returns {Objekt['sort']} */
@@ -77,8 +82,10 @@ export function lasKarta(tmj) {
       const ut = {
         id: o.name,
         x: Math.round(o.x), y: Math.round(o.y), b: Math.round(o.width), h: Math.round(o.height),
-        sort: typ === 'utgang' || typ === 'sak' || typ === 'figur' ? typ : sortFor(o.name),
+        sort: typ === 'utgang' || typ === 'sak' || typ === 'figur' ? typ : typ === 'yta' || typ === 'trappa' || typ === 'stege' ? 'yta' : sortFor(o.name),
       };
+      if (typ === 'yta') ut.niva = Math.max(1, Math.round(Number(egen.niva) || 1));
+      if (typ === 'trappa' || typ === 'stege') ut.forbinder = typ;
       if (egen.till) ut.till = String(egen.till);
       if (SIDOR.has(egen.sida)) ut.sida = egen.sida;
       if (egen.golv) ut.golv = true;

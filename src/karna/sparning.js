@@ -56,6 +56,10 @@ export const MIGRERINGAR = {
       h.garderob = h.garderob || [];
       h.format = 2;
     }
+    // hjälteboken: Dinobokens sidor, ungens tillägg och vad han har tittat på (stjärnan på en ny flik)
+    d.spelare.dinobok = d.spelare.dinobok || [];
+    d.spelare.sett = d.spelare.sett || {};
+    if (d.spelare.unge) d.spelare.unge.tillagg = d.spelare.unge.tillagg || [];
     d.format = 4;
     return d;
   },
@@ -75,7 +79,10 @@ export function nyttTillstand(spelversion, klocka = () => new Date()) {
       // garderob = allt han har hittat att ha på sig
       hjalte: { format: HJALTE_FORMAT, id: slumpId(), namn: '', utseende: {}, lager: { hjalmdekor: null, ryggsack: null }, garderob: [], grad: null, formler: [] },
       // ungen hör till spelaren: namn, växtsteg och förmågor står öppna för nästa äventyr
-      unge: { format: UNGE_FORMAT, namn: '', steg: 1, formagor: [] },
+      unge: { format: UNGE_FORMAT, namn: '', steg: 1, formagor: [], tillagg: [] },
+      // hjälteboken: Dinobokens sidor ({ bild, bildtext }) och hur mycket av varje flik han har sett
+      dinobok: [],
+      sett: {},
       larande: { lasning: {}, skrivning: {}, ord: {}, matte: {}, historik: [] },
     },
     // ett äventyr läggs till första gången det spelas (aventyrFor)

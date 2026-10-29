@@ -1,7 +1,7 @@
 # Innehållsschema – kapitel i format 2
 
 Version 2.8 (2026-10-29). Ägs av teknikspåret.
-2.8: kapitel 1:s steg och fält (T2). Rummen får `skyltar` (text som står i världen, beslut 15.2), `frivilligt` (föremål som ger något en gång) och `dold` på föremål. Scenerna får `frivillig` och `startar_i_rum`. Nya steg: `las_skylt`, `visa_foremal`, `ge_sak`, `dinobok`, `unge_tillagg`, `fri_vag` på `ga_till` och `paminnelse` på repliker som väntar. Pusslen: `skylt` på läs och välj, titta–täck i formeln, brickor och kasta-läge i räddningen, kodlåsets kontroll, och svingning mot rummets föremål i P26. Allt är tillägg, filer i 2.7 gäller fortfarande.
+2.8: kapitel 1:s steg och fält (T2). Rummen får `skyltar` (text som står i världen, beslut 15.2), `frivilligt` (föremål som ger något en gång) och `dold` på föremål. Scenerna får `frivillig` och `startar_i_rum`. Nya steg: `las_skylt`, `visa_foremal`, `ge_sak`, `dinobok`, `unge_tillagg`, `fri_vag` på `ga_till` och `paminnelse` på repliker som väntar. Pusslen: `skylt` på läs och välj, titta–täck i formeln, brickor och kasta-läge i räddningen, kodlåsets kontroll, och svingning mot rummets föremål i P26. `gransnitt` i `aventyr.json` (orden i pausmenyn). Kartorna får höjdnivåer (`yta`, `trappa`, `stege`), och en stig slutar vid kurvan. Allt är tillägg, filer i 2.7 gäller fortfarande, utom `skapa_hjalte`: `delar` är nu `hudfarg` och `drakt` (hjältens form är fast, prologen är omskriven).
 2.7: kartans `last_i` (en utgång är låst i ett tillstånd) och `morker` (hur mörkt rummet är på natten). Räckvidden: saker, figurer och stegar nås från alla håll inom ca 1,5 rutor, och bara den närmaste är aktiv. Kapitelfilerna är oförändrade.
 2.6: `vantar_pa: "nosen"` och `vid: "ungen"` på replik-steget (och `vantar_pa`, `via`, `vid` gäller bara repliker som är egna steg), `nos_demo` görs av spelaren, `sparpunkt_fraga` i `aventyr.json`, `kalla` får vara fyra korta ord. Tillägg.
 2.5: stegen `bara`, `prata` och `ta_emot`; `vantar_pa` och `via` på repliker; `vid_annan_utgang` på `ga_till`; `fraga` på `sparpunkt`; kartans `vagg_bak`, `vagg_sida`, `vagg_fram` och `talare`. Tillägg.
@@ -18,7 +18,7 @@ Schemafilerna finns i `content/schema/`. Kontrollen körs med `npm run kontroll`
 | Fil | Innehåll | Schema |
 |---|---|---|
 | `content/ordlistor.json` | Ordlistor 1–6, flaggor, förbjudna par | `ordlistor.schema.json` |
-| `content/<äventyr>/aventyr.json` | Titel, talare, platshållare, kapitelordning, `sluta_for_idag`, `sparpunkt_fraga` (frågan vid varje sparpunkt) | `aventyr.schema.json` |
+| `content/<äventyr>/aventyr.json` | Titel, talare, platshållare, kapitelordning, `sluta_for_idag`, `sparpunkt_fraga` (frågan vid varje sparpunkt), `gransnitt` (orden i pausmenyn) | `aventyr.schema.json` |
 | `content/<äventyr>/kap-00.json` … `kap-07.json` | Ett kapitel: rum, scener, pussel | `kapitel.schema.json` |
 
 Kapitelfilerna börjar med `"format": 2`, äventyret och ordlistorna med `"format": 1`. Ändras formatet höjs numret, och teknik skriver om gamla filer. En kapitelfil i format 1 godtas inte längre: byt `P27_packa` mot `P28_packa` och `format` mot 2.
@@ -204,9 +204,18 @@ Innehållet säger **vad** som finns i ett rum, kartan säger **var** det står.
 - **Kartans egenskap `inomhus`** ger rummet en väggram: bakvägg 3 rutor, sidoväggar 2, främre kant 1. Dörrar sitter i väggarna och möbler står längs dem. Egenskaperna `vagg_bak`, `vagg_sida` och `vagg_fram` (pixlar) ger andra mått, t.ex. den smala hallen med tjocka sidoväggar.
 - En **punkt** som heter `lampa` (eller `lampa_…`) lyser varmt när rummet är mörkt, t.ex. läslampan vid Farfars plats i köket.
 - En **punkt** med namnet `start` är där hjälten står när han inte kommer genom en utgång (första gången, eller efter en omstart). En punkt `in_<rum>` är där han kommer in från ett rum som inte har någon utgång hit (t.ex. trädgården från hallen).
-- Saknas kartan placeras föremålen automatiskt i ett rutnät (kapitel 1 tills vidare).
+- **Stigar** (granskningen, punkt 16): en stig är en utgång med `golv` och `riktning`, och rutan går från vägskälet till **kurvan**, där stigen försvinner bakom buskarna, inte ända till kanten. Valet räknas när han når kurvan. En fel stig leder aldrig vidare: bakom kurvan händer felet (han syns inte), och sedan kommer han tillbaka till vägskälet. Går han samma prövade stig igen händer samma sak, utan att räknas. Förenklingen spärrar prövade stigar med en gren tvärs över stigens början.
+- **Höjdnivåer** (A Link to the Past): en ruta med typen `yta` och egenskapen `niva` (1, 2 …) är upphöjd, t.ex. kullen med krönet. Kanterna går inte att gå över. En ruta med typen `trappa` eller `stege` förbinder nivåerna och ska ligga över kanten, med en bit på varje nivå. På trappan går han som vanligt, på stegen klättrar han upp och ned med ryggen mot kameran (ungen väntar och skuttar efter). Saker på ytan (lövhögarna) når han bara uppifrån. Ett tryck på något på en annan nivå går över närmaste trappa eller stege. Ett `ga_till` till en yta (`kronet`) är klart när han står på den.
+- Saknas kartan placeras föremålen automatiskt i ett rutnät (kapitel 1 tills vidare). En utgång leder då till rummet i sitt id (`stig_buskarna` → `buskarna`) om det rummet finns.
 
 Kontrollen säger fel om ett föremål saknas i kartan, om kartan har föremål som inte finns i rummet, om något går utanför rummet, om en utgång leder till ett rum som inte finns eller saknar `riktning`, om `klattra` står på något som inte är en utgång, om `lapp` pekar på ett föremål som inte finns i rummet och om `in_<rum>` inte är ett rum. Ett enhetstest kontrollerar att varje föremål går att nå från varje ingång i varje tillstånd.
+
+### Pausmenyn: `gransnitt` i aventyr.json
+Pausmenyn har två bildknappar, KARTAN och HJÄLTEBOKEN, och hjälteboken har flikarna staven, garderoben och Dinoboken (stilguiden §6). Varje knapp och flik är en bild och ett ord, och ordet läses upp vid tryck. Orden står i `aventyr.json`:
+```json
+"gransnitt": { "kartan": "kartan", "hjalteboken": "hjälteboken", "staven": "staven", "garderoben": "garderoben", "dinoboken": "Dinoboken" }
+```
+Saknas ett ord visas bara bilden. Det som står på sidorna kommer från sparningen: formlerna (staven), sakerna hjälten har hittat (`ge_sak`, garderoben), Dinobokens sidor (`dinobok`) och kartbitarna.
 
 ## 4. Ordlistor
 

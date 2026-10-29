@@ -23,8 +23,10 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
       <button type="button" id="hud-lapp" class="hud-knapp" hidden aria-label="Lappen"><span class="ikon">📜</span></button>
       <span id="hud-radio" class="hud-knapp" hidden><span class="ikon">📻</span></span>
     </div>
+    <button type="button" id="hud-paus" class="hud-knapp" hidden aria-label="Paus"><span class="ikon paus-ikon" aria-hidden="true"><i></i><i></i></span></button>
     <button type="button" id="hud-meny" aria-label="Meny för vuxna (håll inne)">⚙</button>
     <div id="tanke" hidden></div>
+    <div id="rumsskyltar"></div>
     <div id="skyltar"></div>
     <div id="rop" hidden></div>
     <div id="ordskylt" hidden></div>
@@ -36,6 +38,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     <div id="remsa" hidden></div>
     <div id="fest" hidden></div>
     <div id="skarm" hidden></div>
+    <div id="pausmeny" hidden></div>
     <div id="vuxenmeny" hidden></div>`;
   document.body.appendChild(ui);
   const $ = (/** @type {string} */ s) => /** @type {HTMLElement} */ (ui.querySelector(s));
@@ -92,7 +95,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
   /** Tänd nosen utan klick (nos_demo: den är redan tänd när lappen öppnas). */
   function tandNos() { if (!nos.tillaten) return; nos.aktiv = true; ui.classList.add('nosar'); }
   /** Orden nosen kan läsa just nu, i ordning: läsplattan, tankebubblan, lappen vid föremålet, skyltarna. */
-  const synligaOrd = () => /** @type {HTMLElement[]} */ ([...ui.querySelectorAll('#plattan .ord, #tanke .ord, #ordskylt .ord, #skyltar .ord')])
+  const synligaOrd = () => /** @type {HTMLElement[]} */ ([...ui.querySelectorAll('#plattan .ord, #tanke .ord, #ordskylt .ord, #skyltar .ord, #rumsskyltar .ord')])
     .filter((e) => e.getClientRects().length > 0 && !e.closest('[hidden]') && !e.closest('.provad'));
   /** Tab: markera nästa ord (det första när nosen just tänts). @returns {boolean} om det fanns något ord */
   function markeraNasta() {
@@ -238,6 +241,9 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
   /** Menyn för vuxna ligger över allt annat, även startskärmen, och rör inte spelets skärmar. @param {string} html */
   function visaMeny(html) { const m = $('#vuxenmeny'); m.innerHTML = html; m.hidden = false; return m; }
   function doljMeny() { const m = $('#vuxenmeny'); m.hidden = true; m.innerHTML = ''; }
+  /** Spelarens pausmeny (kartan och hjälteboken). @param {string} html */
+  function visaPausmeny(html) { const m = $('#pausmeny'); m.innerHTML = html; m.hidden = false; return m; }
+  function doljPausmeny() { const m = $('#pausmeny'); m.hidden = true; m.innerHTML = ''; }
 
   /** Etiketter över rummets objekt (gråbox, för den vuxne). @param {{ id: string, x: number, y: number, b: number }[]} objekt @param {(x: number, y: number) => { x: number, y: number }} tillSkarm @param {boolean} visa */
   function etiketter(objekt, tillSkarm, visa) {
@@ -291,8 +297,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
    * och gå raka vägen. Ett tryck på en skylt går igenom. Den han står vid får handen (klassen nara).
    * @param {{ objekt: string, html: string, punkt: { x: number, y: number }, plats: Plats, vidTryck: () => void }[]} lista
    */
-  function skyltar(lista) {
-    const e = $('#skyltar');
+  function skyltar(lista, e = $('#skyltar')) {
     e.innerHTML = '';
     for (const s of lista) {
       const d = document.createElement('div');
@@ -301,6 +306,17 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
       placera(d, s.punkt, { ...s.plats, objekt: s.objekt });
       d.querySelector('button')?.addEventListener('click', () => { if (!nos.aktiv) s.vidTryck(); });
     }
+  }
+  /**
+   * Rummets egna skyltar och tavlor (rum.skyltar: BÄR, BRON, Farfars skyltar). De står i världen hela tiden, som
+   * utgångarnas skyltar, men utanför valen. @param {Parameters<typeof skyltar>[0]} lista
+   */
+  function rumsskyltar(lista) { skyltar(lista, $('#rumsskyltar')); }
+  /** En rumsskylt glimtar (knuff: "skylten glimtar"). @param {string} objekt */
+  function pulseraSkylt(objekt) {
+    const d = /** @type {HTMLElement | null} */ (ui.querySelector(`#rumsskyltar .skylt[data-objekt="${CSS.escape(objekt)}"]`));
+    if (!d) return;
+    d.classList.remove('puls'); void d.offsetWidth; d.classList.add('puls');
   }
   /**
    * En figur kallar på hjälten på avstånd (högst tre ord): en pratbubbla ovanför figuren. null döljer.
@@ -409,9 +425,9 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     styrhjalp,
     flygBar,
     handknapp,
-    visaTanke, pulseraTanke, ordskylt, skyltar, skyltNara, ropa,
+    visaTanke, pulseraTanke, ordskylt, skyltar, rumsskyltar, pulseraSkylt, skyltNara, ropa,
     ui, $, plattan, rader, esc, visaPlatta, doljPlatta, vantaFortsatt, visaRegi, doljRegi, visaFest,
-    uppdateraHud, pulsera, visaSkarm, doljSkarm, visaMeny, doljMeny, etiketter, sattNos, vaxlaNos, ljuda, arHelord,
+    uppdateraHud, pulsera, visaSkarm, doljSkarm, visaMeny, doljMeny, visaPausmeny, doljPausmeny, etiketter, sattNos, vaxlaNos, ljuda, arHelord,
     fanga, tandNos, markeraOrd,
     /** @param {(vad: 'tand' | 'ord', ord?: string) => void} f @returns {() => void} */
     vidNos(f) { nosLyssnare.add(f); return () => nosLyssnare.delete(f); },

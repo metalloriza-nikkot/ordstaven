@@ -41,3 +41,29 @@ export function skarmTillRum(skala, x, y) {
 export function rumTillSkarm(skala, x, y) {
   return { x: skala.vanster + x * skala.cssSkala, y: skala.topp + y * skala.cssSkala };
 }
+
+/**
+ * Kameran (beslut 14): ett rum kan bli större än skärmen, och då visar skärmen en bit av världen. Kamerans läge är
+ * världspunkten i skärmens övre vänstra hörn, i hela pixlar. Textlagret räknar alltid med den, så att en skylt eller
+ * en pratbubbla sitter kvar på sitt föremål när kameran rör sig. I kapitel 1 ryms rummen på en skärm: läget är (0, 0).
+ * @typedef {{ x: number, y: number }} Kamera
+ */
+
+/**
+ * Världskoordinat → skärmkoordinat, via kameran.
+ * @param {{ cssSkala: number, vanster: number, topp: number }} skala @param {Kamera} kamera
+ * @param {number} x @param {number} y
+ */
+export function varldTillSkarm(skala, kamera, x, y) {
+  return rumTillSkarm(skala, x - Math.round(kamera.x), y - Math.round(kamera.y));
+}
+
+/**
+ * Skärmkoordinat → världskoordinat, via kameran. inne = trycket var inne i bilden av rummet.
+ * @param {{ cssSkala: number, vanster: number, topp: number }} skala @param {Kamera} kamera
+ * @param {number} x @param {number} y
+ */
+export function skarmTillVarld(skala, kamera, x, y) {
+  const p = skarmTillRum(skala, x, y);
+  return { x: p.x + Math.round(kamera.x), y: p.y + Math.round(kamera.y), inne: p.x >= 0 && p.y >= 0 && p.x < RUM.bredd && p.y < RUM.hojd };
+}

@@ -14,11 +14,15 @@ const MAX = { x: RUM.bredd - FIGUR.bredd / 2, y: RUM.hojd };
 /** @typedef {{ x: number, y: number, b: number, h: number }} Ruta */
 /** @typedef {{ x: number, y: number }} Punkt */
 
-/** @param {Ruta[]} hinder */
-export function skapaHinder(hinder) {
+/**
+ * @param {Ruta[]} hinder
+ * @param {(p: Punkt) => boolean} [tillaten] en regel till för var fötterna får stå (höjdnivåerna: kanten på kullen)
+ */
+export function skapaHinder(hinder, tillaten = () => true) {
   /** Är punkten (fötterna) fri? @param {Punkt} p */
   const fri = (p) => {
     if (p.x < MIN.x - 0.01 || p.x > MAX.x + 0.01 || p.y < MIN.y - 0.01 || p.y > MAX.y + 0.01) return false;
+    if (!tillaten(p)) return false;
     const v = p.x - FOT.b / 2, h = p.x + FOT.b / 2, o = p.y - FOT.h, n = p.y;
     for (const r of hinder) if (h > r.x && v < r.x + r.b && n > r.y && o < r.y + r.h) return false;
     return true;
