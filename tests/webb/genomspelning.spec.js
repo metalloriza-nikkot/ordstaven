@@ -266,10 +266,13 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
         expect(krock, `skyltarna i ${p.id}`).toBeNull();
         if (dumpa && !sparadeDumpar.has(`${nyckel}-lapp`)) { sparadeDumpar.add(`${nyckel}-lapp`); await page.screenshot({ path: `tests/skarmdumpar/prolog/${String(sparadeDumpar.size).padStart(2, '0')}-${nyckel}-lapp.png` }); }
         // ett tryck på dörren (iPad och dator) eller på skylten (Safari) går rakt igenom
+        // världen ska gå igen (efter en fel stig går han tillbaka till vägskälet): ett tryck medan den står still glöms
+        await page.waitForFunction(() => !window.__ORDSTAVEN.fryst(), null, { timeout: 10000 });
         if (satt === 'hand') await skylt.click(); else await page.mouse.click(pt.x, pt.y);
       } else {
         // föremål: närlappen syns när han står vid det. Står han redan där går nästa tryck igenom: tryck inte då
         await page.waitForTimeout(150);
+        await page.waitForFunction(() => !window.__ORDSTAVEN.fryst(), null, { timeout: 10000 });
         const redan = await page.locator(`:is(#ordskylt, #handknapp)[data-objekt="${a.objekt}"]`).isVisible();
         if (!redan) await page.mouse.click(pt.x, pt.y);
         // ord: närlappen visar ordet. Utan ord (lådornas färg): handen. Vänta på just det här föremålets lapp:

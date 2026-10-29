@@ -1158,7 +1158,8 @@ export function skapaSpel(d) {
           }
           // förenklingen kan ha tagit bort alternativ: lådor blir tomma, dörrar och stigar spikas igen
           for (const a of /** @type {any[]} */ (Object.values(p.varianter).flatMap((x) => /** @type {any} */ (x).alternativ))) {
-            if (!v.s.alternativ.some((x) => x.id === a.id) && a.objekt) { if (arUtgang(a.objekt)) rum.spika(a.objekt); else rum.tomt(a.objekt); }
+            // bara föremål som inget kvarvarande alternativ använder (samma stig kan stå i flera varianter med olika id)
+            if (!v.s.alternativ.some((x) => x.id === a.id) && a.objekt && !v.s.alternativ.some((x) => x.objekt === a.objekt)) { if (arUtgang(a.objekt)) rum.spika(a.objekt); else rum.tomt(a.objekt); }
           }
           // varianten kan ha bytts (förenkling): lådorna visar de nya alternativens färg och storlek
           for (const a of v.s.alternativ) { const e = egenskaper(a.bild || a.id); if (a.objekt && (e.farg || e.storlek)) rum.visaDelar(a.objekt, delarAv([a])); }

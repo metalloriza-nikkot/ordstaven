@@ -28,6 +28,8 @@ const R = (text, talare = 'berattare', extra = {}) => ({ typ: 'replik', talare, 
 const steg = (page) => page.evaluate(() => window.__ORDSTAVEN.steg());
 const tryckPa = async (page, id) => {
   await expect.poll(() => page.evaluate((m) => !!window.__ORDSTAVEN.objekt(m), id), { timeout: 5000 }).toBe(true);
+  // ett tryck medan världen står still glöms (som i spelet): vänta tills den går
+  await page.waitForFunction(() => !window.__ORDSTAVEN.fryst(), null, { timeout: 10000 });
   const o = await page.evaluate((m) => window.__ORDSTAVEN.objekt(m), id); await page.mouse.click(o.x, o.y);
 };
 
@@ -217,6 +219,7 @@ test('räddningen: ett tryck i taget, fel tonas ut, och kasta-läget skriver res
   expect(await page.locator('#plattan .stav-knapp').count()).toBe(0);
   await bricka(page, 'O').click();
   await expect(bricka(page, 'O')).toHaveClass(/tonad/, { timeout: 5000 });
+  await expect(page.locator('#regi')).toBeHidden({ timeout: 5000 }); // felreaktionen är klar
   await bricka(page, 'E').click();
   await expect.poll(() => page.locator('#plattan .plats.last').count(), { timeout: 5000 }).toBe(2); // E fyller två fält
   // staven lyser efter första rätta bokstaven: kasta-läget
@@ -267,6 +270,7 @@ test('titta–täck: förebilden tonas bort vid första brickan och tänds igen 
   await expect(page.locator('#plattan .unge-tacker')).toBeVisible();
   for (const b of 'DRVÄ') await bricka(page, b).click(); // SDRVÄ: fel
   await expect(page.locator('#plattan .forebild')).not.toHaveClass(/tonad/, { timeout: 8000 });
+  await expect(page.locator('#plattan .platser.skakar')).toHaveCount(0, { timeout: 8000 }); // felreaktionen är klar
   // förebilden står kvar resten av försöket
   for (const b of 'VÄRD') await bricka(page, b).click();
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('SVÄRDET!', { timeout: 10000 });

@@ -102,6 +102,8 @@ export class Rum extends Phaser.Scene {
     this.niva = 0;
     /** @type {Map<number, ReturnType<typeof skapaHinder>>} hindren på varje nivå */
     this.hinderPer = new Map([[0, this.hinder]]);
+    /** @type {{ x: number, y: number, t: number } | null} ett tryck medan världen stod still, som görs när den går igen */
+    this.sparatTryck = null;
     /** Står han på en stege mellan nivåerna (styrbar klättring)? */
     this.paStege = false;
     /** @type {{ x: number, y: number }[]} vägen hjälten går just nu */
@@ -128,27 +130,39 @@ export class Rum extends Phaser.Scene {
     this.malKors.fillStyle(FARG.markerad).fillRect(-3, 0, 7, 1).fillRect(0, -3, 1, 7);
     // tryck på ett objekt = gå fram till det
     this.b.inmatning.lyssna((h) => {
-      if (h.typ !== 'tryck' || !this.harRum || this.fryst || this.klattrar) return;
-      // närmaste objekt vars ruta (med lite marginal) innehåller trycket. En yta (kullen, trappan) är golv:
-      // ett tryck där går dit, som på golvet.
-      const traffar = this.objekt.filter((x) => x.sort !== 'yta' && h.x >= x.x - 4 && h.x <= x.x + x.b + 4 && h.y >= x.y - 4 && h.y <= x.y + x.h + 4);
-      const avst = (/** @type {any} */ x) => Math.hypot(h.x - (x.x + x.b / 2), h.y - (x.y + x.h / 2));
-      const o = traffar.sort((a, c) => avst(a) - avst(c))[0];
-      if (!o) return;
-      // står hjälten redan vid föremålet, och det är det aktiva, räknas trycket som att använda det.
-      // Är det en annan sak än den aktiva går han närmare den, så att den blir aktiv.
-      if (vidObjekt(this.pos, o) && this.tryckPa && this.tryckPa(o.id)) return;
-      // dialogregeln: ett tryck på en figur upprepar dess senaste instruktion (fråga igen)
-      if (o.sort === 'figur' && this.fragaIgen?.(o)) return;
-      const f = this.malFor?.(o) ?? framforFran(o, this.pos, this.inomhus, this.vagg); this.b.inmatning.sattGaTill(f.x, f.y);
+      if (h.typ !== 'tryck') return;
+      // ett tryck medan världen står still (rummet tonas in, en reaktion, han går tillbaka från kurvan) sparas
+      // en kort stund och görs när världen går igen, som ett vanligt tryck. Annars skulle han senare gå till
+      // själva tryckpunkten i stället för till föremålet.
+      if (this.fryst || this.klattrar) { this.b.inmatning.rensaGaTill(); this.sparatTryck = { x: h.x, y: h.y, t: performance.now() }; return; }
+      this.sparatTryck = null;
+      this.trycktPa(h);
     });
     /** @type {{ hjalmdekor: string | null, ryggsack: string | null }} det han har på sig */
-    this.lager = { hjalmdekor: null, ryggsack: null };
+    this.lager = this.lager || { hjalmdekor: null, ryggsack: null };
     this.sattUtseende({});
     this.ritaUnge();
     this.ritaGolv(false);
     this._redo?.();
   }
+
+  /** Ett tryck i rummet: på ett föremål går han dit (eller använder det), på golvet går han dit. @param {{ x: number, y: number }} h */
+  trycktPa(h) {
+    if (!this.harRum) return;
+    // närmaste objekt vars ruta (med lite marginal) innehåller trycket. En yta (kullen, trappan) är golv:
+    // ett tryck där går dit, som på golvet.
+    const traffar = this.objekt.filter((x) => x.sort !== 'yta' && h.x >= x.x - 4 && h.x <= x.x + x.b + 4 && h.y >= x.y - 4 && h.y <= x.y + x.h + 4);
+    const avst = (/** @type {any} */ x) => Math.hypot(h.x - (x.x + x.b / 2), h.y - (x.y + x.h / 2));
+    const o = traffar.sort((a, c) => avst(a) - avst(c))[0];
+    if (!o) return;
+    // står hjälten redan vid föremålet, och det är det aktiva, räknas trycket som att använda det.
+    // Är det en annan sak än den aktiva går han närmare den, så att den blir aktiv.
+    if (vidObjekt(this.pos, o) && this.tryckPa && this.tryckPa(o.id)) return;
+    // dialogregeln: ett tryck på en figur upprepar dess senaste instruktion (fråga igen)
+    if (o.sort === 'figur' && this.fragaIgen?.(o)) return;
+    const f = this.malFor?.(o) ?? framforFran(o, this.pos, this.inomhus, this.vagg); this.b.inmatning.sattGaTill(f.x, f.y);
+  }
+
 
   /** @param {boolean} rum */
   ritaGolv(rum) {
@@ -651,6 +665,11 @@ export class Rum extends Phaser.Scene {
   update(_t, dtMs) {
     const inm = this.b.inmatning;
     if (!this.harRum || this.fryst || this.klattrar) return;
+    // ett tryck medan världen stod still görs nu, om det var nyss (högst 1,5 s sedan)
+    if (this.sparatTryck) {
+      const t = this.sparatTryck; this.sparatTryck = null;
+      if (performance.now() - t.t <= 1500) { inm.sattGaTill(t.x, t.y); this.trycktPa(t); }
+    }
     const mal = inm.gaTillMal();
     const riktning = inm.riktning();
     /** @type {{ x: number, y: number, framme: boolean }} */
