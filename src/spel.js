@@ -2005,6 +2005,14 @@ export function skapaSpel(d) {
         continue;
       }
       if (!stodsAvGrabox(kapitel)) break;
+      // den vuxne hoppade till en scen mitt i kapitlet (menyn): scenerna före den spolas fram, så att ungen,
+      // knapparna, formlerna och det som har visats finns där, som efter en vanlig genomspelning
+      if (av.spolaTill && av.kapitelId === kapitel.id) {
+        const dop = spolaFram({ kapitel, tillstand, aventyrId: AVENTYR, tillScen: av.spolaTill });
+        logg.handelse('berättelse', `spolat fram ${kapitel.id} till ${av.spolaTill}`);
+        dopAttFraga = [...dopAttFraga, ...dop.filter((p) => !dopAttFraga.includes(p))];
+        delete av.spolaTill; spara();
+      }
       b = skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId: AVENTYR, logg });
       // namnen som saknas frågas efter först, med de hoppade kapitlens egna dop-pussel, med rummet bakom
       if (dopAttFraga.length) await visaScen();
@@ -2065,7 +2073,9 @@ export function skapaSpel(d) {
   function oppnaMeny() {
     pausa('meny');
     const niva = lasmotor.niva('L', 'P1_las_och_valj');
-    const scener = !b ? '' : b.kapitel.scener.map((/** @type {any} */ s, i) => `<button type="button" class="menyval scen ${i === b.scenIndex ? 'nu' : ''}" data-i="${i}">${i + 1}. ${ui.esc(s.id)} <small>(pass ${s.pass})</small></button>`).join('');
+    // alla kapitlens scener: ett hopp till ett senare kapitel eller en senare scen spolar fram det som kommer före
+    const scener = aventyr.kapitel.map((/** @type {string} */ kid) => d.kapitel.find((k) => k.id === kid)).filter(Boolean).map((/** @type {any} */ k) =>
+      `<div class="kapitelrad"><small>${ui.esc(k.id)}</small>${k.scener.map((/** @type {any} */ s, i) => `<button type="button" class="menyval scen ${b && b.kapitel.id === k.id && i === b.scenIndex ? 'nu' : ''}" data-kapitel="${ui.esc(k.id)}" data-i="${i}">${i + 1}. ${ui.esc(s.id)} <small>(pass ${s.pass})</small></button>`).join('')}</div>`).join('');
     const s = ui.visaMeny(`<div class="meny vuxen"><h2>Gråboxen <small>${ui.esc(String(d.version))}</small></h2>
       <div class="menygrupp"><b>Läsnivå (läs och välj):</b> ${[1, 2, 3, 4].map((n) => `<button type="button" class="menyval niva ${n === niva ? 'nu' : ''}" data-n="${n}">L${n}</button>`).join('')}</div>
       <div class="menygrupp"><label><input type="checkbox" class="foralder" ${inst.foralderLaser ? 'checked' : ''}> Föräldern läser ${ui.esc(Object.values(aventyr.talare).filter((/** @type {any} */ t) => t.rost === 'foraldern_eller_datorrost').map((/** @type {any} */ t) => t.namn).join(' och ') || 'rollernas')} repliker</label>
@@ -2077,7 +2087,13 @@ export function skapaSpel(d) {
     s.querySelector('.etiketter')?.addEventListener('change', (e) => { inst.vuxenEtiketter = /** @type {HTMLInputElement} */ (e.target).checked; spara(); visaEtiketter(); });
     s.querySelectorAll('.scen').forEach((el) => el.addEventListener('click', () => {
       const i = Number(/** @type {HTMLElement} */ (el).dataset.i);
-      av.scen = i; av.scenId = b.kapitel.scener[i]?.id; av.startad = false; spara();
+      const k = d.kapitel.find((x) => x.id === /** @type {HTMLElement} */ (el).dataset.kapitel);
+      if (!k) return;
+      // kapitlen före spolas fram (av.spolat töms, spolningen gör inget två gånger), och kapitlets scener före hoppet
+      av.kapitelId = k.id; av.scen = i; av.scenId = k.scener[i]?.id; delete av.steg; av.startad = false;
+      av.spolat = []; av.spolaTill = av.scenId;
+      logg.handelse('meny', `hopp till ${k.id} ${av.scenId}`);
+      spara();
       // ladda om utan ?ny, annars nollställs sparningen igen
       const u = new URL(location.href); u.searchParams.delete('ny'); location.href = u.toString();
     }));

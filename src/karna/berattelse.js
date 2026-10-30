@@ -44,10 +44,11 @@ function stegetsEffekt(st, { tillstand, av, unge, pussel, rumId }) {
  * kartbitar, lappar och gåvor. Namnen hittas inte på: dop-pusslen vars namn saknas returneras, och spelet frågar
  * efter dem. Frivilliga scener och bär räknas inte, så det går att spola fram en sparning som redan har spelat
  * kapitlet (allt annat sätts bara om det saknas).
- * @param {{ kapitel: any, tillstand: any, aventyrId: string }} opt
+ * tillScen = spola bara fram till den scenen (den vuxne hoppar till en scen mitt i kapitlet): scenerna före den.
+ * @param {{ kapitel: any, tillstand: any, aventyrId: string, tillScen?: string }} opt
  * @returns {any[]} dop-pusslen (P12) som behövs, i ordning
  */
-export function spolaFram({ kapitel, tillstand, aventyrId }) {
+export function spolaFram({ kapitel, tillstand, aventyrId, tillScen }) {
   const av = aventyrFor(tillstand, aventyrId);
   sakraAventyr(av);
   const unge = (tillstand.spelare.unge = tillstand.spelare.unge || { format: 1, namn: '', steg: 1, formagor: [] });
@@ -55,6 +56,7 @@ export function spolaFram({ kapitel, tillstand, aventyrId }) {
   /** @type {any[]} */
   const dop = [];
   for (const scen of kapitel.scener) {
+    if (tillScen && scen.id === tillScen) break;
     if (scen.frivillig) continue;
     for (const st of scen.steg) {
       // bären räknas inte: spolningen ska gå att göra på en sparning som redan har spelat kapitlet

@@ -426,4 +426,21 @@ describe('spola fram ett kapitel (den vuxne hoppar till kapitel 1)', () => {
     spolaFram({ kapitel: prolog, tillstand: t, aventyrId: AVENTYR });
     expect(JSON.stringify(t)).toBe(fore);
   });
+  it('hopp till en scen mitt i ett kapitel (menyn): bara scenerna före den spolas fram', () => {
+    const kap1 = las('den-gomda-dalen/kap-01.json');
+    const t = nyttTillstand('t'); t.spelare.hjalte.namn = 'TESTA'; t.spelare.unge.namn = 'KNOPP';
+    spolaFram({ kapitel: prolog, tillstand: t, aventyrId: AVENTYR });
+    spolaFram({ kapitel: kap1, tillstand: t, aventyrId: AVENTYR, tillScen: 'k1s08_loven' });
+    const av = t.aventyr[AVENTYR];
+    expect(t.spelare.unge.folj).toBe(true);
+    expect(t.spelare.hjalte.formler).toEqual(['LJUS', 'SVÄRD']);
+    expect(av.visade.glantan).toEqual(['trappa']); // trappan från k1s07, men inte lådan från k1s08
+    expect(t.spelare.hjalte.lager.hjalmdekor).toBe('taggkam');
+    expect(t.spelare.hjalte.lager.ryggsack ?? null).toBeNull(); // buskarna är frivilliga
+    // mitt i prologen: namnet på ungen frågas efter om hoppet går förbi dopet
+    const t2 = nyttTillstand('t');
+    expect(spolaFram({ kapitel: prolog, tillstand: t2, aventyrId: AVENTYR, tillScen: 's12_pasarna' }).map((p) => p.sparas_som)).toEqual(['hjalte.namn', 'unge.namn']);
+    expect(t2.spelare.unge.folj).toBe(true);
+    expect(t2.aventyr[AVENTYR].kartbitar).toEqual([]);
+  });
 });

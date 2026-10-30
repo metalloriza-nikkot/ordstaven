@@ -680,3 +680,37 @@ test('kapitel 1 med kartorna (T5): bara varianten syns, den rätta stenen öppna
   expect(await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt())).toContain('lianer');
   await page.screenshot({ path: 'test-results/kapitel1-ostra-skarmen.png' });
 });
+
+test('menyn för vuxna hoppar till en scen i ett senare kapitel: det som kommer före spolas fram, och ungen är med', async ({ page }) => {
+  test.setTimeout(90000);
+  await page.goto('./?snabb&ny');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('s00_start');
+  await page.keyboard.press('Control+Shift+KeyM');
+  await expect(page.locator('#vuxenmeny .kapitelrad')).toHaveCount(2);
+  await page.screenshot({ path: 'test-results/meny-alla-kapitel.png' });
+  await page.click('#vuxenmeny .scen[data-kapitel="kap-01"][data-i="5"]'); // k1s07_stigarna, pass 2
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  for (const namn of ['TESTA', 'KNOPP']) {
+    await expect(page.locator('#plattan :is(.dop-ruta, .replik-ruta)')).toBeVisible({ timeout: 10000 });
+    if (await page.locator('#plattan .replik-ruta').isVisible()) await page.click('#plattan .replik-ruta');
+    await expect(page.locator('#plattan .dop-ruta')).toBeVisible({ timeout: 10000 });
+    await page.waitForTimeout(200);
+    await page.keyboard.type(namn);
+    await expect(page.locator('#plattan .namnrutor .ruta.fylld')).toHaveCount(namn.length, { timeout: 5000 });
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#plattan .dop-ruta')).toBeHidden({ timeout: 10000 });
+  }
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.tillstand().spelare.unge.namn), { timeout: 10000 }).toBe('KNOPP');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('k1s07_stigarna');
+  const t = await page.evaluate(() => window.__ORDSTAVEN.tillstand());
+  expect(t.spelare.unge).toMatchObject({ namn: 'KNOPP', folj: true });
+  expect(t.spelare.hjalte.formler).toEqual(expect.arrayContaining(['LJUS', 'SVÄRD']));
+  expect(t.spelare.hjalte.lager.hjalmdekor).toBe('taggkam');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').unge.visible)).toBe(true);
+  await expect(page.locator('#hud-bar')).toBeVisible();
+  // stegen står kvar vid apans bo (gläntan i tillståndet räddad)
+  expect(await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt())).toContain('stege');
+});

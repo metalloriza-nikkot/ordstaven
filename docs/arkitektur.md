@@ -483,3 +483,9 @@ Efter den externa granskningen: det ska aldrig löna sig att gissa eller vänta 
 - **`forsvinner_efter`** (karta): föremålet är borta när hjälten har formeln. Rummet ritas om direkt efter formelpusslet.
 - **`oppning`** (karta, på en stig): stigen skär igenom hindret den ligger över när den syns (`skarIgenom` i `karna/vag.js`). Hålet i häcken.
 - **Tester:** enhetstester att allt går att nå i varje område och tillstånd (också på nivå 1), att häcken och lianerna stänger vägen tills stenen och SVÄRD öppnar den, att varje läsval ryms på en skärm, och att en sparning från de gamla rummen följer med. Ett webbtest spelar k1s01 till östra skärmen.
+
+## 28. Hopp till en scen i menyn (0.8.1)
+
+- Menyn för vuxna listar alla kapitlens scener. Ett hopp sätter `av.kapitelId`, `av.scenId` och `av.spolaTill` och laddar om.
+- Kapitlen före spolas fram som vid `?kapitel=` (`av.spolat` töms, spolningen gör inget två gånger). I hoppets kapitel spolas scenerna före hoppet fram (`spolaFram({ tillScen })`): frivilliga scener och bär räknas inte. Namn som saknas frågas efter med dop-pusslen.
+- Ett hopp bakåt tar inte bort det som redan har getts (formler, gåvor). För ett rent prov finns Börja om från början.

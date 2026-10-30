@@ -169,7 +169,10 @@ html, body {
 #plattan { position: absolute; left: calc(var(--rum-vanster) + var(--rum-bredd) / 2); transform: translateX(-50%); max-width: min(92vw, var(--rum-bredd)); width: max-content; color: var(--black); }
 #plattan.replik { bottom: calc(100vh - var(--rum-topp) - var(--rum-hojd) + 12px); }
 #plattan.pussel, #plattan.bok, #plattan.formel-luft { top: calc(var(--rum-topp) + var(--rum-hojd) / 2); transform: translate(-50%, -50%); }
-.platta-oppen #varld canvas { filter: brightness(.6) saturate(.7); transition: filter .2s; }
+/* världen tonas ned bakom läsplattan med ett genomskinligt lager, inte med filter: ett filter på duken ritas om i
+   varje bildruta när något rör sig, och på golvdatorn (utan grafikkort) gav det hack på över en halv sekund */
+#varld::after { content: ''; position: absolute; inset: 0; background: rgba(20, 14, 10, .42); pointer-events: none; display: none; }
+.platta-oppen #varld::after { display: block; }
 .replik-ruta, .pussel-ruta, .formel-ruta, .dop-ruta, .bok-ruta, .hjalte-ruta { position: relative; background: var(--papper); border-radius: 18px; box-shadow: 0 8px 28px rgba(0, 0, 0, .5), inset 0 0 0 3px #d9c9a3; }
 .replik-ruta { display: flex; align-items: flex-end; gap: 16px; padding: 16px 16px 16px 20px; }
 .replik-ruta .text { align-self: center; }
@@ -320,6 +323,7 @@ html, body {
 .menyval.nu { background: var(--guld); }
 .scenlista { flex-direction: column; align-items: stretch; }
 .scenlista .menyval { text-align: left; }
+.kapitelrad > small:first-child { display: block; margin: 8px 0 2px; font-weight: 700; }
 
 /* testläget: inga animationer, så att testerna kan trycka på knapparna */
 .snabb *, .snabb *::before, .snabb *::after { animation: none !important; transition: none !important; }
