@@ -657,7 +657,7 @@ test('kapitel 1 med kartorna (T5): bara varianten syns, den rätta stenen öppna
   const ratt = stenar.includes('hog_sten') ? 'hog_sten' : 'hog_rund_sten';
   expect(stenar).toContain(ratt);
   // skylten vid ingången (en mening): han går dit
-  await fram(() => page.locator('#rumsskyltar .skylt[data-objekt="skylt_ingang"]').isVisible());
+  await fram(() => page.evaluate(() => window.__ORDSTAVEN.steg()?.typ === 'las_skylt' && document.querySelector('#plattan').hidden));
   await page.click('#rumsskyltar .skylt[data-objekt="skylt_ingang"] .kort');
   await expect(page.locator('#plattan .lapp')).toBeVisible({ timeout: 10000 });
   await fram(() => page.evaluate(() => window.__ORDSTAVEN.steg()?.typ === 'ga_till'));
