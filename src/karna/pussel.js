@@ -134,6 +134,8 @@ export function skapaFormel(pussel, { slump = Math.random } = {}) {
     tips: /** @type {number | null} */ (null),
     /** @type {boolean[] | null} vilka platser som var rätt vid senaste kontrollen (kodlåset: tecknen lyser) */
     senastRatt: /** @type {boolean[] | null} */ (null),
+    /** det senaste fel ordet han lade */
+    felOrd: /** @type {string | null} */ (null),
     klar: false,
   };
   const ledigaBrickor = () => s.brickor.filter((b) => !s.platser.includes(b.id));
@@ -145,17 +147,22 @@ export function skapaFormel(pussel, { slump = Math.random } = {}) {
     s.tips = ledigaBrickor().find((b) => b.bokstav === svar[plats])?.id ?? null;
   };
 
-  /** @returns {{ resultat: 'lagd' | 'klar' | 'fel' | 'ingen', reaktion: Handling | null }} */
+  /**
+   * samma = samma fel ord som förra gången: då blir reaktionen kortare (stilguiden §7).
+   * @returns {{ resultat: 'lagd' | 'klar' | 'fel' | 'ingen', reaktion: Handling | null, samma?: boolean }}
+   */
   function kontrollera() {
     if (forstaTomma() >= 0) { uppdateraTips(); return { resultat: 'lagd', reaktion: null }; }
     const ratt = s.platser.map((id, i) => s.brickor.find((b) => b.id === id)?.bokstav === svar[i]);
     if (ratt.every(Boolean)) { s.klar = true; s.tips = null; return { resultat: 'klar', reaktion: pussel.vid_ratt ?? null }; }
     s.fel++;
+    const ord = s.platser.map((id) => s.brickor.find((b) => b.id === id)?.bokstav ?? '').join('');
+    const samma = ord === s.felOrd; s.felOrd = ord;
     s.senastRatt = ratt;
     s.platser = s.platser.map((id, i) => (ratt[i] && pussel.ratt_bokstav_stannar !== false ? id : null));
     s.last = ratt.map((r) => r && pussel.ratt_bokstav_stannar !== false);
     uppdateraTips();
-    return { resultat: 'fel', reaktion: pussel.vid_fel ?? null };
+    return { resultat: 'fel', reaktion: pussel.vid_fel ?? null, samma };
   }
 
   const ingen = () => ({ resultat: /** @type {'ingen'} */ ('ingen'), reaktion: null });

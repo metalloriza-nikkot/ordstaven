@@ -20,7 +20,7 @@ Schemafilerna finns i `content/schema/`. Kontrollen körs med `npm run kontroll`
 | Fil | Innehåll | Schema |
 |---|---|---|
 | `content/ordlistor.json` | Ordlistor 1–6, flaggor, förbjudna par | `ordlistor.schema.json` |
-| `content/<äventyr>/aventyr.json` | Titel, talare, platshållare, kapitelordning, `sluta_for_idag`, `sparpunkt_fraga` (frågan vid varje sparpunkt), `gransnitt` (orden i pausmenyn) | `aventyr.schema.json` |
+| `content/<äventyr>/aventyr.json` | Titel, talare, platshållare, kapitelordning, `sluta_for_idag` (`fore_ungen` och `med_ungen`: mellanscener och repliker när han väljer att sluta för idag, i pausmenyn eller vid passets slut; ordet på pausmenyns knapp är `gransnitt.sluta_for_idag`), `sparpunkt_fraga` (frågan vid varje sparpunkt), `gransnitt` (orden i pausmenyn) | `aventyr.schema.json` |
 | `content/<äventyr>/kap-00.json` … `kap-07.json` | Ett kapitel: rum, scener, pussel | `kapitel.schema.json` |
 
 Kapitelfilerna börjar med `"format": 2`, äventyret och ordlistorna med `"format": 1`. Ändras formatet höjs numret, och teknik skriver om gamla filer. En kapitelfil i format 1 godtas inte längre: byt `P27_packa` mot `P28_packa` och `format` mot 2.

@@ -20,7 +20,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
       <button type="button" id="hud-bar" class="hud-knapp" hidden aria-label="Bär"><span class="ikon">🫐</span><span class="tal">0</span></button>
       <button type="button" id="hud-nos" class="hud-knapp" hidden aria-label="Nosa på ett ord"><span class="ikon">👃</span></button>
       <button type="button" id="hud-lapp" class="hud-knapp" hidden aria-label="Lappen"><span class="ikon">📜</span></button>
-      <span id="hud-radio" class="hud-knapp" hidden><span class="ikon">📻</span></span>
+      <button type="button" id="hud-radio" class="hud-knapp" hidden aria-label="Radion"><span class="ikon">📻</span></button>
     </div>
     <button type="button" id="hud-paus" class="hud-knapp" hidden aria-label="Paus"><span class="ikon paus-ikon" aria-hidden="true"><i></i><i></i></span></button>
     <button type="button" id="hud-meny" aria-label="Meny för vuxna (håll inne)">⚙</button>

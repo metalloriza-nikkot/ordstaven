@@ -2,6 +2,7 @@
 // Spelet: kopplar berättelsemotorn (karna) till rummet (Phaser) och gränssnittet (DOM).
 // Varje stegtyp i innehållet har en hanterare här. Inget innehåll hårdkodas: allt kommer från content/.
 import { skapaBerattelse, spolaFram } from './karna/berattelse.js';
+import { sammanfatta } from './karna/foraldravy.js';
 import { skapaLasmotor, valjVariant } from './karna/lasmotor.js';
 import { egenskaper, PALETT } from './karna/egenskaper.js';
 import { skapaValj, skapaFormel, skapaDop, skapaKrukor, skapaRaddning } from './karna/pussel.js';
@@ -97,6 +98,8 @@ export function skapaSpel(d) {
     return rost.saga(text, t.rollrost || 'berattare');
   }
 
+  /** Nyckeln i senaste för radions senaste replik (dialogregeln: ett tryck på radion upprepar den). */
+  const RADIO = '#radio';
   /** Portätt: färgad ring per talare (ingen text). @param {string} talare */
   const portratt = (talare) => `<span class="portratt p-${ui.esc(talare)}" aria-hidden="true"></span>`;
 
@@ -104,6 +107,7 @@ export function skapaSpel(d) {
   async function replik(r) {
     rum.frys(true);
     if (r.upplast && r.talare && aventyr.talare[r.talare]) senaste.set(r.talare, r);
+    if (r.via === 'radio' && r.upplast) senaste.set(RADIO, r);
     if (r.via === 'radio') ui.pulsera('#hud-radio');
     const via = r.via === 'radio' ? '<span class="via-radio" aria-hidden="true">📻</span>' : '';
     const el = ui.visaPlatta(`<div class="replik-ruta">${portratt(r.talare)}<div class="text">${via}${ui.rader(r.text, varden())}</div><button type="button" class="vidare" aria-label="Vidare">▶</button></div>`, 'replik');
@@ -186,6 +190,29 @@ export function skapaSpel(d) {
   }
 
   /** En reaktion (fel, rätt): regi i bild och eventuell replik. @param {any} h */
+  /**
+   * Rätt val (stilguiden §7): en egen liten händelse, ca 1–1,5 s. Det han valde hoppar till och lyser, och ungen gör
+   * ett glädjehopp. I gråboxen följer handlingen i vid_ratt som regi. Felet är aldrig roligare än så här.
+   * @param {string | null} objekt föremålet han valde i rummet (en dörr, en sten), eller null
+   */
+  async function rattHandelse(objekt) {
+    const o = objekt ? rum.ruta(objekt) : null;
+    if (o) { rum.hoppa(o.id); rum.markera(o.id, true); }
+    rum.ungeReagerar(true); ljud.spela('unge');
+    logg.handelse('rätt', objekt ?? 'kort');
+    await vanta(tid(1100));
+    if (o) rum.markera(o.id, false);
+  }
+
+  /**
+   * Samma fel en gång till: reaktionen blir kortare, bara ett ljud och ungens frågande blick (stilguiden §7).
+   * Ljudet har den som anropar redan spelat.
+   */
+  async function kortReaktion() {
+    rum.ungeReagerar(false);
+    await vanta(tid(600));
+  }
+
   async function reaktion(h) {
     if (!h) return;
     const regi = h.handling || h.reaktion;
@@ -447,6 +474,17 @@ export function skapaSpel(d) {
     replik({ ...r, vantar_pa: undefined }).finally(() => { fragar = false; rum.frys(varFryst); });
     return true;
   };
+  // dialogregeln för radion (granskningen, regel 4 B): ett tryck på radion upprepar Farfars senaste replik genom
+  // den i scenen. Har han inte sagt något sprakar det bara.
+  ui.$('#hud-radio').addEventListener('click', () => {
+    if (!b || pausad || fragar || !ui.plattan.hidden) return;
+    const r = senaste.get(RADIO);
+    if (!r) { ljud.spela('klick'); ui.pulsera('#hud-radio'); logg.handelse('fråga igen', 'radion (tyst)'); return; }
+    fragar = true;
+    const varFryst = rum.fryst;
+    logg.handelse('fråga igen', 'radion');
+    replik({ ...r, vantar_pa: undefined }).finally(() => { fragar = false; rum.frys(varFryst); });
+  });
   /** Utgången är låst i rummets tillstånd (kartans last_i): ytterdörren på natten. @param {any} o */
   const lastNu = (o) => !!o?.lastI && !!rum.tillstand && o.lastI.includes(rum.tillstand);
   /**
@@ -832,13 +870,20 @@ export function skapaSpel(d) {
     if (skyltMal) skyltStyrs.add(st.mal);
     // Medan han går dit kan han göra det frivilliga i rummet (rum.frivilligt), och med fri_vag gå in i en
     // sidogren (en frivillig scen, buskarna). Efteråt fortsätter steget som förut.
+    /** @type {string[]} sidogrenar han tog under det fria vägvalet, i ordning (loggen, beslut 17.1) */
+    const tog = [];
     for (;;) {
       const sidor = st.fri_vag ? sidoUtgangar(st.mal) : [];
       const fri = frivilligaKvar().filter((id) => id !== st.mal);
       const bortSkyltar = visaUtgangsSkyltar();
       const id = await anvand([st.mal, ...sidor, ...fri], { last: st.vid_annan_utgang, framme: skyltMal ? [st.mal] : [] });
       bortSkyltar();
-      if (id === st.mal) break;
+      if (id === st.mal) {
+        // vägvalet: gick han till målet först (apan), eller tog han sidogrenen (buskarna) först?
+        if (st.fri_vag) logg.handelse('vägval', tog.length ? `${st.mal} efter ${tog.join(', ')}` : `${st.mal} först`, { sidogrenar_kvar: sidor });
+        break;
+      }
+      if (st.fri_vag && sidor.includes(id)) { logg.handelse('vägval', tog.length ? `${id} (sedan ${tog.join(', ')})` : `${id} först`); tog.push(id); }
       k.stopp(); window.clearInterval(styr); ui.styrhjalp(null); rum.markera(st.mal, false);
       if (fri.includes(id)) await korFrivilligt(id); else await sidoScen(id);
       rum.frys(false); k.nollstall();
@@ -1018,7 +1063,7 @@ export function skapaSpel(d) {
           k.stopp();
           await vanta(tid(500));
           ui.doljPlatta();
-          await reaktion(r.reaktion);
+          await Promise.all([rattHandelse(null), reaktion(r.reaktion)]);
           klar({ niva: v.s.variantNyckel, forstaForsoket: v.forstaForsoket, forsok: v.s.forsok, hjalp: spar.hjalp });
           return;
         }
@@ -1178,7 +1223,9 @@ export function skapaSpel(d) {
         upptagen = true; visaLappen(null); rum.frys(true);
         logg.handelse('val', `${p.id}: ${a.id} igen (räknas inte)`);
         ljud.spela('fel');
-        await bakomKurvan(o, a.vid_valj ?? p.vid_fel ?? null);
+        // samma stig igen: bakom kurvan händer bara ljudet, och ungen tittar frågande när han kommer tillbaka
+        await bakomKurvan(o, null);
+        await kortReaktion();
         fraga(); rum.frys(false); upptagen = false;
       };
       const valj = async (/** @type {string} */ altId) => {
@@ -1223,7 +1270,7 @@ export function skapaSpel(d) {
         ui.visaTanke(null);
         for (const a of v.s.alternativ) if (a.objekt) rum.markera(a.objekt, false);
         rum.frys(true);
-        await reaktion(r.reaktion);
+        await Promise.all([rattHandelse(alt?.objekt ?? null), reaktion(r.reaktion)]);
         klar({ niva: v.s.variantNyckel, forstaForsoket: v.forstaForsoket, forsok: v.s.forsok, hjalp: spar.hjalp });
       };
     });
@@ -1350,7 +1397,12 @@ export function skapaSpel(d) {
         upptagen = true;
         if (r.resultat === 'lagd') { tack(); ljud.spela('bricka'); rita(); upptagen = false; return; }
         rita();
-        if (r.resultat === 'fel') { tandForebild('fel'); ljud.spela('fel'); ui.plattan.querySelector('.platser')?.classList.add('skakar'); await vanta(tid(400)); await reaktion(r.reaktion); rita(); upptagen = false; return; }
+        if (r.resultat === 'fel') {
+          tandForebild('fel'); ljud.spela('fel'); ui.plattan.querySelector('.platser')?.classList.add('skakar'); await vanta(tid(400));
+          // samma fel ord igen: bara ljudet och ungens blick
+          if (/** @type {any} */ (r).samma) { logg.handelse('formel', `${p.id}: samma fel igen (kort)`); await kortReaktion(); } else await reaktion(r.reaktion);
+          rita(); upptagen = false; return;
+        }
         k.stopp(); sluta();
         ljud.spela('ratt');
         // kolla: förebilden lyser en sekund ovanför hans ord (titta–täck)
@@ -1500,7 +1552,9 @@ export function skapaSpel(d) {
         if (r.resultat === 'fel') {
           logg.handelse('val', `${p.id}: fel ord`, { ratt: f.s.senastRatt });
           ljud.spela('klonk'); rita(); ui.plattan.querySelector('.kod-las')?.classList.add('skakar');
-          await vanta(tid(400)); await reaktion(r.reaktion); rita(); upptagen = false; return;
+          await vanta(tid(400));
+          if (/** @type {any} */ (r).samma) await kortReaktion(); else await reaktion(r.reaktion);
+          rita(); upptagen = false; return;
         }
         k.stopp(); sluta();
         logg.handelse('val', `${p.id}: ${f.s.svar}`, { resultat: 'klar' });
@@ -1898,13 +1952,34 @@ export function skapaSpel(d) {
     if (fr) sag(fr).then(() => {}, () => {});
     await new Promise((klar) => {
       s.querySelector('.fortsatt')?.addEventListener('click', () => { rost.tyst(); klar(undefined); });
-      s.querySelector('.paus')?.addEventListener('click', () => {
-        rost.tyst();
-        const p = ui.visaSkarm(`<div class="pass-slut"><div class="stor-ikon">${sover}</div><button type="button" class="knapp stor fortsatt" aria-label="Fortsätt">▶</button></div>`);
-        p.querySelector('.fortsatt')?.addEventListener('click', () => klar(undefined));
-      });
+      s.querySelector('.paus')?.addEventListener('click', () => { rost.tyst(); ui.doljSkarm(); slutaForIdag().then(() => klar(undefined)); });
     });
     ui.doljSkarm();
+  }
+
+  const SOVER = '<span class="unge-sover" aria-hidden="true"><span class="kropp"></span><span class="zz">z z</span></span>';
+  /**
+   * SLUTA FÖR IDAG (aventyr.json: sluta_for_idag), från pausmenyn eller vid passets slut: spelet har sparat, och
+   * en kort avslutning spelas, med ungen som somnar om den finns, annars utan. Sedan den sovande ungen och ▶, som
+   * fortsätter där han var.
+   */
+  async function slutaForIdag() {
+    const s = aventyr.sluta_for_idag;
+    const medUngen = !!tillstand.spelare.unge?.folj && !!tillstand.spelare.unge?.namn;
+    logg.handelse('sluta för idag', medUngen ? 'med ungen' : 'före ungen');
+    spara();
+    const varFryst = rum.fryst;
+    rum.frys(true);
+    for (const st of (s && (medUngen ? s.med_ungen : s.fore_ungen)) || []) {
+      if (st.typ === 'replik') await replik(st);
+      else if (st.typ === 'mellanscen' && st.beskrivning) { ui.visaRegi(st.beskrivning, 0); await vanta(tid(1500)); ui.doljRegi(); }
+    }
+    rum.frys(true);
+    const p = ui.visaSkarm(`<div class="pass-slut sover-nu"><div class="stor-ikon">${SOVER}</div><button type="button" class="knapp stor fortsatt" aria-label="Fortsätt">▶</button></div>`);
+    await new Promise((klar) => p.querySelector('.fortsatt')?.addEventListener('click', () => klar(undefined), { once: true }));
+    ui.doljSkarm();
+    logg.handelse('sluta för idag', 'fortsätter');
+    rum.frys(varFryst);
   }
 
   // ------------------------------------------------------------------ pausmenyn (stilguiden §6)
@@ -1954,7 +2029,7 @@ export function skapaSpel(d) {
     let html = '';
     if (vy === 'start') {
       const ny = FLIKAR.some(nyFlik);
-      html = `<div class="paus-start">${bildknapp('kartan', BILD.kartan)}${bildknapp('hjalteboken', BILD.hjalteboken, ny ? 'ny' : '')}</div>${stang}`;
+      html = `<div class="paus-start">${bildknapp('kartan', BILD.kartan)}${bildknapp('hjalteboken', BILD.hjalteboken, ny ? 'ny' : '')}${aventyr.sluta_for_idag ? bildknapp('sluta_for_idag', SOVER, 'sluta') : ''}</div>${stang}`;
     } else if (vy === 'kartan') {
       const bitar = (av.kartbitar || []).slice().sort((x, y) => x - y);
       html = `${tillbaka}<div class="paus-karta">${bitar.map((n) => `<span class="kartbit" aria-label="Kartbit ${n}">🗺️<b>${n}</b></span>`).join('')}</div>${stang}`;
@@ -1976,6 +2051,7 @@ export function skapaSpel(d) {
     m.querySelectorAll('.paus-val').forEach((el) => el.addEventListener('click', () => {
       const val = /** @type {HTMLElement} */ (el).dataset.val || '';
       ljud.spela('klick');
+      if (val === 'sluta_for_idag') { stangPaus(); slutaForIdag(); return; }
       // hjälteboken öppnas på den nya fliken, annars på staven
       ritaPaus(val === 'hjalteboken' ? (FLIKAR.find(nyFlik) ?? 'staven') : /** @type {any} */ (val));
       lasOrd(val);
@@ -2088,6 +2164,20 @@ export function skapaSpel(d) {
   function stangMeny() { ui.doljMeny(); fortsatt('meny'); }
   // Escape stänger menyn (en väg ut, även med tangentbord)
   window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !ui.$('#vuxenmeny').hidden) { e.preventDefault(); stangMeny(); } });
+  /** Pusseltyperna i föräldravyn (för den vuxne, inte speltext). */
+  const TYPNAMN = /** @type {Record<string, string>} */ ({ P1_las_och_valj: 'Läsa och välja', P28_packa: 'Packa', P11_formel: 'Formler', P9_kodlas: 'Kodlås', P15_raddning: 'Räddning', P12_dop: 'Namn' });
+  /**
+   * Den minimala föräldravyn: per pusseltyp nivån, hur många uppgifter, andelen rätt på första försöket utan hjälp,
+   * hur ofta hjälpen användes, och för läsvalen vad slumpen hade gett. Ur lärandehistoriken.
+   */
+  function foraldravy() {
+    const rader = sammanfatta(tillstand.spelare.larande?.historik || [], d.kapitel.flatMap((k) => k.pussel));
+    if (!rader.length) return '<div class="menygrupp foraldravy"><b>Hur det går:</b> inga uppgifter än.</div>';
+    const pct = (/** @type {number} */ x) => `${Math.round(100 * x)} %`;
+    const tr = rader.map((r) => `<tr><td>${ui.esc(TYPNAMN[r.typ] ?? r.typ)}</td><td>${r.slag}${lasmotor.niva(r.slag, r.typ)}</td><td>${r.antal}</td><td>${r.rattForsta} (${pct(r.rattForsta / r.antal)})</td><td>${r.slump === null ? '–' : pct(r.slump)}</td><td>${r.hjalp}</td><td>${r.sekunder === null ? '–' : r.sekunder + ' s'}</td></tr>`).join('');
+    return `<div class="menygrupp foraldravy"><b>Hur det går:</b><table><thead><tr><th>Uppgift</th><th>Nivå</th><th>Antal</th><th>Rätt direkt</th><th>Slumpen</th><th>Med hjälp</th><th>Tid</th></tr></thead><tbody>${tr}</tbody></table>
+      <small>Rätt direkt = rätt på första försöket utan hjälp. Slumpen = vad gissningar hade gett i läsvalen.</small></div>`;
+  }
   function oppnaMeny() {
     pausa('meny');
     const niva = lasmotor.niva('L', 'P1_las_och_valj');
@@ -2098,6 +2188,7 @@ export function skapaSpel(d) {
       <div class="menygrupp"><b>Läsnivå (läs och välj):</b> ${[1, 2, 3, 4].map((n) => `<button type="button" class="menyval niva ${n === niva ? 'nu' : ''}" data-n="${n}">L${n}</button>`).join('')}</div>
       <div class="menygrupp"><label><input type="checkbox" class="foralder" ${inst.foralderLaser ? 'checked' : ''}> Föräldern läser ${ui.esc(Object.values(aventyr.talare).filter((/** @type {any} */ t) => t.rost === 'foraldern_eller_datorrost').map((/** @type {any} */ t) => t.namn).join(' och ') || 'rollernas')} repliker</label>
       <label><input type="checkbox" class="etiketter" ${inst.vuxenEtiketter ? 'checked' : ''}> Visa objektens namn (inte under pussel)</label></div>
+      ${foraldravy()}
       <div class="menygrupp scenlista"><b>Hoppa till scen:</b>${scener}</div>
       <div class="menygrupp"><button type="button" class="menyval logg">Spara loggen</button><button type="button" class="menyval nollstall">Börja om från början</button><button type="button" class="menyval stang">Stäng</button></div></div>`);
     s.querySelectorAll('.niva').forEach((el) => el.addEventListener('click', () => { lasmotor.sattNiva('L', 'P1_las_och_valj', Number(/** @type {HTMLElement} */ (el).dataset.n)); lasmotor.sattNiva('L', 'P28_packa', Number(/** @type {HTMLElement} */ (el).dataset.n)); spara(); oppnaMeny(); }));

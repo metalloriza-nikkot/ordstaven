@@ -153,7 +153,7 @@ html, body {
 .hud-knapp { pointer-events: auto; display: inline-flex; align-items: center; gap: 6px; min-width: 56px; min-height: 56px; padding: 0 12px; border-radius: 28px; background: rgba(26, 20, 16, .75); color: var(--papper); font-size: 28px; }
 .hud-knapp .tal { font-size: 28px; font-weight: 700; }
 .hud-knapp.av { opacity: .35; }
-#hud-radio { cursor: default; }
+#hud-radio { cursor: pointer; }
 .nosar #hud-nos { background: var(--guld); color: var(--black); box-shadow: 0 0 0 4px rgba(242, 193, 78, .5); }
 #hud-meny { position: absolute; right: 6px; top: 6px; width: 40px; height: 40px; border-radius: 20px; background: rgba(26, 20, 16, .5); color: rgba(245, 236, 215, .5); font-size: 22px; }
 .puls { animation: puls .5s ease 3; }
@@ -320,6 +320,9 @@ html, body {
 .scenlista { flex-direction: column; align-items: stretch; }
 .scenlista .menyval { text-align: left; }
 .kapitelrad > small:first-child { display: block; margin: 8px 0 2px; font-weight: 700; }
+.foraldravy table { width: 100%; border-collapse: collapse; margin: 6px 0 4px; font-size: 15px; }
+.foraldravy th, .foraldravy td { text-align: left; padding: 3px 6px; border-bottom: 1px solid #d9c9a3; }
+.foraldravy small { color: #6b5a44; }
 
 /* testläget: inga animationer, så att testerna kan trycka på knapparna */
 .snabb *, .snabb *::before, .snabb *::after { animation: none !important; transition: none !important; }

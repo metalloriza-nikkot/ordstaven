@@ -496,3 +496,12 @@ Efter den externa granskningen: det ska aldrig löna sig att gissa eller vänta 
 - **Rösten** (`grans/rost.js`): ett yttrande som inte har startat efter 1,2 s (inget `onstart`, talsyntesen pratar inte) läggs en gång till. Startar det inte då heller ges det upp efter 2,5 s och loggas som `startade inte`. Maxtiden finns kvar som sista spärr.
 - **Golvdatorn:** med läsplattan öppen ritar canvasläget världen högst åtta gånger per sekund (`plattaOppen`), eftersom den står still bakom texten.
 - Regeln `.platta-oppen #varld canvas { filter }` har aldrig gällt (`#varld` ligger inte i `#ui`) och är borttagen. Världen tonas alltså inte ned bakom läsplattan, i enlighet med stilguiden §8.
+
+## 30. T4: dialogregeln, upprepade fel, rätt val, SLUTA FÖR IDAG, föräldravyn och vägvalet (0.8.3)
+
+- **Radion** (`#hud-radio`, nu en knapp): ett tryck upprepar den senaste upplästa repliken genom radion i scenen (`senaste` med nyckeln `#radio`), som ett tryck på en figur med `talare`. Utan replik sprakar det bara. Steget står kvar.
+- **Samma fel igen** (`kortReaktion`): bara ljudet och ungens frågande blick, ca 0,6 s. Det gäller samma fel ord i en formel eller i kodlåset (`samma` i `kontrollera`, `karna/pussel.js`) och en prövad stig som han går in på igen. Andra alternativ kan inte väljas två gånger (de tonas ut eller spikas).
+- **Rätt val** (`rattHandelse`): föremålet han valde hoppar och lyser, och ungen gör ett glädjehopp, samtidigt som `vid_ratt` spelas (ca 1,1 s). På läsplattan hoppar ungen. Loggen skriver `[rätt]`.
+- **SLUTA FÖR IDAG** (`slutaForIdag`): från pausmenyn (bilden med den sovande ungen) och från knappen vid passets slut. Spelet sparar, `sluta_for_idag.med_ungen` eller `fore_ungen` spelas, och sedan den sovande ungen och ▶, som fortsätter där han var. Pausknappen finns först när hjälteboken har något (från LJUS i s03).
+- **Föräldravyn** (`karna/foraldravy.js`, menyn för vuxna): per pusseltyp nivån, antalet uppgifter, rätt på första försöket utan hjälp, vad slumpen hade gett i läsvalen (1 av antalet alternativ i varianten), hur ofta hjälpen användes och mediantiden. Ur `larande.historik`.
+- **Vägvalet** (beslut 17.1): ett `ga_till` med `fri_vag` loggar `[vägval]`, till exempel `stig_buskarna först` och sedan `stig_glantan efter stig_buskarna`, eller `stig_glantan först` med sidogrenarna som fanns kvar.

@@ -292,6 +292,20 @@ test('SVÄRD utifrån bilden: ingen förebild från början, den tänds vid fel,
   expect(logg).toContain('klar med förebild');
 });
 
+test('samma fel ord två gånger i en formel: andra gången bara ljudet och ungens blick', async ({ page }) => {
+  const svard = P1('k1_svard'); delete svard.forenkla;
+  await provscen(page, { id: 't_sammafel', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'pussel', pussel_id: 'k1_svard' }, R('Svärdet!')] }, null, { pussel: [svard] });
+  await page.click('#plattan .vidare');
+  await expect(page.locator('#plattan .formel-bild')).toBeVisible({ timeout: 8000 });
+  for (const b of 'DRSVÄ') await bricka(page, b).click(); // fel: ingen bokstav rätt, alla går tillbaka
+  await expect(page.locator('#plattan .svar-rad')).toHaveText(/NÄSTAN! HÄR STÅR ORDET\./, { timeout: 8000 });
+  await expect(page.locator('#plattan .platser.skakar')).toHaveCount(0, { timeout: 8000 });
+  await page.waitForTimeout(300);
+  for (const b of 'DRSVÄ') await bricka(page, b).click(); // samma fel igen
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 8000 }).toContain('samma fel igen (kort)');
+  expect(await page.locator('#plattan .svar-rad').count()).toBe(0);
+});
+
 test('SVÄRD utifrån bilden, rätt på en gång: förebilden syns aldrig', async ({ page }) => {
   await provscen(page, { id: 't_svardratt', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'pussel', pussel_id: 'k1_svard' }, R('Svärdet!')] }, null, { pussel: [P1('k1_svard')] });
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('VAD ÄR DET? SKRIV ORDET!', { timeout: 8000 });
@@ -396,6 +410,8 @@ test('fri väg: en sidogren (frivillig scen) spelas en gång, han går själv ti
   });
   await tryckPa(page, 'stig_provB');
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('SIDOGREN.', { timeout: 8000 });
+  // loggen säger att han tog sidogrenen först (beslut 17.1)
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('[vägval] stig_provB först');
   await page.click('#plattan .vidare');
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.rumsobjekt())).toContain('kista');
   expect(await page.evaluate(() => window.__ORDSTAVEN.tillstand().aventyr['den-gomda-dalen'].frivilligt)).toContain('t_sido');
@@ -404,6 +420,53 @@ test('fri väg: en sidogren (frivillig scen) spelas en gång, han går själv ti
   expect(await page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('t_vag');
   await tryckPa(page, 'stig_provc');
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('VIDARE.', { timeout: 8000 });
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('[vägval] stig_provc efter stig_provB');
+});
+
+test('SLUTA FÖR IDAG i pausmenyn: ungen somnar, Farfar säger hej då, och ▶ fortsätter där han var', async ({ page }) => {
+  // pausknappen finns när det finns något i hjälteboken (här formeln LJUS)
+  await provscen(page, { id: 't_sluta', pass: 1, rum: 'provskogen', steg: [{ typ: 'ga_till', mal: 'sten' }, R('Framme.')] }, (t) => { t.spelare.hjalte.formler = ['LJUS']; }, { rum: { provskogen: { innehall: ['sten'] } } });
+  await expect.poll(() => steg(page).then((s) => s?.typ), { timeout: 5000 }).toBe('ga_till');
+  await page.click('#hud-paus');
+  await page.click('#pausmeny .paus-val[data-val="sluta_for_idag"]');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('KNOPP SOMNADE. BRA JOBBAT I DAG!', { timeout: 8000 });
+  await page.click('#plattan .vidare');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('VI SES SNART. HEJ DÅ!', { timeout: 8000 });
+  await page.click('#plattan .vidare');
+  await expect(page.locator('.pass-slut.sover-nu')).toBeVisible({ timeout: 8000 });
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('[sluta för idag] med ungen');
+  await page.click('.pass-slut.sover-nu .fortsatt');
+  await expect(page.locator('.pass-slut')).toBeHidden();
+  await expect(page.locator('#plattan')).toBeHidden();
+  expect(await page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('t_sluta');
+  await tryckPa(page, 'sten');
+  await expect(page.locator('#handknapp')).toBeVisible({ timeout: 8000 });
+  await page.keyboard.press('Space');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('FRAMME.', { timeout: 8000 });
+});
+
+test('dialogregeln för radion: ett tryck på radion upprepar Farfars senaste replik genom den', async ({ page }) => {
+  await provscen(page, { id: 't_radio', pass: 1, rum: 'provskogen', steg: [R('Titta på trädet!', 'farfar', { via: 'radio' }), { typ: 'ga_till', mal: 'sten' }, R('Framme.')] },
+    (t) => { t.aventyr['den-gomda-dalen'].ui = { ...t.aventyr['den-gomda-dalen'].ui, radioramen: true }; }, { rum: { provskogen: { innehall: ['sten'] } } });
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText(/TITTA PÅ TRÄDET!/, { timeout: 8000 });
+  await page.click('#plattan .vidare');
+  await expect.poll(() => steg(page).then((s) => s?.typ), { timeout: 5000 }).toBe('ga_till');
+  await expect(page.locator('#plattan')).toBeHidden();
+  await page.click('#hud-radio');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText(/TITTA PÅ TRÄDET!/, { timeout: 8000 });
+  await page.click('#plattan .vidare');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('[fråga igen] radion');
+  expect((await steg(page))?.typ).toBe('ga_till'); // steget står kvar
+});
+
+test('föräldravyn i menyn för vuxna visar hur det går per pusseltyp, med slumpen för läsvalen', async ({ page }) => {
+  await provscen(page, { id: 't_vy', pass: 1, rum: 'provskogen', steg: [{ typ: 'ga_till', mal: 'sten' }] },
+    (t) => { t.spelare.larande.historik = [{ pussel_id: 'p0_filt', typ: 'P1_las_och_valj', niva: 'L2', ratt: true, tid: 5000 }, { pussel_id: 'p0_ljus', typ: 'P11_formel', niva: 'S1', ratt: false, tid: 20000 }]; },
+    { rum: { provskogen: { innehall: ['sten'] } } });
+  await page.keyboard.press('Control+Shift+KeyM');
+  await expect(page.locator('#vuxenmeny .foraldravy tbody tr')).toHaveCount(2);
+  await expect(page.locator('#vuxenmeny .foraldravy tbody tr').first()).toContainText('Läsa och välja');
+  await page.screenshot({ path: 'test-results/foraldravy.png' });
 });
 
 test('stigarna: frågan står på skylten, valet räknas vid kurvan, felet händer bakom kurvan, och förenklingen spärrar med en gren', async ({ page }) => {
@@ -447,8 +510,9 @@ test('stigarna: frågan står på skylten, valet räknas vid kurvan, felet händ
   // den prövade stigen som inte är spärrad: samma sak händer igen, men det räknas inte
   await expect.poll(() => page.evaluate(() => !window.__ORDSTAVEN.fryst() && window.__ORDSTAVEN.position().y > 104), { timeout: 8000 }).toBe(true);
   await tryckPa(page, kvar);
-  if (kvar === 'stig_b') { await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('PLUPP!', { timeout: 8000 }); await page.click('#plattan .vidare'); }
+  // samma fel igen: kortare, bara ljudet och ungens blick (ingen replik)
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 8000 }).toContain('igen (räknas inte)');
+  expect(await page.locator('#plattan .replik-ruta').count()).toBe(0);
   await expect.poll(() => page.evaluate(() => !window.__ORDSTAVEN.fryst() && window.__ORDSTAVEN.position().y > 104), { timeout: 8000 }).toBe(true);
   await tryckPa(page, 'stig_a');
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('RÄTT STIG.', { timeout: 10000 });

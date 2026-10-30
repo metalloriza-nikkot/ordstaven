@@ -160,6 +160,10 @@
         "dinoboken": {
           "type": "string",
           "minLength": 1
+        },
+        "sluta_for_idag": {
+          "type": "string",
+          "minLength": 1
         }
       }
     }
