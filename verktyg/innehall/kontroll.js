@@ -209,6 +209,21 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
         if (n > MAX_RADER_REPLIK) varningar.push(var_(`${plats}: repliken blir ${n} rader på läsplattan, högst ${MAX_RADER_REPLIK}: "${rader(text).join(' ')}"`));
       }
     };
+    // Ljudord (beslut 21.5) följer reglerna för text han läser: vanlig skrift, inga spärrade ljud, och helst
+    // ingen dubbelteckning (Innehålls val: det är just det som är svårt). De står var som helst i kapitlet.
+    const ljudordKontroll = (x, plats) => {
+      if (!x || typeof x !== 'object') return;
+      if (Array.isArray(x)) { x.forEach((y, i) => ljudordKontroll(y, `${plats}[${i}]`)); return; }
+      for (const [nyckel, v] of Object.entries(x)) {
+        if (nyckel !== 'ljudord') { ljudordKontroll(v, plats); continue; }
+        const lo = String(v);
+        if (versalord(lo, new Set()).length) fel.push(var_(`${plats}: ljudordet ${lo} ska stå i vanlig skrift`));
+        for (const o of ord(lo)) { const sp = arSparrat(o); if (sp) fel.push(var_(`${plats}: ljudordet ${lo} har ett spärrat ljud (${sp})`)); }
+        if (/(.)\1|ck/i.test(lo.replace(/\s+/g, ' ').split(' ').join('|'))) varningar.push(var_(`${plats}: ljudordet ${lo} har dubbelteckning`));
+      }
+    };
+    ljudordKontroll(k.scener, 'scener');
+    ljudordKontroll(k.pussel, 'pussel');
     const replikKontroll = (r, plats) => {
       if (!r) return;
       if (!talare.has(r.talare)) fel.push(var_(`${plats}: okänd talare ${r.talare}`));
