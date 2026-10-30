@@ -11,12 +11,16 @@ const FIGUR_HOJD = 24;
  *             niva?: number, forbinder?: 'trappa' | 'stege',
  *             till?: string, sida?: 'under' | 'over' | 'vanster' | 'hoger' | 'alla', golv?: boolean, visar?: string,
  *             riktning?: 'vanster' | 'hoger' | 'upp' | 'ned', klattra?: 'upp' | 'ned', ute?: boolean, lapp?: string,
- *             talare?: string, lastI?: string[] }} Objekt
+ *             talare?: string, lastI?: string[], storlek?: { bredd: number, hojd: number } }} Objekt
  * till = rummet en utgång leder till, sida = var hjälten ställer sig, golv = man går på det (stig, grind).
  * sida 'alla' = föremålet har ingen framsida (krukor, buskar, en låda mitt på golvet): det går att använda från alla håll.
  * sort 'yta' = en del av golvet: en upphöjd yta (niva, kullen) eller en förbindelse mellan nivåerna (forbinder:
  * trappa eller stege). Se karna/nivaer.js.
+ * storlek = områdets storlek (kartans), när det är större än en skärm: föremålen nära kanten räknas mot den.
  */
+
+/** Områdets storlek för ett föremål (en skärm om kartan inte säger annat). @param {Objekt} o */
+const ytan = (o) => o.storlek ?? RUM;
 
 const UTGANG = /^(stege_|dorr_|grind|stig_)/;
 
@@ -62,22 +66,23 @@ export function placeraObjekt(innehall) {
 
 /** Punkten framför ett objekt där hjälten ska stå (fötterna). @param {Objekt} o */
 export function framfor(o) {
+  const S = ytan(o);
   const x = Math.round(o.x + o.b / 2);
   // en stig som leder ut ur rummet: hjälten går ut på den, ända till kanten
   if (o.golv && o.riktning) {
     const y = Math.round(o.y + o.h / 2 + 3);
-    if (o.riktning === 'hoger') return { x: Math.min(RUM.bredd - 8, o.x + o.b - 4), y };
+    if (o.riktning === 'hoger') return { x: Math.min(S.bredd - 8, o.x + o.b - 4), y };
     if (o.riktning === 'vanster') return { x: Math.max(8, o.x + 4), y };
     if (o.riktning === 'upp') return { x, y: Math.max(FIGUR_HOJD, o.y + 8) };
-    return { x, y: Math.min(RUM.hojd, o.y + o.h - 2) };
+    return { x, y: Math.min(S.hojd, o.y + o.h - 2) };
   }
   if (o.sida === 'over') return { x, y: Math.max(FIGUR_HOJD, o.y - 2) };
-  if (o.sida === 'vanster') return { x: o.x - 10, y: Math.min(RUM.hojd, o.y + o.h) };
-  if (o.sida === 'hoger') return { x: o.x + o.b + 10, y: Math.min(RUM.hojd, o.y + o.h) };
-  if (o.sida === 'under') return { x, y: Math.min(RUM.hojd, o.y + o.h + 12) };
-  if (o.sort === 'utgang' && o.y > RUM.hojd / 2) return { x, y: o.y + 2 };
+  if (o.sida === 'vanster') return { x: o.x - 10, y: Math.min(S.hojd, o.y + o.h) };
+  if (o.sida === 'hoger') return { x: o.x + o.b + 10, y: Math.min(S.hojd, o.y + o.h) };
+  if (o.sida === 'under') return { x, y: Math.min(S.hojd, o.y + o.h + 12) };
+  if (o.sort === 'utgang' && o.y > S.hojd / 2) return { x, y: o.y + 2 };
   if (o.sort === 'utgang' && o.x < 20) return { x: o.x + o.b + 10, y: o.y + o.h };
-  return { x, y: Math.min(RUM.hojd, o.y + o.h + 12) };
+  return { x, y: Math.min(S.hojd, o.y + o.h + 12) };
 }
 
 /** Nära nog räcker (grind A): saker, figurer och stegen nås från alla håll inom ca 1,5 rutor från kanten. */
@@ -137,13 +142,14 @@ export function glipa(a, b) {
  */
 export function framforFran(o, pos, inomhus = false, v = VAGG) {
   if (o.sida !== 'alla') return framfor(o);
-  const mx = Math.round(o.x + o.b / 2), my = Math.min(RUM.hojd, o.y + o.h);
+  const S = ytan(o);
+  const mx = Math.round(o.x + o.b / 2), my = Math.min(S.hojd, o.y + o.h);
   const kandidater = [
-    { x: mx, y: Math.min(RUM.hojd, o.y + o.h + 12) },
+    { x: mx, y: Math.min(S.hojd, o.y + o.h + 12) },
     { x: mx, y: Math.max(FIGUR_HOJD, o.y - 2) },
     { x: o.x - 10, y: my },
     { x: o.x + o.b + 10, y: my },
-  ].filter((p) => !inomhus || (p.x > v.sida + 6 && p.x < RUM.bredd - v.sida - 6 && p.y > v.bak + 4 && p.y < RUM.hojd - v.fram));
+  ].filter((p) => !inomhus || (p.x > v.sida + 6 && p.x < S.bredd - v.sida - 6 && p.y > v.bak + 4 && p.y < S.hojd - v.fram));
   if (!kandidater.length) return framfor(o);
   return kandidater.sort((a, c) => Math.hypot(a.x - pos.x, a.y - pos.y) - Math.hypot(c.x - pos.x, c.y - pos.y))[0];
 }
@@ -171,14 +177,14 @@ export const VAGG = Object.freeze({ bak: 48, sida: 32, fram: 16 });
 
 /**
  * Väggarna som rutor (hinder) i ett rum med väggram. Kartan kan ge egna mått (en smal hall har tjocka sidoväggar).
- * @param {{ bak: number, sida: number, fram: number }} [v]
+ * @param {{ bak: number, sida: number, fram: number }} [v] @param {{ bredd: number, hojd: number }} [S] områdets storlek
  */
-export function vaggar(v = VAGG) {
+export function vaggar(v = VAGG, S = RUM) {
   return [
-    { x: 0, y: 0, b: RUM.bredd, h: v.bak },
-    { x: 0, y: 0, b: v.sida, h: RUM.hojd },
-    { x: RUM.bredd - v.sida, y: 0, b: v.sida, h: RUM.hojd },
-    { x: 0, y: RUM.hojd - v.fram, b: RUM.bredd, h: v.fram },
+    { x: 0, y: 0, b: S.bredd, h: v.bak },
+    { x: 0, y: 0, b: v.sida, h: S.hojd },
+    { x: S.bredd - v.sida, y: 0, b: v.sida, h: S.hojd },
+    { x: 0, y: S.hojd - v.fram, b: S.bredd, h: v.fram },
   ];
 }
 
@@ -198,11 +204,12 @@ export function lasplats(o) {
  * tillbaka hit. @param {Objekt} o
  */
 export function stigStart(o) {
+  const S = ytan(o);
   const cx = Math.round(o.x + o.b / 2), cy = Math.round(o.y + o.h / 2) + 3;
-  if (o.riktning === 'upp') return { x: cx, y: Math.min(RUM.hojd, o.y + o.h + 10) };
+  if (o.riktning === 'upp') return { x: cx, y: Math.min(S.hojd, o.y + o.h + 10) };
   if (o.riktning === 'ned') return { x: cx, y: Math.max(FIGUR_HOJD, o.y - 4) };
   if (o.riktning === 'hoger') return { x: Math.max(8, o.x - 10), y: cy };
-  if (o.riktning === 'vanster') return { x: Math.min(RUM.bredd - 8, o.x + o.b + 10), y: cy };
+  if (o.riktning === 'vanster') return { x: Math.min(S.bredd - 8, o.x + o.b + 10), y: cy };
   return lasplats(o);
 }
 
@@ -225,9 +232,11 @@ export function hinderFran(objekt) {
 export function rumsObjekt(innehall, tillstand, karta, visade = []) {
   const ids = synligaIds(innehall, tillstand, visade);
   if (!karta) return placeraObjekt(ids);
-  const iKartan = karta.objekt.filter((o) => ids.includes(o.id)).map((o) => ({ ...o }));
+  // i ett område som är större än skärmen räknas föremålen mot områdets kanter
+  const storlek = karta.storlek && (karta.storlek.bredd !== RUM.bredd || karta.storlek.hojd !== RUM.hojd) ? { storlek: karta.storlek } : {};
+  const iKartan = karta.objekt.filter((o) => ids.includes(o.id)).map((o) => ({ ...o, ...storlek }));
   const saknas = ids.filter((id) => !iKartan.some((o) => o.id === id));
-  return [...iKartan, ...placeraObjekt(saknas)];
+  return [...iKartan, ...placeraObjekt(saknas).map((o) => ({ ...o, ...storlek }))];
 }
 
 /**

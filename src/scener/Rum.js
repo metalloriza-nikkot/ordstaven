@@ -8,6 +8,7 @@ import { rumsObjekt, framfor, framforFran, vidObjekt, aktivSak, hinderFran, vagg
 import { synligaIds } from '../karna/karta.js';
 import { skapaHinder } from '../karna/vag.js';
 import { skapaNivaer } from '../karna/nivaer.js';
+import { KAMERA, centrera, folj, visaRuta, omradeFor, narmare, enSkarm } from '../karna/kamera.js';
 
 const FARG = {
   golv: 0x8c8a86, rutnat: 0x7f7d79, kant: 0x5d5b58,
@@ -35,18 +36,27 @@ export class Rum extends Phaser.Scene {
   /**
    * @param {{ inmatning: ReturnType<typeof import('../karna/inmatning.js').skapaInmatning>,
    *           logg: { handelse(t: string, m: string, d?: any): void },
-   *           vidAndring?: () => void }} b
+   *           vidAndring?: () => void, mjukvara?: boolean,
+   *           vidKamera?: (k: import('../karna/skalning.js').Kamera, stor: boolean) => void }} b
+   * mjukvara = världen ritas med canvas utan grafikkort (golvdatorn): en bildruta ritas bara när något har ändrats
+   * vidKamera = kameran har flyttat sig (textlagret flyttar skyltarna med), stor = området är större än skärmen
    */
   constructor(b) {
     super({ key: 'Rum' });
     this.b = b;
     this.pos = { x: RUM.bredd / 2, y: RUM.hojd - 12 };
     /**
-     * Kamerans läge i världen (beslut 14): punkten i skärmens övre vänstra hörn, i hela pixlar. Kapitel 1:s rum ryms
-     * på en skärm, så den står i (0, 0). Kameran som följer hjälten byggs i T6; textlagret räknar redan med den.
+     * Kamerans läge i världen (beslut 14): punkten i skärmens övre vänstra hörn, i hela pixlar. I ett område som ryms
+     * på en skärm står den i (0, 0). I ett större område följer den hjälten (karna/kamera.js).
      * @type {import('../karna/skalning.js').Kamera}
      */
     this.kamera = { x: 0, y: 0 };
+    /** Områdets storlek (kartans): en skärm, eller större när kameran följer hjälten. */
+    this.storlek = { bredd: RUM.bredd, hojd: RUM.hojd };
+    /** Förskjutning framåt åt det håll han går, i pixlar (en inställning, 0 = ingen, beslut 18.1). */
+    this.kameraFramat = KAMERA.framat;
+    /** @type {{ x: number, y: number, b: number, h: number } | null} rutan som ska synas medan en fråga är ställd (valet) */
+    this.omrade = null;
     this.ungePos = { x: this.pos.x - 18, y: this.pos.y };
     /** @type {import('../karna/rumslayout.js').Objekt[]} */
     this.objekt = [];
@@ -102,6 +112,12 @@ export class Rum extends Phaser.Scene {
     this.niva = 0;
     /** @type {Map<number, ReturnType<typeof skapaHinder>>} hindren på varje nivå */
     this.hinderPer = new Map([[0, this.hinder]]);
+    /** Något har ändrats som inte syns i figurernas lägen (en ram, en låda som öppnas): rita nästa bildruta. */
+    this.smutsig = true;
+    this.forraSig = '';
+    this.senastRitad = 0;
+    /** @type {Set<any>} tweens som pågår hela tiden (glimten): de ritas i lugn takt, inte i varje bildruta */
+    this.oandliga = new Set();
     /** @type {{ x: number, y: number, t: number } | null} ett tryck medan världen stod still, som görs när den går igen */
     this.sparatTryck = null;
     /** Står han på en stege mellan nivåerna (styrbar klättring)? */
@@ -123,9 +139,10 @@ export class Rum extends Phaser.Scene {
     this.lagerFigurer.add([this.unge, this.hjalte]);
     // det som går att använda: en glimt på avstånd, ljus ram och glänt lock när hjälten står vid det
     this.glimtar = this.add.graphics();
-    this.tweens.add({ targets: this.glimtar, alpha: { from: 1, to: 0.25 }, duration: 700, yoyo: true, repeat: -1 });
+    this.oandliga.add(this.tweens.add({ targets: this.glimtar, alpha: { from: 1, to: 0.25 }, duration: 700, yoyo: true, repeat: -1 }));
     this.naraRam = this.add.graphics();
-    this.tweens.add({ targets: this.naraRam, alpha: { from: 1, to: 0.55 }, duration: 450, yoyo: true, repeat: -1 });
+    this.oandliga.add(this.tweens.add({ targets: this.naraRam, alpha: { from: 1, to: 0.55 }, duration: 450, yoyo: true, repeat: -1 }));
+    if (this.b.mjukvara) this.events.on('postupdate', () => this.valjRitning());
     this.malKors = this.add.graphics().setVisible(false);
     this.malKors.fillStyle(FARG.markerad).fillRect(-3, 0, 7, 1).fillRect(0, -3, 1, 7);
     // tryck på ett objekt = gå fram till det
@@ -164,18 +181,35 @@ export class Rum extends Phaser.Scene {
   }
 
 
+  /**
+   * Golvdatorn (canvas i mjukvara): en bildruta ritas bara när något har ändrats. Figurerna, kameran och tweens som
+   * tar slut syns direkt. Glimten (som pågår hela tiden) ritas åtta gånger per sekund. Annat som ändras (en ram,
+   * en låda, ljuset) sätter smutsig. Utan ändringar rör spelet inte duken, och då har datorn inget att rita om.
+   */
+  valjRitning() {
+    this.antalSteg = (this.antalSteg || 0) + 1;
+    const nu = this.time.now, h = this.hjalte, u = this.unge, k = this.cameras.main, bu = this.buren;
+    const sig = `${h.x},${h.y},${h.visible},${u.x},${u.y},${u.visible},${k.scrollX},${k.scrollY},${bu ? bu.x + ',' + bu.y : ''}`;
+    const rorlig = this.tweens.getTweens().some((t) => !this.oandliga.has(t) && t.isPlaying());
+    const rita = this.smutsig || rorlig || sig !== this.forraSig || nu - this.senastRitad >= 125;
+    this.sys.settings.visible = rita;
+    if (rita) { this.smutsig = false; this.forraSig = sig; this.senastRitad = nu; this.antalRitade = (this.antalRitade || 0) + 1; }
+  }
+
   /** @param {boolean} rum */
   ritaGolv(rum) {
+    this.smutsig = true;
     const g = this.golv; g.clear();
     if (!rum) { g.fillStyle(0x1a1410).fillRect(0, 0, RUM.bredd, RUM.hojd); return; }
-    g.fillStyle(FARG.golv).fillRect(0, 0, RUM.bredd, RUM.hojd);
+    const B = this.storlek.bredd, H = this.storlek.hojd;
+    g.fillStyle(FARG.golv).fillRect(0, 0, B, H);
     g.fillStyle(FARG.rutnat);
-    for (let x = RUM.ruta; x < RUM.bredd; x += RUM.ruta) g.fillRect(x, 0, 1, RUM.hojd);
-    for (let y = RUM.ruta; y < RUM.hojd; y += RUM.ruta) g.fillRect(0, y, RUM.bredd, 1);
-    g.fillStyle(FARG.kant).fillRect(0, 0, RUM.bredd, 2).fillRect(0, RUM.hojd - 2, RUM.bredd, 2).fillRect(0, 0, 2, RUM.hojd).fillRect(RUM.bredd - 2, 0, 2, RUM.hojd);
+    for (let x = RUM.ruta; x < B; x += RUM.ruta) g.fillRect(x, 0, 1, H);
+    for (let y = RUM.ruta; y < H; y += RUM.ruta) g.fillRect(0, y, B, 1);
+    g.fillStyle(FARG.kant).fillRect(0, 0, B, 2).fillRect(0, H - 2, B, 2).fillRect(0, 0, 2, H).fillRect(B - 2, 0, 2, H);
     if (!this.inomhus) return;
     // väggramen: bakvägg 3 rutor, sidoväggar 2 med sneda hörn, främre kant 1, och en ljus list överst
-    const B = RUM.bredd, H = RUM.hojd, { bak, sida, fram } = this.vagg;
+    const { bak, sida, fram } = this.vagg;
     g.fillStyle(0x7a6a58).fillRect(sida, 0, B - 2 * sida, bak);
     g.fillStyle(0x5e5244);
     g.fillTriangle(0, 0, sida, bak, 0, H).fillTriangle(0, 0, sida, 0, sida, bak);
@@ -189,7 +223,7 @@ export class Rum extends Phaser.Scene {
 
   /** Hjältens färger efter valen i skapa hjälten. @param {Record<string, number>} val */
   sattUtseende(val) {
-    this.utseende = val;
+    this.utseende = val; this.smutsig = true;
     const f = (/** @type {'hudfarg' | 'drakt' | 'hjalm' | 'skor'} */ del) => (del === 'hjalm' || del === 'skor' ? HJALTE_FAST[del] : HJALTE_FARGER[del][val[del] ?? 0] ?? HJALTE_FARGER[del][0]);
     this.hjalte.removeAll(true);
     // gråboxens version av spelarens figur: stort huvud med rund grå hjälm runt ett blått ansikte,
@@ -225,6 +259,7 @@ export class Rum extends Phaser.Scene {
   /** Ryggen mot kameran (på stegen): ansiktet döljs bakom hjälmen. @param {boolean} pa */
   sattRygg(pa) {
     const hud = HJALTE_FARGER.hudfarg[(this.utseende || {}).hudfarg ?? 0] ?? HJALTE_FARGER.hudfarg[0];
+    this.smutsig = true;
     this.ansikte?.setFillStyle(pa ? HJALTE_FAST.hjalm : hud);
     this.ryggBak?.setVisible(pa);
   }
@@ -268,6 +303,7 @@ export class Rum extends Phaser.Scene {
 
   /** En bild av rummet som det ser ut nu (för glidningen mellan rum). @returns {Promise<HTMLImageElement | null>} */
   bild() {
+    this.smutsig = true;
     return new Promise((klar) => {
       try { this.game.renderer.snapshot((img) => klar(/** @type {HTMLImageElement} */ (img))); } catch (e) { klar(null); }
       setTimeout(() => klar(null), 500);
@@ -295,6 +331,7 @@ export class Rum extends Phaser.Scene {
     this.lampor = v.karta?.lampor || [];
     this.morkerNatt = v.karta?.morker ?? null;
     if (v.nyttRum || !this.harRum) this.vagg = v.karta?.vagg || VAGG;
+    if (v.nyttRum || !this.harRum) { this.storlek = (this.harRum && v.karta?.storlek) || { bredd: RUM.bredd, hojd: RUM.hojd }; this.omrade = null; }
     this.ritaGolv(this.harRum);
     // föremål som bara syns i vissa tillstånd (ägget när ljuset är tänt) gör att rummet byggs om
     const synliga = this.harRum ? synligaIds(v.innehall, v.tillstand, v.visade).join(' ') : '';
@@ -313,13 +350,16 @@ export class Rum extends Phaser.Scene {
         const dorr = v.franRum ? this.objekt.find((o) => o.till === v.franRum) : null;
         /** @type {import('../karna/rumslayout.js').Objekt | null} utgången hjälten kom in genom */
         this.inkom = dorr ?? null;
-        const start = dorr ? framfor(dorr) : (v.franRum && v.karta?.in?.[v.franRum]) || v.karta?.start || { x: RUM.bredd / 2, y: RUM.hojd - 12 };
+        const start = dorr ? framfor(dorr) : (v.franRum && v.karta?.in?.[v.franRum]) || v.karta?.start || { x: this.storlek.bredd / 2, y: this.storlek.hojd - 12 };
         this.niva = 0; this.paStege = false; this.byggHinder(); this.sattNivaVid(start);
         this.pos = this.hinder.narmasteFria(start);
         this.ungePos = { x: this.pos.x - 18, y: this.pos.y };
         this.b.inmatning.rensaGaTill();
+        // kameran hoppar till hjälten när han kommer in (rummet glider eller tonas in)
+        this.sattKamera(enSkarm(this.storlek) ? { x: 0, y: 0 } : centrera(this.pos, this.storlek));
       } else this.pos = this.hinder.narmasteFria(this.pos);
     }
+    if (!this.harRum && (this.kamera.x || this.kamera.y)) this.sattKamera({ x: 0, y: 0 });
     this.hjalte.setVisible(this.harRum);
     this.unge.setVisible(this.harRum && this.visaUnge);
     this.ritaLjus();
@@ -329,7 +369,7 @@ export class Rum extends Phaser.Scene {
 
   /** Föremålen som går att använda just nu får en glimt. @param {string[]} ids */
   sattInteraktiva(ids) {
-    this.interaktiva = ids;
+    this.interaktiva = ids; this.smutsig = true;
     const g = this.glimtar; g.clear();
     for (const id of ids) {
       const o = this.ruta(id); if (!o || o.sort === 'utgang') continue;
@@ -341,7 +381,7 @@ export class Rum extends Phaser.Scene {
 
   /** Hjälten står vid ett föremål som går att använda: ljus ram och locket på glänt. @param {string | null} id */
   nara(id) {
-    this.naraId = id;
+    this.naraId = id; this.smutsig = true;
     const g = this.naraRam; g.clear();
     const o = id ? this.ruta(id) : null;
     if (!o) return;
@@ -352,12 +392,12 @@ export class Rum extends Phaser.Scene {
 
   byggHinder() {
     const sparrade = this.objekt.filter((o) => this.sparrade.has(o.id));
-    const rutor = [...hinderFran(this.objekt), ...sparrade, ...(this.inomhus ? vaggar(this.vagg) : [])];
+    const rutor = [...hinderFran(this.objekt), ...sparrade, ...(this.inomhus ? vaggar(this.vagg, this.storlek) : [])];
     // en uppsättning hinder per nivå: på marken går det inte att gå upp på kullen utom på trappan, och tvärtom
     const n = (this.nivaer = skapaNivaer(this.objekt));
-    this.hinderPer = new Map(n.nivaer.map((niva) => [niva, skapaHinder(rutor, n.finns ? (p) => n.tillaten(p, niva) : undefined)]));
+    this.hinderPer = new Map(n.nivaer.map((niva) => [niva, skapaHinder(rutor, n.finns ? (p) => n.tillaten(p, niva) : undefined, this.storlek)]));
     // på trappan eller stegen gäller båda nivåerna: han kan gå av uppe eller nere (men aldrig över kanten)
-    this.hinderForbindelse = n.finns ? skapaHinder(rutor, (p) => n.nivaer.some((niva) => n.tillaten(p, niva))) : null;
+    this.hinderForbindelse = n.finns ? skapaHinder(rutor, (p) => n.nivaer.some((niva) => n.tillaten(p, niva)), this.storlek) : null;
     if (!this.hinderPer.has(this.niva)) this.niva = 0;
     this.hinder = /** @type {ReturnType<typeof skapaHinder>} */ (this.hinderPer.get(this.niva));
     this.vag = []; this.vagMal = null;
@@ -378,6 +418,7 @@ export class Rum extends Phaser.Scene {
 
   /** @param {import('../karna/rumslayout.js').Objekt} o */
   ritaObjekt(o) {
+    this.smutsig = true;
     // en dörr i en sidovägg är en mörk öppning i väggen; dörrbladet, karmen och golvremsan ritas i ritaDetaljer
     const sidodorr = arSidodorr(o);
     const fyll = sidodorr ? 0x2b241e : objektFarg(o);
@@ -447,10 +488,11 @@ export class Rum extends Phaser.Scene {
   }
 
   ritaLjus() {
+    this.smutsig = true;
     const g = this.morker; g.clear();
     const t = this.tillstand || '';
     const alfa = !this.harRum ? 0 : t === 'natt' ? (this.morkerNatt ?? 0.72) : t === 'natt_upplyst' ? 0.42 : 0;
-    if (alfa) g.fillStyle(0x0a0820, alfa).fillRect(0, 0, RUM.bredd, RUM.hojd);
+    if (alfa) g.fillStyle(0x0a0820, alfa).fillRect(0, 0, this.storlek.bredd, this.storlek.hojd);
     // en lampa (läslampan vid Farfars plats) lyser varmt i mörkret: ljusare ringar inåt och en glödande punkt
     if (alfa) for (const l of this.lampor) {
       for (const [r, a] of [[60, 0.10], [44, 0.12], [28, 0.16]]) g.fillStyle(FARG.ljus, a).fillCircle(l.x, l.y, r);
@@ -479,6 +521,7 @@ export class Rum extends Phaser.Scene {
 
   /** @param {string} id @param {boolean} pa */
   markera(id, pa) {
+    this.smutsig = true;
     const r = this.ritade.get(id);
     if (!r) return;
     if (pa) this.markerade.add(id); else this.markerade.delete(id);
@@ -499,8 +542,9 @@ export class Rum extends Phaser.Scene {
     const ryms = bas && bas.b >= antal * 22;
     for (let i = 0; i < antal; i++) {
       // inom objektets ruta om de ryms, annars en egen rad mitt i rummet
-      const x = ryms && bas ? Math.round(bas.x + ((i + 0.5) * bas.b) / antal) - 9 : Math.round(((i + 1) * RUM.bredd) / (antal + 1)) - 9;
-      const n = { id: `${id}_${i}`, x, y: ryms && bas ? bas.y : 112, b: 18, h: 18, sort: /** @type {'sak'} */ ('sak'), ...(bas?.sida ? { sida: bas.sida } : {}) };
+      // (en egen rad: mitt i det som syns av området)
+      const x = ryms && bas ? Math.round(bas.x + ((i + 0.5) * bas.b) / antal) - 9 : this.kamera.x + Math.round(((i + 1) * RUM.bredd) / (antal + 1)) - 9;
+      const n = { id: `${id}_${i}`, x, y: ryms && bas ? bas.y : this.kamera.y + 112, b: 18, h: 18, sort: /** @type {'sak'} */ ('sak'), ...(bas?.sida ? { sida: bas.sida } : {}) };
       this.objekt.push(n); this.ritaObjekt(n); nya.push(n.id);
     }
     this.byggHinder();
@@ -575,6 +619,7 @@ export class Rum extends Phaser.Scene {
    * omkullfallen gren, och den går inte längre att gå på. @param {string} id
    */
   spika(id) {
+    this.smutsig = true;
     const o = this.ruta(id); if (!o) return;
     if (o.golv) {
       if (this.sparrade.has(id)) return;
@@ -589,6 +634,7 @@ export class Rum extends Phaser.Scene {
 
   /** Grenen tvärs över stigens början (gråbox: en brun stock med gröna blad). @param {import('../karna/rumslayout.js').Objekt} o */
   ritaGren(o) {
+    this.smutsig = true;
     const g = this.add.graphics();
     // grenen ligger inne på stigen, strax efter vägskälet (stigens början), så att man ser att den är spärrad
     const tvars = o.riktning === 'hoger' || o.riktning === 'vanster';
@@ -618,10 +664,10 @@ export class Rum extends Phaser.Scene {
   }
 
   /** Visa att ett föremål är öppnat och tomt. @param {string} id */
-  tomt(id) { const r = this.ritade.get(id); if (r) { r.setFillStyle(0x6f6a62); r.setAlpha(0.6); } this.markera(id, false); }
+  tomt(id) { this.smutsig = true; const r = this.ritade.get(id); if (r) { r.setFillStyle(0x6f6a62); r.setAlpha(0.6); } this.markera(id, false); }
 
   /** Visa att en kruka är slagen. @param {string} id */
-  slagen(id) { const r = this.ritade.get(id); if (r) { r.setFillStyle(0x5a554e); r.setSize(18, 8); r.y += 10; } }
+  slagen(id) { this.smutsig = true; const r = this.ritade.get(id); if (r) { r.setFillStyle(0x5a554e); r.setSize(18, 8); r.y += 10; } }
 
   /** Vilket av objekten står hjälten vid just nu? @param {string[]} ids @returns {string | null} */
   starVid(ids) {
@@ -658,12 +704,44 @@ export class Rum extends Phaser.Scene {
     if (!f) this.sattNivaVid(this.pos);
   }
 
+  /**
+   * Kameran (beslut 14, 18.1): i ett område som är större än skärmen följer den hjälten med en mittzon och stannar
+   * vid kanterna. Medan en fråga är ställd visar den hela valet (visaOmrade). Den rör sig i hela pixlar och högst
+   * KAMERA.fart pixlar per sekund, så den glider i stället för att hoppa. @param {number} dtMs
+   */
+  flyttaKameran(dtMs) {
+    const S = this.storlek;
+    if (enSkarm(S)) { if (this.kamera.x || this.kamera.y) this.sattKamera({ x: 0, y: 0 }); return; }
+    const mal = this.omrade ? visaRuta(this.kamera, this.omrade, this.pos, S).k : folj(this.kamera, this.pos, S, { vand: this.vand, framat: this.kameraFramat });
+    const k = narmare(this.kamera, mal, (Math.max(KAMERA.fart, FIGUR.fart * 1.5) * Math.min(dtMs, 100)) / 1000);
+    if (k.x !== this.kamera.x || k.y !== this.kamera.y) this.sattKamera(k);
+  }
+
+  /** Flytta kameran (hela pixlar), och säg det till textlagret. @param {import('../karna/skalning.js').Kamera} k */
+  sattKamera(k) {
+    this.kamera = { x: Math.round(k.x), y: Math.round(k.y) };
+    this.cameras?.main?.setScroll(this.kamera.x, this.kamera.y);
+    this.smutsig = true;
+    this.b.vidKamera?.(this.kamera, !enSkarm(this.storlek));
+  }
+
+  /**
+   * När en fråga ställs visar kameran hela valet: alla föremål i listan (alternativen, deras skyltar och frågans skylt),
+   * med plats för skyltarna ovanför. null = kameran följer hjälten igen. @param {string[] | null} ids
+   */
+  visaOmrade(ids) {
+    const rutor = (ids || []).map((id) => this.ruta(id)).filter((o) => !!o);
+    this.omrade = omradeFor(/** @type {any[]} */ (rutor));
+  }
+
   /** Objektets ruta i rumskoordinater. @param {string} id */
   ruta(id) { return this.objekt.find((o) => o.id === id) ?? null; }
 
   /** @param {number} _t @param {number} dtMs */
   update(_t, dtMs) {
     const inm = this.b.inmatning;
+    // kameran följer hjälten också när världen står still (han går tillbaka från kurvan, en fråga ställs)
+    if (this.harRum) this.flyttaKameran(dtMs);
     if (!this.harRum || this.fryst || this.klattrar) return;
     // ett tryck medan världen stod still görs nu, om det var nyss (högst 1,5 s sedan)
     if (this.sparatTryck) {
@@ -686,7 +764,7 @@ export class Rum extends Phaser.Scene {
       const nasta = this.vag[0];
       if (!nasta) { ny = { ...this.pos, framme: true }; }
       else {
-        ny = steg(this.pos, { riktning: { x: 0, y: 0 }, gaTill: nasta }, dtMs / 1000);
+        ny = steg(this.pos, { riktning: { x: 0, y: 0 }, gaTill: nasta }, dtMs / 1000, FIGUR.fart, this.storlek);
         if (ny.framme) { this.vag.shift(); ny.framme = this.vag.length === 0; }
       }
     } else ny = { ...this.pos, framme: false };

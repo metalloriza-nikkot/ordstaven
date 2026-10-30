@@ -19,14 +19,17 @@
 // Saker på ytan (lövhögarna) når han bara uppifrån. Se karna/nivaer.js.
 import { RUM } from './skalning.js';
 import { VAGG } from './rumslayout.js';
+import { STORSTA } from './kamera.js';
 
 /** @typedef {import('./rumslayout.js').Objekt} Objekt */
 /**
  * @typedef {{ objekt: Objekt[], start: { x: number, y: number } | null, inomhus: boolean,
  *             in: Record<string, { x: number, y: number }>, lampor: { x: number, y: number }[],
- *             vagg: { bak: number, sida: number, fram: number }, morker: number | null }} Karta
+ *             vagg: { bak: number, sida: number, fram: number }, morker: number | null,
+ *             storlek: { bredd: number, hojd: number } }} Karta
  * inomhus = rummet har väggram (bakvägg, sidoväggar, främre kant). in = var hjälten kommer in från ett rum
  * som inte har någon utgång hit (punkter som heter in_<rum>, t.ex. trädgården från köket). lampor = där det lyser i mörkret.
+ * storlek = områdets storlek i pixlar (kartans bredd och höjd): en skärm (320×192) eller större, högst 640×384.
  */
 
 const UTGANG = /^(stege_|dorr_|grind|stig_)/;
@@ -56,8 +59,10 @@ export const sortFor = (id) => (UTGANG.test(id) ? 'utgang' : 'sak');
  */
 export function lasKarta(tmj) {
   if (!tmj || tmj.type !== 'map') throw new Error('inte en Tiled-karta');
-  if (tmj.width * tmj.tilewidth !== RUM.bredd || tmj.height * tmj.tileheight !== RUM.hojd) {
-    throw new Error(`kartan är ${tmj.width * tmj.tilewidth}×${tmj.height * tmj.tileheight}, rummet är ${RUM.bredd}×${RUM.hojd}`);
+  const bredd = tmj.width * tmj.tilewidth, hojd = tmj.height * tmj.tileheight;
+  // ett område är minst en skärm och högst ungefär 2×2 skärmar (beslut 14). Är det större än skärmen följer kameran hjälten.
+  if (bredd < RUM.bredd || hojd < RUM.hojd || bredd > STORSTA.bredd || hojd > STORSTA.hojd) {
+    throw new Error(`kartan är ${bredd}×${hojd}, ett område är ${RUM.bredd}×${RUM.hojd} till ${STORSTA.bredd}×${STORSTA.hojd}`);
   }
   /** @type {Objekt[]} */
   const objekt = [];
@@ -103,5 +108,5 @@ export function lasKarta(tmj) {
   const vagg = { bak: tal(kartegen.vagg_bak, VAGG.bak), sida: tal(kartegen.vagg_sida, VAGG.sida), fram: tal(kartegen.vagg_fram, VAGG.fram) };
   const m = Number(kartegen.morker);
   const morker = kartegen.morker !== undefined && Number.isFinite(m) ? Math.max(0, Math.min(1, m)) : null;
-  return { objekt, start, inomhus: !!kartegen.inomhus, in: inpunkter, lampor, vagg, morker };
+  return { objekt, start, inomhus: !!kartegen.inomhus, in: inpunkter, lampor, vagg, morker, storlek: { bredd, hojd } };
 }

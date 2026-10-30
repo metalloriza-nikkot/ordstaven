@@ -455,6 +455,12 @@ export function skapaSpel(d) {
   /** @type {(() => void) | null} skyltarna i valet som pågår, ritas om när layouten ändras */
   let skyltarNu = null;
   layout.vidAndring(() => { visaEtiketter(); skyltarNu?.(); visaRumsskyltar(); });
+  // när kameran har stannat placeras skyltarna om på riktigt (under rörelsen flyttas de bara med, se ui.kamera):
+  // då hamnar en skylt vid bildens kant rätt, och en som kommit in i bilden hålls inne i rummet
+  {
+    let t = 0;
+    ui.vidKamera(() => { window.clearTimeout(t); t = window.setTimeout(() => { visaEtiketter(); skyltarNu?.(); visaRumsskyltar(); }, 150); });
+  }
 
   // ------------------------------------------------------------------ rummets skyltar (beslut 15.2)
   /** En skylt med en mening (inte ett ord) öppnas på läsplattan när han går dit. @param {string} text */
@@ -667,7 +673,7 @@ export function skapaSpel(d) {
     // dörrens skylt sitter ovanför dörren och täcker den aldrig (grind A), och den går att läsa från mitten av rummet
     if (o.sort === 'utgang' && !o.golv) return [skarm(o.x + o.b / 2, o.y - 1), bas];
     if (o.sort !== 'utgang' && o.sida === 'hoger' && o.x <= rum.vagg.sida + 8) return [skarm(o.x, mitt), { ...bas, lage: 'vanster' }];
-    if (o.sort !== 'utgang' && o.sida === 'vanster' && o.x + o.b >= RUM.bredd - rum.vagg.sida - 8) return [skarm(o.x + o.b, mitt), { ...bas, lage: 'hoger' }];
+    if (o.sort !== 'utgang' && o.sida === 'vanster' && o.x + o.b >= rum.storlek.bredd - rum.vagg.sida - 8) return [skarm(o.x + o.b, mitt), { ...bas, lage: 'hoger' }];
     return [skarm(o.x + o.b / 2, o.y), bas];
   }
 
@@ -1035,6 +1041,8 @@ export function skapaSpel(d) {
       return !!l && vidObjekt(rum.pos, l);
     };
     rum.frys(false);
+    // kameran visar hela valet: alla alternativ, deras skyltar och frågans skylt (beslut 18.1)
+    rum.visaOmrade([...v.s.alternativ.flatMap((a) => (a.objekt ? [a.objekt, rum.ruta(a.objekt)?.lapp ?? ''] : [])), p.skylt ?? ''].filter(Boolean));
     rum.sattInteraktiva(kvarSaker());
     for (const a of v.s.alternativ) { if (a.objekt) doljEtikett.add(a.objekt); const l = a.objekt && rum.ruta(a.objekt)?.lapp; if (l) doljEtikett.add(l); }
     visaEtiketter();
@@ -1124,7 +1132,7 @@ export function skapaSpel(d) {
       rum.malFor = (/** @type {any} */ o) => (o.sort === 'utgang' && altFor(o.id) ? framfor(o) : null);
       ritaSkyltar();
       const stada = () => {
-        window.clearInterval(tick); sluta(); k.stopp(); rum.tryckPa = null; rum.malFor = null; rum.nara(null); rum.sattInteraktiva([]); ui.ordskylt(null); ui.handknapp(null); ui.skyltar([]); skyltarNu = null; doljEtikett.clear(); visaEtiketter(); rum.ungePekar(null);
+        window.clearInterval(tick); sluta(); k.stopp(); rum.visaOmrade(null); rum.tryckPa = null; rum.malFor = null; rum.nara(null); rum.sattInteraktiva([]); ui.ordskylt(null); ui.handknapp(null); ui.skyltar([]); skyltarNu = null; doljEtikett.clear(); visaEtiketter(); rum.ungePekar(null);
         ui.$('#tanke').removeEventListener('click', tankeTryck);
         if (skylt) { skyltStyrs.delete(skylt.id); skyltSpar = null; skyltPusselNu = null; }
       };

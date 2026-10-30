@@ -453,3 +453,22 @@ Efter den externa granskningen: det ska aldrig löna sig att gissa eller vänta 
 - **Hopp till ett kapitel** (`?kapitel=kap-01`, och en sparning som är längre fram): kapitlen före spolas fram en gång (`spolaFram` i `karna/berattelse.js`, `av.spolat`). Stegens effekter görs utan att spelas: knapparna, ungen som följer, formlerna, kartbitar, lappar och gåvor, men inga bär. Namn som saknas frågas efter med de hoppade kapitlens egna dop-pussel, så att inga namn hittas på i koden.
 - **Det frivilliga och formlerna:** ett frivilligt föremål vars steg övar en formel (P11) går inte att använda förrän formeln finns på staven.
 - **Knapparna i HUD** täcks aldrig av en skylt, lapp eller hand: en som skulle hamna över en knapp ställs under sitt föremål (`placera` i `grans/ui.js`).
+
+## 25. Golvdatorn: canvas som ritar bara när något ändras (0.7.2)
+
+- **Golvet är ritning i mjukvara** (beslut 19): MacBook Pro 13" 2015, canvas, utan grafikkort. Det står i `docs/testmatris.md`. Målet är minst ca 30 bildrutor per sekund.
+- **Världen är redan 320×192** i canvasen, och sidan skalar upp den i ett steg (CSS, `image-rendering: pixelated`). Ingen ritning i full upplösning görs.
+- **Canvasläget** (`?canvas`, `ordstaven_ritning`, eller ingen WebGL alls): Phaser ritar högst 30 bildrutor per sekund (`fps.limit`) och tömmer inte canvasen före varje bildruta.
+- **Bara när något ändras** (`Rum.valjRitning`, efter varje steg i scenen): rummet ritas om när hjälten, ungen, buren eller kameran har flyttat sig, när en tween rör något, eller när rummet är markerat som ändrat (`smutsig`, sätts där föremål ritas, tänds eller byter utseende). Annars står förra bildrutan kvar. Glimtar och andra tweens som går för alltid (`oandliga`) räknas inte som rörelse. De ritas åtta gånger per sekund.
+- Spelet räknar steg och ritade bildrutor (`antalSteg`, `antalRitade`, krokar `steg2` och `ritade`), så att testet ser att stillastående rum inte ritas om.
+- WebGL-läget är oförändrat.
+
+## 26. Kameran (beslut 14 och 18.1, 0.7.2)
+
+- **Ett område** är en karta som är minst en skärm (320×192) och högst 2×2 skärmar (640×384). `lasKarta` ger `storlek`, och en karta utanför det godtas inte. Gränserna dras vid tydliga passager (Innehåll och Stil, rumsplanen).
+- **Logiken** ligger i `karna/kamera.js` (ren logik): `folj` (mittzon ±32×24 px, kameran flyttar sig bara så mycket som behövs), `inomGranserna` (stannar vid kanterna, hela pixlar), `centrera` (när han kommer in), `visaRuta` och `omradeFor` (valet), `narmare` (glidning, högst 240 px/s). Inställningarna står i `KAMERA`: zonen, `framat` (förskjutning framåt, 0) och farten.
+- **Rummet** (`Rum.flyttaKameran`) uppdaterar kameran i varje steg, också när världen står still. Ryms området på en skärm står den i (0, 0), och allt är som förut. När han kommer in i ett område hoppar kameran till honom innan rummet glider eller tonas in.
+- **Storleken** går till det som förut räknade med skärmen: hindren och vägsökningen (`skapaHinder(…, S)`), rörelsen (`steg`, `begransa`), väggarna (`vaggar(v, S)`), golvet och mörkret. Föremålen i ett stort område bär `storlek`, så att `framfor`, `framforFran` och `stigStart` räknar mot områdets kanter.
+- **När en fråga ställs** (läsval i världen) får kameran en ruta (`rum.visaOmrade`): alternativen, deras lappar och frågans skylt, med plats för skyltarna ovanför och på sidorna. Kameran glider så lite som möjligt för att rutan och hjälten ska synas. Ryms de inte på en skärm följer den hjälten som vanligt. Därför ska ett val och platsen där frågan läses rymmas på en skärm (krav på kartorna i T5).
+- **Textlagret:** skyltar, händer, bubblor och etiketter ligger i `#varldslager`. Varje element minns kamerans läge när det placerades, och när kameran rör sig flyttas det med `translate` i stället för att byggas om. 150 ms efter att kameran har stannat placeras skyltarna om på riktigt. I ett område som är större än skärmen klipps lagret vid rummets kanter, så att skyltar för föremål utanför bilden inte syns.
+- Testkrokar: `kamera()` (läge och storlek) och `rutaPaSkarm(id)`.

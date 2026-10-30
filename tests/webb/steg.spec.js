@@ -532,3 +532,91 @@ test('hopp till kapitel 1 (?kapitel=kap-01): prologen spolas fram, namnen fråga
   await expect(page.locator('#hud-nos')).toBeVisible();
   expect(await page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').unge.visible)).toBe(true);
 });
+
+test('golvdatorn (canvas): högst 30 bildrutor per sekund när han går, och nästan inga när inget rör sig', async ({ page }) => {
+  // canvasläget som på golvdatorn (som när WebGL har tappats)
+  await provscen(page, { id: 't_golv', pass: 1, rum: 'provskogen', steg: [{ typ: 'ga_till', mal: 'sten' }] },
+    () => { localStorage.setItem('ordstaven_ritning', JSON.stringify({ typ: 'canvas', t: Date.now() })); }, { rum: { provskogen: { innehall: ['sten'] } } });
+  expect(await page.evaluate(() => window.__ORDSTAVEN.ritning())).toBe('canvas');
+  await page.waitForTimeout(500);
+  const r = () => page.evaluate(() => ({ ritade: window.__ORDSTAVEN.ritade(), steg: window.__ORDSTAVEN.steg2() }));
+  const a = await r(); await page.waitForTimeout(2000); const b = await r();
+  const y0 = (await page.evaluate(() => window.__ORDSTAVEN.position())).y;
+  await page.keyboard.down('ArrowUp'); await page.waitForTimeout(800); const c = await r(); await page.keyboard.up('ArrowUp');
+  expect((await page.evaluate(() => window.__ORDSTAVEN.position())).y).toBeLessThan(y0 - 30); // han gick hela tiden
+  // stilla: glimten åtta gånger per sekund, alltså färre än hälften av stegen (högst 30 per sekund)
+  expect(b.ritade - a.ritade).toBeLessThan((b.steg - a.steg) / 2);
+  expect((b.steg - a.steg) / 2).toBeLessThanOrEqual(32);
+  // han går: varje steg ritas (de första stegen efter tangenten kan vara stilla)
+  expect(c.ritade - b.ritade).toBeGreaterThanOrEqual((c.steg - b.steg) - 4);
+});
+
+// ------------------------------------------------------------------ kameran (beslut 14, 18.1)
+/** En karta som är större än skärmen (högst 2×2 skärmar). */
+const storKarta = (objekt, start, bredd = 40, hojd = 24) => ({ ...provkarta(objekt, start), width: bredd, height: hojd });
+/** Ligger rutan helt inne i bilden av rummet (#varld)? */
+const iBild = async (page, r) => {
+  const v = await page.locator('#varld').boundingBox();
+  return r.x >= v.x - 1 && r.y >= v.y - 1 && r.x + (r.b ?? r.width) <= v.x + v.width + 1 && r.y + (r.h ?? r.height) <= v.y + v.height + 1;
+};
+
+test('kameran följer hjälten i ett stort område: mittzon, hela pixlar, stannar vid kanterna, och skyltarna följer med', async ({ page }) => {
+  test.setTimeout(60000);
+  await provscen(page, { id: 't_kam', pass: 1, rum: 'provdalen', steg: [{ typ: 'ga_till', mal: 'sten' }, R('Framme.')] }, null, {
+    rum: { provdalen: { innehall: ['skylt_ord', 'sten'], skyltar: { skylt_ord: { text: 'bär' } } } },
+    kartor: { provdalen: storKarta([{ name: 'skylt_ord', type: 'sak', x: 120, y: 300, width: 24, height: 16 }, { name: 'sten', type: 'sak', x: 560, y: 60, width: 24, height: 16 }], { x: 80, y: 350 }) },
+  });
+  const kam = () => page.evaluate(() => window.__ORDSTAVEN.kamera());
+  await expect.poll(kam).toMatchObject({ x: 0, y: 192, bredd: 640, hojd: 384 }); // nere till vänster, vid kanterna
+  await expect(page.locator('#varldslager')).toHaveClass(/klipp/);
+  await page.waitForFunction(() => !window.__ORDSTAVEN.fryst());
+  // ett kort steg inom mittzonen: kameran står still
+  await page.keyboard.down('ArrowRight'); await page.waitForTimeout(250); await page.keyboard.up('ArrowRight');
+  expect((await kam()).x).toBe(0);
+  // längre åt höger: kameran följer, i hela pixlar, och hjälten är kvar i bilden
+  await page.keyboard.down('ArrowRight'); await page.waitForTimeout(2600); await page.keyboard.up('ArrowRight');
+  await page.waitForTimeout(300);
+  const k = await kam(), p = await page.evaluate(() => window.__ORDSTAVEN.position());
+  expect(k.x).toBeGreaterThan(0);
+  expect(Number.isInteger(k.x) && Number.isInteger(k.y)).toBe(true);
+  expect(p.x - k.x).toBeGreaterThan(0); expect(p.x - k.x).toBeLessThan(320);
+  expect(Math.abs(p.x - k.x - 160)).toBeLessThanOrEqual(33); // vid mittzonens kant
+  // skylten sitter kvar på sitt föremål när kameran har flyttat sig
+  await expect.poll(async () => {
+    const s = await page.locator('#rumsskyltar .skylt[data-objekt="skylt_ord"]').boundingBox(), o = await page.evaluate(() => window.__ORDSTAVEN.rutaPaSkarm('skylt_ord'));
+    return s ? Math.abs(s.x + s.width / 2 - (o.x + o.b / 2)) : 999;
+  }).toBeLessThanOrEqual(2);
+  // ända bort till höger kanten: kameran stannar vid områdets kant
+  await page.keyboard.down('ArrowRight'); await page.waitForTimeout(5000); await page.keyboard.up('ArrowRight');
+  await expect.poll(async () => (await kam()).x).toBe(320);
+});
+
+test('kameran visar hela valet när frågan ställs: alla alternativ, deras skyltar och frågans skylt', async ({ page }) => {
+  test.setTimeout(60000);
+  const stig = (name, x) => ({ name, type: 'utgang', x, y: 50, width: 28, height: 60, properties: { golv: true, riktning: 'upp' } });
+  const pussel = {
+    id: 't_kamval', typ: 'P1_las_och_valj', i_rummet: true, skylt: 'skylt_fraga', papper: 'traskylt',
+    varianter: { L2: { text: 'Gå mot solen.', alternativ: [
+      { id: 'a', objekt: 'stig_a', ord: 'sol', ratt: true }, { id: 'b', objekt: 'stig_b', ord: 'sal' }, { id: 'c', objekt: 'stig_c', ord: 'sil' },
+    ] } },
+  };
+  await provscen(page, { id: 't_kamv', pass: 1, rum: 'provdalen', steg: [{ typ: 'pussel', pussel_id: 't_kamval' }, R('Rätt.')] }, null, {
+    pussel: [pussel],
+    rum: { provdalen: { innehall: ['skylt_fraga', 'stig_a', 'stig_b', 'stig_c'] } },
+    kartor: { provdalen: storKarta([{ name: 'skylt_fraga', type: 'sak', x: 470, y: 140, width: 48, height: 12 }, stig('stig_a', 420), stig('stig_b', 490), stig('stig_c', 560)], { x: 360, y: 190 }) },
+  });
+  // innan frågan: stigen längst till höger syns inte
+  await expect(page.locator('#skyltar .skylt')).toHaveCount(3, { timeout: 8000 });
+  const allt = async () => {
+    for (const id of ['stig_a', 'stig_b', 'stig_c', 'skylt_fraga']) if (!(await iBild(page, await page.evaluate((i) => window.__ORDSTAVEN.rutaPaSkarm(i), id)))) return id;
+    for (const s of await page.locator('#skyltar .skylt, #rumsskyltar .skylt').all()) if (!(await iBild(page, await s.boundingBox()))) return 'skylt ' + (await s.getAttribute('data-objekt'));
+    const k = await page.evaluate(() => window.__ORDSTAVEN.kamera()), p = await page.evaluate(() => window.__ORDSTAVEN.position());
+    if (p.x - k.x < 0 || p.x - k.x > 320 || p.y - k.y < 24 || p.y - k.y > 192) return 'hjälten';
+    return 'allt syns';
+  };
+  await expect.poll(allt, { timeout: 8000 }).toBe('allt syns');
+  await page.screenshot({ path: 'test-results/kamera-valet.png' });
+  // valet fungerar som vanligt: rätt stig
+  await tryckPa(page, 'stig_a');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('RÄTT.', { timeout: 10000 });
+});

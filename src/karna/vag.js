@@ -9,7 +9,6 @@ import { FIGUR } from './rorelse.js';
 export const FOT = Object.freeze({ b: 12, h: 6 });
 const STEG = 4;
 const MIN = { x: FIGUR.bredd / 2, y: FIGUR.hojd };
-const MAX = { x: RUM.bredd - FIGUR.bredd / 2, y: RUM.hojd };
 
 /** @typedef {{ x: number, y: number, b: number, h: number }} Ruta */
 /** @typedef {{ x: number, y: number }} Punkt */
@@ -17,8 +16,10 @@ const MAX = { x: RUM.bredd - FIGUR.bredd / 2, y: RUM.hojd };
 /**
  * @param {Ruta[]} hinder
  * @param {(p: Punkt) => boolean} [tillaten] en regel till för var fötterna får stå (höjdnivåerna: kanten på kullen)
+ * @param {{ bredd: number, hojd: number }} [S] områdets storlek (en skärm, eller större när kameran följer hjälten)
  */
-export function skapaHinder(hinder, tillaten = () => true) {
+export function skapaHinder(hinder, tillaten = () => true, S = RUM) {
+  const MAX = { x: S.bredd - FIGUR.bredd / 2, y: S.hojd };
   /** Är punkten (fötterna) fri? @param {Punkt} p */
   const fri = (p) => {
     if (p.x < MIN.x - 0.01 || p.x > MAX.x + 0.01 || p.y < MIN.y - 0.01 || p.y > MAX.y + 0.01) return false;

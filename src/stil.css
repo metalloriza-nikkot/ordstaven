@@ -131,6 +131,11 @@ html, body {
 #ui > * { pointer-events: auto; }
 #ui [hidden] { display: none !important; }
 #etiketter { pointer-events: none !important; position: absolute; inset: 0; }
+/* Världslagret: allt i textlagret som sitter på något i världen. Det flyttas med kameran (translate), och i ett
+   område som är större än skärmen klipps det vid rummets kanter. */
+#varldslager { position: absolute; inset: 0; z-index: 4; pointer-events: none !important; }
+#varldslager.klipp { clip-path: inset(var(--rum-topp) calc(100% - var(--rum-vanster) - var(--rum-bredd)) calc(100% - var(--rum-topp) - var(--rum-hojd)) var(--rum-vanster)); }
+#ordskylt, #handknapp { pointer-events: auto; }
 .etikett-obj { position: absolute; transform: translate(-50%, -110%); font-size: 12px; color: #2b2420; background: rgba(245, 236, 215, .7); padding: 0 4px; border-radius: 4px; white-space: nowrap; }
 .platta-oppen #etiketter { display: none; }
 

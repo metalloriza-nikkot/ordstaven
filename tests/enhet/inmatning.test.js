@@ -169,8 +169,11 @@ describe('Tiled-kartor och synliga föremål', () => {
       { id: 'lada', x: 10, y: 20, b: 20, h: 16, sort: 'sak', sida: 'vanster' },
     ]);
   });
-  it('en karta i fel storlek godtas inte', () => {
-    expect(() => lasKarta({ ...tmj([]), width: 21 })).toThrow(/rummet är 320×192/);
+  it('en karta i fel storlek godtas inte: minst en skärm, högst ungefär 2×2 skärmar', () => {
+    expect(() => lasKarta({ ...tmj([]), width: 19 })).toThrow(/320×192 till 640×384/);
+    expect(() => lasKarta({ ...tmj([]), height: 25 })).toThrow(/320×192 till 640×384/);
+    expect(lasKarta(tmj([])).storlek).toEqual({ bredd: 320, hojd: 192 });
+    expect(lasKarta({ ...tmj([]), width: 40, height: 24 }).storlek).toEqual({ bredd: 640, hojd: 384 });
   });
   it('syns_i döljer föremål tills rummet har rätt tillstånd', () => {
     const inn = ['stav', { id: 'agg', syns_i: ['natt_upplyst', 'morgon'] }];

@@ -101,16 +101,30 @@ const tangentbord = skapaTangentbord({
   vidKlar: () => inmatning.tangentNer('Enter'),
 });
 
-const rum = new Rum({ inmatning, logg });
 // Har WebGL tappats förut på den här datorn (Safari på golvdatorn: "WebGL context lost") ritas världen med canvas,
 // en vecka i taget. Annars väljer Phaser: WebGL om det finns, annars canvas.
 const NYCKEL_RITNING = 'ordstaven_ritning';
 const canvasSparad = (() => {
   try { const v = JSON.parse(localStorage.getItem(NYCKEL_RITNING) || 'null'); return !!v && v.typ === 'canvas' && Date.now() - v.t < 7 * 864e5; } catch (e) { return false; }
 })();
+// Finns WebGL alls? Golvdatorn (beslut 19) saknar det: då ritas världen med canvas i mjukvara, och spelet sparar
+// på arbetet (takt 30, och ingen ny bildruta när inget har ändrats).
+const webglFinns = (() => {
+  try {
+    const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl');
+    /** @type {any} */ (gl)?.getExtension('WEBGL_lose_context')?.loseContext();
+    return !!gl;
+  } catch (e) { return false; }
+})();
+const canvasLage = parametrar.has('canvas') || canvasSparad || !webglFinns;
+// kameran (beslut 14): textlagret flyttar skyltarna, händerna och bubblorna med den
+const rum = new Rum({ inmatning, logg, mjukvara: canvasLage, vidKamera: (k, stor) => ui.kamera(k, layout.skala.cssSkala, stor) });
 const spel = new Phaser.Game({
   // ?canvas tvingar canvas-ritningen (som när datorn saknar WebGL), för att kunna testa den
-  type: parametrar.has('canvas') || canvasSparad ? Phaser.CANVAS : Phaser.AUTO,
+  type: canvasLage ? Phaser.CANVAS : Phaser.AUTO,
+  // canvas: högst 30 bildrutor per sekund, och duken rensas inte (golvet ritas över hela rummet varje gång),
+  // så att en bildruta utan ändringar kan hoppas över helt (Rum.valjRitning)
+  ...(canvasLage ? { fps: { limit: 30 }, clearBeforeRender: false } : {}),
   parent: varld,
   width: RUM.bredd,
   height: RUM.hojd,
@@ -138,6 +152,7 @@ spel.events.once(Phaser.Core.Events.READY, () => {
   }, { once: true });
 });
 if (canvasSparad) logg.handelse('ritning', 'canvas (WebGL tappades förut på den här datorn)');
+if (canvasLage) logg.handelse('ritning', 'canvas: högst 30 bildrutor per sekund, och bara när något ändras', { webgl: webglFinns });
 // Hack i bildrutorna skrivs i loggen med vad som pågick (golvdatorn ritar utan grafikkort).
 bevakaBildrutor({ logg, sammanhang: () => ({ scen: spelet?.scen, steg: spelet?.steg?.typ, pussel: spelet?.steg?.pussel_id, platta: !ui.plattan.hidden, ritning: spel.renderer?.type === Phaser.CANVAS ? 'canvas' : 'webgl' }) });
 
@@ -200,6 +215,13 @@ const spelet = skapaSpel({
   logg: () => logg.text(),
   /** Föremålen som går att använda just nu. */
   interaktiva: () => [...rum.interaktiva],
+  /** Hur många bildrutor rummet har ritat (canvasläget ritar bara när något ändras). */
+  ritade: () => rum.antalRitade || 0,
+  kamera: () => ({ ...rum.kamera, ...rum.storlek }),
+  /** Föremålets ruta på skärmen (CSS-pixlar), via kameran: för att se om något syns. */
+  rutaPaSkarm: (id) => { const o = rum.ruta(id); if (!o) return null; const a = varldTillSkarm(layout.skala, rum.kamera, o.x, o.y), b = varldTillSkarm(layout.skala, rum.kamera, o.x + o.b, o.y + o.h); return { x: a.x, y: a.y, b: b.x - a.x, h: b.y - a.y }; },
+  /** Hur många steg (uppdateringar) rummet har gjort i canvasläget. */
+  steg2: () => rum.antalSteg || 0,
   /** Stigar som är spärrade med en gren. */
   sparrade: () => [...rum.sparrade],
   /** Står världen still (läsplattan, en reaktion, han går tillbaka)? */

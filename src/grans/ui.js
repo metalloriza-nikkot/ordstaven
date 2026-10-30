@@ -16,7 +16,6 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
   ui.id = 'ui';
   ui.innerHTML = `
     <div id="tona"></div>
-    <div id="etiketter"></div>
     <div id="hud">
       <button type="button" id="hud-bar" class="hud-knapp" hidden aria-label="Bär"><span class="ikon">🫐</span><span class="tal">0</span></button>
       <button type="button" id="hud-nos" class="hud-knapp" hidden aria-label="Nosa på ett ord"><span class="ikon">👃</span></button>
@@ -26,12 +25,15 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     <button type="button" id="hud-paus" class="hud-knapp" hidden aria-label="Paus"><span class="ikon paus-ikon" aria-hidden="true"><i></i><i></i></span></button>
     <button type="button" id="hud-meny" aria-label="Meny för vuxna (håll inne)">⚙</button>
     <div id="tanke" hidden></div>
-    <div id="rumsskyltar"></div>
-    <div id="skyltar"></div>
-    <div id="rop" hidden></div>
-    <div id="ordskylt" hidden></div>
+    <div id="varldslager">
+      <div id="etiketter"></div>
+      <div id="rumsskyltar"></div>
+      <div id="skyltar"></div>
+      <div id="rop" hidden></div>
+      <div id="ordskylt" hidden></div>
+      <div id="handknapp" hidden><button type="button" aria-label="Använd">✋</button></div>
+    </div>
     <div id="styrhjalp" hidden></div>
-    <div id="handknapp" hidden><button type="button" aria-label="Använd">✋</button></div>
     <div id="regi" hidden></div>
     <div id="narbild" hidden><span>🗺️</span></div>
     <div id="plattan" hidden></div>
@@ -43,6 +45,36 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
   document.body.appendChild(ui);
   const $ = (/** @type {string} */ s) => /** @type {HTMLElement} */ (ui.querySelector(s));
   const plattan = $('#plattan'), regi = $('#regi'), remsa = $('#remsa'), skarm = $('#skarm'), fest = $('#fest');
+
+  // ---------------------------------------------------------------- kameran (beslut 14)
+  // Allt som sitter på något i världen (skyltar, händer, bubblor, etiketter) placeras via kameran. När kameran rör sig
+  // flyttas det med en förskjutning (CSS translate) i stället för att byggas om: varje element minns kamerans läge när
+  // det placerades. När kameran har stannat placeras skyltarna om på riktigt (vidKamera). I ett område som är större
+  // än skärmen klipps världslagret vid rummets kanter, så att skyltar för föremål utanför bilden inte syns.
+  const varldslager = $('#varldslager');
+  let kam = { x: 0, y: 0 }, kamSkala = 1;
+  /** @type {Map<HTMLElement, { x: number, y: number }>} */
+  const ankrade = new Map();
+  /** Elementet placeras nu, med kamerans läge nu. @param {HTMLElement} e */
+  const ankra = (e) => { ankrade.set(e, { ...kam }); e.style.translate = ''; };
+  const flyttaAnkrade = () => {
+    for (const [e, k0] of ankrade) {
+      const dx = (k0.x - kam.x) * kamSkala, dy = (k0.y - kam.y) * kamSkala;
+      e.style.translate = dx || dy ? `${dx}px ${dy}px` : '';
+    }
+  };
+  /** @type {Set<() => void>} */
+  const kameraLyssnare = new Set();
+  /**
+   * Kameran har flyttat sig. @param {{ x: number, y: number }} k @param {number} cssSkala
+   * @param {boolean} stor området är större än skärmen (då klipps världslagret)
+   */
+  function kamera(k, cssSkala, stor) {
+    kam = { x: k.x, y: k.y }; kamSkala = cssSkala;
+    varldslager.classList.toggle('klipp', !!stor);
+    flyttaAnkrade();
+    for (const f of kameraLyssnare) f();
+  }
 
   /** Ord i ordlistorna, för helord-flaggan. */
   const ordInfo = new Map(ordlistor.ord.map((/** @type {any} */ o) => [versaler(o.ord), o]));
@@ -248,7 +280,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
   /** Etiketter över rummets objekt (gråbox, för den vuxne). @param {{ id: string, x: number, y: number, b: number }[]} objekt @param {(x: number, y: number) => { x: number, y: number }} tillSkarm @param {boolean} visa */
   function etiketter(objekt, tillSkarm, visa) {
     const e = $('#etiketter');
-    e.hidden = !visa;
+    e.hidden = !visa; ankra(e);
     e.innerHTML = objekt.map((o) => { const p = tillSkarm(o.x + o.b / 2, o.y); return `<span class="etikett-obj" style="left:${p.x}px;top:${p.y}px">${esc(o.id.replace(/_/g, ' '))}</span>`; }).join('');
   }
 
@@ -277,12 +309,14 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     e.classList.remove('under', 'pa', 'vanster', 'hoger');
     if (plats?.objekt) e.dataset.objekt = plats.objekt; else delete e.dataset.objekt;
     if (lage !== 'over') e.classList.add(lage);
+    // ett föremål utanför bilden (ett stort område) får sin skylt där föremålet är: den klipps, och syns när kameran kommer dit
+    const iBild = !plats?.ram || (punkt.x >= plats.ram.vanster && punkt.x <= plats.ram.hoger);
     e.style.left = punkt.x + 'px'; e.style.top = punkt.y + 'px';
     if (lage === 'over' && plats && punkt.y - e.offsetHeight - 6 < plats.rumTopp) { e.classList.add('under'); e.style.top = (plats.under ?? punkt.y) + 'px'; }
     // en skylt eller lapp får aldrig täcka knapparna (bär, nos, radio, paus): då står den under föremålet
     if (lage === 'over' && plats && !e.classList.contains('under') && tackerKnapp(e)) { e.classList.add('under'); e.style.top = (plats.under ?? punkt.y) + 'px'; }
     // alltid helt inne i rummet
-    if (plats?.ram) {
+    if (plats?.ram && iBild) {
       const r = e.getBoundingClientRect();
       if (r.left < plats.ram.vanster) e.style.left = punkt.x + (plats.ram.vanster - r.left) + 'px';
       else if (r.right > plats.ram.hoger) e.style.left = punkt.x - (r.right - plats.ram.hoger) + 'px';
@@ -298,7 +332,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     const e = $('#ordskylt');
     if (!html || !punkt) { e.hidden = true; e.innerHTML = ''; return; }
     e.innerHTML = html; e.hidden = false;
-    placera(e, punkt, plats);
+    ankra(e); placera(e, punkt, plats);
     const knapp = e.querySelector('button');
     knapp?.addEventListener('click', () => { if (!nos.aktiv) vidTryck?.(); });
   }
@@ -309,7 +343,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
    * @param {{ objekt: string, html: string, punkt: { x: number, y: number }, plats: Plats, vidTryck: () => void }[]} lista
    */
   function skyltar(lista, e = $('#skyltar')) {
-    e.innerHTML = '';
+    e.innerHTML = ''; ankra(e);
     for (const s of lista) {
       const d = document.createElement('div');
       d.className = 'skylt'; d.innerHTML = s.html;
@@ -336,7 +370,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
   function ropa(html, punkt) {
     const e = $('#rop');
     if (!html || !punkt) { e.hidden = true; e.innerHTML = ''; return; }
-    e.innerHTML = html; e.hidden = false;
+    e.innerHTML = html; e.hidden = false; ankra(e);
     e.style.left = punkt.x + 'px'; e.style.top = punkt.y + 'px';
     e.classList.remove('pop'); void e.offsetWidth; e.classList.add('pop');
   }
@@ -357,7 +391,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     if (!punkt) { hand.hidden = true; handTryck = () => {}; return; }
     handTryck = vidTryck || (() => {});
     hand.hidden = false;
-    placera(hand, punkt, plats);
+    ankra(hand); placera(hand, punkt, plats);
   }
 
   /** Ett bär flyger från räknaren till ungen. @param {{ x: number, y: number }} fran @param {{ x: number, y: number }} till @param {number} ms */
@@ -382,7 +416,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     const e = $('#styrhjalp');
     e.hidden = !typ; e.className = typ || '';
     if (typ === 'pilar') e.innerHTML = '<span class="tangent upp">▲</span><span class="tangent vanster">◀</span><span class="tangent ner">▼</span><span class="tangent hoger">▶</span>';
-    else if (typ === 'tryck' && punkt) { e.innerHTML = '<span class="finger">👆</span>'; e.style.left = punkt.x + 'px'; e.style.top = punkt.y + 'px'; }
+    else if (typ === 'tryck' && punkt) { ankra(e); e.innerHTML = '<span class="finger">👆</span>'; e.style.left = punkt.x + 'px'; e.style.top = punkt.y + 'px'; }
     else if (typ === 'mellanslag') e.innerHTML = '<span class="tangent mellanslag" aria-hidden="true"></span>'; // en bred tangent som trycks ned
     else if (typ === 'tab') { // Tab-tangenten, som tänder nosen, under nosknappen
       e.innerHTML = '<span class="tangent tab" aria-hidden="true">⇥</span>';
@@ -432,6 +466,9 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
   }
 
   return {
+    kamera,
+    /** När kameran har flyttat sig. @param {() => void} f */
+    vidKamera(f) { kameraLyssnare.add(f); return () => kameraLyssnare.delete(f); },
     glid, tona,
     styrhjalp,
     flygBar,
