@@ -49,6 +49,9 @@ export function skapaRost({ logg, tyst = () => false }) {
    */
   function saga(text, roll = 'berattare', vidOrd) {
     const min = ++token;
+    // pratade talsyntesen nyss: Chrome på Mac kan fastna med "speaking" om nästa yttrande läggs direkt efter
+    // cancel() (loggen 2026-10-30 22:41: maxtid på namn och nosord). Då väntar vi 80 ms innan nästa läggs.
+    const avbrot = !!(synt && (synt.speaking || synt.pending));
     try { synt?.cancel(); } catch (e) { /* ok */ }
     if (!text) return Promise.resolve('klar');
     if (tyst()) return Promise.resolve('tyst');
@@ -101,7 +104,8 @@ export function skapaRost({ logg, tyst = () => false }) {
         } else tyst = 0;
       }, 100);
       const max = setTimeout(() => { logg?.handelse('röst', 'maxtid', text.slice(0, 40)); sluta('klar'); }, 2000 + uppskattad(text) * 2.5);
-      try { synt.speak(u); } catch (e) { sluta('avbruten'); }
+      const tala = () => { if (klar || min !== token) return; t0 = Date.now(); try { synt.speak(u); } catch (e) { sluta('avbruten'); } };
+      if (avbrot) setTimeout(tala, 80); else tala();
     });
   }
 

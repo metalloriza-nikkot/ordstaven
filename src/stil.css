@@ -305,7 +305,11 @@ html, body {
 #skarm { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(20, 14, 10, .92); z-index: 4; }
 #skarm.genomskinlig { background: transparent; pointer-events: none; }
 .start, .pass-slut { display: flex; flex-direction: column; align-items: center; gap: 32px; }
-.stav-glimt { width: 24px; height: 220px; border-radius: 12px; background: linear-gradient(#8a6a4a, #6b4c35); box-shadow: 0 0 40px 10px rgba(242, 193, 78, .45); transform: rotate(18deg); animation: glimt 2s ease-in-out infinite; }
+/* startskärmens stav: glöden ligger stilla i ett eget lager, och bara dess opacitet pulserar. En skugga med oskärpa
+   som ändrar storlek ritas om i varje bildruta, och på golvdatorn gav startskärmen ca 20 bildrutor per sekund. */
+.stav-glimt { position: relative; width: 24px; height: 220px; border-radius: 12px; background: linear-gradient(#8a6a4a, #6b4c35); transform: rotate(18deg); }
+.stav-glimt::after { content: ''; position: absolute; inset: 0; border-radius: 12px; box-shadow: 0 0 50px 14px rgba(242, 193, 78, .6); animation: glod 2s ease-in-out infinite; will-change: opacity; }
+@keyframes glod { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
 @keyframes glimt { 50% { box-shadow: 0 0 60px 18px rgba(242, 193, 78, .75); } }
 .start-knapp { width: 140px; height: 140px; border-radius: 70px; font-size: 64px; background: var(--guld); }
 .stor-ikon { font-size: 140px; }

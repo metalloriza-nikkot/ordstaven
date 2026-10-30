@@ -54,6 +54,24 @@ describe('datorrösten', () => {
     expect(logg.handelse).toHaveBeenCalledWith('röst', 'startade inte, en gång till', 'Här!');
     expect(logg.handelse).not.toHaveBeenCalledWith('röst', 'maxtid', expect.anything());
   });
+  it('avbryts ett yttrande läggs nästa först efter en kort paus (Chrome fastnar annars)', async () => {
+    vi.useFakeTimers();
+    const s = falskSynt({ ms: 400 });
+    const tala = s.speak; const tider = [];
+    s.speak = (u) => { tider.push(Date.now()); tala(u); };
+    installera(s);
+    const r = skapaRost({});
+    r.saga('Först en lång mening som pratar.');
+    await vi.advanceTimersByTimeAsync(100); // talar nu
+    const t1 = Date.now();
+    let hur = null; r.saga('Hej!').then((h) => { hur = h; });
+    await vi.advanceTimersByTimeAsync(40);
+    expect(tider.length).toBe(1); // inte än
+    await vi.advanceTimersByTimeAsync(600);
+    expect(tider.length).toBe(2);
+    expect(tider[1] - t1).toBeGreaterThanOrEqual(80);
+    expect(hur).toBe('klar');
+  });
   it('startar det inte heller andra gången ges det upp efter 2,5 s', async () => {
     vi.useFakeTimers();
     const s = falskSynt({ ms: 400 }); s.speak = () => {};

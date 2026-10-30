@@ -505,3 +505,8 @@ Efter den externa granskningen: det ska aldrig löna sig att gissa eller vänta 
 - **SLUTA FÖR IDAG** (`slutaForIdag`): från pausmenyn (bilden med den sovande ungen) och från knappen vid passets slut. Spelet sparar, `sluta_for_idag.med_ungen` eller `fore_ungen` spelas, och sedan den sovande ungen och ▶, som fortsätter där han var. Pausknappen finns först när hjälteboken har något (från LJUS i s03).
 - **Föräldravyn** (`karna/foraldravy.js`, menyn för vuxna): per pusseltyp nivån, antalet uppgifter, rätt på första försöket utan hjälp, vad slumpen hade gett i läsvalen (1 av antalet alternativ i varianten), hur ofta hjälpen användes och mediantiden. Ur `larande.historik`.
 - **Vägvalet** (beslut 17.1): ett `ga_till` med `fri_vag` loggar `[vägval]`, till exempel `stig_buskarna först` och sedan `stig_glantan efter stig_buskarna`, eller `stig_glantan först` med sidogrenarna som fanns kvar.
+
+## 31. Startskärmen och rösten efter ett avbrott (0.8.4)
+
+- **Startskärmen:** glöden runt staven ligger i ett eget lager (`.stav-glimt::after`), och bara dess opacitet pulserar. Förut ändrade animationen storleken på en skugga med oskärpa, som golvdatorn ritade om i varje bildruta. Regeln gäller överallt: animera opacitet eller läge, aldrig skuggor, oskärpa eller filter.
+- **Rösten:** pratade talsyntesen när ett nytt yttrande kommer, så görs `cancel()`, och det nya läggs efter 80 ms. Chrome på Mac fastnade ibland som om den pratade, utan `onend`, och då gällde maxtiden.
