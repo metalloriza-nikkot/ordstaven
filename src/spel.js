@@ -14,6 +14,7 @@ import { pekningOmMs, skapaHjalpSpar, knufftidMs } from './karna/hjalp.js';
 import { HJALTE_FARGER, HJALTE_FAST } from './scener/Rum.js';
 import { lagerFor, bytLager } from './karna/hjalte.js';
 import { TANGENTBORD_HOJD } from './grans/tangentbord.js';
+import { skapaRullning } from './grans/rullning.js';
 
 const KNUFF_MS = 9000;
 const vanta = (/** @type {number} */ ms) => new Promise((r) => setTimeout(r, ms));
@@ -30,7 +31,7 @@ export function skapaSpel(d) {
   const AVENTYR = aventyr.id;
   const av = aventyrFor(tillstand, AVENTYR);
   // vuxenEtiketter: föremålens namn i gråboxen, för den vuxne. Avstängt från början (inget för den vuxne syns under ett pass).
-  const inst = (tillstand.installningar = { foralderLaser: false, vuxenEtiketter: false, ...tillstand.installningar });
+  const inst = (tillstand.installningar = { foralderLaser: false, vuxenEtiketter: false, rost: true, markera: true, ...tillstand.installningar });
   const lasmotor = skapaLasmotor({ larande: tillstand.spelare.larande, logg });
   /** @type {ReturnType<typeof skapaBerattelse>} */
   let b;
@@ -89,19 +90,54 @@ export function skapaSpel(d) {
   // När spelet är pausat (menyn för vuxna, dold flik) når inga handlingar stegen.
   const lyssnaHandling = (/** @type {(h: any) => void} */ f) => inmatning.lyssna((/** @type {any} */ h) => { if (!pausad) f(h); });
 
-  /** Säg en replik högt (om den ska läsas upp). @param {any} r */
+  /** Läser föräldern den här talarens repliker (Farfar)? @param {any} r */
+  const foraldernLaser = (r) => inst.foralderLaser && (aventyr.talare[r?.talare] || {}).rost === 'foraldern_eller_datorrost';
+  /** Repliken som den sägs: vanlig skrift, platshållarna ersatta. @param {any} r */
+  const talText = (r) => forSkarm(r.text, { varden: varden(), skrift: 'vanlig' }).join(' ');
+  /** Säg en replik högt (om den ska läsas upp). Rösten kan stängas av i menyn för vuxna. @param {any} r */
   function sag(r) {
-    if (!r || !r.upplast) return Promise.resolve();
+    if (!r || !r.upplast || !inst.rost) return Promise.resolve();
+    if (foraldernLaser(r)) return Promise.resolve();
     const t = aventyr.talare[r.talare] || {};
-    if (inst.foralderLaser && t.rost === 'foraldern_eller_datorrost') return Promise.resolve();
-    const text = forSkarm(r.text, { varden: varden(), skrift: 'vanlig' }).join(' ');
-    return rost.saga(text, t.rollrost || 'berattare');
+    return rost.saga(talText(r), t.rollrost || 'berattare');
+  }
+  const rullning = skapaRullning({ ljud, logg });
+  /**
+   * Repliken rullas fram på läsplattan (beslut 21.2), och rösten läser den med markeringen. Utan röst piper
+   * rullningen i ordtakt, och när föräldern läser Farfar är det tyst.
+   * @param {HTMLElement} textEl @param {any} r
+   */
+  function rullaOchSag(textEl, r) {
+    const t = aventyr.talare[r.talare] || {};
+    const roll = t.rollrost || 'berattare';
+    const foralder = foraldernLaser(r);
+    const medRost = !!r.upplast && inst.rost && !foralder && rost.harRost;
+    return rullning.starta(textEl, {
+      // i snabbläget (testerna) syns allt direkt, utom när testet vill se rullningen (?rulla)
+      text: talText(r), roll, direkt: snabb && !/[?&]rulla\b/.test(location.search),
+      tala: medRost ? (vidOrd) => rost.saga(talText(r), roll, vidOrd) : null,
+      pip: !medRost && !foralder,
+      markera: inst.markera && medRost,
+    });
   }
 
   /** Nyckeln i senaste för radions senaste replik (dialogregeln: ett tryck på radion upprepar den). */
   const RADIO = '#radio';
-  /** Portätt: färgad ring per talare (ingen text). @param {string} talare */
-  const portratt = (talare) => `<span class="portratt p-${ui.esc(talare)}" aria-hidden="true"></span>`;
+  /**
+   * Ansiktet i rutan (ingen text): en färgad ring per talare, radions högtalare när repliken hörs genom radion,
+   * och stjärnan för berättaren. @param {string} talare @param {boolean} [radio]
+   */
+  const portratt = (talare, radio = false) => talare === 'berattare'
+    ? '<span class="portratt stjarna" aria-hidden="true">★</span>'
+    : `<span class="portratt p-${ui.esc(talare)}${radio ? ' radio' : ''}" aria-hidden="true">${radio ? '📻' : ''}</span>`;
+  /**
+   * En replik på läsplattan i sin familj (beslut 21.1): berättaren i en rak ruta med svalt papper och stjärnan,
+   * alla andra i en pratruta med rundade hörn, spets och ansikte. @param {any} r
+   */
+  const replikHtml = (r) => {
+    const familj = r.talare === 'berattare' ? 'berattarruta' : 'pratruta';
+    return `<div class="replik-ruta ${familj}${r.via === 'radio' ? ' genom-radio' : ''}">${portratt(r.talare, r.via === 'radio')}<div class="text">${ui.rader(r.text, varden())}</div><button type="button" class="vidare" aria-label="Vidare">▶</button></div>`;
+  };
 
   /** Visa en replik på läsplattan och vänta tills spelaren går vidare. @param {any} r */
   async function replik(r) {
@@ -109,14 +145,16 @@ export function skapaSpel(d) {
     if (r.upplast && r.talare && aventyr.talare[r.talare]) senaste.set(r.talare, r);
     if (r.via === 'radio' && r.upplast) senaste.set(RADIO, r);
     if (r.via === 'radio') ui.pulsera('#hud-radio');
-    const via = r.via === 'radio' ? '<span class="via-radio" aria-hidden="true">📻</span>' : '';
-    const el = ui.visaPlatta(`<div class="replik-ruta">${portratt(r.talare)}<div class="text">${via}${ui.rader(r.text, varden())}</div><button type="button" class="vidare" aria-label="Vidare">▶</button></div>`, 'replik');
+    const el = ui.visaPlatta(replikHtml(r), 'replik');
     // nosen fungerar på repliker också, gratis (de läses ändå upp), så att "tryck på nosen" alltid ger svar
     ui.sattNos(true, { betala: () => true });
-    const fortsatt = ui.vantaFortsatt(el, lyssnaHandling);
-    await Promise.race([sag(r), fortsatt]);
+    const rull = rullaOchSag(/** @type {HTMLElement} */ (el.querySelector('.text')), r);
+    // ett tryck medan texten rullar visar allt (rösten läser vidare), nästa tryck går vidare
+    const fortsatt = ui.vantaFortsatt(el, lyssnaHandling, () => { if (!rull.rullar()) return false; rull.visaAllt(); return true; });
+    await Promise.race([rull.klar, fortsatt]);
     el.classList.add('klar-att-ga');
     await fortsatt;
+    rull.stopp();
     rost.tyst();
     ui.doljPlatta();
   }
@@ -213,8 +251,23 @@ export function skapaSpel(d) {
     await vanta(tid(600));
   }
 
-  async function reaktion(h) {
+  /**
+   * Ljudordet (beslut 21.5) i världen vid det som låter: ovanför föremålet, annars överst mitt på skärmen
+   * (dunket från vinden, fågeln vid fönstret). Det står i världen, så det syns inte när läsplattan täcker den.
+   * @param {string | undefined} ord @param {string} [ljudId] @param {string | null} [foremal]
+   */
+  function visaLjudord(ord, ljudId, foremal) {
+    if (!ord || !rum.harRum) return;
+    const o = foremal ? rum.ruta(foremal) : null;
+    const s = layout.skala;
+    const punkt = o ? skarm(o.x + o.b / 2, o.y + 4) : { x: s.vanster + s.cssBredd / 2, y: s.topp + s.cssHojd * 0.3 };
+    ui.ljudord(ord, punkt, ljud.farg(ljudId || ''));
+    logg.handelse('ljudord', ord);
+  }
+
+  async function reaktion(h, foremal = /** @type {string | null} */ (null)) {
     if (!h) return;
+    if (h.ljudord) visaLjudord(h.ljudord, '', foremal);
     const regi = h.handling || h.reaktion;
     if (regi) ui.visaRegi(regi, 0);
     if (h.fest) { ljud.spela('fest'); ui.visaFest('✨', tid(900)); }
@@ -586,8 +639,8 @@ export function skapaSpel(d) {
       const o = /** @type {any} */ (rum.ruta(sk.id));
       const [punkt, plats] = skyltPlats(o);
       const html = sk.mening
-        ? `<button type="button" class="kort mening-skylt" data-id="${ui.esc(sk.id)}" aria-label="Skylten"><span aria-hidden="true">📜</span></button>`
-        : `<button type="button" class="kort" data-id="${ui.esc(sk.id)}"><span class="kort-etikett">${ui.rader(sk.text, varden(), 'kort-ord')}</span></button>`;
+        ? `<button type="button" class="kort mening-skylt p-${ui.esc(sk.papper)}" data-id="${ui.esc(sk.id)}" aria-label="Skylten"><span aria-hidden="true">📜</span></button>`
+        : `<button type="button" class="kort p-${ui.esc(sk.papper)}" data-id="${ui.esc(sk.id)}"><span class="kort-etikett">${ui.rader(sk.text, varden(), 'kort-ord')}</span></button>`;
       return { objekt: sk.id, punkt, plats, html, vidTryck: () => {
         if (rum.fryst || pausad) return;
         if (sk.mening && vidObjekt(rum.pos, o)) {
@@ -647,7 +700,7 @@ export function skapaSpel(d) {
         const ms = tid(Math.min(6000, 1800 + st.beskrivning.split(' ').length * 140));
         await ui.visaRegi(st.beskrivning, ms); ui.doljRegi(); return;
       }
-      case 'ljud': ljud.spela(st.id); if (st.foremal) rum.hoppa(st.foremal); await vanta(tid(600)); return;
+      case 'ljud': ljud.spela(st.id); if (st.foremal) rum.hoppa(st.foremal); visaLjudord(st.ljudord, st.id, st.foremal); await vanta(tid(600)); return;
       case 'unge_folj': return; // effekten (ungen syns och följer) görs i berättelsemotorn
       case 'ga_till': return gaTill(st);
       case 'pussel': return pussel(b.pussel(st.pussel_id));
@@ -1259,7 +1312,7 @@ export function skapaSpel(d) {
             // dörren öppnas aldrig: hjälten tar ett steg tillbaka in i rummet
             if (utgang && o) await rum.ga(lasplats(o), tid(250));
             else if (alt?.objekt) rum.tomt(alt.objekt);
-            await reaktion(r.reaktion);
+            await reaktion(r.reaktion, alt?.objekt ?? null);
           }
           // förenklingen kan ha tagit bort alternativ: lådor blir tomma, dörrar och stigar spikas igen
           for (const a of /** @type {any[]} */ (Object.values(p.varianter).flatMap((x) => /** @type {any} */ (x).alternativ))) {
@@ -1281,7 +1334,7 @@ export function skapaSpel(d) {
         ui.visaTanke(null);
         for (const a of v.s.alternativ) if (a.objekt) rum.markera(a.objekt, false);
         rum.frys(true);
-        await Promise.all([rattHandelse(alt?.objekt ?? null), reaktion(r.reaktion)]);
+        await Promise.all([rattHandelse(alt?.objekt ?? null), reaktion(r.reaktion, alt?.objekt ?? null)]);
         klar({ niva: v.s.variantNyckel, forstaForsoket: v.forstaForsoket, forsok: v.s.forsok, hjalp: spar.hjalp });
       };
     });
@@ -2198,12 +2251,16 @@ export function skapaSpel(d) {
     const s = ui.visaMeny(`<div class="meny vuxen"><h2>Gråboxen <small>${ui.esc(String(d.version))}</small></h2>
       <div class="menygrupp"><b>Läsnivå (läs och välj):</b> ${[1, 2, 3, 4].map((n) => `<button type="button" class="menyval niva ${n === niva ? 'nu' : ''}" data-n="${n}">L${n}</button>`).join('')}</div>
       <div class="menygrupp"><label><input type="checkbox" class="foralder" ${inst.foralderLaser ? 'checked' : ''}> Föräldern läser ${ui.esc(Object.values(aventyr.talare).filter((/** @type {any} */ t) => t.rost === 'foraldern_eller_datorrost').map((/** @type {any} */ t) => t.namn).join(' och ') || 'rollernas')} repliker</label>
-      <label><input type="checkbox" class="etiketter" ${inst.vuxenEtiketter ? 'checked' : ''}> Visa objektens namn (inte under pussel)</label></div>
+      <label><input type="checkbox" class="etiketter" ${inst.vuxenEtiketter ? 'checked' : ''}> Visa objektens namn (inte under pussel)</label>
+      <label><input type="checkbox" class="rostval" ${inst.rost ? 'checked' : ''}> Datorrösten läser upp (av: rullningen piper i ordtakt)</label>
+      <label><input type="checkbox" class="markeraval" ${inst.markera ? 'checked' : ''}> Markera ordet som läses (stäng av om markeringen hamnar fel på den här datorn)</label></div>
       ${foraldravy()}
       <div class="menygrupp scenlista"><b>Hoppa till scen:</b>${scener}</div>
       <div class="menygrupp"><button type="button" class="menyval logg">Spara loggen</button><button type="button" class="menyval nollstall">Börja om från början</button><button type="button" class="menyval stang">Stäng</button></div></div>`);
     s.querySelectorAll('.niva').forEach((el) => el.addEventListener('click', () => { lasmotor.sattNiva('L', 'P1_las_och_valj', Number(/** @type {HTMLElement} */ (el).dataset.n)); lasmotor.sattNiva('L', 'P28_packa', Number(/** @type {HTMLElement} */ (el).dataset.n)); spara(); oppnaMeny(); }));
     s.querySelector('.foralder')?.addEventListener('change', (e) => { inst.foralderLaser = /** @type {HTMLInputElement} */ (e.target).checked; spara(); });
+    s.querySelector('.rostval')?.addEventListener('change', (e) => { inst.rost = /** @type {HTMLInputElement} */ (e.target).checked; logg.handelse('inställning', `rösten ${inst.rost ? 'på' : 'av'}`); spara(); });
+    s.querySelector('.markeraval')?.addEventListener('change', (e) => { inst.markera = /** @type {HTMLInputElement} */ (e.target).checked; logg.handelse('inställning', `markeringen ${inst.markera ? 'på' : 'av'}`); spara(); });
     s.querySelector('.etiketter')?.addEventListener('change', (e) => { inst.vuxenEtiketter = /** @type {HTMLInputElement} */ (e.target).checked; spara(); visaEtiketter(); });
     s.querySelectorAll('.scen').forEach((el) => el.addEventListener('click', () => {
       const i = Number(/** @type {HTMLElement} */ (el).dataset.i);

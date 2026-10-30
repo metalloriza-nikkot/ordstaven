@@ -1,6 +1,7 @@
 # Innehållsschema – kapitel i format 2
 
-Version 2.11 (2026-10-30). Ägs av teknikspåret.
+Version 2.12 (2026-10-31). Ägs av teknikspåret.
+2.12: textgrammatiken (T4b, beslut 21). `ljudord` på `ljud`-steget och på reaktioner (`vid_ratt`, `vid_fel`, `vid_valj`): ett ljudord i världen vid det som låter. `gransnitt.sluta_for_idag` har ett ord (sov). Allt är tillägg, filer i 2.11 gäller fortfarande.
 2.11: Farfars hus (T6). Kartorna får typen `vagg`: massiv vägg inne i ett rum, så att ett rum kan ha en annan form än en rektangel (hallen med en bred entré och en smal korridor). Rollrösten `fagel` (en levande fågelröst) i `aventyr.json`. Allt är tillägg, filer i 2.10 gäller fortfarande.
 2.10: SVÄRD utifrån bilden (beslut 18.5, 20.3): `bild` på P11 och `forebild.visas` (`fran_start` eller `vid_fel`). Allt är tillägg, filer i 2.9 gäller fortfarande.
 2.9: kapitel 1:s kartor (T5). Ett område kan vara större än skärmen, högst 2×2 skärmar, och kameran följer hjälten (beslut 14, 18.1). Kartorna får `forsvinner_efter` (lianerna som SVÄRD kapar) och `oppning` (hålet i häcken). `alias.rum` för rum som har gått upp i ett större område. Av ett läsval i världen syns bara den variant han får. Allt är tillägg, filer i 2.8 gäller fortfarande.
@@ -34,6 +35,7 @@ Kapitelfilerna börjar med `"format": 2`, äventyret och ordlistorna med `"forma
 - **Platshållare med små bokstäver**: `{unge}` (ungens namn) och `{hjalte}` (hjältens namn). Namnet visas i samma skrift som texten runt omkring.
 - **Rader:** en text är en sträng, eller en lista med rader (`["Dinomat.", "Ta den röda lådan."]`). Spelet bryter aldrig inom en rad i listan, men kan bryta en lång sträng mellan ord.
 - **`upplast`:** `true` läses alltid upp (instruktioner, berättaren, repliker). `false` läser spelaren själv. Lästexten i pussel läses aldrig upp automatiskt, så den har inget eget `upplast`-fält.
+- **Textgrammatiken** (beslut 21, stilguiden §3): en replik från `berattare` står i berättarens raka ruta med stjärnan, alla andra talare i en pratruta med ansikte (genom radion: radions högtalare). Repliker rullas fram med ca 40 tecken per sekund och läses i 40 punkter. Det han läser själv (lappar, skyltar, kort, molnet, formler) rullas aldrig och står i 48 punkter (meningar) eller 64 (ord). Lappar är papper med riven kant, Farfars skyltar trä. Datan behöver inget nytt för detta: formen följer av talaren och fältet.
 - **Id:n** skrivs med små bokstäver a–z, siffror och understreck, utan å, ä, ö: `lada_med_stav`, `p0_filt`. Kapitlens id är `kap-00` osv.
 
 ## 3. Ett kapitel
@@ -76,7 +78,7 @@ Kapitelfilerna börjar med `"format": 2`, äventyret och ordlistorna med `"forma
 |---|---|---|
 | `replik` | `talare`, `text`, `upplast`, `vantar_pa`, `via`, `vid`, `paminnelse` | Någon säger något. Visas på läsplattan. **`vantar_pa`** (`"mata_ungen"`: ungen har ätit, `"nosen"`: spelaren har tänt nosen): en instruktion som ber om en handling väntar tills den är gjord. Den står uppe i rummet medan världen går, upprepas med en styrbild efter ca 8 s, och nästa steg kommer först efter handlingen. **`via: "radio"`**: repliken hörs genom radion. **`vid: "ungen"`**: texten står i en bubbla ovanför ungen i stället för på läsplattan och läses upp (namnet i s08). **`paminnelse`** (`efter_sek`, `replik`), bara med `vantar_pa`: efter så många sekunder kommer en annan replik i stället för samma instruktion igen ("{unge} är rädd.", sedan "Ge {unge} ett bär."). Fälten finns bara på repliker som är egna steg. |
 | `mellanscen` | `beskrivning`, `bild` | Något händer i bild. Gråboxen visar beskrivningen för den vuxne. |
-| `ljud` | `id`, `foremal` | Ett ljud spelas. Med `foremal` hoppar föremålet till i bild (ägglådan som dunkar). Samma `id` ger alltid samma ljud. |
+| `ljud` | `id`, `foremal`, `ljudord` | Ett ljud spelas. Med `foremal` hoppar föremålet till i bild (ägglådan som dunkar). Samma `id` ger alltid samma ljud. **`ljudord`** (2.12, beslut 21.5): ordet syns i världen vid det som låter (ovanför `foremal`, annars överst mitt på skärmen), i versaler, i Lexends tyngsta vikt med kontur, och försvinner efter ca 0,8 s. Vanlig skrift, ett eller två korta ord (`dunk`, `tok tok`). Kontrollen säger fel om ordet står i versaler eller har ett spärrat ljud, och varnar för dubbelteckning. Samma fält finns på reaktioner (`vid_ratt`, `vid_fel`, `vid_valj`), t.ex. KLONK, PIP och HO-HO: ordet syns då vid föremålet han valde. Ljudord behövs aldrig för att lösa en uppgift. |
 | `unge_folj` | `folj` | Ungen börjar (`true`) eller slutar (`false`) följa hjälten. |
 | `ga_till` | `mal`, `visa_styrhjalp`, `knuff`, `vid_annan_utgang`, `fri_vag` | Spelaren ska gå till ett objekt i rummet. **`fri_vag: true`** (fritt vägval): de andra utgångarna går också att gå igenom, och rummet bakom visas (med en frivillig scen första gången). Steget är klart när han går genom målet. **`vid_annan_utgang`** (`ljud`, `handling`, `replik`): de andra utgångarna är låsta under steget. Går hjälten till en av dem öppnas den inte, ljudet spelas, hjälten tittar upp och målet lyser (hallen före kläckningen: `{ "ljud": "dunk" }`). |
 | `pussel` | `pussel_id` | Ett pussel startar. Scenen fortsätter när det är löst. |
@@ -224,7 +226,7 @@ Pausmenyn har två bildknappar, KARTAN och MIN BOK (hjälteboken), och hjältebo
 ```json
 "gransnitt": { "kartan": "kartan", "hjalteboken": "min bok", "staven": "staven", "garderoben": "kläder", "dinoboken": "Dinoboken" }
 ```
-`sluta_for_idag` kan också få ett ord. Saknas det visar knappen bara den sovande ungen.
+`sluta_for_idag` har ett eget ord (`sov`, Innehåll F11). Saknas det visar knappen bara den sovande ungen.
 Saknas ett ord visas bara bilden. Det som står på sidorna kommer från sparningen: formlerna (staven), sakerna hjälten har hittat (`ge_sak`, garderoben), Dinobokens sidor (`dinobok`) och kartbitarna.
 
 ## 4. Ordlistor

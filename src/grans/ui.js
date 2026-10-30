@@ -231,11 +231,15 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
   }
   function doljPlatta() { plattan.hidden = true; plattan.innerHTML = ''; ui.classList.remove('platta-oppen'); sattNos(false); }
 
-  /** Vänta på ett tryck på ett element, eller Mellanslag/Enter. @param {HTMLElement} el @param {(h: (cb: (h: any) => void) => () => void)} lyssnaHandling */
-  function vantaFortsatt(el, lyssnaHandling) {
+  /**
+   * Vänta på ett tryck på ett element, eller Mellanslag/Enter. @param {HTMLElement} el
+   * @param {(h: (cb: (h: any) => void) => () => void)} lyssnaHandling @param {() => boolean} [forst]
+   */
+  function vantaFortsatt(el, lyssnaHandling, forst = () => false) {
     return new Promise((klar) => {
       let sluta = () => {};
-      const gor = () => { el.removeEventListener('click', gor); sluta(); ljud.spela('klick'); klar(undefined); };
+      // forst: ett tryck som används till något annat först (texten rullar: trycket visar allt), och väntan fortsätter
+      const gor = () => { if (forst()) return; el.removeEventListener('click', gor); sluta(); ljud.spela('klick'); klar(undefined); };
       el.addEventListener('click', gor);
       sluta = lyssnaHandling((h) => { if (h.typ === 'interagera') gor(); });
     });
@@ -388,6 +392,20 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
    * En figur kallar på hjälten på avstånd (högst tre ord): en pratbubbla ovanför figuren. null döljer.
    * @param {string | null} html @param {{ x: number, y: number }} [punkt] figurens överkant på skärmen
    */
+  /**
+   * Ett ljudord i världen vid det som låter (beslut 21.5): poppar upp, studsar och försvinner efter ca 0,8 s.
+   * Det ritas i versaler genom text.js, som all text han läser. @param {string} ord vanlig skrift
+   * @param {{ x: number, y: number }} punkt skärmpunkt @param {string} [farg] ljudets färg
+   */
+  function ljudord(ord, punkt, farg) {
+    const e = document.createElement('div');
+    e.className = 'ljudord'; e.setAttribute('aria-hidden', 'true');
+    e.textContent = forSkarm(ord, { varden: {} }).join(' ');
+    if (farg) e.style.setProperty('--ljudfarg', farg);
+    e.style.left = punkt.x + 'px'; e.style.top = punkt.y + 'px';
+    varldslager.appendChild(e); ankra(e);
+    window.setTimeout(() => { ankrade.delete(e); e.remove(); }, 850);
+  }
   function ropa(html, punkt) {
     const e = $('#rop');
     if (!html || !punkt) { e.hidden = true; e.innerHTML = ''; return; }
@@ -494,7 +512,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     styrhjalp,
     flygBar,
     handknapp,
-    visaTanke, placeraTanke, pulseraTanke, ordskylt, skyltar, rumsskyltar, pulseraSkylt, skyltNara, ropa,
+    ljudord, visaTanke, placeraTanke, pulseraTanke, ordskylt, skyltar, rumsskyltar, pulseraSkylt, skyltNara, ropa,
     ui, $, plattan, rader, esc, visaPlatta, doljPlatta, vantaFortsatt, visaRegi, doljRegi, visaFest,
     uppdateraHud, pulsera, visaSkarm, doljSkarm, visaMeny, doljMeny, visaPausmeny, doljPausmeny, etiketter, sattNos, vaxlaNos, ljuda, arHelord,
     fanga, tandNos, markeraOrd,

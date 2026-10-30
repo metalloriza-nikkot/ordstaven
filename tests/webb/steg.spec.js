@@ -7,7 +7,7 @@ test.beforeEach(({}, info) => { test.skip(info.project.name !== 'mac-helskarm', 
  * Starta en provscen i ett av prologens rum. extra = { pussel, scener, rum }: provpussel, fler scener och fält i rummen.
  * @param {any} page @param {any} scen @param {(t: any) => void} [stall] @param {any} [extra]
  */
-async function provscen(page, scen, stall, extra = {}) {
+async function provscen(page, scen, stall, extra = {}, url = '') {
   await page.goto('./?snabb&ny');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.evaluate(([sc, fn, ex]) => {
@@ -19,7 +19,7 @@ async function provscen(page, scen, stall, extra = {}) {
     localStorage.setItem('ordstaven_spar', JSON.stringify(t));
   }, [scen, stall ? String(stall) : null, extra]);
   // kapitel=kap-00: provrummen har ingen karta, och kapitlet spelas ändå
-  await page.goto('./?snabb&testscen&kapitel=kap-00');
+  await page.goto('./?snabb&testscen&kapitel=kap-00' + url);
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.click('.start-knapp');
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen())).toBe(scen.id);
@@ -93,7 +93,7 @@ test('en instruktion väntar på handlingen: nästa replik först när ungen har
 
 test('radion: repliken hörs genom radion, och radioramen glider in', async ({ page }) => {
   await provscen(page, { id: 't_radio', pass: 1, rum: 'koket', tillstand: 'morgon', steg: [{ typ: 'visa_ui', element: 'radioramen' }, R('Test, test. Hör du mig?', 'farfar', { via: 'radio' })] });
-  await expect(page.locator('#plattan .replik-ruta .via-radio')).toBeVisible({ timeout: 5000 });
+  await expect(page.locator('#plattan .replik-ruta.genom-radio .portratt.radio')).toBeVisible({ timeout: 5000 });
   await expect(page.locator('#hud-radio.glider-in')).toBeVisible();
 });
 
@@ -821,4 +821,47 @@ test('menyn för vuxna hoppar till en scen i ett senare kapitel: det som kommer 
   await expect(page.locator('#hud-bar')).toBeVisible();
   // stegen står kvar vid apans bo (gläntan i tillståndet räddad)
   expect(await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt())).toContain('stege');
+});
+
+// ---------------------------------------------------------------- textgrammatiken (T4b, beslut 21)
+test('textgrammatiken: berättaren i en rak ruta med stjärnan, Farfar i en pratruta, och det som sägs rullas fram', async ({ page }) => {
+  await provscen(page, { id: 't_grammatik', pass: 1, rum: 'vinden', tillstand: 'natt', steg: [
+    R('Det är mörkt. Men något glimmar längst bort i hörnet.'), R('Hörde du? Mina knän är för stela.', 'farfar'), { typ: 'ljud', id: 'dunk', ljudord: 'dunk' }, R('Klart.')] }, null, {}, '&rulla');
+  // berättaren: rak ruta, svalt papper, stjärnan på ansiktets plats
+  await expect(page.locator('#plattan .replik-ruta.berattarruta .portratt.stjarna')).toBeVisible({ timeout: 5000 });
+  // texten rullar: tecknen har sin plats från början (dolda, inte borta), och raden hoppar inte
+  const bredd0 = await page.locator('#plattan .replik-ruta .text').evaluate((e) => e.getBoundingClientRect().width);
+  expect(await page.locator('#plattan .tk.dold').count()).toBeGreaterThan(0);
+  await page.waitForTimeout(250);
+  expect(await page.locator('#plattan .replik-ruta .text').evaluate((e) => e.getBoundingClientRect().width)).toBe(bredd0);
+  // ett tryck visar allt, och repliken står kvar; nästa tryck går vidare
+  await page.click('#plattan .replik-ruta');
+  await expect(page.locator('#plattan .tk.dold')).toHaveCount(0);
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText(/MÖRKT/);
+  await page.click('#plattan .replik-ruta');
+  // Farfar: pratruta med rundade hörn, spets och ansikte
+  await expect(page.locator('#plattan .replik-ruta.pratruta .portratt.p-farfar')).toBeVisible({ timeout: 5000 });
+  const runda = await page.locator('#plattan .replik-ruta.pratruta').evaluate((e) => parseFloat(getComputedStyle(e).borderTopLeftRadius));
+  expect(runda).toBeGreaterThan(15);
+  // utan tryck rullar den klart av sig själv, ca 40 tecken per sekund
+  await expect(page.locator('#plattan .tk.dold')).toHaveCount(0, { timeout: 3000 });
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toMatch(/\[rullning\] \d+ tecken på \d+ ms/);
+  await page.click('#plattan .replik-ruta');
+  // ljudordet i världen, i versaler, och det försvinner av sig självt
+  await expect(page.locator('.ljudord')).toHaveText('DUNK', { timeout: 5000 });
+  await expect(page.locator('.ljudord')).toHaveCount(0, { timeout: 3000 });
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('KLART.', { timeout: 5000 });
+});
+
+test('textgrammatiken: uppläst text i 40 punkter, lappen i 48 på ett snett papper', async ({ page }) => {
+  await provscen(page, { id: 't_storlek', pass: 1, rum: 'vinden', tillstand: 'natt', steg: [R('Hej.'), { typ: 'oppna_lasplatta', pussel_id: 'p0_dinomat' }] });
+  const t = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--t'));
+  const px = (n) => n * Number(t || 1);
+  await expect(page.locator('#plattan .replik-ruta .text')).toBeVisible({ timeout: 5000 });
+  expect(await page.locator('#plattan .replik-ruta .text').evaluate((e) => parseFloat(getComputedStyle(e).fontSize))).toBeCloseTo(px(40), 0);
+  await page.click('#plattan .replik-ruta');
+  await expect(page.locator('#plattan .lapp')).toBeVisible({ timeout: 5000 });
+  expect(await page.locator('#plattan .lapp').evaluate((e) => parseFloat(getComputedStyle(e).fontSize))).toBeCloseTo(px(48), 0);
+  expect(await page.locator('#plattan .lapp').evaluate((e) => getComputedStyle(e).transform)).not.toBe('none');
+  await page.screenshot({ path: 'tests/skarmdumpar/lappen-papper.png' });
 });

@@ -134,3 +134,13 @@ describe('rollrösterna', () => {
     expect(tonFor('finns_inte', 'Hej')).toEqual(tonFor('berattare', 'Hej'));
   });
 });
+
+describe('rullningens takt (beslut 21.2)', () => {
+  it('ca 40 tecken per sekund: en rad på 30 tecken står klar på under en sekund', async () => {
+    const { teckenTid, RULLNING } = await import('../../src/karna/framskrivning.js');
+    expect(RULLNING.teckenPerSek).toBe(40);
+    expect(teckenTid(30)).toBeLessThan(1000);
+    expect(teckenTid(0)).toBe(0);
+    expect(teckenTid(40, true)).toBe(teckenTid(40)); // ett ord i taget går i samma takt
+  });
+});

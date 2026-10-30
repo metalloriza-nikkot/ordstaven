@@ -61,6 +61,20 @@ export function skapaLjud({ tyst = () => false } = {}) {
   return {
     starta,
     /** @param {string} namn effekt eller ljud-id ur innehållet */
+    /**
+     * Pipet när rösten är av (beslut 21.2): lågt och mjukt, ett per ord, med en egen ton per figur.
+     * @param {string} roll talarens rollröst
+     */
+    /** Ljudordets färg för ett ljud-id (stilguiden §3: i ljudets färg). @param {string} id */
+    farg(id) {
+      return /** @type {Record<string, string>} */ ({ dunk: '#d9935a', fagel_late: '#8fd0f0', mage_kurrar: '#f0c060', apa_gnaller: '#f0dc6a', hackspett: '#e08a5a' })[id] ?? '#f2c14e';
+    },
+    pip(roll) {
+      if (tyst()) return;
+      starta();
+      const f = /** @type {Record<string, number>} */ ({ berattare: 520, gammal: 330, fanig: 440, fagel: 880, metall: 700, unge: 760 })[roll] ?? 520;
+      try { ton({ f, t: 0.05, v: 0.06, typ: 'sine' }); } catch (e) { /* ljud får aldrig krascha spelet */ }
+    },
     spela(namn) {
       if (tyst()) return;
       starta();

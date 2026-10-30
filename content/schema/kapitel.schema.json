@@ -113,6 +113,13 @@
     }
   },
   "$defs": {
+    "ljudord": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 12,
+      "pattern": "^[a-zåäö]+( [a-zåäö]+)?$",
+      "description": "Ljudord i världen (beslut 21.5): ett eller två korta ord i vanlig skrift (dunk, tok tok), visas i versaler vid det som låter. Följer reglerna för text han läser."
+    },
     "id": {
       "type": "string",
       "pattern": "^[a-z0-9_]+$",
@@ -217,6 +224,9 @@
         },
         "fest": {
           "$ref": "#/$defs/fest"
+        },
+        "ljudord": {
+          "$ref": "#/$defs/ljudord"
         }
       }
     },
@@ -491,6 +501,9 @@
             "foremal": {
               "$ref": "#/$defs/id",
               "description": "Föremålet i rummet som låter (det hoppar till i bild)."
+            },
+            "ljudord": {
+              "$ref": "#/$defs/ljudord"
             }
           }
         },

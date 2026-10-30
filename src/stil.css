@@ -541,3 +541,38 @@ html, body {
 .kartbit b { position: absolute; right: -4px; bottom: -4px; font-size: 28px; background: var(--papper); border-radius: 50%; padding: 0 8px; }
 .paus-stang { align-self: flex-end; }
 .paus-tillbaka { position: absolute; left: 16px; top: 16px; }
+
+/* ---------------------------------------------------------------- textgrammatiken (beslut 21, stilguiden §3)
+   Fyra familjer, som i serier: någon säger något (pratruta), berättaren (rak ruta), ett ljud (ljudord i världen)
+   och ett papper eller en sak (lapp med riven kant, trä, sten). Formen syns innan han läser. */
+/* det som sägs: 40 punkter (läses upp), det han läser själv: 48 för meningar och 64 för ord */
+.replik-ruta .text, .svar-rad .text { font-size: calc(40px * var(--t)); line-height: 1.35; }
+.replik-ruta { align-items: center; }
+.replik-ruta .vidare { align-self: flex-end; }
+/* någon säger något: varm pratruta med rundade hörn och en spets ner mot ansiktet */
+.pratruta { border-radius: calc(30px * var(--t)); padding-left: calc(14px * var(--t)); }
+.pratruta::before { content: ''; position: absolute; left: calc(30px * var(--t)); bottom: calc(-16px * var(--t)); border: calc(14px * var(--t)) solid transparent; border-top: calc(18px * var(--t)) solid var(--papper); border-bottom: 0; transform: skewX(-20deg); }
+.pratruta .portratt { width: calc(60px * var(--t)); height: calc(60px * var(--t)); border-radius: 50%; align-self: flex-end; box-shadow: 0 0 0 4px #d9c9a3, inset 0 0 0 4px rgba(0, 0, 0, .15); }
+.portratt.radio { display: flex; align-items: center; justify-content: center; font-size: calc(32px * var(--t)); }
+/* berättaren: rak ruta, svalt blågrått papper, guldstjärnan på ansiktets plats */
+.berattarruta { border-radius: 3px; background: #dfe5ea; box-shadow: 0 8px 28px rgba(0, 0, 0, .5), inset 0 0 0 3px #b4c0ca; }
+.portratt.stjarna { display: flex; align-items: center; justify-content: center; background: none; box-shadow: none; width: calc(48px * var(--t)); height: calc(48px * var(--t)); font-size: calc(44px * var(--t)); color: var(--guld); text-shadow: 0 2px 0 #b8892b; }
+/* rullningen: dolda tecken har sin bredd, så raden hoppar aldrig; markeringen är en guldlinje under ordet */
+.tk.dold { visibility: hidden; }
+.rullar { cursor: pointer; }
+.replik-ruta .ord.lases { box-shadow: 0 calc(4px * var(--t)) 0 var(--guld); border-radius: 2px; }
+/* ett papper: riven kant nertill, lite snett, bläckfärgad text */
+.lapp { transform: rotate(-2deg); border-radius: 3px 3px 0 0; padding-bottom: calc(20px * var(--t)); color: #2a2018;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 5px), 96% 100%, 91% calc(100% - 6px), 85% calc(100% - 1px), 79% calc(100% - 7px), 72% 100%, 66% calc(100% - 5px), 59% calc(100% - 1px), 52% calc(100% - 7px), 45% 100%, 38% calc(100% - 6px), 31% calc(100% - 1px), 24% calc(100% - 6px), 17% 100%, 10% calc(100% - 5px), 4% calc(100% - 1px), 0 calc(100% - 6px)); }
+/* en sak: Farfars skylt är en träram med ljust papper (ingen riven kant, den sitter rakt) */
+.lapp.p-traskylt { background: #fff6e0; border: calc(10px * var(--t)) solid #8a6a4a; border-radius: 4px; transform: none; clip-path: none; padding-bottom: 12px; }
+/* skyltar vid dörrar och stigar och tavlor i världen: trä, eller sten */
+#skyltar .kort, #rumsskyltar .kort { background: #fff6e0; box-shadow: 0 0 0 calc(5px * var(--t)) #8a6a4a, 0 calc(7px * var(--t)) 0 calc(2px * var(--t)) #5e4632; border-radius: 6px; }
+#rumsskyltar .kort.p-sten { box-shadow: 0 0 0 calc(5px * var(--t)) #8f8a80, 0 calc(7px * var(--t)) 0 calc(2px * var(--t)) #5f5b54; }
+/* ett rop vid figuren: svart text i full kontrast */
+#rop { color: #000; font-weight: 600; box-shadow: 0 3px 0 #c8bb9c, 0 0 0 2px #2b2420; }
+#rop::before { content: ''; position: absolute; left: 50%; bottom: -12px; transform: translateX(-50%); border: 10px solid transparent; border-top-color: #2b2420; border-bottom: 0; z-index: -1; }
+/* ett ljud: ljudord i världen vid det som låter, Lexends tyngsta vikt, tjock kontur, snett, poppar och försvinner */
+.ljudord { position: absolute; z-index: 5; transform: translate(-50%, -100%) rotate(-8deg); font-weight: 900; font-size: calc(80px * var(--t)); line-height: 1; letter-spacing: .02em; color: var(--ljudfarg, #f2c14e); -webkit-text-stroke: calc(4px * var(--t)) #1a1410; paint-order: stroke fill; pointer-events: none; white-space: nowrap; animation: ljudord .8s ease-out forwards; }
+.platta-oppen .ljudord { display: none; } /* ljudet hör till världen: läsplattan täcker det */
+@keyframes ljudord { 0% { opacity: 0; transform: translate(-50%, -80%) rotate(-8deg) scale(.6); } 18% { opacity: 1; transform: translate(-50%, -100%) rotate(-8deg) scale(1.12); } 30% { transform: translate(-50%, -100%) rotate(-8deg) scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -110%) rotate(-8deg) scale(1); } }

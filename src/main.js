@@ -3,6 +3,7 @@
 // Typsnittet är Lexend (beslut 13). Andika finns kvar som paket, så att ett byte tillbaka är två rader här och en i stil.css.
 import '@fontsource/lexend/latin-400.css';
 import '@fontsource/lexend/latin-700.css';
+import '@fontsource/lexend/latin-900.css';
 import './stil.css';
 import Phaser from 'phaser';
 

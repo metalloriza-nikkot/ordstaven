@@ -41,6 +41,8 @@ async function draFormel(page, svar, dumpa = false) {
  * Tre sätt, ett per projekt: Mellanslag (dator), tryck på föremålet igen (iPad), tryck på handen (Safari).
  */
 async function anvand(page, id, satt) {
+  // ett tryck medan världen står still glöms (som i spelet): vänta tills den går
+  await page.waitForFunction(() => !window.__ORDSTAVEN.fryst(), null, { timeout: 10000 }).catch(() => {});
   const pt = await page.evaluate((m) => window.__ORDSTAVEN.objekt(m), id);
   if (!pt) return;
   await page.mouse.click(pt.x, pt.y);
@@ -52,7 +54,8 @@ async function anvand(page, id, satt) {
   if (satt === 'mellanslag') await page.keyboard.press('Space');
   else if (satt === 'igen') await page.mouse.click(pt.x, pt.y);
   else await hand.locator('button').click();
-  await expect(hand).toBeHidden({ timeout: 5000 });
+  // handen försvinner, eller flyttar till nästa sak inom räckhåll (krukorna står tätt)
+  await expect.poll(async () => (await hand.isHidden()) || (await hand.getAttribute('data-objekt')) !== id, { timeout: 5000 }).toBe(true);
 }
 
 /** Spela tills slutskärmen syns. felFor = pussel-id där ett fel svar ska väljas först. */

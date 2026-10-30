@@ -56,7 +56,7 @@
     ]
    }
   },
-  "teknik": "Teknik har lagt in ledningens beslut i formatet, ingen text är ändrad. 2026-10-25: format 2, P28_packa, syns_i på ägget, i_rummet på FILT med lådorna lada_hyllan, lada_hornet och lada_fonstret i stället för hylla_tre_lador, och ga_till till hyllan i s04 borttaget. 2026-10-26 (val i världen): i_rummet och objekt i p0_dorrar och p0_sangen (dorr_mat, dorr_bad, dorr_toa, dorr_sov), p0_skylten (stig_skogen, stig_byn) och p0_dinomat (lada_lang_overst, lada_lang_mitten, lada_lang_nederst, som ersätter tre_langa_lador), foremal lada_med_agg på dunket i s04, och ga_till grind i s22 borttaget (grinden är en öppning i staketet, valet görs på stigarna). 2026-10-27 (hjälpens timing): \"pekar\": true på knuffarna i p0_dorrar (ungen nosar mot dörren med matdoft) och p0_sangen (ungen lutar sig mot rätt dörr). De pekar på svaret och kommer tidigast efter första felet, eller efter 4 s per alternativ och minst 12 s. Övriga knuffar upprepar frågan (p0_filt, p0_skylten) eller hör till uppgifter som inte är läsval (p0_ljus förebild, p0_ungenamn, p0_krukor, gå till lådan i s02) och kommer som förut. Ungens pekning efter tre fel och efter_3_fel kommer efter fel och påverkas inte. 2026-10-27 (v0.10): hallen har åter tillstånden natt och morgon, och s01b, s07, s10, s15 och s17 har tillstand natt, s20 morgon. s01b: vid_annan_utgang med ljudet dunk på ga_till stege_upp (dörrarna är låsta, hjälten tittar upp). s04: ga_till lada_med_agg efter p0_filt är steget bara (filten följer hjälten och läggs om ägget när han når fram). s08: repliken \"Där är ni ju!\" och ga_till farfar_vid_bordet är steget prata med repliken som kall (dialogen börjar inom 1,5 rutor), och repliken med namnet har vid: ungen (namnet syns ovanför ungen). s09: ga_till farfar_vid_bordet är ta_emot (hjälten tar lappen med ett tryck), och \"Tryck på nosen.\" har vantar_pa: nosen. s12: vantar_pa: mata_ungen på bärrepliken. s21: via: radio på provsändningen. 2026-10-27 (grind A, 2f.4): ytterdörren dorr_ut sitter i hallens främre vägg i stället för i köket (koket och hallen i rum), s21 slutar med ga_till dorr_hallen, och den nya scenen s21b_hallen_ut (hallen på morgonen) har ga_till dorr_ut. Scenen har ingen text och ingen vid_omstart än. På natten är ytterdörren låst (kartans last_i): hjälten känner på handtaget. 2026-10-28 (beslut 13.2): s04 börjar med ljudet dunk från lada_med_agg, så att ägglådan hoppar till direkt när ljuset har tänts. Dunket när hjälten står vid lådan finns kvar. 2026-10-29 (T2): skapa_hjalte väljer hudfarg och drakt, hjältens två palettbyten (sparformat 4). Hjälmen och skorna har fasta färger (färger men inte form). 2026-10-30 (T6): v0.11.1 inlagd utan ändrad text. Husets kartor efter stilguiden v0.16: hallen är en entré och en korridor (28 × 12 rutor, kartans typ vagg ger korridoren dess form), och alla fem dörrar står på en skärm minst 3 rutor isär. Nytt rum kontoret (läsrummet). Köket, gästrummet och vinden är omritade, vinden spegelvänd så att stegen står till höger som i hallen. sex_krukor står i en rad nertill (inte två vid väggen och fyra nertill), eftersom P26 utan foremal delar ett föremål.",
+  "teknik": "Teknik har lagt in ledningens beslut i formatet, ingen text är ändrad. 2026-10-25: format 2, P28_packa, syns_i på ägget, i_rummet på FILT med lådorna lada_hyllan, lada_hornet och lada_fonstret i stället för hylla_tre_lador, och ga_till till hyllan i s04 borttaget. 2026-10-26 (val i världen): i_rummet och objekt i p0_dorrar och p0_sangen (dorr_mat, dorr_bad, dorr_toa, dorr_sov), p0_skylten (stig_skogen, stig_byn) och p0_dinomat (lada_lang_overst, lada_lang_mitten, lada_lang_nederst, som ersätter tre_langa_lador), foremal lada_med_agg på dunket i s04, och ga_till grind i s22 borttaget (grinden är en öppning i staketet, valet görs på stigarna). 2026-10-27 (hjälpens timing): \"pekar\": true på knuffarna i p0_dorrar (ungen nosar mot dörren med matdoft) och p0_sangen (ungen lutar sig mot rätt dörr). De pekar på svaret och kommer tidigast efter första felet, eller efter 4 s per alternativ och minst 12 s. Övriga knuffar upprepar frågan (p0_filt, p0_skylten) eller hör till uppgifter som inte är läsval (p0_ljus förebild, p0_ungenamn, p0_krukor, gå till lådan i s02) och kommer som förut. Ungens pekning efter tre fel och efter_3_fel kommer efter fel och påverkas inte. 2026-10-27 (v0.10): hallen har åter tillstånden natt och morgon, och s01b, s07, s10, s15 och s17 har tillstand natt, s20 morgon. s01b: vid_annan_utgang med ljudet dunk på ga_till stege_upp (dörrarna är låsta, hjälten tittar upp). s04: ga_till lada_med_agg efter p0_filt är steget bara (filten följer hjälten och läggs om ägget när han når fram). s08: repliken \"Där är ni ju!\" och ga_till farfar_vid_bordet är steget prata med repliken som kall (dialogen börjar inom 1,5 rutor), och repliken med namnet har vid: ungen (namnet syns ovanför ungen). s09: ga_till farfar_vid_bordet är ta_emot (hjälten tar lappen med ett tryck), och \"Tryck på nosen.\" har vantar_pa: nosen. s12: vantar_pa: mata_ungen på bärrepliken. s21: via: radio på provsändningen. 2026-10-27 (grind A, 2f.4): ytterdörren dorr_ut sitter i hallens främre vägg i stället för i köket (koket och hallen i rum), s21 slutar med ga_till dorr_hallen, och den nya scenen s21b_hallen_ut (hallen på morgonen) har ga_till dorr_ut. Scenen har ingen text och ingen vid_omstart än. På natten är ytterdörren låst (kartans last_i): hjälten känner på handtaget. 2026-10-28 (beslut 13.2): s04 börjar med ljudet dunk från lada_med_agg, så att ägglådan hoppar till direkt när ljuset har tänts. Dunket när hjälten står vid lådan finns kvar. 2026-10-29 (T2): skapa_hjalte väljer hudfarg och drakt, hjältens två palettbyten (sparformat 4). Hjälmen och skorna har fasta färger (färger men inte form). 2026-10-30 (T6): v0.11.1 inlagd utan ändrad text. Husets kartor efter stilguiden v0.16: hallen är en entré och en korridor (28 × 12 rutor, kartans typ vagg ger korridoren dess form), och alla fem dörrar står på en skärm minst 3 rutor isär. Nytt rum kontoret (läsrummet). Köket, gästrummet och vinden är omritade, vinden spegelvänd så att stegen står till höger som i hallen. sex_krukor står i en rad nertill (inte två vid väggen och fyra nertill), eftersom P26 utan foremal delar ett föremål. 2026-10-31 (T4b): ljudord på ljud-stegen ordagrant ur Innehålls F11 (dunk, kra, brum, buhu, tok tok).",
   "innehall_v08": "Innehåll har utgått från repots fil. Ändrat: nivaer, unge_folj, dunket och lådorna i s04, anteckningen i p0_filt, repliken om bären i s12, luftskeppet i s21, baronen och Klaffen i s22, bild-id för färg och storlek i p0_dinomat, vid_omstart i varje scen. Teknikens id:n och format är orörda.",
   "innehall_v09": "Innehåll har granskat teknikens val i världen (0.5.1). Ändrat, bara beskrivningar: felreaktionerna vid dörrarna (dörren öppnas aldrig, ljudet hörs genom dörren), stigen mot byn (ett steg ut, sedan tillbaka), leksaksbilen i FILT (lådorna står långt från ägget), ungen pekar inte längre mot bergen i s22 (det kunde avslöja vägen), baronen högt upp i gondolen, och Klaffen som putsar fjädrarna. Inga repliker, scener eller id:n är ändrade.",
   "innehall_v10": "Innehåll har lagt in granskningens rättelser (1c) och Niklas speltest (1d): starten i sovrummet (s01) och en ny promenad genom hallen med låsta dörrar (s01b_hallen), frågan först i s04 och filten som följer hjälten, nya repliker i s03, s05, s07, s08, s12, s14, s16, s18, s21 och s22, nosen som spelaren trycker själv (s09), Farfar som frågar efter ungens namn (s08), lappen som hjälten tar emot (s09), ny ordning i s21 med provsändning i radion, \"Allt är packat!\" som vid_ratt i p0_packlista, och knuffen i p0_dinomat (lappen lyser). Inga nya rum. Inga id:n på föremål ändrade.",
@@ -238,7 +238,8 @@
     },
     {
      "typ": "ljud",
-     "id": "dunk"
+     "id": "dunk",
+     "ljudord": "dunk"
     },
     {
      "typ": "replik",
@@ -285,7 +286,8 @@
     },
     {
      "typ": "ljud",
-     "id": "dunk"
+     "id": "dunk",
+     "ljudord": "dunk"
     },
     {
      "typ": "mellanscen",
@@ -382,7 +384,8 @@
     {
      "typ": "ljud",
      "id": "dunk",
-     "foremal": "lada_med_agg"
+     "foremal": "lada_med_agg",
+     "ljudord": "dunk"
     },
     {
      "typ": "mellanscen",
@@ -395,7 +398,8 @@
     {
      "typ": "ljud",
      "id": "dunk",
-     "foremal": "lada_med_agg"
+     "foremal": "lada_med_agg",
+     "ljudord": "dunk"
     },
     {
      "typ": "mellanscen",
@@ -478,7 +482,8 @@
     },
     {
      "typ": "ljud",
-     "id": "fagel_late"
+     "id": "fagel_late",
+     "ljudord": "kra"
     },
     {
      "typ": "replik",
@@ -626,7 +631,8 @@
     },
     {
      "typ": "ljud",
-     "id": "mage_kurrar"
+     "id": "mage_kurrar",
+     "ljudord": "brum"
     },
     {
      "typ": "replik",
@@ -1274,7 +1280,8 @@
     },
     {
      "typ": "ljud",
-     "id": "fagel_late"
+     "id": "fagel_late",
+     "ljudord": "kra"
     },
     {
      "typ": "mellanscen",
