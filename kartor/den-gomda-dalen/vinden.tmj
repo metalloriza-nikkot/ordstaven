@@ -39,7 +39,7 @@
      "id": 1,
      "name": "runt_fonster",
      "type": "sak",
-     "x": 196,
+     "x": 96,
      "y": 6,
      "width": 28,
      "height": 22,
@@ -50,7 +50,7 @@
      "id": 2,
      "name": "hylla",
      "type": "sak",
-     "x": 40,
+     "x": 208,
      "y": 28,
      "width": 72,
      "height": 20,
@@ -61,7 +61,7 @@
      "id": 3,
      "name": "lada_hyllan",
      "type": "sak",
-     "x": 66,
+     "x": 234,
      "y": 26,
      "width": 20,
      "height": 20,
@@ -72,7 +72,7 @@
      "id": 4,
      "name": "lada_fonstret",
      "type": "sak",
-     "x": 198,
+     "x": 98,
      "y": 48,
      "width": 24,
      "height": 16,
@@ -83,7 +83,7 @@
      "id": 5,
      "name": "lada_med_agg",
      "type": "sak",
-     "x": 252,
+     "x": 40,
      "y": 50,
      "width": 32,
      "height": 22,
@@ -94,7 +94,7 @@
      "id": 6,
      "name": "lada_med_stav",
      "type": "sak",
-     "x": 140,
+     "x": 150,
      "y": 88,
      "width": 30,
      "height": 18,
@@ -112,7 +112,7 @@
      "id": 7,
      "name": "lada_lang_overst",
      "type": "sak",
-     "x": 36,
+     "x": 254,
      "y": 56,
      "width": 30,
      "height": 18,
@@ -122,7 +122,7 @@
       {
        "name": "sida",
        "type": "string",
-       "value": "hoger"
+       "value": "vanster"
       }
      ]
     },
@@ -130,7 +130,7 @@
      "id": 8,
      "name": "lada_lang_mitten",
      "type": "sak",
-     "x": 126,
+     "x": 164,
      "y": 50,
      "width": 30,
      "height": 18,
@@ -148,7 +148,7 @@
      "id": 9,
      "name": "lada_lang_nederst",
      "type": "sak",
-     "x": 256,
+     "x": 38,
      "y": 98,
      "width": 30,
      "height": 18,
@@ -158,17 +158,17 @@
       {
        "name": "sida",
        "type": "string",
-       "value": "vanster"
+       "value": "hoger"
       }
      ]
     },
     {
      "id": 10,
-     "name": "fem_krukor",
+     "name": "sex_krukor",
      "type": "sak",
-     "x": 100,
+     "x": 72,
      "y": 124,
-     "width": 130,
+     "width": 168,
      "height": 18,
      "rotation": 0,
      "visible": true,
@@ -189,7 +189,7 @@
      "id": 11,
      "name": "lada_hornet",
      "type": "sak",
-     "x": 252,
+     "x": 42,
      "y": 146,
      "width": 30,
      "height": 26,
@@ -199,7 +199,7 @@
       {
        "name": "sida",
        "type": "string",
-       "value": "vanster"
+       "value": "hoger"
       }
      ]
     },
@@ -207,7 +207,7 @@
      "id": 12,
      "name": "stege_ner",
      "type": "utgang",
-     "x": 40,
+     "x": 256,
      "y": 150,
      "width": 24,
      "height": 20,
@@ -240,7 +240,7 @@
      "id": 13,
      "name": "start",
      "type": "",
-     "x": 52,
+     "x": 268,
      "y": 146,
      "width": 0,
      "height": 0,

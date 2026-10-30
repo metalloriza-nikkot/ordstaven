@@ -1,6 +1,7 @@
 # Innehållsschema – kapitel i format 2
 
-Version 2.10 (2026-10-30). Ägs av teknikspåret.
+Version 2.11 (2026-10-30). Ägs av teknikspåret.
+2.11: Farfars hus (T6). Kartorna får typen `vagg`: massiv vägg inne i ett rum, så att ett rum kan ha en annan form än en rektangel (hallen med en bred entré och en smal korridor). Rollrösten `fagel` (en levande fågelröst) i `aventyr.json`. Allt är tillägg, filer i 2.10 gäller fortfarande.
 2.10: SVÄRD utifrån bilden (beslut 18.5, 20.3): `bild` på P11 och `forebild.visas` (`fran_start` eller `vid_fel`). Allt är tillägg, filer i 2.9 gäller fortfarande.
 2.9: kapitel 1:s kartor (T5). Ett område kan vara större än skärmen, högst 2×2 skärmar, och kameran följer hjälten (beslut 14, 18.1). Kartorna får `forsvinner_efter` (lianerna som SVÄRD kapar) och `oppning` (hålet i häcken). `alias.rum` för rum som har gått upp i ett större område. Av ett läsval i världen syns bara den variant han får. Allt är tillägg, filer i 2.8 gäller fortfarande.
 2.8: kapitel 1:s steg och fält (T2). Rummen får `skyltar` (text som står i världen, beslut 15.2), `frivilligt` (föremål som ger något en gång) och `dold` på föremål. Scenerna får `frivillig` och `startar_i_rum`. Nya steg: `las_skylt`, `visa_foremal`, `ge_sak`, `dinobok`, `unge_tillagg`, `fri_vag` på `ga_till` och `paminnelse` på repliker som väntar. Pusslen: `skylt` på läs och välj, titta–täck i formeln, brickor och kasta-läge i räddningen, kodlåsets kontroll, och svingning mot rummets föremål i P26. `gransnitt` i `aventyr.json` (orden i pausmenyn). Kartorna får höjdnivåer (`yta`, `trappa`, `stege`), och en stig slutar vid kurvan. Allt är tillägg, filer i 2.7 gäller fortfarande, utom `skapa_hjalte`: `delar` är nu `hudfarg` och `drakt` (hjältens form är fast, prologen är omskriven).
@@ -20,7 +21,7 @@ Schemafilerna finns i `content/schema/`. Kontrollen körs med `npm run kontroll`
 | Fil | Innehåll | Schema |
 |---|---|---|
 | `content/ordlistor.json` | Ordlistor 1–6, flaggor, förbjudna par | `ordlistor.schema.json` |
-| `content/<äventyr>/aventyr.json` | Titel, talare, platshållare, kapitelordning, `sluta_for_idag` (`fore_ungen` och `med_ungen`: mellanscener och repliker när han väljer att sluta för idag, i pausmenyn eller vid passets slut; ordet på pausmenyns knapp är `gransnitt.sluta_for_idag`), `sparpunkt_fraga` (frågan vid varje sparpunkt), `gransnitt` (orden i pausmenyn) | `aventyr.schema.json` |
+| `content/<äventyr>/aventyr.json` | Titel, talare (med `rollrost`: `berattare`, `gammal`, `fanig`, `fagel`, `metall` eller `unge`; `fagel` är en levande röst vars ton skiftar lite från replik till replik), platshållare, kapitelordning, `sluta_for_idag` (`fore_ungen` och `med_ungen`: mellanscener och repliker när han väljer att sluta för idag, i pausmenyn eller vid passets slut; ordet på pausmenyns knapp är `gransnitt.sluta_for_idag`), `sparpunkt_fraga` (frågan vid varje sparpunkt), `gransnitt` (orden i pausmenyn) | `aventyr.schema.json` |
 | `content/<äventyr>/kap-00.json` … `kap-07.json` | Ett kapitel: rum, scener, pussel | `kapitel.schema.json` |
 
 Kapitelfilerna börjar med `"format": 2`, äventyret och ordlistorna med `"format": 1`. Ändras formatet höjs numret, och teknik skriver om gamla filer. En kapitelfil i format 1 godtas inte längre: byt `P27_packa` mot `P28_packa` och `format` mot 2.
@@ -104,7 +105,7 @@ En **replik inuti något annat** (`knuff`, `vid_fel`, `instruktion`, `vid_omstar
 
 `id`, `typ`, `instruktion` (replik), `knuff` (`handling`, `replik`, `efter_sek`, standard 9 s), `forenkla` (`efter_fel`, `andring`), `efter_3_fel`, `vid_ratt`, `vid_fel`, `anteckning`.
 
-**Fråga igen** (dialogregeln): en figur med `talare` i kartan upprepar sin senaste upplästa replik i scenen när spelaren trycker på den. Farfar i köket har `talare: farfar`.
+**Fråga igen** (dialogregeln): en figur med `talare` i kartan upprepar sin senaste upplästa replik i scenen när spelaren trycker på den. Farfar i läsrummet och i köket har `talare: farfar`.
 
 **Knuffar som pekar på svaret** får `"pekar": true` (till exempel "ungen lutar sig mot rätt dörr"). De kommer tidigast efter första felet, eller efter 4 sekunder per alternativ och minst 12 sekunder, så att det aldrig lönar sig att vänta i stället för att läsa. Knuffar som upprepar frågan (tankebubblan blinkar, Farfar ropar igen) har inget `pekar` och kommer efter 9 sekunder som förut. Kontrollen varnar när en knuff i ett läsval nämner "rätt" eller "mot" utan `pekar`.
 `vid_ratt`, `vid_fel`, `efter_3_fel` och `vid_valj` har `handling` eller `reaktion` (vad som händer i bild, fri text i gråboxen), `replik` och `fest` (`liten`, `mellan`, `mellan_dampad`, `stor`).
@@ -192,7 +193,7 @@ Innehållet säger **vad** som finns i ett rum, kartan säger **var** det står.
 - Kartan är 20×12 rutor à 16 pixlar (320×192, en skärm), eller större: **ett område** är högst 40×24 rutor (2×2 skärmar, beslut 14 och 18.1). Då följer kameran hjälten med en mittzon och stannar vid kanterna. Gränserna dras vid tydliga passager. **Ett läsval ryms alltid på en skärm:** alternativen och skylten med frågan, med plats för skyltarna ovanför (testas). När frågan ställs glider kameran så att hela valet syns.
 - Ett objektlager. Varje föremål är en rektangel där **namnet är föremålets id** i rummets `innehall`. Ingen text som spelaren ser.
 - **Typ** (klass): `utgang`, `sak` eller `figur`. Saknas den gissas den av id:t (`dorr_`, `stege_`, `grind`, `stig_` är utgångar).
-- **`visar`** = pusslet vars alternativ föremålet visar i rummet: lådorna i `p0_dinomat` ritas i den variant spelaren får, i rätt färg och storlek, och krukorna (P26) delas ut där `fem_krukor` står.
+- **`visar`** = pusslet vars alternativ föremålet visar i rummet: lådorna i `p0_dinomat` ritas i den variant spelaren får, i rätt färg och storlek, och krukorna (P26) delas ut där `sex_krukor` står.
 - **Egenskaper:**
   - `till` = rummet en utgång leder till (hjälten kommer in där när han kommer från det rummet).
   - `riktning` = åt vilket håll utgången leder (`vanster`, `hoger`, `upp`, `ned`). Krävs på varje utgång med `till`. Nästa rum glider in från det hållet, och två dörrar mellan samma rum har motsatt riktning (testas).
@@ -208,8 +209,9 @@ Innehållet säger **vad** som finns i ett rum, kartan säger **var** det står.
 - **Varianterna i ett läsval i världen:** alla varianters föremål står i kartan, men bara den variant han får syns. Den rätta saken kan stå på samma plats i flera varianter (`hog_sten` och `hog_rund_sten`), så att bara en dold väg behövs.
 - **Alternativen i ett val** (lådorna i FILT och dinomaten) står minst 3 rutor isär, så att ingen plats når två av dem (testas).
 - **Kartans egenskap `morker`** (0–1) säger hur mörkt rummet är på natten (annars 0,72). Hallen har 0,55.
-- **Kartans egenskap `inomhus`** ger rummet en väggram: bakvägg 3 rutor, sidoväggar 2, främre kant 1. Dörrar sitter i väggarna och möbler står längs dem. Egenskaperna `vagg_bak`, `vagg_sida` och `vagg_fram` (pixlar) ger andra mått, t.ex. den smala hallen med tjocka sidoväggar.
-- En **punkt** som heter `lampa` (eller `lampa_…`) lyser varmt när rummet är mörkt, t.ex. läslampan vid Farfars plats i köket.
+- **Kartans egenskap `inomhus`** ger rummet en väggram: bakvägg 3 rutor, sidoväggar 2, främre kant 1. Dörrar sitter i väggarna och möbler står längs dem. Egenskaperna `vagg_bak`, `vagg_sida` och `vagg_fram` (pixlar) ger andra mått.
+- **Typen `vagg`** (2.11) = massiv vägg inne i rummet. Den ger rummet dess form och hör inte till innehållet, så namnet används inte. Hallen är en bred entré och en smal korridor västerut: en `vagg` söder om korridoren gör korridoren smal. Dörrar kan sitta i en sådan vägg (SOV i korridorens främre vägg, BAD i entréns vänstra vägg). Väggens kant mot golvet ovanför ritas som en främre kant, och kanterna mot golvet bredvid som sidoväggar.
+- En **punkt** som heter `lampa` (eller `lampa_…`) lyser varmt när rummet är mörkt, t.ex. läslampan vid Farfars fåtölj i läsrummet.
 - En **punkt** med namnet `start` är där hjälten står när han inte kommer genom en utgång (första gången, eller efter en omstart). En punkt `in_<rum>` är där han kommer in från ett rum som inte har någon utgång hit (t.ex. trädgården från hallen).
 - **Stigar** (granskningen, punkt 16): en stig är en utgång med `golv` och `riktning`, och rutan går från vägskälet till **kurvan**, där stigen försvinner bakom buskarna, inte ända till kanten. Valet räknas när han når kurvan. En fel stig leder aldrig vidare: bakom kurvan händer felet (han syns inte), och sedan kommer han tillbaka till vägskälet. Går han samma prövade stig igen händer samma sak, utan att räknas. Förenklingen spärrar prövade stigar med en gren tvärs över stigens början.
 - **Höjdnivåer** (A Link to the Past): en ruta med typen `yta` och egenskapen `niva` (1, 2 …) är upphöjd, t.ex. kullen med krönet. Kanterna går inte att gå över. En ruta med typen `trappa` eller `stege` förbinder nivåerna och ska ligga över kanten, med en bit på varje nivå. På trappan går han som vanligt, på stegen klättrar han upp och ned med ryggen mot kameran (ungen väntar och skuttar efter). Saker på ytan (lövhögarna) når han bara uppifrån. Ett tryck på något på en annan nivå går över närmaste trappa eller stege. Ett `ga_till` till en yta (`kronet`) är klart när han står på den.
@@ -218,10 +220,11 @@ Innehållet säger **vad** som finns i ett rum, kartan säger **var** det står.
 Kontrollen säger fel om ett föremål saknas i kartan, om kartan har föremål som inte finns i rummet, om något går utanför rummet, om en utgång leder till ett rum som inte finns eller saknar `riktning`, om `klattra` står på något som inte är en utgång, om `lapp` pekar på ett föremål som inte finns i rummet och om `in_<rum>` inte är ett rum. Kontrollen säger också fel om `forsvinner_efter` inte är ett formelpussel och om `alias.rum` pekar på ett rum som inte finns. Ett enhetstest kontrollerar att varje föremål går att nå från varje ingång i varje tillstånd, i kapitel 1 också uppe på kullen och i apans bo, och att häcken och lianerna stänger vägen tills stenen och SVÄRD öppnar den.
 
 ### Pausmenyn: `gransnitt` i aventyr.json
-Pausmenyn har två bildknappar, KARTAN och HJÄLTEBOKEN, och hjälteboken har flikarna staven, garderoben och Dinoboken (stilguiden §6). Varje knapp och flik är en bild och ett ord, och ordet läses upp vid tryck. Orden står i `aventyr.json`:
+Pausmenyn har två bildknappar, KARTAN och MIN BOK (hjälteboken), och hjälteboken har flikarna STAVEN, KLÄDER (garderoben) och DINOBOKEN (stilguiden §6, beslut 22.2). Varje knapp och flik är en bild och ett ord, och ordet läses upp vid tryck. Orden står i `aventyr.json` (nycklarna har dokumentens namn):
 ```json
-"gransnitt": { "kartan": "kartan", "hjalteboken": "hjälteboken", "staven": "staven", "garderoben": "garderoben", "dinoboken": "Dinoboken" }
+"gransnitt": { "kartan": "kartan", "hjalteboken": "min bok", "staven": "staven", "garderoben": "kläder", "dinoboken": "Dinoboken" }
 ```
+`sluta_for_idag` kan också få ett ord. Saknas det visar knappen bara den sovande ungen.
 Saknas ett ord visas bara bilden. Det som står på sidorna kommer från sparningen: formlerna (staven), sakerna hjälten har hittat (`ge_sak`, garderoben), Dinobokens sidor (`dinobok`) och kartbitarna.
 
 ## 4. Ordlistor

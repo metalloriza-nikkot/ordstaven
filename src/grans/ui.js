@@ -287,6 +287,27 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
   // ---------------------------------------------------------------- läs i rummet
   /** Frågan (tankebubblan) uppe i rummet medan spelaren letar. null döljer. @param {string | null} html */
   function visaTanke(html) { const t = $('#tanke'); t.hidden = !html; t.innerHTML = html || ''; }
+  /**
+   * Tankebubblan får aldrig täcka det han ska välja (T6: hallens dörrar i bakväggen). Den står överst i mitten,
+   * och täcker den ett alternativ, en skylt eller en knapp flyttar den till första lediga plats: uppe till vänster
+   * eller höger, eller nere. @param {{ left: number, top: number, right: number, bottom: number }[]} hinder
+   * skärmrutor för alternativen @param {{ vanster: number, topp: number, bredd: number, hojd: number }} ram rummet på skärmen
+   */
+  function placeraTanke(hinder, ram) {
+    const t = $('#tanke');
+    t.style.left = ''; t.style.top = ''; t.style.transform = '';
+    if (t.hidden) return;
+    const alla = [...hinder, ...[...ui.querySelectorAll('#skyltar .skylt, #hud .hud-knapp, #hud-paus, #hud-meny')].filter((e) => !/** @type {HTMLElement} */ (e).hidden).map((e) => e.getBoundingClientRect()).filter((r) => r.width > 0)];
+    const r0 = t.getBoundingClientRect();
+    const b = r0.width, h = r0.height, luft = 10;
+    const krockar = (/** @type {number} */ x, /** @type {number} */ y) => alla.some((q) => x < q.right + 4 && q.left - 4 < x + b && y < q.bottom + 4 && q.top - 4 < y + h);
+    const mitt = ram.vanster + (ram.bredd - b) / 2, hoger = ram.vanster + ram.bredd - b - luft, vanster = ram.vanster + luft;
+    const uppe = r0.top, nere = ram.topp + ram.hojd - h - luft;
+    for (const [x, y] of [[mitt, uppe], [vanster, uppe], [hoger, uppe], [mitt, nere], [vanster, nere], [hoger, nere]]) {
+      if (!krockar(x, y)) { t.style.transform = 'none'; t.style.left = Math.round(x) + 'px'; t.style.top = Math.round(y) + 'px'; return; }
+    }
+    t.style.left = ''; t.style.top = ''; t.style.transform = '';
+  }
   function pulseraTanke() { const t = $('#tanke'); t.classList.remove('puls'); void t.offsetWidth; t.classList.add('puls'); }
   /**
    * @typedef {{ lage?: 'over' | 'pa' | 'vanster' | 'hoger', under?: number, rumTopp: number, ram?: { vanster: number, hoger: number }, objekt?: string }} Plats
@@ -473,7 +494,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     styrhjalp,
     flygBar,
     handknapp,
-    visaTanke, pulseraTanke, ordskylt, skyltar, rumsskyltar, pulseraSkylt, skyltNara, ropa,
+    visaTanke, placeraTanke, pulseraTanke, ordskylt, skyltar, rumsskyltar, pulseraSkylt, skyltNara, ropa,
     ui, $, plattan, rader, esc, visaPlatta, doljPlatta, vantaFortsatt, visaRegi, doljRegi, visaFest,
     uppdateraHud, pulsera, visaSkarm, doljSkarm, visaMeny, doljMeny, visaPausmeny, doljPausmeny, etiketter, sattNos, vaxlaNos, ljuda, arHelord,
     fanga, tandNos, markeraOrd,

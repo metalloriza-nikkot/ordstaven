@@ -99,10 +99,10 @@ test('radion: repliken hörs genom radion, och radioramen glider in', async ({ p
 
 test('skyltarna på dörrarna syns även när han bara ska gå (s01b), men dörrarna är låsta', async ({ page }) => {
   await provscen(page, { id: 't_skyltar', pass: 1, rum: 'hallen', tillstand: 'natt', steg: [{ typ: 'ga_till', mal: 'stege_upp', vid_annan_utgang: { ljud: 'dunk' } }, R('Uppe.')] });
-  await expect(page.locator('#skyltar .skylt')).toHaveCount(4, { timeout: 5000 });
-  expect((await page.locator('#skyltar .skylt .kort').allTextContents()).sort()).toEqual(['BAD', 'MAT', 'SOV', 'TOA']);
-  await page.locator('#skyltar .skylt[data-objekt="dorr_toa"] .kort').click();
-  await expect.poll(async () => (await page.evaluate(() => window.__ORDSTAVEN.logg())).includes('[låst] dorr_toa'), { timeout: 8000 }).toBe(true);
+  await expect(page.locator('#skyltar .skylt')).toHaveCount(5, { timeout: 5000 });
+  expect((await page.locator('#skyltar .skylt .kort').allTextContents()).sort()).toEqual(['BAD', 'BOK', 'FARFAR', 'MAT', 'SOV']);
+  await page.locator('#skyltar .skylt[data-objekt="dorr_bad"] .kort').click();
+  await expect.poll(async () => (await page.evaluate(() => window.__ORDSTAVEN.logg())).includes('[låst] dorr_bad'), { timeout: 8000 }).toBe(true);
   await tryckPa(page, 'stege_upp');
   await expect.poll(async () => (await steg(page))?.typ, { timeout: 10000 }).toBe('replik');
   await expect(page.locator('#skyltar .skylt')).toHaveCount(0);
@@ -193,8 +193,8 @@ test('ytterdörren i hallen är låst på natten: hjälten känner på handtaget
   expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).not.toContain('[låst] dorr_ut\n');
   expect(await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt())).toContain('stege_upp'); // fortfarande i hallen
   // nära nog räcker vid stegen: han ställer sig själv mitt för den och klättrar
-  const s = await page.evaluate(() => window.__ORDSTAVEN.skala());
-  await page.mouse.click(s.vanster + 132 * s.cssSkala, s.topp + 66 * s.cssSkala); // snett nedanför stegens vänstra kant
+  const s = await page.evaluate(() => window.__ORDSTAVEN.skala()), k = await page.evaluate(() => window.__ORDSTAVEN.kamera());
+  await page.mouse.click(s.vanster + (292 - k.x) * s.cssSkala, s.topp + (66 - k.y) * s.cssSkala); // snett nedanför stegens vänstra kant
   await expect.poll(async () => (await steg(page))?.typ, { timeout: 10000 }).toBe('replik');
 });
 

@@ -82,9 +82,9 @@ describe('pusslen', () => {
   it('dörrarna: förenklingen spikar igen de dörrar han redan har prövat, två dörrar finns kvar', () => {
     for (const slump of [fast, () => 0.99, () => 0.5]) {
       const p = skapaValj(P('p0_dorrar'), { niva: 1, slump });
-      p.valj('bad'); const r = p.valj('toa');
+      p.valj('bad'); const r = p.valj('farfar');
       expect(r.forenklad).toBe(true);
-      expect(p.s.alternativ.map((a) => a.id).sort()).toEqual(['mat', 'sov']); // den oprövade fel dörren står kvar
+      expect(p.s.alternativ.map((a) => a.id).sort()).toEqual(['bok', 'mat', 'sov']); // de oprövade fel dörrarna står kvar
     }
   });
   it('förenklingen tar aldrig bort så många att bara det rätta är kvar', () => {
@@ -191,11 +191,11 @@ describe('pusslen', () => {
     expect(knufftidMs({ text: null, alternativ: [{ ord: 'Dalens dinos har blå fötter.' }, { ord: 'Dalens dinos har vita fötter.' }, { ord: 'Dalens dinos har gula fötter.' }] })).toBe(33000);
   });
   it('krukorna: kartbiten kommer alltid sist', () => {
-    for (const ordning of [[0, 1, 2, 3, 4], [4, 3, 2, 1, 0], [2, 0, 4, 1, 3]]) {
+    for (const ordning of [[0, 1, 2, 3, 4, 5], [5, 4, 3, 2, 1, 0], [2, 0, 5, 4, 1, 3]]) {
       const k = skapaKrukor(P('p0_krukor'));
       const fynd = ordning.map((i) => k.sla(i));
       expect(fynd.at(-1)).toBe('kartbit_1');
-      expect(fynd.slice(0, 4).sort()).toEqual(['bar', 'bar', 'tom', 'tom']);
+      expect(fynd.slice(0, 5).sort()).toEqual(['bar', 'bar', 'bar', 'tom', 'tom']);
       expect(k.s.klar).toBe(true);
     }
   });

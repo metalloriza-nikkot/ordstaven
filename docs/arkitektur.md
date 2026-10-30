@@ -510,3 +510,11 @@ Efter den externa granskningen: det ska aldrig löna sig att gissa eller vänta 
 
 - **Startskärmen:** glöden runt staven ligger i ett eget lager (`.stav-glimt::after`), och bara dess opacitet pulserar. Förut ändrade animationen storleken på en skugga med oskärpa, som golvdatorn ritade om i varje bildruta. Regeln gäller överallt: animera opacitet eller läge, aldrig skuggor, oskärpa eller filter.
 - **Rösten:** pratade talsyntesen när ett nytt yttrande kommer, så görs `cancel()`, och det nya läggs efter 80 ms. Chrome på Mac fastnade ibland som om den pratade, utan `onend`, och då gällde maxtiden.
+
+## 32. Farfars hus (T6, 0.9.0)
+- **Hallen** (`kartor/den-gomda-dalen/hallen.tmj`, 28 × 12 rutor) är en bred entré österut och en smal korridor västerut. Formen kommer av en ruta med typen `vagg` söder om korridoren: `karta.massiv`. Väggarna inne i rummet är hinder (`Rum.byggHinder`), ritas som massiv vägg med främre kant och sidoväggar (`Rum.ritaGolv`), och en plats i dem väljs aldrig som plats framför en sak (`framforFran(..., massiv)`).
+- **Dörrarna:** FARFAR, BOK och MAT i korridorens bakvägg, SOV i korridorens främre vägg (i väggen inne i rummet) och BAD i entréns vänstra vägg. Alla fem står inom x 56–272, alltså på en skärm med hjälten, minst 3 rutor isär (enhetstest). Rummen bakom ligger som på kartan: läsrummet och köket ovanför, gästrummet nedanför, och rumsbytet glider därifrån.
+- **Läsrummet** (`kontoret`) är nytt: fåtöljerna, bordet, läslampan och bokhyllan med expeditionsboken. Farfar sitter där på natten (`farfar_i_fatoljen`). Köket har bara morgonens saker.
+- **Vinden** är spegelvänd, så att stegen står till höger, rakt ovanför stegen i hallens entré. Avstånden mellan lådorna är desamma. De sex krukorna står i en rad.
+- **Tankebubblan** (`ui.placeraTanke`) står överst i mitten, men täcker den ett alternativ, en skylt eller en knapp flyttar den till första lediga plats (uppe till vänster eller höger, eller nere). Dörrarna i bakväggen satt annars under den.
+- **Fågelns röst:** rollrösten `fagel` (`rost.tonFor`) skiftar tonen lite från replik till replik, räknat ur texten så att samma replik alltid låter likadant, och ett utrop går upp. Lätet `fagel_late` är tre korta kvitter.

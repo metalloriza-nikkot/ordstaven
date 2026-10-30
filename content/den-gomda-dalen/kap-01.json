@@ -21,17 +21,18 @@
  },
  "meta": {
   "namn": "Skogen",
-  "version": "0.7",
+  "version": "0.7.1",
   "datum": "2026-10-30",
   "agare": "Innehåll",
-  "kalla": "Manus 15-kapitel1-manus.md v0.9. Byggd på repots kap-01.json (0.7.1, format 2).",
+  "kalla": "Manus 15-kapitel1-manus.md v0.9.1. Byggd på repots kap-01.json (0.8.1, format 2).",
   "nya_pusseltyper": [
    "P15_raddning",
    "P9_kodlas"
   ],
-  "teknik": "Teknik har lagt in projektets innehall-kapitel1.json (Innehålls v0.5, meta.version säger fortfarande 0.2) i repot, och ingen text är ändrad. 2026-10-28 (T1): format 1 → 2 (kapitlen är i format 2 sedan P28_packa). Inget annat i strukturen är ändrat. 2026-10-29 (T2): Innehålls förslag 2–14 som struktur, med texterna ur anteckningarna ordagrant. Skyltarna och tavlan står i rummens fält skyltar (beslut 15.2). k1s01: ga_till och mellanscenen vid skylten blir las_skylt. k1s02: fritt och ga_till blir ett ga_till med fri_vag. k1s03 är frivillig och startar i buskarna. Ryggsäcken och taggkammen är ge_sak. Frivilligt per rum (rum.frivilligt). last_lada, lila_lapp och stig_backen är dolda tills visa_foremal. k1s13: paminnelse och unge_tillagg. Pusslen: skylt på stenen och träden, forebild.tacks i SVÄRD, brickor och kasta i apan, visa_forsta, kontroll och svar_lyser_sek i kodlåset, sak_i_sista och foremal i busken och löven, och luckornas knufftid räknas av motorn (efter_sek 30 borttaget). Listan (förslag 1) kommer i T3. 2026-10-30 (T5): data v0.7 inlagd utan ändrad text. alias.rum pekar lianerna till skogsbrynet och gamla_tradet till glantan, så att det som har visats i en äldre sparning följer med. Kartorna finns i kartor/den-gomda-dalen (skogsbrynet 40 × 12, buskarna 20 × 12, glantan 40 × 24). 2026-10-30 (T4): Innehålls FÖRSLAG i k1_svard och k1_svard_igen som struktur (schema 2.10): bild svard_ristat på k1_svard, och forebild.visas vid_fel i båda (brickor_efter_sek borttaget, brickorna kommer direkt). Ingen text ändrad.",
+  "teknik": "Teknik har lagt in projektets innehall-kapitel1.json (Innehålls v0.5, meta.version säger fortfarande 0.2) i repot, och ingen text är ändrad. 2026-10-28 (T1): format 1 → 2 (kapitlen är i format 2 sedan P28_packa). Inget annat i strukturen är ändrat. 2026-10-29 (T2): Innehålls förslag 2–14 som struktur, med texterna ur anteckningarna ordagrant. Skyltarna och tavlan står i rummens fält skyltar (beslut 15.2). k1s01: ga_till och mellanscenen vid skylten blir las_skylt. k1s02: fritt och ga_till blir ett ga_till med fri_vag. k1s03 är frivillig och startar i buskarna. Ryggsäcken och taggkammen är ge_sak. Frivilligt per rum (rum.frivilligt). last_lada, lila_lapp och stig_backen är dolda tills visa_foremal. k1s13: paminnelse och unge_tillagg. Pusslen: skylt på stenen och träden, forebild.tacks i SVÄRD, brickor och kasta i apan, visa_forsta, kontroll och svar_lyser_sek i kodlåset, sak_i_sista och foremal i busken och löven, och luckornas knufftid räknas av motorn (efter_sek 30 borttaget). Listan (förslag 1) kommer i T3. 2026-10-30 (T5): data v0.7 inlagd utan ändrad text. alias.rum pekar lianerna till skogsbrynet och gamla_tradet till glantan, så att det som har visats i en äldre sparning följer med. Kartorna finns i kartor/den-gomda-dalen (skogsbrynet 40 × 12, buskarna 20 × 12, glantan 40 × 24). 2026-10-30 (T4): Innehålls FÖRSLAG i k1_svard och k1_svard_igen som struktur (schema 2.10): bild svard_ristat på k1_svard, och forebild.visas vid_fel i båda (brickor_efter_sek borttaget, brickorna kommer direkt). Ingen text ändrad. 2026-10-30 (T6): v0.7.1 inlagd utan ändrad text, med T4:s struktur kvar (bild och forebild.visas i SVÄRD).",
   "innehall_v06": "v0.6 (Innehåll 2026-10-28): F1 och F5 enligt 15 v0.7. Val i världen med i_rummet och objekt (stenarna, träden), skylten vid ingången, Farfars lista, titta–täck för SVÄRD, apan med brickor och kasta-läget, nyckeln från apan, lövhögarna, luckorna med VITA, kodlåset, kartbiten med bron, lappen med fjäderhatten, omsorgen och slutet på ungen. vid_omstart i varje scen. Det som saknar steg i schemat 2.7 står som FÖRSLAG i scenens eller pusslets anteckning, och samlat i Innehålls rapport 2026-10-28.",
-  "innehall_v07": "v0.7 (Innehåll 2026-10-30): F9 enligt 15 v0.9 och beslut 18. Tre områden i stället för fem rum: skogsbrynet (med lianerna) och gläntan (med det gamla trädet); lianerna och gamla_tradet utgår som rum. Stenarna och träden är saker i världen (objekt = stenen eller trädet), och den rätta öppnar vägen med visa_foremal (stig_genom_hacken, trappa). SVÄRD skrivs utifrån Farfars bild, med förebilden först vid fel (FÖRSLAG i k1_svard). Apans ledtråd \"Man klättrar upp med den.\" Farfars lista är borta (beslut 18.7), och Farfar säger på radion var formeln är. Baronen är en klantig rival: nätet var till en fjäril, lappen är ingen fara, och omsorgen kommer av ett ljud ungen inte känner igen (hackspetten). Fågeln heter \"baronens fågel\" tills spelaren har valt namn, och lätet är fagel_late."
+  "innehall_v07": "v0.7 (Innehåll 2026-10-30): F9 enligt 15 v0.9 och beslut 18. Tre områden i stället för fem rum: skogsbrynet (med lianerna) och gläntan (med det gamla trädet); lianerna och gamla_tradet utgår som rum. Stenarna och träden är saker i världen (objekt = stenen eller trädet), och den rätta öppnar vägen med visa_foremal (stig_genom_hacken, trappa). SVÄRD skrivs utifrån Farfars bild, med förebilden först vid fel (FÖRSLAG i k1_svard). Apans ledtråd \"Man klättrar upp med den.\" Farfars lista är borta (beslut 18.7), och Farfar säger på radion var formeln är. Baronen är en klantig rival: nätet var till en fjäril, lappen är ingen fara, och omsorgen kommer av ett ljud ungen inte känner igen (hackspetten). Fågeln heter \"baronens fågel\" tills spelaren har valt namn, och lätet är fagel_late.",
+  "innehall_v071": "v0.7.1 (Innehåll 2026-10-30, F8): k1s06 får tillbaka mellanscenen där apan sätter kammen på hjälmen, och repliken om presenten kommer före gåvan. Stenen och träden: en prövad sak tonas ut direkt (beslut 20.2), så forenkla och anteckningarna säger inte längre gren."
  },
  "rum": [
   {
@@ -450,15 +451,19 @@
      "beskrivning": "Apan klättrar ner och kramar ungen."
     },
     {
-     "typ": "ge_sak",
-     "sort": "hjalmdekor",
-     "id": "taggkam"
-    },
-    {
      "typ": "replik",
      "talare": "berattare",
      "text": "Apan säger tack med en present.",
      "upplast": true
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Apan sätter en kam av taggar på hjälmen och klappar den på plats."
+    },
+    {
+     "typ": "ge_sak",
+     "sort": "hjalmdekor",
+     "id": "taggkam"
     },
     {
      "typ": "mellanscen",
@@ -924,12 +929,12 @@
    },
    "forenkla": {
     "efter_fel": 2,
-    "andring": "de prövade stenarna spärras med en omkullfallen gren"
+    "andring": "ungen ställer sig vid rätt stenen och väntar"
    },
    "efter_3_fel": {
     "handling": "ungen springer till rätt sten och nosar"
    },
-   "anteckning": "Val i världen (beslut 18.1): objekt är stenen själv. Han går till stenen och använder den. Varianten bestäms när han kommer in i området. Den rätta stenen står alltid på samma plats, framför hålet i häcken, och scenen visar sedan stig_genom_hacken. Fel sten leder ingenstans: ekorren svarar vid stenen. efter_3_fel pekar på svaret.",
+   "anteckning": "Val i världen (beslut 18.1): objekt är stenen själv. Han går till stenen och använder den. Varianten bestäms när han kommer in i området. Den rätta stenen står alltid på samma plats, framför hålet i häcken, och scenen visar sedan stig_genom_hacken. Fel sten leder ingenstans: ekorren svarar vid stenen. En prövad sak tonas ut direkt och går inte att välja igen (beslut 20.2), som lådorna på vinden. I L2 finns därför bara rätt sak kvar efter ett fel, och i L3 efter två. forenkla och efter_3_fel pekar på svaret.",
    "skylt": "skylt_farfar_1"
   },
   {
@@ -1180,12 +1185,12 @@
    },
    "forenkla": {
     "efter_fel": 2,
-    "andring": "de prövade träden spärras med en omkullfallen gren"
+    "andring": "ungen ställer sig vid rätt trädet och väntar"
    },
    "efter_3_fel": {
     "handling": "apan hoppar till rätt träd och pekar"
    },
-   "anteckning": "Val i världen (beslut 18.1): objekt är trädet själv. Han går till trädet och använder det. Varianten bestäms när han kommer in i området. Det rätta trädet står alltid vid foten av kullen, och scenen visar sedan trappan bakom stammen. Det gamla trädet har knotiga grenar och mossa, det unga är slätt och smalt. efter_3_fel pekar på svaret.",
+   "anteckning": "Val i världen (beslut 18.1): objekt är trädet själv. Han går till trädet och använder det. Varianten bestäms när han kommer in i området. Det rätta trädet står alltid vid foten av kullen, och scenen visar sedan trappan bakom stammen. Det gamla trädet har knotiga grenar och mossa, det unga är slätt och smalt. En prövad sak tonas ut direkt och går inte att välja igen (beslut 20.2), som lådorna på vinden. I L2 finns därför bara rätt sak kvar efter ett fel, och i L3 efter två. forenkla och efter_3_fel pekar på svaret.",
    "skylt": "skylt_farfar_3"
   },
   {

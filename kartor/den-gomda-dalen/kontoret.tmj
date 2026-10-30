@@ -1,0 +1,213 @@
+{
+ "type": "map",
+ "version": "1.10",
+ "tiledversion": "1.11.0",
+ "orientation": "orthogonal",
+ "renderorder": "right-down",
+ "width": 20,
+ "height": 12,
+ "tilewidth": 16,
+ "tileheight": 16,
+ "infinite": false,
+ "compressionlevel": -1,
+ "nextlayerid": 2,
+ "nextobjectid": 12,
+ "properties": [
+  {
+   "name": "rum",
+   "type": "string",
+   "value": "kontoret"
+  },
+  {
+   "name": "inomhus",
+   "type": "bool",
+   "value": true
+  },
+  {
+   "name": "morker",
+   "type": "float",
+   "value": 0.6
+  }
+ ],
+ "tilesets": [],
+ "layers": [
+  {
+   "id": 1,
+   "name": "foremal",
+   "type": "objectgroup",
+   "draworder": "index",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 1,
+     "name": "bokhylla",
+     "type": "sak",
+     "x": 44,
+     "y": 20,
+     "width": 84,
+     "height": 30,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 2,
+     "name": "expeditionsbok",
+     "type": "sak",
+     "x": 92,
+     "y": 34,
+     "width": 20,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      }
+     ]
+    },
+    {
+     "id": 3,
+     "name": "fatolj_vanster",
+     "type": "sak",
+     "x": 104,
+     "y": 96,
+     "width": 30,
+     "height": 28,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      }
+     ]
+    },
+    {
+     "id": 4,
+     "name": "bord",
+     "type": "sak",
+     "x": 150,
+     "y": 100,
+     "width": 34,
+     "height": 22,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 5,
+     "name": "kakaokopp",
+     "type": "sak",
+     "x": 162,
+     "y": 104,
+     "width": 10,
+     "height": 10,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 6,
+     "name": "fatolj_hoger",
+     "type": "sak",
+     "x": 200,
+     "y": 96,
+     "width": 30,
+     "height": 28,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 7,
+     "name": "farfar_i_fatoljen",
+     "type": "figur",
+     "x": 207,
+     "y": 92,
+     "width": 16,
+     "height": 24,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      },
+      {
+       "name": "talare",
+       "type": "string",
+       "value": "farfar"
+      }
+     ]
+    },
+    {
+     "id": 8,
+     "name": "laslampa",
+     "type": "sak",
+     "x": 240,
+     "y": 84,
+     "width": 12,
+     "height": 24,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 9,
+     "name": "dorr_hallen",
+     "type": "utgang",
+     "x": 146,
+     "y": 176,
+     "width": 28,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "till",
+       "type": "string",
+       "value": "hallen"
+      },
+      {
+       "name": "riktning",
+       "type": "string",
+       "value": "ned"
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "over"
+      }
+     ]
+    },
+    {
+     "id": 10,
+     "name": "start",
+     "type": "",
+     "x": 160,
+     "y": 150,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 11,
+     "name": "lampa",
+     "type": "",
+     "x": 246,
+     "y": 90,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    }
+   ]
+  }
+ ]
+}

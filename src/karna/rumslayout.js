@@ -139,8 +139,9 @@ export function glipa(a, b) {
  * närmaste håll (under, ovanför, vänster, höger), annars från sin sida. Punkter i väggarna väljs inte.
  * @param {Objekt} o @param {{ x: number, y: number }} pos @param {boolean} [inomhus]
  * @param {{ bak: number, sida: number, fram: number }} [v] väggarnas mått
+ * @param {{ x: number, y: number, b: number, h: number }[]} [massiv] väggar inne i rummet (kartans vagg)
  */
-export function framforFran(o, pos, inomhus = false, v = VAGG) {
+export function framforFran(o, pos, inomhus = false, v = VAGG, massiv = []) {
   if (o.sida !== 'alla') return framfor(o);
   const S = ytan(o);
   const mx = Math.round(o.x + o.b / 2), my = Math.min(S.hojd, o.y + o.h);
@@ -149,7 +150,8 @@ export function framforFran(o, pos, inomhus = false, v = VAGG) {
     { x: mx, y: Math.max(FIGUR_HOJD, o.y - 2) },
     { x: o.x - 10, y: my },
     { x: o.x + o.b + 10, y: my },
-  ].filter((p) => !inomhus || (p.x > v.sida + 6 && p.x < S.bredd - v.sida - 6 && p.y > v.bak + 4 && p.y < S.hojd - v.fram));
+  ].filter((p) => !inomhus || (p.x > v.sida + 6 && p.x < S.bredd - v.sida - 6 && p.y > v.bak + 4 && p.y < S.hojd - v.fram))
+    .filter((p) => !massiv.some((m) => p.x > m.x - 6 && p.x < m.x + m.b + 6 && p.y > m.y - 2 && p.y < m.y + m.h + 4));
   if (!kandidater.length) return framfor(o);
   return kandidater.sort((a, c) => Math.hypot(a.x - pos.x, a.y - pos.y) - Math.hypot(c.x - pos.x, c.y - pos.y))[0];
 }

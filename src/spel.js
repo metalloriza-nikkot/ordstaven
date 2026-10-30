@@ -595,7 +595,7 @@ export function skapaSpel(d) {
           if (skyltStyrs.has(sk.id) && skyltPusselNu !== sk.id) { rum.tryckPa?.(sk.id); return; }
           lasSkyltText(sk); return;
         }
-        const f = framforFran(o, rum.pos, rum.inomhus, rum.vagg); inmatning.sattGaTill(f.x, f.y);
+        const f = framforFran(o, rum.pos, rum.inomhus, rum.vagg, rum.massiv); inmatning.sattGaTill(f.x, f.y);
       } };
     }));
   }
@@ -1125,7 +1125,17 @@ export function skapaSpel(d) {
     rum.sattInteraktiva(kvarSaker());
     for (const a of v.s.alternativ) { if (a.objekt) doljEtikett.add(a.objekt); const l = a.objekt && rum.ruta(a.objekt)?.lapp; if (l) doljEtikett.add(l); }
     visaEtiketter();
+    /** Bubblan med frågan täcker aldrig alternativen (dörrarna i bakväggen) eller deras skyltar. */
+    const tankeUrVagen = () => {
+      const s = layout.skala;
+      const rutor = v.s.alternativ.map((a) => (a.objekt ? rum.ruta(a.objekt) : null)).filter(Boolean).map((o) => {
+        const a = skarm(o.x, o.y), b = skarm(o.x + o.b, o.y + o.h);
+        return { left: a.x, top: a.y, right: b.x, bottom: b.y };
+      });
+      ui.placeraTanke(rutor, { vanster: s.vanster, topp: s.topp, bredd: s.cssBredd, hojd: s.cssHojd });
+    };
     fraga();
+    tankeUrVagen();
     if (harLapp) ui.pulsera('#hud-lapp'); // lappen glimtar när han kommer in: den finns kvar
     tillatNos(p, spar);
     return new Promise((klar) => {
@@ -1157,6 +1167,7 @@ export function skapaSpel(d) {
         }
         ui.skyltar(lista);
         ui.skyltNara(vid && arUtgang(vid) ? vid : null);
+        tankeUrVagen();
       };
       skyltarNu = ritaSkyltar;
       const visaLappen = (/** @type {string | null} */ id) => {
@@ -1226,7 +1237,7 @@ export function skapaSpel(d) {
         // samma stig igen: bakom kurvan händer bara ljudet, och ungen tittar frågande när han kommer tillbaka
         await bakomKurvan(o, null);
         await kortReaktion();
-        fraga(); rum.frys(false); upptagen = false;
+        fraga(); tankeUrVagen(); rum.frys(false); upptagen = false;
       };
       const valj = async (/** @type {string} */ altId) => {
         if (upptagen) return;
@@ -1261,7 +1272,7 @@ export function skapaSpel(d) {
           ritaSkyltar();
           const pekar = v.s.pekar ? v.s.alternativ.find((a) => a.id === v.s.pekar) : null;
           if (pekar?.objekt) { rum.markera(pekar.objekt, true); rum.ungePekar(pekar.objekt); }
-          fraga();
+          fraga(); tankeUrVagen();
           rum.frys(false); upptagen = false;
           return;
         }

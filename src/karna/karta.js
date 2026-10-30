@@ -19,6 +19,8 @@
 // Saker på ytan (lövhögarna) når han bara uppifrån. Se karna/nivaer.js.
 // "forsvinner_efter" (ett pussels id, en formel): föremålet är borta när hjälten har formeln, t.ex. lianerna som
 // SVÄRD kapar. "oppning" på en stig: när den syns skär den igenom hindret den ligger över, t.ex. hålet i häcken.
+// Ett rum som inte är rektangulärt (hallen: en bred entré och en smal korridor) får sin form av rutor med typen
+// "vagg": massiv vägg inne i kartan. De hör till rummets form, inte till innehållet, och har inget namn som används.
 import { RUM } from './skalning.js';
 import { VAGG } from './rumslayout.js';
 import { STORSTA } from './kamera.js';
@@ -28,10 +30,11 @@ import { STORSTA } from './kamera.js';
  * @typedef {{ objekt: Objekt[], start: { x: number, y: number } | null, inomhus: boolean,
  *             in: Record<string, { x: number, y: number }>, lampor: { x: number, y: number }[],
  *             vagg: { bak: number, sida: number, fram: number }, morker: number | null,
- *             storlek: { bredd: number, hojd: number } }} Karta
+ *             storlek: { bredd: number, hojd: number }, massiv: { x: number, y: number, b: number, h: number }[] }} Karta
  * inomhus = rummet har väggram (bakvägg, sidoväggar, främre kant). in = var hjälten kommer in från ett rum
  * som inte har någon utgång hit (punkter som heter in_<rum>, t.ex. trädgården från köket). lampor = där det lyser i mörkret.
  * storlek = områdets storlek i pixlar (kartans bredd och höjd): en skärm (320×192) eller större, högst 640×384.
+ * massiv = väggar inne i rummet (typen vagg), som ger rummet en annan form än en rektangel.
  */
 
 const UTGANG = /^(stege_|dorr_|grind|stig_)/;
@@ -73,6 +76,8 @@ export function lasKarta(tmj) {
   const inpunkter = {};
   /** @type {{ x: number, y: number }[]} */
   const lampor = [];
+  /** @type {{ x: number, y: number, b: number, h: number }[]} */
+  const massiv = [];
   const kartegen = Object.fromEntries((tmj.properties || []).map((/** @type {any} */ p) => [p.name, p.value]));
   for (const lager of tmj.layers || []) {
     if (lager.type !== 'objectgroup') continue;
@@ -85,6 +90,7 @@ export function lasKarta(tmj) {
         continue;
       }
       const typ = o.type || o.class || '';
+      if (typ === 'vagg') { massiv.push({ x: Math.round(o.x), y: Math.round(o.y), b: Math.round(o.width), h: Math.round(o.height) }); continue; }
       /** @type {Objekt} */
       const ut = {
         id: o.name,
@@ -112,5 +118,5 @@ export function lasKarta(tmj) {
   const vagg = { bak: tal(kartegen.vagg_bak, VAGG.bak), sida: tal(kartegen.vagg_sida, VAGG.sida), fram: tal(kartegen.vagg_fram, VAGG.fram) };
   const m = Number(kartegen.morker);
   const morker = kartegen.morker !== undefined && Number.isFinite(m) ? Math.max(0, Math.min(1, m)) : null;
-  return { objekt, start, inomhus: !!kartegen.inomhus, in: inpunkter, lampor, vagg, morker, storlek: { bredd, hojd } };
+  return { objekt, start, inomhus: !!kartegen.inomhus, in: inpunkter, lampor, vagg, morker, storlek: { bredd, hojd }, massiv };
 }

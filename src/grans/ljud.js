@@ -49,11 +49,13 @@ export function skapaLjud({ tyst = () => false } = {}) {
     klonk: () => { ton({ f: 160, f2: 110, t: 0.12, v: 0.5, typ: 'square' }); ton({ f: 140, f2: 90, t: 0.14, v: 0.4, typ: 'square', d: 0.11 }); },
     // ett lås som klickar upp, och prassel i löv och buskar
     klick_las: () => { ton({ f: 1200, t: 0.04, v: 0.3, typ: 'square' }); ton({ f: 900, t: 0.05, v: 0.25, typ: 'square', d: 0.06 }); },
+    // ett levande fågelläte: tre korta kvitter (baronens fågel, beslut 18.3)
+    fagel: () => { ton({ f: 1900, t: 0.06, v: 0.14, typ: 'sine' }); ton({ f: 2500, t: 0.05, v: 0.12, typ: 'sine', d: 0.08 }); ton({ f: 2100, t: 0.08, v: 0.12, typ: 'sine', d: 0.17 }); },
     prassel: () => { for (let i = 0; i < 5; i++) ton({ f: 2400 - i * 200, t: 0.04, v: 0.08, typ: 'sawtooth', d: i * 0.04 }); },
   };
   /** Ljud-id i innehållet → effekt. Okända id:n får ett allmänt ljud. */
   const LJUD_ID = /** @type {Record<string, string>} */ ({
-    dunk: 'dunk', klaffen_tick: 'tick', unge_forsta_late: 'unge', unge_langtan: 'unge', unge_svarar: 'unge', mage_kurrar: 'mage', hackspett: 'klick',
+    dunk: 'dunk', klaffen_tick: 'tick', fagel_late: 'fagel', unge_forsta_late: 'unge', unge_langtan: 'unge', unge_svarar: 'unge', mage_kurrar: 'mage', hackspett: 'klick',
   });
 
   return {

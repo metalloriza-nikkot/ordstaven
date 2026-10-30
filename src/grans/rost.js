@@ -3,15 +3,36 @@
 // så att inget kan hänga sig (lärdom från TURBO-RACE v16.3). Kedjan inspelat → datorröst → pladder
 // byggs i fas 4; gråboxen använder bara datorrösten.
 
-/** Tonhöjd och tempo per rollröst (aventyr.json: talare.rollrost). */
+/**
+ * Tonhöjd och tempo per rollröst (aventyr.json: talare.rollrost). levande = hur mycket tonen får skifta mellan
+ * repliker, så att rösten inte låter som en maskin (fågeln är levande, beslut 18.3).
+ * @type {Record<string, { pitch: number, rate: number, levande?: number }>}
+ */
 const ROLLER = {
   berattare: { pitch: 1.05, rate: 0.95 },
   gammal: { pitch: 0.8, rate: 0.88 },
   fanig: { pitch: 1.35, rate: 1.05 },
   metall: { pitch: 1.6, rate: 1.15 },
+  fagel: { pitch: 1.45, rate: 1.12, levande: 0.15 },
   unge: { pitch: 1.8, rate: 1.1 },
   ljudning: { pitch: 1.05, rate: 1.0 },
 };
+
+/**
+ * Tonhöjd och tempo för en replik. En levande röst skiftar lite från replik till replik, och ett utrop går upp.
+ * Skiftet räknas ur texten, så att samma replik alltid låter likadant (och går att testa).
+ * @param {string} roll @param {string} text @returns {{ pitch: number, rate: number }}
+ */
+export function tonFor(roll, text) {
+  const rr = ROLLER[roll] || ROLLER.berattare;
+  if (!rr.levande) return { pitch: rr.pitch, rate: rr.rate };
+  let h = 0;
+  for (const c of text) h = (h * 31 + (c.codePointAt(0) ?? 0)) >>> 0;
+  const skift = ((h % 9) - 4) / 4; // -1 … 1
+  const utrop = /!\s*$/.test(text) ? rr.levande / 2 : 0;
+  const runda = (/** @type {number} */ x) => Math.round(x * 100) / 100;
+  return { pitch: runda(Math.min(2, rr.pitch + skift * rr.levande + utrop)), rate: runda(rr.rate + skift * rr.levande / 3) };
+}
 
 /**
  * @param {{ logg?: { handelse(t: string, m: string, d?: any): void }, tyst?: () => boolean }} opt
@@ -62,7 +83,7 @@ export function skapaRost({ logg, tyst = () => false }) {
     return new Promise((r) => {
       let klar = false;
       const sluta = (/** @type {'klar' | 'avbruten'} */ hur) => { if (!klar) { klar = true; pagaende.delete(u); clearInterval(vakt); clearTimeout(max); r(hur); } };
-      const rr = ROLLER[/** @type {keyof ROLLER} */ (roll)] || ROLLER.berattare;
+      const rr = tonFor(roll, text);
       // talet har börjat: onstart, eller att talsyntesen pratar en stund efter att vi bad den
       let t0 = Date.now();
       let startad = false, tyst = 0;

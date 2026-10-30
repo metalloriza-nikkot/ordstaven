@@ -2,12 +2,13 @@
  "$schema": "schema/ordlistor.schema.json",
  "format": 1,
  "meta": {
-  "version": "0.4",
-  "datum": "2026-10-25",
+  "version": "0.5",
+  "datum": "2026-10-29",
   "agare": "Innehåll",
   "textform": "Orden lagras med små bokstäver, formler i versaler. Böjda former (skogen, bron) står med när de används som alternativ.",
   "beskrivning": "Ordlistor 1-6 for ORDSTAVEN. Bilderna ar platshallare (emoji) for grabox. Ett ord ligger i den hogsta lista som nagot av dess drag kraver.",
-  "bilder": "Emoji är platshållare. Där emojin är missvisande står ett bild-id i stället (filt)."
+  "bilder": "Emoji är platshållare. Där emojin är missvisande står ett bild-id i stället (filt).",
+  "andrat_v05": "bok och farfar tillagda (prologen v0.11, hallens dörrar)."
  },
  "listor": {
   "1": "Korta ljudenliga ord, 2-3 bokstaver, ingen konsonantgrupp, ingen dubbelteckning",
@@ -1290,6 +1291,20 @@
     "ordbild",
     "aao"
    ]
+  },
+  {
+   "ord": "bok",
+   "lista": 1,
+   "bild": "📖",
+   "tema": "hemma",
+   "flaggor": []
+  },
+  {
+   "ord": "farfar",
+   "lista": 2,
+   "bild": "👴",
+   "tema": "hemma",
+   "flaggor": []
   }
  ]
 }

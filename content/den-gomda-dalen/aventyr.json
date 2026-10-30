@@ -5,7 +5,8 @@
  "titel": "Ordstaven. Den gömda dalen.",
  "meta": {
   "agare": "Innehåll (talare och titel), teknik (formatet)",
-  "innehall": "2026-10-25: sluta_for_idag tillagt (förslag). 2026-10-27: sparpunkt_fraga tillagd."
+  "innehall": "2026-10-25: sluta_for_idag tillagt (förslag). 2026-10-27: sparpunkt_fraga tillagd. 2026-10-30: gransnitt (orden i pausmenyn). Hjälteboken heter \"min bok\" och garderoben \"kläder\", eftersom HJ har ett stumt H och GARDEROBEN är lång. Talaren klaffen heter Baronens fågel tills spelaren har valt namn (id:t står kvar).",
+  "teknik": "2026-10-30 (T6): talaren klaffen har rollrösten fagel, en levande fågelröst, i stället för metall (beslut 18.3). Justeras när fågeln är vald."
  },
  "talare": {
   "berattare": {
@@ -26,9 +27,9 @@
    "portratt": "baronen"
   },
   "klaffen": {
-   "namn": "Klaffen",
+   "namn": "Baronens fågel",
    "rost": "datorrost",
-   "rollrost": "metall",
+   "rollrost": "fagel",
    "portratt": "klaffen"
   }
  },
@@ -87,5 +88,12 @@
    "text": "Vill du fortsätta? Eller sluta för idag?",
    "upplast": true
   }
+ },
+ "gransnitt": {
+  "kartan": "kartan",
+  "hjalteboken": "min bok",
+  "staven": "staven",
+  "garderoben": "kläder",
+  "dinoboken": "Dinoboken"
  }
 }

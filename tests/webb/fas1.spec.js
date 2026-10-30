@@ -75,10 +75,10 @@ test('piltangenterna flyttar hjälten', async ({ page }, info) => {
   test.skip(!!info.project.use.hasTouch, 'pekskärm');
   await tillScen(page, 3); // vinden, gå till lådan med staven
   const fore = await pos(page);
-  // åt höger: hjälten börjar vid stegen, till vänster är väggen
-  await page.keyboard.down('ArrowRight');
-  await expect.poll(async () => (await pos(page)).x, { timeout: 20000 }).toBeGreaterThan(fore.x + 20); // långsamma testdatorer: lång väntan
-  await page.keyboard.up('ArrowRight');
+  // åt vänster: hjälten börjar vid stegen, till höger är väggen
+  await page.keyboard.down('ArrowLeft');
+  await expect.poll(async () => (await pos(page)).x, { timeout: 20000 }).toBeLessThan(fore.x - 20); // långsamma testdatorer: lång väntan
+  await page.keyboard.up('ArrowLeft');
   await page.keyboard.down('ArrowUp');
   await expect.poll(async () => (await pos(page)).y, { timeout: 20000 }).toBeLessThan(fore.y - 10);
   await page.keyboard.up('ArrowUp');
@@ -237,12 +237,12 @@ test('stegen: hallen → vinden → hallen, han klättrar själv och kommer fram
   let spar = await folj(page, 5000);
   const uppfard = spar.filter((s) => s.klattrar && s.rum === 'hallen');
   expect(uppfard.length, 'han klättrar uppför stegen i hallen').toBeGreaterThan(0);
-  expect(new Set(uppfard.map((s) => s.pos.x)), 'mitt på stegen, ingen styrning').toEqual(new Set([160]));
+  expect(new Set(uppfard.map((s) => s.pos.x)), 'mitt på stegen, ingen styrning').toEqual(new Set([312]));
   expect(spar.some((s) => s.glider), 'rummen glider, de tonas inte').toBe(true);
   expect(spar.every((s) => Number(s.tona) < 0.01)).toBe(true);
   const forstaPaVinden = spar.find((s) => s.rum === 'vinden');
   expect(forstaPaVinden.klattrar, 'han kommer fram på stegen').toBe(true);
-  expect(forstaPaVinden.pos.x).toBe(52);
+  expect(forstaPaVinden.pos.x).toBe(268);
   expect(spar.at(-1).rum).toBe('vinden');
   expect(spar.at(-1).klattrar).toBe(false);
 
@@ -257,7 +257,7 @@ test('stegen: hallen → vinden → hallen, han klättrar själv och kommer fram
   expect(spar.filter((s) => s.klattrar && s.rum === 'vinden').length, 'han klättrar ner genom luckan').toBeGreaterThan(0);
   const forstaIHallen = spar.find((s) => s.rum === 'hallen');
   expect(forstaIHallen.klattrar).toBe(true);
-  expect(forstaIHallen.pos.x).toBe(160);
+  expect(forstaIHallen.pos.x).toBe(312);
   expect(spar.some((s) => s.glider)).toBe(true);
   expect(spar.at(-1).rum).toBe('hallen');
   expect(spar.at(-1).klattrar).toBe(false);
@@ -343,23 +343,27 @@ async function hall(page, tangent, ms, klar = () => false) {
 
 test('skyltarna syns hela tiden: han läser från mitten av hallen och går rakt igenom med piltangenten', async ({ page }, info) => {
   test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
-  await startaScen(page, 8); // hallen, dörrvalet (rätt dörr: MAT)
+  await startaScen(page, 8); // hallen, dörrvalet (rätt dörr: BOK)
   for (let k = 0; k < 20 && (await page.evaluate(() => window.__ORDSTAVEN.steg()?.pussel_id)) !== 'p0_dorrar'; k++) {
     const r = await page.$('#plattan .replik-ruta'); if (r) await r.click(); await page.waitForTimeout(150);
   }
   await expect(page.locator('#tanke')).toBeVisible();
-  // alla fyra skyltarna syns direkt, utan att han har gått någonstans
+  // alla fem skyltarna syns direkt, utan att han har gått någonstans, och alla dörrarna står på skärmen
   await expect(page.locator('#skyltar .skylt .kort').first()).toBeVisible({ timeout: 3000 });
   const texter = (await page.locator('#skyltar .skylt .kort').allTextContents()).map((t) => t.trim()).sort();
-  expect(texter).toEqual(['BAD', 'MAT', 'SOV', 'TOA']);
+  expect(texter).toEqual(['BAD', 'BOK', 'FARFAR', 'MAT', 'SOV']);
+  await expect.poll(() => page.evaluate(() => ['dorr_farfar', 'dorr_bok', 'dorr_mat', 'dorr_sov', 'dorr_bad'].every((id) => window.__ORDSTAVEN.rutaPaSkarm(id))), { timeout: 4000 }).toBe(true);
   await page.screenshot({ path: 'tests/skarmdumpar/hallen-skyltar.png' });
-  // håll piltangenten mot MAT-dörren hela vägen: han går rakt igenom, utan ett extra tryck
+  // gå under BOK-dörren och håll piltangenten uppåt hela vägen: han går rakt igenom, utan ett extra tryck
   const pos = () => page.evaluate(() => window.__ORDSTAVEN.position());
-  const d = await page.evaluate(() => { const o = window.__ORDSTAVEN.ruta('dorr_mat'); return o; });
-  const malY = d.y + d.h - 6;
-  const ner = (await pos()).y < malY;
-  await hall(page, ner ? 'ArrowDown' : 'ArrowUp', 3000, async () => (ner ? (await pos()).y >= malY - 4 : (await pos()).y <= malY + 4));
-  await hall(page, d.riktning === 'vanster' ? 'ArrowLeft' : 'ArrowRight', 4000, async () => (await page.evaluate(() => window.__ORDSTAVEN.steg()?.pussel_id ?? null)) !== 'p0_dorrar');
+  const d = await page.evaluate(() => { const o = window.__ORDSTAVEN.ruta('dorr_bok'); return o; });
+  const malX = d.x + d.b / 2;
+  // korridoren är smalare än entrén: först upp i höjd med korridoren
+  if ((await pos()).y > 100) await hall(page, 'ArrowUp', 4000, async () => (await pos()).y <= 92);
+  const hoger = (await pos()).x < malX;
+  await hall(page, hoger ? 'ArrowRight' : 'ArrowLeft', 8000, async () => (hoger ? (await pos()).x >= malX - 3 : (await pos()).x <= malX + 3));
+  expect(Math.abs((await pos()).x - malX), `under BOK-dörren (${JSON.stringify(await pos())}, mål ${malX})`).toBeLessThan(8);
+  await hall(page, 'ArrowUp', 4000, async () => (await page.evaluate(() => window.__ORDSTAVEN.steg()?.pussel_id ?? null)) !== 'p0_dorrar');
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.steg()?.pussel_id ?? null), { timeout: 5000 }).not.toBe('p0_dorrar');
 });
 
@@ -374,10 +378,10 @@ test('skyltarna: ett tryck på en dörr går rakt igenom, en prövad dörr behå
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText(/BADANKA/, { timeout: 8000 });
   await page.click('#plattan .replik-ruta');
   await expect(page.locator('#skyltar .skylt[data-objekt="dorr_bad"] .kort.provad')).toBeVisible();
-  expect(await page.locator('#skyltar .skylt .kort:not(.provad)').count()).toBe(3);
+  expect(await page.locator('#skyltar .skylt .kort:not(.provad)').count()).toBe(4);
 });
 
-test('pekningen: står spelaren still vid dörrarna springer ungen till rätt dörr först efter 16 sekunder', async ({ page }, info) => {
+test('pekningen: står spelaren still vid dörrarna springer ungen till rätt dörr först efter 20 sekunder (fem dörrar)', async ({ page }, info) => {
   test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
   test.setTimeout(60000);
   await startaScen(page, 8);
@@ -385,14 +389,14 @@ test('pekningen: står spelaren still vid dörrarna springer ungen till rätt d�
     const r = await page.$('#plattan .replik-ruta'); if (r) await r.click(); await page.waitForTimeout(150);
   }
   const t0 = Date.now();
-  // frågan blinkar efter 9 s, men ungen pekar inte än
-  await page.waitForTimeout(12000);
-  expect(await page.evaluate(() => window.__ORDSTAVEN.ungeMal()), 'ingen pekning före 16 s').toBeNull();
+  // frågan blinkar efter 9 s, men ungen pekar inte än (4 s per dörr: 20 s)
+  await page.waitForTimeout(16000);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.ungeMal()), 'ingen pekning före 20 s').toBeNull();
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.ungeMal()), { timeout: 8000 }).not.toBeNull();
-  expect(Date.now() - t0).toBeGreaterThan(15000);
+  expect(Date.now() - t0).toBeGreaterThan(19000);
   const mal = await page.evaluate(() => window.__ORDSTAVEN.ungeMal());
-  const mat = await page.evaluate(() => window.__ORDSTAVEN.ruta('dorr_mat'));
-  expect(Math.hypot(mal.x - (mat.x + mat.b), mal.y - (mat.y + mat.h / 2)), 'vid MAT-dörren').toBeLessThan(45);
+  const bok = await page.evaluate(() => window.__ORDSTAVEN.ruta('dorr_bok'));
+  expect(Math.hypot(mal.x - (bok.x + bok.b / 2), mal.y - (bok.y + bok.h)), 'vid BOK-dörren').toBeLessThan(45);
   // knuffens beskrivning (för den vuxne) visas inte när ungen själv pekar
   expect(await page.locator('#regi:not([hidden])').count()).toBe(0);
   await page.waitForTimeout(1200);
@@ -511,9 +515,9 @@ test('dinomatens lådor: hjälten står vid en låda från olika håll, bara den
   const alt = { lada_lang_overst: 'gul', lada_lang_mitten: 'rod', lada_lang_nederst: 'bla' };
   // platser runt varje låda (rumspixlar, fötterna): från sidan, ovanför och nedanför där det går att stå
   const platser = {
-    lada_lang_overst: [{ x: 80, y: 66 }, { x: 52, y: 88 }],
-    lada_lang_mitten: [{ x: 112, y: 60 }, { x: 170, y: 60 }, { x: 141, y: 82 }],
-    lada_lang_nederst: [{ x: 242, y: 108 }, { x: 271, y: 130 }],
+    lada_lang_overst: [{ x: 240, y: 66 }, { x: 268, y: 88 }],
+    lada_lang_mitten: [{ x: 208, y: 60 }, { x: 150, y: 60 }, { x: 179, y: 82 }],
+    lada_lang_nederst: [{ x: 82, y: 108 }, { x: 53, y: 130 }],
   };
   for (const [lada, lista] of Object.entries(platser)) {
     for (const p of lista) {
@@ -557,11 +561,11 @@ test('utan WebGL: canvas-ritningen visar rummet, mörkret, skyltarna och rumsbyt
   await page.screenshot({ path: 'tests/skarmdumpar/canvas-sovrummet.png' });
   // bara en röktest: testmaskinen ritar i mjukvara och delas med andra tester, så gränsen är låg
   expect(fps, 'bildrutor per sekund med canvas, 4× långsammare processor').toBeGreaterThan(15);
-  // rumsbytet (glidningen använder en bild av rummet) fungerar med canvas: gå ut genom dörren till vänster
-  await page.keyboard.down('ArrowLeft');
+  // rumsbytet (glidningen använder en bild av rummet) fungerar med canvas: gå ut genom dörren i bakväggen
+  const dorr = await page.evaluate(() => window.__ORDSTAVEN.objekt('dorr_hallen'));
+  await page.mouse.click(dorr.x, dorr.y);
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 60000 }).toBe('s01b_hallen');
-  await page.keyboard.up('ArrowLeft');
-  await expect(page.locator('#skyltar .skylt')).toHaveCount(4, { timeout: 8000 });
+  await expect(page.locator('#skyltar .skylt')).toHaveCount(5, { timeout: 8000 });
   await page.screenshot({ path: 'tests/skarmdumpar/canvas-hallen.png' });
   expect(fel).toEqual([]);
 });

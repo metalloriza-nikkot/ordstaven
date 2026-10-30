@@ -204,10 +204,10 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
       // hallen före kläckningen (s01b): skyltarna syns redan, men en dörr är låst. Det dunkar, och han går till stegen.
       if (lage.scen === 's01b_hallen' && !oppnade.has('s01b')) {
         oppnade.add('s01b');
-        await expect(page.locator('#skyltar .skylt')).toHaveCount(4, { timeout: 5000 });
-        const dorr = await page.evaluate(() => window.__ORDSTAVEN.objekt('dorr_toa'));
+        await expect(page.locator('#skyltar .skylt')).toHaveCount(5, { timeout: 5000 });
+        const dorr = await page.evaluate(() => window.__ORDSTAVEN.objekt('dorr_farfar'));
         await page.mouse.click(dorr.x, dorr.y);
-        await expect.poll(async () => (await page.evaluate(() => window.__ORDSTAVEN.logg())).includes('[låst] dorr_toa'), { timeout: 10000 }).toBe(true);
+        await expect.poll(async () => (await page.evaluate(() => window.__ORDSTAVEN.logg())).includes('[låst] dorr_farfar'), { timeout: 10000 }).toBe(true);
         expect(await page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('s01b_hallen');
         continue;
       }
@@ -224,6 +224,8 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
       const alt = (p.varianter[variant] || p.varianter[niva[0]]).alternativ.filter((a) => !oppnade.has(`${p.id}/${a.id}`));
       const fel = felFor.has(p.id) ? alt.find((a) => !a.ratt) : null;
       const a = fel || alt.find((x) => x.ratt);
+      // rätt val är redan gjort och reaktionen pågår (dörren öppnas, ungen studsar i sängen): vänta in den
+      if (!a) { await page.waitForTimeout(100); continue; }
       if (fel) felFor.delete(p.id);
       oppnade.add(`${p.id}/${a.id}`);
       await expect(page.locator('#tanke')).toBeVisible();
@@ -250,6 +252,10 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
         const skylt = page.locator(`#skyltar .skylt[data-objekt="${a.objekt}"] .kort`);
         await expect(skylt).toBeVisible({ timeout: 5000 });
         await expect(skylt.locator('.kort-etikett')).toHaveText(a.ord.toLocaleUpperCase('sv-SE'));
+        // kameran glider så att hela valet syns (beslut 14): vänta tills den står still
+        let forra = null;
+        await expect.poll(async () => { const k = JSON.stringify(await page.evaluate(() => window.__ORDSTAVEN.kamera())); const still = k === forra; forra = k; return still; }, { timeout: 5000, intervals: [250] }).toBe(true);
+        await page.waitForTimeout(250); // skyltarna placeras om efter kameran
         // ingen skylt täcker en annan eller en dörr, och alla ryms i rummet
         const krock = await page.evaluate(() => {
           const O = window.__ORDSTAVEN, s = O.skala();
@@ -350,7 +356,7 @@ test.describe('genomspelning av prologen', () => {
     const val = loggen.split('\n').filter((r) => r.includes('[val]'));
     expect(val.length, 'valen står i loggen').toBeGreaterThan(5);
     for (const r of val) expect(r, r).toMatch(/"knuff_fore":(true|false),"pekning_fore":(true|false)/);
-    expect(val.some((r) => r.includes('p0_sangen: mat') && r.includes('"resultat":"fel"'))).toBe(true);
+    expect(val.some((r) => r.includes('p0_sangen: bok') && r.includes('"resultat":"fel"'))).toBe(true);
     const t = await page.evaluate(() => window.__ORDSTAVEN.tillstand());
     const av = t.aventyr['den-gomda-dalen'];
     expect(t.spelare.hjalte.namn).toBe('TESTA');

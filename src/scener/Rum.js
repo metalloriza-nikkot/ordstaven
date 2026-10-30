@@ -68,6 +68,8 @@ export class Rum extends Phaser.Scene {
     this.inomhus = false;
     /** väggarnas mått i rummet (kartan) */
     this.vagg = VAGG;
+    /** @type {{ x: number, y: number, b: number, h: number }[]} väggar inne i rummet (kartans vagg) */
+    this.massiv = [];
     /** @type {{ x: number, y: number }[]} lampor som lyser när rummet är mörkt */
     this.lampor = [];
     /** @type {number | null} hur mörkt rummet är på natten (kartans morker) */
@@ -178,7 +180,7 @@ export class Rum extends Phaser.Scene {
     if (vidObjekt(this.pos, o) && this.tryckPa && this.tryckPa(o.id)) return;
     // dialogregeln: ett tryck på en figur upprepar dess senaste instruktion (fråga igen)
     if (o.sort === 'figur' && this.fragaIgen?.(o)) return;
-    const f = this.malFor?.(o) ?? framforFran(o, this.pos, this.inomhus, this.vagg); this.b.inmatning.sattGaTill(f.x, f.y);
+    const f = this.malFor?.(o) ?? framforFran(o, this.pos, this.inomhus, this.vagg, this.massiv); this.b.inmatning.sattGaTill(f.x, f.y);
   }
 
 
@@ -223,6 +225,15 @@ export class Rum extends Phaser.Scene {
     g.fillStyle(0x6a5c4c).fillRect(sida, H - fram, B - 2 * sida, fram);
     g.fillStyle(0xcbb894).fillRect(0, 0, B, 3).fillRect(0, 0, 3, H).fillRect(B - 3, 0, 3, H).fillRect(0, H - 3, B, 3);
     g.fillStyle(0x4a3f34).fillRect(sida, bak - 2, B - 2 * sida, 2);
+    // väggar inne i rummet (hallens form): massiv vägg, med den främre kanten mot golvet ovanför och sidoväggen mot golvet bredvid
+    for (const m of this.massiv) {
+      g.fillStyle(0x5e5244).fillRect(m.x, m.y, m.b, m.h);
+      if (m.y > bak) g.fillStyle(0x6a5c4c).fillRect(m.x, m.y, m.b, Math.min(fram, m.h));
+      g.fillStyle(0xcbb894);
+      if (m.y > bak) g.fillRect(m.x, m.y, m.b, 2);
+      if (m.x > sida) g.fillRect(m.x, m.y, 2, m.h);
+      if (m.x + m.b < B - sida) g.fillRect(m.x + m.b - 2, m.y, 2, m.h);
+    }
   }
 
   /** Hjältens färger efter valen i skapa hjälten. @param {Record<string, number>} val */
@@ -335,6 +346,7 @@ export class Rum extends Phaser.Scene {
     this.lampor = v.karta?.lampor || [];
     this.morkerNatt = v.karta?.morker ?? null;
     if (v.nyttRum || !this.harRum) this.vagg = v.karta?.vagg || VAGG;
+    if (v.nyttRum || !this.harRum) this.massiv = (this.harRum && v.karta?.massiv) || [];
     if (v.nyttRum || !this.harRum) { this.storlek = (this.harRum && v.karta?.storlek) || { bredd: RUM.bredd, hojd: RUM.hojd }; this.omrade = null; }
     this.ritaGolv(this.harRum);
     // föremål som bara syns i vissa tillstånd (ägget när ljuset är tänt) gör att rummet byggs om
@@ -398,7 +410,7 @@ export class Rum extends Phaser.Scene {
     const sparrade = this.objekt.filter((o) => this.sparrade.has(o.id));
     // en stig som är en öppning skär igenom häcken den ligger över (hålet bakom stenen), när den syns
     const oppningar = this.objekt.filter((o) => o.oppning);
-    const rutor = [...skarIgenom(hinderFran(this.objekt), oppningar), ...sparrade, ...(this.inomhus ? vaggar(this.vagg, this.storlek) : [])];
+    const rutor = [...skarIgenom(hinderFran(this.objekt), oppningar), ...sparrade, ...(this.inomhus ? vaggar(this.vagg, this.storlek) : []), ...this.massiv];
     // en uppsättning hinder per nivå: på marken går det inte att gå upp på kullen utom på trappan, och tvärtom
     const n = (this.nivaer = skapaNivaer(this.objekt));
     this.hinderPer = new Map(n.nivaer.map((niva) => [niva, skapaHinder(rutor, n.finns ? (p) => n.tillaten(p, niva) : undefined, this.storlek)]));
@@ -583,7 +595,7 @@ export class Rum extends Phaser.Scene {
     const o = this.ruta(id);
     if (!o || !this.unge.visible) return false;
     // ställ ungen en bit in i rummet från föremålet, på sidan mot hjälten, och låt den nosa mot det
-    const f = o.sort === 'utgang' ? lasplats(o) : framforFran(o, this.pos, this.inomhus, this.vagg);
+    const f = o.sort === 'utgang' ? lasplats(o) : framforFran(o, this.pos, this.inomhus, this.vagg, this.massiv);
     const p = this.hinder.narmasteFria({ x: f.x, y: f.y });
     const cx = o.x + o.b / 2, cy = o.y + o.h / 2;
     this.ungeMal = { x: p.x, y: p.y, mot: Math.atan2(cy - p.y, cx - p.x) };

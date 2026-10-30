@@ -118,3 +118,19 @@ describe('datorrösten', () => {
     expect(ord).toEqual([0, 4]);
   });
 });
+
+describe('rollrösterna', () => {
+  it('fågeln är levande: tonen skiftar mellan repliker, men samma replik låter alltid likadant', async () => {
+    const { tonFor } = await import('../../src/grans/rost.js');
+    const repliker = ['Kra!', 'Baronen kommer.', 'Jag såg ungen.', 'Var är kartan?', 'Hej hej.'];
+    const toner = repliker.map((t) => tonFor('fagel', t).pitch);
+    expect(new Set(toner).size).toBeGreaterThan(1);
+    expect(tonFor('fagel', 'Kra!')).toEqual(tonFor('fagel', 'Kra!'));
+    for (const t of repliker) { const { pitch, rate } = tonFor('fagel', t); expect(pitch).toBeGreaterThan(1.2); expect(pitch).toBeLessThanOrEqual(2); expect(rate).toBeGreaterThan(1); }
+  });
+  it('de andra rösterna har fast ton, och en okänd roll blir berättaren', async () => {
+    const { tonFor } = await import('../../src/grans/rost.js');
+    expect(tonFor('gammal', 'Hej!')).toEqual(tonFor('gammal', 'Hopp.'));
+    expect(tonFor('finns_inte', 'Hej')).toEqual(tonFor('berattare', 'Hej'));
+  });
+});

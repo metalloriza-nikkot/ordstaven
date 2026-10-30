@@ -24,12 +24,13 @@
    "value": true
   }
  ],
+ "tilesets": [],
  "layers": [
   {
    "id": 1,
    "name": "foremal",
    "type": "objectgroup",
-   "draworder": "topdown",
+   "draworder": "index",
    "opacity": 1,
    "visible": true,
    "x": 0,
@@ -39,8 +40,8 @@
      "id": 1,
      "name": "dorr_hallen",
      "type": "utgang",
-     "x": 6,
-     "y": 92,
+     "x": 146,
+     "y": 12,
      "width": 26,
      "height": 36,
      "rotation": 0,
@@ -54,12 +55,12 @@
       {
        "name": "riktning",
        "type": "string",
-       "value": "vanster"
+       "value": "upp"
       },
       {
        "name": "sida",
        "type": "string",
-       "value": "hoger"
+       "value": "under"
       }
      ]
     },
@@ -67,7 +68,7 @@
      "id": 2,
      "name": "fonster",
      "type": "sak",
-     "x": 150,
+     "x": 60,
      "y": 8,
      "width": 40,
      "height": 24,
@@ -79,7 +80,7 @@
      "name": "sang",
      "type": "sak",
      "x": 220,
-     "y": 58,
+     "y": 90,
      "width": 64,
      "height": 44,
      "rotation": 0,
@@ -97,7 +98,7 @@
      "name": "start",
      "type": "",
      "x": 200,
-     "y": 120,
+     "y": 150,
      "width": 0,
      "height": 0,
      "rotation": 0,
@@ -109,15 +110,14 @@
      "name": "lampa",
      "type": "",
      "x": 208,
-     "y": 70,
+     "y": 100,
      "width": 0,
      "height": 0,
-     "point": true,
      "rotation": 0,
-     "visible": true
+     "visible": true,
+     "point": true
     }
    ]
   }
- ],
- "tilesets": []
+ ]
 }

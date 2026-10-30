@@ -107,7 +107,7 @@ describe('läs i rummet, syns_i och kartor (format 2)', () => {
   });
   it('kartan: alla föremål ska finnas, inga okända, och utgångar leder till rum som finns', () => {
     const karta = (objekt) => ({ hallen: { objekt, start: null } });
-    const hallen = ['stege_upp', 'dorr_mat', 'dorr_bad', 'dorr_toa', 'dorr_sov', 'dorr_ut'].map((id, i) => ({ id, x: 10 + i * 40, y: 4, b: 20, h: 20 }));
+    const hallen = ['stege_upp', 'dorr_farfar', 'dorr_bok', 'dorr_mat', 'dorr_sov', 'dorr_bad', 'dorr_ut'].map((id, i) => ({ id, x: 10 + i * 40, y: 4, b: 20, h: 20 }));
     expect(medFel(() => {}, karta(hallen))).toBe('');
     expect(medFel(() => {}, karta(hallen.slice(1)))).toMatch(/stege_upp saknas i kartan/);
     expect(medFel(() => {}, karta([...hallen, { id: 'pianot', x: 0, y: 0, b: 10, h: 10 }]))).toMatch(/pianot finns inte/);
