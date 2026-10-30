@@ -1,0 +1,523 @@
+{
+ "type": "map",
+ "version": "1.10",
+ "tiledversion": "1.11.0",
+ "orientation": "orthogonal",
+ "renderorder": "right-down",
+ "width": 40,
+ "height": 24,
+ "tilewidth": 16,
+ "tileheight": 16,
+ "infinite": false,
+ "compressionlevel": -1,
+ "nextlayerid": 2,
+ "nextobjectid": 31,
+ "properties": [
+  {
+   "name": "rum",
+   "type": "string",
+   "value": "glantan"
+  }
+ ],
+ "tilesets": [],
+ "layers": [
+  {
+   "id": 1,
+   "name": "foremal",
+   "type": "objectgroup",
+   "draworder": "index",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 1,
+     "name": "gren",
+     "type": "sak",
+     "x": 6,
+     "y": 8,
+     "width": 26,
+     "height": 6,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 2,
+     "name": "kulle",
+     "type": "yta",
+     "x": 320,
+     "y": 0,
+     "width": 240,
+     "height": 144,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "niva",
+       "type": "int",
+       "value": 1
+      }
+     ]
+    },
+    {
+     "id": 3,
+     "name": "kronet",
+     "type": "yta",
+     "x": 336,
+     "y": 16,
+     "width": 176,
+     "height": 112,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "niva",
+       "type": "int",
+       "value": 1
+      }
+     ]
+    },
+    {
+     "id": 4,
+     "name": "apans_bo",
+     "type": "yta",
+     "x": 40,
+     "y": 200,
+     "width": 56,
+     "height": 36,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "niva",
+       "type": "int",
+       "value": 1
+      }
+     ]
+    },
+    {
+     "id": 5,
+     "name": "stege",
+     "type": "stege",
+     "x": 60,
+     "y": 228,
+     "width": 16,
+     "height": 32,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 6,
+     "name": "trappa",
+     "type": "trappa",
+     "x": 298,
+     "y": 56,
+     "width": 30,
+     "height": 26,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 7,
+     "name": "stig_brynet",
+     "type": "utgang",
+     "x": 140,
+     "y": 344,
+     "width": 28,
+     "height": 40,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "riktning",
+       "type": "string",
+       "value": "ned"
+      },
+      {
+       "name": "till",
+       "type": "string",
+       "value": "skogsbrynet"
+      }
+     ]
+    },
+    {
+     "id": 8,
+     "name": "apans_trad",
+     "type": "sak",
+     "x": 100,
+     "y": 220,
+     "width": 40,
+     "height": 40,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 9,
+     "name": "apan_i_nat",
+     "type": "sak",
+     "x": 150,
+     "y": 210,
+     "width": 22,
+     "height": 22,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 10,
+     "name": "fossil",
+     "type": "sak",
+     "x": 52,
+     "y": 206,
+     "width": 16,
+     "height": 12,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 11,
+     "name": "apan",
+     "type": "sak",
+     "x": 150,
+     "y": 280,
+     "width": 16,
+     "height": 20,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 12,
+     "name": "skylt_farfar_3",
+     "type": "sak",
+     "x": 176,
+     "y": 120,
+     "width": 16,
+     "height": 14,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 13,
+     "name": "ungt_trad",
+     "type": "sak",
+     "x": 120,
+     "y": 30,
+     "width": 24,
+     "height": 40,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 14,
+     "name": "stort_ungt_trad",
+     "type": "sak",
+     "x": 120,
+     "y": 30,
+     "width": 24,
+     "height": 40,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 15,
+     "name": "litet_gammalt_trad",
+     "type": "sak",
+     "x": 40,
+     "y": 120,
+     "width": 20,
+     "height": 28,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 16,
+     "name": "gammalt_trad",
+     "type": "sak",
+     "x": 264,
+     "y": 48,
+     "width": 28,
+     "height": 40,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 17,
+     "name": "stort_gammalt_trad",
+     "type": "sak",
+     "x": 264,
+     "y": 48,
+     "width": 28,
+     "height": 40,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 18,
+     "name": "lovhog_1",
+     "type": "sak",
+     "x": 352,
+     "y": 40,
+     "width": 24,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 19,
+     "name": "lovhog_2",
+     "type": "sak",
+     "x": 416,
+     "y": 40,
+     "width": 24,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 20,
+     "name": "lovhog_3",
+     "type": "sak",
+     "x": 352,
+     "y": 96,
+     "width": 24,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 21,
+     "name": "lovhog_4",
+     "type": "sak",
+     "x": 416,
+     "y": 96,
+     "width": 24,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 22,
+     "name": "last_lada",
+     "type": "sak",
+     "x": 464,
+     "y": 100,
+     "width": 20,
+     "height": 14,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 23,
+     "name": "rothal",
+     "type": "sak",
+     "x": 480,
+     "y": 40,
+     "width": 16,
+     "height": 12,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 24,
+     "name": "lila_lapp",
+     "type": "sak",
+     "x": 440,
+     "y": 70,
+     "width": 14,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 25,
+     "name": "stig_backen",
+     "type": "utgang",
+     "x": 520,
+     "y": 0,
+     "width": 28,
+     "height": 40,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "riktning",
+       "type": "string",
+       "value": "upp"
+      }
+     ]
+    },
+    {
+     "id": 26,
+     "name": "backen",
+     "type": "sak",
+     "x": 568,
+     "y": 0,
+     "width": 72,
+     "height": 384,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 27,
+     "name": "bron",
+     "type": "sak",
+     "x": 592,
+     "y": 150,
+     "width": 40,
+     "height": 16,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 28,
+     "name": "tavla_bron",
+     "type": "sak",
+     "x": 600,
+     "y": 128,
+     "width": 16,
+     "height": 12,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 29,
+     "name": "buske_vid_bron",
+     "type": "sak",
+     "x": 612,
+     "y": 172,
+     "width": 20,
+     "height": 16,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 30,
+     "name": "start",
+     "type": "",
+     "x": 300,
+     "y": 300,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    }
+   ]
+  }
+ ]
+}

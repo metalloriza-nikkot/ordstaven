@@ -1,0 +1,375 @@
+{
+ "type": "map",
+ "version": "1.10",
+ "tiledversion": "1.11.0",
+ "orientation": "orthogonal",
+ "renderorder": "right-down",
+ "width": 40,
+ "height": 12,
+ "tilewidth": 16,
+ "tileheight": 16,
+ "infinite": false,
+ "compressionlevel": -1,
+ "nextlayerid": 2,
+ "nextobjectid": 20,
+ "properties": [
+  {
+   "name": "rum",
+   "type": "string",
+   "value": "skogsbrynet"
+  }
+ ],
+ "tilesets": [],
+ "layers": [
+  {
+   "id": 1,
+   "name": "foremal",
+   "type": "objectgroup",
+   "draworder": "index",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 1,
+     "name": "gren",
+     "type": "sak",
+     "x": 6,
+     "y": 8,
+     "width": 26,
+     "height": 6,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 2,
+     "name": "skylt_ingang",
+     "type": "sak",
+     "x": 28,
+     "y": 136,
+     "width": 12,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 3,
+     "name": "barbuske_brynet",
+     "type": "sak",
+     "x": 14,
+     "y": 60,
+     "width": 28,
+     "height": 22,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 4,
+     "name": "skylt_farfar_1",
+     "type": "sak",
+     "x": 168,
+     "y": 64,
+     "width": 16,
+     "height": 14,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 5,
+     "name": "lag_sten",
+     "type": "sak",
+     "x": 84,
+     "y": 100,
+     "width": 26,
+     "height": 14,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 6,
+     "name": "lag_rund_sten",
+     "type": "sak",
+     "x": 84,
+     "y": 100,
+     "width": 26,
+     "height": 14,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 7,
+     "name": "hog_spetsig_sten",
+     "type": "sak",
+     "x": 176,
+     "y": 140,
+     "width": 18,
+     "height": 30,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 8,
+     "name": "hog_sten",
+     "type": "sak",
+     "x": 252,
+     "y": 84,
+     "width": 24,
+     "height": 32,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 9,
+     "name": "hog_rund_sten",
+     "type": "sak",
+     "x": 252,
+     "y": 84,
+     "width": 24,
+     "height": 32,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 10,
+     "name": "hack",
+     "type": "sak",
+     "x": 296,
+     "y": 0,
+     "width": 24,
+     "height": 192,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 11,
+     "name": "stig_genom_hacken",
+     "type": "utgang",
+     "x": 284,
+     "y": 92,
+     "width": 56,
+     "height": 24,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "riktning",
+       "type": "string",
+       "value": "hoger"
+      },
+      {
+       "name": "oppning",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 12,
+     "name": "trad_med_formel",
+     "type": "sak",
+     "x": 400,
+     "y": 96,
+     "width": 28,
+     "height": 36,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      }
+     ]
+    },
+    {
+     "id": 13,
+     "name": "lianer",
+     "type": "sak",
+     "x": 328,
+     "y": 56,
+     "width": 312,
+     "height": 24,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "forsvinner_efter",
+       "type": "string",
+       "value": "k1_svard"
+      }
+     ]
+    },
+    {
+     "id": 14,
+     "name": "stubbe",
+     "type": "sak",
+     "x": 352,
+     "y": 8,
+     "width": 20,
+     "height": 14,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 15,
+     "name": "liten_lian",
+     "type": "sak",
+     "x": 348,
+     "y": 26,
+     "width": 28,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 16,
+     "name": "stig_glantan",
+     "type": "utgang",
+     "x": 448,
+     "y": 0,
+     "width": 28,
+     "height": 40,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "riktning",
+       "type": "string",
+       "value": "upp"
+      },
+      {
+       "name": "till",
+       "type": "string",
+       "value": "glantan"
+      }
+     ]
+    },
+    {
+     "id": 17,
+     "name": "skylt_bar",
+     "type": "sak",
+     "x": 568,
+     "y": 26,
+     "width": 14,
+     "height": 14,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 18,
+     "name": "stig_buskarna",
+     "type": "utgang",
+     "x": 600,
+     "y": 18,
+     "width": 40,
+     "height": 26,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "riktning",
+       "type": "string",
+       "value": "hoger"
+      },
+      {
+       "name": "till",
+       "type": "string",
+       "value": "buskarna"
+      }
+     ]
+    },
+    {
+     "id": 19,
+     "name": "start",
+     "type": "",
+     "x": 64,
+     "y": 184,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    }
+   ]
+  }
+ ]
+}

@@ -14,6 +14,29 @@ const MIN = { x: FIGUR.bredd / 2, y: FIGUR.hojd };
 /** @typedef {{ x: number, y: number }} Punkt */
 
 /**
+ * En stig som syns skär igenom hindren den ligger över: hålet i häcken bakom stenen (kapitel 1). Utan stigen är
+ * häcken hel. Varje hinder som en öppning överlappar delas i upp till fyra rutor runt öppningen.
+ * @param {Ruta[]} hinder @param {Ruta[]} oppningar @returns {Ruta[]}
+ */
+export function skarIgenom(hinder, oppningar) {
+  let ut = hinder.map((r) => ({ x: r.x, y: r.y, b: r.b, h: r.h }));
+  for (const o of oppningar) {
+    /** @type {Ruta[]} */
+    const nya = [];
+    for (const r of ut) {
+      const x0 = Math.max(r.x, o.x), x1 = Math.min(r.x + r.b, o.x + o.b), y0 = Math.max(r.y, o.y), y1 = Math.min(r.y + r.h, o.y + o.h);
+      if (x0 >= x1 || y0 >= y1) { nya.push(r); continue; }
+      if (y0 > r.y) nya.push({ x: r.x, y: r.y, b: r.b, h: y0 - r.y }); // ovanför öppningen
+      if (y1 < r.y + r.h) nya.push({ x: r.x, y: y1, b: r.b, h: r.y + r.h - y1 }); // nedanför
+      if (x0 > r.x) nya.push({ x: r.x, y: y0, b: x0 - r.x, h: y1 - y0 }); // till vänster
+      if (x1 < r.x + r.b) nya.push({ x: x1, y: y0, b: r.x + r.b - x1, h: y1 - y0 }); // till höger
+    }
+    ut = nya;
+  }
+  return ut;
+}
+
+/**
  * @param {Ruta[]} hinder
  * @param {(p: Punkt) => boolean} [tillaten] en regel till för var fötterna får stå (höjdnivåerna: kanten på kullen)
  * @param {{ bredd: number, hojd: number }} [S] områdets storlek (en skärm, eller större när kameran följer hjälten)

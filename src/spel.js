@@ -339,6 +339,36 @@ export function skapaSpel(d) {
     return t && b?.rum(t) ? t : null;
   };
 
+  /** Formelpussel som är lösta i det här passet (formeln läggs på staven när steget är klart). @type {Set<string>} */
+  const losta = new Set();
+  /**
+   * Rummets föremål just nu (T5):
+   * - av ett läsval i världen syns bara den variant han får, så att L2:s stenar inte står bredvid L3:s
+   *   (den rätta stenen står på samma plats i båda);
+   * - ett föremål som försvinner efter en formel (kartans forsvinner_efter: lianerna som SVÄRD kapar) är borta när
+   *   hjälten har formeln.
+   * @param {any} r rummet i kapitlet
+   */
+  function innehallNu(r) {
+    const borta = new Set();
+    const iRummet = new Set(r.innehall.map((/** @type {any} */ x) => (typeof x === 'string' ? x : x.id)));
+    for (const p of b.kapitel.pussel) {
+      if (!p.i_rummet || !p.varianter) continue;
+      const alla = Object.values(p.varianter).flatMap((/** @type {any} */ v) => v.alternativ.map((/** @type {any} */ a) => a.objekt)).filter((/** @type {any} */ id) => id && iRummet.has(id));
+      if (!alla.length) continue;
+      const [, v] = valjVariant(p.varianter, nivaFor(p));
+      const med = new Set(v.alternativ.map((/** @type {any} */ a) => a.objekt));
+      for (const id of alla) if (!med.has(id)) borta.add(id);
+    }
+    const formler = tillstand.spelare.hjalte.formler || [];
+    for (const o of kartor[r.id]?.objekt || []) {
+      if (!o.forsvinnerEfter) continue;
+      const p = b.pussel(o.forsvinnerEfter);
+      if (losta.has(o.forsvinnerEfter) || (p && formler.includes(p.svar))) borta.add(o.id);
+    }
+    return borta.size ? r.innehall.filter((/** @type {any} */ x) => !borta.has(typeof x === 'string' ? x : x.id)) : r.innehall;
+  }
+
   /** Nästa rumsbyte tonas (start, FORTSÄTT, ny dag), i stället för att glida. */
   let tonaNasta = true;
   /** Åt vilket håll hjälten klättrade på stegen ut ur förra rummet (han klättrar vidare i nästa). @type {'upp' | 'ned' | null} */
@@ -370,7 +400,7 @@ export function skapaSpel(d) {
     let forra = null;
     if (glida) { rum.frys(true); forra = await rum.bild(); }
     if (tonas) { rum.frys(true); await ui.tona(true, tid(300)); }
-    rum.visa({ rum: scen.rum, tillstand: b.rumsTillstand(scen.rum), innehall: r ? r.innehall : [], unge: tillstand.spelare.unge?.folj ?? !!tillstand.spelare.unge?.namn, nyttRum: nytt,
+    rum.visa({ rum: scen.rum, tillstand: b.rumsTillstand(scen.rum), innehall: r ? innehallNu(r) : [], unge: tillstand.spelare.unge?.folj ?? !!tillstand.spelare.unge?.namn, nyttRum: nytt,
       karta: scen.rum ? kartor[scen.rum] ?? null : null, franRum, delar: scen.rum ? delarIRummet(kartor[scen.rum]) : {}, visade: scen.rum ? b.visade(scen.rum) : [] });
     visaRumsskyltar();
     // närbilden (t.ex. kartbiten) visas tills spelaren ska röra sig i rummet igen
@@ -903,6 +933,10 @@ export function skapaSpel(d) {
     }
     ui.doljPlatta(); rum.frys(false);
     pusselPagar = false; visaEtiketter();
+    // en formel som kapar något i rummet (lianerna): rummet ritas om utan det
+    if (p.typ === 'P11_formel' && res && aktuelltRum && (kartor[aktuelltRum]?.objekt || []).some((/** @type {any} */ o) => o.forsvinnerEfter === p.id)) {
+      losta.add(p.id); await visaScen(visadScen);
+    }
     if (res && res.niva) {
       lasmotor.registrera({ pussel_id: p.id, typ: p.typ, niva: res.niva, ratt: res.forstaForsoket, antal_forsok: res.forsok, hjalp_anvand: res.hjalp, tid: performance.now() - start });
     }

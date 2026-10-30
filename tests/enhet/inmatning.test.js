@@ -362,3 +362,84 @@ describe('stigar', () => {
     expect(stigStart(b2)).toEqual({ x: 160, y: 110 });
   });
 });
+
+import { skarIgenom } from '../../src/karna/vag.js';
+import { skapaNivaer } from '../../src/karna/nivaer.js';
+import { omradeFor } from '../../src/karna/kamera.js';
+
+describe('kapitel 1: kartorna (T5)', () => {
+  const las = async (vag) => { const { readFileSync } = await import('node:fs'); return JSON.parse(readFileSync(new URL(vag, import.meta.url), 'utf8')); };
+  /** Hindren på varje nivå, som i rummet (Rum.byggHinder). */
+  const hinderI = (obj, karta) => {
+    const rutor = [...skarIgenom(hinderFran(obj), obj.filter((o) => o.oppning)), ...(karta.inomhus ? vaggar(karta.vagg, karta.storlek) : [])];
+    const n = skapaNivaer(obj);
+    return { n, per: (niva) => skapaHinder(rutor, n.finns ? (p) => n.tillaten(p, niva) : undefined, karta.storlek) };
+  };
+  /** Allt syns (dolda föremål visade), och det som en formel kapar är borta: läget när kapitlet är spelat. */
+  const allt = (rum) => rum.innehall.map((x) => (typeof x === 'string' ? x : x.id));
+  const dekor = new Set(['bron', 'tavla_bron', 'buske_vid_bron', 'backen', 'hack', 'lianer', 'gren', 'kulle']);
+  it('alla föremål går att nå från ingångarna, också uppe på kullen och apans bo', async () => {
+    const kap = await las('../../content/den-gomda-dalen/kap-01.json');
+    for (const rum of kap.rum) {
+      const karta = lasKarta(await las(`../../kartor/den-gomda-dalen/${rum.id}.tmj`));
+      for (const t of rum.tillstand || [null]) {
+        const obj = rumsObjekt(rum.innehall, t, karta, allt(rum)).filter((o) => !o.forsvinnerEfter);
+        const { n, per } = hinderI(obj, karta);
+        const mark = per(0);
+        const starter = [karta.start, ...obj.filter((o) => o.till).map(framfor)].filter(Boolean).map((p) => mark.narmasteFria(p));
+        // fossilet i apans bo nås först när stegen står där (efter räddningen)
+        const forst = (o) => t === 'fangen' && o.id === 'fossil';
+        for (const start of starter) for (const o of obj.filter((x) => !dekor.has(x.id) && !x.forbinder && x.sort !== 'yta' && !forst(x))) {
+          const niva = n.nivaFor(o);
+          // uppe: först till trappan eller stegen på marken, sedan vidare på nivån
+          let fran = start, h = mark;
+          if (niva > 0) {
+            const pass = /** @type {any} */ (n.passage({ x: o.x + o.b / 2, y: o.y + o.h }));
+            const v0 = mark.vag(start, pass);
+            expect(v0.length, `${rum.id}/${t}: ${o.id}, trappan nås inte`).toBeGreaterThan(0);
+            fran = v0.at(-1); h = per(niva);
+          }
+          const v = h.vag(fran, framfor(o));
+          expect(v.length, `${rum.id}/${t}: ${o.id}`).toBeGreaterThan(0);
+          const slut = v.at(-1);
+          expect(vidObjekt(slut, o) || (o.sort === 'utgang' && genom(o, slut)), `${rum.id}/${t}: ${o.id} nås inte (hamnar ${slut.x},${slut.y})`).toBe(true);
+        }
+      }
+    }
+  });
+  it('häcken och lianerna stänger vägen tills stenen och SVÄRD öppnar den', async () => {
+    const kap = await las('../../content/den-gomda-dalen/kap-01.json');
+    const rum = kap.rum.find((r) => r.id === 'skogsbrynet');
+    const karta = lasKarta(await las('../../kartor/den-gomda-dalen/skogsbrynet.tmj'));
+    const tradet = (obj) => obj.find((o) => o.id === 'trad_med_formel');
+    // före stenen: hålet syns inte, och östra skärmen går inte att nå
+    let obj = rumsObjekt(rum.innehall, null, karta, []);
+    let h = hinderI(obj, karta).per(0);
+    const start = h.narmasteFria(karta.start);
+    const fore = h.vag(start, framfor(tradet(obj)));
+    expect(fore.length === 0 || fore.at(-1).x < 300).toBe(true);
+    // efter stenen: genom hålet till trädet, men lianerna står kvar framför stigarna
+    obj = rumsObjekt(rum.innehall, null, karta, ['stig_genom_hacken']);
+    h = hinderI(obj, karta).per(0);
+    expect(vidObjekt(h.vag(start, framfor(tradet(obj))).at(-1), tradet(obj))).toBe(true);
+    const glantan = obj.find((o) => o.id === 'stig_glantan');
+    const forbi = h.vag(start, framfor(glantan));
+    expect(forbi.length === 0 || !genom(glantan, forbi.at(-1))).toBe(true);
+    // efter SVÄRD: lianerna är borta
+    obj = obj.filter((o) => o.id !== 'lianer');
+    h = hinderI(obj, karta).per(0);
+    expect(genom(glantan, h.vag(start, framfor(glantan)).at(-1))).toBe(true);
+  });
+  it('ett läsval ryms på en skärm: alternativen i alla varianter och skylten med frågan', async () => {
+    const kap = await las('../../content/den-gomda-dalen/kap-01.json');
+    for (const p of kap.pussel.filter((x) => x.i_rummet)) {
+      const rum = kap.rum.find((r) => allt(r).includes(p.skylt));
+      const karta = lasKarta(await las(`../../kartor/den-gomda-dalen/${rum.id}.tmj`));
+      for (const v of Object.values(p.varianter)) {
+        const ids = [...v.alternativ.map((a) => a.objekt), p.skylt];
+        const r = omradeFor(karta.objekt.filter((o) => ids.includes(o.id)));
+        expect(r.b, `${p.id}`).toBeLessThanOrEqual(320); expect(r.h, `${p.id}`).toBeLessThanOrEqual(192);
+      }
+    }
+  });
+});

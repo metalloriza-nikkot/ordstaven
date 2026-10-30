@@ -6,7 +6,7 @@ import { RUM } from '../karna/skalning.js';
 import { FIGUR, steg } from '../karna/rorelse.js';
 import { rumsObjekt, framfor, framforFran, vidObjekt, aktivSak, hinderFran, vaggar, VAGG, objektFarg, lasplats, arSidodorr, stigStart } from '../karna/rumslayout.js';
 import { synligaIds } from '../karna/karta.js';
-import { skapaHinder } from '../karna/vag.js';
+import { skapaHinder, skarIgenom } from '../karna/vag.js';
 import { skapaNivaer } from '../karna/nivaer.js';
 import { KAMERA, centrera, folj, visaRuta, omradeFor, narmare, enSkarm } from '../karna/kamera.js';
 
@@ -392,7 +392,9 @@ export class Rum extends Phaser.Scene {
 
   byggHinder() {
     const sparrade = this.objekt.filter((o) => this.sparrade.has(o.id));
-    const rutor = [...hinderFran(this.objekt), ...sparrade, ...(this.inomhus ? vaggar(this.vagg, this.storlek) : [])];
+    // en stig som är en öppning skär igenom häcken den ligger över (hålet bakom stenen), när den syns
+    const oppningar = this.objekt.filter((o) => o.oppning);
+    const rutor = [...skarIgenom(hinderFran(this.objekt), oppningar), ...sparrade, ...(this.inomhus ? vaggar(this.vagg, this.storlek) : [])];
     // en uppsättning hinder per nivå: på marken går det inte att gå upp på kullen utom på trappan, och tvärtom
     const n = (this.nivaer = skapaNivaer(this.objekt));
     this.hinderPer = new Map(n.nivaer.map((niva) => [niva, skapaHinder(rutor, n.finns ? (p) => n.tillaten(p, niva) : undefined, this.storlek)]));

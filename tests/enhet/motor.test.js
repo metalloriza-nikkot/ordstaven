@@ -364,6 +364,17 @@ describe('ungen följer', () => {
 
 describe('kapitel 1: frivilligt, dolda föremål och gåvor', () => {
   const kap1 = las('den-gomda-dalen/kap-01.json');
+  it('en sparning från de gamla rummen (lianerna, gamla_tradet) följer med till de större områdena (alias.rum)', () => {
+    const t = nyttTillstand('t'); const av = aventyrFor(t, AVENTYR);
+    Object.assign(av, { kapitelId: 'kap-01', scenId: 'k1s09_luckorna', visade: { gamla_tradet: ['last_lada'], glantan: ['trappa'] }, rumstillstand: { gamla_tradet: 'raddad' }, frivilligt: ['lianerna/liten_lian', 'k1s03_buskarna'] });
+    const b = skapaBerattelse({ aventyr, kapitel: kap1, tillstand: t, aventyrId: AVENTYR });
+    expect(b.scen.id).toBe('k1s09_luckorna');
+    expect(b.visade('glantan')).toEqual(['trappa', 'last_lada']);
+    expect(av.visade.gamla_tradet).toBeUndefined();
+    expect(av.rumstillstand).toEqual({ glantan: 'raddad' });
+    expect(b.frivilligtGjort('skogsbrynet/liten_lian')).toBe(true);
+    expect(b.frivilligtGjort('k1s03_buskarna')).toBe(true);
+  });
   const ny = () => { const t = nyttTillstand('t'); return { t, b: skapaBerattelse({ aventyr, kapitel: kap1, tillstand: t, aventyrId: AVENTYR }) }; };
   const spelaScen = (b) => { const id = b.scen.id; while (!b.slut && b.scen.id === id) { b.aktuellt(); b.klar({}); } };
   it('den frivilliga scenen (buskarna) spelas aldrig i tur och ordning', () => {

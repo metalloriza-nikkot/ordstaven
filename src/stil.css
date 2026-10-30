@@ -470,7 +470,9 @@ html, body {
 
 /* räddningen: staven för kasta-läget, uppe till höger */
 .raddning-ruta { padding-top: 30px; }
-.stav-knapp { position: absolute; right: -18px; top: -18px; width: calc(72px * var(--t)); height: calc(72px * var(--t)); border-radius: 50%; border: 0; background: #e9dfc8; box-shadow: 0 4px 0 #b7a98a; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+/* en lång ledtråd (MAN KLÄTTRAR UPP MED DEN.) får inte gå in under staven i hörnet */
+.raddning-ruta > .lapp { margin-right: calc(44px * var(--t)); }
+.stav-knapp { position: absolute; z-index: 2; right: -18px; top: -18px; width: calc(72px * var(--t)); height: calc(72px * var(--t)); border-radius: 50%; border: 0; background: #e9dfc8; box-shadow: 0 4px 0 #b7a98a; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .stav-ikon { display: block; width: calc(12px * var(--t)); height: calc(52px * var(--t)); border-radius: 6px; background: linear-gradient(#8a6a4a, #3a2a20); transform: rotate(25deg); box-shadow: 0 0 0 2px rgba(242, 193, 78, .4); }
 .stav-knapp.glimtar { background: var(--guld); box-shadow: 0 4px 0 #b8892b, 0 0 0 6px rgba(242, 193, 78, .45); }
 .stav-knapp.lyft { background: var(--guld); transform: translateY(-6px); box-shadow: 0 10px 0 #b8892b, 0 0 24px rgba(242, 193, 78, .8); }

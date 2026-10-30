@@ -1,0 +1,160 @@
+{
+ "type": "map",
+ "version": "1.10",
+ "tiledversion": "1.11.0",
+ "orientation": "orthogonal",
+ "renderorder": "right-down",
+ "width": 20,
+ "height": 12,
+ "tilewidth": 16,
+ "tileheight": 16,
+ "infinite": false,
+ "compressionlevel": -1,
+ "nextlayerid": 2,
+ "nextobjectid": 8,
+ "properties": [
+  {
+   "name": "rum",
+   "type": "string",
+   "value": "buskarna"
+  }
+ ],
+ "tilesets": [],
+ "layers": [
+  {
+   "id": 1,
+   "name": "foremal",
+   "type": "objectgroup",
+   "draworder": "index",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 1,
+     "name": "stig_lianerna",
+     "type": "utgang",
+     "x": 0,
+     "y": 84,
+     "width": 40,
+     "height": 24,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "riktning",
+       "type": "string",
+       "value": "vanster"
+      },
+      {
+       "name": "till",
+       "type": "string",
+       "value": "skogsbrynet"
+      }
+     ]
+    },
+    {
+     "id": 2,
+     "name": "buske_1",
+     "type": "sak",
+     "x": 96,
+     "y": 40,
+     "width": 30,
+     "height": 24,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 3,
+     "name": "buske_2",
+     "type": "sak",
+     "x": 200,
+     "y": 40,
+     "width": 30,
+     "height": 24,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 4,
+     "name": "buske_3",
+     "type": "sak",
+     "x": 96,
+     "y": 128,
+     "width": 30,
+     "height": 24,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 5,
+     "name": "buske_4",
+     "type": "sak",
+     "x": 200,
+     "y": 128,
+     "width": 30,
+     "height": 24,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 6,
+     "name": "skattlada",
+     "type": "sak",
+     "x": 268,
+     "y": 92,
+     "width": 20,
+     "height": 14,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 7,
+     "name": "start",
+     "type": "",
+     "x": 60,
+     "y": 100,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    }
+   ]
+  }
+ ]
+}

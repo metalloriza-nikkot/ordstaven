@@ -213,7 +213,7 @@ const bricka = (page, b) => page.locator('#plattan .bricka[data-id]', { hasText:
 test('räddningen: ett tryck i taget, fel tonas ut, och kasta-läget skriver resten av ordet', async ({ page }) => {
   test.setTimeout(60000);
   await provscen(page, { id: 't_apan', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'pussel', pussel_id: 'k1_apan' }, R('Räddad.')] }, null, { pussel: [P1('k1_apan')] });
-  await expect(page.locator('#plattan .raddning-ruta .lapp')).toHaveText('MAN GÅR UPP PÅ DEN.', { timeout: 8000 });
+  await expect(page.locator('#plattan .raddning-ruta .lapp')).toHaveText('MAN KLÄTTRAR UPP MED DEN.', { timeout: 8000 });
   // brickorna i bokstavsordning
   expect(await page.locator('#plattan .bricka[data-id]').allTextContents()).toEqual(['A', 'E', 'G', 'O', 'R', 'S', 'T']);
   expect(await page.locator('#plattan .stav-knapp').count()).toBe(0);
@@ -262,6 +262,9 @@ test('kodlåset: ungen visar första tecknet, låset kontrolleras när hela orde
 test('titta–täck: förebilden tonas bort vid första brickan och tänds igen vid fel', async ({ page }) => {
   test.setTimeout(60000);
   await provscen(page, { id: 't_svard', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'pussel', pussel_id: 'k1_svard' }, R('Svärdet!')] }, null, { pussel: [P1('k1_svard')] });
+  // instruktionen först (v0.7: SVÄRD utifrån Farfars bild)
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('VAD ÄR DET? SKRIV ORDET!', { timeout: 8000 });
+  await page.click('#plattan .vidare');
   await expect(page.locator('#plattan .forebild')).toBeVisible({ timeout: 8000 });
   await expect(page.locator('#plattan .brickor')).not.toHaveClass(/vantar/, { timeout: 5000 });
   expect(await page.locator('#plattan .bricka[data-id]').allTextContents()).toEqual(['D', 'R', 'S', 'V', 'Ä']);
@@ -609,7 +612,9 @@ test('kameran visar hela valet när frågan ställs: alla alternativ, deras skyl
   await expect(page.locator('#skyltar .skylt')).toHaveCount(3, { timeout: 8000 });
   const allt = async () => {
     for (const id of ['stig_a', 'stig_b', 'stig_c', 'skylt_fraga']) if (!(await iBild(page, await page.evaluate((i) => window.__ORDSTAVEN.rutaPaSkarm(i), id)))) return id;
-    for (const s of await page.locator('#skyltar .skylt, #rumsskyltar .skylt').all()) if (!(await iBild(page, await s.boundingBox()))) return 'skylt ' + (await s.getAttribute('data-objekt'));
+    // alla skyltar på en gång (de placeras om när kameran har stannat)
+    const skyltar = await page.evaluate(() => [...document.querySelectorAll('#skyltar .skylt, #rumsskyltar .skylt')].map((e) => { const r = e.getBoundingClientRect(); return { id: e.dataset.objekt, x: r.x, y: r.y, width: r.width, height: r.height }; }));
+    for (const s of skyltar) if (!(await iBild(page, s))) return 'skylt ' + s.id;
     const k = await page.evaluate(() => window.__ORDSTAVEN.kamera()), p = await page.evaluate(() => window.__ORDSTAVEN.position());
     if (p.x - k.x < 0 || p.x - k.x > 320 || p.y - k.y < 24 || p.y - k.y > 192) return 'hjälten';
     return 'allt syns';
@@ -619,4 +624,58 @@ test('kameran visar hela valet när frågan ställs: alla alternativ, deras skyl
   // valet fungerar som vanligt: rätt stig
   await tryckPa(page, 'stig_a');
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('RÄTT.', { timeout: 10000 });
+});
+
+test('kapitel 1 med kartorna (T5): bara varianten syns, den rätta stenen öppnar hålet i häcken, och kameran följer honom igenom', async ({ page }) => {
+  test.setTimeout(120000);
+  await page.goto('./?snabb&ny&kapitel=kap-01');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  for (const namn of ['TESTA', 'KNOPP']) {
+    await expect(page.locator('#plattan :is(.dop-ruta, .replik-ruta)')).toBeVisible({ timeout: 10000 });
+    if (await page.locator('#plattan .replik-ruta').isVisible()) await page.click('#plattan .replik-ruta');
+    await expect(page.locator('#plattan .dop-ruta')).toBeVisible({ timeout: 10000 });
+    await page.waitForTimeout(200);
+    await page.keyboard.type(namn);
+    await expect(page.locator('#plattan .namnrutor .ruta.fylld')).toHaveCount(namn.length, { timeout: 5000 });
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#plattan .dop-ruta')).toBeHidden({ timeout: 10000 });
+  }
+  /** Klicka fram repliker tills villkoret gäller. */
+  const fram = async (villkor, ms = 30000) => {
+    const t0 = Date.now();
+    while (!(await villkor())) {
+      if (Date.now() - t0 > ms) throw new Error('kom inte fram');
+      const v = page.locator('#plattan .vidare');
+      if (await v.isVisible()) await v.click({ timeout: 2000 }).catch(() => {}); else await page.waitForTimeout(150);
+    }
+  };
+  expect(await page.evaluate(() => window.__ORDSTAVEN.kamera())).toMatchObject({ bredd: 640, hojd: 192 });
+  // bara en variant av stenarna syns: två (L2) eller tre (L3), aldrig fem
+  const stenar = await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt().filter((id) => /sten$/.test(id)));
+  expect([2, 3]).toContain(stenar.length);
+  const ratt = stenar.includes('hog_sten') ? 'hog_sten' : 'hog_rund_sten';
+  expect(stenar).toContain(ratt);
+  // skylten vid ingången (en mening): han går dit
+  await fram(() => page.locator('#rumsskyltar .skylt[data-objekt="skylt_ingang"]').isVisible());
+  await page.click('#rumsskyltar .skylt[data-objekt="skylt_ingang"] .kort');
+  await expect(page.locator('#plattan .lapp')).toBeVisible({ timeout: 10000 });
+  await fram(() => page.evaluate(() => window.__ORDSTAVEN.steg()?.typ === 'ga_till'));
+  await tryckPa(page, 'skylt_farfar_1');
+  // frågan står på Farfars skylt: den öppnas när han är där
+  await expect(page.locator('#plattan .lapp.p-traskylt')).toBeVisible({ timeout: 10000 });
+  await page.locator('#plattan .vidare.synlig').click();
+  expect(await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt())).not.toContain('stig_genom_hacken');
+  await tryckPa(page, ratt);
+  await expect(page.locator('#handknapp')).toBeVisible({ timeout: 8000 });
+  await page.keyboard.press('Space');
+  // hålet i häcken kommer fram, och han går igenom det till östra skärmen
+  await fram(() => page.evaluate(() => window.__ORDSTAVEN.rumsobjekt().includes('stig_genom_hacken') && window.__ORDSTAVEN.scen() === 'k1s02_lianerna'));
+  await fram(() => page.evaluate(() => !window.__ORDSTAVEN.fryst() && window.__ORDSTAVEN.steg()?.mal === 'stig_genom_hacken'));
+  await tryckPa(page, 'stig_genom_hacken');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.position().x), { timeout: 10000 }).toBeGreaterThan(320);
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.kamera().x), { timeout: 5000 }).toBeGreaterThan(100);
+  // lianerna står kvar tills SVÄRD
+  expect(await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt())).toContain('lianer');
+  await page.screenshot({ path: 'test-results/kapitel1-ostra-skarmen.png' });
 });

@@ -53,7 +53,7 @@ export function skapaLjud({ tyst = () => false } = {}) {
   };
   /** Ljud-id i innehållet → effekt. Okända id:n får ett allmänt ljud. */
   const LJUD_ID = /** @type {Record<string, string>} */ ({
-    dunk: 'dunk', klaffen_tick: 'tick', unge_forsta_late: 'unge', unge_langtan: 'unge', unge_svarar: 'unge', mage_kurrar: 'mage',
+    dunk: 'dunk', klaffen_tick: 'tick', unge_forsta_late: 'unge', unge_langtan: 'unge', unge_svarar: 'unge', mage_kurrar: 'mage', hackspett: 'klick',
   });
 
   return {

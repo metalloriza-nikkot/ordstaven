@@ -170,8 +170,8 @@ describe('kapitel 1: rummens text, frivilligt och nya steg (schema 2.8)', () => 
   const scen = (k, id) => k.scener.find((s) => s.id === id);
   it('skyltarna hör till rummet: föremålet ska finnas, och texten kontrolleras som lästext', () => {
     expect(medFel(() => {})).toBe('');
-    expect(medFel((k) => { rum(k, 'lianerna').skyltar.skylt_saknas = { text: 'bär' }; })).toMatch(/skylten skylt_saknas finns inte/);
-    expect(medFel((k) => { rum(k, 'lianerna').skyltar.skylt_bar.text = 'BÄR'; })).toMatch(/vanlig skrift/);
+    expect(medFel((k) => { rum(k, 'skogsbrynet').skyltar.skylt_saknas = { text: 'bär' }; })).toMatch(/skylten skylt_saknas finns inte/);
+    expect(medFel((k) => { rum(k, 'skogsbrynet').skyltar.skylt_bar.text = 'BÄR'; })).toMatch(/vanlig skrift/);
     expect(medFel((k) => { rum(k, 'skogsbrynet').skyltar.skylt_ingang.text = 'Gå till berget.'; })).toMatch(/berget är spärrat/);
   });
   it('las_skylt pekar på en skylt i rummet', () => {
@@ -180,8 +180,8 @@ describe('kapitel 1: rummens text, frivilligt och nya steg (schema 2.8)', () => 
   it('frivilligt: föremålet ska finnas, stegen kontrolleras, och pusslet räknas som använt', () => {
     const d = riktigt();
     expect(kontrollera(d).varningar.join('\n')).not.toMatch(/k1_svard_igen används inte/);
-    expect(medFel((k) => { rum(k, 'lianerna').frivilligt[0].foremal = 'stubbe_borta'; })).toMatch(/stubbe_borta finns inte/);
-    expect(medFel((k) => { rum(k, 'lianerna').frivilligt[0].steg[0].pussel_id = 'k1_finns_inte'; })).toMatch(/pusslet k1_finns_inte finns inte/);
+    expect(medFel((k) => { rum(k, 'skogsbrynet').frivilligt[0].foremal = 'stubbe_borta'; })).toMatch(/stubbe_borta finns inte/);
+    expect(medFel((k) => { rum(k, 'skogsbrynet').frivilligt[1].steg[0].pussel_id = 'k1_finns_inte'; })).toMatch(/pusslet k1_finns_inte finns inte/);
     expect(medFel((k) => { rum(k, 'glantan').frivilligt[0].steg.push({ typ: 'sparpunkt', pass_slut: true }); })).toMatch(/hör inte hemma i ett frivilligt/);
   });
   it('en frivillig scen behöver ett rum att starta i, och räknas inte in i passets tid', () => {

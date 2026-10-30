@@ -17,6 +17,8 @@
 // Höjdnivåer: en ruta med typen "yta" och egenskapen "niva" (1, 2 …) är upphöjd (kullen, krönet), och dess kanter
 // går inte att gå över. En ruta med typen "trappa" eller "stege" förbinder nivåerna och ska ligga över kanten.
 // Saker på ytan (lövhögarna) når han bara uppifrån. Se karna/nivaer.js.
+// "forsvinner_efter" (ett pussels id, en formel): föremålet är borta när hjälten har formeln, t.ex. lianerna som
+// SVÄRD kapar. "oppning" på en stig: när den syns skär den igenom hindret den ligger över, t.ex. hålet i häcken.
 import { RUM } from './skalning.js';
 import { VAGG } from './rumslayout.js';
 import { STORSTA } from './kamera.js';
@@ -100,6 +102,8 @@ export function lasKarta(tmj) {
       if (egen.ute) ut.ute = true;
       if (egen.lapp) ut.lapp = String(egen.lapp);
       if (egen.talare) ut.talare = String(egen.talare);
+      if (egen.forsvinner_efter) ut.forsvinnerEfter = String(egen.forsvinner_efter);
+      if (egen.oppning) ut.oppning = true;
       if (egen.last_i) ut.lastI = String(egen.last_i).split(',').map((t) => t.trim()).filter(Boolean);
       objekt.push(ut);
     }

@@ -472,3 +472,14 @@ Efter den externa granskningen: det ska aldrig löna sig att gissa eller vänta 
 - **När en fråga ställs** (läsval i världen) får kameran en ruta (`rum.visaOmrade`): alternativen, deras lappar och frågans skylt, med plats för skyltarna ovanför och på sidorna. Kameran glider så lite som möjligt för att rutan och hjälten ska synas. Ryms de inte på en skärm följer den hjälten som vanligt. Därför ska ett val och platsen där frågan läses rymmas på en skärm (krav på kartorna i T5).
 - **Textlagret:** skyltar, händer, bubblor och etiketter ligger i `#varldslager`. Varje element minns kamerans läge när det placerades, och när kameran rör sig flyttas det med `translate` i stället för att byggas om. 150 ms efter att kameran har stannat placeras skyltarna om på riktigt. I ett område som är större än skärmen klipps lagret vid rummets kanter, så att skyltar för föremål utanför bilden inte syns.
 - Testkrokar: `kamera()` (läge och storlek) och `rutaPaSkarm(id)`.
+
+## 27. Kapitel 1 med kartor (T5, 0.8.0)
+
+- **Datan v0.7** från Innehåll (15 v0.9) ligger i `kap-01.json` utan ändrad text. Tre områden: `skogsbrynet` (40×12), `buskarna` (20×12) och `glantan` (40×24). `alias.rum` pekar `lianerna` till `skogsbrynet` och `gamla_tradet` till `glantan`: det som har visats, rummets tillstånd och det frivilliga följer med (`skapaBerattelse`).
+- **Kartorna** står i `kartor/den-gomda-dalen/`. Kapitel 1 spelas nu i det vanliga spelet efter prologen, eftersom alla rum har kartor.
+  - **Skogsbrynet:** häcken går i nord–sydlig riktning mellan skärmarna och stänger västra skärmen. Den rätta stenen (`hog_sten` i L2 och `hog_rund_sten` i L3, samma plats) står framför hålet. Lianväggen står framför stigarna till gläntan och buskarna och försvinner efter SVÄRD.
+  - **Gläntan:** apans bo är en plattform (nivå 1) med stegen, kullen och krönet är nivå 1 med trappan bakom det rätta trädet, och bäcken med bron ligger längs östra kanten.
+- **Bara den variant han får syns** (`innehallNu` i `spel.js`): av ett läsval i världen tas de andra varianternas föremål bort ur rummet, så att L2:s stenar inte står bredvid L3:s.
+- **`forsvinner_efter`** (karta): föremålet är borta när hjälten har formeln. Rummet ritas om direkt efter formelpusslet.
+- **`oppning`** (karta, på en stig): stigen skär igenom hindret den ligger över när den syns (`skarIgenom` i `karna/vag.js`). Hålet i häcken.
+- **Tester:** enhetstester att allt går att nå i varje område och tillstånd (också på nivå 1), att häcken och lianerna stänger vägen tills stenen och SVÄRD öppnar den, att varje läsval ryms på en skärm, och att en sparning från de gamla rummen följer med. Ett webbtest spelar k1s01 till östra skärmen.

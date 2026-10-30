@@ -84,7 +84,9 @@ function kontrolleraKartor(k, kartor, fel, varningar) {
     for (const fran of Object.keys(karta.in || {})) if (!allaRum.has(fran)) fel.push(`kartan ${r.id}: in_${fran} gäller ett rum som inte finns i ${k.id}`);
     for (const o of karta.objekt) {
       if (!ids.includes(o.id)) fel.push(`kartan ${r.id}: ${o.id} finns inte i rummets innehåll`);
-      if (o.x < 0 || o.y < 0 || o.x + o.b > 320 || o.y + o.h > 192) fel.push(`kartan ${r.id}: ${o.id} går utanför rummet`);
+      const S = karta.storlek || { bredd: 320, hojd: 192 };
+      if (o.x < 0 || o.y < 0 || o.x + o.b > S.bredd || o.y + o.h > S.hojd) fel.push(`kartan ${r.id}: ${o.id} går utanför rummet`);
+      if (o.forsvinnerEfter && !k.pussel.some((p) => p.id === o.forsvinnerEfter && p.typ === 'P11_formel')) fel.push(`kartan ${r.id}: ${o.id} försvinner efter ${o.forsvinnerEfter}, som inte är en formel i ${k.id}`);
       if (o.till && !allaRum.has(o.till)) fel.push(`kartan ${r.id}: ${o.id} leder till ${o.till}, som inte finns i ${k.id}`);
       if (o.visar && !k.pussel.some((p) => p.id === o.visar)) fel.push(`kartan ${r.id}: ${o.id} visar ${o.visar}, som inte finns i ${k.id}`);
       if (o.lapp && !ids.includes(o.lapp)) fel.push(`kartan ${r.id}: ${o.id} har lappen på ${o.lapp}, som inte finns i rummet`);
@@ -179,7 +181,8 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
     }
     // Alias: gamla id pekar på id:n som finns, och ett gammalt id får inte finnas kvar
     const scenIds = new Set(k.scener.map((x) => x.id)), pusselIds = new Set(k.pussel.map((x) => x.id));
-    for (const [sort, ids] of [['scener', scenIds], ['pussel', pusselIds]]) {
+    const rumIds = new Set((k.rum || []).map((x) => x.id));
+    for (const [sort, ids] of [['scener', scenIds], ['pussel', pusselIds], ['rum', rumIds]]) {
       for (const [gammalt, nyttId] of Object.entries((k.alias || {})[sort] || {})) {
         if (ids.has(gammalt)) fel.push(var_(`alias.${sort}: ${gammalt} finns fortfarande, ett alias gäller bara id:n som har tagits bort`));
         if (!ids.has(nyttId) && !((k.alias || {})[sort] || {})[nyttId]) fel.push(var_(`alias.${sort}: ${gammalt} pekar på ${nyttId}, som inte finns`));

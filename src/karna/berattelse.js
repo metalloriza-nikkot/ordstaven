@@ -107,6 +107,14 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
   av.visade = av.visade || {};
   /** @type {string[]} frivilliga scener och föremål som är gjorda (scenens id, eller rum/föremål) */
   av.frivilligt = av.frivilligt || [];
+  // rum som har gått upp i ett större område (kapitel 1: lianerna i skogsbrynet, gamla_tradet i gläntan, beslut 18.1):
+  // det som har visats, rummets tillstånd och det frivilliga följer med till det nya rummet
+  for (const [gammalt] of Object.entries(alias.rum || {})) {
+    const ny = nytt(alias.rum, gammalt);
+    if (av.visade[gammalt]) { av.visade[ny] = [...new Set([...(av.visade[ny] || []), ...av.visade[gammalt]])]; delete av.visade[gammalt]; }
+    if (gammalt in av.rumstillstand) { if (!(ny in av.rumstillstand)) av.rumstillstand[ny] = av.rumstillstand[gammalt]; delete av.rumstillstand[gammalt]; }
+  }
+  av.frivilligt = av.frivilligt.map((/** @type {string} */ x) => { const m = /^([^/]+)\/(.+)$/.exec(x); return m ? `${nytt(alias.rum, m[1])}/${m[2]}` : x; });
   av.bar = av.bar || 0;
   // ungen hör till spelaren (sparformat 2)
   const unge = (tillstand.spelare.unge = tillstand.spelare.unge || { format: 1, namn: '', steg: 1, formagor: [] });

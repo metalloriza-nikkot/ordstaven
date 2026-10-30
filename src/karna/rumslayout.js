@@ -11,7 +11,7 @@ const FIGUR_HOJD = 24;
  *             niva?: number, forbinder?: 'trappa' | 'stege',
  *             till?: string, sida?: 'under' | 'over' | 'vanster' | 'hoger' | 'alla', golv?: boolean, visar?: string,
  *             riktning?: 'vanster' | 'hoger' | 'upp' | 'ned', klattra?: 'upp' | 'ned', ute?: boolean, lapp?: string,
- *             talare?: string, lastI?: string[], storlek?: { bredd: number, hojd: number } }} Objekt
+ *             talare?: string, lastI?: string[], storlek?: { bredd: number, hojd: number }, forsvinnerEfter?: string, oppning?: boolean }} Objekt
  * till = rummet en utgång leder till, sida = var hjälten ställer sig, golv = man går på det (stig, grind).
  * sida 'alla' = föremålet har ingen framsida (krukor, buskar, en låda mitt på golvet): det går att använda från alla håll.
  * sort 'yta' = en del av golvet: en upphöjd yta (niva, kullen) eller en förbindelse mellan nivåerna (forbinder:
