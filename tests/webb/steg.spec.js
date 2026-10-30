@@ -567,7 +567,7 @@ test('kameran följer hjälten i ett stort område: mittzon, hela pixlar, stanna
   test.setTimeout(60000);
   await provscen(page, { id: 't_kam', pass: 1, rum: 'provdalen', steg: [{ typ: 'ga_till', mal: 'sten' }, R('Framme.')] }, null, {
     rum: { provdalen: { innehall: ['skylt_ord', 'sten'], skyltar: { skylt_ord: { text: 'bär' } } } },
-    kartor: { provdalen: storKarta([{ name: 'skylt_ord', type: 'sak', x: 120, y: 300, width: 24, height: 16 }, { name: 'sten', type: 'sak', x: 560, y: 60, width: 24, height: 16 }], { x: 80, y: 350 }) },
+    kartor: { provdalen: storKarta([{ name: 'skylt_ord', type: 'sak', x: 300, y: 300, width: 24, height: 16 }, { name: 'sten', type: 'sak', x: 560, y: 60, width: 24, height: 16 }], { x: 80, y: 350 }) },
   });
   const kam = () => page.evaluate(() => window.__ORDSTAVEN.kamera());
   await expect.poll(kam).toMatchObject({ x: 0, y: 192, bredd: 640, hojd: 384 }); // nere till vänster, vid kanterna
@@ -584,7 +584,8 @@ test('kameran följer hjälten i ett stort område: mittzon, hela pixlar, stanna
   expect(Number.isInteger(k.x) && Number.isInteger(k.y)).toBe(true);
   expect(p.x - k.x).toBeGreaterThan(0); expect(p.x - k.x).toBeLessThan(320);
   expect(Math.abs(p.x - k.x - 160)).toBeLessThanOrEqual(33); // vid mittzonens kant
-  // skylten sitter kvar på sitt föremål när kameran har flyttat sig
+  // skylten sitter kvar på sitt föremål när kameran har flyttat sig (föremålet mitt i bilden, så att skylten inte
+  // flyttas in från bildens kant)
   await expect.poll(async () => {
     const s = await page.locator('#rumsskyltar .skylt[data-objekt="skylt_ord"]').boundingBox(), o = await page.evaluate(() => window.__ORDSTAVEN.rutaPaSkarm('skylt_ord'));
     return s ? Math.abs(s.x + s.width / 2 - (o.x + o.b / 2)) : 999;
