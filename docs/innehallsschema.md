@@ -1,6 +1,7 @@
 # Innehållsschema – kapitel i format 2
 
-Version 2.9 (2026-10-30). Ägs av teknikspåret.
+Version 2.10 (2026-10-30). Ägs av teknikspåret.
+2.10: SVÄRD utifrån bilden (beslut 18.5, 20.3): `bild` på P11 och `forebild.visas` (`fran_start` eller `vid_fel`). Allt är tillägg, filer i 2.9 gäller fortfarande.
 2.9: kapitel 1:s kartor (T5). Ett område kan vara större än skärmen, högst 2×2 skärmar, och kameran följer hjälten (beslut 14, 18.1). Kartorna får `forsvinner_efter` (lianerna som SVÄRD kapar) och `oppning` (hålet i häcken). `alias.rum` för rum som har gått upp i ett större område. Av ett läsval i världen syns bara den variant han får. Allt är tillägg, filer i 2.8 gäller fortfarande.
 2.8: kapitel 1:s steg och fält (T2). Rummen får `skyltar` (text som står i världen, beslut 15.2), `frivilligt` (föremål som ger något en gång) och `dold` på föremål. Scenerna får `frivillig` och `startar_i_rum`. Nya steg: `las_skylt`, `visa_foremal`, `ge_sak`, `dinobok`, `unge_tillagg`, `fri_vag` på `ga_till` och `paminnelse` på repliker som väntar. Pusslen: `skylt` på läs och välj, titta–täck i formeln, brickor och kasta-läge i räddningen, kodlåsets kontroll, och svingning mot rummets föremål i P26. `gransnitt` i `aventyr.json` (orden i pausmenyn). Kartorna får höjdnivåer (`yta`, `trappa`, `stege`), och en stig slutar vid kurvan. Allt är tillägg, filer i 2.7 gäller fortfarande, utom `skapa_hjalte`: `delar` är nu `hudfarg` och `drakt` (hjältens form är fast, prologen är omskriven).
 2.7: kartans `last_i` (en utgång är låst i ett tillstånd) och `morker` (hur mörkt rummet är på natten). Räckvidden: saker, figurer och stegar nås från alla håll inom ca 1,5 rutor, och bara den närmaste är aktiv. Kapitelfilerna är oförändrade.
@@ -152,11 +153,13 @@ En **replik inuti något annat** (`knuff`, `vid_fel`, `instruktion`, `vid_omstar
 
 ### P11_formel
 
-`niva` (S1–S5), `svar` (versaler), `formler` (`ord`, `effekt`, `tillstand_efter`), `nastan` (`ord`, `effekt`), `forebild` (`text`, `placering`, `ligger_kvar`, `tacks`, `brickor_efter_sek`), `brickor` (en versal per bricka), `helord`, `ratt_bokstav_stannar`, `forsta_formel`.
+`niva` (S1–S5), `svar` (versaler), `formler` (`ord`, `effekt`, `tillstand_efter`), `nastan` (`ord`, `effekt`), `forebild` (`text`, `placering`, `ligger_kvar`, `tacks`, `brickor_efter_sek`, `visas`), `bild`, `brickor` (en versal per bricka), `helord`, `ratt_bokstav_stannar`, `forsta_formel`.
 
 **Brickor ligger alltid i bokstavsordning** (granskningen), i alla pussel med brickor. Ordningen i datan spelar ingen roll.
 
 **Titta–täck** (`"tacks": "forsta_brickan"`): förebilden syns, brickorna glider in efter `brickor_efter_sek` sekunder, och förebilden tonas bort när första brickan läggs (ungen håller för ögonen). Vid fel eller knuff tänds den igen och står kvar resten av försöket, och försöket loggas med förebild. Vid rätt lyser förebilden en sekund ovanför hans ord.
+
+**Utifrån en bild** (`"bild"` och `"forebild": { "visas": "vid_fel" }`, beslut 18.5): ord som går att ljuda fram (SVÄRD, FLYG) skrivs utifrån en bild, till exempel Farfars ristade svärd (`svard_ristat`). Bilden står ovanför fälten, brickorna kommer direkt och förebilden syns inte. Vid första felet tänds förebilden bredvid bilden, vid nästa bricka tonas den bort (täck), och efter ett andra fel står den kvar. Knuffen får bilden att glimta, aldrig ordet. Vid rätt lyser ordet en sekund ovanför bilden. Utan `bild` (den lilla lianen) syns bara fälten tills förebilden tänds. Med `visas: "fran_start"` (förval) gäller titta–täck som ovan, för ord som inte går att ljuda fram (LJUS, SKÖLD, SNABB).
 
 ### P12_dop
 

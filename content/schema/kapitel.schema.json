@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ordstaven/schema/kapitel.schema.json",
   "title": "ORDSTAVEN – ett kapitel (rum, scener, pussel)",
-  "description": "Format 2. Beskrivs i docs/innehallsschema.md (version 2.9). All text lagras i vanlig skrift; spelet visar versaler tills nivån säger annat.",
+  "description": "Format 2. Beskrivs i docs/innehallsschema.md (version 2.10). All text lagras i vanlig skrift; spelet visar versaler tills nivån säger annat.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -1232,6 +1232,10 @@
         "forsta_formel": {
           "type": "boolean"
         },
+        "bild": {
+          "$ref": "#/$defs/id",
+          "description": "Bilden som ställer frågan (Farfars ristade svärd i trädet): formeln skrivs utifrån den. Visas ovanför fälten."
+        },
         "forebild": {
           "type": "object",
           "additionalProperties": false,
@@ -1262,6 +1266,13 @@
               "minimum": 0,
               "maximum": 10,
               "description": "Brickorna glider in efter så många sekunder, medan förebilden syns."
+            },
+            "visas": {
+              "enum": [
+                "fran_start",
+                "vid_fel"
+              ],
+              "description": "När förebilden syns. fran_start (förval): från början. vid_fel: först när han har lagt fel (ord som går att ljuda fram skrivs utifrån en bild, beslut 18.5). Den tonas bort vid nästa bricka (täck) och står kvar efter ett andra fel."
             }
           }
         },

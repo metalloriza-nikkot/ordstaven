@@ -39,6 +39,32 @@ describe('datorrösten', () => {
     expect(logg.handelse).toHaveBeenCalledWith('röst', 'slut utan onend', expect.any(String));
     expect(logg.handelse).not.toHaveBeenCalledWith('röst', 'maxtid', expect.anything());
   });
+  it('ett yttrande som tappas (Chrome efter cancel) läggs en gång till, och spelet väntar inte ut maxtiden', async () => {
+    vi.useFakeTimers();
+    const s = falskSynt({ ms: 400 });
+    const tala = s.speak; let n = 0;
+    s.speak = (u) => { if (++n === 1) return; tala(u); }; // det första yttrandet försvinner utan ett ljud
+    installera(s);
+    const logg = { handelse: vi.fn() };
+    const r = skapaRost({ logg });
+    let hur = null; r.saga('Här!').then((h) => { hur = h; });
+    await vi.advanceTimersByTimeAsync(2000);
+    expect(hur).toBe('klar');
+    expect(n).toBe(2);
+    expect(logg.handelse).toHaveBeenCalledWith('röst', 'startade inte, en gång till', 'Här!');
+    expect(logg.handelse).not.toHaveBeenCalledWith('röst', 'maxtid', expect.anything());
+  });
+  it('startar det inte heller andra gången ges det upp efter 2,5 s', async () => {
+    vi.useFakeTimers();
+    const s = falskSynt({ ms: 400 }); s.speak = () => {};
+    installera(s);
+    const logg = { handelse: vi.fn() };
+    const r = skapaRost({ logg });
+    let hur = null; r.saga('Här!').then((h) => { hur = h; });
+    await vi.advanceTimersByTimeAsync(2700);
+    expect(hur).toBe('klar');
+    expect(logg.handelse).toHaveBeenCalledWith('röst', 'startade inte', 'Här!');
+  });
   it('maxtiden gäller fortfarande om talsyntesen hänger sig och fortsätter "prata"', async () => {
     vi.useFakeTimers();
     const s = falskSynt({ ms: 999999, medSlut: false });

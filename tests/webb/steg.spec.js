@@ -259,10 +259,54 @@ test('kodlåset: ungen visar första tecknet, låset kontrolleras när hela orde
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('ÖPPET.', { timeout: 10000 });
 });
 
+test('SVÄRD utifrån bilden: ingen förebild från början, den tänds vid fel, tonas bort vid nästa bricka och står kvar efter ett andra fel', async ({ page }) => {
+  test.setTimeout(60000);
+  await provscen(page, { id: 't_svardbild', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'pussel', pussel_id: 'k1_svard' }, R('Svärdet!')] }, null, { pussel: [P1('k1_svard')] });
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('VAD ÄR DET? SKRIV ORDET!', { timeout: 8000 });
+  await page.click('#plattan .vidare');
+  // bilden ställer frågan, brickorna kommer direkt, och ordet syns ingenstans
+  await expect(page.locator('#plattan .formel-bild')).toBeVisible({ timeout: 8000 });
+  await expect(page.locator('#plattan .brickor')).not.toHaveClass(/vantar/);
+  expect(await page.locator('#plattan .forebild').count()).toBe(0);
+  expect(await page.locator('#plattan .unge-tacker').count()).toBe(0);
+  for (const b of 'SDRVÄ') await bricka(page, b).click(); // fel
+  // första felet: ordet tänds bredvid bilden
+  await expect(page.locator('#plattan .formel-overst .forebild')).toBeVisible({ timeout: 8000 });
+  await expect(page.locator('#plattan .forebild')).not.toHaveClass(/tonad/);
+  await expect(page.locator('#plattan .platser.skakar')).toHaveCount(0, { timeout: 8000 });
+  await page.screenshot({ path: 'test-results/svard-bilden-efter-fel.png' });
+  // nästa bricka: det tonas bort, och ungen håller för ögonen
+  await bricka(page, 'V').click();
+  await expect(page.locator('#plattan .forebild')).toHaveClass(/tonad/);
+  await expect(page.locator('#plattan .unge-tacker')).toBeVisible();
+  for (const b of 'DÄR') await bricka(page, b).click(); // SVDÄR: fel igen
+  await expect(page.locator('#plattan .forebild')).not.toHaveClass(/tonad/, { timeout: 8000 });
+  await expect(page.locator('#plattan .platser.skakar')).toHaveCount(0, { timeout: 8000 });
+  // nu står det kvar resten av försöket
+  await bricka(page, 'Ä').click();
+  await expect(page.locator('#plattan .forebild')).not.toHaveClass(/tonad/);
+  for (const b of 'RD') await bricka(page, b).click();
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('SVÄRDET!', { timeout: 10000 });
+  const logg = await page.evaluate(() => window.__ORDSTAVEN.logg());
+  expect(logg).toContain('förebilden tänds (fel)');
+  expect(logg).toContain('klar med förebild');
+});
+
+test('SVÄRD utifrån bilden, rätt på en gång: förebilden syns aldrig', async ({ page }) => {
+  await provscen(page, { id: 't_svardratt', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'pussel', pussel_id: 'k1_svard' }, R('Svärdet!')] }, null, { pussel: [P1('k1_svard')] });
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('VAD ÄR DET? SKRIV ORDET!', { timeout: 8000 });
+  await page.click('#plattan .vidare');
+  await expect(page.locator('#plattan .formel-bild')).toBeVisible({ timeout: 8000 });
+  for (const b of 'SVÄRD') { await bricka(page, b).click(); expect(await page.locator('#plattan .formel-ruta .forebild').count()).toBe(0); }
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('SVÄRDET!', { timeout: 10000 });
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('klar utan förebild');
+});
+
 test('titta–täck: förebilden tonas bort vid första brickan och tänds igen vid fel', async ({ page }) => {
   test.setTimeout(60000);
-  await provscen(page, { id: 't_svard', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'pussel', pussel_id: 'k1_svard' }, R('Svärdet!')] }, null, { pussel: [P1('k1_svard')] });
-  // instruktionen först (v0.7: SVÄRD utifrån Farfars bild)
+  // titta–täck från början (som SKÖLD och SNABB): förebilden syns innan brickorna kommer
+  const svard = P1('k1_svard'); delete svard.bild; svard.forebild = { ...svard.forebild, visas: 'fran_start', brickor_efter_sek: 2 };
+  await provscen(page, { id: 't_svard', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'pussel', pussel_id: 'k1_svard' }, R('Svärdet!')] }, null, { pussel: [svard] });
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('VAD ÄR DET? SKRIV ORDET!', { timeout: 8000 });
   await page.click('#plattan .vidare');
   await expect(page.locator('#plattan .forebild')).toBeVisible({ timeout: 8000 });

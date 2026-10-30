@@ -58,20 +58,40 @@ export function skapaRost({ logg, tyst = () => false }) {
     }
     return new Promise((r) => {
       let klar = false;
-      const u = new SpeechSynthesisUtterance(text);
       const sluta = (/** @type {'klar' | 'avbruten'} */ hur) => { if (!klar) { klar = true; pagaende.delete(u); clearInterval(vakt); clearTimeout(max); r(hur); } };
-      pagaende.add(u);
       const rr = ROLLER[/** @type {keyof ROLLER} */ (roll)] || ROLLER.berattare;
-      u.lang = 'sv-SE'; u.voice = rost; u.pitch = rr.pitch; u.rate = rr.rate;
       // talet har börjat: onstart, eller att talsyntesen pratar en stund efter att vi bad den
-      const t0 = Date.now();
+      let t0 = Date.now();
       let startad = false, tyst = 0;
-      u.onstart = () => { startad = true; };
-      u.onend = () => sluta('klar'); u.onerror = () => sluta('avbruten');
-      if (vidOrd) u.onboundary = (e) => { if (!klar && min === token && (!e.name || e.name === 'word')) { startad = true; try { vidOrd(e.charIndex); } catch (fel) { /* får inte stoppa rösten */ } } };
+      /** Ett yttrande med texten. Ett nytt görs om det första inte startar. */
+      const nytt = () => {
+        const x = new SpeechSynthesisUtterance(text);
+        x.lang = 'sv-SE'; x.voice = rost; x.pitch = rr.pitch; x.rate = rr.rate;
+        x.onstart = () => { startad = true; };
+        x.onend = () => sluta('klar'); x.onerror = () => sluta('avbruten');
+        if (vidOrd) x.onboundary = (e) => { if (!klar && min === token && (!e.name || e.name === 'word')) { startad = true; try { vidOrd(e.charIndex); } catch (fel) { /* får inte stoppa rösten */ } } };
+        pagaende.add(x);
+        return x;
+      };
+      let u = nytt();
+      let forsok = 1;
       const vakt = setInterval(() => {
         if (min !== token) { sluta('avbruten'); return; }
         if (!startad && synt.speaking && Date.now() - t0 > 300) startad = true;
+        // Chrome på Mac tappar ibland ett yttrande som läggs direkt efter cancel(): inget onstart, och talsyntesen
+        // pratar inte. Då väntade spelet ut maxtiden (loggen 2026-10-30, korta repliker som "Här!" och namnen).
+        // Har talet inte börjat efter 1,2 s läggs det en gång till. Börjar det inte då heller ges det upp efter 2,5 s.
+        if (!startad && !synt.speaking && !synt.pending) {
+          const gatt = Date.now() - t0;
+          if (forsok === 1 && gatt > 1200) {
+            forsok = 2; logg?.handelse('röst', 'startade inte, en gång till', text.slice(0, 40));
+            // det gamla yttrandet får inte avsluta det nya (cancel kan ge onerror)
+            u.onend = null; u.onerror = null; u.onstart = null; u.onboundary = null; pagaende.delete(u);
+            u = nytt();
+            try { synt.cancel(); synt.speak(u); } catch (e) { sluta('avbruten'); }
+          }
+          else if (forsok === 2 && gatt > 2500) { logg?.handelse('röst', 'startade inte', text.slice(0, 40)); sluta('klar'); }
+        }
         // reserv om onend ändå uteblir: talet har börjat och talsyntesen har varit tyst i ca 0,3 s
         if (startad && !synt.speaking && !synt.pending) {
           if (++tyst >= 3) {

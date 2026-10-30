@@ -37,7 +37,8 @@ export class Rum extends Phaser.Scene {
    * @param {{ inmatning: ReturnType<typeof import('../karna/inmatning.js').skapaInmatning>,
    *           logg: { handelse(t: string, m: string, d?: any): void },
    *           vidAndring?: () => void, mjukvara?: boolean,
-   *           vidKamera?: (k: import('../karna/skalning.js').Kamera, stor: boolean) => void }} b
+   *           vidKamera?: (k: import('../karna/skalning.js').Kamera, stor: boolean) => void, plattaOppen?: () => boolean }} b
+   * plattaOppen = läsplattan är öppen (golvdatorn: världen bakom den ritas i lugn takt)
    * mjukvara = världen ritas med canvas utan grafikkort (golvdatorn): en bildruta ritas bara när något har ändrats
    * vidKamera = kameran har flyttat sig (textlagret flyttar skyltarna med), stor = området är större än skärmen
    */
@@ -191,7 +192,10 @@ export class Rum extends Phaser.Scene {
     const nu = this.time.now, h = this.hjalte, u = this.unge, k = this.cameras.main, bu = this.buren;
     const sig = `${h.x},${h.y},${h.visible},${u.x},${u.y},${u.visible},${k.scrollX},${k.scrollY},${bu ? bu.x + ',' + bu.y : ''}`;
     const rorlig = this.tweens.getTweens().some((t) => !this.oandliga.has(t) && t.isPlaying());
-    const rita = this.smutsig || rorlig || sig !== this.forraSig || nu - this.senastRitad >= 125;
+    // med läsplattan öppen står världen still bakom texten: den ritas i lugn takt (åtta gånger per sekund), så att
+    // datorn inte målar om plattans skuggor över en värld som rör sig (golvdatorn, trädgården i s22)
+    const lugn = !!this.b.plattaOppen?.();
+    const rita = this.smutsig || (!lugn && (rorlig || sig !== this.forraSig)) || nu - this.senastRitad >= 125;
     this.sys.settings.visible = rita;
     if (rita) { this.smutsig = false; this.forraSig = sig; this.senastRitad = nu; this.antalRitade = (this.antalRitade || 0) + 1; }
   }

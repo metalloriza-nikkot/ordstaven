@@ -118,7 +118,7 @@ const webglFinns = (() => {
 })();
 const canvasLage = parametrar.has('canvas') || canvasSparad || !webglFinns;
 // kameran (beslut 14): textlagret flyttar skyltarna, händerna och bubblorna med den
-const rum = new Rum({ inmatning, logg, mjukvara: canvasLage, vidKamera: (k, stor) => ui.kamera(k, layout.skala.cssSkala, stor) });
+const rum = new Rum({ inmatning, logg, mjukvara: canvasLage, vidKamera: (k, stor) => ui.kamera(k, layout.skala.cssSkala, stor), plattaOppen: () => !ui.plattan.hidden });
 const spel = new Phaser.Game({
   // ?canvas tvingar canvas-ritningen (som när datorn saknar WebGL), för att kunna testa den
   type: canvasLage ? Phaser.CANVAS : Phaser.AUTO,

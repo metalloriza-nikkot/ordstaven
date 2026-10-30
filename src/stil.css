@@ -169,10 +169,6 @@ html, body {
 #plattan { position: absolute; left: calc(var(--rum-vanster) + var(--rum-bredd) / 2); transform: translateX(-50%); max-width: min(92vw, var(--rum-bredd)); width: max-content; color: var(--black); }
 #plattan.replik { bottom: calc(100vh - var(--rum-topp) - var(--rum-hojd) + 12px); }
 #plattan.pussel, #plattan.bok, #plattan.formel-luft { top: calc(var(--rum-topp) + var(--rum-hojd) / 2); transform: translate(-50%, -50%); }
-/* världen tonas ned bakom läsplattan med ett genomskinligt lager, inte med filter: ett filter på duken ritas om i
-   varje bildruta när något rör sig, och på golvdatorn (utan grafikkort) gav det hack på över en halv sekund */
-#varld::after { content: ''; position: absolute; inset: 0; background: rgba(20, 14, 10, .42); pointer-events: none; display: none; }
-.platta-oppen #varld::after { display: block; }
 .replik-ruta, .pussel-ruta, .formel-ruta, .dop-ruta, .bok-ruta, .hjalte-ruta { position: relative; background: var(--papper); border-radius: 18px; box-shadow: 0 8px 28px rgba(0, 0, 0, .5), inset 0 0 0 3px #d9c9a3; }
 .replik-ruta { display: flex; align-items: flex-end; gap: 16px; padding: 16px 16px 16px 20px; }
 .replik-ruta .text { align-self: center; }
@@ -465,6 +461,11 @@ html, body {
 .forebild.tonad { opacity: 0; }
 .forebild.kolla { animation: luft .4s ease; }
 .formel-luft-ruta { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+/* SVÄRD utifrån bilden: Farfars ristade bild ställer frågan, och förebilden tänds bredvid den först vid fel */
+.formel-overst { display: flex; align-items: center; justify-content: center; gap: 18px; }
+.formel-bild { display: flex; align-items: center; justify-content: center; width: calc(110px * var(--t)); height: calc(110px * var(--t)); border-radius: 14px; background: #8a6a4a; box-shadow: inset 0 0 0 4px #6b4c35; font-size: calc(70px * var(--t)); }
+.formel-bild img { max-width: 90%; max-height: 90%; image-rendering: pixelated; }
+.formel-bild.puls { animation: puls .5s ease 3; }
 /* ungen håller tassarna för ögonen (gråbox): en grön unge med två tassar över ögonen */
 .unge-tacker { position: absolute; left: 16px; top: 14px; width: 56px; height: 40px; }
 .unge-tacker .kropp { position: absolute; inset: 8px 0 0 0; border-radius: 18px 18px 10px 10px; background: #5fae6a; box-shadow: inset 10px -6px 0 #9fd4a0; }

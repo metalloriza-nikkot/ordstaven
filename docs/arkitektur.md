@@ -489,3 +489,10 @@ Efter den externa granskningen: det ska aldrig löna sig att gissa eller vänta 
 - Menyn för vuxna listar alla kapitlens scener. Ett hopp sätter `av.kapitelId`, `av.scenId` och `av.spolaTill` och laddar om.
 - Kapitlen före spolas fram som vid `?kapitel=` (`av.spolat` töms, spolningen gör inget två gånger). I hoppets kapitel spolas scenerna före hoppet fram (`spolaFram({ tillScen })`): frivilliga scener och bär räknas inte. Namn som saknas frågas efter med dop-pusslen.
 - Ett hopp bakåt tar inte bort det som redan har getts (formler, gåvor). För ett rent prov finns Börja om från början.
+
+## 29. SVÄRD utifrån bilden, rösten som inte startar, och lugn ritning bakom läsplattan (0.8.2)
+
+- **P11 med `bild` och `forebild.visas: "vid_fel"`** (`formel` i `spel.js`): bilden står ovanför fälten, brickorna kommer direkt och förebilden finns inte. Vid första felet tänds den bredvid bilden (`.formel-overst`), vid nästa bricka tonas den bort och ungen håller för ögonen, och efter ett andra fel står den kvar. Knuffen får bilden att glimta i stället för att visa ordet, eftersom ordet pekar på svaret. Loggen säger `klar med förebild` eller `klar utan förebild`.
+- **Rösten** (`grans/rost.js`): ett yttrande som inte har startat efter 1,2 s (inget `onstart`, talsyntesen pratar inte) läggs en gång till. Startar det inte då heller ges det upp efter 2,5 s och loggas som `startade inte`. Maxtiden finns kvar som sista spärr.
+- **Golvdatorn:** med läsplattan öppen ritar canvasläget världen högst åtta gånger per sekund (`plattaOppen`), eftersom den står still bakom texten.
+- Regeln `.platta-oppen #varld canvas { filter }` har aldrig gällt (`#varld` ligger inte i `#ui`) och är borttagen. Världen tonas alltså inte ned bakom läsplattan, i enlighet med stilguiden §8.

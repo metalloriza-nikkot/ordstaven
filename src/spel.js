@@ -1254,16 +1254,29 @@ export function skapaSpel(d) {
     if (p.instruktion) await replik(p.instruktion);
     rum.frys(true);
     const tt = p.forebild?.tacks === 'forsta_brickan';
-    /** titta–täck: syns förebilden, och står den kvar (efter fel eller knuff)? */
-    const fb = { syns: true, kvar: false, brickor: !tt || !(p.forebild?.brickor_efter_sek > 0) };
+    // utifrån bilden (forebild.visas vid_fel, beslut 18.5): ingen förebild från början och brickorna direkt.
+    // Förebilden tänds först vid fel (titta), tonas bort vid nästa bricka (täck) och står kvar efter ett andra fel.
+    const vidFel = p.forebild?.visas === 'vid_fel';
+    /** titta–täck: syns förebilden, har den synts, och står den kvar (efter fel eller knuff)? */
+    const fb = { syns: !vidFel, visad: !vidFel, kvar: false, brickor: vidFel || !tt || !(p.forebild?.brickor_efter_sek > 0) };
     return new Promise((klar) => {
       let upptagen = false;
       const tandForebild = (/** @type {string} */ varfor) => {
+        if (vidFel && !fb.visad) {
+          // första felet: ordet tänds bredvid bilden, och han tittar. Vid nästa bricka tonas det bort.
+          fb.syns = true; fb.visad = true; spar.forebild = true;
+          logg.handelse('formel', `${p.id}: förebilden tänds (${varfor})`);
+          return;
+        }
         if (!tt || fb.kvar) return;
         fb.syns = true; fb.kvar = true; spar.forebild = true;
         logg.handelse('formel', `${p.id}: förebilden tänds (${varfor}) och står kvar`);
       };
-      const k = knuffKlocka(p.knuff, () => { tandForebild('knuff'); rita(); ui.plattan.querySelector('.forebild .bokstav')?.classList.add('blinkar'); });
+      // knuffen: utifrån bilden glimtar bilden (förebilden pekar på svaret och kommer först efter fel), annars förebilden
+      const k = knuffKlocka(p.knuff, () => {
+        if (vidFel && !fb.visad) { const b = ui.plattan.querySelector('.formel-bild'); b?.classList.remove('puls'); void (/** @type {HTMLElement | null} */ (b))?.offsetWidth; b?.classList.add('puls'); return; }
+        tandForebild('knuff'); rita(); ui.plattan.querySelector('.forebild .bokstav')?.classList.add('blinkar');
+      });
       if (!fb.brickor) window.setTimeout(() => { fb.brickor = true; if (!upptagen) rita(); }, tid(p.forebild.brickor_efter_sek * 1000));
       const tack = () => {
         if (!tt || !fb.syns || fb.kvar) return;
@@ -1271,12 +1284,16 @@ export function skapaSpel(d) {
       };
       const rita = () => {
         const bokstav = (/** @type {number | null} */ id) => (id === null ? '' : f.s.brickor.find((x) => x.id === id)?.bokstav ?? '');
-        const forebild = p.forebild ? `<div class="forebild ${fb.syns ? '' : 'tonad'}" aria-label="Förebild">${[...p.forebild.text].map((c) => `<span class="bokstav">${ui.esc(c)}</span>`).join('')}</div>` : '';
-        // ungen håller tassarna för ögonen medan förebilden är borta (titta–täck)
-        const tacker = tt && !fb.syns ? '<span class="unge-tacker" aria-hidden="true"><span class="kropp"></span><span class="tass"></span><span class="tass"></span></span>' : '';
+        // förebilden: utifrån bilden finns den inte alls förrän första felet
+        const forebild = p.forebild && fb.visad ? `<div class="forebild ${fb.syns ? '' : 'tonad'}" aria-label="Förebild">${[...p.forebild.text].map((c) => `<span class="bokstav">${ui.esc(c)}</span>`).join('')}</div>` : '';
+        // bilden som ställer frågan (Farfars ristade svärd), med förebilden bredvid när den har tänts
+        const bild = p.bild ? `<div class="formel-bild" aria-hidden="true">${bilder.html(p.bild)}</div>` : '';
+        const overst = bild ? `<div class="formel-overst">${bild}${forebild}</div>` : forebild;
+        // ungen håller tassarna för ögonen medan förebilden är borta (titta–täck), men bara när den har synts
+        const tacker = tt && fb.visad && !fb.syns ? '<span class="unge-tacker" aria-hidden="true"><span class="kropp"></span><span class="tass"></span><span class="tass"></span></span>' : '';
         const platser = `<div class="platser">${f.s.platser.map((id, i) => `<span class="plats ${f.s.last[i] ? 'last' : ''} ${id !== null && !f.s.last[i] ? 'flyttbar' : ''}" data-plats="${i}" ${id !== null ? `data-id="${id}"` : ''}>${ui.esc(bokstav(id))}</span>`).join('')}</div>`;
         const brickor = `<div class="brickor ${fb.brickor ? '' : 'vantar'}">${f.s.brickor.map((x) => `<button type="button" class="bricka ${f.s.platser.includes(x.id) ? 'anvand' : ''} ${f.s.tips === x.id ? 'tips' : ''}" data-id="${x.id}">${ui.esc(x.bokstav)}</button>`).join('')}<button type="button" class="bricka sudda" aria-label="Ta tillbaka">⌫</button></div>`;
-        ui.visaPlatta(`<div class="formel-ruta">${tacker}${forebild}${platser}${brickor}</div>`, 'pussel P11_formel');
+        ui.visaPlatta(`<div class="formel-ruta">${tacker}${overst}${platser}${brickor}</div>`, 'pussel P11_formel');
         tillatNos(p, spar);
         ui.plattan.querySelectorAll('.bricka[data-id]').forEach((el) => {
           el.addEventListener('click', () => { if (!dra.nyss) svar(f.lagg(Number(/** @type {HTMLElement} */ (el).dataset.id))); });
@@ -1337,7 +1354,8 @@ export function skapaSpel(d) {
         k.stopp(); sluta();
         ljud.spela('ratt');
         // kolla: förebilden lyser en sekund ovanför hans ord (titta–täck)
-        const kolla = tt ? `<div class="forebild kolla">${[...p.forebild.text].map((c) => `<span class="bokstav">${ui.esc(c)}</span>`).join('')}</div>` : '';
+        // utifrån bilden lyser ordet ovanför bilden
+        const kolla = tt ? `<div class="forebild kolla">${[...p.forebild.text].map((c) => `<span class="bokstav">${ui.esc(c)}</span>`).join('')}</div>${p.bild ? `<div class="formel-bild" aria-hidden="true">${bilder.html(p.bild)}</div>` : ''}` : '';
         const ordet = `<div class="formel-luft-ruta">${kolla}<div class="formel-i-luften">${ui.esc(p.svar)}</div></div>`;
         ui.visaPlatta(ordet, 'formel-luft');
         await vanta(tid(1000)); ui.doljPlatta();
