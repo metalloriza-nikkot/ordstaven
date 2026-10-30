@@ -8,6 +8,70 @@ import { geSak } from './hjalte.js';
 // En frivillig scen (frivillig: true, t.ex. buskarna) spelas aldrig i tur och ordning: den startar när hjälten går
 // in i sitt rum (startar_i_rum) under en fri väg, och gränssnittet spelar den med frivilligScen().
 
+/** Sparningens delar för äventyret som stegen ändrar. @param {any} av */
+function sakraAventyr(av) {
+  av.ui = av.ui || {}; av.rumstillstand = av.rumstillstand || {}; av.lappar = av.lappar || []; av.kartbitar = av.kartbitar || [];
+  av.bar = av.bar || 0; av.visade = av.visade || {}; av.frivilligt = av.frivilligt || [];
+}
+
+/**
+ * Ett stegs effekt på tillståndet (steg som bara ändrar tillståndet). Delas av berättelsen och framspolningen.
+ * @param {any} st @param {{ tillstand: any, av: any, unge: any, pussel: Map<string, any>, rumId: string | null }} m
+ */
+function stegetsEffekt(st, { tillstand, av, unge, pussel, rumId }) {
+  switch (st.typ) {
+    case 'ge_sak': geSak(tillstand.spelare.hjalte, st.sort, st.id); break;
+    case 'visa_foremal': if (rumId) { const v = (av.visade[rumId] = av.visade[rumId] || []); if (!v.includes(st.foremal)) v.push(st.foremal); } break;
+    case 'dinobok': {
+      const sidor = (tillstand.spelare.dinobok = tillstand.spelare.dinobok || []);
+      if (!sidor.some((/** @type {any} */ x) => x.bild === st.sida.bild)) sidor.push({ ...st.sida });
+      break;
+    }
+    case 'unge_tillagg': { const t = (unge.tillagg = unge.tillagg || []); if (!t.includes(st.id)) t.push(st.id); break; }
+    case 'ge_bar': av.bar += st.antal; break;
+    case 'ge_kartbit': if (!av.kartbitar.includes(st.nummer)) av.kartbitar.push(st.nummer); break;
+    case 'ge_grad': tillstand.spelare.hjalte.grad = st.grad; break;
+    case 'visa_ui': av.ui[st.element] = true; break;
+    case 'unge_folj': unge.folj = st.folj; break;
+    case 'oppna_lasplatta': { const p = pussel.get(st.pussel_id); if (p && p.kan_oppnas_igen && !av.lappar.includes(p.id)) av.lappar.push(p.id); break; }
+    default:
+  }
+}
+
+/**
+ * Spola fram ett kapitel som den vuxne hoppar över (?kapitel=kap-01): det kapitlet skulle ha gett ges, så att nästa
+ * kapitel börjar som efter en vanlig genomspelning: knapparna (bär, nos, radio), ungen som följer, formlerna,
+ * kartbitar, lappar och gåvor. Namnen hittas inte på: dop-pusslen vars namn saknas returneras, och spelet frågar
+ * efter dem. Frivilliga scener och bär räknas inte, så det går att spola fram en sparning som redan har spelat
+ * kapitlet (allt annat sätts bara om det saknas).
+ * @param {{ kapitel: any, tillstand: any, aventyrId: string }} opt
+ * @returns {any[]} dop-pusslen (P12) som behövs, i ordning
+ */
+export function spolaFram({ kapitel, tillstand, aventyrId }) {
+  const av = aventyrFor(tillstand, aventyrId);
+  sakraAventyr(av);
+  const unge = (tillstand.spelare.unge = tillstand.spelare.unge || { format: 1, namn: '', steg: 1, formagor: [] });
+  const pussel = new Map(kapitel.pussel.map((/** @type {any} */ p) => [p.id, p]));
+  /** @type {any[]} */
+  const dop = [];
+  for (const scen of kapitel.scener) {
+    if (scen.frivillig) continue;
+    for (const st of scen.steg) {
+      // bären räknas inte: spolningen ska gå att göra på en sparning som redan har spelat kapitlet
+      if (st.typ !== 'ge_bar') stegetsEffekt(st, { tillstand, av, unge, pussel, rumId: scen.rum ?? null });
+      const p = st.typ === 'pussel' ? pussel.get(st.pussel_id) : null;
+      if (!p) continue;
+      if (p.typ === 'P11_formel') { const f = tillstand.spelare.hjalte.formler; if (!f.includes(p.svar)) f.push(p.svar); }
+      if ((p.typ === 'P1_las_och_valj' || p.typ === 'P28_packa') && p.kan_oppnas_igen && !av.lappar.includes(p.id)) av.lappar.push(p.id);
+      if (p.typ === 'P12_dop') {
+        const tom = p.sparas_som === 'hjalte.namn' ? !tillstand.spelare.hjalte.namn : p.sparas_som === 'unge.namn' ? !unge.namn : false;
+        if (tom && !dop.includes(p)) dop.push(p);
+      }
+    }
+  }
+  return dop;
+}
+
 /**
  * @param {{ aventyr: any, kapitel: any, tillstand: any, aventyrId: string, logg?: { handelse(t: string, m: string, d?: any): void } }} opt
  *   tillstand = hela sparningen (ändras på plats), kapitel = kapitelfilen
@@ -83,23 +147,7 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
    * @param {any} st @param {string | null} [rumId] rummet steget spelas i (visa_foremal)
    */
   function effekt(st, rumId = kapitel.scener[scenIndex]?.rum ?? null) {
-    switch (st.typ) {
-      case 'ge_sak': geSak(tillstand.spelare.hjalte, st.sort, st.id); break;
-      case 'visa_foremal': if (rumId) { const v = (av.visade[rumId] = av.visade[rumId] || []); if (!v.includes(st.foremal)) v.push(st.foremal); } break;
-      case 'dinobok': {
-        const sidor = (tillstand.spelare.dinobok = tillstand.spelare.dinobok || []);
-        if (!sidor.some((/** @type {any} */ x) => x.bild === st.sida.bild)) sidor.push({ ...st.sida });
-        break;
-      }
-      case 'unge_tillagg': { const t = (unge.tillagg = unge.tillagg || []); if (!t.includes(st.id)) t.push(st.id); break; }
-      case 'ge_bar': av.bar += st.antal; break;
-      case 'ge_kartbit': if (!av.kartbitar.includes(st.nummer)) av.kartbitar.push(st.nummer); break;
-      case 'ge_grad': tillstand.spelare.hjalte.grad = st.grad; break;
-      case 'visa_ui': av.ui[st.element] = true; break;
-      case 'unge_folj': unge.folj = st.folj; break;
-      case 'oppna_lasplatta': { const p = pussel.get(st.pussel_id); if (p && p.kan_oppnas_igen && !av.lappar.includes(p.id)) av.lappar.push(p.id); break; }
-      default:
-    }
+    stegetsEffekt(st, { tillstand, av, unge, pussel, rumId });
   }
   let effektGjord = false;
 

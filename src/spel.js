@@ -1,7 +1,7 @@
 // @ts-check
 // Spelet: kopplar berättelsemotorn (karna) till rummet (Phaser) och gränssnittet (DOM).
 // Varje stegtyp i innehållet har en hanterare här. Inget innehåll hårdkodas: allt kommer från content/.
-import { skapaBerattelse } from './karna/berattelse.js';
+import { skapaBerattelse, spolaFram } from './karna/berattelse.js';
 import { skapaLasmotor, valjVariant } from './karna/lasmotor.js';
 import { egenskaper, PALETT } from './karna/egenskaper.js';
 import { skapaValj, skapaFormel, skapaDop, skapaKrukor, skapaRaddning } from './karna/pussel.js';
@@ -823,7 +823,12 @@ export function skapaSpel(d) {
   /** Föremålen i rummet med något frivilligt kvar (rum.frivilligt): ett tryck gör det, en gång. */
   function frivilligaKvar() {
     const r = aktuelltRum ? b.rum(aktuelltRum) : null;
-    return (r?.frivilligt || []).filter((/** @type {any} */ f) => rum.ruta(f.foremal) && !b.frivilligtGjort(`${aktuelltRum}/${f.foremal}`)).map((/** @type {any} */ f) => /** @type {string} */ (f.foremal));
+    // en formel går inte att öva innan han har lärt sig den (lilla lianen före SVÄRD)
+    const kan = (/** @type {any} */ f) => f.steg.every((/** @type {any} */ st) => {
+      const p = st.typ === 'pussel' ? b.pussel(st.pussel_id) : null;
+      return !p || p.typ !== 'P11_formel' || (tillstand.spelare.hjalte.formler || []).includes(p.svar);
+    });
+    return (r?.frivilligt || []).filter((/** @type {any} */ f) => rum.ruta(f.foremal) && !b.frivilligtGjort(`${aktuelltRum}/${f.foremal}`) && kan(f)).map((/** @type {any} */ f) => /** @type {string} */ (f.foremal));
   }
   /**
    * Gör det frivilliga vid ett föremål: stegen spelas utanför berättelsens ordning, och det räknas som gjort
@@ -1941,14 +1946,34 @@ export function skapaSpel(d) {
     rum.lager = { ...lagerFor(tillstand.spelare.hjalte) };
     rum.sattUtseende(tillstand.spelare.hjalte.utseende || {});
     await startskarm();
+    /** @type {any[]} namn som saknas efter ett hopp förbi tidigare kapitel (dop-pusslen frågar efter dem) */
+    let dopAttFraga = [];
     for (const kapitelId of aventyr.kapitel) {
       const kapitel = d.kapitel.find((k) => k.id === kapitelId);
       if (!kapitel) continue;
-      if (av.kapitelId && av.kapitelId !== kapitelId && aventyr.kapitel.indexOf(av.kapitelId) > aventyr.kapitel.indexOf(kapitelId)) continue;
-      // ?kapitel=<id>: hoppa till det kapitlet (för den vuxne, innan kapitlet har kartor)
-      if (d.valtKapitel && aventyr.kapitel.includes(d.valtKapitel) && aventyr.kapitel.indexOf(kapitelId) < aventyr.kapitel.indexOf(d.valtKapitel)) continue;
+      const fore = (/** @type {string} */ id) => aventyr.kapitel.indexOf(kapitelId) < aventyr.kapitel.indexOf(id);
+      // sparningen är längre fram, eller ?kapitel=<id> hoppar dit (för den vuxne): kapitlet spelas inte, men det
+      // spolas fram en gång, så att nästa kapitel börjar med det kapitlet ger (ungen, knapparna, formlerna)
+      const hoppa = (av.kapitelId && av.kapitelId !== kapitelId && fore(av.kapitelId)) || (d.valtKapitel && aventyr.kapitel.includes(d.valtKapitel) && fore(d.valtKapitel));
+      if (hoppa) {
+        const spolat = (av.spolat = av.spolat || []);
+        if (!spolat.includes(kapitelId)) { spolaFram({ kapitel, tillstand, aventyrId: AVENTYR }); spolat.push(kapitelId); logg.handelse('berättelse', 'spolat fram ' + kapitelId); spara(); }
+        dopAttFraga = [...dopAttFraga, ...kapitel.pussel.filter((/** @type {any} */ p) => p.typ === 'P12_dop'
+          && ((p.sparas_som === 'hjalte.namn' && !tillstand.spelare.hjalte.namn) || (p.sparas_som === 'unge.namn' && !tillstand.spelare.unge?.namn)))];
+        continue;
+      }
       if (!stodsAvGrabox(kapitel)) break;
       b = skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId: AVENTYR, logg });
+      // namnen som saknas frågas efter först, med de hoppade kapitlens egna dop-pussel, med rummet bakom
+      if (dopAttFraga.length) await visaScen();
+      for (const p of dopAttFraga) {
+        const r = await pussel(p);
+        if (r?.namn && p.sparas_som === 'hjalte.namn') tillstand.spelare.hjalte.namn = r.namn;
+        if (r?.namn && p.sparas_som === 'unge.namn') tillstand.spelare.unge.namn = r.namn;
+        spara();
+      }
+      dopAttFraga = [];
+      ui.uppdateraHud(av); visaPausknapp();
       logg.registrera('berättelse', () => ({ kapitel: kapitel.id, scen: b.scen?.id, steg: b.stegIndex, typ: aktuelltSteg?.typ }));
       while (!b.slut) {
         await visaScen();

@@ -488,3 +488,47 @@ test('gåvor tas på direkt, pausknappen glimtar, och hjälteboken har garderobe
   expect(await page.evaluate(() => window.__ORDSTAVEN.pausad())).toBe(false);
   expect(await page.evaluate(() => window.__ORDSTAVEN.tillstand().spelare.sett)).toMatchObject({ garderoben: 1, dinoboken: 1 });
 });
+
+// ---------------------------------------------------------------- golvdatorn (MacBooken ritar utan grafikkort)
+test('tappar webbläsaren WebGL startar spelet om med canvas och fortsätter där han var', async ({ page }) => {
+  await page.goto('./?snabb&ny');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.ritning())).toBe('webgl');
+  await page.evaluate(() => window.__ORDSTAVEN.spel.renderer.gl.getExtension('WEBGL_lose_context').loseContext());
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning && window.__ORDSTAVEN.ritning() === 'canvas', null, { timeout: 15000 });
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('canvas (WebGL tappades förut');
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('ordstaven_ritning')).typ)).toBe('canvas');
+});
+
+test('ett hack i bildrutorna skrivs i loggen med vad som pågick', async ({ page }) => {
+  await provscen(page, { id: 't_hack', pass: 1, rum: 'provskogen', steg: [{ typ: 'ga_till', mal: 'sten' }] }, null, { rum: { provskogen: { innehall: ['sten'] } } });
+  await page.waitForTimeout(1500); // starten kan ge egna hack: de skrivs först
+  await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => { const t = performance.now(); while (performance.now() - t < 250) { /* upptagen */ } r(undefined); })));
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 5000 }).toMatch(/\[hack\] \d+ bildrut(a|or) över 100 ms, längst 2\d\d ms[^\n]*"scen":"t_hack","steg":"ga_till"/);
+});
+
+test('hopp till kapitel 1 (?kapitel=kap-01): prologen spolas fram, namnen frågas efter, och ungen och knapparna finns', async ({ page }) => {
+  await page.goto('./?snabb&ny&kapitel=kap-01');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  for (const namn of ['TESTA', 'KNOPP']) {
+    // hjältens dop har en instruktion först ("Skriv ditt namn.")
+    await expect(page.locator('#plattan :is(.dop-ruta, .replik-ruta)')).toBeVisible({ timeout: 10000 });
+    if (await page.locator('#plattan .replik-ruta').isVisible()) await page.click('#plattan .replik-ruta');
+    await expect(page.locator('#plattan .dop-ruta')).toBeVisible({ timeout: 10000 });
+    await page.waitForTimeout(200);
+    await page.keyboard.type(namn);
+    await expect(page.locator('#plattan .namnrutor .ruta.fylld')).toHaveCount(namn.length, { timeout: 5000 });
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#plattan .dop-ruta')).toBeHidden({ timeout: 10000 });
+  }
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.tillstand().spelare.unge.namn), { timeout: 10000 }).toBe('KNOPP');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('k1s01_brynet');
+  const t = await page.evaluate(() => window.__ORDSTAVEN.tillstand());
+  expect(t.spelare.hjalte.namn).toBe('TESTA');
+  expect(t.spelare.unge).toMatchObject({ namn: 'KNOPP', folj: true });
+  expect(t.aventyr['den-gomda-dalen'].spolat).toEqual(['kap-00']);
+  await expect(page.locator('#hud-bar')).toBeVisible();
+  await expect(page.locator('#hud-nos')).toBeVisible();
+  expect(await page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').unge.visible)).toBe(true);
+});

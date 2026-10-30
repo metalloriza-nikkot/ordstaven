@@ -262,6 +262,15 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
    * på (mitt på föremålet), vanster eller hoger (bredvid, vid sidoväggen). ram = rummets kanter på skärmen.
    * objekt = föremålets id (data-objekt), så att det syns vilket föremål lappen eller handen hör till.
    */
+  /** Täcker elementet någon av knapparna i HUD (som syns)? @param {HTMLElement} e */
+  function tackerKnapp(e) {
+    const r = e.getBoundingClientRect();
+    return [...ui.querySelectorAll('#hud .hud-knapp, #hud-paus')].some((k) => {
+      if (/** @type {HTMLElement} */ (k).hidden) return false;
+      const q = k.getBoundingClientRect();
+      return q.width > 0 && r.left < q.right && q.left < r.right && r.top < q.bottom && q.top < r.bottom;
+    });
+  }
   /** @param {HTMLElement} e @param {{ x: number, y: number }} punkt @param {Plats} [plats] */
   function placera(e, punkt, plats) {
     const lage = plats?.lage || 'over';
@@ -270,6 +279,8 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     if (lage !== 'over') e.classList.add(lage);
     e.style.left = punkt.x + 'px'; e.style.top = punkt.y + 'px';
     if (lage === 'over' && plats && punkt.y - e.offsetHeight - 6 < plats.rumTopp) { e.classList.add('under'); e.style.top = (plats.under ?? punkt.y) + 'px'; }
+    // en skylt eller lapp får aldrig täcka knapparna (bär, nos, radio, paus): då står den under föremålet
+    if (lage === 'over' && plats && !e.classList.contains('under') && tackerKnapp(e)) { e.classList.add('under'); e.style.top = (plats.under ?? punkt.y) + 'px'; }
     // alltid helt inne i rummet
     if (plats?.ram) {
       const r = e.getBoundingClientRect();

@@ -4,7 +4,7 @@ import { skapaLasmotor, valjVariant } from '../../src/karna/lasmotor.js';
 import { ljudningsdelar } from '../../src/karna/ljudning.js';
 import { skapaValj, skapaFormel, skapaDop, skapaKrukor, skapaRaddning, iBokstavsordning } from '../../src/karna/pussel.js';
 import { antalMeningar, knufftidMs } from '../../src/karna/hjalp.js';
-import { skapaBerattelse } from '../../src/karna/berattelse.js';
+import { skapaBerattelse, spolaFram } from '../../src/karna/berattelse.js';
 import { nyttTillstand, aventyrFor, migrera } from '../../src/karna/sparning.js';
 const AVENTYR = 'den-gomda-dalen';
 
@@ -392,5 +392,27 @@ describe('kapitel 1: frivilligt, dolda föremål och gåvor', () => {
     expect(t.spelare.dinobok).toHaveLength(1);
     b.effektUtanfor({ typ: 'unge_tillagg', id: 'nosmonster' }, 'gamla_tradet');
     expect(t.spelare.unge.tillagg).toEqual(['nosmonster']);
+  });
+});
+
+describe('spola fram ett kapitel (den vuxne hoppar till kapitel 1)', () => {
+  it('prologen ger knapparna, ungen som följer, LJUS, kartbiten och graden, men inga bär och inga namn', () => {
+    const t = nyttTillstand('t');
+    const dop = spolaFram({ kapitel: prolog, tillstand: t, aventyrId: AVENTYR });
+    const av = t.aventyr[AVENTYR];
+    expect(av.ui).toMatchObject({ nosknappen: true, barraknaren: true, radioramen: true });
+    expect(t.spelare.unge.folj).toBe(true);
+    expect(t.spelare.hjalte.formler).toContain('LJUS');
+    expect(av.kartbitar).toEqual([1]);
+    expect(t.spelare.hjalte.grad).toBe('Lärling');
+    expect(av.bar).toBe(0);
+    expect(dop.map((p) => p.sparas_som)).toEqual(['hjalte.namn', 'unge.namn']);
+  });
+  it('en sparning som redan har namnen behöver inga dop, och en andra spolning ändrar inget', () => {
+    const t = nyttTillstand('t'); t.spelare.hjalte.namn = 'TESTA'; t.spelare.unge.namn = 'KNOPP';
+    expect(spolaFram({ kapitel: prolog, tillstand: t, aventyrId: AVENTYR })).toEqual([]);
+    const fore = JSON.stringify(t);
+    spolaFram({ kapitel: prolog, tillstand: t, aventyrId: AVENTYR });
+    expect(JSON.stringify(t)).toBe(fore);
   });
 });

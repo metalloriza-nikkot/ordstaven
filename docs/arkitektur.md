@@ -444,3 +444,12 @@ Efter den externa granskningen: det ska aldrig löna sig att gissa eller vänta 
 - **Stubbar i gråboxen:** Dinobokens sida (en bild och ett ord), ungens tillägg (`unge.tillagg`, ungen hoppar) och nosens pris (ett bär flyger från räknaren till nosen).
 - **Tryck medan världen står still** (rummet tonas in, en reaktion, han går tillbaka från kurvan) sparas i högst 1,5 s och görs sedan som ett vanligt tryck (`rum.sparatTryck`), så att han går till föremålet och inte till tryckpunkten.
 - **Provscener** kan ha egna rum och kartor (`rum`, `kartor` i `ordstaven_testscen`). `?kapitel=<id>` spelar ett kapitel utan kartor.
+
+## 24. Golvdatorn: ritning utan grafikkort (0.7.1)
+
+- Golvdatorn (MacBook Pro 2015) kör Sequoia via OpenCore, och Chrome har stängt av grafikkortet där (`chrome://gpu`: "GPU access is disabled due to frequent crashes"). Allt ritas i mjukvara, och världen ritas med canvas.
+- **WebGL som tappas** (`webglcontextlost`, Safari på samma dator): spelet sparar `ordstaven_ritning` (canvas, en vecka) och laddar om. Sparningen görs efter varje steg, så han fortsätter där han var.
+- **Hack i loggen** (`grans/prestanda.js`): en bildruta över 100 ms skrivs som `[hack]` med scen, steg, pussel, läsplattan och ritningen. Hack inom samma sekund blir en rad. `js_ms` är tiden i långa JavaScript-uppgifter under hacket: nära noll betyder att ritningen är det tunga, inte koden. Var 30:e sekund skrivs en sammanfattning om mer än en av tio bildrutor var långsam.
+- **Hopp till ett kapitel** (`?kapitel=kap-01`, och en sparning som är längre fram): kapitlen före spolas fram en gång (`spolaFram` i `karna/berattelse.js`, `av.spolat`). Stegens effekter görs utan att spelas: knapparna, ungen som följer, formlerna, kartbitar, lappar och gåvor, men inga bär. Namn som saknas frågas efter med de hoppade kapitlens egna dop-pussel, så att inga namn hittas på i koden.
+- **Det frivilliga och formlerna:** ett frivilligt föremål vars steg övar en formel (P11) går inte att använda förrän formeln finns på staven.
+- **Knapparna i HUD** täcks aldrig av en skylt, lapp eller hand: en som skulle hamna över en knapp ställs under sitt föremål (`placera` i `grans/ui.js`).

@@ -31,6 +31,7 @@ import { skapaLjud } from './grans/ljud.js';
 import { skapaUi } from './grans/ui.js';
 import { skapaBilder } from './grans/bilder.js';
 import { skapaTangentbord } from './grans/tangentbord.js';
+import { bevakaBildrutor } from './grans/prestanda.js';
 import { Rum } from './scener/Rum.js';
 import { skapaSpel } from './spel.js';
 
@@ -101,9 +102,15 @@ const tangentbord = skapaTangentbord({
 });
 
 const rum = new Rum({ inmatning, logg });
+// Har WebGL tappats förut på den här datorn (Safari på golvdatorn: "WebGL context lost") ritas världen med canvas,
+// en vecka i taget. Annars väljer Phaser: WebGL om det finns, annars canvas.
+const NYCKEL_RITNING = 'ordstaven_ritning';
+const canvasSparad = (() => {
+  try { const v = JSON.parse(localStorage.getItem(NYCKEL_RITNING) || 'null'); return !!v && v.typ === 'canvas' && Date.now() - v.t < 7 * 864e5; } catch (e) { return false; }
+})();
 const spel = new Phaser.Game({
   // ?canvas tvingar canvas-ritningen (som när datorn saknar WebGL), för att kunna testa den
-  type: parametrar.has('canvas') ? Phaser.CANVAS : Phaser.AUTO,
+  type: parametrar.has('canvas') || canvasSparad ? Phaser.CANVAS : Phaser.AUTO,
   parent: varld,
   width: RUM.bredd,
   height: RUM.hojd,
@@ -117,6 +124,22 @@ const spel = new Phaser.Game({
   audio: { noAudio: true },
   scene: [rum],
 });
+
+// Tappar webbläsaren WebGL mitt i spelet startar spelet om med canvas, i stället för att stå still.
+// Sparningen görs efter varje steg, så han hamnar där han var.
+spel.events.once(Phaser.Core.Events.READY, () => {
+  if (spel.renderer.type !== Phaser.WEBGL) return;
+  spel.canvas.addEventListener('webglcontextlost', (e) => {
+    e.preventDefault();
+    logg.handelse('ritning', 'WebGL tappades: startar om med canvas');
+    try { localStorage.setItem(NYCKEL_RITNING, JSON.stringify({ typ: 'canvas', t: Date.now() })); } catch (err) { /* ingen lagring */ }
+    logg.spara(true);
+    location.reload();
+  }, { once: true });
+});
+if (canvasSparad) logg.handelse('ritning', 'canvas (WebGL tappades förut på den här datorn)');
+// Hack i bildrutorna skrivs i loggen med vad som pågick (golvdatorn ritar utan grafikkort).
+bevakaBildrutor({ logg, sammanhang: () => ({ scen: spelet?.scen, steg: spelet?.steg?.typ, pussel: spelet?.steg?.pussel_id, platta: !ui.plattan.hidden, ritning: spel.renderer?.type === Phaser.CANVAS ? 'canvas' : 'webgl' }) });
 
 // Versionsraden: information till den vuxne, bara där den inte täcker rummet.
 document.fonts.load('32px Lexend').finally(() => {
