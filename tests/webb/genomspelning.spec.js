@@ -43,19 +43,31 @@ async function draFormel(page, svar, dumpa = false) {
 async function anvand(page, id, satt) {
   // ett tryck medan världen står still glöms (som i spelet): vänta tills den går
   await page.waitForFunction(() => !window.__ORDSTAVEN.fryst(), null, { timeout: 10000 }).catch(() => {});
+  const interaktiva = () => page.evaluate(() => window.__ORDSTAVEN.interaktiva());
   const pt = await page.evaluate((m) => window.__ORDSTAVEN.objekt(m), id);
   if (!pt) return;
+  // krukorna: en kruka som redan är slagen (listan hann ändras) används inte igen
+  if (/_\d$/.test(id) && !(await interaktiva()).includes(id)) return;
   await page.mouse.click(pt.x, pt.y);
   const hand = page.locator('#handknapp');
-  await expect(hand).toBeVisible({ timeout: 20000 });
+  // står han redan vid det aktiva föremålet används det direkt av trycket (som i spelet): då är det klart
+  const kruka = /_\d$/.test(id);
+  const anvant = async () => kruka && !(await interaktiva()).includes(id);
+  await expect.poll(async () => (await hand.isVisible()) || (await anvant()), { timeout: 20000 }).toBe(true);
+  if (await anvant()) return;
+  // handen ska sitta på just det här föremålet: på vägen dit (krukorna står tätt) kan den sitta på en granne en stund
+  for (let t = 0; t < 30 && (await hand.getAttribute('data-objekt')) !== id; t++) {
+    if (!(await interaktiva()).includes(id)) return;
+    await page.waitForTimeout(200);
+  }
   // att bara stå där räcker inte: steget väntar på att spelaren använder föremålet
   await page.waitForTimeout(150);
   await expect(hand).toBeVisible();
   if (satt === 'mellanslag') await page.keyboard.press('Space');
   else if (satt === 'igen') await page.mouse.click(pt.x, pt.y);
   else await hand.locator('button').click();
-  // handen försvinner, eller flyttar till nästa sak inom räckhåll (krukorna står tätt)
-  await expect.poll(async () => (await hand.isHidden()) || (await hand.getAttribute('data-objekt')) !== id, { timeout: 5000 }).toBe(true);
+  // handen försvinner, eller föremålet är inte längre något att använda (krukorna: handen flyttar till nästa)
+  await expect.poll(async () => (await hand.isHidden()) || !(await interaktiva()).includes(id), { timeout: 5000 }).toBe(true);
 }
 
 /** Spela tills slutskärmen syns. felFor = pussel-id där ett fel svar ska väljas först. */
@@ -317,6 +329,8 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
         if (!k) break;
         await anvand(page, k, satt);
         await page.waitForTimeout(200);
+        // vänta tills reaktionen är klar (bären, kartbiten): sista krukan avslutar pusslet
+        await page.waitForFunction(() => !window.__ORDSTAVEN.fryst(), null, { timeout: 10000 }).catch(() => {});
         if ((await page.evaluate(() => window.__ORDSTAVEN.steg()))?.pussel_id !== lage.pusselId) break;
       }
       continue;
@@ -328,7 +342,7 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
 
 test.describe('genomspelning av prologen', () => {
   test('hela prologen går att spela, med fel svar och omstart mitt i', async ({ page }, info) => {
-    test.skip(!['mac-helskarm', 'ipad-10', 'mac-safari'].includes(info.project.name), 'tre projekt räcker');
+    test.skip(!process.env.SATT && !['mac-helskarm', 'ipad-10', 'mac-safari'].includes(info.project.name), 'tre projekt räcker');
     test.setTimeout(420000); // hela prologen, två gånger halva: långsamma CI-maskiner behöver marginal
     const fel = []; page.on('pageerror', (e) => fel.push(String(e)));
     // PW_LANGSAM=4 kör processorn fyra gånger långsammare (Chromium), som en långsam CI-maskin
@@ -338,7 +352,7 @@ test.describe('genomspelning av prologen', () => {
     // skärmdumpar med canvas tar flera sekunder i testmaskinens mjukvarurendering: hoppa över dem då
     const dumpa = info.project.name === 'mac-helskarm' && !CANVAS;
     // pass 1 och en bit in i pass 2, med fel svar på FILT och dörrarna
-    const satt = { 'mac-helskarm': 'mellanslag', 'ipad-10': 'igen', 'mac-safari': 'hand' }[info.project.name];
+    const satt = process.env.SATT || { 'mac-helskarm': 'mellanslag', 'ipad-10': 'igen', 'mac-safari': 'hand' }[info.project.name];
     const forstaSett = await spelaProlog(page, { dumpa, satt, felFor: new Set(['p0_filt', 'p0_dorrar']), stoppVid: 's09_lappen', stangI: new Set(['s04_agget']) });
     // starta om (utan ?ny): spelet ska fortsätta där det var, med Farfars "Var var vi?"
     await page.goto('./?snabb' + CANVAS);

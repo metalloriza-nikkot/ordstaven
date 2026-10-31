@@ -558,11 +558,14 @@ export class Rum extends Phaser.Scene {
     this.objekt = this.objekt.filter((x) => x.id !== id);
     this.ritade.get(id)?.destroy(); this.ritade.delete(id);
     const ryms = bas && bas.b >= antal * 22;
+    // tätt ställda krukor (mindre än en hjältebredd emellan) nås bara framifrån: en plats bredvid en kruka
+    // hamnar annars vid grannkrukan, och då blir grannen den aktiva (iPad, tryck två gånger)
+    const tatt = !!ryms && !!bas && bas.b / antal - 18 < 24;
     for (let i = 0; i < antal; i++) {
       // inom objektets ruta om de ryms, annars en egen rad mitt i rummet
       // (en egen rad: mitt i det som syns av området)
       const x = ryms && bas ? Math.round(bas.x + ((i + 0.5) * bas.b) / antal) - 9 : this.kamera.x + Math.round(((i + 1) * RUM.bredd) / (antal + 1)) - 9;
-      const n = { id: `${id}_${i}`, x, y: ryms && bas ? bas.y : this.kamera.y + 112, b: 18, h: 18, sort: /** @type {'sak'} */ ('sak'), ...(bas?.sida ? { sida: bas.sida } : {}) };
+      const n = { id: `${id}_${i}`, x, y: ryms && bas ? bas.y : this.kamera.y + 112, b: 18, h: 18, sort: /** @type {'sak'} */ ('sak'), ...(tatt ? { sida: /** @type {'under'} */ ('under') } : bas?.sida ? { sida: bas.sida } : {}) };
       this.objekt.push(n); this.ritaObjekt(n); nya.push(n.id);
     }
     this.byggHinder();
