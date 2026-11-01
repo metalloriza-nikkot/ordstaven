@@ -117,6 +117,34 @@
         }
       }
     },
+    "kapitel_last": {
+      "type": "object",
+      "description": "Låsta kapitel (beslut 24.2): kapitlen i last är låsta tills den vuxne öppnar dem på enheten. När nästa kapitel är låst spelas steg (mellanscener och repliker) i stället för frågan vid kapitlets sista sparpunkt, och FORTSÄTT kommer dit igen.",
+      "additionalProperties": false,
+      "required": [
+        "last",
+        "steg"
+      ],
+      "properties": {
+        "anteckning": {
+          "type": "string"
+        },
+        "last": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^kap-[0-9]{2}$"
+          }
+        },
+        "steg": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
     "sparpunkt_fraga": {
       "type": "object",
       "description": "Frågan som läses upp vid varje sparpunkt med pass_slut. Gäller alla kapitel. En sparpunkt kan ha en egen fråga (fraga), som då går före.",

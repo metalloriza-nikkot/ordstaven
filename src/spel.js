@@ -719,7 +719,14 @@ export function skapaSpel(d) {
       case 'ge_grad': ljud.spela('fest'); await ui.visaFest('⭐', tid(1500)); return;
       case 'bok': return bok(st);
       case 'skapa_hjalte': return skapaHjalte(st);
-      case 'sparpunkt': spara(); if (st.pass_slut) return passSlut(st); return;
+      case 'sparpunkt': {
+        spara();
+        // kapitlets sista sparpunkt före ett låst kapitel: slutrutan (kapitel_last) kommer i stället för frågan
+        const sista = b.scenIndex === b.kapitel.scener.length - 1 && b.stegIndex === b.kapitel.scener[b.scenIndex].steg.length - 1;
+        if (st.pass_slut && sista && nastaKapitelLast(b.kapitel.id)) return;
+        if (st.pass_slut) return passSlut(st);
+        return;
+      }
       case 'fritt': return fritt(st);
       case 'bara': return bara(st);
       case 'prata': return prata(st);
@@ -2022,6 +2029,38 @@ export function skapaSpel(d) {
   }
 
   const SOVER = '<span class="unge-sover" aria-hidden="true"><span class="kropp"></span><span class="zz">z z</span></span>';
+
+  // ------------------------------------------------------------------ låsta kapitel (aventyr.json: kapitel_last)
+  /**
+   * Ett kapitel är låst när äventyret listar det i kapitel_last.last och den vuxne inte har öppnat det på den här
+   * enheten (menyn för vuxna, installningar.oppnadeKapitel). ?kapitel=<id> går alltid förbi låset (för den vuxne).
+   * @param {string} id
+   */
+  const kapitelLast = (id) => (aventyr.kapitel_last?.last || []).includes(id) && !(inst.oppnadeKapitel || []).includes(id) && d.valtKapitel !== id;
+  /** Är kapitlet efter det här låst? @param {string} id */
+  const nastaKapitelLast = (id) => { const i = aventyr.kapitel.indexOf(id); const n = aventyr.kapitel[i + 1]; return !!n && kapitelLast(n); };
+  /** Öppna ett kapitel på den här enheten (den vuxne). @param {string} id */
+  const oppnaKapitel = (id) => { inst.oppnadeKapitel = [...new Set([...(inst.oppnadeKapitel || []), id])]; };
+  /**
+   * Slutrutan när nästa kapitel är låst (beslut 24.2): kapitel_last.steg spelas (mellanscener och repliker), och sedan
+   * står den sovande ungen och en stjärna kvar. ▶ spelar slutrutan igen. FORTSÄTT kommer hit igen tills den vuxne
+   * öppnar kapitlet. Inget här raderar eller startar om något.
+   * @param {string} kapitelId det låsta kapitlet
+   */
+  async function visaKapitelLast(kapitelId) {
+    logg.handelse('berättelse', 'kapitlet är låst: ' + kapitelId);
+    spara();
+    for (;;) {
+      rum.frys(true);
+      for (const st of aventyr.kapitel_last?.steg || []) {
+        if (st.typ === 'replik') await replik(st);
+        else if (st.typ === 'mellanscen' && st.beskrivning) { ui.visaRegi(st.beskrivning, 0); await vanta(tid(1500)); ui.doljRegi(); }
+      }
+      const p = ui.visaSkarm(`<div class="pass-slut kapitel-last"><div class="stor-ikon">${SOVER}<span class="stjarna" aria-hidden="true">⭐</span></div><button type="button" class="knapp stor igen" aria-label="Igen">▶</button></div>`);
+      await new Promise((klar) => p.querySelector('.igen')?.addEventListener('click', () => klar(undefined), { once: true }));
+      ui.doljSkarm();
+    }
+  }
   /**
    * SLUTA FÖR IDAG (aventyr.json: sluta_for_idag), från pausmenyn eller vid passets slut: spelet har sparat, och
    * en kort avslutning spelas, med ungen som somnar om den finns, annars utan. Sedan den sovande ungen och ▶, som
@@ -2162,6 +2201,8 @@ export function skapaSpel(d) {
           && ((p.sparas_som === 'hjalte.namn' && !tillstand.spelare.hjalte.namn) || (p.sparas_som === 'unge.namn' && !tillstand.spelare.unge?.namn)))];
         continue;
       }
+      // nästa kapitel är låst (beslut 24.2): förra kapitlets sista rum står kvar bakom slutrutan
+      if (kapitelLast(kapitelId)) { if (b && !aktuelltRum) await visaScen(b.kapitel.scener[b.kapitel.scener.length - 1], null); await visaKapitelLast(kapitelId); return; }
       if (!stodsAvGrabox(kapitel)) break;
       // den vuxne hoppade till en scen mitt i kapitlet (menyn): scenerna före den spolas fram, så att ungen,
       // knapparna, formlerna och det som har visats finns där, som efter en vanlig genomspelning
@@ -2248,7 +2289,15 @@ export function skapaSpel(d) {
     // alla kapitlens scener: ett hopp till ett senare kapitel eller en senare scen spolar fram det som kommer före
     const scener = aventyr.kapitel.map((/** @type {string} */ kid) => d.kapitel.find((k) => k.id === kid)).filter(Boolean).map((/** @type {any} */ k) =>
       `<div class="kapitelrad"><small>${ui.esc(k.id)}</small>${k.scener.map((/** @type {any} */ s, i) => `<button type="button" class="menyval scen ${b && b.kapitel.id === k.id && i === b.scenIndex ? 'nu' : ''}" data-kapitel="${ui.esc(k.id)}" data-i="${i}">${i + 1}. ${ui.esc(s.id)} <small>(pass ${s.pass})</small></button>`).join('')}</div>`).join('');
+    // början av varje pass, så att den vuxne kan starta spelarens spel vid ett pass (det före spolas fram)
+    const kapitlen = aventyr.kapitel.map((/** @type {string} */ kid) => d.kapitel.find((k) => k.id === kid)).filter(Boolean);
+    const passStart = kapitlen.flatMap((/** @type {any} */ k) => k.scener.map((/** @type {any} */ sc, /** @type {number} */ i) => ({ k, sc, i }))
+      .filter((/** @type {any} */ x, /** @type {number} */ j, /** @type {any[]} */ alla) => !x.sc.frivillig && (j === 0 || alla.slice(0, j).every((/** @type {any} */ y) => y.sc.pass !== x.sc.pass))))
+      .map((/** @type {any} */ x) => `<button type="button" class="menyval scen pass-start" data-kapitel="${ui.esc(x.k.id)}" data-i="${x.i}">${ui.esc(x.k.meta?.namn ?? x.k.id)}, pass ${x.sc.pass}</button>`).join('');
+    const lasbara = (aventyr.kapitel_last?.last || []).filter((/** @type {string} */ id) => aventyr.kapitel.includes(id));
+    const las = lasbara.map((/** @type {string} */ id) => `<label><input type="checkbox" class="kapitel-oppet" data-kapitel="${ui.esc(id)}" ${(inst.oppnadeKapitel || []).includes(id) ? 'checked' : ''}> Kapitlet ${ui.esc(d.kapitel.find((k) => k.id === id)?.meta?.namn ?? id)} är öppet på den här enheten (annars är det låst efter kapitlet före)</label>`).join('');
     const s = ui.visaMeny(`<div class="meny vuxen"><h2>Gråboxen <small>${ui.esc(String(d.version))}</small></h2>
+      <div class="menygrupp passlista"><b>Börja ett pass</b> <small>(namnen och det som kommer före finns kvar):</small> ${passStart}${las ? `<div class="kapitel-las">${las}</div>` : ''}</div>
       <div class="menygrupp"><b>Läsnivå (läs och välj):</b> ${[1, 2, 3, 4].map((n) => `<button type="button" class="menyval niva ${n === niva ? 'nu' : ''}" data-n="${n}">L${n}</button>`).join('')}</div>
       <div class="menygrupp"><label><input type="checkbox" class="foralder" ${inst.foralderLaser ? 'checked' : ''}> Föräldern läser ${ui.esc(Object.values(aventyr.talare).filter((/** @type {any} */ t) => t.rost === 'foraldern_eller_datorrost').map((/** @type {any} */ t) => t.namn).join(' och ') || 'rollernas')} repliker</label>
       <label><input type="checkbox" class="etiketter" ${inst.vuxenEtiketter ? 'checked' : ''}> Visa objektens namn (inte under pussel)</label>
@@ -2262,10 +2311,17 @@ export function skapaSpel(d) {
     s.querySelector('.rostval')?.addEventListener('change', (e) => { inst.rost = /** @type {HTMLInputElement} */ (e.target).checked; logg.handelse('inställning', `rösten ${inst.rost ? 'på' : 'av'}`); spara(); });
     s.querySelector('.markeraval')?.addEventListener('change', (e) => { inst.markera = /** @type {HTMLInputElement} */ (e.target).checked; logg.handelse('inställning', `markeringen ${inst.markera ? 'på' : 'av'}`); spara(); });
     s.querySelector('.etiketter')?.addEventListener('change', (e) => { inst.vuxenEtiketter = /** @type {HTMLInputElement} */ (e.target).checked; spara(); visaEtiketter(); });
+    s.querySelectorAll('.kapitel-oppet').forEach((el) => el.addEventListener('change', (e) => {
+      const id = /** @type {string} */ (/** @type {HTMLElement} */ (el).dataset.kapitel);
+      if (/** @type {HTMLInputElement} */ (e.target).checked) oppnaKapitel(id); else inst.oppnadeKapitel = (inst.oppnadeKapitel || []).filter((/** @type {string} */ x) => x !== id);
+      logg.handelse('inställning', `${id} ${kapitelLast(id) ? 'låst' : 'öppet'}`); spara();
+    }));
     s.querySelectorAll('.scen').forEach((el) => el.addEventListener('click', () => {
       const i = Number(/** @type {HTMLElement} */ (el).dataset.i);
       const k = d.kapitel.find((x) => x.id === /** @type {HTMLElement} */ (el).dataset.kapitel);
       if (!k) return;
+      // den vuxne hoppar in i ett låst kapitel: det öppnas på den här enheten
+      if (kapitelLast(k.id)) { oppnaKapitel(k.id); logg.handelse('inställning', `${k.id} öppet (hopp)`); }
       // kapitlen före spolas fram (av.spolat töms, spolningen gör inget två gånger), och kapitlets scener före hoppet
       av.kapitelId = k.id; av.scen = i; av.scenId = k.scener[i]?.id; delete av.steg; av.startad = false;
       av.spolat = []; av.spolaTill = av.scenId;

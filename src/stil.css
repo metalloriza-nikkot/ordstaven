@@ -183,8 +183,11 @@ html, body {
 @keyframes guppa { 50% { transform: translateX(4px); } }
 
 .portratt { flex: none; width: 48px; height: 48px; border-radius: 24px; background: #c9b896; box-shadow: inset 0 0 0 4px rgba(0, 0, 0, .15); }
-.p-farfar { background: #8a6a4a; } .p-baronen { background: #6b3a8a; } .p-berattare { display: none; }
-.p-klaffen { background: #8a8f96; }
+/* gråboxens ansikten i figurernas färger (stilguiden §5): baronen i orange med tropikhjälmen som ljus kant,
+   Herr Skata svartvit med blågrön stjärt */
+.p-farfar { background: #8a6a4a; } .p-berattare { display: none; }
+.p-baronen { background: #e8823a; box-shadow: inset 0 0 0 4px #b85e22, inset 0 10px 0 4px #e6d6a8; }
+.p-herr_skata { background: linear-gradient(135deg, #22252b 0 45%, #ffffff 45% 70%, #2e5966 70%); box-shadow: inset 0 0 0 3px #22252b; }
 
 /* pussel */
 .pussel-ruta { padding: 20px 24px 24px; display: flex; flex-direction: column; align-items: center; gap: 18px; min-width: min(80vw, 520px); }
@@ -193,7 +196,8 @@ html, body {
 .lapp .rad.bockad::after { content: ' ✔'; color: #2f8a3a; font-weight: 700; }
 .lapp .rad.lyser { background: rgba(242, 193, 78, .5); border-radius: 6px; box-shadow: 0 0 0 4px rgba(242, 193, 78, .5); animation: puls .6s ease 3; }
 .kortrad.packat .kort { opacity: .3; transition: opacity .4s; }
-.lapp.p-lila_papper_blackplumpar { background: #e8dcf2; }
+/* baronens papper i hans orange (spelarens val), med de gamla id:na kvar */
+.lapp.p-lila_papper_blackplumpar, .lapp.p-baronens_papper_hatt, .lapp.p-baronens_papper_hjalm { background: #f6dcc3; box-shadow: 0 2px 6px rgba(0,0,0,.2), inset 0 0 0 4px #e8823a; }
 .lapp.p-traskylt { background: #c9a774; border-radius: 4px; }
 .fraga { font-size: calc(64px * var(--t)); }
 .svar-rad { display: flex; align-items: center; gap: 12px; }

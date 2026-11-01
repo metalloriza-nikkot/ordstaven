@@ -1,6 +1,7 @@
 # Innehållsschema – kapitel i format 2
 
-Version 2.12 (2026-10-31). Ägs av teknikspåret.
+Version 2.13 (2026-11-01). Ägs av teknikspåret.
+2.13: låsta kapitel (beslut 24.2). `kapitel_last` i `aventyr.json`: `last` (kapitlen som är låsta från början) och `steg` (slutrutan: mellanscener och repliker). Talaren `klaffen` heter `herr_skata`. Allt är tillägg, filer i 2.12 gäller fortfarande.
 2.12: textgrammatiken (T4b, beslut 21). `ljudord` på `ljud`-steget och på reaktioner (`vid_ratt`, `vid_fel`, `vid_valj`): ett ljudord i världen vid det som låter. `gransnitt.sluta_for_idag` har ett ord (sov). Allt är tillägg, filer i 2.11 gäller fortfarande.
 2.11: Farfars hus (T6). Kartorna får typen `vagg`: massiv vägg inne i ett rum, så att ett rum kan ha en annan form än en rektangel (hallen med en bred entré och en smal korridor). Rollrösten `fagel` (en levande fågelröst) i `aventyr.json`. Allt är tillägg, filer i 2.10 gäller fortfarande.
 2.10: SVÄRD utifrån bilden (beslut 18.5, 20.3): `bild` på P11 och `forebild.visas` (`fran_start` eller `vid_fel`). Allt är tillägg, filer i 2.9 gäller fortfarande.
@@ -22,7 +23,7 @@ Schemafilerna finns i `content/schema/`. Kontrollen körs med `npm run kontroll`
 | Fil | Innehåll | Schema |
 |---|---|---|
 | `content/ordlistor.json` | Ordlistor 1–6, flaggor, förbjudna par | `ordlistor.schema.json` |
-| `content/<äventyr>/aventyr.json` | Titel, talare (med `rollrost`: `berattare`, `gammal`, `fanig`, `fagel`, `metall` eller `unge`; `fagel` är en levande röst vars ton skiftar lite från replik till replik), platshållare, kapitelordning, `sluta_for_idag` (`fore_ungen` och `med_ungen`: mellanscener och repliker när han väljer att sluta för idag, i pausmenyn eller vid passets slut; ordet på pausmenyns knapp är `gransnitt.sluta_for_idag`), `sparpunkt_fraga` (frågan vid varje sparpunkt), `gransnitt` (orden i pausmenyn) | `aventyr.schema.json` |
+| `content/<äventyr>/aventyr.json` | Titel, talare (med `rollrost`: `berattare`, `gammal`, `fanig`, `fagel`, `metall` eller `unge`; `fagel` är en levande röst vars ton skiftar lite från replik till replik), platshållare, kapitelordning, `sluta_for_idag` (`fore_ungen` och `med_ungen`: mellanscener och repliker när han väljer att sluta för idag, i pausmenyn eller vid passets slut; ordet på pausmenyns knapp är `gransnitt.sluta_for_idag`), `sparpunkt_fraga` (frågan vid varje sparpunkt), `gransnitt` (orden i pausmenyn), `kapitel_last` (låsta kapitel och slutrutan, se nedan) | `aventyr.schema.json` |
 | `content/<äventyr>/kap-00.json` … `kap-07.json` | Ett kapitel: rum, scener, pussel | `kapitel.schema.json` |
 
 Kapitelfilerna börjar med `"format": 2`, äventyret och ordlistorna med `"format": 1`. Ändras formatet höjs numret, och teknik skriver om gamla filer. En kapitelfil i format 1 godtas inte längre: byt `P27_packa` mot `P28_packa` och `format` mot 2.
@@ -220,6 +221,12 @@ Innehållet säger **vad** som finns i ett rum, kartan säger **var** det står.
 - Saknas kartan placeras föremålen automatiskt i ett rutnät (provrummen i testerna). En utgång leder då till rummet i sitt id (`stig_buskarna` → `buskarna`) om det rummet finns.
 
 Kontrollen säger fel om ett föremål saknas i kartan, om kartan har föremål som inte finns i rummet, om något går utanför rummet, om en utgång leder till ett rum som inte finns eller saknar `riktning`, om `klattra` står på något som inte är en utgång, om `lapp` pekar på ett föremål som inte finns i rummet och om `in_<rum>` inte är ett rum. Kontrollen säger också fel om `forsvinner_efter` inte är ett formelpussel och om `alias.rum` pekar på ett rum som inte finns. Ett enhetstest kontrollerar att varje föremål går att nå från varje ingång i varje tillstånd, i kapitel 1 också uppe på kullen och i apans bo, och att häcken och lianerna stänger vägen tills stenen och SVÄRD öppnar den.
+
+### Låsta kapitel: `kapitel_last` i aventyr.json (2.13)
+Ett kapitel kan vara låst tills den vuxne öppnar det på enheten (beslut 24.2: spelaren spelar varje kapitel en gång, som en premiär). `last` listar kapitlen som är låsta från början, och `steg` är slutrutan (`mellanscen` och `replik`, som `sluta_for_idag`).
+- När nästa kapitel är låst spelas slutrutan i stället för frågan vid kapitlets sista sparpunkt (`pass_slut`). Sedan står den sovande ungen och en stjärna kvar, och ▶ spelar slutrutan igen.
+- FORTSÄTT kommer till slutrutan igen så länge kapitlet är låst. Inget raderas och inget börjar om.
+- Den vuxne öppnar kapitlet i menyn för vuxna (en kryssruta per kapitel i `last`), eller genom att hoppa till en scen i det. Inställningen gäller bara den enheten. `?kapitel=<id>` går alltid förbi låset.
 
 ### Pausmenyn: `gransnitt` i aventyr.json
 Pausmenyn har två bildknappar, KARTAN och MIN BOK (hjälteboken), och hjälteboken har flikarna STAVEN, KLÄDER (garderoben) och DINOBOKEN (stilguiden §6, beslut 22.2). Varje knapp och flik är en bild och ett ord, och ordet läses upp vid tryck. Orden står i `aventyr.json` (nycklarna har dokumentens namn):

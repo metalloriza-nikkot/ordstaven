@@ -215,6 +215,14 @@ describe('berättelsemotorn', () => {
     return set;
   }
 
+  it('ett kapitel som är spelat till slut är klart efter en omstart och börjar inte om på sista steget', () => {
+    const t = nyttTillstand('t');
+    spela(skapaBerattelse({ aventyr, kapitel: prolog, tillstand: t, aventyrId: AVENTYR }));
+    const b2 = skapaBerattelse({ aventyr, kapitel: prolog, tillstand: t, aventyrId: AVENTYR });
+    expect(b2.slut).toBe(true);
+    expect(b2.aktuellt()).toBe(null);
+  });
+
   it('spelar hela prologen: namn, formel, bär, kartbit, grad, tre pass', () => {
     const t = nyttTillstand('t');
     const b = skapaBerattelse({ aventyr, kapitel: prolog, tillstand: t, aventyrId: AVENTYR });

@@ -529,3 +529,10 @@ Beslut 21 och stilguiden §3: fyra familjer som i serier.
 - **Ljudord** (`ui.ljudord`, `spel.visaLjudord`): fältet `ljudord` på `ljud`-steget och på reaktioner. Ordet står i världslagret vid det som låter, i Lexend 900 med kontur och snett, i ljudets färg (`ljud.farg`), och försvinner efter 0,8 s. Läsplattan täcker det.
 - **Papper och saker:** lappen har riven kant nertill (`clip-path`) och sitter 2° snett. Farfars skylt med en mening är en träram med ljust papper. Skyltarna vid dörrar och stigar och tavlorna i världen har en träram, eller sten (`papper: "sten"`).
 - **Storlek:** uppläst text 40 punkter, lappar och meningar han läser 48, ord 64, ljudord 80 (stilguiden: 64–96). Ropet vid figuren har svart text med full kontrast och en mörk kant.
+
+## 34. Pass 3 och låsta kapitel (beslut 24.2, 0.11.0)
+- **Låsta kapitel** (`spel.kapitelLast`): ett kapitel i `aventyr.kapitel_last.last` är låst tills den vuxne öppnar det (`installningar.oppnadeKapitel`, per enhet). `?kapitel=<id>` går förbi låset. I `spela()` hoppar loopen inte in i ett låst kapitel: förra kapitlets sista rum visas, och `visaKapitelLast` spelar slutrutan (`kapitel_last.steg`) och står sedan kvar med den sovande ungen, en stjärna och ▶ (som spelar slutrutan igen). Kapitlets sista sparpunkt hoppar över frågan när nästa kapitel är låst.
+- **Ett klart kapitel förblir klart** (`skapaBerattelse`): står sparningen på sista scenens sista steg (`av.steg` ≥ antalet steg) är kapitlet slut, och det börjar inte om på sparpunkten med "Var var vi?".
+- **Börja ett pass** (menyn för vuxna): en knapp per pass och kapitel, till passets första scen. Samma hopp som scenlistan (§28): det som kommer före spolas fram, och namnen och det som har getts finns kvar. Ett hopp in i ett låst kapitel öppnar det på enheten.
+- **Herr Skata:** talaren `herr_skata` (rollrösten `fagel`) och lätet `fagel_late` som ett skrockande skratt i tre stötar (`ljud.skata`), tills Stil gör det riktiga ljudet.
+

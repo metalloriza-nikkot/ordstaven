@@ -97,8 +97,11 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
   if (typeof av.scenId === 'string') {
     const id = nytt(alias.scener, av.scenId);
     const i = kapitel.scener.findIndex((/** @type {any} */ s) => s.id === id);
-    if (i >= 0) { av.scen = i; if (id === av.scenId && Number.isInteger(av.steg)) startSteg = av.steg; }
-    else if (Number.isInteger(av.pass)) { const j = kapitel.scener.findIndex((/** @type {any} */ s) => s.pass === av.pass); if (j >= 0) av.scen = j; }
+    if (i >= 0) {
+      av.scen = i; if (id === av.scenId && Number.isInteger(av.steg)) startSteg = av.steg;
+      // kapitlets sista scen är spelad till slut: kapitlet är klart och börjar inte om på sista steget
+      if (i === kapitel.scener.length - 1 && id === av.scenId && Number.isInteger(av.steg) && av.steg >= kapitel.scener[i].steg.length) av.scen = kapitel.scener.length;
+    } else if (Number.isInteger(av.pass)) { const j = kapitel.scener.findIndex((/** @type {any} */ s) => s.pass === av.pass); if (j >= 0) av.scen = j; }
     else av.scen = Math.min(av.scen, kapitel.scener.length - 1);
   }
   av.ui = av.ui || {};

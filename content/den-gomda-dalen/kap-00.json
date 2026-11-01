@@ -15,10 +15,10 @@
  },
  "meta": {
   "namn": "Prologen",
-  "version": "0.11.1",
-  "datum": "2026-10-30",
+  "version": "0.11.2",
+  "datum": "2026-11-01",
   "agare": "Innehåll",
-  "kalla": "Manus 13-prolog-manus.md v1.4. Byggd på repots kap-00.json (0.8.1).",
+  "kalla": "Manus 13-prolog-manus.md v1.5. Byggd på repots kap-00.json (0.10.1).",
   "uppskattning": {
    "metod": "Uppläsning ca 0,4 s per ord plus 1 s per replik. Läsuppgift 45–90 s inklusive ett fel. Namn 60 s. Skapa hjälten 90 s.",
    "pass_1": {
@@ -61,7 +61,8 @@
   "innehall_v09": "Innehåll har granskat teknikens val i världen (0.5.1). Ändrat, bara beskrivningar: felreaktionerna vid dörrarna (dörren öppnas aldrig, ljudet hörs genom dörren), stigen mot byn (ett steg ut, sedan tillbaka), leksaksbilen i FILT (lådorna står långt från ägget), ungen pekar inte längre mot bergen i s22 (det kunde avslöja vägen), baronen högt upp i gondolen, och Klaffen som putsar fjädrarna. Inga repliker, scener eller id:n är ändrade.",
   "innehall_v10": "Innehåll har lagt in granskningens rättelser (1c) och Niklas speltest (1d): starten i sovrummet (s01) och en ny promenad genom hallen med låsta dörrar (s01b_hallen), frågan först i s04 och filten som följer hjälten, nya repliker i s03, s05, s07, s08, s12, s14, s16, s18, s21 och s22, nosen som spelaren trycker själv (s09), Farfar som frågar efter ungens namn (s08), lappen som hjälten tar emot (s09), ny ordning i s21 med provsändning i radion, \"Allt är packat!\" som vid_ratt i p0_packlista, och knuffen i p0_dinomat (lappen lyser). Inga nya rum. Inga id:n på föremål ändrade.",
   "innehall_v11": "v0.11 (Innehåll 2026-10-29, F3): Farfars hus enligt stilguiden v0.16. Nytt rum kontoret (Farfars läsrum) där Farfar sitter på natten (s08, s09, s16), och köket bara på morgonen. Hallens dörrar är FARFAR, BOK, MAT, SOV och BAD (dorr_toa borta, dorr_bok och dorr_farfar nya). p0_dorrar blir 'Jag är där böckerna är' med tankebubbla_bok, och FARFAR är en lockande fälla. Sex krukor (fem_krukor heter sex_krukor). Inget nivåbyte bland dinomatens lådor. Egna skämt vid rätt svar i p0_dinomat och p0_sangen. Sagan har fyra uppslag (ca 1:40), och kartan i sju bitar sägs i s21. Två repliker delade för Lexend (s08, s21). vid_omstart i s21b. Gästrummet har id:t sovrummet kvar. Inga scen- eller pussel-id:n är ändrade.",
-  "innehall_v0111": "v0.11.1 (Innehåll 2026-10-30, F8): v0.11 på repots fil från 0.8.1 (skapa_hjalte med hudfarg och drakt står kvar). Sagan har \"Dalens ägg kläcks bara av ordkraft.\" igen (beslut 17.2). Baronen är en klantig rival och slutet en kapplöpning (beslut 18.2): ingen replik säger att han vill ha ungen, inget \"Spring!\", och ingen replik säger luftskeppets färg. Fågeln är levande (beslut 18.3) med lätet fagel_late, i s05 vid fönstret och i s22."
+  "innehall_v0111": "v0.11.1 (Innehåll 2026-10-30, F8): v0.11 på repots fil från 0.8.1 (skapa_hjalte med hudfarg och drakt står kvar). Sagan har \"Dalens ägg kläcks bara av ordkraft.\" igen (beslut 17.2). Baronen är en klantig rival och slutet en kapplöpning (beslut 18.2): ingen replik säger att han vill ha ungen, inget \"Spring!\", och ingen replik säger luftskeppets färg. Fågeln är levande (beslut 18.3) med lätet fagel_late, i s05 vid fönstret och i s22.",
+  "innehall_v0112": "v0.11.2 (Innehåll 2026-11-01, F10): spelarens val. Baronen heter bara Baronen, fågeln heter Herr Skata (skatan som snor det som blänker), baronens färg är orange och han har tropikhjälm och kikare. Fågelns läte har inget ljudord (tj-ljud). Farfar säger \"orange luftskepp\". Herr Skata presenteras av baronen och kopplas till ljuset vid vindsfönstret. Slutrutan när kapitel 1 är låst står som FÖRSLAG i anteckningen i s22."
  },
  "rum": [
   {
@@ -92,7 +93,7 @@
     "sex_krukor",
     "stege_ner"
    ],
-   "anteckning": "Stilguiden v0.16: sneda takbjälkar, fönster fram och bak (baronens fågel i bakfönstret). Sex krukor: två vid vänstra väggen och fyra i rad nertill. Dinomatens lådor (GUL, BLÅ, RÖD, i L3 stor röd, liten röd, stor blå) i tre hörn långt isär."
+   "anteckning": "Stilguiden v0.16: sneda takbjälkar, fönster fram och bak (Herr Skata i bakfönstret). Sex krukor: två vid vänstra väggen och fyra i rad nertill. Dinomatens lådor (GUL, BLÅ, RÖD, i L3 stor röd, liten röd, stor blå) i tre hörn långt isär."
   },
   {
    "id": "hallen",
@@ -478,12 +479,11 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Utanför vindsfönstret fladdrar en fågel. Den tittar in på ljuset med stora ögon, låter och flyger iväg."
+     "beskrivning": "Utanför vindsfönstret fladdrar en svartvit fågel med blågrön stjärt. Den tittar in på ljuset med en blank glimt i ögat, skrattar och flyger iväg."
     },
     {
      "typ": "ljud",
-     "id": "fagel_late",
-     "ljudord": "kra"
+     "id": "fagel_late"
     },
     {
      "typ": "replik",
@@ -1208,7 +1208,7 @@
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Baron Gripklo vill hitta dalen först.",
+     "text": "Baronen vill hitta dalen först.",
      "upplast": true
     },
     {
@@ -1220,7 +1220,7 @@
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Håll utkik efter hans luftskepp!",
+     "text": "Håll utkik efter hans orange luftskepp!",
      "upplast": true
     },
     {
@@ -1234,7 +1234,7 @@
      "mal": "dorr_hallen"
     }
    ],
-   "anteckning": "Ny ordning (granskningen 2026-10-27): uppdraget, packningen och radion först, varningen precis före dörren, så att den hörs sekunder innan luftskeppet syns. Radioramen glider in vid provsändningen (teknik 2d.6). v0.11: kartan i sju bitar sägs här i stället för i sagan. v0.11.1: baronen är en rival, inte en fara (beslut 18.2). Varningen säger att han vill hinna först och att han inte läser ordentligt, vilket är hjältens fördel. Ingen replik säger luftskeppets färg förrän spelaren har valt baronens färg."
+   "anteckning": "Ny ordning (granskningen 2026-10-27): uppdraget, packningen och radion först, varningen precis före dörren, så att den hörs sekunder innan luftskeppet syns. Radioramen glider in vid provsändningen (teknik 2d.6). v0.11: kartan i sju bitar sägs här i stället för i sagan. v0.11.1: baronen är en rival, inte en fara (beslut 18.2). Varningen säger att han vill hinna först och att han inte läser ordentligt, vilket är hjältens fördel. v0.11.2: spelaren har valt orange, och Farfar säger det, som han förut sa lila. Baronen heter bara Baronen, som Farfar heter Farfar."
   },
   {
    "id": "s21b_hallen_ut",
@@ -1276,21 +1276,36 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Ett luftskepp i baronens färg glider fram över trädgården. Baronen står högt upp i gondolen och spanar med en kikare. Ungen tittar upp med stora ögon."
+     "beskrivning": "Ett orange luftskepp glider fram över trädgården. Baronen står i gondolen, kort och rund, med tropikhjälm och medaljer. Han tittar i en kikare, åt fel håll. Ungen tittar upp med stora ögon."
     },
     {
      "typ": "ljud",
-     "id": "fagel_late",
-     "ljudord": "kra"
+     "id": "fagel_late"
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Baronens fågel fladdrar fram med samma läte som vid vindsfönstret och landar klumpigt på hans hatt."
+     "beskrivning": "Herr Skata kommer flygande med samma skratt som vid vindsfönstret och landar på tropikhjälmen. Fjädern hamnar på sned."
     },
     {
      "typ": "replik",
      "talare": "baronen",
-     "text": "Jag är Baron Gripklo, den store upptäckaren!",
+     "text": "Var är dalen? Allt ser så litet ut!",
+     "upplast": true
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Han vänder på kikaren och ser hjälten. Han rätar på sig."
+    },
+    {
+     "typ": "replik",
+     "talare": "baronen",
+     "text": "Jag är Baronen, den store upptäckaren!",
+     "upplast": true
+    },
+    {
+     "typ": "replik",
+     "talare": "baronen",
+     "text": "Herr Skata såg ljuset i natt!",
      "upplast": true
     },
     {
@@ -1301,11 +1316,11 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Fågeln putsar fjädrarna, nöjd."
+     "beskrivning": "Herr Skata putsar fjädrarna, nöjd, och snor en av baronens medaljer."
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Baronen lutar sig ut för att se bättre och trasslar in sig i sin repstege. Hatten trillar av. Ingen tidspress."
+     "beskrivning": "Baronen lutar sig ut för att se bättre och trasslar in sig i sin repstege. Tropikhjälmen trillar av. Ingen tidspress."
     },
     {
      "typ": "replik",
@@ -1319,7 +1334,7 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Sidovy: hjälten och ungen springer in i skogen. Ovanför träden glider luftskeppet åt fel håll, och baronen och fågeln pekar åt var sitt håll."
+     "beskrivning": "Sidovy: hjälten och ungen springer in i skogen. Ovanför träden glider det orange luftskeppet åt fel håll, och baronen och Herr Skata pekar åt var sitt håll."
     },
     {
      "typ": "replik",
@@ -1333,7 +1348,7 @@
      "valfri": false
     }
    ],
-   "anteckning": "Baronen presenterar sig (figurer presenterar sig) och fågeln svarar på frågan från vindsfönstret: samma läte (fagel_late). Baronen är klantig och aldrig läskig (beslut 18.2): han vill bli berömd för dalen, han jagar ingen, och Farfar gör det till en kapplöpning. Ingen replik säger luftskeppets färg."
+   "anteckning": "Baronen presenterar sig (figurer presenterar sig), och Herr Skata svarar på frågan från vindsfönstret: samma skratt (fagel_late, utan ljudord, eftersom TJACK har tj-ljud) och baronens \"Herr Skata såg ljuset i natt!\". Kikaren åt fel håll är hans kännetecken: han ser inte ordentligt, precis som han inte läser ordentligt. Baronen är klantig och aldrig läskig (beslut 18.2), och Farfar gör det till en kapplöpning. FÖRSLAG slutrutan när kapitel 1 är låst (beslut 24.2): i stället för sparpunktens fråga, och FORTSÄTT startar inte kapitel 1. Till exempel ett fält \"kapitel_last\" i aventyr.json, som sluta_for_idag: [{\"typ\": \"mellanscen\", \"beskrivning\": \"Hjälten och ungen står vid skogsbrynet och tittar in bland träden. Ungen viftar med svansklubban.\"}, {\"typ\": \"replik\", \"talare\": \"berattare\", \"text\": \"Snart går ni in i skogen.\", \"upplast\": true}, {\"typ\": \"replik\", \"talare\": \"berattare\", \"text\": \"Fortsättning följer!\", \"upplast\": true}]."
   }
  ],
  "pussel": [

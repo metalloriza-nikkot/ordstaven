@@ -26,6 +26,8 @@ export const HJALTE_FARGER = {
 };
 /** Det som inte går att välja: den runda grå hjälmen och de mörkblå skorna. */
 export const HJALTE_FAST = Object.freeze({ hjalm: 0xc9ccd2, skor: 0x1e4fa0 });
+/** Hjälte A (stilguiden v0.25 §5): dräktens ljusa kant och ögonen. */
+const HJALTE_A = Object.freeze({ draktKant: 0x8a90a0, ogon: 0x12305a });
 /**
  * Gråboxens bild av sakerna han kan ha på sig (lager): en färg per sak. Okända saker ritas i en neutral färg.
  * Riktig grafik kommer med Stil (stilguiden §5).
@@ -252,10 +254,14 @@ export class Rum extends Phaser.Scene {
       this.add.rectangle(1, 13, 2, 6, f('hudfarg')).setOrigin(0, 0),
       this.add.rectangle(13, 13, 2, 6, f('hudfarg')).setOrigin(0, 0),
       this.add.rectangle(3, 12, 10, 9, f('drakt')).setOrigin(0, 0),
+      this.add.rectangle(3, 12, 10, 1, HJALTE_A.draktKant).setOrigin(0, 0),
       this.add.rectangle(2, 0, 12, 12, f('hjalm')).setOrigin(0, 0),
       this.add.rectangle(3, 0, 10, 1, 0xffffff, 0.5).setOrigin(0, 0),
       this.ansikte,
     ]);
+    // ögonen: två mörka pixlar (döljs när han vänder ryggen mot kameran)
+    this.ogon = [this.add.rectangle(6, 5, 1, 2, HJALTE_A.ogon).setOrigin(0, 0), this.add.rectangle(9, 5, 1, 2, HJALTE_A.ogon).setOrigin(0, 0)];
+    this.hjalte.add(this.ogon);
     // hjälmdekoren: taggar längs hjälmens topp
     const dekor = this.lager?.hjalmdekor;
     if (dekor) { const fd = LAGER_FARG[/** @type {keyof LAGER_FARG} */ (dekor)] ?? 0x9a8f80; for (const x of [4, 7, 10]) this.hjalte.add(this.add.rectangle(x, -3, 2, 3, fd).setOrigin(0, 0)); }
@@ -276,6 +282,7 @@ export class Rum extends Phaser.Scene {
     const hud = HJALTE_FARGER.hudfarg[(this.utseende || {}).hudfarg ?? 0] ?? HJALTE_FARGER.hudfarg[0];
     this.smutsig = true;
     this.ansikte?.setFillStyle(pa ? HJALTE_FAST.hjalm : hud);
+    for (const o of this.ogon || []) o.setVisible(!pa);
     this.ryggBak?.setVisible(pa);
   }
 

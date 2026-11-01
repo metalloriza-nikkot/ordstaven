@@ -823,6 +823,68 @@ test('menyn för vuxna hoppar till en scen i ett senare kapitel: det som kommer 
   expect(await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt())).toContain('stege');
 });
 
+// ---------------------------------------------------------------- pass 3 och låset (beslut 24.2)
+/** En sparning där prologen är spelad till slut, med namnen. */
+async function prologenKlar(page) {
+  await page.goto('./?snabb&ny');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.evaluate((n) => {
+    const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
+    t.spelare.hjalte.namn = 'TESTA'; t.spelare.unge.namn = 'KNOPP'; t.spelare.unge.folj = true; t.spelare.hjalte.formler = ['LJUS'];
+    av.kapitelId = 'kap-00'; av.scenId = 's22_tradgarden'; av.scen = n.i; av.steg = n.steg; av.startad = true; av.spolat = [];
+    av.ui = { nosknappen: true, barraknaren: true, radioramen: true };
+    localStorage.setItem('ordstaven_spar', JSON.stringify(t));
+  }, { i: kap00.scener.length - 1, steg: kap00.scener.at(-1).steg.length });
+}
+const kap00 = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-00.json', import.meta.url), 'utf8'));
+
+test('kapitel 1 är låst efter prologen: slutrutan kommer i stället, FORTSÄTT kommer dit igen, och den vuxne öppnar kapitlet', async ({ page }) => {
+  test.setTimeout(60000);
+  await prologenKlar(page);
+  await page.goto('./?snabb');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  const sagt = [];
+  for (let i = 0; i < 40 && !(await page.locator('.pass-slut.kapitel-last').isVisible()); i++) {
+    const r = page.locator('#plattan .replik-ruta');
+    if (await r.isVisible()) { sagt.push(await r.locator('.text').textContent()); await r.click(); }
+    await page.waitForTimeout(150);
+  }
+  await expect(page.locator('.pass-slut.kapitel-last')).toBeVisible();
+  expect(sagt).toEqual(['SNART GÅR NI IN I SKOGEN.', 'FORTSÄTTNING FÖLJER!']);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('kapitlet är låst: kap-01');
+  // ingen knapp som raderar eller börjar om
+  await expect(page.locator('.pass-slut .om')).toHaveCount(0);
+  await page.screenshot({ path: 'test-results/kapitel-last.png' });
+  // den vuxne öppnar kapitel 1 på enheten, och då fortsätter spelet där
+  await page.keyboard.press('Control+Shift+KeyM');
+  await page.locator('#vuxenmeny .kapitel-oppet[data-kapitel="kap-01"]').check();
+  await page.goto('./?snabb');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 10000 }).toBe('k1s01_brynet');
+});
+
+test('menyn för vuxna startar ett pass: pass 3 börjar med morgonen, namnen och det som kommer före finns kvar', async ({ page }) => {
+  test.setTimeout(60000);
+  await prologenKlar(page);
+  await page.goto('./?snabb');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.keyboard.press('Control+Shift+KeyM');
+  await expect(page.locator('#vuxenmeny .pass-start')).toHaveCount(5); // prologens tre pass och kapitel 1:s två
+  await page.screenshot({ path: 'test-results/meny-pass.png' });
+  await page.locator('#vuxenmeny .pass-start', { hasText: 'Prologen, pass 3' }).click();
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 10000 }).toBe('s19_morgon');
+  await expect(page.locator('#plattan .dop-ruta')).toHaveCount(0);
+  const t = await page.evaluate(() => window.__ORDSTAVEN.tillstand());
+  expect(t.spelare.hjalte.namn).toBe('TESTA');
+  expect(t.spelare.unge).toMatchObject({ namn: 'KNOPP', folj: true });
+  expect(t.aventyr['den-gomda-dalen'].kartbitar).toEqual([1]);
+  expect(t.spelare.hjalte.grad).toBe('Lärling');
+});
+
 // ---------------------------------------------------------------- textgrammatiken (T4b, beslut 21)
 test('textgrammatiken: berättaren i en rak ruta med stjärnan, Farfar i en pratruta, och det som sägs rullas fram', async ({ page }) => {
   await provscen(page, { id: 't_grammatik', pass: 1, rum: 'vinden', tillstand: 'natt', steg: [

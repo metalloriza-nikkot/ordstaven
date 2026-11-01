@@ -110,12 +110,12 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
         start: synlig('.start-knapp'), replik: synlig('#plattan .replik-ruta'), hjalte: synlig('.hjalte-ruta'),
         kort: synlig('#plattan .kortrad'), lapp: synlig('#plattan.lapp-vy'), formel: synlig('.formel-ruta'), dop: synlig('.dop-ruta'),
         bok: synlig('.bok-ruta'), passSlut: synlig('.pass-slut .fortsatt'),
-        slut: synlig('.pass-slut .om'), objekt: O.rumsobjekt(), vuxen: !!document.querySelector('#etiketter:not([hidden]) .etikett-obj'),
+        slut: synlig('.pass-slut .om') || synlig('.pass-slut.kapitel-last'), objekt: O.rumsobjekt(), vuxen: !!document.querySelector('#etiketter:not([hidden]) .etikett-obj'),
       };
     });
     // inget som är till för den vuxne syns under ett pass (gråboxens etiketter är avstängda från början)
     expect(lage.vuxen, `etiketter för den vuxne syns i ${lage.scen}`).toBe(false);
-    // prologen är klar när slutskärmen kommer, eller när kapitel 1 börjar (det har kartor sedan T5)
+    // prologen är klar när slutskärmen kommer, när slutrutan för det låsta kapitlet kommer, eller när kapitel 1 börjar
     if (lage.slut || /^k1s/.test(lage.scen || '')) return sett;
     if (stoppVid && lage.scen === stoppVid) return sett;
     if (process.env.PW_TIDER && !sett.has(lage.scen)) console.log('tid', ((Date.now() - T0) / 1000).toFixed(1), lage.scen);
@@ -363,8 +363,10 @@ test.describe('genomspelning av prologen', () => {
     const sett = await spelaProlog(page, { dumpa, satt, felFor: new Set(['p0_packlista', 'p0_skylten', 'p0_sangen']), stangI: new Set(['s12_pasarna', 's21_uppdraget']) });
     clearInterval(samla);
     expect([...sett].filter(Boolean)[0]).toBe('s09_lappen');
-    // efter prologen fortsätter spelet i kapitel 1
-    expect(await page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('k1s01_brynet');
+    // efter prologen är kapitel 1 låst (beslut 24.2): slutrutan i stället för frågan vid passets slut
+    await expect(page.locator('.pass-slut.kapitel-last')).toBeVisible();
+    expect(omstartRepliker).toContain('FORTSÄTTNING FÖLJER!');
+    expect(omstartRepliker.filter((t) => /VILL DU FORTSÄTTA/.test(t))).toEqual([]);
     expect(forstaSett.has('s01b_hallen') && forstaSett.has('s01_natten')).toBe(true);
     expect(omstartRepliker.some((t) => /VAR VAR VI/.test(t))).toBe(true);
     // loggen visar varje val, och om en knuff eller pekning kom före det

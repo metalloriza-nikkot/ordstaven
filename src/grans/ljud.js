@@ -50,12 +50,21 @@ export function skapaLjud({ tyst = () => false } = {}) {
     // ett lås som klickar upp, och prassel i löv och buskar
     klick_las: () => { ton({ f: 1200, t: 0.04, v: 0.3, typ: 'square' }); ton({ f: 900, t: 0.05, v: 0.25, typ: 'square', d: 0.06 }); },
     // ett levande fågelläte: tre korta kvitter (baronens fågel, beslut 18.3)
+    // Herr Skatas skratt (stilguiden §9): ett skrockande "tjack-tjack-tjack", kort och ljust, som sjunker lite
+    // för varje stöt, som ett skratt. Tillfälligt syntetiserat tills Stil gör det riktiga ljudet (Stil 17).
+    skata: () => {
+      [0, 0.13, 0.26].forEach((d, i) => {
+        const f = 1500 - i * 120;
+        ton({ f: f * 1.6, f2: f * 0.7, t: 0.055, v: 0.16, typ: 'square', d });
+        ton({ f: f * 2.4, f2: f, t: 0.045, v: 0.1, typ: 'sawtooth', d: d + 0.005 });
+      });
+    },
     fagel: () => { ton({ f: 1900, t: 0.06, v: 0.14, typ: 'sine' }); ton({ f: 2500, t: 0.05, v: 0.12, typ: 'sine', d: 0.08 }); ton({ f: 2100, t: 0.08, v: 0.12, typ: 'sine', d: 0.17 }); },
     prassel: () => { for (let i = 0; i < 5; i++) ton({ f: 2400 - i * 200, t: 0.04, v: 0.08, typ: 'sawtooth', d: i * 0.04 }); },
   };
   /** Ljud-id i innehållet → effekt. Okända id:n får ett allmänt ljud. */
   const LJUD_ID = /** @type {Record<string, string>} */ ({
-    dunk: 'dunk', klaffen_tick: 'tick', fagel_late: 'fagel', unge_forsta_late: 'unge', unge_langtan: 'unge', unge_svarar: 'unge', mage_kurrar: 'mage', hackspett: 'klick',
+    dunk: 'dunk', klaffen_tick: 'tick', fagel_late: 'skata', unge_forsta_late: 'unge', unge_langtan: 'unge', unge_svarar: 'unge', mage_kurrar: 'mage', hackspett: 'klick',
   });
 
   return {
