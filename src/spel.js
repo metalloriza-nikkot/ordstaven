@@ -170,6 +170,27 @@ export function skapaSpel(d) {
   ui.vidNos((vad, ord) => { if (vad === 'tand') handlingGjord('nosen'); else handlingGjord('nosa:' + versaler(ord || '')); });
 
   /**
+   * Molnet nere till vänster (stilguiden §3, T4c): uppgiften och frågan i samma moln, alltid med en bild av
+   * handlingen. En uppgift som läses upp har sin text och en högtalare (ett tryck läser den igen). Frågan som han
+   * läser själv (dörrarna, lappen) är bara en bild. Ett mjukt pling när ett nytt moln kommer. null döljer.
+   * @param {string | null} bild HTML för bilden @param {any} [r] uppgiften (replik) som läses upp, eller null
+   */
+  let molnNu = '';
+  function visaMoln(bild, r = null) {
+    if (!bild && !r) { ui.visaTanke(null); molnNu = ''; return; }
+    const html = `${bild ? `<span class="moln-bild">${bild}</span>` : ''}${r ? `<span class="instruktion">${ui.rader(r.text, varden())}</span><button type="button" class="moln-hogtalare" aria-label="Läs igen">🔊</button>` : ''}`;
+    if (html !== molnNu) ljud.spela('pling');
+    molnNu = html;
+    ui.visaTanke(html);
+    if (r) ui.$('#tanke .moln-hogtalare')?.addEventListener('click', (e) => { e.stopPropagation(); sag(r); ui.pulseraTanke(); });
+    if (b) placeraMoln([]);
+  }
+  /** Molnet täcker aldrig ett alternativ, en skylt eller en knapp. @param {{ left: number, top: number, right: number, bottom: number }[]} rutor */
+  function placeraMoln(rutor) { const s = layout.skala; ui.placeraTanke(rutor, { vanster: s.vanster, topp: s.topp, bredd: s.cssBredd, hojd: s.cssHojd }); }
+  /** Bilden av handlingen i en instruktion som väntar. @param {string} vad */
+  const handlingsBild = (vad) => ({ nosen: '<span class="bild emoji">👃</span>', mata_ungen: '<span class="bild emoji">🫐</span>' })[vad] ?? null;
+
+  /**
    * En instruktion som ber om en handling väntar tills den är gjord ("Tryck på bären, så får {unge} ett.").
    * Den står uppe i rummet medan världen går och läses upp. Efter ca 8 sekunder upprepas den, med en styrbild
    * som pekar på det som ska tryckas. Nästa steg kommer först efter handlingen.
@@ -178,7 +199,7 @@ export function skapaSpel(d) {
   async function replikVantar(r) {
     if (r.upplast && r.talare && aventyr.talare[r.talare]) senaste.set(r.talare, r);
     rum.frys(false);
-    ui.visaTanke(`<span class="instruktion">${ui.rader(r.text, varden())}</span>`);
+    visaMoln(handlingsBild(r.vantar_pa), r);
     sag(r);
     const mal = { mata_ungen: '#hud-bar', nosen: '#hud-nos' }[/** @type {string} */ (r.vantar_pa)];
     // nosen ska gå att tända medan instruktionen väntar (den kostar inget här)
@@ -195,7 +216,7 @@ export function skapaSpel(d) {
       if (pausad) { knuff(); return; }
       if (mal) ui.pulsera(mal);
       pekaPa();
-      if (pam) { ui.visaTanke(`<span class="instruktion">${ui.rader(pam.replik.text, varden())}</span>`); sag(pam.replik); } else sag(r);
+      if (pam) { visaMoln(handlingsBild(r.vantar_pa), pam.replik); sag(pam.replik); } else sag(r);
       ui.pulseraTanke();
       logg.handelse('knuff', `väntar på ${r.vantar_pa}`, { paminnelse: !!pam });
     }, pam ? pam.efter_sek * 1000 : 8000); };
@@ -208,7 +229,7 @@ export function skapaSpel(d) {
     knuff();
     await new Promise((klar) => vantarPaHandling.set(r.vantar_pa, () => klar(undefined)));
     clearTimeout(t);
-    ui.styrhjalp(null); ui.visaTanke(null);
+    ui.styrhjalp(null); visaMoln(null);
   }
 
   /**
@@ -1049,6 +1070,23 @@ export function skapaSpel(d) {
     return res;
   }
 
+  /**
+   * Frågan som står kvar ovanför korten (stilguiden §3, T4c): pusslets instruktion, annars den upplästa repliken
+   * strax före pusslet i scenen (mellanscener och ljud emellan räknas inte). @param {any} p
+   */
+  const fragaFor = (p) => {
+    if (p.instruktion) return p.instruktion;
+    const sc = b?.scen; if (!sc || !(b.stegIndex > 0)) return null;
+    for (let i = b.stegIndex - 1; i >= 0; i--) {
+      const st = sc.steg[i];
+      if (st.typ === 'replik' && st.upplast) return st;
+      if (st.typ !== 'mellanscen' && st.typ !== 'ljud') return null;
+    }
+    return null;
+  };
+  /** En rad med frågan och den som ställde den (ansikte eller stjärna). Ett tryck på ansiktet läser den igen. @param {any} r @param {string} [bild] */
+  const fragaRadHtml = (r, bild = '') => `<div class="fraga-rad">${portratt(r.talare, r.via === 'radio').replace('class="portratt', 'role="button" tabindex="0" aria-label="Läs frågan igen" class="portratt las-igen')}<div class="text">${ui.rader(r.text, varden())}</div>${bild ? `<span class="fraga-bild">${bild}</span>` : ''}</div>`;
+
   /** Läs och välj (P1) och packa (P28). @param {any} p */
   async function valj(p) {
     const flera = p.typ === 'P28_packa';
@@ -1064,18 +1102,26 @@ export function skapaSpel(d) {
       // knufftiden på läsplattan följer textmängden: ca 11 s per mening (granskningen av kapitel 1)
       const k = knuffKlocka(p.knuff, () => plattan().querySelector('.fraga, .lapp')?.classList.add('puls'), vakt, knufftidMs({ text: v.s.text, alternativ: v.s.alternativ }));
       const plattan = () => ui.plattan;
+      // frågan står kvar ovanför korten (inte på packlistan, där listan är frågan)
+      const fr = flera ? null : fragaFor(p);
+      // luckorna (stilguiden §3): alternativ som är meningar blir rader i hela bredden, var och en en lucka
+      const luckor = !flera && v.s.alternativ.length > 0 && v.s.alternativ.every((a) => !!a.ord && a.ord.trim().includes(' '));
       const kortHtml = (/** @type {any} */ a) => {
         const bild = flera ? bilder.html(a.bild || a.id) : a.ord ? '' : bilder.html(a.bild || a.id);
         const etikett = a.ord ? `<span class="kort-etikett">${ui.rader(a.ord, varden(), 'kort-ord')}</span>` : '';
-        const klasser = ['kort', v.s.valda.has(a.id) ? 'vald' : '', v.s.pekar === a.id ? 'pekar' : '', a.ord && a.ord.includes(' ') ? 'mening' : ''].join(' ');
-        return `<button type="button" class="${klasser}" data-id="${ui.esc(a.id)}">${bild}${etikett}${v.s.pekar === a.id ? '<span class="nos-pekar" aria-hidden="true">👃</span>' : ''}</button>`;
+        const klasser = ['kort', v.s.valda.has(a.id) ? 'vald' : '', v.s.pekar === a.id ? 'pekar' : '', a.ord && a.ord.includes(' ') ? 'mening' : '', luckor ? 'lucka' : ''].join(' ');
+        return `<button type="button" class="${klasser}" data-id="${ui.esc(a.id)}">${luckor ? '<span class="lucka-ikon" aria-hidden="true"></span>' : ''}${bild}${etikett}${v.s.pekar === a.id ? '<span class="nos-pekar" aria-hidden="true">👃</span>' : ''}</button>`;
       };
       const rita = () => {
         const papper = v.s.text ? `<div class="lapp p-${ui.esc(p.papper || 'lapp')}">${ui.rader(v.s.text, varden())}</div>` : '';
-        const bild = v.s.bild ? `<div class="fraga">${bilder.html(v.s.bild)}</div>` : '';
+        const bildHtml = v.s.bild ? bilder.html(v.s.bild) : '';
+        // på luckorna står bilden till höger om frågan, annars under den
+        const bild = bildHtml && !(luckor && fr) ? `<div class="fraga">${bildHtml}</div>` : '';
+        const frRad = fr ? fragaRadHtml(fr, luckor ? bildHtml : '') : '';
         const visar = visarFor(p.id);
         if (visar) rum.visaDelar(visar.id, delarAv(p.varianter[v.s.variantNyckel].alternativ.filter((/** @type {any} */ a) => v.s.alternativ.some((x) => x.id === a.id))));
-        ui.visaPlatta(`<div class="pussel-ruta">${papper}${bild}<div class="kortrad ${flera && v.s.klar ? 'packat' : ''}">${v.s.alternativ.map(kortHtml).join('')}</div>${flera ? '<div class="ryggsack" aria-hidden="true">🎒</div>' : ''}</div>`, 'pussel ' + p.typ);
+        ui.visaPlatta(`<div class="pussel-ruta${luckor ? ' luckor' : ''}">${frRad}${papper}${bild}<div class="kortrad ${flera && v.s.klar ? 'packat' : ''}">${v.s.alternativ.map(kortHtml).join('')}</div>${flera ? '<div class="ryggsack" aria-hidden="true">🎒</div>' : ''}</div>`, 'pussel ' + p.typ);
+        if (fr) plattan().querySelector('.fraga-rad .las-igen')?.addEventListener('click', () => sag(fr));
         if (flera) bockaListan();
         tillatNos(p, spar);
         plattan().querySelectorAll('.kort').forEach((el) => el.addEventListener('click', () => tryck(/** @type {HTMLElement} */ (el).dataset.id || '')));
@@ -1148,7 +1194,7 @@ export function skapaSpel(d) {
     const v = skapaValj(p, { niva });
     aktuellVariant = v.s.variantNyckel;
     const spar = { hjalp: false };
-    if (p.instruktion) await replik(p.instruktion);
+    // instruktionen står i molnet och läses upp där (T4c), medan världen går
     /** @type {Set<string>} alternativ som är använda (fel) eller borttagna */
     const borta = new Set();
     const altFor = (/** @type {string} */ objekt) => v.s.alternativ.find((a) => a.objekt === objekt && !borta.has(a.id));
@@ -1163,9 +1209,9 @@ export function skapaSpel(d) {
     // papper, och skylten öppnas när han går dit eller trycker på papperet. Den läses aldrig upp.
     const skylt = p.skylt ? skyltarIRummet().find((x) => x.id === p.skylt) ?? null : null;
     if (p.skylt && !skylt) logg.handelse('FEL', `${p.id}: skylten ${p.skylt} finns inte i rummet`);
-    const fraga = () => ui.visaTanke(skylt ? '<button type="button" class="tanke-lapp tanke-skylt" aria-label="Skylten">📜</button>'
+    const fraga = () => visaMoln(skylt ? '<button type="button" class="tanke-lapp tanke-skylt" aria-label="Skylten">📜</button>'
       : harLapp ? '<button type="button" class="tanke-lapp" aria-label="Lappen">📜</button>'
-      : v.s.bild ? bilder.html(v.s.bild) : v.s.text ? ui.rader(v.s.text, varden()) : null);
+      : v.s.bild ? bilder.html(v.s.bild) : v.s.text ? ui.rader(v.s.text, varden()) : null, p.instruktion ?? null);
     if (skylt) {
       skyltStyrs.add(skylt.id); skyltSpar = spar; skyltPusselNu = skylt.id;
       // han har just gått fram till skylten: den öppnas direkt
@@ -1196,6 +1242,9 @@ export function skapaSpel(d) {
     };
     fraga();
     tankeUrVagen();
+    // uppgiften i molnet läses upp när den kommer och en gång till efter 8 s (stilguiden §3)
+    let igenTimer = 0;
+    if (p.instruktion) { sag(p.instruktion); igenTimer = window.setTimeout(() => { if (!pausad && ui.plattan.hidden) { sag(p.instruktion); ui.pulseraTanke(); } }, tid(8000)); }
     if (harLapp) ui.pulsera('#hud-lapp'); // lappen glimtar när han kommer in: den finns kvar
     tillatNos(p, spar);
     return new Promise((klar) => {
@@ -1283,7 +1332,7 @@ export function skapaSpel(d) {
       ritaSkyltar();
       const stada = () => {
         window.clearInterval(tick); sluta(); k.stopp(); rum.visaOmrade(null); rum.tryckPa = null; rum.malFor = null; rum.nara(null); rum.sattInteraktiva([]); ui.ordskylt(null); ui.handknapp(null); ui.skyltar([]); skyltarNu = null; doljEtikett.clear(); visaEtiketter(); rum.ungePekar(null);
-        ui.$('#tanke').removeEventListener('click', tankeTryck);
+        ui.$('#tanke').removeEventListener('click', tankeTryck); window.clearTimeout(igenTimer);
         if (skylt) { skyltStyrs.delete(skylt.id); skyltSpar = null; skyltPusselNu = null; }
       };
       /**
@@ -1338,7 +1387,7 @@ export function skapaSpel(d) {
         }
         ljud.spela('ratt');
         stada();
-        ui.visaTanke(null);
+        visaMoln(null);
         for (const a of v.s.alternativ) if (a.objekt) rum.markera(a.objekt, false);
         rum.frys(true);
         await Promise.all([rattHandelse(alt?.objekt ?? null), reaktion(r.reaktion, alt?.objekt ?? null)]);

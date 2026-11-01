@@ -336,11 +336,19 @@ html, body {
 .snabb *, .snabb *::before, .snabb *::after { animation: none !important; transition: none !important; }
 
 /* läs i rummet: frågan uppe i rummet, ordet ovanför föremålet hjälten står vid */
-#tanke { position: absolute; left: calc(var(--rum-vanster) + var(--rum-bredd) / 2); top: calc(var(--rum-topp) + 10px); transform: translateX(-50%); padding: 6px 18px; border-radius: 40px; background: rgba(255, 255, 255, .92); box-shadow: 0 4px 14px rgba(0, 0, 0, .35); pointer-events: none; font-size: calc(48px * var(--t)); line-height: 1; }
+/* molnet nere till vänster (stilguiden §3, T4c): uppgiften och frågan, alltid med en bild. Ingen oskärpa (golvdatorn) */
+#tanke { position: absolute; left: calc(var(--rum-vanster) + 10px); top: calc(var(--rum-topp) + var(--rum-hojd) - 10px); transform: translateY(-100%); display: flex; align-items: center; gap: calc(10px * var(--t)); max-width: min(62vw, calc(var(--rum-bredd) - 20px)); padding: calc(8px * var(--t)) calc(20px * var(--t)); border-radius: calc(44px * var(--t)); background: #fdfbf6; box-shadow: 0 calc(4px * var(--t)) 0 #c8bb9c, 0 0 0 3px #e5d9bd; pointer-events: none; font-size: calc(48px * var(--t)); line-height: 1; }
+#tanke::before, #tanke::after { content: ''; position: absolute; z-index: -1; border-radius: 50%; background: #fdfbf6; box-shadow: 0 0 0 3px #e5d9bd; }
+#tanke::before { width: calc(46px * var(--t)); height: calc(46px * var(--t)); left: calc(18px * var(--t)); top: calc(-16px * var(--t)); }
+#tanke::after { width: calc(34px * var(--t)); height: calc(34px * var(--t)); left: calc(56px * var(--t)); top: calc(-10px * var(--t)); }
+#tanke .moln-bild { display: inline-flex; align-items: center; }
+#tanke .bild.bubbla .bubbla-ytter { box-shadow: none; background: none; width: auto; height: auto; }
+#tanke .bild.bubbla .bubbla-prick { display: none; }
+#tanke .moln-hogtalare { pointer-events: auto; flex: none; width: 48px; height: 48px; border-radius: 24px; font-size: 24px; background: #efe6d2; align-self: flex-start; }
 #tanke .bild.bubbla { font-size: inherit; }
 #tanke .tanke-lapp { pointer-events: auto; font-size: inherit; background: none; border: 0; cursor: pointer; padding: 0 4px; }
 #tanke.puls { animation: tankepuls .6s ease-in-out 3; }
-@keyframes tankepuls { 50% { transform: translateX(-50%) scale(1.15); } }
+@keyframes tankepuls { 50% { scale: 1.12; } }
 #ordskylt { position: absolute; transform: translate(-50%, calc(-100% - 6px)); z-index: 5; }
 /* skyltarna på dörrar och stigar i ett val: syns hela tiden, handen bara på den han står vid */
 #skyltar { position: absolute; inset: 0; pointer-events: none; z-index: 4; }
@@ -452,7 +460,7 @@ html, body {
 @keyframes radioin { from { transform: translateX(-160%); opacity: 0; } to { transform: none; opacity: 1; } }
 .via-radio { margin-right: 6px; font-size: .8em; }
 /* en instruktion som väntar på handlingen står uppe i rummet medan världen går */
-#tanke .instruktion { font-size: calc(36px * var(--t)); line-height: 1.3; padding: 4px 6px; display: block; }
+#tanke .instruktion { font-size: calc(40px * var(--t)); line-height: 1.3; padding: 4px 6px; display: block; } /* uppläst text: 40 punkter */
 
 /* nosen på tangentbordet: ordet som Tab har markerat, och ordet som glimtar när spelaren ska nosa själv (s09) */
 .nosar .ord.markerad { outline: 4px solid var(--guld); outline-offset: 3px; background: rgba(242, 193, 78, .7); }
@@ -580,3 +588,21 @@ html, body {
 .ljudord { position: absolute; z-index: 5; transform: translate(-50%, -100%) rotate(-8deg); font-weight: 900; font-size: calc(80px * var(--t)); line-height: 1; letter-spacing: .02em; color: var(--ljudfarg, #f2c14e); -webkit-text-stroke: calc(4px * var(--t)) #1a1410; paint-order: stroke fill; pointer-events: none; white-space: nowrap; animation: ljudord .8s ease-out forwards; }
 .platta-oppen .ljudord { display: none; } /* ljudet hör till världen: läsplattan täcker det */
 @keyframes ljudord { 0% { opacity: 0; transform: translate(-50%, -80%) rotate(-8deg) scale(.6); } 18% { opacity: 1; transform: translate(-50%, -100%) rotate(-8deg) scale(1.12); } 30% { transform: translate(-50%, -100%) rotate(-8deg) scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -110%) rotate(-8deg) scale(1); } }
+
+/* ---------------------------------------------------------------- T4c (stilguiden §3)
+   Frågan står kvar ovanför korten: en rad i sin form (stjärnan för berättaren, ansiktet för den som frågade), 40 punkter */
+.fraga-rad { align-self: stretch; display: flex; align-items: center; gap: calc(12px * var(--t)); padding: calc(4px * var(--t)) calc(10px * var(--t)); border-radius: 3px; background: #dfe5ea; box-shadow: inset 0 0 0 2px #b4c0ca; }
+.fraga-rad .text { font-size: calc(40px * var(--t)); line-height: 1.3; }
+.fraga-rad .portratt { flex: none; cursor: pointer; }
+.fraga-rad .fraga-bild { margin-left: auto; font-size: calc(56px * var(--t)); line-height: 1; }
+/* luckorna: läsplattan är en närbild av lådans lock. Tre rader i hela bredden, var och en en lucka med gångjärn */
+.pussel-ruta.luckor { background: #d9b98a; box-shadow: 0 8px 28px rgba(0, 0, 0, .5), inset 0 0 0 calc(10px * var(--t)) #8a6a4a; border-radius: 6px; }
+.luckor .kortrad { flex-direction: column; flex-wrap: nowrap; align-items: stretch; align-self: stretch; gap: calc(10px * var(--t)); }
+.pussel-ruta.luckor { padding: calc(14px * var(--t)) calc(16px * var(--t)) calc(18px * var(--t)); gap: calc(12px * var(--t)); }
+.kort.lucka { flex-direction: row; justify-content: flex-start; gap: calc(14px * var(--t)); min-height: 0; padding: calc(8px * var(--t)) calc(14px * var(--t)); border-radius: 4px; background: #fff6e0; box-shadow: 0 4px 0 #8a6a4a, 0 0 0 3px #a7845a; text-align: left; }
+/* texten växer med rummet, men bara så långt att en mening ryms på en rad (aldrig under 48 punkter) */
+.kort.lucka .kort-etikett { font-size: max(48px, min(calc(48px * var(--t)), calc((92vw - 150px * var(--t)) / 18.2))); letter-spacing: 0; line-height: 1.3; }
+.kort.lucka .kort-ord, .kort.lucka .kort-ord.bryts { white-space: normal; max-width: 18em; } /* radbredden är 18 em här (stilguiden §3) */
+.lucka-ikon { position: relative; flex: none; width: calc(36px * var(--t)); height: calc(40px * var(--t)); border-radius: 3px; background: #a7845a; box-shadow: inset 0 0 0 3px #6b4a2a; }
+.lucka-ikon::before { content: ''; position: absolute; left: calc(-4px * var(--t)); top: 20%; width: calc(8px * var(--t)); height: 60%; border-radius: 2px; background: #c9a24a; }
+

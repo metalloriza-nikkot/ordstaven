@@ -536,3 +536,10 @@ Beslut 21 och stilguiden §3: fyra familjer som i serier.
 - **Börja ett pass** (menyn för vuxna): en knapp per pass och kapitel, till passets första scen. Samma hopp som scenlistan (§28): det som kommer före spolas fram, och namnen och det som har getts finns kvar. Ett hopp in i ett låst kapitel öppnar det på enheten.
 - **Herr Skata:** talaren `herr_skata` (rollrösten `fagel`) och lätet `fagel_late` som ett skrockande skratt i tre stötar (`ljud.skata`), tills Stil gör det riktiga ljudet.
 
+## 35. T4c: molnet, frågan ovanför korten och luckorna (0.12.0)
+Stilguiden §3 gick igenom mot spelet. Det som saknades är byggt här, resten fanns.
+- **Molnet** (`spel.visaMoln`, `#tanke`): nere till vänster i rummet. `ui.placeraTanke` provar nere till vänster, nere i mitten, uppe till vänster, uppe i mitten och uppe till höger, och väljer första platsen där molnet inte täcker ett alternativ, en skylt eller en knapp (nere till höger är spelarens: bären och nosen). Innehållet är en bild (`moln-bild`) och, för en uppgift som läses upp, texten i 40 punkter och en högtalare som läser den igen. Ett mjukt pling (`ljud.pling`) när ett nytt moln kommer. Ingen oskärpa: kanten och puffarna är hela förskjutningar.
+- **Instruktionen till ett val i rummet** (`valjIRummet`, t.ex. FILT) visas i molnet och läses upp där, och en gång till efter 8 s om inget val är gjort. Den visas inte längre först på läsplattan.
+- **Frågan ovanför korten** (`fragaFor`, `fragaRadHtml`): i läsvalen på läsplattan står pusslets instruktion, annars den upplästa repliken strax före pusslet i scenen, kvar överst i sin form: stjärnan för berättaren, ansiktet för någon annan. Ett tryck på stjärnan eller ansiktet läser den igen. Inte på packlistan, där listan är frågan.
+- **Luckorna:** ett läsval där alla alternativ är meningar visas som lådans lock (träram): frågan och bilden överst och en rad per lucka i hela bredden, med en liten lucka med gångjärn före meningen. Radbredden är 18 em, och texten växer med rummet bara så långt att en mening ryms på en rad, aldrig under 48 punkter.
+

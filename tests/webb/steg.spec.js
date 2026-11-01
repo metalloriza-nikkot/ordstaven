@@ -522,9 +522,9 @@ test('stigarna: frågan står på skylten, valet räknas vid kurvan, felet händ
 test('påminnelsen: egen text efter en stund, och har han inga bär trillar ett ner först', async ({ page }) => {
   await provscen(page, { id: 't_pam', pass: 1, rum: 'provskogen', steg: [R('{unge} är rädd.', 'berattare', { vantar_pa: 'mata_ungen', paminnelse: { efter_sek: 1, replik: R('Ge {unge} ett bär.') } }), R('Tack.')] },
     (t) => { t.aventyr['den-gomda-dalen'].bar = 0; }, { rum: { provskogen: { innehall: ['sten'] } } });
-  await expect(page.locator('#tanke')).toHaveText('KNOPP ÄR RÄDD.', { timeout: 8000 });
+  await expect(page.locator('#tanke .instruktion')).toHaveText('KNOPP ÄR RÄDD.', { timeout: 8000 });
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.tillstand().aventyr['den-gomda-dalen'].bar)).toBe(1);
-  await expect(page.locator('#tanke')).toHaveText('GE KNOPP ETT BÄR.', { timeout: 5000 });
+  await expect(page.locator('#tanke .instruktion')).toHaveText('GE KNOPP ETT BÄR.', { timeout: 5000 });
   await page.click('#hud-bar');
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('TACK.', { timeout: 8000 });
 });
@@ -821,6 +821,49 @@ test('menyn för vuxna hoppar till en scen i ett senare kapitel: det som kommer 
   await expect(page.locator('#hud-bar')).toBeVisible();
   // stegen står kvar vid apans bo (gläntan i tillståndet räddad)
   expect(await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt())).toContain('stege');
+});
+
+// ---------------------------------------------------------------- T4c (stilguiden §3)
+test('molnet: uppgiften står nere till vänster med en bild av handlingen och en högtalare som läser den igen', async ({ page }) => {
+  await provscen(page, { id: 't_moln', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [R('Tryck på bären, så får {unge} ett.', 'berattare', { vantar_pa: 'mata_ungen' }), R('Klart.')] });
+  const moln = page.locator('#tanke');
+  await expect(moln).toBeVisible();
+  await expect(moln.locator('.instruktion')).toHaveText('TRYCK PÅ BÄREN, SÅ FÅR KNOPP ETT.');
+  await expect(moln.locator('.moln-bild')).toBeVisible();
+  await expect(moln.locator('.moln-hogtalare')).toBeVisible();
+  // nere till vänster i rummet
+  const r = await moln.boundingBox(); const s = await page.evaluate(() => window.__ORDSTAVEN.skala());
+  expect(r.x).toBeLessThan(s.vanster + s.cssBredd / 2);
+  expect(r.y + r.height).toBeGreaterThan(s.topp + s.cssHojd / 2);
+  await page.screenshot({ path: 'test-results/t4c-molnet.png' });
+  await page.click('#tanke .moln-hogtalare');
+  await page.click('#hud-bar');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('KLART.', { timeout: 8000 });
+  await expect(moln).toBeHidden();
+});
+
+test('frågan står kvar ovanför korten, och ett tryck på stjärnan läser den igen', async ({ page }) => {
+  await provscen(page, { id: 't_fraga', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [R('Vad vill {unge} äta?'), { typ: 'pussel', pussel_id: 'p0_bar' }] });
+  await page.click('#plattan .replik-ruta');
+  await expect(page.locator('#plattan .kortrad')).toBeVisible({ timeout: 5000 });
+  await expect(page.locator('#plattan .fraga-rad .text')).toHaveText('VAD VILL KNOPP ÄTA?');
+  await expect(page.locator('#plattan .fraga-rad .stjarna')).toBeVisible();
+  await page.screenshot({ path: 'test-results/t4c-fragan.png' });
+});
+
+test('luckorna: frågan och bilden överst, tre rader i hela bredden som är luckor, en mening per rad', async ({ page }) => {
+  const luckor = kap01.pussel.find((p) => p.id === 'k1_luckorna');
+  await provscen(page, { id: 't_luckor', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'pussel', pussel_id: 't_luckorna' }] }, null, { pussel: [{ ...luckor, id: 't_luckorna' }] });
+  await page.click('#plattan .replik-ruta');
+  await expect(page.locator('#plattan .pussel-ruta.luckor')).toBeVisible({ timeout: 5000 });
+  await expect(page.locator('#plattan .fraga-rad .text')).toHaveText('VILKEN LUCKA STÄMMER?');
+  await expect(page.locator('#plattan .fraga-rad .fraga-bild')).toBeVisible();
+  const rader = page.locator('#plattan .kort.lucka');
+  await expect(rader).toHaveCount(3);
+  // varje mening ryms på en rad (skala ×4): raden är lägre än två textrader
+  for (const h of await rader.evaluateAll((els) => els.map((e) => e.querySelector('.kort-etikett').getBoundingClientRect().height / parseFloat(getComputedStyle(e.querySelector('.kort-etikett')).fontSize)))) expect(h).toBeLessThan(2);
+  await page.screenshot({ path: 'test-results/t4c-luckorna.png' });
+  await rader.first().click();
 });
 
 // ---------------------------------------------------------------- pass 3 och låset (beslut 24.2)

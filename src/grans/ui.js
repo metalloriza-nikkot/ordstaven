@@ -292,9 +292,9 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
   /** Frågan (tankebubblan) uppe i rummet medan spelaren letar. null döljer. @param {string | null} html */
   function visaTanke(html) { const t = $('#tanke'); t.hidden = !html; t.innerHTML = html || ''; }
   /**
-   * Tankebubblan får aldrig täcka det han ska välja (T6: hallens dörrar i bakväggen). Den står överst i mitten,
-   * och täcker den ett alternativ, en skylt eller en knapp flyttar den till första lediga plats: uppe till vänster
-   * eller höger, eller nere. @param {{ left: number, top: number, right: number, bottom: number }[]} hinder
+   * Molnet får aldrig täcka det han ska välja (T6: hallens dörrar i bakväggen). Det står nere till vänster (T4c,
+   * stilguiden §3), och täcker det ett alternativ, en skylt eller en knapp flyttar det till första lediga plats:
+   * nere i mitten, uppe till vänster, uppe i mitten eller uppe till höger. @param {{ left: number, top: number, right: number, bottom: number }[]} hinder
    * skärmrutor för alternativen @param {{ vanster: number, topp: number, bredd: number, hojd: number }} ram rummet på skärmen
    */
   function placeraTanke(hinder, ram) {
@@ -306,8 +306,9 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     const b = r0.width, h = r0.height, luft = 10;
     const krockar = (/** @type {number} */ x, /** @type {number} */ y) => alla.some((q) => x < q.right + 4 && q.left - 4 < x + b && y < q.bottom + 4 && q.top - 4 < y + h);
     const mitt = ram.vanster + (ram.bredd - b) / 2, hoger = ram.vanster + ram.bredd - b - luft, vanster = ram.vanster + luft;
-    const uppe = r0.top, nere = ram.topp + ram.hojd - h - luft;
-    for (const [x, y] of [[mitt, uppe], [vanster, uppe], [hoger, uppe], [mitt, nere], [vanster, nere], [hoger, nere]]) {
+    const uppe = ram.topp + luft, nere = ram.topp + ram.hojd - h - luft;
+    // molnet hör hemma nere till vänster (stilguiden §3); nere till höger är hans (bären, nosen), och uppe är världen
+    for (const [x, y] of [[vanster, nere], [mitt, nere], [vanster, uppe], [mitt, uppe], [hoger, uppe]]) {
       if (!krockar(x, y)) { t.style.transform = 'none'; t.style.left = Math.round(x) + 'px'; t.style.top = Math.round(y) + 'px'; return; }
     }
     t.style.left = ''; t.style.top = ''; t.style.transform = '';

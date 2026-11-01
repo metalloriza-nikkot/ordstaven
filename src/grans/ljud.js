@@ -60,6 +60,8 @@ export function skapaLjud({ tyst = () => false } = {}) {
       });
     },
     fagel: () => { ton({ f: 1900, t: 0.06, v: 0.14, typ: 'sine' }); ton({ f: 2500, t: 0.05, v: 0.12, typ: 'sine', d: 0.08 }); ton({ f: 2100, t: 0.08, v: 0.12, typ: 'sine', d: 0.17 }); },
+    // molnet kommer (stilguiden §3): ett mjukt pling
+    pling: () => { ton({ f: 1320, f2: 1480, t: 0.12, v: 0.12, typ: 'sine' }); ton({ f: 1980, t: 0.18, v: 0.07, typ: 'sine', d: 0.06 }); },
     prassel: () => { for (let i = 0; i < 5; i++) ton({ f: 2400 - i * 200, t: 0.04, v: 0.08, typ: 'sawtooth', d: i * 0.04 }); },
   };
   /** Ljud-id i innehållet → effekt. Okända id:n får ett allmänt ljud. */
