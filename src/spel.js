@@ -275,14 +275,15 @@ export function skapaSpel(d) {
   /**
    * Ljudordet (beslut 21.5) i världen vid det som låter: ovanför föremålet, annars överst mitt på skärmen
    * (dunket från vinden, fågeln vid fönstret). Det står i världen, så det syns inte när läsplattan täcker den.
-   * @param {string | undefined} ord @param {string} [ljudId] @param {string | null} [foremal]
+   * Färgen hör till ordet (stilguiden v0.26 §3), så att samma ord har samma färg också på en reaktion utan ljud-id.
+   * @param {string | undefined} ord @param {string} [ljudId] (används inte för färgen) @param {string | null} [foremal]
    */
   function visaLjudord(ord, ljudId, foremal) {
     if (!ord || !rum.harRum) return;
     const o = foremal ? rum.ruta(foremal) : null;
     const s = layout.skala;
     const punkt = o ? skarm(o.x + o.b / 2, o.y + 4) : { x: s.vanster + s.cssBredd / 2, y: s.topp + s.cssHojd * 0.3 };
-    ui.ljudord(ord, punkt, ljud.farg(ljudId || ''));
+    ui.ljudord(ord, punkt, ljud.farg(ord));
     logg.handelse('ljudord', ord);
   }
 
@@ -1149,7 +1150,7 @@ export function skapaSpel(d) {
         upptagen = true;
         const kort = /** @type {HTMLElement | null} */ (plattan().querySelector(`.kort[data-id="${CSS.escape(id)}"]`));
         if (r.resultat === 'fel') {
-          ljud.spela('fel'); kort?.classList.add('skakar');
+          ljud.spela('fel'); kort?.classList.add('sjunker');
           await reaktion(r.reaktion);
           rita();
         } else if (r.resultat === 'ratt') {
@@ -1518,7 +1519,7 @@ export function skapaSpel(d) {
         if (r.resultat === 'lagd') { tack(); ljud.spela('bricka'); rita(); upptagen = false; return; }
         rita();
         if (r.resultat === 'fel') {
-          tandForebild('fel'); ljud.spela('fel'); ui.plattan.querySelector('.platser')?.classList.add('skakar'); await vanta(tid(400));
+          tandForebild('fel'); ljud.spela('fel'); ui.plattan.querySelector('.platser')?.classList.add('gra'); await vanta(tid(400));
           // samma fel ord igen: bara ljudet och ungens blick
           if (/** @type {any} */ (r).samma) { logg.handelse('formel', `${p.id}: samma fel igen (kort)`); await kortReaktion(); } else await reaktion(r.reaktion);
           rita(); upptagen = false; return;
@@ -1654,7 +1655,7 @@ export function skapaSpel(d) {
       const tipsBokstav = () => (f.s.tips === null ? null : f.s.brickor.find((x) => x.id === f.s.tips)?.bokstav ?? null);
       const rita = () => {
         const bokstav = (/** @type {number | null} */ id) => (id === null ? '' : f.s.brickor.find((x) => x.id === id)?.bokstav ?? '');
-        const las = `<div class="kod-kort kod-las"><div class="kod-tecken">${c.tecken.map((t, i) => `<span class="kod-tecken-ruta ${f.s.last[i] ? 'ratt' : ''} ${i === visar ? 'visar' : ''}">${bilder.html(t)}</span>`).join('')}</div>
+        const las = `<div class="kod-kort kod-las"><span class="kod-bygel" aria-hidden="true"></span><div class="kod-tecken">${c.tecken.map((t, i) => `<span class="kod-tecken-ruta ${f.s.last[i] ? 'ratt' : ''} ${i === visar ? 'visar' : ''}">${bilder.html(t)}</span>`).join('')}</div>
           <div class="platser">${f.s.platser.map((id, i) => `<span class="plats ${f.s.last[i] ? 'last' : ''} ${id !== null && !f.s.last[i] ? 'flyttbar' : ''}" data-plats="${i}">${ui.esc(bokstav(id))}</span>`).join('')}</div></div>`;
         const tb = tipsBokstav();
         const nyckel = `<div class="kod-kort kod-nyckel">${c.nyckel.map((n) => `<span class="kod-par ${visar >= 0 && n.tecken === c.tecken[visar] ? 'visar' : ''} ${tb && n.bokstav === tb ? 'tips' : ''}">${bilder.html(n.tecken)}<span class="kod-bokstav">${ui.esc(n.bokstav)}</span></span>`).join('')}</div>`;
@@ -1671,7 +1672,7 @@ export function skapaSpel(d) {
         if (r.resultat === 'lagd') { visar = -1; ljud.spela('bricka'); rita(); upptagen = false; return; }
         if (r.resultat === 'fel') {
           logg.handelse('val', `${p.id}: fel ord`, { ratt: f.s.senastRatt });
-          ljud.spela('klonk'); rita(); ui.plattan.querySelector('.kod-las')?.classList.add('skakar');
+          ljud.spela('klonk'); rita(); ui.plattan.querySelector('.kod-las')?.classList.add('rasslar');
           await vanta(tid(400));
           if (/** @type {any} */ (r).samma) await kortReaktion(); else await reaktion(r.reaktion);
           rita(); upptagen = false; return;

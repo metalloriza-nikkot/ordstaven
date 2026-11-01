@@ -543,3 +543,8 @@ Stilguiden §3 gick igenom mot spelet. Det som saknades är byggt här, resten f
 - **Frågan ovanför korten** (`fragaFor`, `fragaRadHtml`): i läsvalen på läsplattan står pusslets instruktion, annars den upplästa repliken strax före pusslet i scenen, kvar överst i sin form: stjärnan för berättaren, ansiktet för någon annan. Ett tryck på stjärnan eller ansiktet läser den igen. Inte på packlistan, där listan är frågan.
 - **Luckorna:** ett läsval där alla alternativ är meningar visas som lådans lock (träram): frågan och bilden överst och en rad per lucka i hela bredden, med en liten lucka med gångjärn före meningen. Radbredden är 18 em, och texten växer med rummet bara så långt att en mening ryms på en rad, aldrig under 48 punkter.
 
+## 36. T4d: ljudordens färger, animationer och fel utan skakning (0.12.1)
+- **Ljudordens färger** (`ljud.farg(ord)`, stilguiden v0.26 §3): färgen slås upp på ordet, inte på ljud-id:t, så att en reaktion utan ljud (KLONK, PIP, HO HO) får samma färg som samma ord från ett `ljud`-steg. Okända ord får läsplattans papper (#F5ECD7). Ett nytt ljudord får sin färg av Stil.
+- **Animera bara opacitet och läge** (§8, golvdatorn): en glöd är ett eget lager (`::after`) med hel kant eller platt färg, och bara dess opacitet pulserar (`glod`, `glodpuls`). Styrhjälpens tangent är en kant (`.tangent`) och en yta (`.yta`) som flyttas. `tests/enhet/stil.test.js` läser `src/stil.css` och säger fel om en `@keyframes` ändrar något annat än opacitet och läge (undantag: vuxenmenyns `fyll`), om något använder `filter`, och om något skakar utom ungens nos.
+- **Fel skakar aldrig** (25.4, §7): `.kort.sjunker` (läsplattans kort), `.platser.gra` (formeln och räddningen) och `.kod-las.rasslar`, där bara bygeln (`.kod-bygel`) rör sig.
+

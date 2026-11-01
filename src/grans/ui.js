@@ -455,11 +455,11 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
   function styrhjalp(typ, punkt) {
     const e = $('#styrhjalp');
     e.hidden = !typ; e.className = typ || '';
-    if (typ === 'pilar') e.innerHTML = '<span class="tangent upp">▲</span><span class="tangent vanster">◀</span><span class="tangent ner">▼</span><span class="tangent hoger">▶</span>';
+    if (typ === 'pilar') e.innerHTML = '<span class="tangent upp"><span class="yta">▲</span></span><span class="tangent vanster"><span class="yta">◀</span></span><span class="tangent ner"><span class="yta">▼</span></span><span class="tangent hoger"><span class="yta">▶</span></span>';
     else if (typ === 'tryck' && punkt) { ankra(e); e.innerHTML = '<span class="finger">👆</span>'; e.style.left = punkt.x + 'px'; e.style.top = punkt.y + 'px'; }
-    else if (typ === 'mellanslag') e.innerHTML = '<span class="tangent mellanslag" aria-hidden="true"></span>'; // en bred tangent som trycks ned
+    else if (typ === 'mellanslag') e.innerHTML = '<span class="tangent mellanslag" aria-hidden="true"><span class="yta"></span></span>'; // en bred tangent som trycks ned
     else if (typ === 'tab') { // Tab-tangenten, som tänder nosen, under nosknappen
-      e.innerHTML = '<span class="tangent tab" aria-hidden="true">⇥</span>';
+      e.innerHTML = '<span class="tangent tab" aria-hidden="true"><span class="yta">⇥</span></span>';
       if (punkt) { e.style.left = punkt.x + 'px'; e.style.top = punkt.y + 'px'; }
     }
     else e.innerHTML = '';

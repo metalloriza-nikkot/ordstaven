@@ -210,8 +210,14 @@ html, body {
 .kort.ratt { box-shadow: 0 5px 0 #6aa36a, 0 0 0 4px #8fd18f; }
 .kort.pekar { box-shadow: 0 5px 0 #c8bb9c, 0 0 0 5px var(--guld); }
 .nos-pekar { position: absolute; top: -18px; right: -14px; font-size: 32px; animation: guppa 1s infinite; }
-.skakar { animation: skaka .35s; }
-@keyframes skaka { 25% { transform: translateX(-8px) rotate(-2deg); } 75% { transform: translateX(8px) rotate(2deg); } }
+/* fel skakar aldrig (stilguiden v0.26 §7, beslut 25.4): ett fel kort sjunker lite och blir grått, formelns platser
+   blir grå en stund, och kodlåset rasslar bara med bygeln. Bara läge och opacitet rör sig. */
+.kort.sjunker { transform: translateY(10px); opacity: .6; background: #d9d4ca; box-shadow: 0 2px 0 #b3ac9e, 0 0 0 3px #cfc8b9; transition: transform .25s ease-in, opacity .25s; }
+.platser.gra .plats { background: #d9d4ca; color: #8f887c; border-color: #b3ac9e; }
+.kod-las { position: relative; margin-top: calc(30px * var(--t)); }
+.kod-bygel { position: absolute; left: 50%; top: calc(-30px * var(--t)); width: calc(60px * var(--t)); height: calc(38px * var(--t)); margin-left: calc(-30px * var(--t)); box-sizing: border-box; border: calc(9px * var(--t)) solid #9b8f7c; border-bottom: 0; border-radius: calc(30px * var(--t)) calc(30px * var(--t)) 0 0; }
+.kod-las.rasslar .kod-bygel { animation: rassla .45s linear; }
+@keyframes rassla { 15%, 55% { transform: translateY(-5px); } 35%, 75% { transform: translateY(0); } 90% { transform: translateY(-2px); } }
 .ryggsack { font-size: 48px; }
 
 .bild { display: inline-flex; align-items: center; justify-content: center; }
@@ -312,9 +318,9 @@ html, body {
 /* startskärmens stav: glöden ligger stilla i ett eget lager, och bara dess opacitet pulserar. En skugga med oskärpa
    som ändrar storlek ritas om i varje bildruta, och på golvdatorn gav startskärmen ca 20 bildrutor per sekund. */
 .stav-glimt { position: relative; width: 24px; height: 220px; border-radius: 12px; background: linear-gradient(#8a6a4a, #6b4c35); transform: rotate(18deg); }
-.stav-glimt::after { content: ''; position: absolute; inset: 0; border-radius: 12px; box-shadow: 0 0 50px 14px rgba(242, 193, 78, .6); animation: glod 2s ease-in-out infinite; will-change: opacity; }
+/* glöden är en ring med hel kant (ingen oskärpa), och bara dess opacitet pulserar (stilguiden §8, golvdatorn) */
+.stav-glimt::after { content: ''; position: absolute; inset: -14px; border-radius: 24px; border: 8px solid rgba(242, 193, 78, .6); box-shadow: 0 0 0 10px rgba(242, 193, 78, .25); animation: glod 2s ease-in-out infinite; will-change: opacity; }
 @keyframes glod { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
-@keyframes glimt { 50% { box-shadow: 0 0 60px 18px rgba(242, 193, 78, .75); } }
 .start-knapp { width: 140px; height: 140px; border-radius: 70px; font-size: 64px; background: var(--guld); }
 .stor-ikon { font-size: 140px; }
 .pass-slut .knappar { display: flex; gap: 32px; }
@@ -416,14 +422,17 @@ html, body {
 /* styrhjälpen: piltangenterna (dator) eller ett finger som trycker (pekskärm), utan text */
 #styrhjalp { position: absolute; pointer-events: none; z-index: 4; }
 #styrhjalp.pilar { left: calc(var(--rum-vanster) + var(--rum-bredd) / 2); bottom: calc(100vh - var(--rum-topp) - var(--rum-hojd) + 16px); transform: translateX(-50%); display: grid; grid-template-columns: repeat(3, 52px); grid-template-rows: 52px 52px; gap: 6px; }
-#styrhjalp .tangent { display: flex; align-items: center; justify-content: center; border-radius: 10px; background: #f5ecd7; color: var(--black); font-size: 22px; box-shadow: 0 5px 0 #b7a98a; animation: tangentpuls 1.6s ease-in-out infinite; }
-#styrhjalp .upp { grid-column: 2; grid-row: 1; } #styrhjalp .vanster { grid-column: 1; grid-row: 2; animation-delay: .4s; }
-#styrhjalp .ner { grid-column: 2; grid-row: 2; animation-delay: .8s; } #styrhjalp .hoger { grid-column: 3; grid-row: 2; animation-delay: 1.2s; }
-@keyframes tangentpuls { 0%, 70%, 100% { transform: none; } 80% { transform: translateY(4px); box-shadow: 0 1px 0 #b7a98a; } }
+/* en tangent: basen (den mörka kanten) står still, och ytan flyttas ned när den trycks (bara läge, stilguiden §8) */
+#styrhjalp .tangent { display: flex; border-radius: 10px; background: #b7a98a; padding-bottom: 5px; color: var(--black); font-size: 22px; }
+#styrhjalp .tangent .yta { flex: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; background: #f5ecd7; animation: tangentpuls 1.6s ease-in-out infinite; }
+#styrhjalp .upp { grid-column: 2; grid-row: 1; } #styrhjalp .vanster { grid-column: 1; grid-row: 2; } #styrhjalp .vanster .yta { animation-delay: .4s; }
+#styrhjalp .ner { grid-column: 2; grid-row: 2; } #styrhjalp .ner .yta { animation-delay: .8s; } #styrhjalp .hoger { grid-column: 3; grid-row: 2; } #styrhjalp .hoger .yta { animation-delay: 1.2s; }
+@keyframes tangentpuls { 0%, 70%, 100% { transform: none; } 80% { transform: translateY(4px); } }
 #styrhjalp.tryck { transform: translate(-30%, 10%); }
 #styrhjalp.mellanslag { left: calc(var(--rum-vanster) + var(--rum-bredd) / 2); bottom: calc(100vh - var(--rum-topp) - var(--rum-hojd) + 16px); transform: translateX(-50%); }
-#styrhjalp .tangent.mellanslag { width: 220px; height: 48px; animation: mellanslagpuls 1.2s ease-in-out infinite; }
-@keyframes mellanslagpuls { 0%, 60%, 100% { transform: translateY(0); box-shadow: 0 5px 0 #b7a98a; } 30% { transform: translateY(4px); box-shadow: 0 1px 0 #b7a98a; } }
+#styrhjalp .tangent.mellanslag { width: 220px; height: 53px; }
+#styrhjalp .tangent.mellanslag .yta, #styrhjalp .tangent.tab .yta { animation: mellanslagpuls 1.2s ease-in-out infinite; }
+@keyframes mellanslagpuls { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(4px); } }
 #styrhjalp .finger { display: block; font-size: 56px; animation: fingertryck 1.2s ease-in-out infinite; }
 @keyframes fingertryck { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
 .snabb #styrhjalp * { animation: none; }
@@ -431,7 +440,7 @@ html, body {
 #styrhjalp.over-platta { z-index: 30; }
 /* Tab under nosknappen: tangenten som tänder nosen på datorn */
 #styrhjalp.tab { transform: translate(-50%, 10px); }
-#styrhjalp .tangent.tab { width: 86px; height: 50px; font-size: 30px; animation: mellanslagpuls 1.2s ease-in-out infinite; }
+#styrhjalp .tangent.tab { width: 86px; height: 55px; font-size: 30px; }
 
 /* rumsbyten: förra rummet som bild bredvid det nya under glidningen, toning för hopp som inte är grannrum */
 #varld .forra-rummet { position: absolute; left: 0; top: 0; width: 100%; height: 100%; image-rendering: pixelated; pointer-events: none; }
@@ -464,8 +473,10 @@ html, body {
 
 /* nosen på tangentbordet: ordet som Tab har markerat, och ordet som glimtar när spelaren ska nosa själv (s09) */
 .nosar .ord.markerad { outline: 4px solid var(--guld); outline-offset: 3px; background: rgba(242, 193, 78, .7); }
-.ord.glimtar { animation: ordglimt 1.4s ease-in-out infinite; }
-@keyframes ordglimt { 0%, 100% { box-shadow: 0 3px 0 var(--guld), 0 0 0 0 rgba(242, 193, 78, 0); } 50% { box-shadow: 0 3px 0 var(--guld), 0 0 0 8px rgba(242, 193, 78, .55); } }
+/* ordet som glimtar: guldlinjen står still, och glöden är ett eget lager vars opacitet pulserar (stilguiden §8) */
+.ord.glimtar { position: relative; z-index: 0; box-shadow: 0 3px 0 var(--guld); }
+.ord.glimtar::after { content: ''; position: absolute; inset: -6px -5px; z-index: -1; border-radius: 8px; background: rgba(242, 193, 78, .5); pointer-events: none; opacity: 0; animation: glodpuls 1.4s ease-in-out infinite; }
+@keyframes glodpuls { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
 .snabb .ord.glimtar { animation: none; }
 
 /* pilskylten vid en stig: pilen pekar längs stigen, efter ordet */
@@ -530,9 +541,9 @@ html, body {
 .paus-ikon { display: inline-flex; gap: 6px; }
 .paus-ikon i { display: block; width: 7px; height: 22px; border-radius: 2px; background: var(--papper); }
 /* nytt i hjälteboken: pausknappen glimtar en gång */
-#hud-paus.glimt { animation: pausglimt .5s ease-in-out 2; }
-@keyframes pausglimt { 50% { background: var(--guld); box-shadow: 0 0 0 6px rgba(242, 193, 78, .5); transform: scale(1.12); } }
-.snabb #hud-paus.glimt { animation-duration: .05s; }
+/* något nytt i pausmenyn: en guldring över knappen tonas in och ut två gånger (bara opacitet, stilguiden §8) */
+#hud-paus.glimt::after { content: ''; position: absolute; inset: -6px; border-radius: 50%; border: 6px solid rgba(242, 193, 78, .8); background: rgba(242, 193, 78, .45); pointer-events: none; opacity: 0; animation: glodpuls .5s ease-in-out 2; }
+.snabb #hud-paus.glimt::after { animation-duration: .05s; }
 #pausmeny { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(20, 14, 10, .88); z-index: 6; font-style: normal; }
 .pausmeny { position: relative; display: flex; flex-direction: column; align-items: center; gap: 20px; width: min(92vw, calc(var(--rum-bredd) * .9)); max-height: 92vh; padding: 24px; border-radius: 20px; background: var(--papper); color: var(--black); }
 .paus-start { display: flex; gap: 32px; }

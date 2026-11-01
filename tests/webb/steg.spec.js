@@ -252,8 +252,9 @@ test('kodlåset: ungen visar första tecknet, låset kontrolleras när hela orde
   expect(await page.locator('#plattan .plats.last').count()).toBe(0); // ingen kontroll än
   await bricka(page, 'M').click();
   await expect.poll(() => page.locator('#plattan .plats.last').count(), { timeout: 8000 }).toBe(2); // H och M stannar
+  await page.screenshot({ path: 'test-results/kodlas-fel.png' });
   expect(await page.locator('#plattan .kod-tecken-ruta.ratt').count()).toBe(2);
-  await expect(page.locator('#plattan .kod-las.skakar')).toHaveCount(0, { timeout: 8000 }); // felreaktionen är klar
+  await expect(page.locator('#plattan .kod-las.rasslar')).toHaveCount(0, { timeout: 8000 }); // felreaktionen är klar
   await bricka(page, 'E').click();
   await expect(page.locator('#plattan .formel-i-luften')).toHaveText('HEM', { timeout: 5000 });
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('ÖPPET.', { timeout: 10000 });
@@ -273,7 +274,7 @@ test('SVÄRD utifrån bilden: ingen förebild från början, den tänds vid fel,
   // första felet: ordet tänds bredvid bilden
   await expect(page.locator('#plattan .formel-overst .forebild')).toBeVisible({ timeout: 8000 });
   await expect(page.locator('#plattan .forebild')).not.toHaveClass(/tonad/);
-  await expect(page.locator('#plattan .platser.skakar')).toHaveCount(0, { timeout: 8000 });
+  await expect(page.locator('#plattan .platser.gra')).toHaveCount(0, { timeout: 8000 });
   await page.screenshot({ path: 'test-results/svard-bilden-efter-fel.png' });
   // nästa bricka: det tonas bort, och ungen håller för ögonen
   await bricka(page, 'V').click();
@@ -281,7 +282,7 @@ test('SVÄRD utifrån bilden: ingen förebild från början, den tänds vid fel,
   await expect(page.locator('#plattan .unge-tacker')).toBeVisible();
   for (const b of 'DÄR') await bricka(page, b).click(); // SVDÄR: fel igen
   await expect(page.locator('#plattan .forebild')).not.toHaveClass(/tonad/, { timeout: 8000 });
-  await expect(page.locator('#plattan .platser.skakar')).toHaveCount(0, { timeout: 8000 });
+  await expect(page.locator('#plattan .platser.gra')).toHaveCount(0, { timeout: 8000 });
   // nu står det kvar resten av försöket
   await bricka(page, 'Ä').click();
   await expect(page.locator('#plattan .forebild')).not.toHaveClass(/tonad/);
@@ -299,7 +300,7 @@ test('samma fel ord två gånger i en formel: andra gången bara ljudet och unge
   await expect(page.locator('#plattan .formel-bild')).toBeVisible({ timeout: 8000 });
   for (const b of 'DRSVÄ') await bricka(page, b).click(); // fel: ingen bokstav rätt, alla går tillbaka
   await expect(page.locator('#plattan .svar-rad')).toHaveText(/NÄSTAN! HÄR STÅR ORDET\./, { timeout: 8000 });
-  await expect(page.locator('#plattan .platser.skakar')).toHaveCount(0, { timeout: 8000 });
+  await expect(page.locator('#plattan .platser.gra')).toHaveCount(0, { timeout: 8000 });
   await page.waitForTimeout(300);
   for (const b of 'DRSVÄ') await bricka(page, b).click(); // samma fel igen
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 8000 }).toContain('samma fel igen (kort)');
@@ -331,7 +332,7 @@ test('titta–täck: förebilden tonas bort vid första brickan och tänds igen 
   await expect(page.locator('#plattan .unge-tacker')).toBeVisible();
   for (const b of 'DRVÄ') await bricka(page, b).click(); // SDRVÄ: fel
   await expect(page.locator('#plattan .forebild')).not.toHaveClass(/tonad/, { timeout: 8000 });
-  await expect(page.locator('#plattan .platser.skakar')).toHaveCount(0, { timeout: 8000 }); // felreaktionen är klar
+  await expect(page.locator('#plattan .platser.gra')).toHaveCount(0, { timeout: 8000 }); // felreaktionen är klar
   // förebilden står kvar resten av försöket
   for (const b of 'VÄRD') await bricka(page, b).click();
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('SVÄRDET!', { timeout: 10000 });

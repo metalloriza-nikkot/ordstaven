@@ -69,6 +69,11 @@ export function skapaLjud({ tyst = () => false } = {}) {
     dunk: 'dunk', klaffen_tick: 'tick', fagel_late: 'skata', unge_forsta_late: 'unge', unge_langtan: 'unge', unge_svarar: 'unge', mage_kurrar: 'mage', hackspett: 'klick',
   });
 
+  /** Stilguiden v0.26 §3. Ett nytt ljudord får sin färg av Stil innan Innehåll lägger in det. */
+  const LJUDORD_FARG = /** @type {Record<string, string>} */ ({
+    dunk: '#f5d9a8', brum: '#f4a6b8', buhu: '#8fcbf2', 'tok tok': '#c8e36a', 'ho ho': '#ffd95a', klonk: '#b9c6d3', pip: '#a6e3cf',
+  });
+
   return {
     starta,
     /** @param {string} namn effekt eller ljud-id ur innehållet */
@@ -76,9 +81,13 @@ export function skapaLjud({ tyst = () => false } = {}) {
      * Pipet när rösten är av (beslut 21.2): lågt och mjukt, ett per ord, med en egen ton per figur.
      * @param {string} roll talarens rollröst
      */
-    /** Ljudordets färg för ett ljud-id (stilguiden §3: i ljudets färg). @param {string} id */
-    farg(id) {
-      return /** @type {Record<string, string>} */ ({ dunk: '#d9935a', fagel_late: '#8fd0f0', mage_kurrar: '#f0c060', apa_gnaller: '#f0dc6a', hackspett: '#e08a5a' })[id] ?? '#f2c14e';
+    /**
+     * Ljudordets färg (stilguiden v0.26 §3): färgen hör till ordet, så att samma ord har samma färg överallt. Alltid
+     * ljus fyllning (konturen är mörk), aldrig baronens orange eller rött, och guld bara vid rätt. Ett ord som Stil
+     * inte har gett en färg får läsplattans papper. @param {string} ord ljudordet i vanlig skrift
+     */
+    farg(ord) {
+      return LJUDORD_FARG[(ord || '').toLocaleLowerCase('sv-SE').trim()] ?? '#f5ecd7';
     },
     pip(roll) {
       if (tyst()) return;
