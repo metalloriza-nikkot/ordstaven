@@ -89,6 +89,12 @@ export class Rum extends Phaser.Scene {
     this.sparrade = new Set();
     /** @type {any[]} saker som hjälten har lagt ifrån sig i rummet */
     this.lagda = [];
+    /** @type {any} luftskeppet i rummet (regi, s22): bilden, läget och dess timrar */
+    this.luft = null;
+    /** @type {string | null} den senaste sidovyn som visades (för testerna) */
+    this.senasteSidovy = null;
+    /** @type {string[]} luftskeppets lägen i den ordning de visades (för testerna) */
+    this.regiLogg = [];
     this.tillstand = /** @type {string | null} */ (null);
     /** @type {{ ids: string[], klar: (id: string) => void } | null} */
     this.vantar = null;
@@ -146,7 +152,11 @@ export class Rum extends Phaser.Scene {
     this.lagerObjekt = this.add.container(0, 0);
     this.ljusboll = this.add.graphics().setVisible(false);
     this.lagerFigurer = this.add.container(0, 0);
+    // det som är i luften (luftskeppet i s22) syns ovanför figurerna
+    this.lagerLuft = this.add.container(0, 0);
     this.morker = this.add.graphics();
+    // Herr Skatas fönster (kartans skata_fonster) ligger ovanför mörkret, så att han syns där på natten (beslut 28.3)
+    this.lagerLjust = this.add.container(0, 0);
     this.hjalte = this.add.container(0, 0);
     this.unge = this.add.container(0, 0).setVisible(false);
     this.lagerFigurer.add([this.unge, this.hjalte]);
@@ -158,6 +168,8 @@ export class Rum extends Phaser.Scene {
     if (this.b.mjukvara) this.events.on('postupdate', () => this.valjRitning());
     this.malKors = this.add.graphics().setVisible(false);
     this.malKors.fillStyle(FARG.markerad).fillRect(-3, 0, 7, 1).fillRect(0, -3, 1, 7);
+    // sidovyn (en mellanscen från sidan, t.ex. in i skogen) täcker hela skärmen ovanför allt i rummet
+    this.sidovy = this.add.container(0, 0).setVisible(false);
     // tryck på ett objekt = gå fram till det
     this.b.inmatning.lyssna((h) => {
       if (h.typ !== 'tryck') return;
@@ -351,7 +363,7 @@ export class Rum extends Phaser.Scene {
   sov() {
     const o = this.objekt.find((x) => x.sovplats), img = o ? this.ritade.get(o.id) : null;
     if (!o || !img || !img.setFrame || !this.textures.get('hjalte').has('hjalte_sang_03')) return false;
-    this.sover = { id: o.id, img, tex: img.texture.key, ram: img.frame.name };
+    this.sover = { id: o.id, img, tex: img.texture.key, ram: img.frame.name, ungeGomd: false, andas: /** @type {any} */ (null) };
     img.setTexture(this.hjalteTextur || 'hjalte', 'hjalte_sang_03');
     this.hjalte.setVisible(false);
     this.sover.andas = this.time.addEvent({ delay: 900, loop: true, callback: () => { img.setFrame(img.frame.name === 'hjalte_sang_03' ? 'hjalte_sang_04' : 'hjalte_sang_03'); this.smutsig = true; } });
@@ -368,6 +380,8 @@ export class Rum extends Phaser.Scene {
     s.img.setTexture(s.tex, s.ram);
     const o = this.ruta(s.id);
     if (o) { this.pos = this.hinder.narmasteFria(framforFran(o, { x: o.x + o.b / 2, y: o.y + o.h + 12 }, this.inomhus, this.vagg, this.massiv)); this.vand = { x: 0, y: 1 }; }
+    // ungen låg på täcket (morgonen i sängen): den hoppar ned bredvid honom
+    if (s.ungeGomd) { this.ungePos = this.hinder.narmasteFria({ x: this.pos.x - 18, y: this.pos.y }); this.unge.setVisible(this.harRum && this.visaUnge); }
     this.hjalte.setVisible(this.harRum);
     this.placera(); this.smutsig = true;
   }
@@ -390,6 +404,23 @@ export class Rum extends Phaser.Scene {
       })();
     }
     const k = this.kamera, y = k.y + 34; // under knapparna i hörnen
+    // luftskeppet är här (s22): Herr Skata kommer från höger och landar på baronens hjälm
+    if (this.luft && figur === 'herr_skata' && this.textures.get(figur).has('herr_skata_flyga_vanster_01')) {
+      const l = this.luft, mal = { x: l.mal.x + 56, y: l.mal.y + 42 }; // hjälmen i bilden
+      const f = this.add.image(k.x + RUM.bredd + 4, y, figur, 'herr_skata_flyga_vanster_01').setOrigin(0.5, 1);
+      this.lagerLuft.add(f);
+      return new Promise((klar) => {
+        const fran = { x: f.x, y: f.y };
+        this.tweens.add({
+          targets: f, x: mal.x, duration: Math.max(1, ms * 0.6), ease: 'Sine.easeOut',
+          onUpdate: (tw) => {
+            f.x = Math.round(f.x); f.y = Math.round(fran.y + (mal.y - fran.y) * tw.progress + Math.sin(tw.progress * Math.PI * 3) * 3);
+            f.setFrame(`herr_skata_flyga_vanster_0${1 + (Math.floor(this.time.now / 140) % 2)}`); this.smutsig = true;
+          },
+          onComplete: () => { f.destroy(); if (this.luft === l) this.luftskepp('skata_landar'); klar(); },
+        });
+      });
+    }
     const f = this.add.image(k.x - 20, y, figur, `${figur}_flyga_hoger_01`).setOrigin(0, 0);
     this.lagerFigurer.add(f);
     return new Promise((klar) => {
@@ -402,6 +433,183 @@ export class Rum extends Phaser.Scene {
         onComplete: () => { f.destroy(); this.smutsig = true; klar(); },
       });
     });
+  }
+
+  // ------------------------------------------------------------------ regi: mellanscener med bild (Stil 20:35)
+
+  /**
+   * En mellanscen med bild (stegets `bild`): något händer i rummet, utan text. En bild som inte finns gör
+   * ingenting, och då visar spelet beskrivningen som i gråboxen.
+   * - `hjalte_sang_morgon`: morgonen i sängen, ungen slickar honom på näsan (s19);
+   * - `luftskepp_<läge>`: luftskeppet med baronen och Herr Skata (s22), se `luftskepp`;
+   * - en sidovy (`assets/sidovyer/<bild>_bakgrund.png`), se `visaSidovy`.
+   * @param {string} bild @returns {number} hur länge mellanscenen visas (ms), 0 = ingen bild
+   */
+  regi(bild) {
+    if (!this.harRum || !bild) return 0;
+    if (bild === 'hjalte_sang_morgon') return this.morgonISangen() ? 2400 : 0;
+    if (bild.startsWith('luftskepp_')) {
+      const lage = bild.slice('luftskepp_'.length);
+      return this.luftskepp(lage) ? ({ glider: 2800, skata_putsar: 2200, trasslar: 2000 })[lage] ?? 1400 : 0;
+    }
+    if (this.textures.exists(`sidovy_${bild}_bakgrund`)) { this.visaSidovy(bild); return 4200; }
+    return 0;
+  }
+
+  /** Luftskeppet, hjälmen och sidovyn tas bort (nytt rum). */
+  rensaRegi() {
+    if (this.luft) { for (const t of this.luft.tider) t.remove(); this.luft.gung.remove(); this.tweens.killTweensOf(this.luft.img); this.luft = null; }
+    this.lagerLuft?.each((/** @type {any} */ x) => this.tweens.killTweensOf(x));
+    this.lagerLuft?.removeAll(true);
+    if (this.sidovy) this.rensaSidovy();
+  }
+
+  /** Morgonen i sängen (s19): han är vaken och skrattar, och ungen på täcket slickar honom på näsan. @returns {boolean} */
+  morgonISangen() {
+    const s = this.sover;
+    if (!s || !s.img.texture.has('hjalte_sang_morgon_01')) return false;
+    s.andas.remove();
+    s.ungeGomd = true; this.unge.setVisible(false);
+    s.img.setFrame('hjalte_sang_morgon_01');
+    s.andas = this.time.addEvent({ delay: 260, loop: true, callback: () => { s.img.setFrame(s.img.frame.name === 'hjalte_sang_morgon_01' ? 'hjalte_sang_morgon_02' : 'hjalte_sang_morgon_01'); this.smutsig = true; } });
+    this.smutsig = true;
+    return true;
+  }
+
+  /**
+   * Luftskeppet (s22): hela bilder i baronens atlas (Stil 20:35), som byts och flyttas. Lägena kommer i
+   * berättelsens ordning, men vart och ett går att visa direkt (efter en omstart mitt i scenen).
+   * - glider: glider in från vänster med snurrande propeller, kikaren åt fel håll, och svävar sedan stilla;
+   * - skata_landar: Herr Skata på hjälmen, fjädern på sned;
+   * - ser_hjalten: kikaren vänd, han ser hjälten;
+   * - talar: munnen öppen och stängd (medan baronen talar, se `talar`);
+   * - skata_putsar: Herr Skata putsar sig och snor en medalj;
+   * - trasslar: baronen trasslar in sig i repstegen, och hjälmen trillar ned på gräset.
+   * @param {string} lage @returns {boolean}
+   */
+  luftskepp(lage) {
+    if (!this.textures.exists('baronen') || !this.textures.get('baronen').has('luftskepp_glider_01')) return false;
+    const k = this.kamera, mal = { x: Math.round(k.x + 64), y: k.y + 2 };
+    if (!this.luft) {
+      const img = this.add.image(lage === 'glider' ? k.x - 112 : mal.x, mal.y, 'baronen', 'luftskepp_glider_01').setOrigin(0, 0);
+      this.lagerLuft.add(img);
+      // det svävar: upp och ned en pixel
+      const gung = this.time.addEvent({ delay: 700, loop: true, callback: () => { if (this.luft && !this.luft.glider) { img.y = mal.y + (img.y === mal.y ? 1 : 0); this.smutsig = true; } } });
+      this.luft = { img, lage: '', tider: /** @type {Phaser.Time.TimerEvent[]} */ ([]), gung, glider: false, mal };
+    }
+    const l = this.luft, img = l.img;
+    this.regiLogg.push(lage); if (this.regiLogg.length > 40) this.regiLogg.shift();
+    for (const t of l.tider) t.remove();
+    l.tider = []; l.lage = lage;
+    const ram = (/** @type {string} */ r) => { img.setFrame(`luftskepp_${r}`); this.smutsig = true; };
+    // två bilder om vartannat tills läget byts
+    const vaxla = (/** @type {string[]} */ ramar, /** @type {number} */ ms) => {
+      let i = 0; ram(ramar[0]);
+      l.tider.push(this.time.addEvent({ delay: ms, loop: true, callback: () => { i++; ram(ramar[i % ramar.length]); } }));
+    };
+    const sedan = (/** @type {number} */ ms, /** @type {() => void} */ f) => l.tider.push(this.time.delayedCall(ms, () => { for (const t of l.tider) t.remove(); l.tider = []; f(); }));
+    if (lage === 'glider') {
+      vaxla(['glider_01', 'glider_02'], 140);
+      if (img.x !== mal.x) {
+        l.glider = true;
+        this.tweens.add({ targets: img, x: mal.x, duration: 2600, ease: 'Sine.easeOut', onUpdate: () => { img.x = Math.round(img.x); this.smutsig = true; }, onComplete: () => { l.glider = false; } });
+      }
+      return true;
+    }
+    if (l.glider) { this.tweens.killTweensOf(img); img.x = mal.x; l.glider = false; }
+    if (lage === 'skata_putsar') { vaxla(['skata_putsar_01', 'skata_putsar_02'], 260); sedan(1700, () => ram('skata_snor')); return true; }
+    if (lage === 'talar') { vaxla(['talar_01', 'talar_02'], 180); return true; }
+    if (lage === 'trasslar') {
+      ram('trasslar_01');
+      sedan(700, () => { ram('trasslar_02'); this.tappaHjalmen(); });
+      return true;
+    }
+    if (this.textures.get('baronen').has(`luftskepp_${lage}`)) { ram(lage); return true; }
+    return false;
+  }
+
+  /** Baronens tropikhjälm trillar ur gondolen och landar i gräset, där den ligger kvar. */
+  tappaHjalmen() {
+    const l = this.luft; if (!l || !this.textures.get('baronen').has('baronen_hjalm')) return;
+    const fran = { x: l.img.x + 70, y: l.img.y + 48 }; // där hjälmen sitter i trasslar_01
+    const h = this.add.image(fran.x, fran.y, 'baronen', 'baronen_hjalm').setOrigin(0.5, 1);
+    this.lagerLuft.add(h);
+    const golv = Math.min(this.kamera.y + RUM.hojd - 30, fran.y + 96);
+    this.tweens.add({
+      targets: h, y: golv, duration: 900, ease: 'Bounce.easeOut',
+      // den gungar lite när den faller, och ligger rättvänd i gräset
+      onUpdate: (tw) => { h.x = Math.round(fran.x + tw.progress * 10); h.y = Math.round(h.y); h.angle = Math.round(Math.sin(tw.progress * Math.PI * 3) * (1 - tw.progress) * 3) * 15; this.smutsig = true; },
+      onComplete: () => { h.angle = 0; this.smutsig = true; },
+    });
+  }
+
+  /**
+   * Baronen talar från luftskeppet: munnen rör sig medan repliken läses, och stängs sedan. Gäller bara när han
+   * har sett hjälten (före det tittar han i kikaren). @param {string} talare @param {boolean} pa
+   */
+  talar(talare, pa) {
+    const l = this.luft;
+    if (talare !== 'baronen' || !l || !['ser_hjalten', 'talar'].includes(l.lage)) return;
+    if (pa) this.luftskepp('talar');
+    else { for (const t of l.tider) t.remove(); l.tider = []; l.img.setFrame('luftskepp_talar_02'); this.smutsig = true; }
+  }
+
+  /**
+   * Hur ser talaren ut i pratrutan just nu (porträttets min)? Baronen är förvånad innan han ser hjälten, stolt när
+   * han presenterar sig och sur när han har trasslat in sig. null = som vanligt. @param {string} talare
+   * @returns {string | null}
+   */
+  uttryck(talare) {
+    if (talare !== 'baronen' || !this.luft) return null;
+    return ['glider', 'skata_landar'].includes(this.luft.lage) ? 'forvanad' : this.luft.lage === 'trasslar' ? 'sur' : 'stolt';
+  }
+
+  /**
+   * En sidovy (mellanscen från sidan): bakgrunden täcker skärmen, och det som rör sig läggs ovanpå. In i skogen:
+   * det lilla luftskeppet glider åt vänster ovanför träden (åt fel håll), och hjälten och ungen springer åt
+   * höger in i skogen. Sidovyn står kvar tills nästa rum. @param {string} bild @param {number} [ms]
+   */
+  visaSidovy(bild, ms = 3600) {
+    this.rensaSidovy();
+    this.senasteSidovy = bild;
+    const k = this.kamera, c = this.sidovy;
+    c.setPosition(k.x, k.y).setVisible(true).setAlpha(0);
+    c.add(this.add.image(0, 0, `sidovy_${bild}_bakgrund`).setOrigin(0, 0));
+    this.tweens.add({ targets: c, alpha: 1, duration: 300, onUpdate: () => { this.smutsig = true; } });
+    if (this.textures.exists(`sidovy_${bild}_luftskepp`)) {
+      const ls = this.add.image(RUM.bredd - 70, 8, `sidovy_${bild}_luftskepp`).setOrigin(0, 0);
+      c.add(ls);
+      this.tweens.add({ targets: ls, x: -60, duration: ms * 2.2, onUpdate: () => { ls.x = Math.round(ls.x); this.smutsig = true; } });
+    }
+    // hjälten och ungen springer på stigen (stigen går tvärs över bilden, fötterna på y 162)
+    const fot = 162, figurer = [];
+    const skugga = this.textures.exists('skugga');
+    const hjalte = this.add.container(-24, fot - 24);
+    if (skugga) hjalte.add(this.add.image(0, 0, 'skugga', 'skugga_16x24').setOrigin(0, 0));
+    const kropp = this.add.image(0, 0, this.hjalteTextur || 'hjalte', 'hjalte_ga_hoger_01').setOrigin(0, 0);
+    hjalte.add(kropp);
+    if (this.harStav && this.stav) hjalte.add(this.add.image(0, 0, this.stav.texture.key, 'stav_hand_hoger_01').setOrigin(0, 0));
+    figurer.push({ c: hjalte, img: kropp, ram: 'hjalte_ga_hoger_0', start: -24 });
+    if (this.textures.exists('unge') && this.visaUnge) {
+      const unge = this.add.container(-60, fot - 24);
+      if (skugga) unge.add(this.add.image(0, 0, 'skugga', 'skugga_24x24').setOrigin(0, 0));
+      const ub = this.add.image(0, 0, 'unge', 'unge1_ga_hoger_01').setOrigin(0, 0);
+      unge.add(ub);
+      figurer.push({ c: unge, img: ub, ram: 'unge1_ga_hoger_0', start: -60 });
+    }
+    for (const f of figurer) {
+      c.add(f.c);
+      this.tweens.add({
+        targets: f.c, x: RUM.bredd + 40 + f.start, duration: ms, delay: 300,
+        onUpdate: () => { f.c.x = Math.round(f.c.x); f.img.setFrame(`${f.ram}${1 + (Math.floor(this.time.now / 110) % 4)}`); this.smutsig = true; },
+      });
+    }
+  }
+
+  /** @private */
+  rensaSidovy() {
+    this.sidovy.each((/** @type {any} */ x) => this.tweens.killTweensOf(x));
+    this.sidovy.removeAll(true); this.sidovy.setVisible(false);
   }
 
   /**
@@ -491,7 +699,7 @@ export class Rum extends Phaser.Scene {
     this.harRum = !!v.rum;
     if (v.nyttRum || !this.harRum) { this.rumsbild = (this.harRum && v.karta?.bild) || null; this.mark = (this.harRum && v.karta?.mark) || null; this.rumId = v.rum; this.markObjekt = v.karta?.objekt || []; }
     this.visaUnge = v.unge;
-    if (v.nyttRum) { this.ungeMal = null; for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas.remove(); this.sover = null; } }
+    if (v.nyttRum) { this.ungeMal = null; for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas.remove(); this.sover = null; } this.rensaRegi(); }
     this.tillstand = v.tillstand;
     if (v.nyttRum || !this.harRum) this.inomhus = !!v.karta?.inomhus;
     this.lampor = v.karta?.lampor || [];
@@ -506,7 +714,7 @@ export class Rum extends Phaser.Scene {
     this.synliga = synliga;
     if (v.nyttRum || !this.harRum || andrat) {
       this.objekt = this.harRum ? rumsObjekt(v.innehall, v.tillstand, v.karta, v.visade) : [];
-      this.lagerObjekt.removeAll(true); this.ritade.clear(); this.markerade.clear(); this.ritadeDelar.clear(); this.markramar?.clear();
+      this.lagerObjekt.removeAll(true); this.lagerLjust.removeAll(true); this.ritade.clear(); this.markerade.clear(); this.ritadeDelar.clear(); this.markramar?.clear();
       this.delar = { ...(v.delar || {}) };
       for (const o of [...this.objekt.filter((x) => x.sort === 'yta'), ...this.objekt.filter((x) => x.sort !== 'yta')]) this.ritaObjekt(o);
       for (const id of this.sparrade) { const o = this.ruta(id); if (o) this.ritaGren(o); }
@@ -528,7 +736,7 @@ export class Rum extends Phaser.Scene {
     }
     if (!this.harRum && (this.kamera.x || this.kamera.y)) this.sattKamera({ x: 0, y: 0 });
     this.hjalte.setVisible(this.harRum && !this.sover);
-    this.unge.setVisible(this.harRum && this.visaUnge);
+    this.unge.setVisible(this.harRum && this.visaUnge && !this.sover?.ungeGomd);
     this.ritaLjus();
     this.placera();
     this.b.vidAndring?.();
@@ -597,7 +805,7 @@ export class Rum extends Phaser.Scene {
       const pa = (o.bildPa && this.objekt.find((x) => x.id === o.bildPa)) || o;
       const tex = fb.nyckel === 'hjalte' ? this.hjalteTextur || 'hjalte' : fb.nyckel;
       const img = this.add.image(Math.round(pa.x + pa.b / 2), pa.y + pa.h, tex, fb.ram).setOrigin(0.5, 1);
-      this.lagerObjekt.add(img);
+      (o.skataFonster ? this.lagerLjust : this.lagerObjekt).add(img);
       this.ritade.set(o.id, /** @type {any} */ (img));
       return;
     }

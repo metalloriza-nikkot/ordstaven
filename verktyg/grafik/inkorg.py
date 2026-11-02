@@ -8,7 +8,8 @@ Läser en kopia av Niklas inkorgsmapp och skriver till repot:
 - foremal/<zon>/*.png    → assets/foremal/<zon>/<zon>.png och .json: ett atlas per zon (föremålen i kartorna).
 - rum/<zon>/<rum>.png    → assets/rum/<zon>/<rum>.png: en bild per inomhusrum (beslut 27.6).
 - rutor/<zon>/<zon>.png  → assets/tiles/<zon>/<zon>.png och <zon>.json (Tilleds rutset, .tsj).
-- bildkort/*.png         → assets/bildkort/bildkort.png och .json (läsplattans bildkort).
+- bildkort/*.png         → assets/bildkort/<id>.png: läsplattans bildkort, en bild per id (textlagret visar dem).
+- sidovyer/*.png         → assets/sidovyer/<namn>.png: sidovyernas bakgrunder och det som rör sig i dem.
 - figurer/*/*_portratt_*.png → också assets/portratt/<namn>.png (ansiktena i pratrutan, i textlagret).
 - ljud/*.wav             → assets/ljud/<namn>.wav, döpta utan mellanslag ("unge_late 2" → unge_late_02).
 
@@ -91,7 +92,7 @@ def las_bilder(mapp, fel, alla):
             continue
         im = ren(Image.open(f))
         for prefix, (b, h) in STORLEK.items():
-            if f.stem.startswith(prefix) and im.size != (b, h):
+            if mapp.parent.name == 'figurer' and f.stem.startswith(prefix) and im.size != (b, h):
                 fel.append(f'{f.name}: {im.width} × {im.height}, ska vara {b} × {h}')
         alla.update(farger(im))
         bilder[f.stem] = im
@@ -177,8 +178,15 @@ def main():
     for mapp in sorted((ink / 'foremal').glob('*/')):
         if med(f'foremal/{mapp.name}') and (b := las_bilder(mapp, fel, alla)):
             skriv_atlas(b, repo / 'assets' / 'foremal' / mapp.name, mapp.name, arg.prova)
-    if med('bildkort') and (ink / 'bildkort').is_dir() and (b := las_bilder(ink / 'bildkort', fel, alla)):
-        skriv_atlas(b, repo / 'assets' / 'bildkort', 'bildkort', arg.prova)
+    # bildkorten och sidovyerna som egna bilder: bildkorten visas i textlagret, sidovyerna är hela skärmar
+    for mapp in ('bildkort', 'sidovyer'):
+        if not (med(mapp) and (ink / mapp).is_dir()):
+            continue
+        for namn, im in las_bilder(ink / mapp, fel, alla).items():
+            print(f'assets/{mapp}/{namn}.png ({im.width} × {im.height})')
+            if not arg.prova:
+                (repo / 'assets' / mapp).mkdir(parents=True, exist_ok=True)
+                im.save(repo / 'assets' / mapp / f'{namn}.png', optimize=True)
     for mapp in sorted((ink / 'rum').glob('*/')):
         if not med(f'rum/{mapp.name}'):
             continue

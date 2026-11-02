@@ -4,6 +4,7 @@
 // - assets/foremal/<zon>/<zon>.png + .json: föremålen i kartorna (kartans objekt säger vilken bild med `bild`)
 // - assets/rum/<zon>/<rum>.png: inomhusrummen, en bild per rum (kartans `bild`)
 // - assets/tiles/<zon>/<zon>.png + .json: rutor för marken utomhus (kartans `mark`)
+// - assets/sidovyer/<namn>.png: sidovyernas bakgrunder och det som rör sig i dem (mellanscenens `bild`)
 // Hjälten och staven ritas i spelarens färger med palettbyten (karna/fargbyte.js), en bild per val.
 
 const bilder = /** @type {Record<string, string>} */ (import.meta.glob('../../assets/{sprites,foremal}/*/*.png', { query: '?url', import: 'default', eager: true }));
@@ -11,19 +12,21 @@ const ramar = /** @type {Record<string, any>} */ (import.meta.glob('../../assets
 const rumsbilder = /** @type {Record<string, string>} */ (import.meta.glob('../../assets/rum/*/*.png', { query: '?url', import: 'default', eager: true }));
 const rutbilder = /** @type {Record<string, string>} */ (import.meta.glob('../../assets/tiles/*/*.png', { query: '?url', import: 'default', eager: true }));
 const rutset = /** @type {Record<string, any>} */ (import.meta.glob('../../assets/tiles/*/*.json', { import: 'default', eager: true }));
+const sidovyer = /** @type {Record<string, string>} */ (import.meta.glob('../../assets/sidovyer/*.png', { query: '?url', import: 'default', eager: true }));
 
 const namn = (/** @type {string} */ fil) => /** @type {string} */ (fil.split('/').pop()).replace(/\.[a-z]+$/, '');
 
 /** Föremålens atlas, i ordning: en bild med samma namn hittas i det första som har den. */
 export const FOREMAL_ATLAS = Object.keys(ramar).filter((f) => f.includes('/foremal/')).map(namn);
 
-/** Ladda all grafik (scenens preload). Rummen heter rum_<rum>, rutorna rutor_<zon>. @param {Phaser.Scene} scen */
+/** Ladda all grafik (scenens preload). Rummen heter rum_<rum>, rutorna rutor_<zon>, sidovyerna sidovy_<namn>. @param {Phaser.Scene} scen */
 export function laddaGrafik(scen) {
   for (const [fil, url] of Object.entries(bilder)) {
     const n = namn(fil), json = ramar[fil.replace(/\.png$/, '.json')];
     if (json && !scen.textures.exists(n)) scen.load.atlas(n, url, json);
   }
   for (const [fil, url] of Object.entries(rumsbilder)) if (!scen.textures.exists(`rum_${namn(fil)}`)) scen.load.image(`rum_${namn(fil)}`, url);
+  for (const [fil, url] of Object.entries(sidovyer)) if (!scen.textures.exists(`sidovy_${namn(fil)}`)) scen.load.image(`sidovy_${namn(fil)}`, url);
   for (const [fil, url] of Object.entries(rutbilder)) {
     const n = namn(fil), ts = rutset[fil.replace(/\.png$/, '.json')];
     if (ts && !scen.textures.exists(`rutor_${n}`)) scen.load.spritesheet(`rutor_${n}`, url, { frameWidth: ts.tilewidth, frameHeight: ts.tileheight });
@@ -45,7 +48,7 @@ export function rutnamn(zon) {
  */
 export function foremalsbild(scen, bild) {
   for (const n of FOREMAL_ATLAS) if (scen.textures.exists(n) && scen.textures.get(n).has(bild)) return { nyckel: n, ram: bild };
-  for (const n of ['hjalte', 'farfar', 'herr_skata', 'unge']) if (scen.textures.exists(n) && scen.textures.get(n).has(bild)) return { nyckel: n, ram: bild };
+  for (const n of ['hjalte', 'farfar', 'herr_skata', 'unge', 'baronen']) if (scen.textures.exists(n) && scen.textures.get(n).has(bild)) return { nyckel: n, ram: bild };
   return null;
 }
 

@@ -27,7 +27,10 @@ export function skapaLayout({ varld, logg }) {
     r.setProperty('--rum-bredd', s.cssBredd + 'px');
     r.setProperty('--rum-hojd', s.cssHojd + 'px');
     r.setProperty('--reserv', reserv + 'px');
-    r.setProperty('--t', String(Math.max(1, Math.min(2.4, s.cssBredd / TEXT_BAS))));
+    const t = Math.max(1, Math.min(2.4, s.cssBredd / TEXT_BAS));
+    r.setProperty('--t', String(t));
+    // bildkorten (48 × 48 pixlar) skalas i hela steg i fysiska pixlar, så nära emojins storlek (64 punkter × t) som det går
+    r.setProperty('--kort', (Math.max(1, Math.round((64 * t * dpr) / 48)) * 48) / dpr + 'px');
     varld.dataset.skala = String(s.fysisk);
     if (logg) logg.handelse('skärm', `skala ${s.fysisk} (fysisk)`, { fonster: `${window.innerWidth}×${window.innerHeight}`, dpr, reserv });
     for (const f of lyssnare) f(s);

@@ -520,10 +520,50 @@
     "h": 44
    }
   },
-  "hjalte_stol_ner": {
+  "hjalte_sang_morgon_01": {
    "frame": {
     "x": 0,
     "y": 240,
+    "w": 64,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 44
+   }
+  },
+  "hjalte_sang_morgon_02": {
+   "frame": {
+    "x": 65,
+    "y": 240,
+    "w": 64,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 44
+   }
+  },
+  "hjalte_stol_ner": {
+   "frame": {
+    "x": 0,
+    "y": 285,
     "w": 16,
     "h": 26
    },
@@ -543,7 +583,7 @@
   "hjalte_svinga_hoger_01": {
    "frame": {
     "x": 0,
-    "y": 267,
+    "y": 312,
     "w": 32,
     "h": 40
    },
@@ -563,7 +603,7 @@
   "hjalte_svinga_hoger_02": {
    "frame": {
     "x": 33,
-    "y": 267,
+    "y": 312,
     "w": 32,
     "h": 40
    },
@@ -583,7 +623,7 @@
   "hjalte_svinga_hoger_03": {
    "frame": {
     "x": 66,
-    "y": 267,
+    "y": 312,
     "w": 32,
     "h": 40
    },
@@ -603,7 +643,7 @@
   "hjalte_svinga_ner_01": {
    "frame": {
     "x": 0,
-    "y": 308,
+    "y": 353,
     "w": 32,
     "h": 40
    },
@@ -623,7 +663,7 @@
   "hjalte_svinga_ner_02": {
    "frame": {
     "x": 33,
-    "y": 308,
+    "y": 353,
     "w": 32,
     "h": 40
    },
@@ -643,7 +683,7 @@
   "hjalte_svinga_ner_03": {
    "frame": {
     "x": 66,
-    "y": 308,
+    "y": 353,
     "w": 32,
     "h": 40
    },
@@ -663,7 +703,7 @@
   "hjalte_svinga_upp_01": {
    "frame": {
     "x": 0,
-    "y": 349,
+    "y": 394,
     "w": 32,
     "h": 40
    },
@@ -683,7 +723,7 @@
   "hjalte_svinga_upp_02": {
    "frame": {
     "x": 33,
-    "y": 349,
+    "y": 394,
     "w": 32,
     "h": 40
    },
@@ -703,7 +743,7 @@
   "hjalte_svinga_upp_03": {
    "frame": {
     "x": 66,
-    "y": 349,
+    "y": 394,
     "w": 32,
     "h": 40
    },
@@ -723,7 +763,7 @@
   "hjalte_svinga_vanster_01": {
    "frame": {
     "x": 0,
-    "y": 390,
+    "y": 435,
     "w": 32,
     "h": 40
    },
@@ -743,7 +783,7 @@
   "hjalte_svinga_vanster_02": {
    "frame": {
     "x": 33,
-    "y": 390,
+    "y": 435,
     "w": 32,
     "h": 40
    },
@@ -763,7 +803,7 @@
   "hjalte_svinga_vanster_03": {
    "frame": {
     "x": 66,
-    "y": 390,
+    "y": 435,
     "w": 32,
     "h": 40
    },
@@ -783,7 +823,7 @@
   "hjalte_trolla_ner_01": {
    "frame": {
     "x": 0,
-    "y": 431,
+    "y": 476,
     "w": 32,
     "h": 40
    },
@@ -803,7 +843,7 @@
   "hjalte_trolla_ner_02": {
    "frame": {
     "x": 33,
-    "y": 431,
+    "y": 476,
     "w": 32,
     "h": 40
    },
@@ -823,7 +863,7 @@
   "hjalte_trolla_ner_03": {
    "frame": {
     "x": 66,
-    "y": 431,
+    "y": 476,
     "w": 32,
     "h": 40
    },
@@ -843,7 +883,7 @@
   "hjalte_trolla_ner_04": {
    "frame": {
     "x": 99,
-    "y": 431,
+    "y": 476,
     "w": 32,
     "h": 40
    },
@@ -863,7 +903,7 @@
   "ryggsack_hoger_01": {
    "frame": {
     "x": 0,
-    "y": 472,
+    "y": 517,
     "w": 16,
     "h": 24
    },
@@ -883,7 +923,7 @@
   "ryggsack_ner_01": {
    "frame": {
     "x": 0,
-    "y": 497,
+    "y": 542,
     "w": 16,
     "h": 24
    },
@@ -903,7 +943,7 @@
   "ryggsack_upp_01": {
    "frame": {
     "x": 0,
-    "y": 522,
+    "y": 567,
     "w": 16,
     "h": 24
    },
@@ -923,7 +963,7 @@
   "ryggsack_vanster_01": {
    "frame": {
     "x": 0,
-    "y": 547,
+    "y": 592,
     "w": 16,
     "h": 24
    },
@@ -943,7 +983,7 @@
   "taggkam_hoger_01": {
    "frame": {
     "x": 0,
-    "y": 572,
+    "y": 617,
     "w": 16,
     "h": 24
    },
@@ -963,7 +1003,7 @@
   "taggkam_ner_01": {
    "frame": {
     "x": 0,
-    "y": 597,
+    "y": 642,
     "w": 16,
     "h": 24
    },
@@ -983,7 +1023,7 @@
   "taggkam_upp_01": {
    "frame": {
     "x": 0,
-    "y": 622,
+    "y": 667,
     "w": 16,
     "h": 24
    },
@@ -1003,7 +1043,7 @@
   "taggkam_vanster_01": {
    "frame": {
     "x": 0,
-    "y": 647,
+    "y": 692,
     "w": 16,
     "h": 24
    },
@@ -1026,7 +1066,7 @@
   "format": "RGBA8888",
   "size": {
    "w": 260,
-   "h": 672
+   "h": 717
   },
   "scale": "1",
   "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."

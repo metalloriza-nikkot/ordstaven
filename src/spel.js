@@ -137,7 +137,9 @@ export function skapaSpel(d) {
    */
   const portratt = (talare, radio = false) => talare === 'berattare'
     ? '<span class="portratt stjarna" aria-hidden="true">★</span>'
-    : `<span class="portratt p-${ui.esc(talare)}${radio ? ' radio' : ''}" aria-hidden="true">${radio ? '📻' : ''}</span>`;
+    : `<span class="portratt p-${ui.esc(talare)}${radio ? ' radio' : ''}${uttryckKlass(talare)}" aria-hidden="true">${radio ? '📻' : ''}</span>`;
+  /** Porträttets min just nu (baronen förvånad, stolt eller sur efter vad som händer i rummet). @param {string} talare */
+  const uttryckKlass = (talare) => { const u = rum.uttryck?.(talare); return u ? ` u-${ui.esc(u)}` : ''; };
   /**
    * En replik på läsplattan i sin familj (beslut 21.1): berättaren i en rak ruta med svalt papper och stjärnan,
    * alla andra i en pratruta med rundade hörn, spets och ansikte. @param {any} r
@@ -157,6 +159,8 @@ export function skapaSpel(d) {
     // nosen fungerar på repliker också, gratis (de läses ändå upp), så att "tryck på nosen" alltid ger svar
     ui.sattNos(true, { betala: () => true });
     const rull = rullaOchSag(/** @type {HTMLElement} */ (el.querySelector('.text')), r);
+    // figuren i världen pratar medan repliken läses (baronen i luftskeppet)
+    rum.talar?.(r.talare, true); rull.klar.then(() => rum.talar?.(r.talare, false));
     // ett tryck medan texten rullar visar allt (rösten läser vidare), nästa tryck går vidare
     const fortsatt = ui.vantaFortsatt(el, lyssnaHandling, () => { if (!rull.rullar()) return false; rull.visaAllt(); return true; });
     await Promise.race([rull.klar, fortsatt]);
@@ -164,6 +168,7 @@ export function skapaSpel(d) {
     await fortsatt;
     rull.stopp();
     rost.tyst();
+    rum.talar?.(r.talare, false);
     ui.doljPlatta();
   }
 
@@ -733,6 +738,9 @@ export function skapaSpel(d) {
     switch (st.typ) {
       case 'replik': return st.vantar_pa ? replikVantar(st) : st.vid === 'ungen' ? replikVidUngen(st) : replik(st);
       case 'mellanscen': {
+        // med bild händer det i rummet (Stils bilder), och beskrivningen behövs inte. Annars som i gråboxen.
+        const regiMs = st.bild ? rum.regi(st.bild) : 0;
+        if (regiMs) { await vanta(tid(regiMs)); return; }
         const ms = tid(Math.min(6000, 1800 + st.beskrivning.split(' ').length * 140));
         await ui.visaRegi(st.beskrivning, ms); ui.doljRegi(); return;
       }

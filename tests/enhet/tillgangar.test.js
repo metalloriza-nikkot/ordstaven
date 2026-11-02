@@ -6,7 +6,8 @@ import { readFileSync, readdirSync, existsSync } from 'node:fs';
 const rot = new URL('../../', import.meta.url);
 const las = (p) => readFileSync(new URL(p, rot));
 const filer = (mapp, slut) => (existsSync(new URL(mapp, rot)) ? readdirSync(new URL(mapp, rot), { recursive: true }).filter((f) => String(f).endsWith(slut)).map((f) => `${mapp}${String(f).replace(/\\/g, '/')}`) : []);
-const bilder = [...filer('assets/sprites/', '.png'), ...filer('assets/foremal/', '.png'), ...filer('assets/rum/', '.png'), ...filer('assets/tiles/', '.png')];
+const bilder = [...filer('assets/sprites/', '.png'), ...filer('assets/foremal/', '.png'), ...filer('assets/rum/', '.png'), ...filer('assets/tiles/', '.png'),
+  ...filer('assets/bildkort/', '.png'), ...filer('assets/sidovyer/', '.png'), ...filer('assets/portratt/', '.png')];
 const ljud = filer('assets/ljud/', '.wav');
 
 /** PNG-filens bitar (chunks), i ordning. */
@@ -107,5 +108,34 @@ describe('kartornas grafik', () => {
       const png = las(`assets/rum/hus/${b}.png`);
       expect([png.readUInt32BE(16), png.readUInt32BE(20)], f).toEqual([k.width * k.tilewidth, k.height * k.tileheight]);
     }
+  });
+});
+
+describe('mellanscenernas bilder och bildkorten', () => {
+  const kapitel = readdirSync(new URL('content/den-gomda-dalen/', rot)).filter((f) => /^kap-\d+\.json$/.test(f)).map((f) => JSON.parse(las('content/den-gomda-dalen/' + f).toString()));
+  const ramar = new Set(filer('assets/sprites/', '.json').flatMap((f) => Object.keys(JSON.parse(las(f).toString()).frames)));
+  it('varje mellanscen med bild har grafik (morgonen i sängen, luftskeppets lägen, sidovyerna)', () => {
+    const saknas = [];
+    for (const k of kapitel) for (const sc of k.scener) for (const st of sc.steg) {
+      if (st.typ !== 'mellanscen' || !st.bild) continue;
+      const finns = st.bild === 'hjalte_sang_morgon' ? ramar.has('hjalte_sang_morgon_01') && ramar.has('hjalte_sang_morgon_02')
+        : st.bild.startsWith('luftskepp_') ? ramar.has(st.bild) || ramar.has(st.bild + '_01')
+          : existsSync(new URL(`assets/sidovyer/${st.bild}_bakgrund.png`, rot));
+      if (!finns) saknas.push(`${k.id} ${sc.id}: ${st.bild}`);
+    }
+    expect(saknas).toEqual([]);
+  });
+  it('luftskeppet har alla bilder som regin använder, och hjälmen som trillar', () => {
+    for (const r of ['glider_01', 'glider_02', 'skata_landar', 'ser_hjalten', 'talar_01', 'talar_02', 'skata_putsar_01', 'skata_putsar_02', 'skata_snor', 'trasslar_01', 'trasslar_02']) expect(ramar.has('luftskepp_' + r), r).toBe(true);
+    expect(ramar.has('baronen_hjalm')).toBe(true);
+  });
+  it('bildkorten är 48 × 48, och sidovyns bakgrund fyller skärmen (320 × 192)', () => {
+    const storlek = (f) => { const png = las(f); return [png.readUInt32BE(16), png.readUInt32BE(20)]; };
+    for (const f of filer('assets/bildkort/', '.png')) expect(storlek(f), f).toEqual([48, 48]);
+    for (const f of filer('assets/sidovyer/', '_bakgrund.png')) expect(storlek(f), f).toEqual([320, 192]);
+    expect(existsSync(new URL('assets/bildkort/filt_rod.png', rot))).toBe(true);
+  });
+  it('baronens porträtt finns i alla tre minerna', () => {
+    for (const m of ['stolt', 'forvanad', 'sur']) expect(existsSync(new URL(`assets/portratt/baronen_portratt_${m}.png`, rot)), m).toBe(true);
   });
 });

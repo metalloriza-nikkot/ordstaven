@@ -1,6 +1,13 @@
 // @ts-check
-// Platshållarbilder för gråboxen: emoji från ordlistorna och enkla former (färg, storlek, höjd).
-// Ersätts av stilspårets grafik. Ingen text i bilderna: en bild som visar ett ord skulle lösa läsuppgiften.
+// Läsplattans bilder: Stils bildkort (assets/bildkort/<id>.png) där de finns, annars gråboxens platshållare:
+// emoji från ordlistorna och enkla former (färg, storlek, höjd).
+// Ingen text i bilderna: en bild som visar ett ord skulle lösa läsuppgiften.
+
+const KORT = /** @type {Record<string, string>} */ (Object.fromEntries(Object.entries(
+  /** @type {Record<string, string>} */ (import.meta.glob('../../assets/bildkort/*.png', { query: '?url', import: 'default', eager: true })),
+).map(([fil, url]) => [/** @type {string} */ (fil.split('/').pop()).replace(/\.png$/, ''), url])));
+/** Ett bildkort som HTML, eller null om Stil inte har ritat det. @param {string} id */
+const kort = (id) => KORT[id] ? `<img class="bild bildkort" data-bild="${id}" src="${KORT[id]}" alt="" draggable="false">` : null;
 
 /** ASCII-vikning så att id:n utan å, ä, ö hittar sina ord (bar → bär). @param {string} s */
 const vik = (s) => s.toLocaleLowerCase('sv-SE').replace(/[åä]/g, 'a').replace(/ö/g, 'o').replace(/é/g, 'e');
@@ -40,9 +47,10 @@ export function skapaBilder(ordlistor, platshallare = {}) {
   function html(id) {
     const delar = id.split('_');
     if (delar[0] === 'tankebubbla') {
-      const e = hitta(delar.slice(1).join('_')) || '❔';
+      const e = kort(delar.slice(1).join('_')) || hitta(delar.slice(1).join('_')) || '❔';
       return `<span class="bild bubbla" data-bild="${id}"><span class="bubbla-ytter">${e}</span><span class="bubbla-prick"></span></span>`;
     }
+    const k = kort(id); if (k) return k;
     if (EXTRA[id]) return `<span class="bild emoji" data-bild="${id}">${EXTRA[id]}</span>`;
     const farg = delar.map((d) => FARGER[/** @type {keyof FARGER} */ (d)]).find(Boolean);
     const storlek = egenskaper(id).storlek;

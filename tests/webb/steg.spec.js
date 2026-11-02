@@ -1086,14 +1086,84 @@ test('Farfars hus i grafik: rummets bild, föremålen som bilder, och hjälten s
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('s19_morgon');
   // han sover: hjälten syns inte, sängen visar honom
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.synlig())).toBe(false);
-  expect(await page.evaluate(() => window.__ORDSTAVEN.grafik())).toMatchObject({ golv: 'rum_sovrummet', sang: expect.stringMatching(/^hjalte_sang_0[34]$/) });
+  expect(await page.evaluate(() => window.__ORDSTAVEN.grafik())).toMatchObject({ golv: 'rum_sovrummet', sang: expect.stringMatching(/^hjalte_sang_(0[34]|morgon_0[12])$/) });
+  // morgonen (mellanscenens bild): han är vaken, och ungen ligger på täcket och slickar honom på näsan
+  for (let i = 0; i < 20 && !/morgon/.test((await page.evaluate(() => window.__ORDSTAVEN.grafik())).sang); i++) { await page.locator('#plattan .replik-ruta').click({ timeout: 300 }).catch(() => {}); await page.waitForTimeout(150); }
+  expect((await page.evaluate(() => window.__ORDSTAVEN.grafik())).sang).toMatch(/^hjalte_sang_morgon_0[12]$/);
+  expect((await page.evaluate(() => window.__ORDSTAVEN.grafik())).unge).toBe(false);
   await page.screenshot({ path: 'test-results/hus-sover.png' });
   // repliker hör han i sängen, och när han ska gå kliver han ur
   for (let i = 0; i < 8 && (await steg(page))?.typ !== 'ga_till'; i++) { await page.locator('#plattan .replik-ruta').click().catch(() => {}); await page.waitForTimeout(150); }
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.synlig())).toBe(true);
-  expect((await page.evaluate(() => window.__ORDSTAVEN.grafik())).sang).toBe('sang');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.grafik())).toMatchObject({ sang: 'sang', unge: true });
   await tryckPa(page, 'dorr_hallen');
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 10000 }).toBe('s20_hallen_morgon');
   expect((await page.evaluate(() => window.__ORDSTAVEN.grafik())).golv).toBe('rum_hallen');
   await page.screenshot({ path: 'test-results/hus-hallen.png' });
+});
+
+test('Pass 3 komplett: luftskeppet i trädgården, baronens porträtt, packlistans bildkort och sidovyn in i skogen', async ({ page }) => {
+  test.setTimeout(90000);
+  await page.goto('./?snabb&ny');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.evaluate(() => {
+    const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
+    t.spelare.hjalte.namn = 'TESTA'; t.spelare.unge.namn = 'KNOPP';
+    Object.assign(av, { kapitelId: 'kap-00', scenId: 's22_tradgarden', spolaTill: 's22_tradgarden', spolat: [], startad: false, scen: 25 }); delete av.steg;
+    localStorage.setItem('ordstaven_spar', JSON.stringify(t));
+  });
+  await page.goto('./?snabb');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('s22_tradgarden');
+  const grafik = () => page.evaluate(() => window.__ORDSTAVEN.grafik());
+  const sett = new Set(); const minerna = new Set();
+  let skylt = false;
+  for (let i = 0; i < 160; i++) {
+    const g = await grafik();
+    if (g.luftskepp) sett.add(g.luftskepp);
+    const p = await page.evaluate(() => document.querySelector('#plattan .portratt.p-baronen')?.className ?? null);
+    if (p) minerna.add(/u-(\w+)/.exec(p)?.[1] || 'stolt');
+    if (g.luftskepp === 'luftskepp_skata_landar' && !sett.has('skott')) { sett.add('skott'); await page.screenshot({ path: 'test-results/pass3-luftskepp.png' }); }
+    const s = await steg(page);
+    if (s?.typ === 'fritt') { await tryckPa(page, 'tva_buskar'); await page.locator('#handknapp').click({ timeout: 5000 }).catch(() => {}); continue; }
+    if (s?.typ === 'pussel' && !(await page.evaluate(() => window.__ORDSTAVEN.fryst()))) {
+      if (!skylt) { skylt = true; await page.waitForTimeout(800); await page.screenshot({ path: 'test-results/pass3-trasslar.png' }); }
+      await page.locator('#skyltar .skylt[data-objekt="stig_skogen"] .kort').click({ timeout: 2000 }).catch(() => {});
+      await page.waitForTimeout(400); continue;
+    }
+    if (g.senasteSidovy === 'in_i_skogen') { await page.waitForTimeout(400); await page.screenshot({ path: 'test-results/pass3-sidovy.png' }); break; }
+    await page.locator('#plattan .replik-ruta').click({ timeout: 300 }).catch(() => {});
+    await page.waitForTimeout(120);
+  }
+  // lägena i berättelsens ordning (Herr Skata landar två gånger: när han kommer flygande och i mellanscenen)
+  expect((await grafik()).regi.filter((x, i, a) => x !== a[i - 1])).toEqual(['glider', 'skata_landar', 'ser_hjalten', 'talar', 'skata_putsar', 'trasslar']);
+  expect(sett.has('luftskepp_trasslar_02')).toBe(true);
+  expect(minerna.has('forvanad') && minerna.has('stolt')).toBe(true);
+  expect((await grafik()).hjalm).toBe(true);
+  expect((await grafik()).senasteSidovy).toBe('in_i_skogen');
+});
+
+test('Packlistans bildkort: Stils bilder i stället för emoji', async ({ page }) => {
+  await page.goto('./?snabb&ny');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.evaluate(() => {
+    const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
+    t.spelare.hjalte.namn = 'TESTA'; t.spelare.unge.namn = 'KNOPP';
+    Object.assign(av, { kapitelId: 'kap-00', scenId: 's21_uppdraget', spolaTill: 's21_uppdraget', spolat: [], startad: false, scen: 23 }); delete av.steg;
+    localStorage.setItem('ordstaven_spar', JSON.stringify(t));
+  });
+  await page.goto('./?snabb');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  for (let i = 0; i < 60 && (await page.locator('#plattan img.bild.bildkort').count()) === 0; i++) {
+    const s = await steg(page);
+    if (s?.typ === 'ga_till') await tryckPa(page, s.mal);
+    await page.locator('#plattan .replik-ruta').click({ timeout: 300 }).catch(() => {});
+    await page.waitForTimeout(150);
+  }
+  const kort = await page.locator('#plattan img.bild.bildkort').evaluateAll((el) => el.map((e) => [e.getAttribute('data-bild'), e.naturalWidth, Math.round(e.getBoundingClientRect().width * devicePixelRatio) % 48]));
+  expect(kort.length).toBeGreaterThanOrEqual(6);
+  for (const [, b, rest] of kort) { expect(b).toBe(48); expect(rest).toBe(0); }
+  await page.screenshot({ path: 'test-results/pass3-packlista.png' });
 });

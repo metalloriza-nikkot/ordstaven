@@ -183,11 +183,13 @@ html, body {
 @keyframes guppa { 50% { transform: translateX(4px); } }
 
 .portratt { flex: none; width: 48px; height: 48px; border-radius: 24px; background: #c9b896; box-shadow: inset 0 0 0 4px rgba(0, 0, 0, .15); }
-/* gråboxens ansikten i figurernas färger (stilguiden §5): baronen i orange med tropikhjälmen som ljus kant,
-   Herr Skata svartvit med blågrön stjärt */
-/* Farfars porträtt (beslut 27.4): pixelbilden i ramen, skalad utan utjämning */
+/* gråboxens ansikten i figurernas färger (stilguiden §5): Herr Skata svartvit med blågrön stjärt */
+/* Farfars och baronens porträtt (beslut 27.4, Stil 20:35): pixelbilden i ramen, skalad utan utjämning.
+   Baronens min följer vad som händer i rummet (u-forvanad, u-sur), annars är han stolt. */
 .p-farfar { background: #8a6a4a url('../assets/portratt/farfar_portratt_glad.png') center / cover no-repeat; image-rendering: pixelated; } .p-berattare { display: none; }
-.p-baronen { background: #e8823a; box-shadow: inset 0 0 0 4px #b85e22, inset 0 10px 0 4px #e6d6a8; }
+.p-baronen { background: #9fd0ee url('../assets/portratt/baronen_portratt_stolt.png') center / cover no-repeat; image-rendering: pixelated; }
+.p-baronen.u-forvanad { background-image: url('../assets/portratt/baronen_portratt_forvanad.png'); }
+.p-baronen.u-sur { background-image: url('../assets/portratt/baronen_portratt_sur.png'); }
 .p-herr_skata { background: linear-gradient(135deg, #22252b 0 45%, #ffffff 45% 70%, #2e5966 70%); box-shadow: inset 0 0 0 3px #22252b; }
 
 /* pussel */
@@ -223,6 +225,11 @@ html, body {
 
 .bild { display: inline-flex; align-items: center; justify-content: center; }
 .bild.emoji { font-size: calc(64px * var(--t)); line-height: 1; }
+/* Stils bildkort (48 × 48 pixlar, ingen text), skalade i hela steg (--kort sätts i layout.js) */
+.bild.bildkort { width: var(--kort, 96px); height: var(--kort, 96px); image-rendering: pixelated; }
+/* på ett kort: bilden har luft i kanten (Stil ritar inom 48 × 48), så kortet blir inte högre än med emoji */
+.kort > .bild.bildkort { margin: calc(var(--kort, 96px) / -12) 0; }
+.kort:has(> .bild.bildkort) { padding-top: 4px; padding-bottom: 6px; }
 .bild.form { border-radius: 8px; box-shadow: inset 0 -6px 0 rgba(0, 0, 0, .25), 0 2px 0 rgba(0,0,0,.2); }
 .bild.form.rund { border-radius: 50% / 45%; }
 .bild.form.spetsig { clip-path: polygon(50% 0, 100% 100%, 0 100%); border-radius: 0; }
