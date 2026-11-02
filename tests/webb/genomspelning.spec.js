@@ -67,7 +67,7 @@ async function anvand(page, id, satt, klar = async () => false) {
   else if (satt === 'igen') await page.mouse.click(pt.x, pt.y);
   else await hand.locator('button').click();
   // handen försvinner, eller föremålet är inte längre något att använda (krukorna: handen flyttar till nästa)
-  await expect.poll(async () => (await hand.isHidden()) || !(await interaktiva()).includes(id), { timeout: 5000 }).toBe(true);
+  await expect.poll(async () => (await hand.isHidden()) || !(await interaktiva()).includes(id) || (await klar()), { timeout: 5000 }).toBe(true);
 }
 
 /** Spela tills slutskärmen syns. felFor = pussel-id där ett fel svar ska väljas först. */
@@ -329,7 +329,8 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
         const kvar = await page.evaluate(() => window.__ORDSTAVEN.interaktiva());
         const k = kvar.find((o) => /kruk.*_\d$/.test(o));
         if (!k) break;
-        await anvand(page, k, satt);
+        // sista krukan kan avsluta pusslet medan nästa tryck redan är på väg: då är krukorna klara
+        await anvand(page, k, satt, async () => (await page.evaluate(() => window.__ORDSTAVEN.steg()))?.pussel_id !== lage.pusselId);
         await page.waitForTimeout(200);
         // vänta tills reaktionen är klar (bären, kartbiten): sista krukan avslutar pusslet
         await page.waitForFunction(() => !window.__ORDSTAVEN.fryst(), null, { timeout: 10000 }).catch(() => {});
