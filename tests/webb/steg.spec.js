@@ -980,3 +980,92 @@ test('textgrammatiken: uppläst text i 40 punkter, lappen i 48 på ett snett pap
   expect(await page.locator('#plattan .lapp').evaluate((e) => getComputedStyle(e).transform)).not.toBe('none');
   await page.screenshot({ path: 'tests/skarmdumpar/lappen-papper.png' });
 });
+
+test('hjälten ur inkorgen: en bild per riktning, gången byter bild, staven syns när han har en formel, huden byts', async ({ page }) => {
+  test.setTimeout(60000);
+  await provscen(page, { id: 't_figur', pass: 1, rum: 'provrum', steg: [{ typ: 'ga_till', mal: 'sten' }, R('Framme.')] }, (t) => { t.spelare.hjalte.formler = []; t.spelare.hjalte.utseende = { hudfarg: 2 }; }, {
+    rum: { provrum: { innehall: ['sten'] } },
+    kartor: { provrum: provkarta([{ name: 'sten', type: 'sak', x: 280, y: 20, width: 24, height: 16 }], { x: 40, y: 170 }) },
+  });
+  const bild = () => page.evaluate(() => window.__ORDSTAVEN.hjaltebild());
+  await page.waitForFunction(() => !window.__ORDSTAVEN.fryst());
+  // utan formel: ingen stav. Huden är bytt (en egen textur för valet), och han står vänd mot oss
+  expect(await bild()).toMatchObject({ bild: 'hjalte_ga_ner_01', stav: false });
+  expect((await bild()).textur).toMatch(/^hjalte:/);
+  await page.screenshot({ path: 'test-results/hjalte-hud.png' });
+  // åt höger: bilderna åt höger, och gången byter bild medan han går
+  const sedda = new Set();
+  await page.keyboard.down('ArrowRight'); await page.waitForTimeout(150);
+  for (let i = 0; i < 12; i++) { sedda.add((await bild()).bild); await page.waitForTimeout(60); }
+  await page.keyboard.up('ArrowRight');
+  expect([...sedda].every((b) => b.startsWith('hjalte_ga_hoger_'))).toBe(true);
+  expect(sedda.size).toBeGreaterThan(1);
+  // han stannar: första bilden
+  await expect.poll(async () => (await bild()).bild).toBe('hjalte_ga_hoger_01');
+  for (const [tangent, riktning] of [['ArrowUp', 'upp'], ['ArrowLeft', 'vanster'], ['ArrowDown', 'ner']]) {
+    await page.keyboard.down(tangent); await page.waitForTimeout(250); await page.keyboard.up(tangent);
+    await expect.poll(async () => (await bild()).bild).toBe(`hjalte_ga_${riktning}_01`);
+  }
+  // en formel: staven syns i handen (den kommer med nästa steg)
+  await page.evaluate(() => window.__ORDSTAVEN.tillstand().spelare.hjalte.formler.push('LJUS'));
+  await tryckPa(page, 'sten');
+  await expect(page.locator('#handknapp')).toBeVisible({ timeout: 10000 }); await page.keyboard.press('Space');
+  await expect.poll(async () => (await bild()).stav, { timeout: 10000 }).toBe(true);
+  await page.screenshot({ path: 'test-results/hjalte-stav.png' });
+});
+
+test('Herr Skata flyger förbi när han skrattar, och lätet får låta klart', async ({ page }) => {
+  await provscen(page, { id: 't_skata', pass: 1, rum: 'provrum', steg: [R('Lyssna.'), { typ: 'ljud', id: 'fagel_late' }, R('Där flög han.')] }, null, {
+    rum: { provrum: { innehall: [] } }, kartor: { provrum: provkarta([]) },
+  });
+  await page.evaluate(() => { window.__flog = []; setInterval(() => { const f = window.__ORDSTAVEN.flygande(); if (f.length) window.__flog.push(...f); }, 30); });
+  await page.locator('#plattan .replik-ruta').click();
+  await expect.poll(() => page.evaluate(() => window.__flog.length), { timeout: 8000 }).toBeGreaterThan(0);
+  const bilder = await page.evaluate(() => [...new Set(window.__flog)]);
+  expect(bilder.every((b) => b.startsWith('herr_skata_flyga_hoger_'))).toBe(true);
+  await page.screenshot({ path: 'test-results/herr-skata.png' });
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.flygande().length), { timeout: 8000 }).toBe(0);
+});
+
+test('Prologen, pass 3 i menyn: inget från kapitel 1 finns kvar, och kapitel 1 är låst igen (beslut 26.6)', async ({ page }) => {
+  test.setTimeout(60000);
+  // en sparning där kapitel 1 är spelat på enheten: SVÄRD, kartbit 2, Dinoboken, ryggsäcken, hjälmdekoren, bären
+  await page.goto('./?snabb&ny');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.evaluate(() => {
+    const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
+    t.spelare.hjalte.namn = 'TESTA'; t.spelare.unge.namn = 'KNOPP'; t.spelare.hjalte.utseende = { hudfarg: 1 };
+    t.spelare.hjalte.formler = ['LJUS', 'SVÄRD']; t.spelare.dinobok = [{ bild: 'fossil_och_ungen', bildtext: 'fossil' }];
+    t.spelare.hjalte.garderob = [{ sort: 'hjalmdekor', id: 'taggkam' }, { sort: 'ryggsack', id: 'ryggsack_skog' }];
+    t.spelare.hjalte.lager = { hjalmdekor: 'taggkam', ryggsack: 'ryggsack_skog' };
+    t.spelare.unge.tillagg = ['nosmonster'];
+    Object.assign(av, { kapitelId: 'kap-01', scen: 10, scenId: 'k1s10', bar: 15, kartbitar: [1, 2], frivilligt: ['buskarna'] });
+    t.installningar = { ...t.installningar, oppnadeKapitel: ['kap-01'] };
+    localStorage.setItem('ordstaven_spar', JSON.stringify(t));
+  });
+  await page.goto('./?snabb');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.keyboard.press('Control+Shift+KeyM');
+  await expect(page.locator('#vuxenmeny .kapitel-oppet')).toBeChecked();
+  await page.locator('#vuxenmeny .pass-start', { hasText: 'Prologen, pass 3' }).click();
+  await page.waitForURL((u) => true);
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('s19_morgon');
+  const t = await page.evaluate(() => window.__ORDSTAVEN.tillstand());
+  const av = t.aventyr['den-gomda-dalen'];
+  expect(t.spelare.hjalte.formler).not.toContain('SVÄRD');
+  expect(t.spelare.hjalte.formler).toContain('LJUS');
+  expect(av.kartbitar).toEqual([1]);
+  expect(t.spelare.dinobok).toEqual([]);
+  expect(t.spelare.hjalte.lager).toEqual({ hjalmdekor: null, ryggsack: null });
+  expect(t.spelare.hjalte.garderob).toEqual([]);
+  expect(t.spelare.unge.tillagg).toEqual([]);
+  expect(av.bar).toBe(6); // högst det prologen ger före pass 3
+  expect(av.frivilligt || []).toEqual([]);
+  // namnen och utseendet står kvar
+  expect(t.spelare.hjalte.namn).toBe('TESTA'); expect(t.spelare.unge.namn).toBe('KNOPP'); expect(t.spelare.hjalte.utseende).toEqual({ hudfarg: 1 });
+  // kapitel 1 är låst igen
+  expect(t.installningar.oppnadeKapitel || []).not.toContain('kap-01');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toMatch(/kap-01 låst \(hopp bakåt\)/);
+});

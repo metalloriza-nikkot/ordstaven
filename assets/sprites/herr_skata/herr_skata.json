@@ -1,0 +1,174 @@
+{
+ "frames": {
+  "herr_skata_flyga_hoger_01": {
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 18,
+    "h": 12
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 18,
+    "h": 12
+   },
+   "sourceSize": {
+    "w": 18,
+    "h": 12
+   }
+  },
+  "herr_skata_flyga_hoger_02": {
+   "frame": {
+    "x": 19,
+    "y": 0,
+    "w": 18,
+    "h": 12
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 18,
+    "h": 12
+   },
+   "sourceSize": {
+    "w": 18,
+    "h": 12
+   }
+  },
+  "herr_skata_flyga_vanster_01": {
+   "frame": {
+    "x": 0,
+    "y": 13,
+    "w": 18,
+    "h": 12
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 18,
+    "h": 12
+   },
+   "sourceSize": {
+    "w": 18,
+    "h": 12
+   }
+  },
+  "herr_skata_flyga_vanster_02": {
+   "frame": {
+    "x": 19,
+    "y": 13,
+    "w": 18,
+    "h": 12
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 18,
+    "h": 12
+   },
+   "sourceSize": {
+    "w": 18,
+    "h": 12
+   }
+  },
+  "herr_skata_sitta_hoger_01": {
+   "frame": {
+    "x": 0,
+    "y": 26,
+    "w": 17,
+    "h": 12
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 17,
+    "h": 12
+   },
+   "sourceSize": {
+    "w": 17,
+    "h": 12
+   }
+  },
+  "herr_skata_sitta_vanster_01": {
+   "frame": {
+    "x": 0,
+    "y": 39,
+    "w": 17,
+    "h": 12
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 17,
+    "h": 12
+   },
+   "sourceSize": {
+    "w": 17,
+    "h": 12
+   }
+  },
+  "herr_skata_titta_hoger_01": {
+   "frame": {
+    "x": 0,
+    "y": 52,
+    "w": 17,
+    "h": 12
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 17,
+    "h": 12
+   },
+   "sourceSize": {
+    "w": 17,
+    "h": 12
+   }
+  },
+  "herr_skata_titta_vanster_01": {
+   "frame": {
+    "x": 0,
+    "y": 65,
+    "w": 17,
+    "h": 12
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 17,
+    "h": 12
+   },
+   "sourceSize": {
+    "w": 17,
+    "h": 12
+   }
+  }
+ },
+ "meta": {
+  "image": "herr_skata.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 38,
+   "h": 78
+  },
+  "scale": "1",
+  "om": "Skrivs av verktyg/grafik/inkorg.py. Bildernas namn: <figur>_<handling>_<riktning>_<bild>."
+ }
+}

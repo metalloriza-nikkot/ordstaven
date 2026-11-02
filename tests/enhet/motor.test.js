@@ -4,7 +4,7 @@ import { skapaLasmotor, valjVariant } from '../../src/karna/lasmotor.js';
 import { ljudningsdelar } from '../../src/karna/ljudning.js';
 import { skapaValj, skapaFormel, skapaDop, skapaKrukor, skapaRaddning, iBokstavsordning } from '../../src/karna/pussel.js';
 import { antalMeningar, knufftidMs } from '../../src/karna/hjalp.js';
-import { skapaBerattelse, spolaFram } from '../../src/karna/berattelse.js';
+import { skapaBerattelse, spolaFram, aterstallFramsteg, barFore } from '../../src/karna/berattelse.js';
 import { nyttTillstand, aventyrFor, migrera } from '../../src/karna/sparning.js';
 const AVENTYR = 'den-gomda-dalen';
 
@@ -450,5 +450,57 @@ describe('spola fram ett kapitel (den vuxne hoppar till kapitel 1)', () => {
     expect(spolaFram({ kapitel: prolog, tillstand: t2, aventyrId: AVENTYR, tillScen: 's12_pasarna' }).map((p) => p.sparas_som)).toEqual(['hjalte.namn', 'unge.namn']);
     expect(t2.spelare.unge.folj).toBe(true);
     expect(t2.aventyr[AVENTYR].kartbitar).toEqual([]);
+  });
+});
+
+describe('tillbaka till början av ett pass (beslut 26.6)', () => {
+  const kap1 = las('den-gomda-dalen/kap-01.json');
+  const kapitlen = [prolog, kap1];
+  it('bären som prologen kan ge före pass 3: påsarna, krukorna (buskarna i trädgården kommer efter)', () => {
+    expect(barFore({ kapitlen, tillKapitel: 'kap-00', tillScen: 's19_morgon', perForemal: 2 })).toBe(6);
+    expect(barFore({ kapitlen, tillKapitel: 'kap-00', tillScen: 's00_start', perForemal: 2 })).toBe(0);
+    // hela prologen, med buskarna i trädgården
+    expect(barFore({ kapitlen, tillKapitel: 'kap-01', tillScen: kap1.scener[0].id, perForemal: 2 })).toBe(8);
+  });
+  it('inget från kapitel 1 finns kvar efter återställningen och spolningen till pass 3', () => {
+    const t = nyttTillstand('test');
+    t.spelare.hjalte.namn = 'Testa'; t.spelare.hjalte.utseende = { hudfarg: 2, drakt: 1 };
+    t.spelare.unge.namn = 'Pip'; t.spelare.larande.historik.push({ x: 1 });
+    t.installningar.rost = false;
+    // en sparning som har spelat hela prologen och kapitel 1
+    spolaFram({ kapitel: prolog, tillstand: t, aventyrId: AVENTYR });
+    spolaFram({ kapitel: kap1, tillstand: t, aventyrId: AVENTYR });
+    const av = aventyrFor(t, AVENTYR);
+    av.bar = 14; av.kapitelId = 'kap-01'; av.scen = 12; av.frivilligt = ['buskarna'];
+    // det frivilliga i kapitel 1 (spolningen ger det inte): fossilet i Dinoboken och ryggsäcken
+    t.spelare.dinobok.push({ bild: 'fossil_och_ungen', bildtext: 'fossil' }); t.spelare.hjalte.garderob.push({ sort: 'ryggsack', id: 'ryggsack_skog' });
+    expect(t.spelare.hjalte.formler).toContain('SVÄRD');
+    expect(av.kartbitar.length).toBeGreaterThan(1);
+    expect(t.spelare.dinobok.length).toBeGreaterThan(0);
+    expect(t.spelare.hjalte.lager.hjalmdekor).toBe('taggkam');
+    const fore = av;
+    aterstallFramsteg({ tillstand: t, aventyrId: AVENTYR, maxBar: barFore({ kapitlen, tillKapitel: 'kap-00', tillScen: 's19_morgon', perForemal: 2 }) });
+    spolaFram({ kapitel: prolog, tillstand: t, aventyrId: AVENTYR, tillScen: 's19_morgon' });
+    const efter = aventyrFor(t, AVENTYR);
+    expect(efter).toBe(fore); // samma objekt (gränssnittet håller det)
+    expect(t.spelare.hjalte.formler).not.toContain('SVÄRD');
+    expect(t.spelare.hjalte.formler.length).toBeGreaterThan(0); // prologens formler spolas tillbaka
+    expect(efter.kartbitar).toEqual([1]);
+    expect(t.spelare.dinobok).toEqual([]);
+    expect(t.spelare.hjalte.lager).toEqual({ hjalmdekor: null, ryggsack: null });
+    expect(t.spelare.hjalte.garderob).toEqual([]);
+    expect(t.spelare.unge.tillagg).toEqual([]);
+    expect(efter.bar).toBe(6);
+    expect(efter.frivilligt).toEqual([]);
+    expect(Object.values(efter.visade || {}).flat().some((id) => kap1.rum.some((r) => (r.foremal || []).includes(id)))).toBe(false);
+    // det som är spelarens står kvar
+    expect(t.spelare.hjalte.namn).toBe('Testa'); expect(t.spelare.hjalte.utseende).toEqual({ hudfarg: 2, drakt: 1 });
+    expect(t.spelare.unge.namn).toBe('Pip'); expect(t.spelare.larande.historik).toHaveLength(1);
+    expect(t.installningar.rost).toBe(false);
+  });
+  it('färre bär än prologen kan ge står kvar', () => {
+    const t = nyttTillstand('test'); aventyrFor(t, AVENTYR).bar = 2;
+    aterstallFramsteg({ tillstand: t, aventyrId: AVENTYR, maxBar: 6 });
+    expect(aventyrFor(t, AVENTYR).bar).toBe(2);
   });
 });

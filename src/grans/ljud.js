@@ -1,6 +1,21 @@
 // @ts-check
 // Ljudeffekter för gråboxen, syntetiserade som i TURBO-RACE (04_audio.js, Snd) men med mjukare klanger
 // (triangel och sinus, stilguiden). Riktiga ljud och musik kommer i fas 4. Ljudet startas av första trycket (iPad).
+// De inspelade lätena (assets/ljud, bearbetade så att rösten inte går att känna igen) ersätter syntesen för
+// Herr Skata och ungen. Tills de är avkodade, eller om de inte går att avkoda, spelas syntesen.
+import skrattUrl from '../../assets/ljud/herr_skata_skratt.wav?url';
+import unge1Url from '../../assets/ljud/unge_late_01.wav?url';
+import unge2Url from '../../assets/ljud/unge_late_02.wav?url';
+import unge3Url from '../../assets/ljud/unge_late_03.wav?url';
+
+/** De inspelade ljuden. */
+const INSPELADE = { herr_skata_skratt: skrattUrl, unge_late_01: unge1Url, unge_late_02: unge2Url, unge_late_03: unge3Url };
+/** Ljud-id i innehållet och effekter → inspelat ljud. 'unge' (ungen reagerar) tar ett av de tre lätena. */
+const INSPELAT_FOR = /** @type {Record<string, string | string[]>} */ ({
+  fagel_late: 'herr_skata_skratt', skata: 'herr_skata_skratt',
+  unge_forsta_late: 'unge_late_01', unge_langtan: 'unge_late_02', unge_svarar: 'unge_late_03',
+  unge: ['unge_late_01', 'unge_late_02', 'unge_late_03'],
+});
 
 /** @param {{ tyst?: () => boolean }} [opt] */
 export function skapaLjud({ tyst = () => false } = {}) {
@@ -14,6 +29,30 @@ export function skapaLjud({ tyst = () => false } = {}) {
     const AC = window.AudioContext || /** @type {any} */ (window).webkitAudioContext;
     if (!AC) return;
     ac = new AC(); ut = ac.createGain(); ut.gain.value = 0.35; ut.connect(ac.destination);
+    avkoda();
+  }
+
+  /** @type {Map<string, AudioBuffer>} */
+  const buffrar = new Map();
+  /** Hämta och avkoda de inspelade ljuden en gång (callback-formen fungerar också i äldre Safari). */
+  function avkoda() {
+    for (const [namn, url] of Object.entries(INSPELADE)) {
+      fetch(url).then((r) => r.arrayBuffer()).then((data) => new Promise((klar, fel) => {
+        const p = ac?.decodeAudioData(data, klar, fel); if (p && p.catch) p.catch(fel);
+      })).then((b) => { buffrar.set(namn, /** @type {AudioBuffer} */ (b)); }).catch(() => { /* syntesen får spela i stället */ });
+    }
+  }
+
+  /** Spela ett inspelat ljud, om det finns. @param {string} namn @returns {number} längden i ms, 0 om det saknas */
+  function inspelat(namn) {
+    let n = INSPELAT_FOR[namn];
+    if (Array.isArray(n)) n = n[Math.floor(Math.random() * n.length)];
+    const buf = n ? buffrar.get(n) : null;
+    if (!ac || !ut || !buf) return 0;
+    const k = ac.createBufferSource(), g = ac.createGain();
+    g.gain.value = 1; // inspelningarna är normaliserade (topp 0,89), genom ut (0,35) som syntesen
+    k.buffer = buf; k.connect(g); g.connect(ut); k.start();
+    return Math.round(buf.duration * 1000);
   }
 
   /** @param {{ f: number, f2?: number, t?: number, v?: number, typ?: OscillatorType, d?: number }} o */
@@ -95,10 +134,16 @@ export function skapaLjud({ tyst = () => false } = {}) {
       const f = /** @type {Record<string, number>} */ ({ berattare: 520, gammal: 330, fanig: 440, fagel: 880, metall: 700, unge: 760 })[roll] ?? 520;
       try { ton({ f, t: 0.05, v: 0.06, typ: 'sine' }); } catch (e) { /* ljud får aldrig krascha spelet */ }
     },
+    /** @returns {number} hur länge ljudet låter i ms (0 = kort syntes eller tyst) */
     spela(namn) {
-      if (tyst()) return;
+      if (tyst()) return 0;
       starta();
-      try { (fx[namn] || fx[LJUD_ID[namn]] || fx.allmant)(); } catch (e) { /* ljud får aldrig krascha spelet */ }
+      try {
+        const ms = inspelat(namn) || inspelat(LJUD_ID[namn] || '');
+        if (ms) return ms;
+        (fx[namn] || fx[LJUD_ID[namn]] || fx.allmant)();
+      } catch (e) { /* ljud får aldrig krascha spelet */ }
+      return 0;
     },
   };
 }

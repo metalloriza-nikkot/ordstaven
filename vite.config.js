@@ -45,7 +45,7 @@ export default defineConfig({
       workbox: {
         cacheId: 'ordstaven',
         // Allt som byggs förcachas: sidan, skript, typsnitt, bilder, kartor, data, ljud.
-        globPatterns: ['**/*.{html,js,css,png,svg,json,tmj,woff2,webmanifest,ogg,mp3,m4a}'],
+        globPatterns: ['**/*.{html,js,css,png,svg,json,tmj,woff2,webmanifest,ogg,mp3,m4a,wav}'],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         cleanupOutdatedCaches: true,
         navigateFallback: 'index.html',

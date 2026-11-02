@@ -233,6 +233,10 @@ const spelet = skapaSpel({
   niva: () => ({ niva: rum.niva, stege: rum.paStege }),
   /** Det hjälten har på sig. */
   lager: () => ({ ...rum.lager }),
+  /** Hjältens bild just nu (bildens namn, texturen med färgerna) och om staven syns. */
+  hjaltebild: () => ({ bild: rum.kropp?.frame.name ?? null, textur: rum.kropp?.texture.key ?? null, stav: !!rum.stav?.visible }),
+  /** Figurer som flyger förbi just nu (Herr Skata). */
+  flygande: () => rum.lagerFigurer.list.filter((/** @type {any} */ o) => o.texture?.key === 'herr_skata').map((/** @type {any} */ o) => o.frame.name),
   spel,
   /** 'webgl' eller 'canvas': hur världen ritas just nu */
   ritning: () => (spel.renderer && spel.renderer.type === Phaser.CANVAS ? 'canvas' : 'webgl'),

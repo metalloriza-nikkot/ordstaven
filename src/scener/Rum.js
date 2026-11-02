@@ -9,6 +9,8 @@ import { synligaIds } from '../karna/karta.js';
 import { skapaHinder, skarIgenom } from '../karna/vag.js';
 import { skapaNivaer } from '../karna/nivaer.js';
 import { KAMERA, centrera, folj, visaRuta, omradeFor, narmare, enSkarm } from '../karna/kamera.js';
+import { hjaltensByten } from '../karna/fargbyte.js';
+import { laddaFigurer, fargad, riktningFor } from './figurbilder.js';
 
 const FARG = {
   golv: 0x8c8a86, rutnat: 0x7f7d79, kant: 0x5d5b58,
@@ -26,8 +28,8 @@ export const HJALTE_FARGER = {
 };
 /** Det som inte går att välja: den runda grå hjälmen och de mörkblå skorna. */
 export const HJALTE_FAST = Object.freeze({ hjalm: 0xc9ccd2, skor: 0x1e4fa0 });
-/** Hjälte A (stilguiden v0.25 §5): dräktens ljusa kant och ögonen. */
-const HJALTE_A = Object.freeze({ draktKant: 0x8a90a0, ogon: 0x12305a });
+/** Gången: en ny bild var femte pixel han går (stå, steg, stå, steg). */
+const GANG_STEG = 5;
 /**
  * Gråboxens bild av sakerna han kan ha på sig (lager): en färg per sak. Okända saker ritas i en neutral färg.
  * Riktig grafik kommer med Stil (stilguiden §5).
@@ -133,6 +135,10 @@ export class Rum extends Phaser.Scene {
     this.vagMal = null;
   }
 
+  preload() {
+    laddaFigurer(this);
+  }
+
   create() {
     this.golv = this.add.graphics();
     this.lagerObjekt = this.add.container(0, 0);
@@ -194,7 +200,7 @@ export class Rum extends Phaser.Scene {
   valjRitning() {
     this.antalSteg = (this.antalSteg || 0) + 1;
     const nu = this.time.now, h = this.hjalte, u = this.unge, k = this.cameras.main, bu = this.buren;
-    const sig = `${h.x},${h.y},${h.visible},${u.x},${u.y},${u.visible},${k.scrollX},${k.scrollY},${bu ? bu.x + ',' + bu.y : ''}`;
+    const sig = `${this.kropp?.frame.name},${h.x},${h.y},${h.visible},${u.x},${u.y},${u.visible},${k.scrollX},${k.scrollY},${bu ? bu.x + ',' + bu.y : ''}`;
     const rorlig = this.tweens.getTweens().some((t) => !this.oandliga.has(t) && t.isPlaying());
     // med läsplattan öppen står världen still bakom texten: den ritas i lugn takt (åtta gånger per sekund), så att
     // datorn inte målar om plattans skuggor över en värld som rör sig (golvdatorn, trädgården i s22)
@@ -238,37 +244,36 @@ export class Rum extends Phaser.Scene {
     }
   }
 
-  /** Hjältens färger efter valen i skapa hjälten. @param {Record<string, number>} val */
+  /**
+   * Hjälten i spelarens färger (valen i skapa hjälten): bilderna av hjälte A med hud och dräkt bytta, staven ovanpå
+   * när han har den, och det han har på sig. @param {Record<string, number>} val
+   */
   sattUtseende(val) {
     this.utseende = val; this.smutsig = true;
-    const f = (/** @type {'hudfarg' | 'drakt' | 'hjalm' | 'skor'} */ del) => (del === 'hjalm' || del === 'skor' ? HJALTE_FAST[del] : HJALTE_FARGER[del][val[del] ?? 0] ?? HJALTE_FARGER[del][0]);
+    const hud = HJALTE_FARGER.hudfarg[val.hudfarg ?? 0] ?? HJALTE_FARGER.hudfarg[0];
+    const drakt = HJALTE_FARGER.drakt[val.drakt ?? 0] ?? HJALTE_FARGER.drakt[0];
     this.hjalte.removeAll(true);
-    // gråboxens version av spelarens figur: stort huvud med rund grå hjälm runt ett blått ansikte,
-    // mörkgrå dräkt, blå armar, mörkblå skor
-    this.ansikte = this.add.rectangle(4, 3, 8, 7, f('hudfarg')).setOrigin(0, 0);
-    this.hjalte.add([
-      this.add.rectangle(4, 21, 3, 3, f('skor')).setOrigin(0, 0),
-      this.add.rectangle(9, 21, 3, 3, f('skor')).setOrigin(0, 0),
-      // ryggsäcken syns som en kant bakom ryggen
-      ...(this.lager?.ryggsack ? [this.add.rectangle(11, 12, 4, 8, LAGER_FARG[/** @type {keyof LAGER_FARG} */ (this.lager.ryggsack)] ?? 0x9a8f80).setOrigin(0, 0)] : []),
-      this.add.rectangle(1, 13, 2, 6, f('hudfarg')).setOrigin(0, 0),
-      this.add.rectangle(13, 13, 2, 6, f('hudfarg')).setOrigin(0, 0),
-      this.add.rectangle(3, 12, 10, 9, f('drakt')).setOrigin(0, 0),
-      this.add.rectangle(3, 12, 10, 1, HJALTE_A.draktKant).setOrigin(0, 0),
-      this.add.rectangle(2, 0, 12, 12, f('hjalm')).setOrigin(0, 0),
-      this.add.rectangle(3, 0, 10, 1, 0xffffff, 0.5).setOrigin(0, 0),
-      this.ansikte,
-    ]);
-    // ögonen: två mörka pixlar (döljs när han vänder ryggen mot kameran)
-    this.ogon = [this.add.rectangle(6, 5, 1, 2, HJALTE_A.ogon).setOrigin(0, 0), this.add.rectangle(9, 5, 1, 2, HJALTE_A.ogon).setOrigin(0, 0)];
-    this.hjalte.add(this.ogon);
-    // hjälmdekoren: taggar längs hjälmens topp
+    const farg = (/** @type {string} */ id) => LAGER_FARG[/** @type {keyof LAGER_FARG} */ (id)] ?? 0x9a8f80;
+    // ryggsäcken syns som en kant bakom ryggen (gråbox tills Stil ritar lagret)
+    if (this.lager?.ryggsack) this.hjalte.add(this.add.rectangle(11, 12, 4, 8, farg(this.lager.ryggsack)).setOrigin(0, 0));
+    this.kropp = this.add.image(0, 0, fargad(this, 'hjalte', hjaltensByten(hud, drakt)), 'hjalte_ga_ner_01').setOrigin(0, 0);
+    // staven i handen är ett eget lager ovanpå, med knytnäven i hudens färg (10b)
+    this.stav = this.add.image(0, 0, fargad(this, 'stav', hjaltensByten(hud)), 'stav_hand_ner_01').setOrigin(0, 0).setVisible(!!this.harStav);
+    this.hjalte.add([this.kropp, this.stav]);
+    // hjälmdekoren: taggar längs hjälmens topp (gråbox)
     const dekor = this.lager?.hjalmdekor;
-    if (dekor) { const fd = LAGER_FARG[/** @type {keyof LAGER_FARG} */ (dekor)] ?? 0x9a8f80; for (const x of [4, 7, 10]) this.hjalte.add(this.add.rectangle(x, -3, 2, 3, fd).setOrigin(0, 0)); }
-    // ryggsäcken mitt på ryggen, när han vänder ryggen mot kameran (stegen)
-    this.ryggBak = this.lager?.ryggsack ? this.add.rectangle(4, 12, 8, 8, LAGER_FARG[/** @type {keyof LAGER_FARG} */ (this.lager.ryggsack)] ?? 0x9a8f80).setOrigin(0, 0).setVisible(false) : null;
+    if (dekor) for (const x of [4, 7, 10]) this.hjalte.add(this.add.rectangle(x, -3, 2, 3, farg(dekor)).setOrigin(0, 0));
+    // ryggsäcken mitt på ryggen, när han vänder ryggen mot kameran
+    this.ryggBak = this.lager?.ryggsack ? this.add.rectangle(4, 12, 8, 8, farg(this.lager.ryggsack)).setOrigin(0, 0).setVisible(false) : null;
     if (this.ryggBak) this.hjalte.add(this.ryggBak);
-    this.sattRygg(this.klattrar);
+    this.ritaHjalte();
+  }
+
+  /** Har han staven? Den syns i handen från att han har en formel (LJUS). @param {boolean} pa */
+  sattStav(pa) {
+    if (this.harStav === pa) return;
+    this.harStav = pa; this.smutsig = true;
+    this.stav?.setVisible(pa);
   }
 
   /** Det han har på sig (hjältens lager: hjälmdekor, ryggsäck). @param {{ hjalmdekor: string | null, ryggsack: string | null }} lager */
@@ -277,13 +282,46 @@ export class Rum extends Phaser.Scene {
     this.sattUtseende(this.utseende || {});
   }
 
-  /** Ryggen mot kameran (på stegen): ansiktet döljs bakom hjälmen. @param {boolean} pa */
+  /** Ryggen mot kameran (på stegen). @param {boolean} pa */
   sattRygg(pa) {
-    const hud = HJALTE_FARGER.hudfarg[(this.utseende || {}).hudfarg ?? 0] ?? HJALTE_FARGER.hudfarg[0];
-    this.smutsig = true;
-    this.ansikte?.setFillStyle(pa ? HJALTE_FAST.hjalm : hud);
-    for (const o of this.ogon || []) o.setVisible(!pa);
+    this.rygg = pa; this.smutsig = true;
     this.ryggBak?.setVisible(pa);
+    this.ritaHjalte();
+  }
+
+  /**
+   * Hjältens bild just nu: åt det håll han är vänd (ryggen mot oss på stegen), och i gången en ny bild var
+   * GANG_STEG:e pixel. Står han still är det gångens första bild.
+   */
+  ritaHjalte() {
+    if (!this.kropp) return;
+    const r = this.rygg ? 'upp' : riktningFor(this.vand);
+    const i = this.gar ? Math.floor((this.gang || 0) / GANG_STEG) % 4 : 0;
+    const namn = `hjalte_ga_${r}_0${i + 1}`;
+    if (this.kropp.frame.name !== namn) { this.kropp.setFrame(namn); this.smutsig = true; }
+    if (this.stav && this.stav.frame.name !== `stav_hand_${r}_01`) this.stav.setFrame(`stav_hand_${r}_01`);
+  }
+
+  /**
+   * En figur flyger förbi högt uppe i bild (Herr Skata när han skrattar, vid vindsfönstret och i trädgården), med
+   * vingarna upp och ned, och är sedan borta. Ingen text, inget att trycka på. @param {string} figur atlasen
+   * @param {number} [ms] @returns {Promise<void>}
+   */
+  flygForbi(figur, ms = 2200) {
+    if (!this.harRum || !this.textures.exists(figur)) return Promise.resolve();
+    const k = this.kamera, y = k.y + 34; // under knapparna i hörnen
+    const f = this.add.image(k.x - 20, y, figur, `${figur}_flyga_hoger_01`).setOrigin(0, 0);
+    this.lagerFigurer.add(f);
+    return new Promise((klar) => {
+      this.tweens.add({
+        targets: f, x: k.x + RUM.bredd + 4, duration: Math.max(1, ms), ease: 'Linear',
+        onUpdate: (tw) => {
+          f.y = Math.round(y + Math.sin(tw.progress * Math.PI * 3) * 3); f.x = Math.round(f.x);
+          f.setFrame(`${figur}_flyga_hoger_0${1 + (Math.floor(this.time.now / 140) % 2)}`);
+        },
+        onComplete: () => { f.destroy(); this.smutsig = true; klar(); },
+      });
+    });
   }
 
   /**
@@ -528,6 +566,7 @@ export class Rum extends Phaser.Scene {
 
   placera() {
     this.hjalte.setPosition(Math.round(this.pos.x - FIGUR.bredd / 2), Math.round(this.pos.y - FIGUR.hojd));
+    this.ritaHjalte();
     if (this.buren) this.buren.setPosition(Math.round(this.pos.x + 6), Math.round(this.pos.y - FIGUR.hojd - 6 + Math.sin(this.time.now / 300) * 1.5));
     // pekar ungen nosar den mot föremålet: små ryck åt dess håll
     const m = this.ungeMal;
@@ -770,7 +809,7 @@ export class Rum extends Phaser.Scene {
     const inm = this.b.inmatning;
     // kameran följer hjälten också när världen står still (han går tillbaka från kurvan, en fråga ställs)
     if (this.harRum) this.flyttaKameran(dtMs);
-    if (!this.harRum || this.fryst || this.klattrar) return;
+    if (!this.harRum || this.fryst || this.klattrar) { if (this.gar) { this.gar = false; this.ritaHjalte(); } return; }
     // ett tryck medan världen stod still görs nu, om det var nyss (högst 1,5 s sedan)
     if (this.sparatTryck) {
       const t = this.sparatTryck; this.sparatTryck = null;
@@ -800,7 +839,9 @@ export class Rum extends Phaser.Scene {
     if (mal && !ny.framme && sista) this.malKors.setPosition(Math.round(sista.x), Math.round(sista.y)).setVisible(true);
     else { this.malKors.setVisible(false); if (ny.framme) { inm.rensaGaTill(); this.vag = []; this.vagMal = null; } }
     const flyttad = ny.x !== this.pos.x || ny.y !== this.pos.y;
-    if (flyttad) { const vx = ny.x - this.pos.x, vy = ny.y - this.pos.y, l = Math.hypot(vx, vy); if (l > 0.01) this.vand = { x: vx / l, y: vy / l }; }
+    if (flyttad) { const vx = ny.x - this.pos.x, vy = ny.y - this.pos.y, l = Math.hypot(vx, vy); if (l > 0.01) this.vand = { x: vx / l, y: vy / l }; this.gang = (this.gang || 0) + l; }
+    // gången: benen rör sig medan han går, och han står i första bilden när han stannar
+    if (flyttad !== !!this.gar) { this.gar = flyttad; if (!flyttad) this.ritaHjalte(); }
     this.pos = { x: ny.x, y: ny.y };
     if (this.nivaer.finns) this.foljNivan();
     // ungen följer efter på avstånd, eller springer dit den pekar

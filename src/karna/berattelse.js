@@ -242,3 +242,51 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
     hoppaTill(i) { scenIndex = Math.max(0, Math.min(kapitel.scener.length - 1, i)); effektGjord = false; omstart = false; borjaScen(); },
   };
 }
+
+/**
+ * Sätt tillbaka sparningen till början av ett pass, utan spår av det som kom efter (beslut 26.6): det som spelet ger
+ * under berättelsen töms (formlerna, det han har på sig och i garderoben, Dinobokens sidor, ungens tillägg, graden,
+ * kartbitarna, lapparna, det som har visats och det frivilliga), och spelet spolar sedan fram kapitlen fram till
+ * passet igen (spolaFram). Det som är spelarens står kvar: namnen, utseendet, lärandet och inställningarna.
+ * Bären kan inte spolas fram (en del kommer ur krukor och buskar): de får vara kvar, men aldrig fler än
+ * kapitlen före passet kan ge (barFore).
+ * @param {{ tillstand: any, aventyrId: string, maxBar: number }} opt
+ */
+export function aterstallFramsteg({ tillstand, aventyrId, maxBar }) {
+  const h = tillstand.spelare.hjalte;
+  h.formler = []; h.lager = { hjalmdekor: null, ryggsack: null }; h.garderob = []; h.grad = null;
+  const u = tillstand.spelare.unge;
+  if (u) { u.tillagg = []; u.formagor = []; delete u.folj; }
+  tillstand.spelare.dinobok = [];
+  tillstand.spelare.sett = {};
+  // äventyrets del töms på plats (gränssnittet håller en referens till den)
+  const av = aventyrFor(tillstand, aventyrId);
+  const bar = Math.max(0, Math.min(av.bar || 0, maxBar));
+  for (const k of Object.keys(av)) delete av[k];
+  Object.assign(av, { kapitel: 0, flaggor: {}, bar, kartbitar: [] });
+  return av;
+}
+
+/**
+ * Hur många bär kapitlen kan ge före en scen: ge_bar, bären i krukorna (P26) och buskarna i fri lek (fritt,
+ * perForemal bär per föremål). Frivilliga scener räknas inte.
+ * @param {{ kapitlen: any[], tillKapitel: string, tillScen: string, perForemal: number }} opt
+ */
+export function barFore({ kapitlen, tillKapitel, tillScen, perForemal }) {
+  let n = 0;
+  for (const k of kapitlen) {
+    const pussel = new Map((k.pussel || []).map((/** @type {any} */ p) => [p.id, p]));
+    for (const sc of k.scener) {
+      if (k.id === tillKapitel && sc.id === tillScen) return n;
+      if (sc.frivillig) continue;
+      for (const st of sc.steg) {
+        if (st.typ === 'ge_bar') n += st.antal || 0;
+        if (st.typ === 'fritt') n += (st.foremal || []).length * perForemal;
+        const p = st.typ === 'pussel' ? pussel.get(st.pussel_id) : null;
+        if (p?.typ === 'P26_krukorna') n += (p.innehall || []).filter((/** @type {string} */ x) => x === 'bar').length;
+      }
+    }
+    if (k.id === tillKapitel) return n;
+  }
+  return n;
+}

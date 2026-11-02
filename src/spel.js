@@ -1,7 +1,7 @@
 // @ts-check
 // Spelet: kopplar berättelsemotorn (karna) till rummet (Phaser) och gränssnittet (DOM).
 // Varje stegtyp i innehållet har en hanterare här. Inget innehåll hårdkodas: allt kommer från content/.
-import { skapaBerattelse, spolaFram } from './karna/berattelse.js';
+import { skapaBerattelse, spolaFram, aterstallFramsteg, barFore } from './karna/berattelse.js';
 import { sammanfatta } from './karna/foraldravy.js';
 import { skapaLasmotor, valjVariant } from './karna/lasmotor.js';
 import { egenskaper, PALETT } from './karna/egenskaper.js';
@@ -26,6 +26,14 @@ const vanta = (/** @type {number} */ ms) => new Promise((r) => setTimeout(r, ms)
  *           bilder: ReturnType<typeof import('./grans/bilder.js').skapaBilder>, snabb: boolean, pek: () => boolean,
  *           uppdatering: { tillampa(): void }, valtKapitel?: string | null, version?: string, exporteraLogg?: () => void }} d
  */
+/** Bär per föremål i fri lek (buskarna): två slag var. */
+const BAR_PER_FOREMAL = 2;
+/**
+ * Figurer som flyger förbi i världen när deras läte hörs (gråboxen: tills mellanscenerna har bilder). Herr Skatas
+ * skratt, vid vindsfönstret och i trädgården.
+ */
+const FLYGER_VID_LJUD = /** @type {Record<string, string>} */ ({ fagel_late: 'herr_skata' });
+
 export function skapaSpel(d) {
   const { aventyr, kartor = {}, tillstand, sparning, logg, rost, ljud, ui, rum, layout, inmatning, tangentbord, bilder, snabb } = d;
   const AVENTYR = aventyr.id;
@@ -722,7 +730,12 @@ export function skapaSpel(d) {
         const ms = tid(Math.min(6000, 1800 + st.beskrivning.split(' ').length * 140));
         await ui.visaRegi(st.beskrivning, ms); ui.doljRegi(); return;
       }
-      case 'ljud': ljud.spela(st.id); if (st.foremal) rum.hoppa(st.foremal); visaLjudord(st.ljudord, st.id, st.foremal); await vanta(tid(600)); return;
+      case 'ljud': {
+        // ett inspelat läte får låta klart innan nästa replik läses (högst 1,6 s, maxtiden)
+        const ms = ljud.spela(st.id); if (st.foremal) rum.hoppa(st.foremal); visaLjudord(st.ljudord, st.id, st.foremal);
+        const figur = FLYGER_VID_LJUD[st.id]; if (figur) rum.flygForbi(figur, 2200); // väntar inte: berättelsen går vidare
+        await vanta(tid(Math.max(600, Math.min(ms, 1600)))); return;
+      }
       case 'unge_folj': return; // effekten (ungen syns och följer) görs i berättelsemotorn
       case 'ga_till': return gaTill(st);
       case 'pussel': return pussel(b.pussel(st.pussel_id));
@@ -1937,7 +1950,7 @@ export function skapaSpel(d) {
     rum.frys(false);
     const foremal = /** @type {string[]} */ (st.foremal || []);
     // väntetiden är spelarens tid, inte en animation: den kortas inte i snabbläget
-    const BAR_PER = 2, STILLA_MS = 25000;
+    const BAR_PER = BAR_PER_FOREMAL, STILLA_MS = 25000;
     const slagna = new Map();
     let senast = performance.now();
     /** @type {ReturnType<typeof anvand> | null} */
@@ -2233,6 +2246,7 @@ export function skapaSpel(d) {
 
   async function spela() {
     rum.lager = { ...lagerFor(tillstand.spelare.hjalte) };
+    rum.sattStav((tillstand.spelare.hjalte.formler || []).length > 0);
     rum.sattUtseende(tillstand.spelare.hjalte.utseende || {});
     await startskarm();
     /** @type {any[]} namn som saknas efter ett hopp förbi tidigare kapitel (dop-pusslen frågar efter dem) */
@@ -2263,6 +2277,9 @@ export function skapaSpel(d) {
         delete av.spolaTill; spara();
       }
       b = skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId: AVENTYR, logg });
+      // efter en återställning (hopp i menyn) har han redan sett det som spolningen gav tillbaka: inga nya stjärnor
+      rum.sattStav((tillstand.spelare.hjalte.formler || []).length > 0);
+      if (av.aterstalld) { for (const f of ['staven', 'garderoben', 'dinoboken']) sett()[f] = antalI(f); delete av.aterstalld; spara(); }
       // namnen som saknas frågas efter först, med de hoppade kapitlens egna dop-pussel, med rummet bakom
       if (dopAttFraga.length) await visaScen();
       for (const p of dopAttFraga) {
@@ -2280,6 +2297,7 @@ export function skapaSpel(d) {
         if (!st) break;
         const res = await utfor(st);
         b.klar(res || {});
+        rum.sattStav((tillstand.spelare.hjalte.formler || []).length > 0);
         spara();
       }
     }
@@ -2372,6 +2390,16 @@ export function skapaSpel(d) {
       if (!k) return;
       // den vuxne hoppar in i ett låst kapitel: det öppnas på den här enheten
       if (kapitelLast(k.id)) { oppnaKapitel(k.id); logg.handelse('inställning', `${k.id} öppet (hopp)`); }
+      // och kapitlen efter som kan låsas (kapitel_last) låses igen: sparningen står vid början av passet (beslut 26.6)
+      const efter = aventyr.kapitel.slice(aventyr.kapitel.indexOf(k.id) + 1).filter((/** @type {string} */ id) => (aventyr.kapitel_last?.last || []).includes(id) && (inst.oppnadeKapitel || []).includes(id));
+      if (efter.length) { inst.oppnadeKapitel = (inst.oppnadeKapitel || []).filter((/** @type {string} */ id) => !efter.includes(id)); logg.handelse('inställning', `${efter.join(', ')} låst (hopp bakåt)`); }
+      // sparningen sätts tillbaka till början av passet, utan spår av det som kom efter (beslut 26.6): det som
+      // berättelsen ger töms, och spolningen nedan ger tillbaka det som kapitlen före passet ger
+      const kapitlen = aventyr.kapitel.map((/** @type {string} */ id) => d.kapitel.find((x) => x.id === id)).filter(Boolean);
+      const forut = { bar: av.bar, formler: (tillstand.spelare.hjalte.formler || []).length };
+      aterstallFramsteg({ tillstand, aventyrId: AVENTYR, maxBar: barFore({ kapitlen, tillKapitel: k.id, tillScen: k.scener[i]?.id, perForemal: BAR_PER_FOREMAL }) });
+      av.aterstalld = true;
+      logg.handelse('meny', 'sparningen satt tillbaka till passets början', { bar: `${forut.bar} → ${av.bar}`, formler_fore: forut.formler });
       // kapitlen före spolas fram (av.spolat töms, spolningen gör inget två gånger), och kapitlets scener före hoppet
       av.kapitelId = k.id; av.scen = i; av.scenId = k.scener[i]?.id; delete av.steg; av.startad = false;
       av.spolat = []; av.spolaTill = av.scenId;
