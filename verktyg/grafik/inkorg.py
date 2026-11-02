@@ -1,27 +1,29 @@
 #!/usr/bin/env python3
-"""Inkorgen → repot (dokument 02 §7, beslut 25.2 och 26.5).
+"""Inkorgen → repot (dokument 02 §7, beslut 25.2, 26.5 och 27).
 
-Läser en kopia av Niklas inkorgsmapp (figurer/<figur>/*.png och ljud/*.wav) och skriver till repot:
+Läser en kopia av Niklas inkorgsmapp och skriver till repot:
 
-- assets/sprites/<figur>/<figur>.png och <figur>.json: figurens bilder packade i ett atlas (Phaser, JSON Hash).
-  Bildernas namn följer stilguiden §8: <figur>_<handling>_<riktning>_<bild>. Arken (*_ark.png) hoppas över, de är
-  bara till för att titta på.
-- assets/ljud/<namn>.wav: ljuden, omdöpta utan mellanslag ("unge_late 2.wav" → unge_late_02.wav, och då blir
-  "unge_late.wav" unge_late_01.wav).
-- assets/palett.json: masterpaletten (stilguiden §2, högst 48 färger).
+- figurer/<mapp>/*.png   → assets/sprites/<mapp>/<mapp>.png och .json: ett atlas per mapp (Phaser, JSON Hash).
+  Bildens namn i atlaset är filens namn (stilguiden §8 och 10b, t.ex. hjalte_ga_ner_01, unge1_glad_hoger_02).
+- foremal/<zon>/*.png    → assets/foremal/<zon>/<zon>.png och .json: ett atlas per zon (föremålen i kartorna).
+- rum/<zon>/<rum>.png    → assets/rum/<zon>/<rum>.png: en bild per inomhusrum (beslut 27.6).
+- rutor/<zon>/<zon>.png  → assets/tiles/<zon>/<zon>.png och <zon>.json (Tilleds rutset, .tsj).
+- bildkort/*.png         → assets/bildkort/bildkort.png och .json (läsplattans bildkort).
+- figurer/*/*_portratt_*.png → också assets/portratt/<namn>.png (ansiktena i pratrutan, i textlagret).
+- ljud/*.wav             → assets/ljud/<namn>.wav, döpta utan mellanslag ("unge_late 2" → unge_late_02).
 
-Varje bild:
-- tvingas in i masterpaletten: en färg nära en färg i paletten (avstånd högst NARA) blir den färgen, en ny färg
-  läggs till och skrivs ut, och fler än 48 färger är ett fel;
-- halvgenomskinliga pixlar blir hela eller borta (inga grå fläckar runt figuren);
-- skrivs om från pixlarna, så att ingen metadata följer med (EXIF, program, tid). Repot är publikt.
-- kontrolleras mot figurens storlek (STORLEK).
+Arken (*_ark.png) hoppas över, de är bara till för att titta på.
+
+Varje bild skrivs om från pixlarna, så att ingen metadata följer med (EXIF, program, tid). Repot är publikt.
+Färgerna och genomskinligheten (skuggorna är halvgenomskinliga) står kvar som Stil ritade dem. Alla färger
+samlas i assets/palett.json, så att det syns hur många de är (stilguiden §2 säger högst 48, men *Så ritas allt*
+med fyra toner per material ger fler, och det är Stils sak att avgöra).
 
 Ljuden skrivs om med bara formatet och ljuddatan (inga INFO-fält). Råinspelningar läggs aldrig i inkorgen
 (beslut 25.2): bara ljud som är bearbetade så att rösten inte går att känna igen.
 
-Körning:  python3 verktyg/grafik/inkorg.py <inkorgsmappen> [--repo .] [--prova]
---prova skriver ingenting, utan visar bara vad som skulle hända.
+Körning:  python3 -I verktyg/grafik/inkorg.py <inkorgsmappen> [--repo .] [--bara figurer/hjalte rum ...] [--prova]
+--bara tar bara med de mappar som börjar så (t.ex. figurer/hjalte, foremal/hus, rum). --prova skriver ingenting.
 """
 import argparse
 import json
@@ -33,69 +35,41 @@ from pathlib import Path
 from PIL import Image
 
 MAX_FARGER = 48
-NARA = 3  # avstånd i RGB (summan av skillnaderna) som räknas som samma färg: bara avrundningsbrus
-# Figurernas storlek (bredd, höjd), högst. Herr Skata är 16–17 × 12 när han sitter och 18 × 12 i flykt.
-STORLEK = {'hjalte': (16, 24), 'stav': (16, 24), 'herr_skata': (18, 12), 'unge1': (24, 24), 'baronen': (24, 24)}
-NAMN = re.compile(r'^(?P<figur>[a-z0-9]+(?:_[a-z0-9]+)*)_(?P<handling>[a-z]+)_(?P<riktning>ner|upp|hoger|vanster|sida)_(?P<bild>\d{2})$')
+NAMN = re.compile(r'^[a-z0-9]+(?:_[a-z0-9]+)*$')
+# Storlekar som koden räknar med (bredd, höjd) för bilder vars namn börjar så
+STORLEK = {'hjalte_ga_': (16, 24), 'stav_hand_': (16, 24), 'ryggsack_': (16, 24), 'taggkam_': (16, 24), 'unge1_ga_': (24, 24)}
 
 
 def hex_av(c):
     return '#%02x%02x%02x' % c[:3]
 
 
-def av_hex(h):
-    return tuple(int(h[i:i + 2], 16) for i in (1, 3, 5))
-
-
-def avstand(a, b):
-    return sum(abs(x - y) for x, y in zip(a[:3], b[:3]))
-
-
-class Palett:
-    def __init__(self, fil):
-        self.fil = fil
-        self.farger = [av_hex(h) for h in json.loads(fil.read_text())['farger']] if fil.exists() else []
-        self.nya = []
-
-    def nara(self, c):
-        best = min(self.farger, key=lambda p: avstand(p, c), default=None)
-        if best is not None and avstand(best, c) <= NARA:
-            return best
-        self.farger.append(c[:3])
-        self.nya.append(c[:3])
-        return c[:3]
-
-    def spara(self):
-        self.fil.write_text(json.dumps({
-            'om': 'Masterpaletten (stilguiden §2), högst 48 färger. Skrivs av verktyg/grafik/inkorg.py.',
-            'farger': [hex_av(c) for c in self.farger]}, indent=1) + '\n')
-
-
-def palettlas(im, palett):
-    """En ny bild, ritad pixel för pixel i masterpaletten: utan metadata och utan halvgenomskinliga pixlar."""
+def ren(im):
+    """En ny bild ritad pixel för pixel: inga metadata, färgerna och genomskinligheten som de är."""
     src = im.convert('RGBA')
     ut = Image.new('RGBA', src.size, (0, 0, 0, 0))
-    px, ny = src.load(), ut.load()
-    for y in range(src.height):
-        for x in range(src.width):
-            r, g, b, a = px[x, y]
-            if a < 128:
-                continue
-            ny[x, y] = (*palett.nara((r, g, b)), 255)
+    ut.putdata(list(src.getdata()))
     return ut
 
 
+def farger(im):
+    return {p[:3] for _, p in im.getcolors(1 << 20) if p[3]}
+
+
 def packa(bilder):
-    """Bilderna i en rad per handling och riktning (atlas). Returnerar (bild, ramar)."""
-    rader = {}
+    """Bilderna i rader (en rad per namn utan sista delen, högst ca 512 bred). Returnerar (atlas, ramar)."""
+    rader, rad, bredd = [], [], 0
     for namn, im in sorted(bilder.items()):
-        nyckel = namn.rsplit('_', 1)[0]
-        rader.setdefault(nyckel, []).append((namn, im))
-    bredd = max(sum(im.width + 1 for _, im in r) for r in rader.values())
-    hojd = sum(max(im.height for _, im in r) + 1 for r in rader.values())
-    atlas = Image.new('RGBA', (bredd, hojd), (0, 0, 0, 0))
+        if rad and (bredd + im.width > 512 or namn.rsplit('_', 1)[0] != rad[-1][0].rsplit('_', 1)[0]):
+            rader.append(rad); rad, bredd = [], 0
+        rad.append((namn, im)); bredd += im.width + 1
+    if rad:
+        rader.append(rad)
+    B = max(sum(im.width + 1 for _, im in r) for r in rader)
+    H = sum(max(im.height for _, im in r) + 1 for r in rader)
+    atlas = Image.new('RGBA', (B, H), (0, 0, 0, 0))
     ramar, y = {}, 0
-    for r in rader.values():
+    for r in rader:
         x = 0
         for namn, im in r:
             atlas.paste(im, (x, y))
@@ -107,42 +81,35 @@ def packa(bilder):
     return atlas, ramar
 
 
-# Hjältens färger går före i paletten (koden byter hud och dräkt efter dem, src/scener/Rum.js)
-FORST = ['hjalte', 'stav']
+def las_bilder(mapp, fel, alla):
+    bilder = {}
+    for f in sorted(mapp.glob('*.png')):
+        if f.stem.endswith('_ark'):
+            continue
+        if not NAMN.match(f.stem):
+            fel.append(f'{f}: namnet har tecken utanför a–z, 0–9 och _')
+            continue
+        im = ren(Image.open(f))
+        for prefix, (b, h) in STORLEK.items():
+            if f.stem.startswith(prefix) and im.size != (b, h):
+                fel.append(f'{f.name}: {im.width} × {im.height}, ska vara {b} × {h}')
+        alla.update(farger(im))
+        bilder[f.stem] = im
+    return bilder
 
 
-def figurer(inkorg, repo, palett, prova, fel):
-    mappar = sorted((inkorg / 'figurer').glob('*/'), key=lambda m: (m.name not in FORST, FORST.index(m.name) if m.name in FORST else 0, m.name))
-    for mapp in mappar:
-        bilder = {}
-        for f in sorted(mapp.glob('*.png')):
-            if f.stem.endswith('_ark'):
-                continue
-            m = NAMN.match(f.stem)
-            if not m:
-                fel.append(f'{f.name}: namnet följer inte <figur>_<handling>_<riktning>_<bild>')
-                continue
-            figur = m['figur']
-            im = palettlas(Image.open(f), palett)
-            maxb, maxh = STORLEK.get(figur, (32, 32))
-            if im.width > maxb or im.height > maxh:
-                fel.append(f'{f.name}: {im.width} × {im.height}, högst {maxb} × {maxh}')
-            bilder[f.stem] = im
-        if not bilder:
-            continue
-        figur = NAMN.match(next(iter(bilder)))['figur']
-        atlas, ramar = packa(bilder)
-        print(f'{figur}: {len(bilder)} bilder → assets/sprites/{figur}/{figur}.png ({atlas.width} × {atlas.height})')
-        if prova:
-            continue
-        ut = repo / 'assets' / 'sprites' / figur
-        ut.mkdir(parents=True, exist_ok=True)
-        atlas.save(ut / f'{figur}.png', optimize=True)
-        (ut / f'{figur}.json').write_text(json.dumps({
-            'frames': ramar,
-            'meta': {'image': f'{figur}.png', 'format': 'RGBA8888', 'size': {'w': atlas.width, 'h': atlas.height}, 'scale': '1',
-                     'om': 'Skrivs av verktyg/grafik/inkorg.py. Bildernas namn: <figur>_<handling>_<riktning>_<bild>.'}},
-            indent=1, ensure_ascii=False) + '\n')
+def skriv_atlas(bilder, ut, nyckel, prova):
+    atlas, ramar = packa(bilder)
+    print(f'{ut.as_posix()}/{nyckel}.png: {len(bilder)} bilder ({atlas.width} × {atlas.height})')
+    if prova:
+        return
+    ut.mkdir(parents=True, exist_ok=True)
+    atlas.save(ut / f'{nyckel}.png', optimize=True)
+    (ut / f'{nyckel}.json').write_text(json.dumps({
+        'frames': ramar,
+        'meta': {'image': f'{nyckel}.png', 'format': 'RGBA8888', 'size': {'w': atlas.width, 'h': atlas.height}, 'scale': '1',
+                 'om': 'Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen.'}},
+        indent=1, ensure_ascii=False) + '\n')
 
 
 def ljudnamn(filer):
@@ -159,15 +126,14 @@ def ljudnamn(filer):
 
 
 def ljud(inkorg, repo, prova, fel):
-    filer = sorted((inkorg / 'ljud').glob('*.wav'))
-    for f, namn in ljudnamn(filer).items():
-        if not re.match(r'^[a-z0-9_]+$', namn):
+    for f, namn in ljudnamn(sorted((inkorg / 'ljud').glob('*.wav'))).items():
+        if not NAMN.match(namn):
             fel.append(f'{f.name}: namnet {namn} har tecken utanför a–z, 0–9 och _')
             continue
         with wave.open(str(f)) as w:
             par, data = w.getparams(), w.readframes(w.getnframes())
         sek = par.nframes / par.framerate
-        print(f'{f.name} → assets/ljud/{namn}.wav ({sek:.2f} s, {par.nchannels} kanal, {par.framerate} Hz)')
+        print(f'{f.name} → assets/ljud/{namn}.wav ({sek:.2f} s)')
         if sek > 3:
             fel.append(f'{f.name}: {sek:.1f} s, ett läte ska vara kort (högst 3 s)')
         if prova:
@@ -180,11 +146,14 @@ def ljud(inkorg, repo, prova, fel):
 
 
 def licenser(repo, fel):
-    """Varje fil i assets/sprites och assets/ljud ska stå i assets/LICENSER.md (testet i tests/enhet kontrollerar)."""
+    """Varje fil i assets/ (utom licenstexterna) ska stå i assets/LICENSER.md. Ett atlas räknas med sin mapp."""
     text = (repo / 'assets' / 'LICENSER.md').read_text()
-    for f in sorted([*(repo / 'assets' / 'sprites').glob('*/*.png'), *(repo / 'assets' / 'ljud').glob('*.wav')]):
+    for f in sorted((repo / 'assets').rglob('*')):
+        if f.is_dir() or f.suffix not in ('.png', '.wav') or 'licenser' in f.parts:
+            continue
         rel = f.relative_to(repo).as_posix()
-        if rel not in text:
+        mappar = [p.relative_to(repo).as_posix() + '/' for p in f.parents if p != repo and repo in p.parents]
+        if rel not in text and not any(f'`{m}' in text for m in mappar):
             fel.append(f'{rel} saknar en rad i assets/LICENSER.md')
 
 
@@ -192,20 +161,54 @@ def main():
     a = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     a.add_argument('inkorg', type=Path)
     a.add_argument('--repo', type=Path, default=Path(__file__).resolve().parents[2])
+    a.add_argument('--bara', nargs='*', default=None)
     a.add_argument('--prova', action='store_true')
     arg = a.parse_args()
-    fel = []
-    palett = Palett(arg.repo / 'assets' / 'palett.json')
-    figurer(arg.inkorg, arg.repo, palett, arg.prova, fel)
-    ljud(arg.inkorg, arg.repo, arg.prova, fel)
-    if palett.nya:
-        print(f'Nya färger i masterpaletten ({len(palett.nya)}):', ' '.join(hex_av(c) for c in palett.nya))
-    if len(palett.farger) > MAX_FARGER:
-        fel.append(f'masterpaletten har {len(palett.farger)} färger, högst {MAX_FARGER} (stilguiden §2)')
+    ink, repo, fel, alla = arg.inkorg, arg.repo, [], set()
+    med = lambda p: arg.bara is None or any(p.startswith(b.rstrip('/')) for b in arg.bara)
+    for mapp in sorted((ink / 'figurer').glob('*/')):
+        if med(f'figurer/{mapp.name}') and (b := las_bilder(mapp, fel, alla)):
+            skriv_atlas(b, repo / 'assets' / 'sprites' / mapp.name, mapp.name, arg.prova)
+            # porträtten (läsplattans ansikten) som egna bilder, så att textlagret kan visa dem
+            for namn, im in b.items():
+                if '_portratt_' in namn and not arg.prova:
+                    (repo / 'assets' / 'portratt').mkdir(parents=True, exist_ok=True)
+                    im.save(repo / 'assets' / 'portratt' / f'{namn}.png', optimize=True)
+    for mapp in sorted((ink / 'foremal').glob('*/')):
+        if med(f'foremal/{mapp.name}') and (b := las_bilder(mapp, fel, alla)):
+            skriv_atlas(b, repo / 'assets' / 'foremal' / mapp.name, mapp.name, arg.prova)
+    if med('bildkort') and (ink / 'bildkort').is_dir() and (b := las_bilder(ink / 'bildkort', fel, alla)):
+        skriv_atlas(b, repo / 'assets' / 'bildkort', 'bildkort', arg.prova)
+    for mapp in sorted((ink / 'rum').glob('*/')):
+        if not med(f'rum/{mapp.name}'):
+            continue
+        for namn, im in las_bilder(mapp, fel, alla).items():
+            print(f'assets/rum/{mapp.name}/{namn}.png ({im.width} × {im.height})')
+            if not arg.prova:
+                (repo / 'assets' / 'rum' / mapp.name).mkdir(parents=True, exist_ok=True)
+                im.save(repo / 'assets' / 'rum' / mapp.name / f'{namn}.png', optimize=True)
+    for mapp in sorted((ink / 'rutor').glob('*/')):
+        if not med(f'rutor/{mapp.name}'):
+            continue
+        for tsj in mapp.glob('*.tsj'):
+            data = json.loads(tsj.read_text())
+            im = ren(Image.open(mapp / data['image']))
+            alla.update(farger(im))
+            print(f'assets/tiles/{mapp.name}/{tsj.stem}.png och .json ({data.get("tilecount")} rutor)')
+            if not arg.prova:
+                (repo / 'assets' / 'tiles' / mapp.name).mkdir(parents=True, exist_ok=True)
+                im.save(repo / 'assets' / 'tiles' / mapp.name / f'{tsj.stem}.png', optimize=True)
+                data['image'] = f'{tsj.stem}.png'
+                (repo / 'assets' / 'tiles' / mapp.name / f'{tsj.stem}.json').write_text(json.dumps(data, indent=1, ensure_ascii=False) + '\n')
+    if med('ljud'):
+        ljud(ink, repo, arg.prova, fel)
     if not arg.prova:
-        palett.spara()
-        licenser(arg.repo, fel)
-    print(f'Masterpaletten: {len(palett.farger)} av {MAX_FARGER} färger.')
+        fil = repo / 'assets' / 'palett.json'
+        gamla = set(json.loads(fil.read_text())['farger']) if fil.exists() and arg.bara is not None else set()
+        p = sorted(gamla | {hex_av(c) for c in alla})
+        fil.write_text(json.dumps({'om': 'Alla färger i grafiken, samlade av verktyg/grafik/inkorg.py (stilguiden §2).', 'antal': len(p), 'farger': p}, indent=1) + '\n')
+        print(f'Färger i grafiken: {len(p)} (stilguiden §2 säger högst {MAX_FARGER}).')
+        licenser(repo, fel)
     for f in fel:
         print('FEL:', f, file=sys.stderr)
     sys.exit(1 if fel else 0)

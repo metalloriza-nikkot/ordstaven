@@ -493,6 +493,8 @@ export function skapaSpel(d) {
    * @param {any} [scen] scenen vars rum ska visas: berättelsens, eller en frivillig scen (buskarna)
    * @param {any} [steg] steget som ska utföras (annars berättelsens aktuella), för närbilden
    */
+  /** Scenen där hjälten senast sov (en gång per scen). */
+  let sovitI = /** @type {string | null} */ (null);
   async function visaScen(scen = b.scen, steg = undefined) {
     if (!scen) return;
     visadScen = scen;
@@ -513,6 +515,8 @@ export function skapaSpel(d) {
     rum.visa({ rum: scen.rum, tillstand: b.rumsTillstand(scen.rum), innehall: r ? innehallNu(r) : [], unge: tillstand.spelare.unge?.folj ?? !!tillstand.spelare.unge?.namn, nyttRum: nytt,
       karta: scen.rum ? kartor[scen.rum] ?? null : null, franRum, delar: scen.rum ? delarIRummet(kartor[scen.rum]) : {}, visade: scen.rum ? b.visade(scen.rum) : [] });
     visaRumsskyltar();
+    // hjälten sover i sängen när scenen börjar så (scenens hjalte: "sover"), tills han ska röra sig
+    if (scen.hjalte === 'sover' && scen === b?.scen && b.stegIndex <= 0 && sovitI !== scen.id) { sovitI = scen.id; rum.sov(); }
     // närbilden (t.ex. kartbiten) visas tills spelaren ska röra sig i rummet igen
     const st = steg === undefined ? b.aktuellt() : steg;
     const sp = st && st.typ === 'pussel' ? b.pussel(st.pussel_id) : null;
@@ -724,6 +728,8 @@ export function skapaSpel(d) {
   /** @param {any} st */
   async function utfor(st) {
     aktuelltSteg = st;
+    // han vaknar och kliver ur sängen när något ska göras i rummet (repliker och mellanscener hör han i sängen)
+    if (rum.sover && !['replik', 'mellanscen', 'ljud', 'visa_ui'].includes(st.typ)) await rum.vakna(tid(500));
     switch (st.typ) {
       case 'replik': return st.vantar_pa ? replikVantar(st) : st.vid === 'ungen' ? replikVidUngen(st) : replik(st);
       case 'mellanscen': {

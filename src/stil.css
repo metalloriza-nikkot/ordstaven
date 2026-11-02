@@ -185,7 +185,8 @@ html, body {
 .portratt { flex: none; width: 48px; height: 48px; border-radius: 24px; background: #c9b896; box-shadow: inset 0 0 0 4px rgba(0, 0, 0, .15); }
 /* gråboxens ansikten i figurernas färger (stilguiden §5): baronen i orange med tropikhjälmen som ljus kant,
    Herr Skata svartvit med blågrön stjärt */
-.p-farfar { background: #8a6a4a; } .p-berattare { display: none; }
+/* Farfars porträtt (beslut 27.4): pixelbilden i ramen, skalad utan utjämning */
+.p-farfar { background: #8a6a4a url('../assets/portratt/farfar_portratt_glad.png') center / cover no-repeat; image-rendering: pixelated; } .p-berattare { display: none; }
 .p-baronen { background: #e8823a; box-shadow: inset 0 0 0 4px #b85e22, inset 0 10px 0 4px #e6d6a8; }
 .p-herr_skata { background: linear-gradient(135deg, #22252b 0 45%, #ffffff 45% 70%, #2e5966 70%); box-shadow: inset 0 0 0 3px #22252b; }
 

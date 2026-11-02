@@ -111,6 +111,10 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
   schemafel('aventyr', aventyr, 'aventyr.json');
   schemafel('ordlistor', ordlistor, 'ordlistor.json');
   for (const k of kapitel) schemafel('kapitel', k, `${k.id || '?'}.json`);
+  // en scen där hjälten sover (2.14) behöver en säng i rummets karta (ett föremål med sovplats)
+  for (const k of kapitel) for (const s of k.scener || []) {
+    if (s.hjalte === 'sover' && kartor?.[s.rum] && !(kartor[s.rum].objekt || []).some((/** @type {any} */ o) => o.sovplats)) fel.push(`${k.id} scen ${s.id}: hjälten sover, men kartan för ${s.rum} har ingen säng (sovplats)`);
+  }
   if (fel.length) return { fel, varningar, pass: passInfo };
 
   // Ordlistorna

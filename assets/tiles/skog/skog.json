@@ -1,0 +1,1457 @@
+{
+ "type": "tileset",
+ "version": "1.10",
+ "tiledversion": "1.11.0",
+ "name": "skog",
+ "image": "skog.png",
+ "imagewidth": 128,
+ "imageheight": 160,
+ "tilewidth": 16,
+ "tileheight": 16,
+ "margin": 0,
+ "spacing": 0,
+ "columns": 8,
+ "tilecount": 80,
+ "tiles": [
+  {
+   "id": 0,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "gras_1"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "gras_2"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "gras_3"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "gras_4"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "gras_blommor_1"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "gras_blommor_2"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "gras_flack_1"
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "gras_flack_2"
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "platå_1"
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "platå_2"
+    }
+   ]
+  },
+  {
+   "id": 10,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "platå_blommor"
+    }
+   ]
+  },
+  {
+   "id": 11,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "stig_0000"
+    }
+   ]
+  },
+  {
+   "id": 12,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "stig_0001"
+    }
+   ]
+  },
+  {
+   "id": 13,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "stig_0010"
+    }
+   ]
+  },
+  {
+   "id": 14,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "stig_0011"
+    }
+   ]
+  },
+  {
+   "id": 15,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "stig_0100"
+    }
+   ]
+  },
+  {
+   "id": 16,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "stig_0101"
+    }
+   ]
+  },
+  {
+   "id": 17,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "stig_0110"
+    }
+   ]
+  },
+  {
+   "id": 18,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "stig_0111"
+    }
+   ]
+  },
+  {
+   "id": 19,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "stig_1000"
+    }
+   ]
+  },
+  {
+   "id": 20,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "stig_1001"
+    }
+   ]
+  },
+  {
+   "id": 21,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "stig_1010"
+    }
+   ]
+  },
+  {
+   "id": 22,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "stig_1011"
+    }
+   ]
+  },
+  {
+   "id": 23,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "stig_1100"
+    }
+   ]
+  },
+  {
+   "id": 24,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "stig_1101"
+    }
+   ]
+  },
+  {
+   "id": 25,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "stig_1110"
+    }
+   ]
+  },
+  {
+   "id": 26,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "stig_1111"
+    }
+   ]
+  },
+  {
+   "id": 27,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "vatten_0000"
+    }
+   ]
+  },
+  {
+   "id": 28,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "vatten_0001"
+    }
+   ]
+  },
+  {
+   "id": 29,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "vatten_0010"
+    }
+   ]
+  },
+  {
+   "id": 30,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "vatten_0011"
+    }
+   ]
+  },
+  {
+   "id": 31,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "vatten_0100"
+    }
+   ]
+  },
+  {
+   "id": 32,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "vatten_0101"
+    }
+   ]
+  },
+  {
+   "id": 33,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "vatten_0110"
+    }
+   ]
+  },
+  {
+   "id": 34,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "vatten_0111"
+    }
+   ]
+  },
+  {
+   "id": 35,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "vatten_1000"
+    }
+   ]
+  },
+  {
+   "id": 36,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "vatten_1001"
+    }
+   ]
+  },
+  {
+   "id": 37,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "vatten_1010"
+    }
+   ]
+  },
+  {
+   "id": 38,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "vatten_1011"
+    }
+   ]
+  },
+  {
+   "id": 39,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "vatten_1100"
+    }
+   ]
+  },
+  {
+   "id": 40,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "vatten_1101"
+    }
+   ]
+  },
+  {
+   "id": 41,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "vatten_1110"
+    }
+   ]
+  },
+  {
+   "id": 42,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "vatten_1111"
+    }
+   ],
+   "animation": [
+    {
+     "tileid": 42,
+     "duration": 250
+    },
+    {
+     "tileid": 71,
+     "duration": 250
+    },
+    {
+     "tileid": 72,
+     "duration": 250
+    }
+   ]
+  },
+  {
+   "id": 43,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "skog_0000"
+    }
+   ]
+  },
+  {
+   "id": 44,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "skog_0001"
+    }
+   ]
+  },
+  {
+   "id": 45,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "skog_0010"
+    }
+   ]
+  },
+  {
+   "id": 46,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "skog_0011"
+    }
+   ]
+  },
+  {
+   "id": 47,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "skog_0100"
+    }
+   ]
+  },
+  {
+   "id": 48,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "skog_0101"
+    }
+   ]
+  },
+  {
+   "id": 49,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "skog_0110"
+    }
+   ]
+  },
+  {
+   "id": 50,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "skog_0111"
+    }
+   ]
+  },
+  {
+   "id": 51,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "skog_1000"
+    }
+   ]
+  },
+  {
+   "id": 52,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "skog_1001"
+    }
+   ]
+  },
+  {
+   "id": 53,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "skog_1010"
+    }
+   ]
+  },
+  {
+   "id": 54,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "skog_1011"
+    }
+   ]
+  },
+  {
+   "id": 55,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "skog_1100"
+    }
+   ]
+  },
+  {
+   "id": 56,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "skog_1101"
+    }
+   ]
+  },
+  {
+   "id": 57,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "skog_1110"
+    }
+   ]
+  },
+  {
+   "id": 58,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "skog_1111"
+    }
+   ]
+  },
+  {
+   "id": 59,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "kulle_NW"
+    }
+   ]
+  },
+  {
+   "id": 60,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "kulle_N"
+    }
+   ]
+  },
+  {
+   "id": 61,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "kulle_NE"
+    }
+   ]
+  },
+  {
+   "id": 62,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "kulle_W"
+    }
+   ]
+  },
+  {
+   "id": 63,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "kulle_C"
+    }
+   ]
+  },
+  {
+   "id": 64,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "kulle_E"
+    }
+   ]
+  },
+  {
+   "id": 65,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "kulle_SW"
+    }
+   ]
+  },
+  {
+   "id": 66,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "kulle_S"
+    }
+   ]
+  },
+  {
+   "id": 67,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "kulle_SE"
+    }
+   ]
+  },
+  {
+   "id": 68,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "kulle_FW"
+    }
+   ]
+  },
+  {
+   "id": 69,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "kulle_F"
+    }
+   ]
+  },
+  {
+   "id": 70,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "kulle_FE"
+    }
+   ]
+  },
+  {
+   "id": 71,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "vatten_glitter_2"
+    }
+   ]
+  },
+  {
+   "id": 72,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "vatten_glitter_3"
+    }
+   ]
+  }
+ ],
+ "wangsets": [
+  {
+   "name": "gräs/stig",
+   "type": "corner",
+   "tile": -1,
+   "colors": [
+    {
+     "name": "gräs",
+     "color": "#6fa34a",
+     "tile": 0,
+     "probability": 1
+    },
+    {
+     "name": "stig",
+     "color": "#be9a62",
+     "tile": 26,
+     "probability": 1
+    }
+   ],
+   "wangtiles": [
+    {
+     "tileid": 11,
+     "wangid": [
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1
+     ]
+    },
+    {
+     "tileid": 12,
+     "wangid": [
+      0,
+      1,
+      0,
+      2,
+      0,
+      1,
+      0,
+      1
+     ]
+    },
+    {
+     "tileid": 13,
+     "wangid": [
+      0,
+      1,
+      0,
+      1,
+      0,
+      2,
+      0,
+      1
+     ]
+    },
+    {
+     "tileid": 14,
+     "wangid": [
+      0,
+      1,
+      0,
+      2,
+      0,
+      2,
+      0,
+      1
+     ]
+    },
+    {
+     "tileid": 15,
+     "wangid": [
+      0,
+      2,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1
+     ]
+    },
+    {
+     "tileid": 16,
+     "wangid": [
+      0,
+      2,
+      0,
+      2,
+      0,
+      1,
+      0,
+      1
+     ]
+    },
+    {
+     "tileid": 17,
+     "wangid": [
+      0,
+      2,
+      0,
+      1,
+      0,
+      2,
+      0,
+      1
+     ]
+    },
+    {
+     "tileid": 18,
+     "wangid": [
+      0,
+      2,
+      0,
+      2,
+      0,
+      2,
+      0,
+      1
+     ]
+    },
+    {
+     "tileid": 19,
+     "wangid": [
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      2
+     ]
+    },
+    {
+     "tileid": 20,
+     "wangid": [
+      0,
+      1,
+      0,
+      2,
+      0,
+      1,
+      0,
+      2
+     ]
+    },
+    {
+     "tileid": 21,
+     "wangid": [
+      0,
+      1,
+      0,
+      1,
+      0,
+      2,
+      0,
+      2
+     ]
+    },
+    {
+     "tileid": 22,
+     "wangid": [
+      0,
+      1,
+      0,
+      2,
+      0,
+      2,
+      0,
+      2
+     ]
+    },
+    {
+     "tileid": 23,
+     "wangid": [
+      0,
+      2,
+      0,
+      1,
+      0,
+      1,
+      0,
+      2
+     ]
+    },
+    {
+     "tileid": 24,
+     "wangid": [
+      0,
+      2,
+      0,
+      2,
+      0,
+      1,
+      0,
+      2
+     ]
+    },
+    {
+     "tileid": 25,
+     "wangid": [
+      0,
+      2,
+      0,
+      1,
+      0,
+      2,
+      0,
+      2
+     ]
+    },
+    {
+     "tileid": 26,
+     "wangid": [
+      0,
+      2,
+      0,
+      2,
+      0,
+      2,
+      0,
+      2
+     ]
+    }
+   ]
+  },
+  {
+   "name": "gräs/vatten",
+   "type": "corner",
+   "tile": -1,
+   "colors": [
+    {
+     "name": "gräs",
+     "color": "#6fa34a",
+     "tile": 0,
+     "probability": 1
+    },
+    {
+     "name": "vatten",
+     "color": "#3e7eba",
+     "tile": 42,
+     "probability": 1
+    }
+   ],
+   "wangtiles": [
+    {
+     "tileid": 27,
+     "wangid": [
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1
+     ]
+    },
+    {
+     "tileid": 28,
+     "wangid": [
+      0,
+      1,
+      0,
+      2,
+      0,
+      1,
+      0,
+      1
+     ]
+    },
+    {
+     "tileid": 29,
+     "wangid": [
+      0,
+      1,
+      0,
+      1,
+      0,
+      2,
+      0,
+      1
+     ]
+    },
+    {
+     "tileid": 30,
+     "wangid": [
+      0,
+      1,
+      0,
+      2,
+      0,
+      2,
+      0,
+      1
+     ]
+    },
+    {
+     "tileid": 31,
+     "wangid": [
+      0,
+      2,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1
+     ]
+    },
+    {
+     "tileid": 32,
+     "wangid": [
+      0,
+      2,
+      0,
+      2,
+      0,
+      1,
+      0,
+      1
+     ]
+    },
+    {
+     "tileid": 33,
+     "wangid": [
+      0,
+      2,
+      0,
+      1,
+      0,
+      2,
+      0,
+      1
+     ]
+    },
+    {
+     "tileid": 34,
+     "wangid": [
+      0,
+      2,
+      0,
+      2,
+      0,
+      2,
+      0,
+      1
+     ]
+    },
+    {
+     "tileid": 35,
+     "wangid": [
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      2
+     ]
+    },
+    {
+     "tileid": 36,
+     "wangid": [
+      0,
+      1,
+      0,
+      2,
+      0,
+      1,
+      0,
+      2
+     ]
+    },
+    {
+     "tileid": 37,
+     "wangid": [
+      0,
+      1,
+      0,
+      1,
+      0,
+      2,
+      0,
+      2
+     ]
+    },
+    {
+     "tileid": 38,
+     "wangid": [
+      0,
+      1,
+      0,
+      2,
+      0,
+      2,
+      0,
+      2
+     ]
+    },
+    {
+     "tileid": 39,
+     "wangid": [
+      0,
+      2,
+      0,
+      1,
+      0,
+      1,
+      0,
+      2
+     ]
+    },
+    {
+     "tileid": 40,
+     "wangid": [
+      0,
+      2,
+      0,
+      2,
+      0,
+      1,
+      0,
+      2
+     ]
+    },
+    {
+     "tileid": 41,
+     "wangid": [
+      0,
+      2,
+      0,
+      1,
+      0,
+      2,
+      0,
+      2
+     ]
+    },
+    {
+     "tileid": 42,
+     "wangid": [
+      0,
+      2,
+      0,
+      2,
+      0,
+      2,
+      0,
+      2
+     ]
+    }
+   ]
+  },
+  {
+   "name": "gräs/skog",
+   "type": "corner",
+   "tile": -1,
+   "colors": [
+    {
+     "name": "gräs",
+     "color": "#6fa34a",
+     "tile": 0,
+     "probability": 1
+    },
+    {
+     "name": "skog",
+     "color": "#2e6a30",
+     "tile": 58,
+     "probability": 1
+    }
+   ],
+   "wangtiles": [
+    {
+     "tileid": 43,
+     "wangid": [
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1
+     ]
+    },
+    {
+     "tileid": 44,
+     "wangid": [
+      0,
+      1,
+      0,
+      2,
+      0,
+      1,
+      0,
+      1
+     ]
+    },
+    {
+     "tileid": 45,
+     "wangid": [
+      0,
+      1,
+      0,
+      1,
+      0,
+      2,
+      0,
+      1
+     ]
+    },
+    {
+     "tileid": 46,
+     "wangid": [
+      0,
+      1,
+      0,
+      2,
+      0,
+      2,
+      0,
+      1
+     ]
+    },
+    {
+     "tileid": 47,
+     "wangid": [
+      0,
+      2,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1
+     ]
+    },
+    {
+     "tileid": 48,
+     "wangid": [
+      0,
+      2,
+      0,
+      2,
+      0,
+      1,
+      0,
+      1
+     ]
+    },
+    {
+     "tileid": 49,
+     "wangid": [
+      0,
+      2,
+      0,
+      1,
+      0,
+      2,
+      0,
+      1
+     ]
+    },
+    {
+     "tileid": 50,
+     "wangid": [
+      0,
+      2,
+      0,
+      2,
+      0,
+      2,
+      0,
+      1
+     ]
+    },
+    {
+     "tileid": 51,
+     "wangid": [
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      2
+     ]
+    },
+    {
+     "tileid": 52,
+     "wangid": [
+      0,
+      1,
+      0,
+      2,
+      0,
+      1,
+      0,
+      2
+     ]
+    },
+    {
+     "tileid": 53,
+     "wangid": [
+      0,
+      1,
+      0,
+      1,
+      0,
+      2,
+      0,
+      2
+     ]
+    },
+    {
+     "tileid": 54,
+     "wangid": [
+      0,
+      1,
+      0,
+      2,
+      0,
+      2,
+      0,
+      2
+     ]
+    },
+    {
+     "tileid": 55,
+     "wangid": [
+      0,
+      2,
+      0,
+      1,
+      0,
+      1,
+      0,
+      2
+     ]
+    },
+    {
+     "tileid": 56,
+     "wangid": [
+      0,
+      2,
+      0,
+      2,
+      0,
+      1,
+      0,
+      2
+     ]
+    },
+    {
+     "tileid": 57,
+     "wangid": [
+      0,
+      2,
+      0,
+      1,
+      0,
+      2,
+      0,
+      2
+     ]
+    },
+    {
+     "tileid": 58,
+     "wangid": [
+      0,
+      2,
+      0,
+      2,
+      0,
+      2,
+      0,
+      2
+     ]
+    }
+   ]
+  }
+ ],
+ "properties": [
+  {
+   "name": "beskrivning",
+   "type": "string",
+   "value": "Skogens rutor (Stil). Kullen: kulle_* i 3 x 4, sista raden är klippans framsida. Vattnets helruta är animerad."
+  }
+ ]
+}

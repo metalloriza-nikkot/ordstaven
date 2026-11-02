@@ -1069,3 +1069,31 @@ test('Prologen, pass 3 i menyn: inget från kapitel 1 finns kvar, och kapitel 1 
   expect(t.installningar.oppnadeKapitel || []).not.toContain('kap-01');
   expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toMatch(/kap-01 låst \(hopp bakåt\)/);
 });
+
+test('Farfars hus i grafik: rummets bild, föremålen som bilder, och hjälten sover i sängen tills han ska gå (pass 3)', async ({ page }) => {
+  test.setTimeout(60000);
+  await page.goto('./?snabb&ny');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.evaluate(() => {
+    const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
+    t.spelare.hjalte.namn = 'TESTA'; t.spelare.unge.namn = 'KNOPP';
+    Object.assign(av, { kapitelId: 'kap-00', scenId: 's19_morgon', spolaTill: 's19_morgon', spolat: [], startad: false, scen: 21 }); delete av.steg;
+    localStorage.setItem('ordstaven_spar', JSON.stringify(t));
+  });
+  await page.goto('./?snabb');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('s19_morgon');
+  // han sover: hjälten syns inte, sängen visar honom
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.synlig())).toBe(false);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.grafik())).toMatchObject({ golv: 'rum_sovrummet', sang: expect.stringMatching(/^hjalte_sang_0[34]$/) });
+  await page.screenshot({ path: 'test-results/hus-sover.png' });
+  // repliker hör han i sängen, och när han ska gå kliver han ur
+  for (let i = 0; i < 8 && (await steg(page))?.typ !== 'ga_till'; i++) { await page.locator('#plattan .replik-ruta').click().catch(() => {}); await page.waitForTimeout(150); }
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.synlig())).toBe(true);
+  expect((await page.evaluate(() => window.__ORDSTAVEN.grafik())).sang).toBe('sang');
+  await tryckPa(page, 'dorr_hallen');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 10000 }).toBe('s20_hallen_morgon');
+  expect((await page.evaluate(() => window.__ORDSTAVEN.grafik())).golv).toBe('rum_hallen');
+  await page.screenshot({ path: 'test-results/hus-hallen.png' });
+});

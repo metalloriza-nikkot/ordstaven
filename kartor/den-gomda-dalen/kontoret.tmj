@@ -27,6 +27,11 @@
    "name": "morker",
    "type": "float",
    "value": 0.6
+  },
+  {
+   "name": "bild",
+   "type": "string",
+   "value": "kontoret"
   }
  ],
  "tilesets": [],
@@ -50,7 +55,14 @@
      "width": 84,
      "height": 30,
      "rotation": 0,
-     "visible": true
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "bokhylla"
+      }
+     ]
     },
     {
      "id": 2,
@@ -67,6 +79,11 @@
        "name": "sida",
        "type": "string",
        "value": "under"
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "expeditionsbok"
       }
      ]
     },
@@ -85,6 +102,11 @@
        "name": "sida",
        "type": "string",
        "value": "under"
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "fatolj_vanster"
       }
      ]
     },
@@ -97,7 +119,14 @@
      "width": 34,
      "height": 22,
      "rotation": 0,
-     "visible": true
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "bord"
+      }
+     ]
     },
     {
      "id": 5,
@@ -108,7 +137,14 @@
      "width": 10,
      "height": 10,
      "rotation": 0,
-     "visible": true
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "kakaokopp"
+      }
+     ]
     },
     {
      "id": 6,
@@ -119,7 +155,14 @@
      "width": 30,
      "height": 28,
      "rotation": 0,
-     "visible": true
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "fatolj_hoger"
+      }
+     ]
     },
     {
      "id": 7,
@@ -141,6 +184,16 @@
        "name": "talare",
        "type": "string",
        "value": "farfar"
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "farfar_fatolj_hoger"
+      },
+      {
+       "name": "bild_pa",
+       "type": "string",
+       "value": "fatolj_hoger"
       }
      ]
     },
@@ -153,7 +206,14 @@
      "width": 12,
      "height": 24,
      "rotation": 0,
-     "visible": true
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "laslampa"
+      }
+     ]
     },
     {
      "id": 9,
@@ -180,6 +240,11 @@
        "name": "sida",
        "type": "string",
        "value": "over"
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "dorr_fram"
       }
      ]
     },

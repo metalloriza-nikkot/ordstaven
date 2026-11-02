@@ -27,6 +27,11 @@
    "name": "morker",
    "type": "float",
    "value": 0.55
+  },
+  {
+   "name": "bild",
+   "type": "string",
+   "value": "hallen"
   }
  ],
  "tilesets": [],
@@ -72,6 +77,11 @@
        "name": "sida",
        "type": "string",
        "value": "under"
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "dorr"
       }
      ]
     },
@@ -100,6 +110,11 @@
        "name": "sida",
        "type": "string",
        "value": "under"
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "dorr"
       }
      ]
     },
@@ -128,6 +143,11 @@
        "name": "sida",
        "type": "string",
        "value": "under"
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "dorr"
       }
      ]
     },
@@ -156,6 +176,11 @@
        "name": "sida",
        "type": "string",
        "value": "over"
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "dorr_fram"
       }
      ]
     },
@@ -179,6 +204,11 @@
        "name": "sida",
        "type": "string",
        "value": "hoger"
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "dorr"
       }
      ]
     },
@@ -212,6 +242,11 @@
        "name": "sida",
        "type": "string",
        "value": "under"
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "stege_upp"
       }
      ]
     },
@@ -250,6 +285,11 @@
        "name": "last_i",
        "type": "string",
        "value": "natt"
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "dorr_fram_ute"
       }
      ]
     },

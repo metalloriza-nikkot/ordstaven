@@ -1,19 +1,52 @@
 // @ts-check
-// Figurernas bilder i världen (dokument 02 §7): atlasen i assets/sprites, som verktyg/grafik/inkorg.py skriver.
+// Grafiken i världen (dokument 02 §7): atlasen och bilderna i assets/, som verktyg/grafik/inkorg.py skriver.
+// - assets/sprites/<figur>/<figur>.png + .json: figurerna (hjälten, staven, ungen, Herr Skata, Farfar, skuggorna)
+// - assets/foremal/<zon>/<zon>.png + .json: föremålen i kartorna (kartans objekt säger vilken bild med `bild`)
+// - assets/rum/<zon>/<rum>.png: inomhusrummen, en bild per rum (kartans `bild`)
+// - assets/tiles/<zon>/<zon>.png + .json: rutor för marken utomhus (kartans `mark`)
 // Hjälten och staven ritas i spelarens färger med palettbyten (karna/fargbyte.js), en bild per val.
-import hjaltePng from '../../assets/sprites/hjalte/hjalte.png?url';
-import hjalteRamar from '../../assets/sprites/hjalte/hjalte.json';
-import stavPng from '../../assets/sprites/stav/stav.png?url';
-import stavRamar from '../../assets/sprites/stav/stav.json';
-import skataPng from '../../assets/sprites/herr_skata/herr_skata.png?url';
-import skataRamar from '../../assets/sprites/herr_skata/herr_skata.json';
 
-/** Atlasen: nyckel → [bild, ramar]. */
-const ATLAS = { hjalte: [hjaltePng, hjalteRamar], stav: [stavPng, stavRamar], herr_skata: [skataPng, skataRamar] };
+const bilder = /** @type {Record<string, string>} */ (import.meta.glob('../../assets/{sprites,foremal}/*/*.png', { query: '?url', import: 'default', eager: true }));
+const ramar = /** @type {Record<string, any>} */ (import.meta.glob('../../assets/{sprites,foremal}/*/*.json', { import: 'default', eager: true }));
+const rumsbilder = /** @type {Record<string, string>} */ (import.meta.glob('../../assets/rum/*/*.png', { query: '?url', import: 'default', eager: true }));
+const rutbilder = /** @type {Record<string, string>} */ (import.meta.glob('../../assets/tiles/*/*.png', { query: '?url', import: 'default', eager: true }));
+const rutset = /** @type {Record<string, any>} */ (import.meta.glob('../../assets/tiles/*/*.json', { import: 'default', eager: true }));
 
-/** Ladda figurernas bilder (scenens preload). @param {Phaser.Scene} scen */
-export function laddaFigurer(scen) {
-  for (const [nyckel, [png, ramar]] of Object.entries(ATLAS)) if (!scen.textures.exists(nyckel)) scen.load.atlas(nyckel, png, ramar);
+const namn = (/** @type {string} */ fil) => /** @type {string} */ (fil.split('/').pop()).replace(/\.[a-z]+$/, '');
+
+/** Föremålens atlas, i ordning: en bild med samma namn hittas i det första som har den. */
+export const FOREMAL_ATLAS = Object.keys(ramar).filter((f) => f.includes('/foremal/')).map(namn);
+
+/** Ladda all grafik (scenens preload). Rummen heter rum_<rum>, rutorna rutor_<zon>. @param {Phaser.Scene} scen */
+export function laddaGrafik(scen) {
+  for (const [fil, url] of Object.entries(bilder)) {
+    const n = namn(fil), json = ramar[fil.replace(/\.png$/, '.json')];
+    if (json && !scen.textures.exists(n)) scen.load.atlas(n, url, json);
+  }
+  for (const [fil, url] of Object.entries(rumsbilder)) if (!scen.textures.exists(`rum_${namn(fil)}`)) scen.load.image(`rum_${namn(fil)}`, url);
+  for (const [fil, url] of Object.entries(rutbilder)) {
+    const n = namn(fil), ts = rutset[fil.replace(/\.png$/, '.json')];
+    if (ts && !scen.textures.exists(`rutor_${n}`)) scen.load.spritesheet(`rutor_${n}`, url, { frameWidth: ts.tilewidth, frameHeight: ts.tileheight });
+  }
+}
+
+/**
+ * Rutsetets rutor efter namn (Tiled-egenskapen `namn`): namn → rutans nummer.
+ * @param {string} zon @returns {Map<string, number>}
+ */
+export function rutnamn(zon) {
+  const ts = Object.entries(rutset).find(([f]) => namn(f) === zon)?.[1];
+  return new Map((ts?.tiles || []).map((/** @type {any} */ t) => [(t.properties || []).find((/** @type {any} */ p) => p.name === 'namn')?.value, t.id]));
+}
+
+/**
+ * Var finns en föremålsbild? @param {Phaser.Scene} scen @param {string} bild
+ * @returns {{ nyckel: string, ram: string } | null}
+ */
+export function foremalsbild(scen, bild) {
+  for (const n of FOREMAL_ATLAS) if (scen.textures.exists(n) && scen.textures.get(n).has(bild)) return { nyckel: n, ram: bild };
+  for (const n of ['hjalte', 'farfar', 'herr_skata', 'unge']) if (scen.textures.exists(n) && scen.textures.get(n).has(bild)) return { nyckel: n, ram: bild };
+  return null;
 }
 
 /**
@@ -40,9 +73,9 @@ export function fargad(scen, nyckel, byten) {
   }
   c.putImageData(d, 0, 0);
   const tex = /** @type {Phaser.Textures.CanvasTexture} */ (scen.textures.addCanvas(ny, duk));
-  for (const namn of bas.getFrameNames()) {
-    const f = bas.get(namn);
-    tex.add(namn, 0, f.cutX, f.cutY, f.cutWidth, f.cutHeight);
+  for (const n of bas.getFrameNames()) {
+    const f = bas.get(n);
+    tex.add(n, 0, f.cutX, f.cutY, f.cutWidth, f.cutHeight);
   }
   return ny;
 }

@@ -1,9 +1,89 @@
 {
  "frames": {
-  "hjalte_ga_hoger_01": {
+  "hjalte_fatolj_vanster": {
    "frame": {
     "x": 0,
     "y": 0,
+    "w": 30,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 30,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 30,
+    "h": 28
+   }
+  },
+  "hjalte_fira_ner_01": {
+   "frame": {
+    "x": 0,
+    "y": 29,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "hjalte_fira_ner_02": {
+   "frame": {
+    "x": 33,
+    "y": 29,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "hjalte_fira_ner_03": {
+   "frame": {
+    "x": 66,
+    "y": 29,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "hjalte_ga_hoger_01": {
+   "frame": {
+    "x": 0,
+    "y": 70,
     "w": 16,
     "h": 24
    },
@@ -23,7 +103,7 @@
   "hjalte_ga_hoger_02": {
    "frame": {
     "x": 17,
-    "y": 0,
+    "y": 70,
     "w": 16,
     "h": 24
    },
@@ -43,7 +123,7 @@
   "hjalte_ga_hoger_03": {
    "frame": {
     "x": 34,
-    "y": 0,
+    "y": 70,
     "w": 16,
     "h": 24
    },
@@ -63,7 +143,7 @@
   "hjalte_ga_hoger_04": {
    "frame": {
     "x": 51,
-    "y": 0,
+    "y": 70,
     "w": 16,
     "h": 24
    },
@@ -83,7 +163,7 @@
   "hjalte_ga_ner_01": {
    "frame": {
     "x": 0,
-    "y": 25,
+    "y": 95,
     "w": 16,
     "h": 24
    },
@@ -103,7 +183,7 @@
   "hjalte_ga_ner_02": {
    "frame": {
     "x": 17,
-    "y": 25,
+    "y": 95,
     "w": 16,
     "h": 24
    },
@@ -123,7 +203,7 @@
   "hjalte_ga_ner_03": {
    "frame": {
     "x": 34,
-    "y": 25,
+    "y": 95,
     "w": 16,
     "h": 24
    },
@@ -143,7 +223,7 @@
   "hjalte_ga_ner_04": {
    "frame": {
     "x": 51,
-    "y": 25,
+    "y": 95,
     "w": 16,
     "h": 24
    },
@@ -163,7 +243,7 @@
   "hjalte_ga_upp_01": {
    "frame": {
     "x": 0,
-    "y": 50,
+    "y": 120,
     "w": 16,
     "h": 24
    },
@@ -183,7 +263,7 @@
   "hjalte_ga_upp_02": {
    "frame": {
     "x": 17,
-    "y": 50,
+    "y": 120,
     "w": 16,
     "h": 24
    },
@@ -203,7 +283,7 @@
   "hjalte_ga_upp_03": {
    "frame": {
     "x": 34,
-    "y": 50,
+    "y": 120,
     "w": 16,
     "h": 24
    },
@@ -223,7 +303,7 @@
   "hjalte_ga_upp_04": {
    "frame": {
     "x": 51,
-    "y": 50,
+    "y": 120,
     "w": 16,
     "h": 24
    },
@@ -243,7 +323,7 @@
   "hjalte_ga_vanster_01": {
    "frame": {
     "x": 0,
-    "y": 75,
+    "y": 145,
     "w": 16,
     "h": 24
    },
@@ -263,7 +343,7 @@
   "hjalte_ga_vanster_02": {
    "frame": {
     "x": 17,
-    "y": 75,
+    "y": 145,
     "w": 16,
     "h": 24
    },
@@ -283,7 +363,7 @@
   "hjalte_ga_vanster_03": {
    "frame": {
     "x": 34,
-    "y": 75,
+    "y": 145,
     "w": 16,
     "h": 24
    },
@@ -303,7 +383,627 @@
   "hjalte_ga_vanster_04": {
    "frame": {
     "x": 51,
-    "y": 75,
+    "y": 145,
+    "w": 16,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 24
+   }
+  },
+  "hjalte_klattra_upp_01": {
+   "frame": {
+    "x": 0,
+    "y": 170,
+    "w": 16,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 24
+   }
+  },
+  "hjalte_klattra_upp_02": {
+   "frame": {
+    "x": 17,
+    "y": 170,
+    "w": 16,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 24
+   }
+  },
+  "hjalte_sang_01": {
+   "frame": {
+    "x": 0,
+    "y": 195,
+    "w": 64,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 44
+   }
+  },
+  "hjalte_sang_02": {
+   "frame": {
+    "x": 65,
+    "y": 195,
+    "w": 64,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 44
+   }
+  },
+  "hjalte_sang_03": {
+   "frame": {
+    "x": 130,
+    "y": 195,
+    "w": 64,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 44
+   }
+  },
+  "hjalte_sang_04": {
+   "frame": {
+    "x": 195,
+    "y": 195,
+    "w": 64,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 44
+   }
+  },
+  "hjalte_stol_ner": {
+   "frame": {
+    "x": 0,
+    "y": 240,
+    "w": 16,
+    "h": 26
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 26
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 26
+   }
+  },
+  "hjalte_svinga_hoger_01": {
+   "frame": {
+    "x": 0,
+    "y": 267,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "hjalte_svinga_hoger_02": {
+   "frame": {
+    "x": 33,
+    "y": 267,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "hjalte_svinga_hoger_03": {
+   "frame": {
+    "x": 66,
+    "y": 267,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "hjalte_svinga_ner_01": {
+   "frame": {
+    "x": 0,
+    "y": 308,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "hjalte_svinga_ner_02": {
+   "frame": {
+    "x": 33,
+    "y": 308,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "hjalte_svinga_ner_03": {
+   "frame": {
+    "x": 66,
+    "y": 308,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "hjalte_svinga_upp_01": {
+   "frame": {
+    "x": 0,
+    "y": 349,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "hjalte_svinga_upp_02": {
+   "frame": {
+    "x": 33,
+    "y": 349,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "hjalte_svinga_upp_03": {
+   "frame": {
+    "x": 66,
+    "y": 349,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "hjalte_svinga_vanster_01": {
+   "frame": {
+    "x": 0,
+    "y": 390,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "hjalte_svinga_vanster_02": {
+   "frame": {
+    "x": 33,
+    "y": 390,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "hjalte_svinga_vanster_03": {
+   "frame": {
+    "x": 66,
+    "y": 390,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "hjalte_trolla_ner_01": {
+   "frame": {
+    "x": 0,
+    "y": 431,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "hjalte_trolla_ner_02": {
+   "frame": {
+    "x": 33,
+    "y": 431,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "hjalte_trolla_ner_03": {
+   "frame": {
+    "x": 66,
+    "y": 431,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "hjalte_trolla_ner_04": {
+   "frame": {
+    "x": 99,
+    "y": 431,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "ryggsack_hoger_01": {
+   "frame": {
+    "x": 0,
+    "y": 472,
+    "w": 16,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 24
+   }
+  },
+  "ryggsack_ner_01": {
+   "frame": {
+    "x": 0,
+    "y": 497,
+    "w": 16,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 24
+   }
+  },
+  "ryggsack_upp_01": {
+   "frame": {
+    "x": 0,
+    "y": 522,
+    "w": 16,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 24
+   }
+  },
+  "ryggsack_vanster_01": {
+   "frame": {
+    "x": 0,
+    "y": 547,
+    "w": 16,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 24
+   }
+  },
+  "taggkam_hoger_01": {
+   "frame": {
+    "x": 0,
+    "y": 572,
+    "w": 16,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 24
+   }
+  },
+  "taggkam_ner_01": {
+   "frame": {
+    "x": 0,
+    "y": 597,
+    "w": 16,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 24
+   }
+  },
+  "taggkam_upp_01": {
+   "frame": {
+    "x": 0,
+    "y": 622,
+    "w": 16,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 24
+   }
+  },
+  "taggkam_vanster_01": {
+   "frame": {
+    "x": 0,
+    "y": 647,
     "w": 16,
     "h": 24
    },
@@ -325,10 +1025,10 @@
   "image": "hjalte.png",
   "format": "RGBA8888",
   "size": {
-   "w": 68,
-   "h": 100
+   "w": 260,
+   "h": 672
   },
   "scale": "1",
-  "om": "Skrivs av verktyg/grafik/inkorg.py. Bildernas namn: <figur>_<handling>_<riktning>_<bild>."
+  "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."
  }
 }

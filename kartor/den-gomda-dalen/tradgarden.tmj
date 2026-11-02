@@ -17,6 +17,11 @@
    "name": "rum",
    "type": "string",
    "value": "tradgarden"
+  },
+  {
+   "name": "mark",
+   "type": "string",
+   "value": "skog"
   }
  ],
  "layers": [
@@ -39,7 +44,14 @@
      "width": 160,
      "height": 20,
      "rotation": 0,
-     "visible": true
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "berg"
+      }
+     ]
     },
     {
      "id": 2,
@@ -50,7 +62,14 @@
      "width": 8,
      "height": 64,
      "rotation": 0,
-     "visible": true
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "staket"
+      }
+     ]
     },
     {
      "id": 3,
@@ -61,7 +80,14 @@
      "width": 8,
      "height": 72,
      "rotation": 0,
-     "visible": true
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "staket"
+      }
+     ]
     },
     {
      "id": 4,
@@ -146,7 +172,14 @@
      "width": 14,
      "height": 14,
      "rotation": 0,
-     "visible": true
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "skylt_liten"
+      }
+     ]
     },
     {
      "id": 8,
@@ -157,7 +190,14 @@
      "width": 14,
      "height": 14,
      "rotation": 0,
-     "visible": true
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "skylt_liten"
+      }
+     ]
     },
     {
      "id": 9,
@@ -174,6 +214,11 @@
        "name": "sida",
        "type": "string",
        "value": "alla"
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "tva_buskar"
       }
      ]
     },

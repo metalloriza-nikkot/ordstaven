@@ -235,6 +235,8 @@ const spelet = skapaSpel({
   lager: () => ({ ...rum.lager }),
   /** Hjältens bild just nu (bildens namn, texturen med färgerna) och om staven syns. */
   hjaltebild: () => ({ bild: rum.kropp?.frame.name ?? null, textur: rum.kropp?.texture.key ?? null, stav: !!rum.stav?.visible }),
+  /** Grafiken i rummet: golvets bild, och sängens bild (sover han i den). */
+  grafik: () => ({ golv: rum.golvBild?.visible ? rum.golvBild.texture.key : null, sang: (() => { const o = rum.objekt.find((/** @type {any} */ x) => x.sovplats); const r = o ? rum.ritade.get(o.id) : null; return r?.frame?.name ?? null; })() }),
   /** Figurer som flyger förbi just nu (Herr Skata). */
   flygande: () => rum.lagerFigurer.list.filter((/** @type {any} */ o) => o.texture?.key === 'herr_skata').map((/** @type {any} */ o) => o.frame.name),
   spel,

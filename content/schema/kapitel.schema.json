@@ -444,6 +444,12 @@
         "startar_i_rum": {
           "$ref": "#/$defs/id",
           "description": "Rummet där den frivilliga scenen startar."
+        },
+        "hjalte": {
+          "enum": [
+            "sover"
+          ],
+          "description": "Hur hjälten syns när scenen börjar (2.14). sover = i sängen (kartans föremål med sovplats) tills han ska röra sig."
         }
       }
     },

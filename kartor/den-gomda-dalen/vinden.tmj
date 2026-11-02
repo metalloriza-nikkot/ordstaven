@@ -22,6 +22,11 @@
    "name": "inomhus",
    "type": "bool",
    "value": true
+  },
+  {
+   "name": "bild",
+   "type": "string",
+   "value": "vinden"
   }
  ],
  "layers": [
@@ -44,7 +49,24 @@
      "width": 28,
      "height": 22,
      "rotation": 0,
-     "visible": true
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "runt_fonster"
+      },
+      {
+       "name": "bild_natt",
+       "type": "string",
+       "value": "runt_fonster_natt"
+      },
+      {
+       "name": "skata_fonster",
+       "type": "bool",
+       "value": true
+      }
+     ]
     },
     {
      "id": 2,
@@ -55,7 +77,14 @@
      "width": 72,
      "height": 20,
      "rotation": 0,
-     "visible": true
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "hylla"
+      }
+     ]
     },
     {
      "id": 3,
@@ -66,7 +95,14 @@
      "width": 20,
      "height": 20,
      "rotation": 0,
-     "visible": true
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "lada_liten"
+      }
+     ]
     },
     {
      "id": 4,
@@ -77,7 +113,14 @@
      "width": 24,
      "height": 16,
      "rotation": 0,
-     "visible": true
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "lada_lag"
+      }
+     ]
     },
     {
      "id": 5,
@@ -88,7 +131,14 @@
      "width": 32,
      "height": 22,
      "rotation": 0,
-     "visible": true
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "lada_stor"
+      }
+     ]
     },
     {
      "id": 6,
@@ -105,6 +155,11 @@
        "name": "sida",
        "type": "string",
        "value": "alla"
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "lada_lang"
       }
      ]
     },
@@ -123,6 +178,11 @@
        "name": "sida",
        "type": "string",
        "value": "vanster"
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "lada_lang"
       }
      ]
     },
@@ -141,6 +201,11 @@
        "name": "sida",
        "type": "string",
        "value": "alla"
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "lada_lang"
       }
      ]
     },
@@ -159,6 +224,11 @@
        "name": "sida",
        "type": "string",
        "value": "hoger"
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "lada_lang"
       }
      ]
     },
@@ -182,6 +252,16 @@
        "name": "sida",
        "type": "string",
        "value": "alla"
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "sex_krukor"
+      },
+      {
+       "name": "bild_del",
+       "type": "string",
+       "value": "kruka"
       }
      ]
     },
@@ -200,6 +280,11 @@
        "name": "sida",
        "type": "string",
        "value": "hoger"
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "lada_hornet"
       }
      ]
     },
@@ -233,6 +318,11 @@
        "name": "sida",
        "type": "string",
        "value": "over"
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "stege_ner"
       }
      ]
     },

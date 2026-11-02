@@ -30,7 +30,9 @@ import { STORSTA } from './kamera.js';
  * @typedef {{ objekt: Objekt[], start: { x: number, y: number } | null, inomhus: boolean,
  *             in: Record<string, { x: number, y: number }>, lampor: { x: number, y: number }[],
  *             vagg: { bak: number, sida: number, fram: number }, morker: number | null,
- *             storlek: { bredd: number, hojd: number }, massiv: { x: number, y: number, b: number, h: number }[] }} Karta
+ *             storlek: { bredd: number, hojd: number }, massiv: { x: number, y: number, b: number, h: number }[],
+ *             bild?: string | null, mark?: string | null }} Karta
+ * bild = rummets bild (assets/rum), mark = rutsetet för marken utomhus (assets/tiles).
  * inomhus = rummet har väggram (bakvägg, sidoväggar, främre kant). in = var hjälten kommer in från ett rum
  * som inte har någon utgång hit (punkter som heter in_<rum>, t.ex. trädgården från köket). lampor = där det lyser i mörkret.
  * storlek = områdets storlek i pixlar (kartans bredd och höjd): en skärm (320×192) eller större, högst 640×384.
@@ -111,6 +113,13 @@ export function lasKarta(tmj) {
       if (egen.forsvinner_efter) ut.forsvinnerEfter = String(egen.forsvinner_efter);
       if (egen.oppning) ut.oppning = true;
       if (egen.last_i) ut.lastI = String(egen.last_i).split(',').map((t) => t.trim()).filter(Boolean);
+      // grafiken (2.14): bildens namn, bilden på natten, och föremålet vars nederkant bilden står på
+      if (egen.bild) ut.bild = String(egen.bild);
+      if (egen.bild_natt) ut.bildNatt = String(egen.bild_natt);
+      if (egen.bild_pa) ut.bildPa = String(egen.bild_pa);
+      if (egen.bild_del) ut.bildDel = String(egen.bild_del);
+      if (egen.sovplats) ut.sovplats = true;
+      if (egen.skata_fonster) ut.skataFonster = true;
       objekt.push(ut);
     }
   }
@@ -118,5 +127,5 @@ export function lasKarta(tmj) {
   const vagg = { bak: tal(kartegen.vagg_bak, VAGG.bak), sida: tal(kartegen.vagg_sida, VAGG.sida), fram: tal(kartegen.vagg_fram, VAGG.fram) };
   const m = Number(kartegen.morker);
   const morker = kartegen.morker !== undefined && Number.isFinite(m) ? Math.max(0, Math.min(1, m)) : null;
-  return { objekt, start, inomhus: !!kartegen.inomhus, in: inpunkter, lampor, vagg, morker, storlek: { bredd, hojd }, massiv };
+  return { objekt, start, inomhus: !!kartegen.inomhus, in: inpunkter, lampor, vagg, morker, storlek: { bredd, hojd }, massiv, bild: kartegen.bild ? String(kartegen.bild) : null, mark: kartegen.mark ? String(kartegen.mark) : null };
 }

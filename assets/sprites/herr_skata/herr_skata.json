@@ -80,11 +80,171 @@
     "h": 12
    }
   },
-  "herr_skata_sitta_hoger_01": {
+  "herr_skata_krascha_hoger_01": {
    "frame": {
     "x": 0,
     "y": 26,
-    "w": 17,
+    "w": 20,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 16
+   }
+  },
+  "herr_skata_krascha_hoger_02": {
+   "frame": {
+    "x": 21,
+    "y": 26,
+    "w": 20,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 16
+   }
+  },
+  "herr_skata_krascha_hoger_03": {
+   "frame": {
+    "x": 42,
+    "y": 26,
+    "w": 20,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 16
+   }
+  },
+  "herr_skata_krascha_hoger_04": {
+   "frame": {
+    "x": 63,
+    "y": 26,
+    "w": 20,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 16
+   }
+  },
+  "herr_skata_krascha_vanster_01": {
+   "frame": {
+    "x": 0,
+    "y": 43,
+    "w": 20,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 16
+   }
+  },
+  "herr_skata_krascha_vanster_02": {
+   "frame": {
+    "x": 21,
+    "y": 43,
+    "w": 20,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 16
+   }
+  },
+  "herr_skata_krascha_vanster_03": {
+   "frame": {
+    "x": 42,
+    "y": 43,
+    "w": 20,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 16
+   }
+  },
+  "herr_skata_krascha_vanster_04": {
+   "frame": {
+    "x": 63,
+    "y": 43,
+    "w": 20,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 16
+   }
+  },
+  "herr_skata_sitta_hoger_01": {
+   "frame": {
+    "x": 0,
+    "y": 60,
+    "w": 16,
     "h": 12
    },
    "rotated": false,
@@ -92,19 +252,19 @@
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 17,
+    "w": 16,
     "h": 12
    },
    "sourceSize": {
-    "w": 17,
+    "w": 16,
     "h": 12
    }
   },
   "herr_skata_sitta_vanster_01": {
    "frame": {
     "x": 0,
-    "y": 39,
-    "w": 17,
+    "y": 73,
+    "w": 16,
     "h": 12
    },
    "rotated": false,
@@ -112,19 +272,19 @@
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 17,
+    "w": 16,
     "h": 12
    },
    "sourceSize": {
-    "w": 17,
+    "w": 16,
     "h": 12
    }
   },
   "herr_skata_titta_hoger_01": {
    "frame": {
     "x": 0,
-    "y": 52,
-    "w": 17,
+    "y": 86,
+    "w": 16,
     "h": 12
    },
    "rotated": false,
@@ -132,19 +292,19 @@
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 17,
+    "w": 16,
     "h": 12
    },
    "sourceSize": {
-    "w": 17,
+    "w": 16,
     "h": 12
    }
   },
   "herr_skata_titta_vanster_01": {
    "frame": {
     "x": 0,
-    "y": 65,
-    "w": 17,
+    "y": 99,
+    "w": 16,
     "h": 12
    },
    "rotated": false,
@@ -152,12 +312,112 @@
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 17,
+    "w": 16,
     "h": 12
    },
    "sourceSize": {
-    "w": 17,
+    "w": 16,
     "h": 12
+   }
+  },
+  "runt_fonster_skata_01": {
+   "frame": {
+    "x": 0,
+    "y": 112,
+    "w": 28,
+    "h": 22
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 28,
+    "h": 22
+   },
+   "sourceSize": {
+    "w": 28,
+    "h": 22
+   }
+  },
+  "runt_fonster_skata_02": {
+   "frame": {
+    "x": 29,
+    "y": 112,
+    "w": 28,
+    "h": 22
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 28,
+    "h": 22
+   },
+   "sourceSize": {
+    "w": 28,
+    "h": 22
+   }
+  },
+  "runt_fonster_skata_03": {
+   "frame": {
+    "x": 58,
+    "y": 112,
+    "w": 28,
+    "h": 22
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 28,
+    "h": 22
+   },
+   "sourceSize": {
+    "w": 28,
+    "h": 22
+   }
+  },
+  "runt_fonster_skata_04": {
+   "frame": {
+    "x": 87,
+    "y": 112,
+    "w": 28,
+    "h": 22
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 28,
+    "h": 22
+   },
+   "sourceSize": {
+    "w": 28,
+    "h": 22
+   }
+  },
+  "runt_fonster_skata_05": {
+   "frame": {
+    "x": 116,
+    "y": 112,
+    "w": 28,
+    "h": 22
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 28,
+    "h": 22
+   },
+   "sourceSize": {
+    "w": 28,
+    "h": 22
    }
   }
  },
@@ -165,10 +425,10 @@
   "image": "herr_skata.png",
   "format": "RGBA8888",
   "size": {
-   "w": 38,
-   "h": 78
+   "w": 145,
+   "h": 135
   },
   "scale": "1",
-  "om": "Skrivs av verktyg/grafik/inkorg.py. Bildernas namn: <figur>_<handling>_<riktning>_<bild>."
+  "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."
  }
 }

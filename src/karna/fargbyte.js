@@ -2,10 +2,13 @@
 // Palettbyten för hjälten (stilguiden §5): formen och skuggningen är ritade en gång, i förvalets färger (hjälte A),
 // och spelarens val av hud och dräkt byter färgerna. Ren logik: färg in, färg ut. Ritningen görs i scener/figurbilder.js.
 
-/** Hjälte A:s hud i bilderna: skugga, mitt och ljus (assets/sprites/hjalte, staven har samma i knytnäven). */
-export const HUD_A = Object.freeze({ skugga: 0x1e5fa8, mitt: 0x2e8bd8, ljus: 0x5fb4e8 });
-/** Hjälte A:s dräkt i bilderna (en ton, kanten är fast). */
-export const DRAKT_A = Object.freeze({ mitt: 0x3a3e48 });
+/**
+ * Hjälte A:s hud i bilderna (*Så ritas allt*: kontur, skugga, mitt, ljus och högdager). Staven har samma i
+ * knytnäven, och sängen i hjälten som sover (assets/sprites/hjalte, stav).
+ */
+export const HUD_A = Object.freeze({ mitt: 0x2e8bd8, toner: [0x0e2a5a, 0x1e5fa8, 0x2e8bd8, 0x5fb4e8, 0xa8dcf8] });
+/** Hjälte A:s dräkt i bilderna (kontur, skugga, mitt och ljus). Den ljusa kanten är fast. */
+export const DRAKT_A = Object.freeze({ mitt: 0x3a3e48, toner: [0x15171c, 0x2a2d35, 0x3a3e48, 0x565b68] });
 
 /** @param {number} c @returns {[number, number, number]} h (0–360), s och l (0–1) */
 export function tillHsl(c) {
@@ -42,7 +45,7 @@ export function flyttaTon(ton, mitt, ny) {
  */
 export function hjaltensByten(hud, drakt) {
   const m = new Map();
-  if (hud !== HUD_A.mitt) for (const t of [HUD_A.skugga, HUD_A.mitt, HUD_A.ljus]) m.set(t, t === HUD_A.mitt ? hud : flyttaTon(t, HUD_A.mitt, hud));
-  if (drakt !== undefined && drakt !== DRAKT_A.mitt) m.set(DRAKT_A.mitt, drakt);
+  if (hud !== HUD_A.mitt) for (const t of HUD_A.toner) m.set(t, t === HUD_A.mitt ? hud : flyttaTon(t, HUD_A.mitt, hud));
+  if (drakt !== undefined && drakt !== DRAKT_A.mitt) for (const t of DRAKT_A.toner) m.set(t, t === DRAKT_A.mitt ? drakt : flyttaTon(t, DRAKT_A.mitt, drakt));
   return m;
 }

@@ -1,9 +1,69 @@
 {
  "frames": {
-  "stav_hand_hoger_01": {
+  "stav_fira_ner_01": {
    "frame": {
     "x": 0,
     "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "stav_fira_ner_02": {
+   "frame": {
+    "x": 33,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "stav_fira_ner_03": {
+   "frame": {
+    "x": 66,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "stav_hand_hoger_01": {
+   "frame": {
+    "x": 0,
+    "y": 41,
     "w": 16,
     "h": 24
    },
@@ -23,7 +83,7 @@
   "stav_hand_ner_01": {
    "frame": {
     "x": 0,
-    "y": 25,
+    "y": 66,
     "w": 16,
     "h": 24
    },
@@ -43,7 +103,7 @@
   "stav_hand_upp_01": {
    "frame": {
     "x": 0,
-    "y": 50,
+    "y": 91,
     "w": 16,
     "h": 24
    },
@@ -63,7 +123,7 @@
   "stav_hand_vanster_01": {
    "frame": {
     "x": 0,
-    "y": 75,
+    "y": 116,
     "w": 16,
     "h": 24
    },
@@ -79,16 +139,336 @@
     "w": 16,
     "h": 24
    }
+  },
+  "stav_svinga_hoger_01": {
+   "frame": {
+    "x": 0,
+    "y": 141,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "stav_svinga_hoger_02": {
+   "frame": {
+    "x": 33,
+    "y": 141,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "stav_svinga_hoger_03": {
+   "frame": {
+    "x": 66,
+    "y": 141,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "stav_svinga_ner_01": {
+   "frame": {
+    "x": 0,
+    "y": 182,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "stav_svinga_ner_02": {
+   "frame": {
+    "x": 33,
+    "y": 182,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "stav_svinga_ner_03": {
+   "frame": {
+    "x": 66,
+    "y": 182,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "stav_svinga_upp_01": {
+   "frame": {
+    "x": 0,
+    "y": 223,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "stav_svinga_upp_02": {
+   "frame": {
+    "x": 33,
+    "y": 223,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "stav_svinga_upp_03": {
+   "frame": {
+    "x": 66,
+    "y": 223,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "stav_svinga_vanster_01": {
+   "frame": {
+    "x": 0,
+    "y": 264,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "stav_svinga_vanster_02": {
+   "frame": {
+    "x": 33,
+    "y": 264,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "stav_svinga_vanster_03": {
+   "frame": {
+    "x": 66,
+    "y": 264,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "stav_trolla_ner_01": {
+   "frame": {
+    "x": 0,
+    "y": 305,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "stav_trolla_ner_02": {
+   "frame": {
+    "x": 33,
+    "y": 305,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "stav_trolla_ner_03": {
+   "frame": {
+    "x": 66,
+    "y": 305,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "stav_trolla_ner_04": {
+   "frame": {
+    "x": 99,
+    "y": 305,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
   }
  },
  "meta": {
   "image": "stav.png",
   "format": "RGBA8888",
   "size": {
-   "w": 17,
-   "h": 100
+   "w": 132,
+   "h": 346
   },
   "scale": "1",
-  "om": "Skrivs av verktyg/grafik/inkorg.py. Bildernas namn: <figur>_<handling>_<riktning>_<bild>."
+  "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."
  }
 }

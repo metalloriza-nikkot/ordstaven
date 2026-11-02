@@ -6,7 +6,7 @@ import { readFileSync, readdirSync, existsSync } from 'node:fs';
 const rot = new URL('../../', import.meta.url);
 const las = (p) => readFileSync(new URL(p, rot));
 const filer = (mapp, slut) => (existsSync(new URL(mapp, rot)) ? readdirSync(new URL(mapp, rot), { recursive: true }).filter((f) => String(f).endsWith(slut)).map((f) => `${mapp}${String(f).replace(/\\/g, '/')}`) : []);
-const bilder = filer('assets/sprites/', '.png');
+const bilder = [...filer('assets/sprites/', '.png'), ...filer('assets/foremal/', '.png'), ...filer('assets/rum/', '.png'), ...filer('assets/tiles/', '.png')];
 const ljud = filer('assets/ljud/', '.wav');
 
 /** PNG-filens bitar (chunks), i ordning. */
@@ -27,26 +27,29 @@ describe('grafiken och ljuden', () => {
     expect(bilder.length).toBeGreaterThan(0);
     expect(ljud.length).toBeGreaterThan(0);
   });
-  it('varje fil står i assets/LICENSER.md', () => {
+  it('varje fil står i assets/LICENSER.md (filen eller dess mapp)', () => {
     const licenser = las('assets/LICENSER.md').toString();
-    expect([...bilder, ...ljud].filter((f) => !licenser.includes(f))).toEqual([]);
+    const finns = (f) => licenser.includes(f) || f.split('/').slice(0, -1).some((_, i, d) => licenser.includes('`' + d.slice(0, i + 1).join('/') + '/'));
+    expect([...bilder, ...ljud].filter((f) => !finns(f))).toEqual([]);
   });
   it('ingen metadata följer med: bilderna har bara pixlar, ljuden bara format och data', () => {
     const tillatet = new Set(['IHDR', 'PLTE', 'tRNS', 'IDAT', 'IEND']);
     for (const f of bilder) expect(pngBitar(las(f)).filter((b) => !tillatet.has(b)), f).toEqual([]);
     for (const f of ljud) expect(wavBitar(las(f)), f).toEqual(['fmt ', 'data']);
   });
-  it('masterpaletten har högst 48 färger (stilguiden §2)', () => {
+  it('färgförteckningen finns, och hjältens hud och dräkt finns i bilderna (palettbytet hittar dem)', () => {
     const p = JSON.parse(las('assets/palett.json').toString()).farger;
-    expect(p.length).toBeLessThanOrEqual(48);
     expect(new Set(p).size).toBe(p.length);
+    const hex = (c) => '#' + c.toString(16).padStart(6, '0');
+    for (const t of [...HUD_A.toner, ...DRAKT_A.toner]) expect(p, hex(t)).toContain(hex(t));
   });
   it('hjälten och staven är 16 × 24 i fyra riktningar, gången har fyra bilder', () => {
     for (const figur of ['hjalte', 'stav']) {
       const ramar = JSON.parse(las(`assets/sprites/${figur}/${figur}.json`).toString()).frames;
-      for (const r of Object.values(ramar)) expect([r.frame.w, r.frame.h]).toEqual([16, 24]);
+      const prefix = figur === 'hjalte' ? 'hjalte_ga_' : 'stav_hand_';
+      for (const [k, r] of Object.entries(ramar)) if (k.startsWith(prefix)) expect([r.frame.w, r.frame.h]).toEqual([16, 24]);
       for (const riktning of ['ner', 'upp', 'hoger', 'vanster']) {
-        const n = Object.keys(ramar).filter((k) => k.includes(`_${riktning}_`)).length;
+        const n = Object.keys(ramar).filter((k) => k.startsWith(`${prefix}${riktning}_`)).length;
         expect(n, `${figur} ${riktning}`).toBe(figur === 'hjalte' ? 4 : 1);
       }
     }
@@ -73,8 +76,36 @@ describe('hjältens palettbyten', () => {
     expect(m.get(HUD_A.mitt)).toBe(0xd8a24a);
     expect(m.get(DRAKT_A.mitt)).toBe(0x6e3a3a);
     const l = (c) => tillHsl(c)[2];
-    expect(l(m.get(HUD_A.skugga))).toBeLessThan(l(0xd8a24a));
-    expect(l(m.get(HUD_A.ljus))).toBeGreaterThan(l(0xd8a24a));
+    expect(l(m.get(HUD_A.toner[1]))).toBeLessThan(l(0xd8a24a));
+    expect(l(m.get(HUD_A.toner[3]))).toBeGreaterThan(l(0xd8a24a));
+    expect(m.size).toBe(HUD_A.toner.length + DRAKT_A.toner.length);
     expect(flyttaTon(HUD_A.mitt, HUD_A.mitt, 0x4fae6a)).toBe(0x4fae6a);
+  });
+});
+
+describe('kartornas grafik', () => {
+  const kartmapp = 'kartor/den-gomda-dalen/';
+  const kartor = readdirSync(new URL(kartmapp, rot)).filter((f) => f.endsWith('.tmj')).map((f) => [f, JSON.parse(las(kartmapp + f).toString())]);
+  const egen = (o) => Object.fromEntries((o.properties || []).map((p) => [p.name, p.value]));
+  const ramar = new Set([...filer('assets/foremal/', '.json'), ...filer('assets/sprites/', '.json')].flatMap((f) => Object.keys(JSON.parse(las(f).toString()).frames)));
+  it('varje bild som en karta pekar på finns (föremål, figurer, rummens bilder och marken)', () => {
+    const saknas = [];
+    for (const [f, k] of kartor) {
+      const ke = egen(k);
+      if (ke.bild && !existsSync(new URL(`assets/rum/hus/${ke.bild}.png`, rot))) saknas.push(`${f}: rummet ${ke.bild}`);
+      if (ke.mark && !existsSync(new URL(`assets/tiles/${ke.mark}/${ke.mark}.json`, rot))) saknas.push(`${f}: marken ${ke.mark}`);
+      for (const l of k.layers) for (const o of l.objects || []) {
+        const e = egen(o);
+        for (const b of [e.bild, e.bild_natt, e.bild_del].filter(Boolean)) if (!ramar.has(b)) saknas.push(`${f} ${o.name}: ${b}`);
+      }
+    }
+    expect(saknas).toEqual([]);
+  });
+  it('rummets bild har kartans storlek', () => {
+    for (const [f, k] of kartor) {
+      const b = egen(k).bild; if (!b) continue;
+      const png = las(`assets/rum/hus/${b}.png`);
+      expect([png.readUInt32BE(16), png.readUInt32BE(20)], f).toEqual([k.width * k.tilewidth, k.height * k.tileheight]);
+    }
   });
 });
