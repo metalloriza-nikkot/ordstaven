@@ -1021,9 +1021,10 @@
         "vantar_pa": {
           "enum": [
             "mata_ungen",
-            "nosen"
+            "nosen",
+            "radion"
           ],
-          "description": "En instruktion som ber om en handling väntar tills den är gjord (mata_ungen: ungen har ätit ett bär, nosen: spelaren har tänt nosen). Repliken visas uppe i rummet medan världen går, upprepas med en styrbild efter ca 8 s, och nästa steg kommer först efter handlingen."
+          "description": "En instruktion som ber om en handling väntar tills den är gjord (mata_ungen: ungen har ätit ett bär, nosen: spelaren har tänt nosen, radion: spelaren har tryckt på radion och hört Farfars senaste replik genom den igen). Repliken visas uppe i rummet medan världen går, upprepas med en styrbild efter ca 8 s, och nästa steg kommer först efter handlingen."
         },
         "via": {
           "enum": [
@@ -1055,6 +1056,10 @@
               "$ref": "#/$defs/replik"
             }
           }
+        },
+        "kapitelrubrik": {
+          "type": "boolean",
+          "description": "Repliken är kapitlets rubrik i slutet av kapitlet före (\"Kapitel 1. Skogen.\"). Den visas inte när nästa kapitel är låst (kapitel_last), eftersom slutrutan kommer i stället."
         }
       }
     },

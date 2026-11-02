@@ -119,7 +119,8 @@ describe('mellanscenernas bilder och bildkorten', () => {
     for (const k of kapitel) for (const sc of k.scener) for (const st of sc.steg) {
       if (st.typ !== 'mellanscen' || !st.bild) continue;
       const finns = st.bild === 'hjalte_sang_morgon' ? ramar.has('hjalte_sang_morgon_01') && ramar.has('hjalte_sang_morgon_02')
-        : st.bild.startsWith('luftskepp_') ? ramar.has(st.bild) || ramar.has(st.bild + '_01')
+        : st.bild === 'luftskepp_ser_kartan' ? ramar.has('luftskepp_ser_hjalten') // samma bild (Rum.luftskepp)
+          : st.bild.startsWith('luftskepp_') ? ramar.has(st.bild) || ramar.has(st.bild + '_01')
           : existsSync(new URL(`assets/sidovyer/${st.bild}_bakgrund.png`, rot));
       if (!finns) saknas.push(`${k.id} ${sc.id}: ${st.bild}`);
     }

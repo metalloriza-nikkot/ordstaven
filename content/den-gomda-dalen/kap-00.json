@@ -15,54 +15,12 @@
  },
  "meta": {
   "namn": "Prologen",
-  "version": "0.11.2",
-  "datum": "2026-11-01",
+  "version": "0.11.3",
+  "datum": "2026-11-02",
   "agare": "Innehåll",
-  "kalla": "Manus 13-prolog-manus.md v1.5. Byggd på repots kap-00.json (0.10.1).",
-  "uppskattning": {
-   "metod": "Uppläsning ca 0,4 s per ord plus 1 s per replik. Läsuppgift 45–90 s inklusive ett fel. Namn 60 s. Skapa hjälten 90 s.",
-   "pass_1": {
-    "minuter": 8,
-    "lasuppgifter_som_avgor": [
-     "p0_filt",
-     "p0_dorrar"
-    ],
-    "ovrigt": [
-     "p0_ljus (förebild)",
-     "p0_ungenamn"
-    ]
-   },
-   "pass_2": {
-    "minuter": 10,
-    "lasuppgifter_som_avgor": [
-     "p0_dinomat",
-     "p0_bar",
-     "p0_sangen"
-    ],
-    "ovrigt": [
-     "p0_krukor (vila)",
-     "bokens bildtexter (frivilliga)",
-     "mata ungen med bären (frivilligt)"
-    ]
-   },
-   "pass_3": {
-    "minuter": 5,
-    "lasuppgifter_som_avgor": [
-     "p0_packlista",
-     "p0_skylten"
-    ],
-    "ovrigt": [
-     "går direkt över i kapitel 1"
-    ]
-   }
-  },
-  "teknik": "Teknik har lagt in ledningens beslut i formatet, ingen text är ändrad. 2026-10-25: format 2, P28_packa, syns_i på ägget, i_rummet på FILT med lådorna lada_hyllan, lada_hornet och lada_fonstret i stället för hylla_tre_lador, och ga_till till hyllan i s04 borttaget. 2026-10-26 (val i världen): i_rummet och objekt i p0_dorrar och p0_sangen (dorr_mat, dorr_bad, dorr_toa, dorr_sov), p0_skylten (stig_skogen, stig_byn) och p0_dinomat (lada_lang_overst, lada_lang_mitten, lada_lang_nederst, som ersätter tre_langa_lador), foremal lada_med_agg på dunket i s04, och ga_till grind i s22 borttaget (grinden är en öppning i staketet, valet görs på stigarna). 2026-10-27 (hjälpens timing): \"pekar\": true på knuffarna i p0_dorrar (ungen nosar mot dörren med matdoft) och p0_sangen (ungen lutar sig mot rätt dörr). De pekar på svaret och kommer tidigast efter första felet, eller efter 4 s per alternativ och minst 12 s. Övriga knuffar upprepar frågan (p0_filt, p0_skylten) eller hör till uppgifter som inte är läsval (p0_ljus förebild, p0_ungenamn, p0_krukor, gå till lådan i s02) och kommer som förut. Ungens pekning efter tre fel och efter_3_fel kommer efter fel och påverkas inte. 2026-10-27 (v0.10): hallen har åter tillstånden natt och morgon, och s01b, s07, s10, s15 och s17 har tillstand natt, s20 morgon. s01b: vid_annan_utgang med ljudet dunk på ga_till stege_upp (dörrarna är låsta, hjälten tittar upp). s04: ga_till lada_med_agg efter p0_filt är steget bara (filten följer hjälten och läggs om ägget när han når fram). s08: repliken \"Där är ni ju!\" och ga_till farfar_vid_bordet är steget prata med repliken som kall (dialogen börjar inom 1,5 rutor), och repliken med namnet har vid: ungen (namnet syns ovanför ungen). s09: ga_till farfar_vid_bordet är ta_emot (hjälten tar lappen med ett tryck), och \"Tryck på nosen.\" har vantar_pa: nosen. s12: vantar_pa: mata_ungen på bärrepliken. s21: via: radio på provsändningen. 2026-10-27 (grind A, 2f.4): ytterdörren dorr_ut sitter i hallens främre vägg i stället för i köket (koket och hallen i rum), s21 slutar med ga_till dorr_hallen, och den nya scenen s21b_hallen_ut (hallen på morgonen) har ga_till dorr_ut. Scenen har ingen text och ingen vid_omstart än. På natten är ytterdörren låst (kartans last_i): hjälten känner på handtaget. 2026-10-28 (beslut 13.2): s04 börjar med ljudet dunk från lada_med_agg, så att ägglådan hoppar till direkt när ljuset har tänts. Dunket när hjälten står vid lådan finns kvar. 2026-10-29 (T2): skapa_hjalte väljer hudfarg och drakt, hjältens två palettbyten (sparformat 4). Hjälmen och skorna har fasta färger (färger men inte form). 2026-10-30 (T6): v0.11.1 inlagd utan ändrad text. Husets kartor efter stilguiden v0.16: hallen är en entré och en korridor (28 × 12 rutor, kartans typ vagg ger korridoren dess form), och alla fem dörrar står på en skärm minst 3 rutor isär. Nytt rum kontoret (läsrummet). Köket, gästrummet och vinden är omritade, vinden spegelvänd så att stegen står till höger som i hallen. sex_krukor står i en rad nertill (inte två vid väggen och fyra nertill), eftersom P26 utan foremal delar ett föremål. 2026-10-31 (T4b): ljudord på ljud-stegen ordagrant ur Innehålls F11 (dunk, kra, brum, buhu, tok tok). 2026-11-02 (pass 3 med grafik, schema 2.14): s01_natten och s19_morgon har hjalte: \"sover\" (\"Hjälten sover\" i mellanscenen, och morgonen där ungen slickar honom på näsan). Ingen text ändrad. 2026-11-02 (pass 3 komplett, Stil 20:35): mellanscenerna i s19 och s22 har bild (morgonen i sängen, luftskeppets lägen och sidovyn in_i_skogen). Ingen text ändrad.",
-  "innehall_v08": "Innehåll har utgått från repots fil. Ändrat: nivaer, unge_folj, dunket och lådorna i s04, anteckningen i p0_filt, repliken om bären i s12, luftskeppet i s21, baronen och Klaffen i s22, bild-id för färg och storlek i p0_dinomat, vid_omstart i varje scen. Teknikens id:n och format är orörda.",
-  "innehall_v09": "Innehåll har granskat teknikens val i världen (0.5.1). Ändrat, bara beskrivningar: felreaktionerna vid dörrarna (dörren öppnas aldrig, ljudet hörs genom dörren), stigen mot byn (ett steg ut, sedan tillbaka), leksaksbilen i FILT (lådorna står långt från ägget), ungen pekar inte längre mot bergen i s22 (det kunde avslöja vägen), baronen högt upp i gondolen, och Klaffen som putsar fjädrarna. Inga repliker, scener eller id:n är ändrade.",
-  "innehall_v10": "Innehåll har lagt in granskningens rättelser (1c) och Niklas speltest (1d): starten i sovrummet (s01) och en ny promenad genom hallen med låsta dörrar (s01b_hallen), frågan först i s04 och filten som följer hjälten, nya repliker i s03, s05, s07, s08, s12, s14, s16, s18, s21 och s22, nosen som spelaren trycker själv (s09), Farfar som frågar efter ungens namn (s08), lappen som hjälten tar emot (s09), ny ordning i s21 med provsändning i radion, \"Allt är packat!\" som vid_ratt i p0_packlista, och knuffen i p0_dinomat (lappen lyser). Inga nya rum. Inga id:n på föremål ändrade.",
-  "innehall_v11": "v0.11 (Innehåll 2026-10-29, F3): Farfars hus enligt stilguiden v0.16. Nytt rum kontoret (Farfars läsrum) där Farfar sitter på natten (s08, s09, s16), och köket bara på morgonen. Hallens dörrar är FARFAR, BOK, MAT, SOV och BAD (dorr_toa borta, dorr_bok och dorr_farfar nya). p0_dorrar blir 'Jag är där böckerna är' med tankebubbla_bok, och FARFAR är en lockande fälla. Sex krukor (fem_krukor heter sex_krukor). Inget nivåbyte bland dinomatens lådor. Egna skämt vid rätt svar i p0_dinomat och p0_sangen. Sagan har fyra uppslag (ca 1:40), och kartan i sju bitar sägs i s21. Två repliker delade för Lexend (s08, s21). vid_omstart i s21b. Gästrummet har id:t sovrummet kvar. Inga scen- eller pussel-id:n är ändrade.",
-  "innehall_v0111": "v0.11.1 (Innehåll 2026-10-30, F8): v0.11 på repots fil från 0.8.1 (skapa_hjalte med hudfarg och drakt står kvar). Sagan har \"Dalens ägg kläcks bara av ordkraft.\" igen (beslut 17.2). Baronen är en klantig rival och slutet en kapplöpning (beslut 18.2): ingen replik säger att han vill ha ungen, inget \"Spring!\", och ingen replik säger luftskeppets färg. Fågeln är levande (beslut 18.3) med lätet fagel_late, i s05 vid fönstret och i s22.",
-  "innehall_v0112": "v0.11.2 (Innehåll 2026-11-01, F10): spelarens val. Baronen heter bara Baronen, fågeln heter Herr Skata (skatan som snor det som blänker), baronens färg är orange och han har tropikhjälm och kikare. Fågelns läte har inget ljudord (tj-ljud). Farfar säger \"orange luftskepp\". Herr Skata presenteras av baronen och kopplas till ljuset vid vindsfönstret. Slutrutan när kapitel 1 är låst står som FÖRSLAG i anteckningen i s22."
+  "kalla": "Manus 13-prolog-manus.md v1.6. Byggd på repots kap-00.json (0.14.0).",
+  "teknik": "Teknik har lagt in ledningens beslut i formatet, ingen text är ändrad. 2026-10-25: format 2, P28_packa, syns_i på ägget, i_rummet på FILT med lådorna lada_hyllan, lada_hornet och lada_fonstret i stället för hylla_tre_lador, och ga_till till hyllan i s04 borttaget. 2026-10-26 (val i världen): i_rummet och objekt i p0_dorrar och p0_sangen (dorr_mat, dorr_bad, dorr_toa, dorr_sov), p0_skylten (stig_skogen, stig_byn) och p0_dinomat (lada_lang_overst, lada_lang_mitten, lada_lang_nederst, som ersätter tre_langa_lador), foremal lada_med_agg på dunket i s04, och ga_till grind i s22 borttaget (grinden är en öppning i staketet, valet görs på stigarna). 2026-10-27 (hjälpens timing): \"pekar\": true på knuffarna i p0_dorrar (ungen nosar mot dörren med matdoft) och p0_sangen (ungen lutar sig mot rätt dörr). De pekar på svaret och kommer tidigast efter första felet, eller efter 4 s per alternativ och minst 12 s. Övriga knuffar upprepar frågan (p0_filt, p0_skylten) eller hör till uppgifter som inte är läsval (p0_ljus förebild, p0_ungenamn, p0_krukor, gå till lådan i s02) och kommer som förut. Ungens pekning efter tre fel och efter_3_fel kommer efter fel och påverkas inte. 2026-10-27 (v0.10): hallen har åter tillstånden natt och morgon, och s01b, s07, s10, s15 och s17 har tillstand natt, s20 morgon. s01b: vid_annan_utgang med ljudet dunk på ga_till stege_upp (dörrarna är låsta, hjälten tittar upp). s04: ga_till lada_med_agg efter p0_filt är steget bara (filten följer hjälten och läggs om ägget när han når fram). s08: repliken \"Där är ni ju!\" och ga_till farfar_vid_bordet är steget prata med repliken som kall (dialogen börjar inom 1,5 rutor), och repliken med namnet har vid: ungen (namnet syns ovanför ungen). s09: ga_till farfar_vid_bordet är ta_emot (hjälten tar lappen med ett tryck), och \"Tryck på nosen.\" har vantar_pa: nosen. s12: vantar_pa: mata_ungen på bärrepliken. s21: via: radio på provsändningen. 2026-10-27 (grind A, 2f.4): ytterdörren dorr_ut sitter i hallens främre vägg i stället för i köket (koket och hallen i rum), s21 slutar med ga_till dorr_hallen, och den nya scenen s21b_hallen_ut (hallen på morgonen) har ga_till dorr_ut. Scenen har ingen text och ingen vid_omstart än. På natten är ytterdörren låst (kartans last_i): hjälten känner på handtaget. 2026-10-28 (beslut 13.2): s04 börjar med ljudet dunk från lada_med_agg, så att ägglådan hoppar till direkt när ljuset har tänts. Dunket när hjälten står vid lådan finns kvar. 2026-10-29 (T2): skapa_hjalte väljer hudfarg och drakt, hjältens två palettbyten (sparformat 4). Hjälmen och skorna har fasta färger (färger men inte form). 2026-10-30 (T6): v0.11.1 inlagd utan ändrad text. Husets kartor efter stilguiden v0.16: hallen är en entré och en korridor (28 × 12 rutor, kartans typ vagg ger korridoren dess form), och alla fem dörrar står på en skärm minst 3 rutor isär. Nytt rum kontoret (läsrummet). Köket, gästrummet och vinden är omritade, vinden spegelvänd så att stegen står till höger som i hallen. sex_krukor står i en rad nertill (inte två vid väggen och fyra nertill), eftersom P26 utan foremal delar ett föremål. 2026-10-31 (T4b): ljudord på ljud-stegen ordagrant ur Innehålls F11 (dunk, kra, brum, buhu, tok tok). 2026-11-02 (pass 3 med grafik, schema 2.14): s01_natten och s19_morgon har hjalte: \"sover\" (\"Hjälten sover\" i mellanscenen, och morgonen där ungen slickar honom på näsan). Ingen text ändrad. 2026-11-02 (pass 3 komplett, Stil 20:35): mellanscenerna i s19 och s22 har bild (morgonen i sängen, luftskeppets lägen och sidovyn in_i_skogen). v0.11.3 inlagd utan ändrad text (schema 2.15): vantar_pa radion i s21 och kapitelrubrik på \"Kapitel 1. Skogen.\" i s22, så att rubriken inte visas när kapitel 1 är låst.",
+  "innehall_v0113": "v0.11.3 (Innehåll 2026-11-02, beslut 29, granskningen A 14–21): bara pass 3. Baronens motiv är kartan, och han läser SKOLAN som SKOGEN. s21 slutar med målet på radion, och radion lärs ut (vantar_pa radion). Packlistan har instruktion och kort som bara är bilder. Tidigare versioner: Innehålls rapporter (rapport-innehall-arkiv*.md) och 13. Tiden per pass räknar kontrollen."
  },
  "rum": [
   {
@@ -93,7 +51,7 @@
     "sex_krukor",
     "stege_ner"
    ],
-   "anteckning": "Stilguiden v0.16: sneda takbjälkar, fönster fram och bak (Herr Skata i bakfönstret). Sex krukor: två vid vänstra väggen och fyra i rad nertill. Dinomatens lådor (GUL, BLÅ, RÖD, i L3 stor röd, liten röd, stor blå) i tre hörn långt isär."
+   "anteckning": "Stilguiden v0.16: sneda takbjälkar, fönster fram och bak (Herr Skata i bakfönstret). Sex krukor i en rad nertill (Teknik, ett föremål). Dinomatens lådor (GUL, BLÅ, RÖD, i L3 stor röd, liten röd, stor blå) i tre hörn långt isär."
   },
   {
    "id": "hallen",
@@ -125,7 +83,7 @@
     "bord_med_saker",
     "dorr_hallen"
    ],
-   "anteckning": "Köket används bara på morgonen (s19–s21). Spis, diskbänk, bord med två stolar, hylla med radion, fönster mot öster."
+   "anteckning": "Köket används bara på morgonen (s19–s21). Spis, diskbänk, bord med två stolar, hylla med radion, fönster i norra väggen (Niklas, Stil 2026-11-02)."
   },
   {
    "id": "kontoret",
@@ -172,7 +130,8 @@
     "skylt_byn",
     "berg",
     "tva_buskar"
-   ]
+   ],
+   "anteckning": "Två stigar med varsin skylt: SKOGEN (stig_skogen, skylt_skogen) och SKOLAN (stig_byn, skylt_byn; id:n står kvar fast skylten nu säger SKOLAN). Orden börjar likadant och är lika långa, så att bara läsningen avgör."
   }
  ],
  "scener": [
@@ -1160,13 +1119,19 @@
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Jag rev kartan i sju bitar. Då hittar ingen tjuv dit.",
+     "text": "Jag rev kartan i sju bitar.",
      "upplast": true
     },
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Bitarna är gömda längs vägen. Hitta dem!",
+     "text": "Då kan ingen annan hitta dalen.",
+     "upplast": true
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Varje bit visar vägen till nästa.",
      "upplast": true
     },
     {
@@ -1180,9 +1145,31 @@
      "pussel_id": "p0_packlista"
     },
     {
+     "typ": "mellanscen",
+     "beskrivning": "Farfar tittar ut genom fönstret och rynkar pannan."
+    },
+    {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Ta min gamla radio på hyllan. Då kan vi prata.",
+     "text": "Baronen vill också hitta dalen.",
+     "upplast": true
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Men han läser aldrig ordentligt.",
+     "upplast": true
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Titta efter hans orange luftskepp!",
+     "upplast": true
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Ta min gamla radio på hyllan.",
      "upplast": true
     },
     {
@@ -1196,7 +1183,7 @@
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Test, test. Hör du mig?",
+     "text": "Hitta bitarna. Följ {unge} hem!",
      "upplast": true,
      "via": "radio"
     },
@@ -1205,39 +1192,18 @@
      "beskrivning": "Farfar talar genom radion fast han står i rummet. Ungen hoppar till."
     },
     {
-     "typ": "mellanscen",
-     "beskrivning": "Farfar tittar ut genom fönstret och rynkar pannan."
-    },
-    {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Baronen vill hitta dalen först.",
-     "upplast": true
-    },
-    {
-     "typ": "replik",
-     "talare": "farfar",
-     "text": "Men han läser aldrig ordentligt.",
-     "upplast": true
-    },
-    {
-     "typ": "replik",
-     "talare": "farfar",
-     "text": "Håll utkik efter hans orange luftskepp!",
-     "upplast": true
-    },
-    {
-     "typ": "replik",
-     "talare": "farfar",
-     "text": "Lycka till, {hjalte}! Jag är med dig hela vägen.",
-     "upplast": true
+     "text": "Tryck på radion, så säger jag det igen.",
+     "upplast": true,
+     "vantar_pa": "radion"
     },
     {
      "typ": "ga_till",
      "mal": "dorr_hallen"
     }
    ],
-   "anteckning": "Ny ordning (granskningen 2026-10-27): uppdraget, packningen och radion först, varningen precis före dörren, så att den hörs sekunder innan luftskeppet syns. Radioramen glider in vid provsändningen (teknik 2d.6). v0.11: kartan i sju bitar sägs här i stället för i sagan. v0.11.1: baronen är en rival, inte en fara (beslut 18.2). Varningen säger att han vill hinna först och att han inte läser ordentligt, vilket är hjältens fördel. v0.11.2: spelaren har valt orange, och Farfar säger det, som han förut sa lila. Baronen heter bara Baronen, som Farfar heter Farfar."
+   "anteckning": "v0.11.3 (A 14, 16–18): kortare, målet i en mening, ingen tjuv. Målet är Farfars enda replik genom radion, så det är den radioknappen upprepar. \"Tryck på radion ...\" säger han i rummet, och scenen väntar tills spelaren har tryckt (som nosen i s09)."
   },
   {
    "id": "s21b_hallen_ut",
@@ -1252,7 +1218,7 @@
    ],
    "vid_omstart": {
     "talare": "farfar",
-    "text": "Var var vi? Skogen väntar!",
+    "text": "Var var vi? Farfars lista visar vägen.",
     "upplast": true
    }
   },
@@ -1262,7 +1228,7 @@
    "rum": "tradgarden",
    "vid_omstart": {
     "talare": "farfar",
-    "text": "Var var vi? Du skulle gå mot skogen.",
+    "text": "Var var vi? Farfars lista visar vägen.",
     "upplast": true
    },
    "steg": [
@@ -1305,7 +1271,7 @@
     {
      "typ": "replik",
      "talare": "baronen",
-     "text": "Jag är Baronen, den store upptäckaren!",
+     "text": "Jag är Baronen!",
      "upplast": true
     },
     {
@@ -1315,9 +1281,20 @@
      "upplast": true
     },
     {
+     "typ": "mellanscen",
+     "beskrivning": "Hjälten håller kartbiten. Baronen spanar på den med kikaren, och ögonen blir stora.",
+     "bild": "luftskepp_ser_kartan"
+    },
+    {
      "typ": "replik",
      "talare": "baronen",
-     "text": "Dalen blir min upptäckt!",
+     "text": "En karta? Den vill jag se!",
+     "upplast": true
+    },
+    {
+     "typ": "replik",
+     "talare": "baronen",
+     "text": "Jag ska hitta dalen först! Då blir jag känd!",
      "upplast": true
     },
     {
@@ -1333,7 +1310,7 @@
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Nu blir det kapplöpning! Dit listan säger!",
+     "text": "Nu tävlar vi! Gå dit listan säger!",
      "upplast": true
     },
     {
@@ -1342,14 +1319,25 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Sidovy: hjälten och ungen springer in i skogen. Ovanför träden glider det orange luftskeppet åt fel håll, och baronen och Herr Skata pekar åt var sitt håll.",
+     "beskrivning": "Baronen har trasslat sig loss. Han lutar sig ut ur gondolen och läser skyltarna med kikaren, åt fel håll."
+    },
+    {
+     "typ": "replik",
+     "talare": "baronen",
+     "text": "Skolan... skogen... samma sak! Till skolan!",
+     "upplast": true
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Sidovy: hjälten och ungen springer in i skogen. Ovanför träden glider det orange luftskeppet åt fel håll, mot skolan, och baronen och Herr Skata pekar åt var sitt håll.",
      "bild": "in_i_skogen"
     },
     {
      "typ": "replik",
      "talare": "berattare",
      "text": "Kapitel 1. Skogen.",
-     "upplast": true
+     "upplast": true,
+     "kapitelrubrik": true
     },
     {
      "typ": "sparpunkt",
@@ -1357,7 +1345,7 @@
      "valfri": false
     }
    ],
-   "anteckning": "Baronen presenterar sig (figurer presenterar sig), och Herr Skata svarar på frågan från vindsfönstret: samma skratt (fagel_late, utan ljudord, eftersom TJACK har tj-ljud) och baronens \"Herr Skata såg ljuset i natt!\". Kikaren åt fel håll är hans kännetecken: han ser inte ordentligt, precis som han inte läser ordentligt. Baronen är klantig och aldrig läskig (beslut 18.2), och Farfar gör det till en kapplöpning. FÖRSLAG slutrutan när kapitel 1 är låst (beslut 24.2): i stället för sparpunktens fråga, och FORTSÄTT startar inte kapitel 1. Till exempel ett fält \"kapitel_last\" i aventyr.json, som sluta_for_idag: [{\"typ\": \"mellanscen\", \"beskrivning\": \"Hjälten och ungen står vid skogsbrynet och tittar in bland träden. Ungen viftar med svansklubban.\"}, {\"typ\": \"replik\", \"talare\": \"berattare\", \"text\": \"Snart går ni in i skogen.\", \"upplast\": true}, {\"typ\": \"replik\", \"talare\": \"berattare\", \"text\": \"Fortsättning följer!\", \"upplast\": true}]."
+   "anteckning": "Baronen presenterar sig, och Herr Skata svarar på frågan från vindsfönstret (samma skratt, fagel_late, inget ljudord). v0.11.3 (A 14, 15, 17, 20): motivet planteras med kartbiten, och efter hjältens rätta val läser baronen slarvigt (\"Skolan... skogen... samma sak!\"). Klantig, aldrig läskig (18.2). Kapitelrubriken visas inte när kapitel 1 är låst (Teknik), och slutrutan står i aventyr.json."
   }
  ],
  "pussel": [
@@ -1908,30 +1896,30 @@
      "alternativ": [
       {
        "id": "filt",
-       "ord": "filt",
-       "ratt": true
+       "ratt": true,
+       "bild": "filt"
       },
       {
        "id": "bar",
-       "ord": "bär",
-       "ratt": true
+       "ratt": true,
+       "bild": "bar"
       },
       {
        "id": "rep",
-       "ord": "rep",
-       "ratt": true
+       "ratt": true,
+       "bild": "rep"
       },
       {
        "id": "bil",
-       "ord": "bil"
+       "bild": "bil"
       },
       {
        "id": "ost",
-       "ord": "ost"
+       "bild": "ost"
       },
       {
        "id": "sko",
-       "ord": "sko"
+       "bild": "sko"
       }
      ]
     },
@@ -1945,32 +1933,30 @@
      "alternativ": [
       {
        "id": "rod_filt",
-       "ord": "filt",
        "bild": "filt_rod",
        "ratt": true
       },
       {
        "id": "bla_filt",
-       "ord": "filt",
        "bild": "filt_bla"
       },
       {
        "id": "bar",
-       "ord": "bär",
-       "ratt": true
+       "ratt": true,
+       "bild": "bar"
       },
       {
        "id": "rep",
-       "ord": "rep",
-       "ratt": true
+       "ratt": true,
+       "bild": "rep"
       },
       {
        "id": "bil",
-       "ord": "bil"
+       "bild": "bil"
       },
       {
        "id": "sko",
-       "ord": "sko"
+       "bild": "sko"
       }
      ]
     }
@@ -1994,13 +1980,19 @@
     }
    },
    "forenkla": {
-    "efter_fel": 2,
+    "efter_fel": 3,
     "andring": "två fel saker försvinner från bordet"
    },
    "efter_3_fel": {
     "handling": "ungen nosar på nästa sak som står på listan"
    },
-   "anteckning": "NY TYP (förslag till teknik): som P1 men flera alternativ har ratt: true, och spelaren väljer alla. Sista raden avgör p0_skylten."
+   "anteckning": "P28: flera rätta, spelaren väljer alla. v0.11.3 (A 19): korten är bara bilder, så listan måste läsas. Förenklingen kommer efter tre fel. Sista raden avgör p0_skylten.",
+   "instruktion": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "Packa allt som står på listan.",
+    "upplast": true
+   }
   },
   {
    "id": "p0_skylten",
@@ -2018,10 +2010,10 @@
        "objekt": "stig_skogen"
       },
       {
-       "id": "byn",
-       "ord": "byn",
+       "id": "skolan",
+       "ord": "skolan",
        "vid_valj": {
-        "reaktion": "hjälten tar ett steg ut på stigen, och ungen sätter sig ner och skakar på huvudet",
+        "reaktion": "hjälten tar ett steg ut på stigen mot skolan, och ungen sätter sig ner och skakar på huvudet",
         "replik": {
          "typ": "replik",
          "talare": "berattare",
@@ -2040,7 +2032,7 @@
    "efter_3_fel": {
     "handling": "ungen drar hjälten mot skogsstigen"
    },
-   "anteckning": "Vägskylt: rätt svar står på sista raden i Farfars lista (p0_packlista). Ingen tidspress: baronen har trasslat in sig i repstegen."
+   "anteckning": "Rätt svar står på listans sista rad. v0.11.3 (A 15): BYN heter SKOLAN, som börjar likadant och är lika lång som SKOGEN. Objektet heter fortfarande stig_byn (stabila id:n). Ingen tidspress."
   }
  ]
 }

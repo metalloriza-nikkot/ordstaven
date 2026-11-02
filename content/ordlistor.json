@@ -2,13 +2,14 @@
  "$schema": "schema/ordlistor.schema.json",
  "format": 1,
  "meta": {
-  "version": "0.5",
-  "datum": "2026-10-29",
+  "version": "0.6",
+  "datum": "2026-11-02",
   "agare": "Innehåll",
   "textform": "Orden lagras med små bokstäver, formler i versaler. Böjda former (skogen, bron) står med när de används som alternativ.",
   "beskrivning": "Ordlistor 1-6 for ORDSTAVEN. Bilderna ar platshallare (emoji) for grabox. Ett ord ligger i den hogsta lista som nagot av dess drag kraver.",
   "bilder": "Emoji är platshållare. Där emojin är missvisande står ett bild-id i stället (filt).",
-  "andrat_v05": "bok och farfar tillagda (prologen v0.11, hallens dörrar)."
+  "andrat_v05": "bok och farfar tillagda (prologen v0.11, hallens dörrar).",
+  "andrat_v06": "skolan (prologen v0.11.3, vägskylten), och var, vid, bakom, väntar, busken och skata (kapitel 1 v0.7.4: skylten vid ingången och baronens lapp). Granskningen A 25: varje ord i en lästext ska finnas i ordlistorna."
  },
  "listor": {
   "1": "Korta ljudenliga ord, 2-3 bokstaver, ingen konsonantgrupp, ingen dubbelteckning",
@@ -1304,6 +1305,57 @@
    "lista": 2,
    "bild": "👴",
    "tema": "hemma",
+   "flaggor": []
+  },
+  {
+   "ord": "skolan",
+   "lista": 3,
+   "bild": "🏫",
+   "tema": "hemma",
+   "flaggor": []
+  },
+  {
+   "ord": "var",
+   "lista": 1,
+   "bild": null,
+   "tema": "smaord",
+   "flaggor": []
+  },
+  {
+   "ord": "vid",
+   "lista": 1,
+   "bild": null,
+   "tema": "smaord",
+   "flaggor": []
+  },
+  {
+   "ord": "bakom",
+   "lista": 2,
+   "bild": null,
+   "tema": "smaord",
+   "flaggor": []
+  },
+  {
+   "ord": "väntar",
+   "lista": 2,
+   "bild": "⏳",
+   "tema": "smaord",
+   "flaggor": [
+    "aao"
+   ]
+  },
+  {
+   "ord": "busken",
+   "lista": 2,
+   "bild": "🌳",
+   "tema": "natur",
+   "flaggor": []
+  },
+  {
+   "ord": "skata",
+   "lista": 3,
+   "bild": "🐦",
+   "tema": "djur",
    "flaggor": []
   }
  ]

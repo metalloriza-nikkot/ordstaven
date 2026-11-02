@@ -575,3 +575,8 @@ Stilguiden §3 gick igenom mot spelet. Det som saknades är byggt här, resten f
   - **Sidovyn** (`assets/sidovyer/<bild>_bakgrund.png`) täcker skärmen i ett eget lager överst. In i skogen: det lilla luftskeppet glider åt vänster ovanför träden, och hjälten (i spelarens färger, med staven) och ungen springer åt höger på stigen med sina gångbilder. Sidovyn står kvar tills nästa rum.
 - **Herr Skata i vindsfönstret på natten** (beslut 28.3): fönstret med `skata_fonster` ritas i ett lager ovanför rummets mörker, så att han syns där.
 - **Bildkorten** (`assets/bildkort/<id>.png`, 48 × 48) visas i textlagret i stället för gråboxens emoji för samma id (`grans/bilder.js`). De skalas i hela steg i fysiska pixlar (`--kort` i `grans/layout.js`, så nära emojins storlek som det går). Skriptet skriver bildkorten och sidovyerna som egna bilder.
+
+## 40. Prologen v0.11.3 (0.16.0)
+- **Radion lärs ut** (`vantar_pa: "radion"`, schema 2.15): instruktionen står i molnet med radion som bild och väntar. Ett tryck på radion säger Farfars senaste replik genom den igen, och när den är hörd går scenen vidare. Sprakar radion bara (ingen replik), räknas trycket ändå.
+- **Kapitelrubriken** (`kapitelrubrik: true`) hoppas över när nästa kapitel är låst, så att slutrutan inte kommer efter en rubrik för ett kapitel som inte börjar.
+- **Luftskeppet** har läget `ser_kartan` (bilden `ser_hjalten`) när baronen spanar på kartbiten. Porträttet är förvånat i `glider`, `skata_landar` och `ser_kartan` och annars stolt. När han läser skyltarna efter pusslet har Stil ingen bild än, så den mellanscenen visar beskrivningen och luftskeppet står kvar i `trasslar_02`.

@@ -201,7 +201,7 @@ export function skapaSpel(d) {
   /** Molnet täcker aldrig ett alternativ, en skylt eller en knapp. @param {{ left: number, top: number, right: number, bottom: number }[]} rutor */
   function placeraMoln(rutor) { const s = layout.skala; ui.placeraTanke(rutor, { vanster: s.vanster, topp: s.topp, bredd: s.cssBredd, hojd: s.cssHojd }); }
   /** Bilden av handlingen i en instruktion som väntar. @param {string} vad */
-  const handlingsBild = (vad) => ({ nosen: '<span class="bild emoji">👃</span>', mata_ungen: '<span class="bild emoji">🫐</span>' })[vad] ?? null;
+  const handlingsBild = (vad) => ({ nosen: '<span class="bild emoji">👃</span>', mata_ungen: '<span class="bild emoji">🫐</span>', radion: '<span class="bild emoji">📻</span>' })[vad] ?? null;
 
   /**
    * En instruktion som ber om en handling väntar tills den är gjord ("Tryck på bären, så får {unge} ett.").
@@ -214,7 +214,7 @@ export function skapaSpel(d) {
     rum.frys(false);
     visaMoln(handlingsBild(r.vantar_pa), r);
     sag(r);
-    const mal = { mata_ungen: '#hud-bar', nosen: '#hud-nos' }[/** @type {string} */ (r.vantar_pa)];
+    const mal = { mata_ungen: '#hud-bar', nosen: '#hud-nos', radion: '#hud-radio' }[/** @type {string} */ (r.vantar_pa)];
     // nosen ska gå att tända medan instruktionen väntar (den kostar inget här)
     if (r.vantar_pa === 'nosen') ui.sattNos(true, { betala: () => true });
     // styrbilden: ett finger på det som ska tryckas, eller Tab på datorn när det gäller nosen
@@ -571,11 +571,12 @@ export function skapaSpel(d) {
   ui.$('#hud-radio').addEventListener('click', () => {
     if (!b || pausad || fragar || !ui.plattan.hidden) return;
     const r = senaste.get(RADIO);
-    if (!r) { ljud.spela('klick'); ui.pulsera('#hud-radio'); logg.handelse('fråga igen', 'radion (tyst)'); return; }
+    // en instruktion som väntar på radion ("Tryck på radion, så säger jag det igen.") är klar när repliken är hörd
+    if (!r) { ljud.spela('klick'); ui.pulsera('#hud-radio'); logg.handelse('fråga igen', 'radion (tyst)'); handlingGjord('radion'); return; }
     fragar = true;
     const varFryst = rum.fryst;
     logg.handelse('fråga igen', 'radion');
-    replik({ ...r, vantar_pa: undefined }).finally(() => { fragar = false; rum.frys(varFryst); });
+    replik({ ...r, vantar_pa: undefined }).finally(() => { fragar = false; rum.frys(varFryst); handlingGjord('radion'); });
   });
   /** Utgången är låst i rummets tillstånd (kartans last_i): ytterdörren på natten. @param {any} o */
   const lastNu = (o) => !!o?.lastI && !!rum.tillstand && o.lastI.includes(rum.tillstand);
@@ -736,7 +737,10 @@ export function skapaSpel(d) {
     // han vaknar och kliver ur sängen när något ska göras i rummet (repliker och mellanscener hör han i sängen)
     if (rum.sover && !['replik', 'mellanscen', 'ljud', 'visa_ui'].includes(st.typ)) await rum.vakna(tid(500));
     switch (st.typ) {
-      case 'replik': return st.vantar_pa ? replikVantar(st) : st.vid === 'ungen' ? replikVidUngen(st) : replik(st);
+      case 'replik':
+        // kapitlets rubrik visas inte när nästa kapitel är låst: slutrutan kommer i stället (granskningen A 21)
+        if (st.kapitelrubrik && nastaKapitelLast(b.kapitel.id)) { logg.handelse('berättelse', 'kapitelrubriken hoppas över (kapitlet är låst)'); return; }
+        return st.vantar_pa ? replikVantar(st) : st.vid === 'ungen' ? replikVidUngen(st) : replik(st);
       case 'mellanscen': {
         // med bild händer det i rummet (Stils bilder), och beskrivningen behövs inte. Annars som i gråboxen.
         const regiMs = st.bild ? rum.regi(st.bild) : 0;
@@ -1159,10 +1163,14 @@ export function skapaSpel(d) {
        * (GÅ MOT SKOGEN), och sakerna tonas ut.
        */
       const bockaListan = () => {
-        const rattOrd = v.s.alternativ.filter((a) => a.ratt && a.ord).map((a) => ({ a, re: new RegExp(`(^|[\\s])${versaler(a.ord)}[.!,]?(\\s|$)`) }));
+        // raden hör till saken: dess ord, eller (kort som bara är bilder, v0.11.3) saken i bild-id:t (filt_rod → FILT,
+        // bar → BÄR), utan färg och storlek. Jämförs utan prickar och ring.
+        const vik = (/** @type {string} */ x) => versaler(x).replace(/[ÅÄ]/g, 'A').replace(/Ö/g, 'O');
+        const saker = (/** @type {any} */ a) => a.ord ? [a.ord] : String(a.bild || a.id).split('_').filter((d) => !(d in PALETT) && !['stor', 'liten', 'stort', 'litet'].includes(d));
+        const rattOrd = v.s.alternativ.filter((a) => a.ratt).map((a) => ({ a, re: saker(a).map((o) => new RegExp(`(^|[\\s])${vik(o)}[.!,]?(\\s|$)`)) }));
         for (const rad of /** @type {NodeListOf<HTMLElement>} */ (plattan().querySelectorAll('.lapp .rad'))) {
-          const t = versaler(rad.textContent || '');
-          const m = rattOrd.find((x) => x.re.test(t));
+          const t = vik(rad.textContent || '');
+          const m = rattOrd.find((x) => x.re.some((re) => re.test(t)));
           rad.classList.toggle('bockad', !!m && v.s.valda.has(m.a.id));
           rad.classList.toggle('lyser', !m && v.s.klar);
         }

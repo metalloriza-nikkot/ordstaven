@@ -97,6 +97,21 @@ test('radion: repliken hörs genom radion, och radioramen glider in', async ({ p
   await expect(page.locator('#hud-radio.glider-in')).toBeVisible();
 });
 
+test('radion lärs ut: "Tryck på radion" väntar tills radion har sagt målet igen (v0.11.3)', async ({ page }) => {
+  await provscen(page, { id: 't_radio_vantar', pass: 1, rum: 'koket', tillstand: 'morgon', steg: [{ typ: 'visa_ui', element: 'radioramen' },
+    R('Hitta bitarna.', 'farfar', { via: 'radio' }), R('Tryck på radion, så säger jag det igen.', 'farfar', { vantar_pa: 'radion' }), R('Bra!')] });
+  await page.locator('#plattan .replik-ruta').click();
+  await expect.poll(async () => (await steg(page))?.vantar_pa, { timeout: 5000 }).toBe('radion');
+  // instruktionen står i molnet med radion som bild, och världen går
+  await expect(page.locator('#tanke')).toContainText('📻');
+  await page.waitForTimeout(300);
+  expect((await steg(page))?.vantar_pa).toBe('radion');
+  await page.click('#hud-radio');
+  await expect(page.locator('#plattan .replik-ruta.genom-radio')).toContainText('HITTA BITARNA.');
+  await page.locator('#plattan .replik-ruta').click();
+  await expect(page.locator('#plattan .replik-ruta')).toContainText('BRA!', { timeout: 5000 });
+});
+
 test('skyltarna på dörrarna syns även när han bara ska gå (s01b), men dörrarna är låsta', async ({ page }) => {
   await provscen(page, { id: 't_skyltar', pass: 1, rum: 'hallen', tillstand: 'natt', steg: [{ typ: 'ga_till', mal: 'stege_upp', vid_annan_utgang: { ljud: 'dunk' } }, R('Uppe.')] });
   await expect(page.locator('#skyltar .skylt')).toHaveCount(5, { timeout: 5000 });
@@ -904,7 +919,7 @@ test('kapitel 1 är låst efter prologen: slutrutan kommer i stället, FORTSÄTT
     await page.waitForTimeout(150);
   }
   await expect(page.locator('.pass-slut.kapitel-last')).toBeVisible();
-  expect(sagt).toEqual(['SNART GÅR NI IN I SKOGEN.', 'FORTSÄTTNING FÖLJER!']);
+  expect(sagt).toEqual(['VAD FINNS I SKOGEN?', 'FORTSÄTTNING FÖLJER!']);
   expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('kapitlet är låst: kap-01');
   // ingen knapp som raderar eller börjar om
   await expect(page.locator('.pass-slut .om')).toHaveCount(0);
@@ -1137,11 +1152,21 @@ test('Pass 3 komplett: luftskeppet i trädgården, baronens porträtt, packlista
     await page.waitForTimeout(120);
   }
   // lägena i berättelsens ordning (Herr Skata landar två gånger: när han kommer flygande och i mellanscenen)
-  expect((await grafik()).regi.filter((x, i, a) => x !== a[i - 1])).toEqual(['glider', 'skata_landar', 'ser_hjalten', 'talar', 'skata_putsar', 'trasslar']);
+  expect((await grafik()).regi.filter((x, i, a) => x !== a[i - 1])).toEqual(['glider', 'skata_landar', 'ser_hjalten', 'talar', 'ser_kartan', 'talar', 'skata_putsar', 'trasslar']);
   expect(sett.has('luftskepp_trasslar_02')).toBe(true);
   expect(minerna.has('forvanad') && minerna.has('stolt')).toBe(true);
   expect((await grafik()).hjalm).toBe(true);
   expect((await grafik()).senasteSidovy).toBe('in_i_skogen');
+  // kapitel 1 är låst: rubriken "Kapitel 1. Skogen." kommer inte, utan slutrutans krok (granskningen A 21)
+  const texter = [];
+  for (let i = 0; i < 40 && !texter.some((t) => t.includes('VAD FINNS I SKOGEN')); i++) {
+    const t = await page.evaluate(() => document.querySelector('#plattan')?.textContent || '');
+    if (t) texter.push(t);
+    await page.locator('#plattan .replik-ruta').click({ timeout: 300 }).catch(() => {});
+    await page.waitForTimeout(150);
+  }
+  expect(texter.some((t) => t.includes('VAD FINNS I SKOGEN'))).toBe(true);
+  expect(texter.some((t) => t.includes('KAPITEL 1'))).toBe(false);
 });
 
 test('Packlistans bildkort: Stils bilder i stället för emoji', async ({ page }) => {

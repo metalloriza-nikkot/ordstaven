@@ -481,7 +481,7 @@ export class Rum extends Phaser.Scene {
    * berättelsens ordning, men vart och ett går att visa direkt (efter en omstart mitt i scenen).
    * - glider: glider in från vänster med snurrande propeller, kikaren åt fel håll, och svävar sedan stilla;
    * - skata_landar: Herr Skata på hjälmen, fjädern på sned;
-   * - ser_hjalten: kikaren vänd, han ser hjälten;
+   * - ser_hjalten: kikaren vänd, han ser hjälten (ser_kartan: samma bild, när han spanar på kartbiten);
    * - talar: munnen öppen och stängd (medan baronen talar, se `talar`);
    * - skata_putsar: Herr Skata putsar sig och snor en medalj;
    * - trasslar: baronen trasslar in sig i repstegen, och hjälmen trillar ned på gräset.
@@ -524,6 +524,8 @@ export class Rum extends Phaser.Scene {
       sedan(700, () => { ram('trasslar_02'); this.tappaHjalmen(); });
       return true;
     }
+    // han spanar på kartbiten med kikaren (v0.11.3): samma bild som när han har vänt kikaren mot hjälten
+    if (lage === 'ser_kartan') { ram('ser_hjalten'); return true; }
     if (this.textures.get('baronen').has(`luftskepp_${lage}`)) { ram(lage); return true; }
     return false;
   }
@@ -537,9 +539,8 @@ export class Rum extends Phaser.Scene {
     const golv = Math.min(this.kamera.y + RUM.hojd - 30, fran.y + 96);
     this.tweens.add({
       targets: h, y: golv, duration: 900, ease: 'Bounce.easeOut',
-      // den gungar lite när den faller, och ligger rättvänd i gräset
-      onUpdate: (tw) => { h.x = Math.round(fran.x + tw.progress * 10); h.y = Math.round(h.y); h.angle = Math.round(Math.sin(tw.progress * Math.PI * 3) * (1 - tw.progress) * 3) * 15; this.smutsig = true; },
-      onComplete: () => { h.angle = 0; this.smutsig = true; },
+      // den driver lite åt sidan och studsar i gräset (pixelbilden vrids inte)
+      onUpdate: (tw) => { h.x = Math.round(fran.x + tw.progress * 10); h.y = Math.round(h.y); this.smutsig = true; },
     });
   }
 
@@ -549,19 +550,20 @@ export class Rum extends Phaser.Scene {
    */
   talar(talare, pa) {
     const l = this.luft;
-    if (talare !== 'baronen' || !l || !['ser_hjalten', 'talar'].includes(l.lage)) return;
+    if (talare !== 'baronen' || !l || !['ser_hjalten', 'ser_kartan', 'talar'].includes(l.lage)) return;
     if (pa) this.luftskepp('talar');
     else { for (const t of l.tider) t.remove(); l.tider = []; l.img.setFrame('luftskepp_talar_02'); this.smutsig = true; }
   }
 
   /**
-   * Hur ser talaren ut i pratrutan just nu (porträttets min)? Baronen är förvånad innan han ser hjälten, stolt när
-   * han presenterar sig och sur när han har trasslat in sig. null = som vanligt. @param {string} talare
+   * Hur ser talaren ut i pratrutan just nu (porträttets min)? Baronen är förvånad innan han ser hjälten och när han
+   * får syn på kartbiten, och annars stolt. null = som vanligt. Den sura minen (Stil) används inte än: efter
+   * trasslet säger han bara något stolt ("Till skolan!"). @param {string} talare
    * @returns {string | null}
    */
   uttryck(talare) {
     if (talare !== 'baronen' || !this.luft) return null;
-    return ['glider', 'skata_landar'].includes(this.luft.lage) ? 'forvanad' : this.luft.lage === 'trasslar' ? 'sur' : 'stolt';
+    return ['glider', 'skata_landar', 'ser_kartan'].includes(this.luft.lage) ? 'forvanad' : 'stolt';
   }
 
   /**

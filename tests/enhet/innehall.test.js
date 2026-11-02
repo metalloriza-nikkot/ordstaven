@@ -135,7 +135,10 @@ describe('bilden stämmer med texten', () => {
       const har = (rad, o) => new RegExp(`(^|[^a-zåäö])${o}([^a-zåäö]|$)`).test(rad);
       for (const rad of [v.text].flat().filter(Boolean).map((x) => x.toLocaleLowerCase('sv-SE'))) {
         const lasta = Object.entries(ORD).filter(([o]) => har(rad, o));
-        const galler = v.alternativ.filter((a) => a.ratt && (!a.ord || har(rad, a.ord.toLocaleLowerCase('sv-SE'))));
+        // ett kort som bara är en bild (packlistan v0.11.3) hör till raden som nämner saken i dess bild-id (filt_rod → filt)
+        const vik = (x) => x.replace(/[åä]/g, 'a').replace(/ö/g, 'o');
+        const saken = (a) => (a.bild || a.id).split('_').filter((d) => !Object.values(ORD).some(([, v]) => v === d));
+        const galler = v.alternativ.filter((a) => a.ratt && (a.ord ? har(rad, a.ord.toLocaleLowerCase('sv-SE')) : saken(a).some((d) => har(vik(rad), d))));
         for (const r of galler) for (const [, [slag, varde]] of lasta) {
           expect(egenskaper(r.bild || r.id)[slag], `${k.id} ${p.id} ${niva}: ${r.id} syns inte som ${varde}`).toBe(varde);
         }

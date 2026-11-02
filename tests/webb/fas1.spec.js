@@ -220,8 +220,9 @@ test('bärräknaren matar ungen, och vid 0 bär rycker ungen på axlarna', async
 async function folj(page, ms) {
   return page.evaluate(async (tid) => {
     const O = window.__ORDSTAVEN; const ut = []; const slut = performance.now() + tid;
+    const glidningar0 = Number(document.querySelector('#varld').dataset.glidningar || 0);
     while (performance.now() < slut) {
-      ut.push({ pos: O.position(), klattrar: O.klattrar(), rum: O.rumsobjekt().includes('stege_ner') ? 'vinden' : O.rumsobjekt().includes('stege_upp') ? 'hallen' : '?', glider: !!document.querySelector('#varld .forra-rummet'), tona: getComputedStyle(document.querySelector('#tona')).opacity });
+      ut.push({ pos: O.position(), klattrar: O.klattrar(), rum: O.rumsobjekt().includes('stege_ner') ? 'vinden' : O.rumsobjekt().includes('stege_upp') ? 'hallen' : '?', glider: !!document.querySelector('#varld .forra-rummet') || Number(document.querySelector('#varld').dataset.glidningar || 0) > glidningar0, tona: getComputedStyle(document.querySelector('#tona')).opacity });
       await new Promise((r) => setTimeout(r, 25));
     }
     return ut;

@@ -479,6 +479,8 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     if (!canvas) return Promise.resolve();
     const forra = document.createElement('img');
     forra.className = 'forra-rummet'; forra.src = bild.src; forra.alt = '';
+    // räknaren låter testerna se en glidning som är för kort för att fångas (snabbläget, 30 ms)
+    varld.dataset.glidningar = String(Number(varld.dataset.glidningar || 0) + 1);
     varld.appendChild(forra);
     const [ax, ay] = { hoger: [1, 0], vanster: [-1, 0], upp: [0, -1], ned: [0, 1] }[riktning];
     const B = 320, H = 192;
