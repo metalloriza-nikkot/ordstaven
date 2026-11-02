@@ -127,7 +127,6 @@ test('nosen på datorn: Tab tänder och markerar, Tab igen nästa ord, Mellansla
   await expect(page.locator('#ui.nosar')).toHaveCount(0);
   await expect(markerad).toHaveCount(0);
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('TA DEN RÖDA LÅDAN.');
-  await page.waitForTimeout(300);
   await page.keyboard.press('Space');
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('KLART.', { timeout: 5000 });
 });
@@ -301,7 +300,6 @@ test('samma fel ord två gånger i en formel: andra gången bara ljudet och unge
   for (const b of 'DRSVÄ') await bricka(page, b).click(); // fel: ingen bokstav rätt, alla går tillbaka
   await expect(page.locator('#plattan .svar-rad')).toHaveText(/NÄSTAN! HÄR STÅR ORDET\./, { timeout: 8000 });
   await expect(page.locator('#plattan .platser.gra')).toHaveCount(0, { timeout: 8000 });
-  await page.waitForTimeout(300);
   for (const b of 'DRSVÄ') await bricka(page, b).click(); // samma fel igen
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 8000 }).toContain('samma fel igen (kort)');
   expect(await page.locator('#plattan .svar-rad').count()).toBe(0);
@@ -574,10 +572,21 @@ test('gåvor tas på direkt, pausknappen glimtar, och hjälteboken har garderobe
   await provscen(page, { id: 't_gava', pass: 1, rum: 'provskogen', steg: [
     { typ: 'ge_sak', sort: 'hjalmdekor', id: 'taggkam' }, { typ: 'dinobok', sida: { bild: 'fossil_och_ungen', bildtext: 'fossil' } }, { typ: 'ga_till', mal: 'sten' }, R('Klart.'),
   ] }, null, { rum: { provskogen: { innehall: ['sten'] } } });
+  // festen visar bilden, aldrig dess kod (fossilet i Dinoboken visade HTML som text i 0.12.1)
+  await page.evaluate(() => { window.__fest = []; new MutationObserver(() => { const f = document.querySelector('#fest'); window.__fest.push({ text: f.textContent, bild: !!f.querySelector('.bild') }); }).observe(document.querySelector('#fest'), { childList: true, characterData: true, subtree: true }); });
+  // skärmdumpen: festen hålls kvar när bilden kommit, så att den hinner fotograferas i snabbläget
+  await page.evaluate(() => { const f = document.querySelector('#fest'); const egen = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'hidden');
+    Object.defineProperty(f, 'hidden', { configurable: true, get() { return egen.get.call(this); }, set(v) { if (v && this.querySelector('.bild')) return; egen.set.call(this, v); } }); });
+  await page.locator('#fest .bild').waitFor({ timeout: 8000 });
+  await page.screenshot({ path: 'test-results/fest-bild.png' });
+  await page.evaluate(() => { const f = document.querySelector('#fest'); delete f.hidden; f.hidden = true; });
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.lager().hjalmdekor), { timeout: 5000 }).toBe('taggkam');
   await expect(page.locator('#hud-paus')).toBeVisible();
   await expect(page.locator('#hud-paus')).toHaveClass(/glimt/);
   await expect.poll(() => steg(page).then((s) => s?.typ), { timeout: 5000 }).toBe('ga_till');
+  const fester = await page.evaluate(() => window.__fest);
+  expect(fester.some((f) => f.bild)).toBe(true);
+  expect(fester.filter((f) => f.text.includes('<'))).toEqual([]);
   await page.click('#hud-paus');
   expect(await page.evaluate(() => window.__ORDSTAVEN.pausad())).toBe(true);
   await expect(page.locator('#pausmeny .paus-val[data-val="kartan"]')).toBeVisible();
@@ -687,7 +696,6 @@ test('kameran följer hjälten i ett stort område: mittzon, hela pixlar, stanna
   expect((await kam()).x).toBe(0);
   // längre åt höger: kameran följer, i hela pixlar, och hjälten är kvar i bilden
   await page.keyboard.down('ArrowRight'); await page.waitForTimeout(2600); await page.keyboard.up('ArrowRight');
-  await page.waitForTimeout(300);
   const k = await kam(), p = await page.evaluate(() => window.__ORDSTAVEN.position());
   expect(k.x).toBeGreaterThan(0);
   expect(Number.isInteger(k.x) && Number.isInteger(k.y)).toBe(true);

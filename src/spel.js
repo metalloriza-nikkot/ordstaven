@@ -790,7 +790,7 @@ export function skapaSpel(d) {
   /** Dinoboken får en sida (stubbe i gråboxen: sidan finns i hjälteboken, och pausknappen glimtar). @param {any} st */
   async function dinobok(st) {
     ljud.spela('fest'); nyttIHjalteboken();
-    await ui.visaFest(bilder.html(st.sida.bild), tid(1100));
+    await ui.visaFest(bilder.html(st.sida.bild), tid(1100), true);
   }
   /** Ungen lär sig något nytt (stubbe i gråboxen: ungen hoppar och låter glad). @param {any} st */
   async function ungeTillagg(st) {
@@ -2052,7 +2052,7 @@ export function skapaSpel(d) {
     if (!o) { logg.handelse('FEL', 'ta emot: figuren finns inte i rummet: ' + st.fran); return; }
     await anvand([st.fran]);
     ljud.spela('klick');
-    await ui.visaFest(bilder.html(st.bild), tid(700));
+    await ui.visaFest(bilder.html(st.bild), tid(700), true);
   }
 
   /** Passets slut: föreslå en paus, men tvinga inte. */

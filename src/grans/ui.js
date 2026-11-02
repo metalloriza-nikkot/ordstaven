@@ -252,9 +252,12 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
   }
   function doljRegi() { regi.hidden = true; }
 
-  /** Kort fest: ikon i mitten. @param {string} ikon @param {number} ms */
-  function visaFest(ikon, ms = 900) {
-    fest.textContent = ikon; fest.hidden = false; fest.classList.remove('pop'); void fest.offsetWidth; fest.classList.add('pop');
+  /**
+   * Kort fest: ikon i mitten. En emoji visas som text, en bild ur `bilder.html` som HTML (annars syns koden).
+   * @param {string} ikon @param {number} ms @param {boolean} [html] ikonen är HTML från bildlistan
+   */
+  function visaFest(ikon, ms = 900, html = false) {
+    if (html || ikon.trimStart().startsWith('<')) fest.innerHTML = ikon; else fest.textContent = ikon; fest.hidden = false; fest.classList.remove('pop'); void fest.offsetWidth; fest.classList.add('pop');
     return new Promise((r) => setTimeout(() => { fest.hidden = true; r(undefined); }, ms));
   }
 
