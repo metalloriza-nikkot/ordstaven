@@ -696,11 +696,12 @@ test('kameran följer hjälten i ett stort område: mittzon, hela pixlar, stanna
   expect((await kam()).x).toBe(0);
   // längre åt höger: kameran följer, i hela pixlar, och hjälten är kvar i bilden
   await page.keyboard.down('ArrowRight'); await page.waitForTimeout(2600); await page.keyboard.up('ArrowRight');
-  const k = await kam(), p = await page.evaluate(() => window.__ORDSTAVEN.position());
+  // kameran och hjälten läses i samma ögonblick, annars hinner hjälten glida en bildruta till mellan läsningarna
+  const { k, p } = await page.evaluate(() => ({ k: window.__ORDSTAVEN.kamera(), p: window.__ORDSTAVEN.position() }));
   expect(k.x).toBeGreaterThan(0);
   expect(Number.isInteger(k.x) && Number.isInteger(k.y)).toBe(true);
   expect(p.x - k.x).toBeGreaterThan(0); expect(p.x - k.x).toBeLessThan(320);
-  expect(Math.abs(p.x - k.x - 160)).toBeLessThanOrEqual(33); // vid mittzonens kant
+  expect(Math.abs(p.x - k.x - 160)).toBeLessThanOrEqual(34); // vid mittzonens kant (32), plus avrundning och en bildrutas steg
   // skylten sitter kvar på sitt föremål när kameran har flyttat sig (föremålet mitt i bilden, så att skylten inte
   // flyttas in från bildens kant)
   await expect.poll(async () => {
