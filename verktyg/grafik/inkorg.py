@@ -16,9 +16,9 @@ Läser en kopia av Niklas inkorgsmapp och skriver till repot:
 Arken (*_ark.png) hoppas över, de är bara till för att titta på.
 
 Varje bild skrivs om från pixlarna, så att ingen metadata följer med (EXIF, program, tid). Repot är publikt.
-Färgerna och genomskinligheten (skuggorna är halvgenomskinliga) står kvar som Stil ritade dem. Alla färger
-samlas i assets/palett.json, så att det syns hur många de är (stilguiden §2 säger högst 48, men *Så ritas allt*
-med fyra toner per material ger fler, och det är Stils sak att avgöra).
+Färgerna och genomskinligheten (skuggorna är halvgenomskinliga) står kvar som Stil ritade dem. Paletten är sluten
+(beslut 28.4): varje färg ska stå i Stils masterpalett, verktyg/stil/palett/palett.json, annars stoppar skriptet.
+assets/palett.json skrivs som samma lista (en ny färg läggs bara in av Stil).
 
 Ljuden skrivs om med bara formatet och ljuddatan (inga INFO-fält). Råinspelningar läggs aldrig i inkorgen
 (beslut 25.2): bara ljud som är bearbetade så att rösten inte går att känna igen.
@@ -35,7 +35,8 @@ from pathlib import Path
 
 from PIL import Image
 
-MAX_FARGER = 48
+# Stils masterpalett (beslut 28.4): facit för alla färger i grafiken
+PALETT = Path('verktyg') / 'stil' / 'palett' / 'palett.json'
 NAMN = re.compile(r'^[a-z0-9]+(?:_[a-z0-9]+)*$')
 # Storlekar som koden räknar med (bredd, höjd) för bilder vars namn börjar så
 STORLEK = {'hjalte_ga_': (16, 24), 'stav_hand_': (16, 24), 'ryggsack_': (16, 24), 'taggkam_': (16, 24), 'unge1_ga_': (24, 24)}
@@ -94,7 +95,8 @@ def las_bilder(mapp, fel, alla):
         for prefix, (b, h) in STORLEK.items():
             if mapp.parent.name == 'figurer' and f.stem.startswith(prefix) and im.size != (b, h):
                 fel.append(f'{f.name}: {im.width} × {im.height}, ska vara {b} × {h}')
-        alla.update(farger(im))
+        for c in farger(im):
+            alla.setdefault(c, f'{mapp.name}/{f.name}')
         bilder[f.stem] = im
     return bilder
 
@@ -165,7 +167,7 @@ def main():
     a.add_argument('--bara', nargs='*', default=None)
     a.add_argument('--prova', action='store_true')
     arg = a.parse_args()
-    ink, repo, fel, alla = arg.inkorg, arg.repo, [], set()
+    ink, repo, fel, alla = arg.inkorg, arg.repo, [], {}
     med = lambda p: arg.bara is None or any(p.startswith(b.rstrip('/')) for b in arg.bara)
     for mapp in sorted((ink / 'figurer').glob('*/')):
         if med(f'figurer/{mapp.name}') and (b := las_bilder(mapp, fel, alla)):
@@ -201,7 +203,8 @@ def main():
         for tsj in mapp.glob('*.tsj'):
             data = json.loads(tsj.read_text())
             im = ren(Image.open(mapp / data['image']))
-            alla.update(farger(im))
+            for c in farger(im):
+                alla.setdefault(c, f'{mapp.name}/{data["image"]}')
             print(f'assets/tiles/{mapp.name}/{tsj.stem}.png och .json ({data.get("tilecount")} rutor)')
             if not arg.prova:
                 (repo / 'assets' / 'tiles' / mapp.name).mkdir(parents=True, exist_ok=True)
@@ -210,12 +213,17 @@ def main():
                 (repo / 'assets' / 'tiles' / mapp.name / f'{tsj.stem}.json').write_text(json.dumps(data, indent=1, ensure_ascii=False) + '\n')
     if med('ljud'):
         ljud(ink, repo, arg.prova, fel)
+    # paletten är sluten: en färg som inte står i Stils masterpalett stoppar (Stil ritar om eller lägger in den)
+    master = json.loads((repo / PALETT).read_text())
+    tillatna = {f['hex'].lower() for f in master['farger'] + [t for t in master.get('tillagg', []) if isinstance(t, dict) and 'hex' in t]}
+    nya = sorted({hex_av(c) for c in alla} - tillatna)
+    for h in nya:
+        fel.append(f'{alla[next(c for c in alla if hex_av(c) == h)]}: färgen {h} står inte i {PALETT.as_posix()}')
+    print(f'Färger i grafiken: {len({hex_av(c) for c in alla})} av masterpalettens {len(tillatna)}.')
     if not arg.prova:
         fil = repo / 'assets' / 'palett.json'
-        gamla = set(json.loads(fil.read_text())['farger']) if fil.exists() and arg.bara is not None else set()
-        p = sorted(gamla | {hex_av(c) for c in alla})
-        fil.write_text(json.dumps({'om': 'Alla färger i grafiken, samlade av verktyg/grafik/inkorg.py (stilguiden §2).', 'antal': len(p), 'farger': p}, indent=1) + '\n')
-        print(f'Färger i grafiken: {len(p)} (stilguiden §2 säger högst {MAX_FARGER}).')
+        p = sorted(tillatna)
+        fil.write_text(json.dumps({'om': f'Masterpaletten (beslut 28.4), samma lista som {PALETT.as_posix()} (Stils). Skriven av verktyg/grafik/inkorg.py.', 'antal': len(p), 'tak_per_zon': master.get('tak_per_zon'), 'farger': p}, indent=1) + '\n')
         licenser(repo, fel)
     for f in fel:
         print('FEL:', f, file=sys.stderr)

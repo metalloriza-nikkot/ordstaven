@@ -580,3 +580,8 @@ Stilguiden §3 gick igenom mot spelet. Det som saknades är byggt här, resten f
 - **Radion lärs ut** (`vantar_pa: "radion"`, schema 2.15): instruktionen står i molnet med radion som bild och väntar. Ett tryck på radion säger Farfars senaste replik genom den igen, och när den är hörd går scenen vidare. Sprakar radion bara (ingen replik), räknas trycket ändå.
 - **Kapitelrubriken** (`kapitelrubrik: true`) hoppas över när nästa kapitel är låst, så att slutrutan inte kommer efter en rubrik för ett kapitel som inte börjar.
 - **Luftskeppet** har läget `ser_kartan` (bilden `ser_hjalten`) när baronen spanar på kartbiten. Porträttet är förvånat i `glider`, `skata_landar` och `ser_kartan` och annars stolt. När han läser skyltarna efter pusslet har Stil ingen bild än, så den mellanscenen visar beskrivningen och luftskeppet står kvar i `trasslar_02`.
+
+## 41. Masterpaletten och nattfönstret (0.16.1)
+- **Paletten är sluten** (beslut 28.4): Stils masterpalett ligger i `verktyg/stil/palett/palett.json` (350 färger, taket 256 per zon). `verktyg/grafik/inkorg.py` stoppar vid en färg som inte står där (eller under `tillagg`), och säger vilken bild den kom från. `assets/palett.json` skrivs som samma lista. Hjältens hud- och dräkttoner står i den, så palettbytet hittar dem (test).
+- **Kartans `lyser`** (på ett föremål): föremålet ritas i lagret ovanför rummets mörker. Vindsfönstret har det, så att månarna och Herr Skata syns på natten. `skata_fonster` gör samma sak, för äldre kartor.
+- Stils skript i `verktyg/stil/` byts mot den nya zippen när den kommer (beslut 28.6), nu med `palett/` (`las.py` låser bilderna till paletten).

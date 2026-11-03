@@ -7,13 +7,25 @@ src=open('/home/claude/skata2/skata.py').read()
 g={}; exec(src.rsplit("if __name__",1)[0].replace("open('pix.py')","open('/home/claude/skata2/pix.py')"),g)
 SK=g['B']
 NATT=('#4A5E96','#36487A')
+MANE=('#F4F0D0','#D6CFA4')     # stora månen: ljus och skuggkant nere till höger
+MANE2=('#BFE3EF','#8DB4CC')    # lilla blåaktiga månen
 def fonster_natt(stjarna=True):
     im=fonster(28,22,rund=True); px=im.load(); cx,cy=14,11
     for y in range(22):
         for x in range(28):
             dx=(x+0.5-cx)/14; dy=(y+0.5-cy)/11; r=dx*dx+dy*dy
             if r<=0.62: px[x,y]=hx2(TRA[2] if (x==14 or y==11) else (NATT[0] if y<cy else NATT[1]))
-    if stjarna: px[9,6]=hx2('#F4F0D0'); px[19,5]=hx2('#BFE3EF')
+    if stjarna:
+        # 2026-11-03 (28.3): fönstret undantas från rummets mörker. Den stora ljusa månen bakom Herr Skatas huvud
+        # gör den svarta fågeln till en siluett, och den lilla blåaktiga månen är världens andra måne (briefen §4).
+        for y in range(22):
+            for x in range(28):
+                d=((x+0.5-8)**2+(y+0.5-7)**2)**0.5
+                if d<=3.3 and glas(x,y) and x!=14 and y!=11:
+                    px[x,y]=hx2(MANE[1] if (x+0.5-8)+(y+0.5-7)>2.0 else MANE[0])
+                d2=((x+0.5-21)**2+(y+0.5-7)**2)**0.5
+                if d2<=1.6 and glas(x,y) and x!=14 and y!=11: px[x,y]=hx2(MANE2[1] if x>=21 and y>=7 else MANE2[0])
+        px[11,3]=hx2('#F4F0D0'); px[17,4]=hx2('#F4F0D0'); px[24,8]=hx2('#BFE3EF')
     return im
 def glas(x,y):
     dx=(x+0.5-14)/14; dy=(y+0.5-11)/11; return dx*dx+dy*dy<=0.62

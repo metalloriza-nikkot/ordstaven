@@ -155,7 +155,7 @@ export class Rum extends Phaser.Scene {
     // det som är i luften (luftskeppet i s22) syns ovanför figurerna
     this.lagerLuft = this.add.container(0, 0);
     this.morker = this.add.graphics();
-    // Herr Skatas fönster (kartans skata_fonster) ligger ovanför mörkret, så att han syns där på natten (beslut 28.3)
+    // det som lyser (kartans lyser: vindsfönstret med månarna och Herr Skata) ligger ovanför mörkret (beslut 28.3, Stil 06:55)
     this.lagerLjust = this.add.container(0, 0);
     this.hjalte = this.add.container(0, 0);
     this.unge = this.add.container(0, 0).setVisible(false);
@@ -807,7 +807,7 @@ export class Rum extends Phaser.Scene {
       const pa = (o.bildPa && this.objekt.find((x) => x.id === o.bildPa)) || o;
       const tex = fb.nyckel === 'hjalte' ? this.hjalteTextur || 'hjalte' : fb.nyckel;
       const img = this.add.image(Math.round(pa.x + pa.b / 2), pa.y + pa.h, tex, fb.ram).setOrigin(0.5, 1);
-      (o.skataFonster ? this.lagerLjust : this.lagerObjekt).add(img);
+      (o.lyser || o.skataFonster ? this.lagerLjust : this.lagerObjekt).add(img);
       this.ritade.set(o.id, /** @type {any} */ (img));
       return;
     }

@@ -65,6 +65,11 @@
        "name": "skata_fonster",
        "type": "bool",
        "value": true
+      },
+      {
+       "name": "lyser",
+       "type": "bool",
+       "value": true
       }
      ]
     },

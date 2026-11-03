@@ -44,6 +44,13 @@ describe('grafiken och ljuden', () => {
     const hex = (c) => '#' + c.toString(16).padStart(6, '0');
     for (const t of [...HUD_A.toner, ...DRAKT_A.toner]) expect(p, hex(t)).toContain(hex(t));
   });
+  it('paletten är Stils masterpalett (beslut 28.4): samma färger, och taket per zon står med', () => {
+    const stil = JSON.parse(las('verktyg/stil/palett/palett.json').toString());
+    const vara = JSON.parse(las('assets/palett.json').toString());
+    const hexar = [...stil.farger, ...(stil.tillagg || []).filter((t) => t && t.hex)].map((f) => f.hex.toLowerCase()).sort();
+    expect(vara.farger).toEqual(hexar);
+    expect(vara.tak_per_zon).toBe(stil.tak_per_zon);
+  });
   it('hjälten och staven är 16 × 24 i fyra riktningar, gången har fyra bilder', () => {
     for (const figur of ['hjalte', 'stav']) {
       const ramar = JSON.parse(las(`assets/sprites/${figur}/${figur}.json`).toString()).frames;

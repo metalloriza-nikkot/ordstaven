@@ -120,6 +120,7 @@ export function lasKarta(tmj) {
       if (egen.bild_del) ut.bildDel = String(egen.bild_del);
       if (egen.sovplats) ut.sovplats = true;
       if (egen.skata_fonster) ut.skataFonster = true;
+      if (egen.lyser) ut.lyser = true;
       objekt.push(ut);
     }
   }
