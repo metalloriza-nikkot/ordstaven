@@ -53,7 +53,7 @@ let testkartor = {};
       const t = JSON.parse(localStorage.getItem('ordstaven_testscen') || 'null');
       if (t && kapitel[0]) {
         const k = kapitel[0];
-        k.scener.splice(t.index ?? k.scener.length, 0, t.scen);
+        k.scener.splice(t.index ?? k.scener.length, 0, t.scen, ...(t.efter || [])); // efter = scenerna som kommer direkt efter
         // provpussel, fler scener (frivilliga) och fält i rummen, så att kapitel 1:s steg kan provas i prologens rum
         for (const p of t.pussel || []) k.pussel.push(p);
         for (const sc of t.scener || []) k.scener.push(sc);

@@ -400,10 +400,30 @@
     "h": 24
    }
   },
-  "hjalte_klattra_upp_01": {
+  "hjalte_kartbit_upp_01": {
    "frame": {
     "x": 0,
     "y": 170,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "hjalte_klattra_upp_01": {
+   "frame": {
+    "x": 0,
+    "y": 211,
     "w": 16,
     "h": 24
    },
@@ -423,7 +443,7 @@
   "hjalte_klattra_upp_02": {
    "frame": {
     "x": 17,
-    "y": 170,
+    "y": 211,
     "w": 16,
     "h": 24
    },
@@ -443,7 +463,7 @@
   "hjalte_sang_01": {
    "frame": {
     "x": 0,
-    "y": 195,
+    "y": 236,
     "w": 64,
     "h": 44
    },
@@ -463,7 +483,7 @@
   "hjalte_sang_02": {
    "frame": {
     "x": 65,
-    "y": 195,
+    "y": 236,
     "w": 64,
     "h": 44
    },
@@ -483,7 +503,7 @@
   "hjalte_sang_03": {
    "frame": {
     "x": 130,
-    "y": 195,
+    "y": 236,
     "w": 64,
     "h": 44
    },
@@ -503,7 +523,7 @@
   "hjalte_sang_04": {
    "frame": {
     "x": 195,
-    "y": 195,
+    "y": 236,
     "w": 64,
     "h": 44
    },
@@ -523,7 +543,7 @@
   "hjalte_sang_morgon_01": {
    "frame": {
     "x": 0,
-    "y": 240,
+    "y": 281,
     "w": 64,
     "h": 44
    },
@@ -543,7 +563,7 @@
   "hjalte_sang_morgon_02": {
    "frame": {
     "x": 65,
-    "y": 240,
+    "y": 281,
     "w": 64,
     "h": 44
    },
@@ -563,7 +583,7 @@
   "hjalte_stol_ner": {
    "frame": {
     "x": 0,
-    "y": 285,
+    "y": 326,
     "w": 16,
     "h": 26
    },
@@ -583,7 +603,7 @@
   "hjalte_svinga_hoger_01": {
    "frame": {
     "x": 0,
-    "y": 312,
+    "y": 353,
     "w": 32,
     "h": 40
    },
@@ -603,7 +623,7 @@
   "hjalte_svinga_hoger_02": {
    "frame": {
     "x": 33,
-    "y": 312,
+    "y": 353,
     "w": 32,
     "h": 40
    },
@@ -623,7 +643,7 @@
   "hjalte_svinga_hoger_03": {
    "frame": {
     "x": 66,
-    "y": 312,
+    "y": 353,
     "w": 32,
     "h": 40
    },
@@ -643,7 +663,7 @@
   "hjalte_svinga_ner_01": {
    "frame": {
     "x": 0,
-    "y": 353,
+    "y": 394,
     "w": 32,
     "h": 40
    },
@@ -663,7 +683,7 @@
   "hjalte_svinga_ner_02": {
    "frame": {
     "x": 33,
-    "y": 353,
+    "y": 394,
     "w": 32,
     "h": 40
    },
@@ -683,7 +703,7 @@
   "hjalte_svinga_ner_03": {
    "frame": {
     "x": 66,
-    "y": 353,
+    "y": 394,
     "w": 32,
     "h": 40
    },
@@ -703,7 +723,7 @@
   "hjalte_svinga_upp_01": {
    "frame": {
     "x": 0,
-    "y": 394,
+    "y": 435,
     "w": 32,
     "h": 40
    },
@@ -723,7 +743,7 @@
   "hjalte_svinga_upp_02": {
    "frame": {
     "x": 33,
-    "y": 394,
+    "y": 435,
     "w": 32,
     "h": 40
    },
@@ -743,7 +763,7 @@
   "hjalte_svinga_upp_03": {
    "frame": {
     "x": 66,
-    "y": 394,
+    "y": 435,
     "w": 32,
     "h": 40
    },
@@ -763,7 +783,7 @@
   "hjalte_svinga_vanster_01": {
    "frame": {
     "x": 0,
-    "y": 435,
+    "y": 476,
     "w": 32,
     "h": 40
    },
@@ -783,7 +803,7 @@
   "hjalte_svinga_vanster_02": {
    "frame": {
     "x": 33,
-    "y": 435,
+    "y": 476,
     "w": 32,
     "h": 40
    },
@@ -803,7 +823,7 @@
   "hjalte_svinga_vanster_03": {
    "frame": {
     "x": 66,
-    "y": 435,
+    "y": 476,
     "w": 32,
     "h": 40
    },
@@ -823,7 +843,7 @@
   "hjalte_trolla_ner_01": {
    "frame": {
     "x": 0,
-    "y": 476,
+    "y": 517,
     "w": 32,
     "h": 40
    },
@@ -843,7 +863,7 @@
   "hjalte_trolla_ner_02": {
    "frame": {
     "x": 33,
-    "y": 476,
+    "y": 517,
     "w": 32,
     "h": 40
    },
@@ -863,7 +883,7 @@
   "hjalte_trolla_ner_03": {
    "frame": {
     "x": 66,
-    "y": 476,
+    "y": 517,
     "w": 32,
     "h": 40
    },
@@ -883,7 +903,7 @@
   "hjalte_trolla_ner_04": {
    "frame": {
     "x": 99,
-    "y": 476,
+    "y": 517,
     "w": 32,
     "h": 40
    },
@@ -903,7 +923,7 @@
   "ryggsack_hoger_01": {
    "frame": {
     "x": 0,
-    "y": 517,
+    "y": 558,
     "w": 16,
     "h": 24
    },
@@ -923,7 +943,7 @@
   "ryggsack_ner_01": {
    "frame": {
     "x": 0,
-    "y": 542,
+    "y": 583,
     "w": 16,
     "h": 24
    },
@@ -943,7 +963,7 @@
   "ryggsack_upp_01": {
    "frame": {
     "x": 0,
-    "y": 567,
+    "y": 608,
     "w": 16,
     "h": 24
    },
@@ -963,7 +983,7 @@
   "ryggsack_vanster_01": {
    "frame": {
     "x": 0,
-    "y": 592,
+    "y": 633,
     "w": 16,
     "h": 24
    },
@@ -983,7 +1003,7 @@
   "taggkam_hoger_01": {
    "frame": {
     "x": 0,
-    "y": 617,
+    "y": 658,
     "w": 16,
     "h": 24
    },
@@ -1003,7 +1023,7 @@
   "taggkam_ner_01": {
    "frame": {
     "x": 0,
-    "y": 642,
+    "y": 683,
     "w": 16,
     "h": 24
    },
@@ -1023,7 +1043,7 @@
   "taggkam_upp_01": {
    "frame": {
     "x": 0,
-    "y": 667,
+    "y": 708,
     "w": 16,
     "h": 24
    },
@@ -1043,7 +1063,7 @@
   "taggkam_vanster_01": {
    "frame": {
     "x": 0,
-    "y": 692,
+    "y": 733,
     "w": 16,
     "h": 24
    },
@@ -1066,7 +1086,7 @@
   "format": "RGBA8888",
   "size": {
    "w": 260,
-   "h": 717
+   "h": 758
   },
   "scale": "1",
   "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."

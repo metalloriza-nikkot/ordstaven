@@ -318,7 +318,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
   }
   function pulseraTanke() { const t = $('#tanke'); t.classList.remove('puls'); void t.offsetWidth; t.classList.add('puls'); }
   /**
-   * @typedef {{ lage?: 'over' | 'pa' | 'vanster' | 'hoger', under?: number, rumTopp: number, ram?: { vanster: number, hoger: number }, objekt?: string }} Plats
+   * @typedef {{ lage?: 'over' | 'pa' | 'vanster' | 'hoger', under?: number, rumTopp: number, rumBotten?: number, ram?: { vanster: number, hoger: number }, objekt?: string }} Plats
    * Var lappen eller handen ställs i förhållande till punkten: över (vänds under om den inte ryms nära taket),
    * på (mitt på föremålet), vanster eller hoger (bredvid, vid sidoväggen). ram = rummets kanter på skärmen.
    * objekt = föremålets id (data-objekt), så att det syns vilket föremål lappen eller handen hör till.
@@ -376,10 +376,114 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     for (const s of lista) {
       const d = document.createElement('div');
       d.className = 'skylt'; d.innerHTML = s.html;
+      /** @type {any} */ (d).skylt = s;
       e.appendChild(d);
-      placera(d, s.punkt, { ...s.plats, objekt: s.objekt });
       d.querySelector('button')?.addEventListener('click', () => { if (!nos.aktiv) s.vidTryck(); });
     }
+    ordnaSkyltar();
+  }
+
+  /** @type {{ left: number, top: number, right: number, bottom: number } | null} hjältens ruta på skärmen */
+  let hjalteRuta = null;
+  /** Dörrarna på skärmen: en skylt som flyttas undan för hjälten ställs aldrig på en dörr (grind A). */
+  let dorrRutor = () => /** @type {{ left: number, top: number, right: number, bottom: number }[]} */ ([]);
+  /** @param {() => { left: number, top: number, right: number, bottom: number }[]} f */
+  function sattDorrRutor(f) { dorrRutor = f; }
+  /**
+   * Hjälten har flyttat sig: en skylt som täcker honom flyttas åt sidan (beslut 31.2). @param {{ left: number, top: number, right: number, bottom: number } | null} r
+   */
+  function skyltHjalte(r) {
+    const runda = (/** @type {any} */ q) => q && [q.left, q.top, q.right, q.bottom].map(Math.round).join(',');
+    if (runda(r) === runda(hjalteRuta)) return;
+    hjalteRuta = r;
+    if (ui.querySelector('#skyltar .skylt, #rumsskyltar .skylt')) ordnaSkyltar();
+  }
+  /**
+   * Skyltarna (dörrarnas lappar och rummets skyltar) täcker aldrig varandra eller hjälten (beslut 31.2). Varje skylt
+   * ställs först där den hör hemma (placera), och sedan skjuts de som krockar isär i sidled, inom rummets kanter.
+   * Hjälten står still i det: en skylt som täcker honom flyttas åt den sida den redan står mest åt. Räcker inte
+   * bredden flyttas skylten ned en rad. Läget räknas om från början varje gång, så det beror bara på var hjälten står.
+   */
+  function ordnaSkyltar() {
+    const luft = 6;
+    /** @type {{ d: HTMLElement, r: DOMRect, ram: { vanster: number, hoger: number } | null, bas: boolean }[]} */
+    const alla = [];
+    for (const behallare of [$('#rumsskyltar'), $('#skyltar')]) {
+      if (getComputedStyle(behallare).display === 'none') continue;
+      for (const d of /** @type {HTMLElement[]} */ ([...behallare.querySelectorAll(':scope > .skylt')])) {
+        const s = /** @type {any} */ (d).skylt;
+        if (!s) continue;
+        placera(d, s.punkt, { ...s.plats, objekt: s.objekt });
+        const r = d.getBoundingClientRect();
+        if (!r.width) continue;
+        // utanför bilden (ett stort område): den står där föremålet är och ordnas inte
+        const ram = s.plats?.ram && r.right > s.plats.ram.vanster && r.left < s.plats.ram.hoger ? s.plats.ram : null;
+        alla.push({ d, r, ram, bas: false });
+      }
+    }
+    if (alla.length === 0) return;
+    const krock = (/** @type {any} */ a, /** @type {any} */ b) => a.left < b.right + luft && b.left < a.right + luft && a.top < b.bottom + luft && b.top < a.bottom + luft;
+    const flytta = (/** @type {any} */ q, /** @type {number} */ dx, dy = 0) => {
+      if (!dx && !dy) return;
+      q.d.style.left = parseFloat(q.d.style.left) + dx + 'px';
+      if (dy) q.d.style.top = parseFloat(q.d.style.top) + dy + 'px';
+      q.r = q.d.getBoundingClientRect();
+    };
+    const iRam = (/** @type {any} */ q) => { if (!q.ram) return; if (q.r.left < q.ram.vanster) flytta(q, q.ram.vanster - q.r.left); else if (q.r.right > q.ram.hoger) flytta(q, q.ram.hoger - q.r.right); };
+    const hj = hjalteRuta;
+    // bas = skylten täcker hjälten där den hör hemma: då står den kvar på samma sida tills han har gått förbi
+    for (const q of alla) q.bas = !!hj && krock(q.r, hj);
+    // 1. en skylt som täcker hjälten flyttas: helst rakt under (eller över) honom, så att den står kvar i dörrens
+    //    kolumn, annars åt sidan. Det läge väljs som ryms i rummet och krockar minst med de andra skyltarna.
+    const dorrar = hj && alla.some((q) => q.bas) ? dorrRutor() : [];
+    if (hj) for (const q of alla) {
+      if (!q.bas) continue;
+      const s = /** @type {any} */ (q.d).skylt, botten = s?.plats?.rumBotten ?? Infinity, topp = s?.plats?.rumTopp ?? -Infinity;
+      const ram = q.ram ?? { vanster: -Infinity, hoger: Infinity };
+      const r = q.r, mq = (r.left + r.right) / 2, mh = (hj.left + hj.right) / 2;
+      const uppat = !q.d.classList.contains('under');
+      /** @type {Record<string, [number, number]>} */
+      const drag = {
+        ned: [0, hj.bottom + luft + 1 - r.top], upp: [0, hj.top - luft - 1 - r.bottom],
+        hoger: [hj.right + luft + 1 - r.left, 0], vanster: [hj.left - luft - 1 - r.right, 0],
+      };
+      const ordning = [uppat ? 'upp' : 'ned', ...(mq >= mh ? ['hoger', 'vanster'] : ['vanster', 'hoger']), uppat ? 'ned' : 'upp'];
+      const kostnad = (/** @type {string} */ sida) => {
+        const [dx, dy] = drag[sida], n = { left: r.left + dx, right: r.right + dx, top: r.top + dy, bottom: r.bottom + dy };
+        let k = n.top < topp || n.bottom > botten || n.left < ram.vanster || n.right > ram.hoger ? 1e6 : 0;
+      if (dorrar.some((d) => n.left < d.right - 1 && d.left < n.right - 1 && n.top < d.bottom - 1 && d.top < n.bottom - 1)) k += 5e5;
+        for (const o of alla) if (o !== q && krock(n, o.r)) k += (Math.min(n.right, o.r.right) - Math.max(n.left, o.r.left) + luft) * (Math.min(n.bottom, o.r.bottom) - Math.max(n.top, o.r.top) + luft);
+        return k;
+      };
+      // samma sida som förra gången så länge den ryms i rummet (ingen fladder), annars den bästa
+      const forra = /** @type {any} */ (q.d).sida;
+      let bast = ordning[0], minst = Infinity;
+      if (forra && kostnad(forra) < 1e6) bast = forra;
+      else for (const sida of ordning) { const k = kostnad(sida); if (k < minst) { minst = k; bast = sida; } if (k === 0) break; }
+      /** @type {any} */ (q.d).sida = bast; q.d.dataset.undan = bast;
+      flytta(q, ...drag[bast]);
+    }
+    // 2. skyltarna som krockar skjuts isär i sidled, hälften var, inom rummets kanter
+    for (let varv = 0; varv < 24; varv++) {
+      let lugnt = true;
+      for (let i = 0; i < alla.length; i++) for (let j = i + 1; j < alla.length; j++) {
+        const a = alla[i], b = alla[j];
+        if (!krock(a.r, b.r)) continue;
+        lugnt = false;
+        const [v, h] = (a.r.left + a.r.right) <= (b.r.left + b.r.right) ? [a, b] : [b, a];
+        const over = v.r.right + luft + 1 - h.r.left;
+        flytta(v, -Math.ceil(over / 2)); flytta(h, Math.ceil(over / 2));
+        iRam(v); iRam(h);
+      }
+      if (lugnt) break;
+    }
+    // räckte inte bredden: den som fortfarande krockar flyttas ned en rad (under hjälten eller under den andra)
+    for (let i = 0; i < alla.length; i++) {
+      const b = alla[i];
+      if (hj && krock(b.r, hj)) flytta(b, 0, hj.bottom + luft + 1 - b.r.top);
+      for (let j = 0; j < i; j++) if (krock(alla[j].r, b.r)) flytta(b, 0, alla[j].r.bottom + luft + 1 - b.r.top);
+    }
+    for (const q of alla) if (!q.bas) { delete /** @type {any} */ (q.d).sida; delete q.d.dataset.undan; }
   }
   /**
    * Rummets egna skyltar och tavlor (rum.skyltar: BÄR, BRON, Farfars skyltar). De står i världen hela tiden, som
@@ -518,7 +622,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     styrhjalp,
     flygBar,
     handknapp,
-    ljudord, visaTanke, placeraTanke, pulseraTanke, ordskylt, skyltar, rumsskyltar, pulseraSkylt, skyltNara, ropa,
+    ljudord, visaTanke, placeraTanke, pulseraTanke, ordskylt, skyltar, rumsskyltar, skyltHjalte, sattDorrRutor, ordnaSkyltar, pulseraSkylt, skyltNara, ropa,
     ui, $, plattan, rader, esc, visaPlatta, doljPlatta, vantaFortsatt, visaRegi, doljRegi, visaFest,
     uppdateraHud, pulsera, visaSkarm, doljSkarm, visaMeny, doljMeny, visaPausmeny, doljPausmeny, etiketter, sattNos, vaxlaNos, ljuda, arHelord,
     fanga, tandNos, markeraOrd,

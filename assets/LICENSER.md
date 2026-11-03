@@ -13,6 +13,7 @@ Varje grafik-, ljud- eller typsnittsfil och varje bibliotek som följer med spel
 | Porträtten (ansiktena i pratrutan) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/portratt/` |
 | Läsplattans bildkort | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/bildkort/` |
 | Sidovyerna (bakgrunder och det som rör sig i dem) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/sidovyer/` |
+| Farfars karta (kartbitarna) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/karta/` |
 | Farfars hus: föremålen | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/foremal/hus/` |
 | Farfars hus: rummen (en bild per rum) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/rum/hus/` |
 | Skogens rutor (rutset för Tiled) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/tiles/skog/` |

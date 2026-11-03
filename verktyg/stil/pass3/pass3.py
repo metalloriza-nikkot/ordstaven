@@ -58,13 +58,24 @@ def baron_overkropp(huvud_upp=0):
     return b.crop((0,0,24,15+huvud_upp))
 
 def kikare(fel=True):
-    # en mässingskikare: fel = den breda änden mot ögat
-    im=bild(10,6); px=im.load()
-    for x in range(10):
-        r=1 if (x<5)==fel else 2
-        for y in range(3-r,3+r+1): px[x,y]=hx2('#C8A040' if y<3 else '#8A6A20')
-        px[x,3-r]=hx2('#4A3A10'); px[x,3+r]=hx2('#4A3A10')
-    for y in range(1,6): px[0 if not fel else 9,y]=hx2('#B8DCF4') if 1<y<5 else px[0 if not fel else 9,y]
+    # En mässingskikare, 14 x 8, ögat till vänster (x 0). Rätt: den smala änden (okularet) mot ögat och den breda
+    # (objektivet) ut. Fel: den breda änden mot ögat, så att allt ser litet ut (baronens skämt).
+    # Rättat 2026-11-03: ändarna var omkastade, så att "fel" såg rätt ut. Ritas nu direkt i 14 x 8.
+    im=bild(14,8); px=im.load()
+    for x in range(14):
+        bred=(x<6) if fel else (x>=8)
+        y0,y1=(0,7) if bred else (2,5)
+        for y in range(y0,y1+1):
+            c='#E8C868' if y==y0+1 else ('#C8A040' if y<4 else '#8A6A20')
+            if y in (y0,y1): c='#4A3A10'
+            px[x,y]=hx2(c)
+    for x in range(14):                                         # ringen där delarna möts
+        if (fel and x==6) or (not fel and x==7):
+            for y in range(1,7):
+                if px[x,y][3]: px[x,y]=hx2('#4A3A10')
+    ut=13
+    for y in range(1,7):                                        # linsen blänker i den yttre änden
+        if px[ut,y][3] and px[ut,y]!=hx2('#4A3A10'): px[ut,y]=hx2('#B8DCF4')
     return im
 
 def repstege(trasslad=False):
@@ -98,13 +109,13 @@ def luftskepp(baron='kikare_fel',prop=0,skata=None,mun=False,stege='hanger',hjal
         for y in range(0,7):
             for x in range(24):
                 if bp[x,y][3]: bp[x,y]=(0,0,0,0)
-        d=Duk(24,10); d.ellips(12,7,6,4,'hud','hjassa',zbias=0.1); d.kontur(); bo.alpha_composite(d.bild(),(0,0))
+        d=Duk(24,10); d.ellips(12,7.5,6.3,5.0,'hud','hjassa',zbias=0.1,klipp=lambda x,y: y<8); d.kontur(); bo.alpha_composite(d.bild().crop((0,0,24,8)),(0,0))   # en rund hjässa, ansiktet och ögonen orörda (2026-11-03)
     im.alpha_composite(bo,(bx,by))
     p=im.load()
     if mun:                                                  # öppen mun när han pratar
         p[bx+11,by+12]=hx2('#5A2A1C'); p[bx+12,by+12]=hx2('#5A2A1C'); p[bx+11,by+13]=hx2('#8A3A2E'); p[bx+12,by+13]=hx2('#8A3A2E')
     if baron in ('kikare_fel','kikare_ratt'):
-        k=kikare(baron=='kikare_fel').resize((14,8),Image.NEAREST); im.alpha_composite(k,(bx+13,by+8))
+        k=kikare(baron=='kikare_fel'); im.alpha_composite(k,(bx+13,by+5))   # i ögonhöjd (2026-11-03)
     if baron=='stolt':
         for (x,y) in [(bx+3,by+9),(bx+2,by+8),(bx+20,by+9),(bx+21,by+8)]: p[x,y]=hx2('#E8823A')   # händerna i sidorna
     g=gondol(); im.alpha_composite(g,(34,60))

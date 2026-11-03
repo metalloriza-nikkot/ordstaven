@@ -10,6 +10,7 @@ Läser en kopia av Niklas inkorgsmapp och skriver till repot:
 - rutor/<zon>/<zon>.png  → assets/tiles/<zon>/<zon>.png och <zon>.json (Tilleds rutset, .tsj).
 - bildkort/*.png         → assets/bildkort/<id>.png: läsplattans bildkort, en bild per id (textlagret visar dem).
 - sidovyer/*.png         → assets/sidovyer/<namn>.png: sidovyernas bakgrunder och det som rör sig i dem.
+- karta/kartbit_*.png och karta.json → assets/karta/: Farfars karta, en bild per bit och var bitarna ligger.
 - figurer/*/*_portratt_*.png → också assets/portratt/<namn>.png (ansiktena i pratrutan, i textlagret).
 - ljud/*.wav             → assets/ljud/<namn>.wav, döpta utan mellanslag ("unge_late 2" → unge_late_02).
 
@@ -181,7 +182,7 @@ def main():
         if med(f'foremal/{mapp.name}') and (b := las_bilder(mapp, fel, alla)):
             skriv_atlas(b, repo / 'assets' / 'foremal' / mapp.name, mapp.name, arg.prova)
     # bildkorten och sidovyerna som egna bilder: bildkorten visas i textlagret, sidovyerna är hela skärmar
-    for mapp in ('bildkort', 'sidovyer'):
+    for mapp in ('bildkort', 'sidovyer', 'karta'):
         if not (med(mapp) and (ink / mapp).is_dir()):
             continue
         for namn, im in las_bilder(ink / mapp, fel, alla).items():
@@ -189,6 +190,12 @@ def main():
             if not arg.prova:
                 (repo / 'assets' / mapp).mkdir(parents=True, exist_ok=True)
                 im.save(repo / 'assets' / mapp / f'{namn}.png', optimize=True)
+    # kartans läge för bitarna: läses och skrivs om (bara det som tolkas som JSON följer med)
+    if med('karta') and (ink / 'karta' / 'karta.json').is_file():
+        data = json.loads((ink / 'karta' / 'karta.json').read_text())
+        print('assets/karta/karta.json')
+        if not arg.prova:
+            (repo / 'assets' / 'karta' / 'karta.json').write_text(json.dumps(data, indent=1, ensure_ascii=False) + '\n')
     for mapp in sorted((ink / 'rum').glob('*/')):
         if not med(f'rum/{mapp.name}'):
             continue

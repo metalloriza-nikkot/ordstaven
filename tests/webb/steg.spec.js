@@ -108,6 +108,13 @@ test('radion lärs ut: "Tryck på radion" väntar tills radion har sagt målet i
   expect((await steg(page))?.vantar_pa).toBe('radion');
   await page.click('#hud-radio');
   await expect(page.locator('#plattan .replik-ruta.genom-radio')).toContainText('HITTA BITARNA.');
+  // radiomärket är ritat i Farfars porträtt (beslut 31.2): ingen emoji ovanpå ansiktet
+  const portratt = page.locator('#plattan .replik-ruta.genom-radio .portratt.p-farfar.radio');
+  await expect(portratt).toHaveText('');
+  // en egen bild (radiomärket), inte samma som utan radio
+  const bilder = await portratt.evaluate((e) => { const u = document.createElement('span'); u.className = 'portratt p-farfar'; e.parentElement.appendChild(u); const b = [getComputedStyle(e).backgroundImage, getComputedStyle(u).backgroundImage]; u.remove(); return b; });
+  expect(bilder[0]).toMatch(/^url\(/);
+  expect(bilder[0]).not.toBe(bilder[1]);
   await page.locator('#plattan .replik-ruta').click();
   await expect(page.locator('#plattan .replik-ruta')).toContainText('BRA!', { timeout: 5000 });
 });
@@ -1133,10 +1140,21 @@ test('Pass 3 komplett: luftskeppet i trädgården, baronens porträtt, packlista
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('s22_tradgarden');
   const grafik = () => page.evaluate(() => window.__ORDSTAVEN.grafik());
   const sett = new Set(); const minerna = new Set();
-  let skylt = false;
+  let skylt = false; const pose = { sedd: false, stav: false, under: new Set() };
+  const texter = []; // allt som står på plattan (slutrutan kan komma innan sidovyn syns i snabbläget)
   for (let i = 0; i < 160; i++) {
     const g = await grafik();
+    const tp = await page.evaluate(() => document.querySelector('#plattan')?.textContent || '');
+    if (tp) texter.push(tp);
     if (g.luftskepp) sett.add(g.luftskepp);
+    // hjälten håller upp kartbiten medan baronen spanar på den och talar om den, utan staven
+    const hb = await page.evaluate(() => window.__ORDSTAVEN.hjaltebild());
+    if (hb.bild === 'hjalte_kartbit_upp_01') {
+      if (!pose.sedd) await page.screenshot({ path: 'test-results/pass3-kartbiten.png' });
+      pose.sedd = true; pose.stav ||= hb.stav; if (g.luftskepp) pose.under.add(g.luftskepp);
+    }
+    if (g.luftskepp === 'luftskepp_laser_skyltarna' && !sett.has('skott2')) { sett.add('skott2'); await page.screenshot({ path: 'test-results/pass3-laser-skyltarna.png' }); }
+    if (g.luftskepp?.startsWith('luftskepp_flyger_fel') && !sett.has('skott3')) { sett.add('skott3'); await page.waitForTimeout(500); await page.screenshot({ path: 'test-results/pass3-flyger-fel.png' }); }
     const p = await page.evaluate(() => document.querySelector('#plattan .portratt.p-baronen')?.className ?? null);
     if (p) minerna.add(/u-(\w+)/.exec(p)?.[1] || 'stolt');
     if (g.luftskepp === 'luftskepp_skata_landar' && !sett.has('skott')) { sett.add('skott'); await page.screenshot({ path: 'test-results/pass3-luftskepp.png' }); }
@@ -1152,13 +1170,15 @@ test('Pass 3 komplett: luftskeppet i trädgården, baronens porträtt, packlista
     await page.waitForTimeout(120);
   }
   // lägena i berättelsens ordning (Herr Skata landar två gånger: när han kommer flygande och i mellanscenen)
-  expect((await grafik()).regi.filter((x, i, a) => x !== a[i - 1])).toEqual(['glider', 'skata_landar', 'ser_hjalten', 'talar', 'ser_kartan', 'talar', 'skata_putsar', 'trasslar']);
+  expect((await grafik()).regi.filter((x, i, a) => x !== a[i - 1])).toEqual(['glider', 'skata_landar', 'ser_hjalten', 'talar', 'ser_kartan', 'pose:hjalte_kartbit_upp_01', 'talar', 'skata_putsar', 'pose:-', 'trasslar', 'laser_skyltarna', 'flyger_fel']);
   expect(sett.has('luftskepp_trasslar_02')).toBe(true);
+  expect(pose.stav).toBe(false); // staven syns inte medan han håller upp kartbiten
+  expect([...pose.under].every((x) => /ser_kartan|talar/.test(x))).toBe(true);
+  expect((await page.evaluate(() => window.__ORDSTAVEN.hjaltebild())).bild).not.toBe('hjalte_kartbit_upp_01');
   expect(minerna.has('forvanad') && minerna.has('stolt')).toBe(true);
   expect((await grafik()).hjalm).toBe(true);
   expect((await grafik()).senasteSidovy).toBe('in_i_skogen');
   // kapitel 1 är låst: rubriken "Kapitel 1. Skogen." kommer inte, utan slutrutans krok (granskningen A 21)
-  const texter = [];
   for (let i = 0; i < 40 && !texter.some((t) => t.includes('VAD FINNS I SKOGEN')); i++) {
     const t = await page.evaluate(() => document.querySelector('#plattan')?.textContent || '');
     if (t) texter.push(t);
@@ -1191,4 +1211,108 @@ test('Packlistans bildkort: Stils bilder i stället för emoji', async ({ page }
   expect(kort.length).toBeGreaterThanOrEqual(6);
   for (const [, b, rest] of kort) { expect(b).toBe(48); expect(rest).toBe(0); }
   await page.screenshot({ path: 'test-results/pass3-packlista.png' });
+});
+
+test('kartbiten: Stils bild i närbilden, i festen och i KARTAN, där den hör hemma i kartan (Stil 21:20)', async ({ page }) => {
+  await provscen(page, { id: 't_kartbit', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', vy: 'narbild',
+    steg: [R('En kartbit!'), { typ: 'ge_kartbit', nummer: 1 }, R('Visa den för Farfar!'), { typ: 'ga_till', mal: 'stege_ner' }] });
+  await expect(page.locator('#narbild .karta-bitar img[data-bit="1"]')).toBeVisible({ timeout: 5000 });
+  await expect(page.locator('#narbild')).not.toContainText('🗺️');
+  // heltalsskala: bildens bredd i fysiska pixlar är en jämn multipel av bitens 87 pixlar
+  const fysisk = await page.evaluate(() => document.querySelector('#narbild .kartbit-bild').getBoundingClientRect().width * devicePixelRatio);
+  expect(Math.abs(fysisk / 87 - Math.round(fysisk / 87))).toBeLessThan(0.01);
+  await page.screenshot({ path: 'test-results/kartbit-narbild.png' });
+  await page.evaluate(() => { window.__festbit = false; new MutationObserver(() => { if (document.querySelector('#fest .karta-bitar')) window.__festbit = true; }).observe(document.querySelector('#fest'), { childList: true, subtree: true }); });
+  await page.locator('#plattan .replik-ruta').click();
+  await expect.poll(() => page.evaluate(() => window.__festbit), { timeout: 5000 }).toBe(true);
+  await expect.poll(async () => (await steg(page))?.typ, { timeout: 8000 }).toBe('replik');
+  await page.locator('#plattan .replik-ruta').click();
+  await expect.poll(async () => (await steg(page))?.typ, { timeout: 8000 }).toBe('ga_till');
+  await expect(page.locator('#narbild')).toBeHidden();
+  await page.click('#hud-paus');
+  await page.click('#pausmeny .paus-val[data-val="kartan"]');
+  await expect(page.locator('#pausmeny .paus-karta .karta-bitar img[data-bit="1"]')).toBeVisible();
+  await expect(page.locator('#pausmeny .paus-karta .kartbit')).toHaveCount(0); // ingen emoji för en ritad bit
+  await page.screenshot({ path: 'test-results/kartbit-kartan.png' });
+  await page.click('#pausmeny .paus-stang');
+});
+
+test('efter en dialog står målet kvar i molnet med en bild tills han är framme, och ungen nosar mot det efter ca 10 s (31.2)', async ({ page }) => {
+  test.setTimeout(60000);
+  await provscen(page, { id: 't_malmoln', pass: 3, rum: 'hallen', tillstand: 'morgon', steg: [R('Frukost! Kom till köket!', 'farfar'), { typ: 'ga_till', mal: 'dorr_mat' }, R('Klart.')] });
+  await page.locator('#plattan .replik-ruta').click({ timeout: 8000 });
+  await expect.poll(async () => (await steg(page))?.typ, { timeout: 8000 }).toBe('ga_till');
+  const moln = page.locator('#tanke');
+  await expect(moln).toBeVisible();
+  await expect(moln.locator('.instruktion')).toHaveText('FRUKOST! KOM TILL KÖKET!');
+  await expect(moln.locator('img.malbild[data-bild="dorr_mat"]')).toBeVisible();
+  // molnet står nere till vänster
+  const r = await moln.boundingBox(), s = await page.evaluate(() => window.__ORDSTAVEN.skala());
+  expect(r.x).toBeLessThan(s.vanster + s.cssBredd / 3);
+  expect(r.y + r.height).toBeGreaterThan(s.topp + s.cssHojd / 2);
+  await page.screenshot({ path: 'test-results/mal-i-molnet.png' });
+  // ungens knuff efter ca 10 s: den nosar mot dörren
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.ungeMal()), { timeout: 13000, intervals: [500] }).not.toBeNull();
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('[knuff] ungen nosar mot målet: dorr_mat');
+  await page.locator('#skyltar .skylt[data-objekt="dorr_mat"] .kort').click();
+  await expect.poll(async () => (await steg(page))?.typ, { timeout: 10000 }).toBe('replik');
+  await expect(moln).toBeHidden();
+  expect(await page.evaluate(() => window.__ORDSTAVEN.ungeMal())).toBeNull();
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toMatch(/\[framme\] dorr_mat .*"efter_dialog":true/);
+});
+
+test('dörrarnas lappar täcker aldrig varandra eller hjälten, var han än står i hallen (31.2)', async ({ page }) => {
+  test.setTimeout(60000);
+  await provscen(page, { id: 't_lappar', pass: 1, rum: 'hallen', tillstand: 'natt', steg: [{ typ: 'ga_till', mal: 'dorr_ut', vid_annan_utgang: { ljud: 'dunk' } }, R('Ute.')] });
+  await expect(page.locator('#skyltar .skylt')).toHaveCount(5, { timeout: 5000 });
+  const krockar = () => page.evaluate(() => {
+    const p = window.__ORDSTAVEN.position(), s = window.__ORDSTAVEN.skala(), k = window.__ORDSTAVEN.kamera();
+    const hj = { left: s.vanster + (p.x - 8 - k.x) * s.cssSkala, right: s.vanster + (p.x + 8 - k.x) * s.cssSkala, top: s.topp + (p.y - 26 - k.y) * s.cssSkala, bottom: s.topp + (p.y - k.y) * s.cssSkala };
+    const r = [...document.querySelectorAll('#skyltar .skylt')].map((e) => ({ id: e.dataset.objekt, ...e.getBoundingClientRect().toJSON() }))
+      .filter((q) => q.right > s.vanster && q.left < s.vanster + s.cssBredd); // de som syns
+    const over = (a, b) => a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1;
+    const fel = [];
+    for (let i = 0; i < r.length; i++) { if (over(r[i], hj)) fel.push(`${r[i].id} täcker hjälten|` + JSON.stringify({ q: [r[i].left, r[i].top, r[i].right, r[i].bottom].map(Math.round), hj: [hj.left, hj.top, hj.right, hj.bottom].map(Math.round), undan: document.querySelector(`#skyltar .skylt[data-objekt="${r[i].id}"]`).dataset.undan, alla: r.map((x) => [x.id, Math.round(x.left), Math.round(x.top), Math.round(x.right)]) })); for (let j = i + 1; j < r.length; j++) if (over(r[i], r[j])) fel.push(`${r[i].id} över ${r[j].id}`); }
+    return fel;
+  });
+  // han går längs bakväggen, där lapparna står, från höger till vänster och tillbaka. Lapparna ordnas om några
+  // gånger i sekunden, så ett fel räknas när det står kvar i två prov i rad (inte medan han precis har klivit in)
+  const fel = new Set();
+  let forra = new Set();
+  let undan = 0;
+  const prova = async () => {
+    const lista = await krockar(); const nu = new Set(lista.map((f) => f.split('|')[0]));
+    for (const f of lista) if (forra.has(f.split('|')[0])) fel.add(f); forra = nu;
+    undan += await page.locator('#skyltar .skylt[data-undan]').count();
+  };
+  // upp till bakväggen, där han går rakt under lapparna
+  await page.keyboard.down('ArrowLeft'); await page.waitForTimeout(800); await page.keyboard.up('ArrowLeft');
+  await page.keyboard.down('ArrowUp'); await page.waitForTimeout(1500); await page.keyboard.up('ArrowUp');
+  for (const tangent of ['ArrowLeft', 'ArrowRight']) {
+    await page.keyboard.down(tangent);
+    for (let i = 0; i < 14; i++) { await page.waitForTimeout(250); await prova(); }
+    await page.keyboard.up(tangent);
+    await page.waitForTimeout(300); await prova(); await page.waitForTimeout(150); await prova();
+  }
+  await page.screenshot({ path: 'test-results/lappar-hallen.png' });
+  expect([...fel]).toEqual([]);
+  expect(undan).toBeGreaterThan(0); // han gick under lapparna, och de flyttade sig
+});
+
+test('målet i molnet efter radion: instruktionen före "Tryck på radion" står där, och den följer med till nästa rum (s21, 31.2)', async ({ page }) => {
+  test.setTimeout(60000);
+  await provscen(page, { id: 't_malradio', pass: 3, rum: 'koket', tillstand: 'morgon', steg: [{ typ: 'visa_ui', element: 'radioramen' },
+    R('Hitta bitarna. Följ {unge} hem!', 'farfar', { via: 'radio' }), R('Tryck på radion, så säger jag det igen.', 'farfar', { vantar_pa: 'radion' }), { typ: 'ga_till', mal: 'dorr_hallen' }] },
+  null, { efter: [{ id: 't_malradio_hall', pass: 3, rum: 'hallen', tillstand: 'morgon', steg: [{ typ: 'ga_till', mal: 'dorr_ut' }, R('Ute.')] }] });
+  await page.locator('#plattan .replik-ruta').click({ timeout: 8000 });
+  await expect.poll(async () => (await steg(page))?.vantar_pa, { timeout: 5000 }).toBe('radion');
+  await page.click('#hud-radio');
+  await page.locator('#plattan .replik-ruta').click({ timeout: 8000 });
+  await expect.poll(async () => (await steg(page))?.typ, { timeout: 8000 }).toBe('ga_till');
+  await expect(page.locator('#tanke .instruktion')).toHaveText('HITTA BITARNA. FÖLJ KNOPP HEM!');
+  await expect(page.locator('#tanke img.malbild[data-bild="dorr_hallen"]')).toBeVisible();
+  await tryckPa(page, 'dorr_hallen');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 10000 }).toBe('t_malradio_hall');
+  await expect(page.locator('#tanke img.malbild[data-bild="dorr_ut"]')).toBeVisible({ timeout: 5000 });
+  await expect(page.locator('#tanke .instruktion')).toHaveText('HITTA BITARNA. FÖLJ KNOPP HEM!');
 });

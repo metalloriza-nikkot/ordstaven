@@ -126,16 +126,29 @@ describe('mellanscenernas bilder och bildkorten', () => {
     for (const k of kapitel) for (const sc of k.scener) for (const st of sc.steg) {
       if (st.typ !== 'mellanscen' || !st.bild) continue;
       const finns = st.bild === 'hjalte_sang_morgon' ? ramar.has('hjalte_sang_morgon_01') && ramar.has('hjalte_sang_morgon_02')
-        : st.bild === 'luftskepp_ser_kartan' ? ramar.has('luftskepp_ser_hjalten') // samma bild (Rum.luftskepp)
-          : st.bild.startsWith('luftskepp_') ? ramar.has(st.bild) || ramar.has(st.bild + '_01')
+        : st.bild.startsWith('luftskepp_') ? ramar.has(st.bild) || ramar.has(st.bild + '_01')
           : existsSync(new URL(`assets/sidovyer/${st.bild}_bakgrund.png`, rot));
       if (!finns) saknas.push(`${k.id} ${sc.id}: ${st.bild}`);
     }
     expect(saknas).toEqual([]);
   });
   it('luftskeppet har alla bilder som regin använder, och hjälmen som trillar', () => {
-    for (const r of ['glider_01', 'glider_02', 'skata_landar', 'ser_hjalten', 'talar_01', 'talar_02', 'skata_putsar_01', 'skata_putsar_02', 'skata_snor', 'trasslar_01', 'trasslar_02']) expect(ramar.has('luftskepp_' + r), r).toBe(true);
+    for (const r of ['glider_01', 'glider_02', 'skata_landar', 'ser_hjalten', 'ser_kartan', 'talar_01', 'talar_02', 'skata_putsar_01', 'skata_putsar_02', 'skata_snor', 'trasslar_01', 'trasslar_02',
+      'laser_skyltarna', 'laser_skyltarna_talar', 'flyger_fel_01', 'flyger_fel_02']) expect(ramar.has('luftskepp_' + r), r).toBe(true);
     expect(ramar.has('baronen_hjalm')).toBe(true);
+    expect(ramar.has('hjalte_kartbit_upp_01')).toBe(true); // hjälten håller upp kartbiten (s22)
+  });
+  it('Farfars porträtt har radiomärket, och kartbit 1 och 2 finns med sitt läge i kartan', () => {
+    for (const m of ['glad', 'fundersam']) expect(existsSync(new URL(`assets/portratt/farfar_portratt_${m}_radio.png`, rot)), m).toBe(true);
+    const karta = JSON.parse(las('assets/karta/karta.json').toString());
+    expect(karta.storlek).toEqual([224, 144]);
+    const storlek = (f) => { const png = las(f); return [png.readUInt32BE(16), png.readUInt32BE(20)]; };
+    for (const n of [1, 2]) {
+      const f = `assets/karta/kartbit_${n}.png`, [b, h] = storlek(f), l = karta.bitar[`kartbit_${n}`];
+      expect(l, f).toBeTruthy();
+      // biten ligger inne i kartan
+      expect(l.x + b <= 224 && l.y + h <= 144, f).toBe(true);
+    }
   });
   it('bildkorten är 48 × 48, och sidovyns bakgrund fyller skärmen (320 × 192)', () => {
     const storlek = (f) => { const png = las(f); return [png.readUInt32BE(16), png.readUInt32BE(20)]; };

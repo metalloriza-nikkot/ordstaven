@@ -400,7 +400,7 @@
     "h": 48
    }
   },
-  "luftskepp_glider_01": {
+  "luftskepp_flyger_fel_01": {
    "frame": {
     "x": 0,
     "y": 162,
@@ -420,7 +420,7 @@
     "h": 96
    }
   },
-  "luftskepp_glider_02": {
+  "luftskepp_flyger_fel_02": {
    "frame": {
     "x": 113,
     "y": 162,
@@ -440,7 +440,7 @@
     "h": 96
    }
   },
-  "luftskepp_ser_hjalten": {
+  "luftskepp_glider_01": {
    "frame": {
     "x": 0,
     "y": 259,
@@ -460,7 +460,27 @@
     "h": 96
    }
   },
-  "luftskepp_skata_landar": {
+  "luftskepp_glider_02": {
+   "frame": {
+    "x": 113,
+    "y": 259,
+    "w": 112,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 112,
+    "h": 96
+   }
+  },
+  "luftskepp_laser_skyltarna": {
    "frame": {
     "x": 0,
     "y": 356,
@@ -480,7 +500,7 @@
     "h": 96
    }
   },
-  "luftskepp_skata_putsar_01": {
+  "luftskepp_laser_skyltarna_talar": {
    "frame": {
     "x": 0,
     "y": 453,
@@ -500,27 +520,7 @@
     "h": 96
    }
   },
-  "luftskepp_skata_putsar_02": {
-   "frame": {
-    "x": 113,
-    "y": 453,
-    "w": 112,
-    "h": 96
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 112,
-    "h": 96
-   },
-   "sourceSize": {
-    "w": 112,
-    "h": 96
-   }
-  },
-  "luftskepp_skata_snor": {
+  "luftskepp_ser_hjalten": {
    "frame": {
     "x": 0,
     "y": 550,
@@ -540,10 +540,110 @@
     "h": 96
    }
   },
-  "luftskepp_talar_01": {
+  "luftskepp_ser_kartan": {
+   "frame": {
+    "x": 113,
+    "y": 550,
+    "w": 112,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 112,
+    "h": 96
+   }
+  },
+  "luftskepp_skata_landar": {
    "frame": {
     "x": 0,
     "y": 647,
+    "w": 112,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 112,
+    "h": 96
+   }
+  },
+  "luftskepp_skata_putsar_01": {
+   "frame": {
+    "x": 0,
+    "y": 744,
+    "w": 112,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 112,
+    "h": 96
+   }
+  },
+  "luftskepp_skata_putsar_02": {
+   "frame": {
+    "x": 113,
+    "y": 744,
+    "w": 112,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 112,
+    "h": 96
+   }
+  },
+  "luftskepp_skata_snor": {
+   "frame": {
+    "x": 0,
+    "y": 841,
+    "w": 112,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 112,
+    "h": 96
+   }
+  },
+  "luftskepp_talar_01": {
+   "frame": {
+    "x": 0,
+    "y": 938,
     "w": 112,
     "h": 96
    },
@@ -563,7 +663,7 @@
   "luftskepp_talar_02": {
    "frame": {
     "x": 113,
-    "y": 647,
+    "y": 938,
     "w": 112,
     "h": 96
    },
@@ -583,7 +683,7 @@
   "luftskepp_trasslar_01": {
    "frame": {
     "x": 0,
-    "y": 744,
+    "y": 1035,
     "w": 112,
     "h": 96
    },
@@ -603,7 +703,7 @@
   "luftskepp_trasslar_02": {
    "frame": {
     "x": 113,
-    "y": 744,
+    "y": 1035,
     "w": 112,
     "h": 96
    },
@@ -626,7 +726,7 @@
   "format": "RGBA8888",
   "size": {
    "w": 226,
-   "h": 841
+   "h": 1132
   },
   "scale": "1",
   "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."

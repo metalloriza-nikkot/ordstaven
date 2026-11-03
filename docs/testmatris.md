@@ -1,6 +1,6 @@
 # Testmatris
 
-Version 0.2 (2026-10-30). Princip: spelet ska fungera i en modern webbläsare på dator och iPad. **Den svagaste enheten är golvet.**
+Version 0.3 (2026-11-03). Princip: spelet ska fungera i en modern webbläsare på dator och iPad. **Den svagaste enheten är golvet.**
 
 **Golvet (beslut 19):** MacBook Pro 13" 2015 med **ritning i mjukvara**: canvas, utan grafikkort. Den kör macOS Sequoia via OpenCore, och Chrome har stängt av grafikkortet (`chrome://gpu`). Safari tappar WebGL på samma dator. **Målet** är jämn rörelse, minst ca 30 bildrutor per sekund. Varje fas testas där.
 
@@ -11,7 +11,7 @@ I canvasläget ritar spelet högst 30 bildrutor per sekund, och bara när något
 | Enhet | Webbläsare | Roll | Från fas |
 |---|---|---|---|
 | MacBook Pro 13" (2015, macOS Sequoia via OpenCore, utan grafikkort i webbläsaren) | Chrome (canvas), Safari | Primär, golvet för prestanda | 1 |
-| Windows-dator | Chrome eller Edge | Sekundär | 1 |
+| Windows-dator (den vuxnes arbetsdator) | Chrome-appen (installerad), Chrome eller Edge | Sekundär. Den vuxne testar här, inte i barnets app (beslut 28.5, 31.10). | 1 |
 | iPad | Safari, installerad på hemskärmen | Sekundär | 1 (grind), fullt från 2 |
 | Ny utvecklingsdator | Chrome/Safari | Utveckling. Ändrar inte golvet. | – |
 

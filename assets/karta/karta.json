@@ -1,0 +1,37 @@
+{
+ "om": "Var varje bit ligger i hela kartan (224 x 144), övre vänstra hörnet. Bitarna läggs ihop med 1 pixels glipa (rivna kanter).",
+ "storlek": [
+  224,
+  144
+ ],
+ "bitar": {
+  "kartbit_1": {
+   "x": 69,
+   "y": 42
+  },
+  "kartbit_2": {
+   "x": 0,
+   "y": 95
+  },
+  "kartbit_3": {
+   "x": 0,
+   "y": 43
+  },
+  "kartbit_4": {
+   "x": 0,
+   "y": 0
+  },
+  "kartbit_5": {
+   "x": 113,
+   "y": 0
+  },
+  "kartbit_6": {
+   "x": 149,
+   "y": 43
+  },
+  "kartbit_7": {
+   "x": 105,
+   "y": 95
+  }
+ }
+}

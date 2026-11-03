@@ -80,10 +80,50 @@
     "h": 48
    }
   },
+  "farfar_portratt_fundersam_radio": {
+   "frame": {
+    "x": 0,
+    "y": 128,
+    "w": 48,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 48,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 48,
+    "h": 48
+   }
+  },
   "farfar_portratt_glad": {
    "frame": {
-    "x": 49,
-    "y": 79,
+    "x": 0,
+    "y": 177,
+    "w": 48,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 48,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 48,
+    "h": 48
+   }
+  },
+  "farfar_portratt_glad_radio": {
+   "frame": {
+    "x": 0,
+    "y": 226,
     "w": 48,
     "h": 48
    },
@@ -105,8 +145,8 @@
   "image": "farfar.png",
   "format": "RGBA8888",
   "size": {
-   "w": 98,
-   "h": 128
+   "w": 49,
+   "h": 275
   },
   "scale": "1",
   "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."

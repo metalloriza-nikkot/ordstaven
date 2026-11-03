@@ -187,6 +187,8 @@ html, body {
 /* Farfars och baronens porträtt (beslut 27.4, Stil 20:35): pixelbilden i ramen, skalad utan utjämning.
    Baronens min följer vad som händer i rummet (u-forvanad, u-sur), annars är han stolt. */
 .p-farfar { background: #8a6a4a url('../assets/portratt/farfar_portratt_glad.png') center / cover no-repeat; image-rendering: pixelated; } .p-berattare { display: none; }
+/* genom radion: samma ansikte med en liten radio i nedre högra hörnet (beslut 31.2), ingen emoji ovanpå */
+.p-farfar.radio { background-image: url('../assets/portratt/farfar_portratt_glad_radio.png'); }
 .p-baronen { background: #9fd0ee url('../assets/portratt/baronen_portratt_stolt.png') center / cover no-repeat; image-rendering: pixelated; }
 .p-baronen.u-forvanad { background-image: url('../assets/portratt/baronen_portratt_forvanad.png'); }
 .p-baronen.u-sur { background-image: url('../assets/portratt/baronen_portratt_sur.png'); }
@@ -360,6 +362,8 @@ html, body {
 #tanke .bild.bubbla .bubbla-prick { display: none; }
 #tanke .moln-hogtalare { pointer-events: auto; flex: none; width: 48px; height: 48px; border-radius: 24px; font-size: 24px; background: #efe6d2; align-self: flex-start; }
 #tanke .bild.bubbla { font-size: inherit; }
+/* målet i molnet efter en dialog (beslut 31.2): föremålets egen pixelbild, i heltalsskala */
+#tanke .bild.malbild { image-rendering: pixelated; flex: none; display: block; }
 #tanke .tanke-lapp { pointer-events: auto; font-size: inherit; background: none; border: 0; cursor: pointer; padding: 0 4px; }
 #tanke.puls { animation: tankepuls .6s ease-in-out 3; }
 @keyframes tankepuls { 50% { scale: 1.12; } }
@@ -569,6 +573,9 @@ html, body {
 .paus-sida .kort.vald { box-shadow: 0 5px 0 #b8892b, 0 0 0 4px var(--guld); }
 .paus-karta { display: flex; gap: 14px; min-height: 120px; align-items: center; }
 .kartbit { position: relative; font-size: 72px; }
+/* Farfars karta: bitarna ihop där de hör hemma, i heltalsskala (src/grans/kartbitar.js) */
+.karta-bitar { position: relative; display: inline-block; flex: none; }
+.karta-bitar .kartbit-bild { position: absolute; image-rendering: pixelated; display: block; }
 .kartbit b { position: absolute; right: -4px; bottom: -4px; font-size: 28px; background: var(--papper); border-radius: 50%; padding: 0 8px; }
 .paus-stang { align-self: flex-end; }
 .paus-tillbaka { position: absolute; left: 16px; top: 16px; }

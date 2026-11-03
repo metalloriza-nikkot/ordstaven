@@ -95,6 +95,8 @@ export class Rum extends Phaser.Scene {
     this.senasteSidovy = null;
     /** @type {string[]} luftskeppets lägen i den ordning de visades (för testerna) */
     this.regiLogg = [];
+    /** @type {string | null} en hel bild av hjälten i stället för gången (kartbiten upp mot luftskeppet, s22) */
+    this.hjaltePose = null;
     this.tillstand = /** @type {string | null} */ (null);
     /** @type {{ ids: string[], klar: (id: string) => void } | null} */
     this.vantar = null;
@@ -342,13 +344,17 @@ export class Rum extends Phaser.Scene {
    */
   ritaHjalte() {
     if (!this.kropp) return;
-    const r = this.rygg ? 'upp' : riktningFor(this.vand);
+    const r = this.rygg || this.hjaltePose ? 'upp' : riktningFor(this.vand);
     const i = this.gar ? Math.floor((this.gang || 0) / GANG_STEG) % 4 : 0;
     // på stegen: klättra med ryggen mot oss (två bilder som växlar medan han klättrar)
     const klattrar = this.klattrar && this.textures.get('hjalte').has('hjalte_klattra_upp_01');
-    const namn = klattrar ? `hjalte_klattra_upp_0${1 + (Math.floor(this.pos.y / 6) % 2)}` : `hjalte_ga_${r}_0${i + 1}`;
+    const pose = !klattrar && this.hjaltePose;
+    const namn = pose || (klattrar ? `hjalte_klattra_upp_0${1 + (Math.floor(this.pos.y / 6) % 2)}` : `hjalte_ga_${r}_0${i + 1}`);
     if (this.kropp.frame.name !== namn) { this.kropp.setFrame(namn); this.smutsig = true; }
-    this.stav?.setVisible(!!this.harStav && !klattrar);
+    // en hel bild (32 × 40) står med fötterna där gångens bild (16 × 24) har dem
+    const px = pose ? -8 : 0, py = pose ? -16 : 0;
+    if (this.kropp.x !== px || this.kropp.y !== py) { this.kropp.setPosition(px, py); this.smutsig = true; }
+    this.stav?.setVisible(!!this.harStav && !klattrar && !pose);
     if (this.stav && this.stav.frame.name !== `stav_hand_${r}_01`) this.stav.setFrame(`stav_hand_${r}_01`);
     const sida = r === 'hoger' || r === 'vanster';
     this.sackBak?.setVisible(sida).setFrame(`ryggsack_${r}_01`);
@@ -452,13 +458,19 @@ export class Rum extends Phaser.Scene {
       const lage = bild.slice('luftskepp_'.length);
       return this.luftskepp(lage) ? ({ glider: 2800, skata_putsar: 2200, trasslar: 2000 })[lage] ?? 1400 : 0;
     }
-    if (this.textures.exists(`sidovy_${bild}_bakgrund`)) { this.visaSidovy(bild); return 4200; }
+    if (this.textures.exists(`sidovy_${bild}_bakgrund`)) {
+      // luftskeppet flyger först iväg åt fel håll, mot SKOLAN (Stil 21:20), sedan kommer sidovyn
+      const ms = this.luft && this.flygFel() ? 1600 : 0;
+      if (ms && this.luft) this.luft.tider.push(this.time.delayedCall(ms, () => this.visaSidovy(bild))); else this.visaSidovy(bild);
+      return ms + 4200;
+    }
     return 0;
   }
 
   /** Luftskeppet, hjälmen och sidovyn tas bort (nytt rum). */
   rensaRegi() {
     if (this.luft) { for (const t of this.luft.tider) t.remove(); this.luft.gung.remove(); this.tweens.killTweensOf(this.luft.img); this.luft = null; }
+    this.sattPose(null);
     this.lagerLuft?.each((/** @type {any} */ x) => this.tweens.killTweensOf(x));
     this.lagerLuft?.removeAll(true);
     if (this.sidovy) this.rensaSidovy();
@@ -481,10 +493,14 @@ export class Rum extends Phaser.Scene {
    * berättelsens ordning, men vart och ett går att visa direkt (efter en omstart mitt i scenen).
    * - glider: glider in från vänster med snurrande propeller, kikaren åt fel håll, och svävar sedan stilla;
    * - skata_landar: Herr Skata på hjälmen, fjädern på sned;
-   * - ser_hjalten: kikaren vänd, han ser hjälten (ser_kartan: samma bild, när han spanar på kartbiten);
+   * - ser_hjalten: kikaren vänd, han ser hjälten;
+   * - ser_kartan: kikaren ned mot kartbiten, ögat blir stort, och hjälten håller upp kartbiten (till nästa läge
+   *   som inte är talar);
    * - talar: munnen öppen och stängd (medan baronen talar, se `talar`);
    * - skata_putsar: Herr Skata putsar sig och snor en medalj;
-   * - trasslar: baronen trasslar in sig i repstegen, och hjälmen trillar ned på gräset.
+   * - trasslar: baronen trasslar in sig i repstegen, och hjälmen trillar ned på gräset;
+   * - laser_skyltarna: utan hjälm läser han skyltarna med kikaren åt fel håll (munnen rör sig när han talar);
+   * - flyger_fel: se `flygFel`.
    * @param {string} lage @returns {boolean}
    */
   luftskepp(lage) {
@@ -501,6 +517,8 @@ export class Rum extends Phaser.Scene {
     this.regiLogg.push(lage); if (this.regiLogg.length > 40) this.regiLogg.shift();
     for (const t of l.tider) t.remove();
     l.tider = []; l.lage = lage;
+    // hjälten håller upp kartbiten från att baronen ser den tills han har talat klart om den (Stil 21:20)
+    if (lage === 'ser_kartan') this.sattPose('hjalte_kartbit_upp_01'); else if (lage !== 'talar') this.sattPose(null);
     const ram = (/** @type {string} */ r) => { img.setFrame(`luftskepp_${r}`); this.smutsig = true; };
     // två bilder om vartannat tills läget byts
     const vaxla = (/** @type {string[]} */ ramar, /** @type {number} */ ms) => {
@@ -524,10 +542,42 @@ export class Rum extends Phaser.Scene {
       sedan(700, () => { ram('trasslar_02'); this.tappaHjalmen(); });
       return true;
     }
-    // han spanar på kartbiten med kikaren (v0.11.3): samma bild som när han har vänt kikaren mot hjälten
-    if (lage === 'ser_kartan') { ram('ser_hjalten'); return true; }
+    if (lage === 'flyger_fel') { vaxla(['flyger_fel_01', 'flyger_fel_02'], 140); return true; }
     if (this.textures.get('baronen').has(`luftskepp_${lage}`)) { ram(lage); return true; }
     return false;
+  }
+
+  /**
+   * Baronen flyger åt fel håll (efter "Till skolan!"): propellern snurrar, och luftskeppet glider ned åt höger mot
+   * stigen till byn (SKOLAN) och ut ur bild. @returns {boolean} om det finns bilder
+   */
+  flygFel() {
+    const l = this.luft;
+    if (!l || !this.textures.get('baronen').has('luftskepp_flyger_fel_01')) return false;
+    this.luftskepp('flyger_fel');
+    const img = l.img, byn = this.ruta('stig_byn');
+    const fran = { x: img.x + img.width / 2, y: img.y + img.height / 2 };
+    const mot = byn ? { x: byn.x + byn.b / 2, y: byn.y + byn.h / 2 } : { x: fran.x + 200, y: fran.y + 80 };
+    const d = Math.hypot(mot.x - fran.x, mot.y - fran.y) || 1;
+    const ut = 360; // långt nog för att lämna bilden
+    l.glider = true;
+    this.tweens.add({
+      targets: img, x: img.x + ((mot.x - fran.x) / d) * ut, y: img.y + ((mot.y - fran.y) / d) * ut, duration: 1500, ease: 'Sine.easeIn',
+      onUpdate: () => { img.x = Math.round(img.x); img.y = Math.round(img.y); this.smutsig = true; },
+    });
+    return true;
+  }
+
+  /**
+   * En hel bild av hjälten i stället för gången (32 × 40 som svingen, fötterna där gångens fötter är), eller null.
+   * Staven göms så länge. @param {string | null} bild
+   */
+  sattPose(bild) {
+    const ny = bild && this.textures.exists('hjalte') && this.textures.get('hjalte').has(bild) ? bild : null;
+    if (ny === this.hjaltePose) return;
+    this.hjaltePose = ny; this.smutsig = true;
+    this.regiLogg.push(`pose:${ny ?? '-'}`); if (this.regiLogg.length > 40) this.regiLogg.shift();
+    this.ritaHjalte();
   }
 
   /** Baronens tropikhjälm trillar ur gondolen och landar i gräset, där den ligger kvar. */
@@ -550,7 +600,17 @@ export class Rum extends Phaser.Scene {
    */
   talar(talare, pa) {
     const l = this.luft;
-    if (talare !== 'baronen' || !l || !['ser_hjalten', 'ser_kartan', 'talar'].includes(l.lage)) return;
+    if (talare !== 'baronen' || !l) return;
+    // han läser skyltarna: munnen rör sig i samma bild (kikaren kvar)
+    if (l.lage === 'laser_skyltarna') {
+      for (const t of l.tider) t.remove(); l.tider = [];
+      const img = l.img, ram = (/** @type {string} */ r) => { img.setFrame(r); this.smutsig = true; };
+      if (!pa || !img.texture.has('luftskepp_laser_skyltarna_talar')) { ram('luftskepp_laser_skyltarna'); return; }
+      let i = 0;
+      l.tider.push(this.time.addEvent({ delay: 180, loop: true, callback: () => { i++; ram(i % 2 ? 'luftskepp_laser_skyltarna_talar' : 'luftskepp_laser_skyltarna'); } }));
+      return;
+    }
+    if (!['ser_hjalten', 'ser_kartan', 'talar'].includes(l.lage)) return;
     if (pa) this.luftskepp('talar');
     else { for (const t of l.tider) t.remove(); l.tider = []; l.img.setFrame('luftskepp_talar_02'); this.smutsig = true; }
   }
@@ -649,6 +709,21 @@ export class Rum extends Phaser.Scene {
         },
       });
     });
+  }
+
+  /**
+   * Föremålets bild som en bild-URL (målet i molnet, beslut 31.2), eller null om föremålet inte har någon bild.
+   * @param {string} id @returns {{ url: string, b: number, h: number } | null}
+   */
+  malBild(id) {
+    const o = this.ruta(id);
+    const fb = o?.bild ? foremalsbild(this, o.bild) : null;
+    if (!fb) return null;
+    try {
+      const ram = this.textures.getFrame(fb.nyckel, fb.ram);
+      const url = this.textures.getBase64(fb.nyckel, fb.ram);
+      return url && ram ? { url, b: ram.cutWidth, h: ram.cutHeight } : null;
+    } catch (e) { return null; }
   }
 
   /** En bild av rummet som det ser ut nu (för glidningen mellan rum). @returns {Promise<HTMLImageElement | null>} */
