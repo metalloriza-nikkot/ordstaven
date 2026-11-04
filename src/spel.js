@@ -529,6 +529,8 @@ export function skapaSpel(d) {
   let sovitI = /** @type {string | null} */ (null);
   async function visaScen(scen = b.scen, steg = undefined) {
     if (!scen) return;
+    // spelet startade om mitt i en avstickare: rummet han var i visas, med scenens id (beslut 26.2)
+    if (aterAvstickare && scen === b.scen && b.rum(aterAvstickare.rum) && (b.aktuellt()?.omstart || b.aktuellt()?.typ === 'ga_till')) scen = { id: scen.id, rum: aterAvstickare.rum, steg: [] };
     visadScen = scen;
     if (scen.id !== senasteScen) { senaste.clear(); senasteScen = scen.id; }
     const nytt = scen.rum !== aktuelltRum;
@@ -1045,7 +1047,8 @@ export function skapaSpel(d) {
   /** @param {any} st */
   async function gaTill(st) {
     rum.frys(false);
-    if (!rum.ruta(st.mal)) { logg.handelse('FEL', 'objektet finns inte i rummet: ' + st.mal); return; }
+    // (står han kvar i en avstickare efter en omstart finns målet i scenens rum, inte här)
+    if (!rum.ruta(st.mal) && !aterAvstickare) { logg.handelse('FEL', 'objektet finns inte i rummet: ' + st.mal); return; }
     if (st.visa_styrhjalp) rum.markera(st.mal, true);
     // styrhjälpen visar hur man går på just den här enheten: piltangenter på dator, ett finger som trycker på pekskärm.
     // Den försvinner så fort hjälten börjar gå.
@@ -1093,8 +1096,10 @@ export function skapaSpel(d) {
     // sidogren (en frivillig scen, buskarna). Efteråt fortsätter steget som förut.
     /** @type {string[]} sidogrenar han tog under det fria vägvalet, i ordning (loggen, beslut 17.1) */
     const tog = [];
+    // spelet startade om mitt i en avstickare: han står kvar i rummet han var i
+    if (aterAvstickare) { const a = aterAvstickare; aterAvstickare = null; k.stopp(); await avstickare(null, st, visaMal, a); k.nollstall(); }
     for (;;) {
-      const sidor = st.fri_vag ? sidoUtgangar(st.mal) : [];
+      const sidor = st.vid_annan_utgang ? [] : sidoUtgangar(st.mal, !!st.fri_vag);
       const fri = frivilligaKvar().filter((id) => id !== st.mal);
       const bortSkyltar = visaUtgangsSkyltar();
       visaMal();
@@ -1108,7 +1113,7 @@ export function skapaSpel(d) {
       if (st.fri_vag && sidor.includes(id)) { logg.handelse('vägval', tog.length ? `${id} (sedan ${tog.join(', ')})` : `${id} först`); tog.push(id); }
       k.stopp(); window.clearInterval(styr); ui.styrhjalp(null); rum.markera(st.mal, false);
       if (iMolnet) { visaMoln(null); rum.ungePekar(null); }
-      if (fri.includes(id)) await korFrivilligt(id); else await sidoScen(id);
+      if (fri.includes(id)) await korFrivilligt(id); else await avstickare(id, st, visaMal);
       rum.frys(false); k.nollstall();
     }
     if (skyltMal) skyltStyrs.delete(st.mal); // pusslet tar över skylten (den öppnas inte av sig själv, han står redan där)
@@ -1171,33 +1176,129 @@ export function skapaSpel(d) {
     aktuelltSteg = forra;
     ui.uppdateraHud(av); spara(); rum.frys(false);
   }
-  /** Utgångar till en frivillig scen som inte är spelad (stig_buskarna). @param {string} mal utgången steget väntar på */
-  function sidoUtgangar(mal) {
-    return rum.objekt.filter((o) => o.sort === 'utgang' && o.id !== mal && !lastNu(o) && !!tillFor(o) && !!b.frivilligScen(/** @type {string} */ (tillFor(o)))).map((o) => o.id);
+  /**
+   * Har kapitlet en sidogren (en frivillig scen som startar i ett rum)? Då är vägarna mellan kapitlets områden
+   * öppna under varje ga_till (beslut 26.2). Prologen har ingen, och där är det som förut.
+   */
+  const harSidogren = () => (b?.kapitel?.scener || []).some((/** @type {any} */ s) => s.frivillig && s.startar_i_rum);
+  /** Rummen han har varit i i kapitlet: scenerna fram till den som pågår, och sidogrenarna han har tagit. */
+  function kandaRum() {
+    const sc = b.kapitel.scener, i = sc.indexOf(b.scen);
+    const k = new Set();
+    sc.forEach((/** @type {any} */ x, /** @type {number} */ j) => { if (x.frivillig ? b.frivilligtGjort(x.id) : j <= i) k.add(x.startar_i_rum || x.rum); });
+    return k;
   }
   /**
-   * En sidogren (frivillig scen): han går in i rummet, scenen spelas en gång, och sedan går han själv tillbaka
-   * ut genom utgången han kom in genom. Berättelsen står kvar i steget han lämnade.
-   * @param {string} utId utgången han gick ut genom
+   * Utgångarna han får gå igenom under ett ga_till, utöver målet. Med fri_vag: till en frivillig scen som inte är
+   * spelad (stig_buskarna). I ett kapitel med en sidogren (beslut 26.2): också till sidogrenens rum och till
+   * kapitlets rum som han redan har varit i (tillbaka till buskarna efter apan). Aldrig till prologen.
+   * @param {string | null} mal utgången steget väntar på @param {boolean} friVag
    */
-  async function sidoScen(utId) {
-    const hem = aktuelltRum, hemScen = visadScen;
-    const scen = b.frivilligScen(/** @type {string} */ (tillFor(rum.ruta(utId))));
-    if (!scen) return;
-    logg.handelse('frivilligt', 'scen ' + scen.id);
-    const forra = aktuelltSteg;
-    for (const st of scen.steg) {
-      await visaScen(scen, st);
-      b.effektUtanfor(st, scen.rum);
-      await utfor(st);
+  function sidoUtgangar(mal, friVag) {
+    const oppet = harSidogren();
+    const kanda = oppet ? kandaRum() : new Set();
+    return rum.objekt.filter((o) => {
+      if (o.sort !== 'utgang' || o.id === mal || lastNu(o)) return false;
+      const t = tillFor(o);
+      if (!t) return false;
+      if (b.frivilligScen(t)) return friVag || oppet;
+      return kanda.has(t);
+    }).map((o) => o.id);
+  }
+  /**
+   * Utgången i rummet som leder närmast tillbaka till hem (bredden först genom kartornas utgångar).
+   * @param {string} fran @param {string} hem @returns {string | null}
+   */
+  function vagTillbaka(fran, hem) {
+    /** @type {Map<string, string>} rum → första utgången från fran på vägen dit */
+    const forst = new Map([[fran, '']]);
+    const ko = [fran];
+    while (ko.length) {
+      const r = /** @type {string} */ (ko.shift());
+      for (const o of kartor[r]?.objekt || []) {
+        const t = tillFor(o);
+        if (!t || forst.has(t)) continue;
+        forst.set(t, forst.get(r) || o.id);
+        if (t === hem) return /** @type {string} */ (forst.get(t));
+        ko.push(t);
+      }
     }
-    b.frivilligtKlart(scen.id); spara();
-    await visaScen(scen, null);
-    const tillbaka = rum.objekt.find((o) => o.sort === 'utgang' && tillFor(o) === hem);
-    if (tillbaka) await gaTill({ typ: 'ga_till', mal: tillbaka.id });
-    else logg.handelse('FEL', `ingen utgång tillbaka från ${scen.rum} till ${hem}`);
+    return null;
+  }
+  /** @type {{ rum: string, scen?: string } | null} avstickaren han var i när spelet sparades (fortsätter där) */
+  let aterAvstickare = null;
+  /**
+   * En avstickare (beslut 26.2): han går ut genom en annan utgång än målet medan ett ga_till pågår. I sidogrenens
+   * rum spelas den frivilliga scenen första gången (buskarna). Sedan går han fritt mellan kapitlets rum han har varit
+   * i, gör det frivilliga där, och när han kommer tillbaka till scenens rum fortsätter steget. Målet står kvar i
+   * molnet, och ungen nosar mot vägen tillbaka efter en stund. Spelet sparar mitt i avstickaren (av.avstickare)
+   * och fortsätter där; mitt i sidogrenens scen börjar den om med scenens vid_omstart.
+   * @param {string | null} utId utgången han gick ut genom (null: spelet startade om i avstickaren)
+   * @param {any} st ga_till-steget som pågår @param {() => void} visaMal målet i molnet
+   * @param {{ rum: string, scen?: string } | null} [ater]
+   */
+  async function avstickare(utId, st, visaMal, ater = null) {
+    const hemScen = b.scen, hem = hemScen.rum, forra = aktuelltSteg;
+    const radion = new Map(senaste);
+    let rumId = ater ? ater.rum : tillFor(rum.ruta(/** @type {string} */ (utId)));
+    logg.handelse('avstickare', `${hem} → ${rumId}${ater ? ' (fortsätter)' : ''}`);
+    rum.markera(st.mal, false); rum.ungePekar(null);
+    while (rumId && rumId !== hem) {
+      av.avstickare = { rum: rumId }; spara();
+      const scen = b.frivilligScen(rumId);
+      if (scen) {
+        av.avstickare.scen = scen.id; spara();
+        logg.handelse('frivilligt', 'scen ' + scen.id);
+        for (const x of scen.steg) {
+          await visaScen(scen, x);
+          b.effektUtanfor(x, scen.rum);
+          await utfor(x);
+        }
+        b.frivilligtKlart(scen.id); delete av.avstickare.scen; spara();
+      }
+      // scenens id står kvar, så att radion upprepar Farfars senaste replik i den scen som pågår
+      await visaScen({ id: hemScen.id, rum: rumId, steg: [] }, st);
+      for (const [nyckel, r] of radion) senaste.set(nyckel, r);
+      rumId = await vandraI(/** @type {string} */ (rumId), hem, visaMal);
+    }
+    delete av.avstickare; spara();
     aktuelltSteg = forra;
-    await visaScen(hemScen ?? b.scen, forra);
+    logg.handelse('avstickare', `tillbaka i ${hem}`);
+    await visaScen(hemScen, st);
+    for (const [nyckel, r] of radion) senaste.set(nyckel, r);
+  }
+  /**
+   * I ett rum under en avstickare: han går till en utgång (tillbaka, eller vidare till ett rum han har varit i)
+   * eller gör det frivilliga här. @param {string} rumId @param {string} hem @param {() => void} visaMal
+   * @returns {Promise<string | null>} rummet han går till
+   */
+  async function vandraI(rumId, hem, visaMal) {
+    rum.frys(false);
+    const vag = vagTillbaka(rumId, hem);
+    const k = knuffKlocka({ handling: '' }, () => {
+      if (!vag) return;
+      rum.markera(vag, true);
+      logg.handelse('knuff', 'ungen nosar mot vägen tillbaka: ' + vag, { ungenPekar: rum.ungePekar(vag) });
+    }, undefined, MAL_KNUFF_MS);
+    try {
+      for (;;) {
+        const utg = sidoUtgangar(null, true);
+        if (vag && !utg.includes(vag)) utg.push(vag);
+        const fri = frivilligaKvar();
+        const bortSkyltar = visaUtgangsSkyltar();
+        visaMal();
+        const id = await anvand([...utg, ...fri]);
+        bortSkyltar();
+        if (fri.includes(id)) {
+          k.stopp(); rum.ungePekar(null); if (vag) rum.markera(vag, false);
+          await korFrivilligt(id); rum.frys(false); k.nollstall();
+          continue;
+        }
+        return tillFor(rum.ruta(id));
+      }
+    } finally {
+      k.stopp(); if (vag) rum.markera(vag, false); rum.ungePekar(null); visaMoln(null);
+    }
   }
 
   // ------------------------------------------------------------------ pussel
@@ -1716,6 +1817,10 @@ export function skapaSpel(d) {
    * finns, en fel bricka tonas ut och apan glider en bit. Efter första rätta bokstaven lyser staven: ett tryck på den
    * ger kasta-läget, som formelvyn (fälten får guldkant och nästa tomma lyser). Där studsar en fel bricka tillbaka
    * ("pff"), de rätta ligger kvar, och efter två fel på samma plats blinkar rätt bricka. Inget fel räknas där.
+   * Kasta-läget finns bara när pusslet har `kasta` (kapitel 1 har det inte, beslut 29.2).
+   * Apan (variant apan, v0.7.4): bredvid fälten står stegen under nätet. Varje fyllt fält fäller ut ett pinnsteg
+   * nerifrån, och apan klättrar ner ett steg (E fyller två fält och ger två steg). Vid fel blundar apan.
+   * En knuff med efter_sek börjar räkna först efter första felet (före det gäller textmängdens tid).
    * Mellanslag trycker på staven, och en bokstavstangent trycker på brickan.
    * @param {any} p
    */
@@ -1725,15 +1830,26 @@ export function skapaSpel(d) {
     if (p.instruktion) await replik(p.instruktion);
     rum.frys(true);
     return new Promise((klar) => {
-      let upptagen = false, stavGlimtar = false;
-      const k = knuffKlocka(p.knuff, () => ui.plattan.querySelector('.lapp')?.classList.add('puls'), undefined, knufftidMs({ text: p.kategori }));
+      let upptagen = false, stavGlimtar = false, blundar = false, nyaPinnar = 0;
+      const medStege = p.variant === 'apan';
+      const pinnar = () => r.s.falt.filter(Boolean).length;
+      const knuffExtra = () => ui.plattan.querySelector('.lapp')?.classList.add('puls');
+      const knuffFore = p.knuff?.efter_sek ? { ...p.knuff, efter_sek: undefined } : p.knuff;
+      let k = knuffKlocka(knuffFore, knuffExtra, undefined, knufftidMs({ text: p.kategori }));
+      let knuffEfterFel = !p.knuff?.efter_sek;
+      const stege = () => {
+        if (!medStege) return '';
+        const n = pinnar(), alla = r.s.falt.length;
+        const steg = Array.from({ length: alla }, (_, i) => `<span class="pinne ${i < n ? 'ute' : ''} ${i < n && i >= n - nyaPinnar ? 'ny' : ''}" style="--i:${i}"></span>`).join('');
+        return `<div class="stege-raddning" data-pinnar="${n}" style="--alla:${alla}"><span class="natet"></span>${steg}<span class="apa-markor ${blundar ? 'blundar' : ''}" style="--ner:${n}"></span></div>`;
+      };
       const rita = () => {
         const falt = `<div class="platser">${r.s.falt.map((b, i) => `<span class="plats ${b ? 'last' : ''} ${r.s.kastar && i === r.nasta ? 'nasta' : ''}" data-plats="${i}">${ui.esc(b || '')}</span>`).join('')}</div>`;
         // i kasta-läget går alla brickor att använda utom de fel gissade (E behövs kanske två gånger)
         const dold = (/** @type {number} */ id) => !r.s.kastar && r.s.provade.has(id) && !r.s.fela.has(id);
         const brickor = `<div class="brickor">${r.s.brickor.map((x) => `<button type="button" class="bricka ${r.s.fela.has(x.id) ? 'tonad' : ''} ${dold(x.id) ? 'anvand' : ''} ${r.s.tips === x.id ? 'tips' : ''}" data-id="${x.id}"${r.s.fela.has(x.id) ? ' disabled' : ''}>${ui.esc(x.bokstav)}</button>`).join('')}</div>`;
         const stav = r.s.kastaErbjuden ? `<button type="button" class="stav-knapp ${r.s.kastar ? 'lyft' : ''} ${stavGlimtar ? 'glimtar' : ''}" aria-label="Staven"><span class="stav-ikon"></span></button>` : '';
-        ui.visaPlatta(`<div class="formel-ruta raddning-ruta ${r.s.kastar ? 'kastar' : ''}">${stav}<div class="lapp p-${ui.esc(p.papper || 'lapp')}">${ui.rader(p.kategori, varden())}</div>${falt}${brickor}</div>`, 'pussel P15_raddning');
+        ui.visaPlatta(`<div class="formel-ruta raddning-ruta ${r.s.kastar ? 'kastar' : ''} ${medStege ? 'med-stege' : ''}">${stege()}${stav}<div class="lapp p-${ui.esc(p.papper || 'lapp')}">${ui.rader(p.kategori, varden())}</div>${falt}${brickor}</div>`, 'pussel P15_raddning');
         tillatNos(p, spar);
         ui.plattan.querySelectorAll('.bricka[data-id]').forEach((el) => el.addEventListener('click', () => tryck(Number(/** @type {HTMLElement} */ (el).dataset.id))));
         ui.plattan.querySelector('.stav-knapp')?.addEventListener('click', () => vaxla());
@@ -1765,10 +1881,13 @@ export function skapaSpel(d) {
         logg.handelse('val', `${p.id}: ${r.s.brickor.find((x) => x.id === id)?.bokstav}`, { resultat: res.resultat });
         upptagen = true;
         if (res.resultat === 'fel') {
-          ljud.spela('fel'); rita();
+          if (!knuffEfterFel) { knuffEfterFel = true; k.stopp(); k = knuffKlocka(p.knuff, knuffExtra); }
+          ljud.spela('fel'); nyaPinnar = 0; blundar = medStege; rita();
           await reaktion(p.vid_fel);
-          upptagen = false; rita(); return;
+          blundar = false; upptagen = false; rita(); return;
         }
+        nyaPinnar = res.nya?.length || 0;
+        if (medStege) logg.handelse('räddning', `pinnsteg ${pinnar()} av ${r.s.falt.length}`);
         ljud.spela('ratt'); rita();
         if (res.resultat === 'klar') { await fardig(); return; }
         if (res.erbjud) {
@@ -1782,6 +1901,8 @@ export function skapaSpel(d) {
       const fardig = async () => {
         upptagen = true; k.stopp(); sluta();
         ljud.spela('ratt');
+        // sista pinnsteget syns en stund innan ordet skrivs i luften
+        if (medStege) await vanta(tid(600));
         ui.visaPlatta(`<div class="formel-i-luften">${ui.esc(r.s.svar)}</div>`, 'formel-luft');
         await vanta(tid(1000)); ui.doljPlatta();
         logg.handelse('räddning', r.s.kastat ? 'klar i kasta-läget' : 'klar genom att gissa', { fel: r.s.fel });
@@ -1902,10 +2023,13 @@ export function skapaSpel(d) {
   /**
    * Krukorna (P26): svinga staven mot krukorna i rummet, eller mot rummets föremål (foremal: buskarna, lövhögarna).
    * Det sista som hittas är alltid sak_i_sista (skattlådan, lådan) eller kartbiten. Vila, ingen text.
+   * Instruktionen läses upp först (v0.7.4: "Vifta med staven mot buskarna!"). Knuffen: ungen springer till närmaste
+   * föremål som inte är svingat och nosar mot det, och det glimtar (beskrivningen är för den vuxne och visas inte).
    * @param {any} p
    */
   async function krukor(p) {
     const k = skapaKrukor(p);
+    if (p.instruktion) await replik(p.instruktion);
     rum.frys(false);
     /** @type {string[]} */
     let ids;
@@ -1919,12 +2043,24 @@ export function skapaSpel(d) {
       ids = rum.dela(bas, k.s.antal);
     }
     visaEtiketter();
-    const knuff = knuffKlocka(p.knuff, () => { const i = k.s.slagna.findIndex((x) => x === null); if (i >= 0 && ids[i]) rum.markera(ids[i], true); });
+    /** @type {string | null} */
+    let pekad = null;
+    const pekaNarmaste = () => {
+      const kvar = ids.filter((_, i) => k.s.slagna[i] === null);
+      const avst = (/** @type {string} */ id) => { const o = rum.ruta(id); return o ? Math.hypot(o.x + o.b / 2 - rum.pos.x, o.y + o.h / 2 - rum.pos.y) : Infinity; };
+      const id = kvar.sort((a, b) => avst(a) - avst(b))[0];
+      if (!id) return;
+      rum.markera(id, true); pekad = id;
+      const ungen = rum.ungePekar(id);
+      logg.handelse('knuff', p.knuff?.handling || 'närmaste föremål glimtar', { foremal: id, ungenPekar: ungen });
+    };
+    const knuff = knuffKlocka(p.knuff ? { efter_sek: p.knuff.efter_sek } : null, pekaNarmaste);
     while (!k.s.klar && ids.length) {
       const kvar = ids.filter((_, i) => k.s.slagna[i] === null);
       if (!kvar.length) break;
       const id = await anvand(kvar, { verb: 'svinga' });
       knuff.nollstall(); rum.markera(id, false);
+      if (pekad) { rum.markera(pekad, false); rum.ungePekar(null); pekad = null; }
       const fynd = k.sla(ids.indexOf(id));
       ljud.spela(p.foremal ? 'prassel' : 'sla'); rum.slagen(id);
       logg.handelse('svinga', `${id}: ${fynd}`);
@@ -1934,6 +2070,7 @@ export function skapaSpel(d) {
       else await vanta(tid(300));
     }
     knuff.stopp();
+    if (pekad) { rum.markera(pekad, false); rum.ungePekar(null); }
     if (p.vid_ratt) await reaktion(p.vid_ratt);
     return {};
   }
@@ -2454,11 +2591,24 @@ export function skapaSpel(d) {
       dopAttFraga = [];
       ui.uppdateraHud(av); visaPausknapp();
       logg.registrera('berättelse', () => ({ kapitel: kapitel.id, scen: b.scen?.id, steg: b.stegIndex, typ: aktuelltSteg?.typ }));
+      // sparat mitt i en avstickare (beslut 26.2): han fortsätter i rummet han var i, och mitt i sidogrenens scen
+      // hör han dess vid_omstart ("Var var vi? Vi letar i buskarna."). Annars den pågående scenens.
+      aterAvstickare = av.avstickare && b.rum(av.avstickare.rum) && b.aktuellt()?.omstart ? { ...av.avstickare } : null;
+      if (av.avstickare && !aterAvstickare) { delete av.avstickare; spara(); }
       while (!b.slut) {
         await visaScen();
-        const st = b.aktuellt();
-        if (!st) break;
+        const st0 = b.aktuellt();
+        if (!st0) break;
+        const sido = st0.omstart && aterAvstickare?.scen ? b.kapitel.scener.find((/** @type {any} */ x) => x.id === aterAvstickare?.scen) : null;
+        const st = sido?.vid_omstart ? { ...st0, ...sido.vid_omstart } : st0;
         const res = await utfor(st);
+        // en avstickare hör till steget (ga_till): är steget klart finns den inte längre
+        if (!st0.omstart) { aterAvstickare = null; delete av.avstickare; }
+        // efter en omstart upprepar radion Farfars senaste replik genom radion i scenen före steget han fortsätter på
+        else if (!senaste.has(RADIO)) {
+          const fore = (b.scen?.steg || []).slice(0, av.steg ?? 0).filter((/** @type {any} */ x) => x.typ === 'replik' && x.via === 'radio' && x.upplast);
+          if (fore.length) senaste.set(RADIO, fore[fore.length - 1]);
+        }
         b.klar(res || {});
         rum.sattStav((tillstand.spelare.hjalte.formler || []).length > 0);
         spara();
@@ -2564,7 +2714,7 @@ export function skapaSpel(d) {
       av.aterstalld = true;
       logg.handelse('meny', 'sparningen satt tillbaka till passets början', { bar: `${forut.bar} → ${av.bar}`, formler_fore: forut.formler });
       // kapitlen före spolas fram (av.spolat töms, spolningen gör inget två gånger), och kapitlets scener före hoppet
-      av.kapitelId = k.id; av.scen = i; av.scenId = k.scener[i]?.id; delete av.steg; av.startad = false;
+      av.kapitelId = k.id; av.scen = i; av.scenId = k.scener[i]?.id; delete av.steg; av.startad = false; delete av.avstickare;
       av.spolat = []; av.spolaTill = av.scenId;
       logg.handelse('meny', `hopp till ${k.id} ${av.scenId}`);
       spara();

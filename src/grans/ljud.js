@@ -101,16 +101,18 @@ export function skapaLjud({ tyst = () => false } = {}) {
     fagel: () => { ton({ f: 1900, t: 0.06, v: 0.14, typ: 'sine' }); ton({ f: 2500, t: 0.05, v: 0.12, typ: 'sine', d: 0.08 }); ton({ f: 2100, t: 0.08, v: 0.12, typ: 'sine', d: 0.17 }); },
     // molnet kommer (stilguiden §3): ett mjukt pling
     pling: () => { ton({ f: 1320, f2: 1480, t: 0.12, v: 0.12, typ: 'sine' }); ton({ f: 1980, t: 0.18, v: 0.07, typ: 'sine', d: 0.06 }); },
+    // ugglorna på krönet: två mjuka, låga HO (v0.7.3)
+    uggla: () => { ton({ f: 392, f2: 349, t: 0.28, v: 0.32, typ: 'sine' }); ton({ f: 392, f2: 330, t: 0.34, v: 0.3, typ: 'sine', d: 0.4 }); },
     prassel: () => { for (let i = 0; i < 5; i++) ton({ f: 2400 - i * 200, t: 0.04, v: 0.08, typ: 'sawtooth', d: i * 0.04 }); },
   };
   /** Ljud-id i innehållet → effekt. Okända id:n får ett allmänt ljud. */
   const LJUD_ID = /** @type {Record<string, string>} */ ({
-    dunk: 'dunk', klaffen_tick: 'tick', fagel_late: 'skata', unge_forsta_late: 'unge', unge_langtan: 'unge', unge_svarar: 'unge', mage_kurrar: 'mage', hackspett: 'klick',
+    dunk: 'dunk', klaffen_tick: 'tick', fagel_late: 'skata', unge_forsta_late: 'unge', unge_langtan: 'unge', unge_svarar: 'unge', mage_kurrar: 'mage', hackspett: 'klick', ekorre_not: 'kras',
   });
 
   /** Stilguiden v0.26 §3. Ett nytt ljudord får sin färg av Stil innan Innehåll lägger in det. */
   const LJUDORD_FARG = /** @type {Record<string, string>} */ ({
-    dunk: '#f5d9a8', brum: '#f4a6b8', buhu: '#8fcbf2', 'tok tok': '#c8e36a', 'ho ho': '#ffd95a', klonk: '#b9c6d3', pip: '#a6e3cf',
+    dunk: '#f5d9a8', brum: '#f4a6b8', buhu: '#8fcbf2', 'tok tok': '#c8e36a', 'ho ho': '#ffd95a', klonk: '#b9c6d3', pip: '#a6e3cf', kras: '#d9ccf5',
   });
 
   return {

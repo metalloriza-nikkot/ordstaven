@@ -144,8 +144,10 @@ describe('pusslen', () => {
     expect(f.skriv('E').resultat).toBe('klar');
   });
   it('räddningen: rätt bokstav fyller alla sina fält, fel tonas ut, kasta-läget erbjuds efter första rätta', () => {
+    // kapitel 1 har ingen kasta-knapp (beslut 29.2), men motorn har kvar den till nästa räddning
     const k1 = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-01.json', import.meta.url), 'utf8'));
-    const r = skapaRaddning(k1.pussel.find((p) => p.id === 'k1_apan'));
+    const apan = k1.pussel.find((p) => p.id === 'k1_apan');
+    const r = skapaRaddning({ ...apan, kasta: { erbjudande: { talare: 'berattare', text: 'Prova!', upplast: true } } });
     const id = (b) => r.s.brickor.find((x) => x.bokstav === b).id;
     expect(r.s.brickor.map((b) => b.bokstav).join('')).toBe('AEGORST');
     expect(r.gissa(id('O'))).toMatchObject({ resultat: 'fel' });
@@ -173,6 +175,16 @@ describe('pusslen', () => {
     expect(r.gissa(id('E')).resultat).toBe('klar');
     expect(r.forstaForsoket).toBe(true);
     expect(r.s.kastat).toBe(false);
+  });
+  it('apan i kapitel 1: ingen kasta-knapp, och staven erbjuds aldrig', () => {
+    const k1 = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-01.json', import.meta.url), 'utf8'));
+    const apan = k1.pussel.find((p) => p.id === 'k1_apan');
+    expect(apan.kasta).toBeUndefined();
+    expect(apan.knuff.efter_sek).toBe(3);
+    const r = skapaRaddning(apan);
+    const id = (b) => r.s.brickor.find((x) => x.bokstav === b).id;
+    expect(r.gissa(id('E'))).toMatchObject({ resultat: 'ratt', nya: [2, 4], erbjud: false });
+    expect(r.vaxlaKasta()).toBe(false);
   });
   it('buskarna och lövhögarna: saken i sista kommer alltid sist', () => {
     const k1 = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-01.json', import.meta.url), 'utf8'));

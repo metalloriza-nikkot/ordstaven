@@ -231,32 +231,37 @@ const kap01 = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap
 const P1 = (id) => JSON.parse(JSON.stringify(kap01.pussel.find((p) => p.id === id)));
 const bricka = (page, b) => page.locator('#plattan .bricka[data-id]', { hasText: new RegExp(`^${b}$`) });
 
-test('räddningen: ett tryck i taget, fel tonas ut, och kasta-läget skriver resten av ordet', async ({ page }) => {
+test('räddningen (apan, v0.7.4): ingen kasta-knapp, ett pinnsteg per fyllt fält, apan blundar vid fel och knuffen kommer efter första felet', async ({ page }) => {
   test.setTimeout(60000);
   await provscen(page, { id: 't_apan', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'pussel', pussel_id: 'k1_apan' }, R('Räddad.')] }, null, { pussel: [P1('k1_apan')] });
   await expect(page.locator('#plattan .raddning-ruta .lapp')).toHaveText('MAN KLÄTTRAR UPP MED DEN.', { timeout: 8000 });
-  // brickorna i bokstavsordning
+  // brickorna i bokstavsordning, stegen under nätet utan pinnsteg, och ingen stav
   expect(await page.locator('#plattan .bricka[data-id]').allTextContents()).toEqual(['A', 'E', 'G', 'O', 'R', 'S', 'T']);
+  await expect(page.locator('#plattan .stege-raddning')).toHaveAttribute('data-pinnar', '0');
+  expect(await page.locator('#plattan .stege-raddning .pinne').count()).toBe(5);
   expect(await page.locator('#plattan .stav-knapp').count()).toBe(0);
+  // ingen knuff före första felet (3 s)
+  await page.waitForTimeout(3600);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).not.toMatch(/\[knuff\] ungen pekar på kategorin/);
   await bricka(page, 'O').click();
+  await expect(page.locator('#plattan .apa-markor')).toHaveClass(/blundar/, { timeout: 3000 });
   await expect(bricka(page, 'O')).toHaveClass(/tonad/, { timeout: 5000 });
   await expect(page.locator('#regi')).toBeHidden({ timeout: 5000 }); // felreaktionen är klar
+  await expect(page.locator('#plattan .apa-markor')).not.toHaveClass(/blundar/);
+  // efter första felet kommer knuffen efter 3 s
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 8000 }).toMatch(/\[knuff\] ungen pekar på kategorin/);
   await bricka(page, 'E').click();
   await expect.poll(() => page.locator('#plattan .plats.last').count(), { timeout: 5000 }).toBe(2); // E fyller två fält
-  // staven lyser efter första rätta bokstaven: kasta-läget
-  await expect(page.locator('#plattan .stav-knapp')).toBeVisible();
-  await page.click('#plattan .stav-knapp');
-  await expect(page.locator('#plattan .raddning-ruta')).toHaveClass(/kastar/);
-  await expect(page.locator('#plattan .plats.nasta')).toHaveAttribute('data-plats', '0');
-  await bricka(page, 'A').click(); // fel: studsar
-  expect(await page.locator('#plattan .plats.last').count()).toBe(2); // de rätta ligger kvar
-  await bricka(page, 'R').click(); // två fel på samma plats: rätt bricka blinkar
-  await expect(bricka(page, 'S')).toHaveClass(/tips/);
-  for (const b of 'STG') await bricka(page, b).click();
-  // större fest och en egen replik när han kastade ordet
-  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('DU VISSTE ORDET!', { timeout: 10000 });
+  await expect(page.locator('#plattan .stege-raddning')).toHaveAttribute('data-pinnar', '2'); // och ger två pinnsteg
+  await expect(page.locator('#plattan .stege-raddning .pinne.ny')).toHaveCount(2);
+  expect(await page.locator('#plattan .stav-knapp').count()).toBe(0); // staven erbjuds aldrig
+  for (const b of 'ST') { await bricka(page, b).click(); await page.waitForTimeout(450); }
+  await expect(page.locator('#plattan .stege-raddning')).toHaveAttribute('data-pinnar', '4');
+  await bricka(page, 'G').click();
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('RÄDDAD.', { timeout: 10000 });
   const logg = await page.evaluate(() => window.__ORDSTAVEN.logg());
-  expect(logg).toContain('klar i kasta-läget');
+  expect(logg).toContain('pinnsteg 5 av 5');
+  expect(logg).toContain('klar genom att gissa');
 });
 
 test('kodlåset: ungen visar första tecknet, låset kontrolleras när hela ordet är lagt, rätta stannar', async ({ page }) => {
@@ -359,10 +364,17 @@ test('titta–täck: förebilden tonas bort vid första brickan och tänds igen 
   expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('klar med förebild');
 });
 
-test('svinga mot rummets föremål: saken i sista kommer alltid sist', async ({ page }) => {
+test('svinga mot rummets föremål: instruktionen först, knuffen nosar mot närmaste, och saken i sista kommer alltid sist', async ({ page }) => {
   test.setTimeout(60000);
   const p = { ...P1('k1_busken'), foremal: ['lada_lang_overst', 'lada_lang_mitten', 'lada_lang_nederst', 'lada_hornet'] };
   await provscen(page, { id: 't_busken', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'pussel', pussel_id: 'k1_busken' }, R('Hittat.')] }, null, { pussel: [p] });
+  // instruktionen läses upp först (v0.7.4)
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('VIFTA MED STAVEN MOT BUSKARNA!', { timeout: 8000 });
+  await page.click('#plattan .replik-ruta');
+  // knuffen: ungen springer till föremålet närmast hjälten och nosar mot det (ingen text för den vuxne)
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 15000 }).toMatch(/\[knuff\] ungen nosar mot närmaste buske/);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.ungeMal())).not.toBeNull();
+  await expect(page.locator('#regi')).toBeHidden();
   for (const id of p.foremal) {
     await tryckPa(page, id);
     await expect(page.locator('#handknapp')).toBeVisible({ timeout: 8000 }); // hjälten står vid föremålet
@@ -372,6 +384,88 @@ test('svinga mot rummets föremål: saken i sista kommer alltid sist', async ({ 
   const logg = await page.evaluate(() => window.__ORDSTAVEN.logg());
   expect(logg).toContain(`[svinga] lada_hornet: skattlada`);
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('HITTAT.', { timeout: 10000 });
+});
+
+/** Kapitel 1 vid en scen, med prologen och scenerna före spolade (som ett hopp i menyn). */
+async function kapitel1Vid(page, scenId) {
+  await page.goto('./?snabb&ny');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.evaluate(([id, i]) => {
+    const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
+    t.spelare.hjalte.namn = 'TESTA'; t.spelare.unge.namn = 'KNOPP'; t.spelare.unge.folj = true;
+    Object.assign(av, { kapitelId: 'kap-01', scen: i, scenId: id, spolaTill: id, spolat: [], startad: false }); delete av.steg;
+    t.installningar = { ...t.installningar, oppnadeKapitel: ['kap-01'] };
+    localStorage.setItem('ordstaven_spar', JSON.stringify(t));
+  }, [scenId, kap01.scener.findIndex((x) => x.id === scenId)]);
+  await page.goto('./?snabb');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 10000 }).toBe(scenId);
+}
+/** Tryck förbi replikerna tills ett ga_till väntar. */
+async function tillGaTill(page) {
+  for (let k = 0; k < 40; k++) {
+    if ((await page.evaluate(() => window.__ORDSTAVEN.steg()?.typ)) === 'ga_till' && !(await page.$('#plattan .replik-ruta'))) return;
+    const r = await page.$('#plattan .replik-ruta'); if (r) await r.click().catch(() => {});
+    await page.waitForTimeout(150);
+  }
+  throw new Error('inget ga_till');
+}
+const iRummet = (page, id) => expect.poll(() => page.evaluate((m) => window.__ORDSTAVEN.rumsobjekt().includes(m), id), { timeout: 15000 }).toBe(true);
+
+test('vägen tillbaka (beslut 26.2): från gläntan i pass 2 till buskarna och tillbaka, och spelet fortsätter i avstickaren', async ({ page }) => {
+  test.setTimeout(150000);
+  await kapitel1Vid(page, 'k1s07_stigarna');
+  await tillGaTill(page);
+  expect((await steg(page)).mal).toBe('skylt_farfar_3');
+  // stigen söderut leder tillbaka till skogsbrynet, fast målet är skylten
+  await tryckPa(page, 'stig_brynet');
+  await iRummet(page, 'stig_buskarna');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('k1s07_stigarna');
+  expect((await steg(page)).mal).toBe('skylt_farfar_3');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.tillstand().aventyr['den-gomda-dalen'].avstickare)).toEqual({ rum: 'skogsbrynet' });
+  // vidare till buskarna: sidogrenens scen spelas första gången
+  await tryckPa(page, 'stig_buskarna');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('VIFTA MED STAVEN MOT BUSKARNA!', { timeout: 15000 });
+  expect(await page.evaluate(() => window.__ORDSTAVEN.tillstand().aventyr['den-gomda-dalen'].avstickare)).toEqual({ rum: 'buskarna', scen: 'k1s03_buskarna' });
+  // spelet startar om mitt i sidogrenen: den börjar om med sin egen omstart
+  await page.reload();
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('VAR VAR VI? VI LETAR I BUSKARNA.', { timeout: 15000 });
+  await iRummet(page, 'buske_1');
+  await page.click('#plattan .replik-ruta');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('VIFTA MED STAVEN MOT BUSKARNA!', { timeout: 15000 });
+  await page.click('#plattan .replik-ruta');
+  for (const id of ['buske_1', 'buske_2', 'buske_3', 'buske_4']) {
+    await tryckPa(page, id);
+    await expect(page.locator('#handknapp')).toBeVisible({ timeout: 8000 });
+    await page.keyboard.press('Space');
+    await expect.poll(async () => (await page.evaluate(() => window.__ORDSTAVEN.logg())).includes(`[svinga] ${id}:`), { timeout: 8000 }).toBe(true);
+  }
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('EN SKATTLÅDA! EN NY RYGGSÄCK!', { timeout: 15000 });
+  await page.click('#plattan .replik-ruta');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.tillstand().aventyr['den-gomda-dalen'].avstickare), { timeout: 10000 }).toEqual({ rum: 'buskarna' });
+  expect(await page.evaluate(() => window.__ORDSTAVEN.tillstand().aventyr['den-gomda-dalen'].frivilligt)).toContain('k1s03_buskarna');
+  // spelet startar om efter sidogrenen: han står kvar i buskarna och hör den pågående scenens omstart
+  await page.reload();
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('VAR VAR VI? APAN ÄR RÄDDAD. NU KARTBITEN!', { timeout: 15000 });
+  await iRummet(page, 'buske_1');
+  await page.click('#plattan .replik-ruta');
+  // tillbaka: buskarna → skogsbrynet → gläntan, och steget fortsätter
+  await tryckPa(page, 'stig_lianerna');
+  await iRummet(page, 'stig_glantan');
+  await tryckPa(page, 'stig_glantan');
+  await iRummet(page, 'skylt_farfar_3');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 10000 }).toContain('[avstickare] tillbaka i glantan');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.tillstand().aventyr['den-gomda-dalen'].avstickare)).toBeUndefined();
+  expect(await page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('k1s07_stigarna');
+  expect((await steg(page)).mal).toBe('skylt_farfar_3');
+  // radion upprepar fortfarande Farfars replik i scenen
+  await page.click('#hud-radio');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('KARTBITEN ÄR NÄRA. LÄS MIN SKYLT!', { timeout: 8000 });
 });
 
 // ---------------------------------------------------------------- kapitel 1:s värld (T2)
@@ -888,7 +982,7 @@ test('luckorna: frågan och bilden överst, tre rader i hela bredden som är luc
   await provscen(page, { id: 't_luckor', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'pussel', pussel_id: 't_luckorna' }] }, null, { pussel: [{ ...luckor, id: 't_luckorna' }] });
   await page.click('#plattan .replik-ruta');
   await expect(page.locator('#plattan .pussel-ruta.luckor')).toBeVisible({ timeout: 5000 });
-  await expect(page.locator('#plattan .fraga-rad .text')).toHaveText('VILKEN LUCKA STÄMMER?');
+  await expect(page.locator('#plattan .fraga-rad .text')).toHaveText('VILKEN LUCKA PASSAR KNOPP?');
   await expect(page.locator('#plattan .fraga-rad .fraga-bild')).toBeVisible();
   const rader = page.locator('#plattan .kort.lucka');
   await expect(rader).toHaveCount(3);

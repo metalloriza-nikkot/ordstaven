@@ -11,7 +11,7 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 31,
+ "nextobjectid": 33,
  "properties": [
   {
    "name": "rum",
@@ -406,8 +406,8 @@
      "id": 23,
      "name": "rothal",
      "type": "sak",
-     "x": 480,
-     "y": 40,
+     "x": 488,
+     "y": 60,
      "width": 16,
      "height": 12,
      "rotation": 0,
@@ -516,6 +516,42 @@
      "rotation": 0,
      "visible": true,
      "point": true
+    },
+    {
+     "id": 31,
+     "name": "ungt_trad_2",
+     "type": "sak",
+     "x": 38,
+     "y": 108,
+     "width": 24,
+     "height": 40,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 32,
+     "name": "ugglor",
+     "type": "sak",
+     "x": 472,
+     "y": 18,
+     "width": 24,
+     "height": 12,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
     }
    ]
   }

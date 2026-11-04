@@ -439,7 +439,7 @@
         },
         "frivillig": {
           "type": "boolean",
-          "description": "Scenen spelas inte i tur och ordning, utan första gången hjälten går in i rummet startar_i_rum medan ett steg med fri_vag pågår. Högst en gång."
+          "description": "Scenen spelas inte i tur och ordning, utan första gången hjälten går in i rummet startar_i_rum medan ett ga_till pågår (en avstickare, beslut 26.2). Högst en gång."
         },
         "startar_i_rum": {
           "$ref": "#/$defs/id",

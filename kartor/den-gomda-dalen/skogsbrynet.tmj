@@ -11,7 +11,7 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 20,
+ "nextobjectid": 22,
  "properties": [
   {
    "name": "rum",
@@ -368,6 +368,42 @@
      "rotation": 0,
      "visible": true,
      "point": true
+    },
+    {
+     "id": 20,
+     "name": "lag_sten_2",
+     "type": "sak",
+     "x": 172,
+     "y": 156,
+     "width": 26,
+     "height": 14,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 21,
+     "name": "ekorre_gren",
+     "type": "sak",
+     "x": 536,
+     "y": 96,
+     "width": 16,
+     "height": 14,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
     }
    ]
   }

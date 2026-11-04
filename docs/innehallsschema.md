@@ -1,6 +1,7 @@
 # Innehållsschema – kapitel i format 2
 
-Version 2.15 (2026-11-02). Ägs av teknikspåret.
+Version 2.16 (2026-11-04). Ägs av teknikspåret.
+2.16: kapitel 1 v0.7.4 och vägen tillbaka (beslut 26.2). Inga nya fält, men tre regler i motorn: **en frivillig scen** spelas första gången hjälten går in i dess rum under vilket `ga_till` som helst i ett kapitel med en sidogren (inte bara med `fri_vag`), och han kan gå mellan kapitlets rum som han redan har varit i (en avstickare). **P15 utan `kasta`** visar stegen som växer ett pinnsteg per fyllt fält (`variant: "apan"`), och en `knuff` med `efter_sek` börjar räkna först efter första felet. **P26** läser upp `instruktion` först, och `knuff` låter ungen nosa mot närmaste föremål som inte är svingat. Filer i 2.15 gäller fortfarande.
 2.15: prologen v0.11.3. `vantar_pa: "radion"` (instruktionen väntar tills spelaren har tryckt på radion och hört Farfars senaste replik genom den igen) och `kapitelrubrik: true` på repliken med nästa kapitels rubrik (den visas inte när nästa kapitel är låst). Mellanscenens `bild` har lägena för luftskeppet. Allt är tillägg, filer i 2.14 gäller fortfarande.
 2.14: grafiken i Farfars hus. Scenen kan ha `hjalte: "sover"` (hjälten ligger i sängen när scenen börjar och kliver ur när han ska röra sig). Kartorna får `bild` och `mark` (rummets bild eller markens rutset) och objekten `bild`, `bild_natt`, `bild_pa`, `bild_del`, `sovplats` och `skata_fonster`. Allt är tillägg, filer i 2.13 gäller fortfarande.
 2.13: låsta kapitel (beslut 24.2). `kapitel_last` i `aventyr.json`: `last` (kapitlen som är låsta från början) och `steg` (slutrutan: mellanscener och repliker). Talaren `klaffen` heter `herr_skata`. Allt är tillägg, filer i 2.12 gäller fortfarande.
@@ -70,7 +71,8 @@ Kapitelfilerna börjar med `"format": 2`, äventyret och ordlistorna med `"forma
   ```
   Stegen får inte vara `sparpunkt`, `ga_till`, `las_skylt` eller `prata`.
 - **Scen:** `id`, `pass` (1, 2, 3 …), `rum` (eller `null` för scener utanför rummen), `tillstand`, `vy` (`uppifran`, `sidovy`, `narbild`), `vid_omstart` (en replik när spelet startar om här), `steg`, `frivillig`, `startar_i_rum`.
-- **En frivillig scen** (`"frivillig": true, "startar_i_rum": "buskarna"`) spelas inte i tur och ordning. Den spelas första gången hjälten går in i rummet medan ett `ga_till` med `fri_vag` pågår, högst en gång. Efteråt går han tillbaka själv. Den räknas inte in i passets tid.
+- **En frivillig scen** (`"frivillig": true, "startar_i_rum": "buskarna"`) spelas inte i tur och ordning. Den spelas första gången hjälten går in i rummet medan ett `ga_till` pågår, högst en gång. Efteråt går han tillbaka själv. Den räknas inte in i passets tid.
+- **Avstickare** (beslut 26.2): i ett kapitel med en frivillig scen kan hjälten under varje `ga_till` gå genom utgångarna till sidogrenens rum och till kapitlets rum som han redan har varit i. Målet står kvar i molnet, ungen nosar efter en stund mot utgången närmast tillbaka, och radion upprepar Farfars senaste replik i scenen. När han kommer tillbaka till scenens rum fortsätter steget. Spelet sparar i avstickaren och fortsätter där: mitt i den frivilliga scenen börjar den om med sin `vid_omstart`, annars hörs den pågående scenens. Prologen har ingen frivillig scen, så där gäller det inte. `vid_annan_utgang` stänger avstickarna.
 - **Scenerna spelas i ordning.** Ett `pussel`-steg väntar tills pusslet är löst. Det behövs alltså ingen `nasta_scen`.
 - `meta` och `anteckning` är fria fält för versionsnummer och noter. De påverkar inte spelet.
 - **`nivaer`** (frivilligt): golv och tak i kapitlet, `{ "lasning": ["L1", "L3"], "skrivning": ["S1", "S1"] }`. Anpassningen håller sig inom dem.
@@ -184,6 +186,8 @@ Hänga apan-familjen. `kategori` (text spelaren läser själv), `svar` (ett ord,
 
 **`kasta`** (`erbjudande`, `vid_ratt`): efter första rätta bokstaven lyser staven, och `erbjudande` läses upp (det väntar inte). Ett tryck på staven ger formelvyn: fälten får guldkant, och nästa tomma fält lyser. Han fyller bara de tomma fälten. En fel bricka studsar tillbaka, de rätta ligger kvar, och efter två fel på samma plats blinkar rätt bricka. Inget fel räknas. Ett nytt tryck på staven lämnar läget. Rätt i kasta-läget ger `kasta.vid_ratt`.
 
+**Utan `kasta`** (kapitel 1, beslut 29.2) erbjuds staven aldrig. **`variant: "apan"`**: bredvid fälten står stegen under nätet, med ett pinnsteg per fält. Varje fyllt fält fäller ut ett pinnsteg nerifrån, och apan klättrar ner ett steg (E fyller två och ger två). Vid fel blundar apan. **`knuff.efter_sek`** börjar räkna först efter första felet. Före det gäller läsplattans tid efter textmängden.
+
 ### P9_kodlas (fas 3)
 
 `niva`, `svar` (ett ord, små bokstäver), `brickor`, `chiffer` med `tecken` (på låset, i ordning), `nyckel` (`tecken` → `bokstav`) och `nyckeln_finns_i`, `visa_forsta`, `kontroll`, `svar_lyser_sek`. Kontrollen räknar ut ordet ur tecknen och nyckeln och jämför med svaret.
@@ -192,7 +196,7 @@ Låset och nyckeln står på samma skärm. **`visa_forsta`**: ungen visar det f�
 
 ### P26_krukorna
 
-`innehall` (en post per kruka eller buske: `bar`, `tom`, `kartbit_1`, `ekorre`, `skattlada` …), `kartbit_i_sista`, `sak_i_sista` (posten som alltid hittas sist), `foremal` (föremålen i rummet att svinga mot, ett per post; utan `foremal` delas föremålet som visar pusslet upp i krukor). Vila, påverkar inte nivån.
+`innehall` (en post per kruka eller buske: `bar`, `tom`, `kartbit_1`, `ekorre`, `skattlada` …), `kartbit_i_sista`, `sak_i_sista` (posten som alltid hittas sist), `foremal` (föremålen i rummet att svinga mot, ett per post; utan `foremal` delas föremålet som visar pusslet upp i krukor). Vila, påverkar inte nivån. **`instruktion`** läses upp innan han börjar. **`knuff`**: efter en stund utan att något svingas springer ungen till föremålet närmast hjälten som inte är svingat och nosar mot det, och det glimtar. Knuffens `handling` är bara för loggen.
 
 ## 3b. Rummens kartor (Tiled)
 
