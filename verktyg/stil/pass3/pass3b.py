@@ -1,4 +1,4 @@
-# Pass 3, det sista före pass (12-uppdrag 2026-11-03, Stil 1, beslut 30.1 och 31.2):
+# Pass 3, det sista innan pass 3 spelas (12-uppdrag 2026-11-03, Stil 1, beslut 30.1 och 31.2):
 # - luftskepp_laser_skyltarna (+ _talar): baronen utan hjälm lutar sig ut och läser skyltarna med kikaren åt fel håll
 # - luftskepp_flyger_fel_01–02: luftskeppet styr iväg mot SKOLAN, baronen pekar stolt framåt, Herr Skata tittar bakåt
 # - luftskepp_ser_kartan: kikaren vänd ned mot kartbiten, och ögonen blir stora

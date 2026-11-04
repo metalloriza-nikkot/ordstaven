@@ -101,6 +101,7 @@ const tangentbord = skapaTangentbord({
   vidSudda: () => inmatning.tangentNer('Backspace'),
   vidKlar: () => inmatning.tangentNer('Enter'),
 });
+ui.ikonKnappar(tangentbord.el); // ✓ blir Stils ikon (beslut 31.4)
 
 // Har WebGL tappats förut på den här datorn (Safari på golvdatorn: "WebGL context lost") ritas världen med canvas,
 // en vecka i taget. Annars väljer Phaser: WebGL om det finns, annars canvas.
@@ -239,6 +240,8 @@ const spelet = skapaSpel({
   grafik: () => ({ golv: rum.golvBild?.visible ? rum.golvBild.texture.key : null, sang: (() => { const o = rum.objekt.find((/** @type {any} */ x) => x.sovplats); const r = o ? rum.ritade.get(o.id) : null; return r?.frame?.name ?? null; })(),
     luftskepp: rum.luft ? rum.luft.img.frame.name : null, hjalm: rum.lagerLuft.list.some((/** @type {any} */ o) => o.frame?.name === 'baronen_hjalm'),
     sidovy: rum.sidovy.visible, senasteSidovy: rum.senasteSidovy, regi: [...rum.regiLogg], unge: rum.unge.visible }),
+  /** Det senaste samtalet (vem som talade och åt vilket håll hjälten vände sig), och figurens bild. @param {string} [id] */
+  samtal: (id) => ({ ...(rum.samtal || {}), hjalte: rum.kropp?.frame.name ?? null, figur: id ? rum.ritade.get(id)?.frame?.name ?? null : null, unge: rum.ungeBild?.frame.name ?? null, ungeVand: rum.ungeVand, ungePos: rum.ungePos, ungeGar: rum.ungeGar, tittar: rum.ungeTittarPa }),
   /** Figurer som flyger förbi just nu (Herr Skata). */
   flygande: () => [...rum.lagerFigurer.list, ...rum.lagerLuft.list].filter((/** @type {any} */ o) => o.texture?.key === 'herr_skata').map((/** @type {any} */ o) => o.frame.name),
   spel,

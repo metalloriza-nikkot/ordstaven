@@ -163,7 +163,7 @@ html, body {
 /* regianvisning för den vuxne (mellanscener i gråboxen): liten, i vanlig skrift, uppe till höger i rummet.
    Den läses inte upp och står aldrig på läsplattan. Den vuxne kan läsa den högt. Försvinner när mellanscenerna får bild. */
 #regi { position: absolute; right: calc(100vw - var(--rum-vanster) - var(--rum-bredd) + 64px); top: calc(var(--rum-topp) + 10px); max-width: min(40vw, calc(var(--rum-bredd) / 2.6)); padding: 4px 10px 5px; border-radius: 6px; border: 1px dashed rgba(216, 204, 180, .55); background: rgba(26, 20, 16, .72); color: #d8ccb4; font-size: 13px; line-height: 1.3; font-style: italic; text-transform: none; pointer-events: none; z-index: 3; }
-#regi::before { content: '🎬 '; font-style: normal; }
+/* regirutan har ingen emoji längre (beslut 31.4) */
 
 /* läsplattan: ljust papper, mörk text, stor */
 #plattan { position: absolute; left: calc(var(--rum-vanster) + var(--rum-bredd) / 2); transform: translateX(-50%); max-width: min(92vw, var(--rum-bredd)); width: max-content; color: var(--black); }
@@ -198,7 +198,7 @@ html, body {
 .pussel-ruta { padding: 20px 24px 24px; display: flex; flex-direction: column; align-items: center; gap: 18px; min-width: min(80vw, 520px); }
 .lapp { background: #fffaf0; padding: 12px 22px; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,.2); transform: rotate(-1deg); }
 /* packlistan: en bock per packad rad; när allt är packat lyser raden som inte är en sak, och sakerna tonas ut */
-.lapp .rad.bockad::after { content: ' ✔'; color: #2f8a3a; font-weight: 700; }
+.lapp .rad.bockad::after { content: ''; display: inline-block; width: calc(16 * var(--ipx-text)); height: calc(16 * var(--ipx-text)); margin-left: .25em; vertical-align: -.1em; background: url('../assets/ui/ikon_klar.png') 0 0 / 100% 100%; image-rendering: pixelated; }
 .lapp .rad.lyser { background: rgba(242, 193, 78, .5); border-radius: 6px; box-shadow: 0 0 0 4px rgba(242, 193, 78, .5); animation: puls .6s ease 3; }
 .kortrad.packat .kort { opacity: .3; transition: opacity .4s; }
 /* baronens papper i hans orange (spelarens val), med de gamla id:na kvar */
@@ -387,12 +387,12 @@ html, body {
 .skylt .kort { min-width: calc(80px * var(--t)); min-height: calc(56px * var(--t)); padding: 4px 12px; }
 .skylt .kort.provad { opacity: .5; cursor: default; }
 .skylt.nara .kort:not(.provad) { box-shadow: 0 5px 0 #c8bb9c, 0 0 0 4px var(--guld); }
-.skylt.nara .kort:not(.provad)::before { content: '✋'; position: absolute; right: calc(-18px * var(--t)); top: calc(-18px * var(--t)); width: calc(40px * var(--t)); height: calc(40px * var(--t)); display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--guld); font-size: calc(22px * var(--t)); box-shadow: 0 3px 0 #b8892b; animation: handpuls 0.9s ease-in-out infinite; pointer-events: none; }
+.skylt.nara .kort:not(.provad)::before { content: ''; position: absolute; right: calc(-18px * var(--t)); top: calc(-18px * var(--t)); width: calc(16 * var(--ipx-text)); height: calc(16 * var(--ipx-text)); background: url('../assets/ui/ikon_hand.png') 0 0 / 100% 100%; image-rendering: pixelated; animation: handpuls 0.9s ease-in-out infinite; pointer-events: none; }
 .snabb .skylt.nara .kort:not(.provad)::before { animation: none; }
 .nosar .skylt .ord { cursor: pointer; background: rgba(242, 193, 78, .35); box-shadow: 0 3px 0 var(--guld); }
 #ordskylt .kort { min-width: calc(96px * var(--t)); min-height: calc(72px * var(--t)); padding: 6px 14px; animation: luft .25s ease; }
 /* en hand i hörnet: tryck på lappen (eller föremålet igen) så händer det. Samma hand som vid föremålen. */
-#ordskylt .kort::before { content: '✋'; position: absolute; right: calc(-18px * var(--t)); top: calc(-18px * var(--t)); width: calc(40px * var(--t)); height: calc(40px * var(--t)); display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--guld); font-size: calc(22px * var(--t)); box-shadow: 0 3px 0 #b8892b; animation: handpuls 0.9s ease-in-out infinite; pointer-events: none; }
+#ordskylt .kort::before { content: ''; position: absolute; right: calc(-18px * var(--t)); top: calc(-18px * var(--t)); width: calc(16 * var(--ipx-text)); height: calc(16 * var(--ipx-text)); background: url('../assets/ui/ikon_hand.png') 0 0 / 100% 100%; image-rendering: pixelated; animation: handpuls 0.9s ease-in-out infinite; pointer-events: none; }
 .snabb #ordskylt .kort::before { animation: none; }
 #ordskylt .kort::after { content: ''; position: absolute; left: 50%; bottom: -10px; transform: translateX(-50%); border: 8px solid transparent; border-top-color: #fff; border-bottom: 0; }
 .platta-oppen #ordskylt, .platta-oppen #tanke { display: none; }
@@ -562,7 +562,7 @@ html, body {
 .paus-val { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 160px; padding: 16px 20px; border: 0; border-radius: 18px; background: #fffaf0; box-shadow: 0 5px 0 #c8bb9c; cursor: pointer; font-family: inherit; color: inherit; }
 .paus-bild { font-size: 72px; line-height: 1; }
 .paus-ord { font-size: calc(36px * var(--t, 1)); font-weight: 700; }
-.paus-val.ny::after { content: '⭐'; position: absolute; right: -10px; top: -12px; font-size: 32px; }
+.paus-val.ny::after { content: ''; position: absolute; right: -10px; top: -12px; width: calc(16 * var(--ipx-text)); height: calc(16 * var(--ipx-text)); background: url('../assets/ui/ikon_stjarna.png') 0 0 / 100% 100%; image-rendering: pixelated; }
 .paus-flikar { display: flex; gap: 12px; }
 .paus-flikar .paus-val { min-width: 110px; padding: 10px 14px; }
 .paus-flikar .paus-bild { font-size: 44px; }
@@ -632,3 +632,68 @@ html, body {
 .lucka-ikon { position: relative; flex: none; width: calc(36px * var(--t)); height: calc(40px * var(--t)); border-radius: 3px; background: #a7845a; box-shadow: inset 0 0 0 3px #6b4a2a; }
 .lucka-ikon::before { content: ''; position: absolute; left: calc(-4px * var(--t)); top: 20%; width: calc(8px * var(--t)); height: 60%; border-radius: 2px; background: #c9a24a; }
 
+/* ---------------------------------------------------------------- Stils ikoner och HUD (beslut 31.4, 33.2, 10d) */
+/* ikonerna: 16 × 16 pixlar i hela steg i fysiska pixlar (grans/layout.js räknar --ipx-text, --ipx-stor och --hudpx) */
+.ikon-px { display: inline-block; image-rendering: pixelated; vertical-align: middle; flex: none; pointer-events: none; }
+.ikon-text { width: calc(16 * var(--ipx-text)); height: calc(16 * var(--ipx-text)); }
+.ikon-stor { width: calc(16 * var(--ipx-stor)); height: calc(16 * var(--ipx-stor)); }
+.knapp.stor .ikon-text { width: calc(32 * var(--ipx-text)); height: calc(32 * var(--ipx-text)); }
+.paus-flikar .paus-bild .ikon-stor { width: calc(16 * var(--ipx-text)); height: calc(16 * var(--ipx-text)); }
+#fest .ikon-stor { width: calc(32 * var(--ipx-stor)); height: calc(32 * var(--ipx-stor)); }
+#narbild .ikon-stor { width: calc(32 * var(--ipx-stor)); height: calc(32 * var(--ipx-stor)); }
+.flygande-bar { margin: 0; }
+.flygande-bar .ikon-px { transform: translate(-50%, -50%); }
+#handknapp button { display: flex; align-items: center; justify-content: center; }
+#styrhjalp .finger .ikon-px { display: block; }
+.nos-pekar .ikon-stor, .ryggsack .ikon-stor { width: calc(16 * var(--ipx-text)); height: calc(16 * var(--ipx-text)); }
+.portratt.stjarna .ikon-text { width: calc(16 * var(--ipx-text)); height: calc(16 * var(--ipx-text)); }
+.moln-hogtalare { display: flex; align-items: center; justify-content: center; padding: 0; }
+.vidare .ikon-text { width: calc(16 * var(--ipx-text)); height: calc(16 * var(--ipx-text)); }
+.kort.mening-skylt .ikon-stor { width: calc(16 * var(--ipx-text)); height: calc(16 * var(--ipx-text)); }
+
+/* HUD:ens knappar: en rund knapp i mässing och läder (24 × 24), ikonen 4 pixlar in. Samma knappar som förut. */
+.hud-knapp { position: relative; width: var(--hud); height: var(--hud); min-width: 0; min-height: 0; padding: 0; gap: 0; border-radius: 50%;
+  background: url('../assets/ui/hud_knapp.png') 0 0 / 100% 100% no-repeat; image-rendering: pixelated; box-shadow: none; color: #2b2420; }
+.hud-knapp:active { background-image: url('../assets/ui/hud_knapp_tryckt.png'); }
+.hud-knapp .ikon-hud { position: absolute; left: calc(4 * var(--hudpx)); top: calc(4 * var(--hudpx)); width: calc(16 * var(--hudpx)); height: calc(16 * var(--hudpx)); }
+#hud-nos .ikon-hud.aktiv { display: none; }
+.nosar #hud-nos { background: url('../assets/ui/hud_knapp_aktiv.png') 0 0 / 100% 100% no-repeat; color: inherit; box-shadow: none; }
+.nosar #hud-nos .ikon-hud { display: none; }
+.nosar #hud-nos .ikon-hud.aktiv { display: block; }
+/* antalet bär på Farfars papperslapp (18 × 14) under bären, i Lexend */
+.hud-knapp .tal { position: absolute; left: 50%; top: calc(100% - 3 * var(--hudpx)); transform: translateX(-50%); width: calc(18 * var(--hudpx)); height: calc(14 * var(--hudpx));
+  display: flex; align-items: center; justify-content: center; padding-top: calc(1 * var(--hudpx)); box-sizing: border-box;
+  background: url('../assets/ui/hud_tal.png') 0 0 / 100% 100% no-repeat; image-rendering: pixelated; font-size: calc(9 * var(--hudpx)); font-weight: 700; color: #2b2420; line-height: 1; }
+#hud { gap: calc(4 * var(--hudpx)); align-items: flex-start; }
+#hud-bar { margin-bottom: calc(11 * var(--hudpx)); }
+#hud-paus { left: calc(var(--rum-vanster) + var(--rum-bredd) - var(--hud) - 64px); width: var(--hud); }
+#hud-paus.glimt::after { inset: calc(-2 * var(--hudpx)); border-width: calc(2 * var(--hudpx)); }
+/* i ramen till höger när den är minst 48 punkter bred (33.2): radio, nos och bär nere till höger, lappen under bären,
+   och pausen uppe till höger. Står aldrig över väggen med skyltarna. */
+.hud-i-ramen #hud { left: calc(var(--rum-vanster) + var(--rum-bredd) + (var(--ram-hoger) - var(--hud)) / 2); top: auto;
+  bottom: calc(100vh - var(--rum-topp) - var(--rum-hojd) + 4px); flex-direction: column; align-items: center; }
+.hud-i-ramen #hud-paus { left: calc(var(--rum-vanster) + var(--rum-bredd) + (var(--ram-hoger) - var(--hud)) / 2); top: calc(var(--rum-topp) + 4px); }
+
+/* Dörrskyltarna (beslut 33.3, 10d): en träskylt med två spikar på väggen mitt över dörren, i tre delar (9-slice).
+   32 punkter i vila, och skylten vid dörren där hjälten står växer till dubbel storlek in över dörren. */
+.skylt.vagg { transform: translate(-50%, -100%); }
+.skylt.vagg-fram { transform: translate(-50%, 0); }
+.skylt.vagg-pa { transform: translate(-50%, -100%); }
+.skylt .kort.vaggskylt { min-width: 0; min-height: 0; height: calc(10 * var(--vpx)); padding: 0 calc(2 * var(--vpx)); box-sizing: border-box;
+  display: flex; align-items: center; justify-content: center; border-radius: 0; box-shadow: none; background: none;
+  border-style: solid; border-width: 0 calc(4 * var(--vpx)); border-color: #8a6a4a; border-image: var(--skylt9) 0 4 fill / 0 calc(4 * var(--vpx)) stretch;
+  image-rendering: pixelated; color: #2b2420; font-size: calc(32px * var(--t)); line-height: 1; letter-spacing: .03em;
+  transform-origin: 50% 0; transition: transform .15s ease-out, opacity .15s; }
+#skyltar .kort.vaggskylt { box-shadow: none; background: none; }
+.skylt .kort.vaggskylt .kort-etikett { line-height: 1; }
+.skylt.vagg-fram .kort.vaggskylt, .skylt.vagg-pa .kort.vaggskylt { transform-origin: 50% 100%; }
+.skylt .kort.vaggskylt .kort-etikett { font-size: inherit; white-space: nowrap; }
+.skylt .kort.vaggskylt .kort-ord { font-size: inherit; }
+.skylt.vagg.stor { z-index: 3; }
+.skylt.vagg.stor .kort.vaggskylt { transform: scale(2); }
+.skylt.vagg.tonad .kort.vaggskylt { opacity: .12; }
+.skylt.vagg .kort.vaggskylt.provad { opacity: .5; }
+.skylt.vagg.nara .kort.vaggskylt:not(.provad) { box-shadow: none; }
+.snabb .skylt .kort.vaggskylt { transition: none; }
+/* Mellanslag-tangenten står bredvid handen när det finns en hand (inte över molnet) */
+#styrhjalp.mellanslag.vid-hand { bottom: auto; transform: translate(calc(40px * var(--t)), -50%); }

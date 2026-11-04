@@ -16,8 +16,13 @@ import { lagerFor, bytLager } from './karna/hjalte.js';
 import { TANGENTBORD_HOJD } from './grans/tangentbord.js';
 import { skapaRullning } from './grans/rullning.js';
 import { kartbitarHtml } from './grans/kartbitar.js';
+import { ikon } from './grans/ikoner.js';
 
 const KNUFF_MS = 9000;
+/** Handen vid målet i molnet syns på ca två rutors avstånd (beslut 34.3), i världens pixlar. */
+const TIDIG_HAND = 32;
+/** Dörrskylten blir stor när hjälten står så här nära dörren (10d: som markeringen, ca 1,5 rutor). */
+const DORR_STOR = 24;
 /** Talare vars porträtt har radiomärket ritat i nedre hörnet (Stil 21:20). Andra får emojin tills vidare. */
 const MED_RADIOMARKE = new Set(['farfar']);
 /** Ungens knuff när målet står i molnet efter en dialog (beslut 31.2). */
@@ -58,21 +63,21 @@ export function skapaSpel(d) {
   let pausad = false;
   /** @type {Set<string>} orsakerna till pausen */
   const pausorsaker = new Set();
-  let fryst = false;
   /**
    * Pausa spelet: världen stannar, rösten tystnar, knuffar och tangenter väntar. Läsplattan och
    * allt annat ligger kvar som det var, så att spelet fortsätter exakt där det stod.
    * @param {string} orsak
    */
   function pausa(orsak) {
-    if (!pausorsaker.size) { fryst = rum.fryst; rum.frys(true); rost.tyst(); ui.avbrytLjudning(); spara(); }
+    if (!pausorsaker.size) { rum.sattPaus(true); rost.tyst(); ui.avbrytLjudning(); spara(); }
     pausorsaker.add(orsak); pausad = true;
     logg.handelse('paus', orsak);
   }
   /** @param {string} orsak */
   function fortsatt(orsak) {
     if (!pausorsaker.delete(orsak) || pausorsaker.size) return;
-    pausad = false; rum.frys(fryst);
+    // världen står som stegen vill: ett steg som släppte den under pausen gäller (förut kom frysningen från före pausen tillbaka)
+    pausad = false; rum.sattPaus(false);
     logg.handelse('paus', 'slut');
   }
   document.addEventListener('visibilitychange', () => { if (document.hidden) pausa('dold'); else fortsatt('dold'); });
@@ -141,7 +146,7 @@ export function skapaSpel(d) {
    * och stjärnan för berättaren. @param {string} talare @param {boolean} [radio]
    */
   const portratt = (talare, radio = false) => talare === 'berattare'
-    ? '<span class="portratt stjarna" aria-hidden="true">★</span>'
+    ? `<span class="portratt stjarna" aria-hidden="true">${ikon('stjarna')}</span>`
     : `<span class="portratt p-${ui.esc(talare)}${radio ? ' radio' : ''}${uttryckKlass(talare)}" aria-hidden="true">${radio && !MED_RADIOMARKE.has(talare) ? '📻' : ''}</span>`;
   /** Porträttets min just nu (baronen förvånad, stolt eller sur efter vad som händer i rummet). @param {string} talare */
   const uttryckKlass = (talare) => { const u = rum.uttryck?.(talare); return u ? ` u-${ui.esc(u)}` : ''; };
@@ -164,6 +169,8 @@ export function skapaSpel(d) {
     // nosen fungerar på repliker också, gratis (de läses ändå upp), så att "tryck på nosen" alltid ger svar
     ui.sattNos(true, { betala: () => true });
     const rull = rullaOchSag(/** @type {HTMLElement} */ (el.querySelector('.text')), r);
+    // ett samtal: hjälten och den som talar vänder sig mot varandra, och ungen tittar dit (34.2). Inte genom radion.
+    if (r.talare && r.talare !== 'berattare' && r.via !== 'radio') rum.vandMotTalare?.(r.talare);
     // figuren i världen pratar medan repliken läses (baronen i luftskeppet)
     rum.talar?.(r.talare, true); rull.klar.then(() => rum.talar?.(r.talare, false));
     // ett tryck medan texten rullar visar allt (rösten läser vidare), nästa tryck går vidare
@@ -196,7 +203,7 @@ export function skapaSpel(d) {
   let molnNu = '';
   function visaMoln(bild, r = null) {
     if (!bild && !r) { ui.visaTanke(null); molnNu = ''; return; }
-    const html = `${bild ? `<span class="moln-bild">${bild}</span>` : ''}${r ? `<span class="instruktion">${ui.rader(r.text, varden())}</span><button type="button" class="moln-hogtalare" aria-label="Läs igen">🔊</button>` : ''}`;
+    const html = `${bild ? `<span class="moln-bild">${bild}</span>` : ''}${r ? `<span class="instruktion">${ui.rader(r.text, varden())}</span><button type="button" class="moln-hogtalare" aria-label="Läs igen">${ikon('hogtalare')}</button>` : ''}`;
     if (html !== molnNu) ljud.spela('pling');
     molnNu = html;
     ui.visaTanke(html);
@@ -217,9 +224,9 @@ export function skapaSpel(d) {
     return `<img class="bild malbild" data-bild="${ui.esc(id)}" src="${m.url}" alt="" draggable="false" style="width:${(m.b * k) / dpr}px;height:${(m.h * k) / dpr}px">`;
   }
   /** Kartbiten i festen när han hittar eller får den: Stils bild, annars emojin. @param {number} n */
-  const kartbitFest = (n) => kartbitarHtml([n], { hojd: Math.min(160, layout.skala.cssHojd * 0.5) }) ?? (Number.isFinite(n) ? '🗺️' : '📜');
+  const kartbitFest = (n) => kartbitarHtml([n], { hojd: Math.min(160, layout.skala.cssHojd * 0.5) }) ?? ikon(Number.isFinite(n) ? 'karta' : 'lapp', 'stor');
   /** Bilden av handlingen i en instruktion som väntar. @param {string} vad */
-  const handlingsBild = (vad) => ({ nosen: '<span class="bild emoji">👃</span>', mata_ungen: '<span class="bild emoji">🫐</span>', radion: '<span class="bild emoji">📻</span>' })[vad] ?? null;
+  const handlingsBild = (vad) => { const n = ({ nosen: 'nos', mata_ungen: 'bar', radion: 'radio' })[vad]; return n ? `<span class="bild ikon-bild" data-bild="${n}">${ikon(n, 'stor')}</span>` : null; };
 
   /**
    * En instruktion som ber om en handling väntar tills den är gjord ("Tryck på bären, så får {unge} ett.").
@@ -229,6 +236,7 @@ export function skapaSpel(d) {
    */
   async function replikVantar(r) {
     if (r.upplast && r.talare && aventyr.talare[r.talare]) senaste.set(r.talare, r);
+    if (r.talare && r.talare !== 'berattare' && r.via !== 'radio') rum.vandMotTalare?.(r.talare);
     rum.frys(false);
     visaMoln(handlingsBild(r.vantar_pa), r);
     sag(r);
@@ -449,9 +457,10 @@ export function skapaSpel(d) {
         if (o.sort !== 'utgang') continue;
         const ord = skyltOrd(o.id);
         if (!ord) continue;
-        const [punkt, plats] = skyltPlats((o.lapp && rum.ruta(o.lapp)) || o);
+        const vis = (o.lapp && rum.ruta(o.lapp)) || o;
+        const [punkt, plats] = o.golv ? skyltPlats(vis) : vaggSkyltPlats(vis);
         lista.push({ objekt: o.id, punkt, plats, vidTryck: () => { if (rum.fryst) return; const f = framfor(o); inmatning.sattGaTill(f.x, f.y); },
-          html: `<button type="button" class="kort${o.golv ? ' stigskylt' : ''}" data-id="${ui.esc(o.id)}"><span class="kort-etikett">${ui.rader(ord, varden(), 'kort-ord')}</span>${pilFor(o)}</button>` });
+          html: `<button type="button" class="kort${o.golv ? ' stigskylt' : ' vaggskylt'}" data-id="${ui.esc(o.id)}"><span class="kort-etikett">${ui.rader(ord, varden(), 'kort-ord')}</span>${pilFor(o)}</button>` });
       }
       ui.skyltar(lista);
     };
@@ -550,7 +559,7 @@ export function skapaSpel(d) {
     if (!narbild.hidden) {
       const nya = (scen.steg || []).filter((/** @type {any} */ x) => x.typ === 'ge_kartbit').map((/** @type {any} */ x) => /** @type {number} */ (x.nummer));
       const s2 = layout.skala;
-      narbild.innerHTML = kartbitarHtml([...(av.kartbitar || []), ...nya], { hojd: s2.cssHojd * 0.8, bredd: s2.cssBredd * 0.9 }) ?? '<span>🗺️</span>';
+      narbild.innerHTML = kartbitarHtml([...(av.kartbitar || []), ...nya], { hojd: s2.cssHojd * 0.8, bredd: s2.cssBredd * 0.9 }) ?? ikon('karta', 'stor');
     }
     ui.uppdateraHud(av); visaPausknapp();
     visaEtiketter();
@@ -659,7 +668,17 @@ export function skapaSpel(d) {
     if (!b || !rum.harRum || !rum.hjalte?.visible || rum.klattrar) { ui.skyltHjalte(null); return; }
     const a = skarm(rum.pos.x - 12, rum.pos.y - 28), c = skarm(rum.pos.x + 12, rum.pos.y + 1);
     ui.skyltHjalte({ left: a.x, top: a.y, right: c.x, bottom: c.y });
+    // dörrskylten vid dörren där han står växer (33.3): samma avstånd som markeringen, ca 1,5 rutor
+    let vid = null, bast = DORR_STOR;
+    for (const o of rum.objekt) {
+      if (o.sort !== 'utgang' || o.golv || o.klattra) continue;
+      const f = framfor(o), dd = Math.hypot(rum.pos.x - f.x, rum.pos.y - f.y);
+      if (dd <= bast) { bast = dd; vid = o.id; }
+    }
+    if (vid !== dorrStor) { dorrStor = vid; ui.skyltStor(vid); }
   }, 50);
+  /** @type {string | null} */
+  let dorrStor = null;
 
   // ------------------------------------------------------------------ rummets skyltar (beslut 15.2)
   /** En skylt med en mening (inte ett ord) öppnas på läsplattan när han går dit. @param {string} text */
@@ -717,7 +736,7 @@ export function skapaSpel(d) {
       const o = /** @type {any} */ (rum.ruta(sk.id));
       const [punkt, plats] = skyltPlats(o);
       const html = sk.mening
-        ? `<button type="button" class="kort mening-skylt p-${ui.esc(sk.papper)}" data-id="${ui.esc(sk.id)}" aria-label="Skylten"><span aria-hidden="true">📜</span></button>`
+        ? `<button type="button" class="kort mening-skylt p-${ui.esc(sk.papper)}" data-id="${ui.esc(sk.id)}" aria-label="Skylten">${ikon('lapp', 'stor')}</button>`
         : `<button type="button" class="kort p-${ui.esc(sk.papper)}" data-id="${ui.esc(sk.id)}"><span class="kort-etikett">${ui.rader(sk.text, varden(), 'kort-ord')}</span></button>`;
       return { objekt: sk.id, punkt, plats, html, vidTryck: () => {
         if (rum.fryst || pausad) return;
@@ -892,6 +911,28 @@ export function skapaSpel(d) {
     const mitt = o.y + o.h / 2;
     // dörrens skylt sitter ovanför dörren och täcker den aldrig (grind A), och den går att läsa från mitten av rummet
     if (o.sort === 'utgang' && !o.golv) return [skarm(o.x + o.b / 2, o.y - 1), bas];
+    return skyltPlatsAnnan(o, bas, mitt);
+  }
+  /**
+   * Dörrskylten på väggen (beslut 33.3, 10d): en träskylt mitt över dörren, med nederkanten 1 pixel ovanför dörrens
+   * överkant. I en främre vägg sitter den under hålet om det finns plats där, annars på hålets nederkant. Den
+   * växer in över dörren när hjälten står vid den, aldrig ut över golvet. @param {any} o
+   * @returns {[{ x: number, y: number }, any]}
+   */
+  function vaggSkyltPlats(o) {
+    const s = layout.skala;
+    const ram = { vanster: rumTillSkarm(s, 0, 0).x, hoger: rumTillSkarm(s, RUM.bredd, 0).x };
+    const bas = { rumTopp: s.topp, rumBotten: s.topp + s.cssHojd, ram, objekt: o.id };
+    const cx = o.x + o.b / 2;
+    if (o.riktning === 'ned') {
+      const hojd = rum.storlek?.hojd ?? RUM.hojd;
+      if (o.y + o.h + 11 <= hojd) return [skarm(cx, o.y + o.h + 1), { ...bas, lage: 'vagg', vagg: 'fram' }];
+      return [skarm(cx, o.y + o.h - 1), { ...bas, lage: 'vagg', vagg: 'pa' }];
+    }
+    return [skarm(cx, o.y - 1), { ...bas, lage: 'vagg', vagg: 'bak' }];
+  }
+  /** @param {any} o @param {any} bas @param {number} mitt @returns {[{ x: number, y: number }, any]} */
+  function skyltPlatsAnnan(o, bas, mitt) {
     if (o.sort !== 'utgang' && o.sida === 'hoger' && o.x <= rum.vagg.sida + 8) return [skarm(o.x, mitt), { ...bas, lage: 'vanster' }];
     if (o.sort !== 'utgang' && o.sida === 'vanster' && o.x + o.b >= rum.storlek.bredd - rum.vagg.sida - 8) return [skarm(o.x + o.b, mitt), { ...bas, lage: 'hoger' }];
     return [skarm(o.x + o.b / 2, o.y), bas];
@@ -923,8 +964,10 @@ export function skapaSpel(d) {
    * last = de andra utgångarna i rummet är låsta: går hjälten till en av dem öppnas den inte, ljudet spelas,
    * hjälten tittar upp och målet lyser (hallen före kläckningen: DUNK ovanifrån, och stegen lyser).
    * framme = föremål som räknas när han går dit, som en utgång (en skylt med en mening öppnas när han går dit).
+   * tidig = målet i molnet: handen syns redan på ca två rutors avstånd (beslut 34.3), också på en dörr, och ett tryck
+   * på den räknas. Hjälten går själv sista biten.
    */
-  function anvand(ids, { verb = 'anvand', last, framme: narFramme = [] } = {}) {
+  function anvand(ids, { verb = 'anvand', last, framme: narFramme = [], tidig = /** @type {string | null} */ (null) } = {}) {
     let avbryt = () => {};
     const lova = /** @type {Promise<string> & { avbryt(): void }} */ (new Promise((klar) => {
       const utgangar = ids.filter((id) => rum.ruta(id)?.sort === 'utgang' || narFramme.includes(id));
@@ -938,9 +981,18 @@ export function skapaSpel(d) {
         const o = id ? rum.ruta(id) : null;
         if (!o) { ui.handknapp(null); styrAnvand(verb, null); return; }
         ljud.spela('klick');
-        const [pt, plats] = skyltPlats(o);
+        logg.handelse('hand', o.id, { avstand: Math.round(avstandTill(rum.pos, o)) });
+        // på en dörr sitter handen på dörren (skylten sitter ovanför)
+        const [pt, plats] = o.sort === 'utgang' && !o.golv ? [skarm(o.x + o.b / 2, o.y + o.h / 2), { ...skyltPlats(o)[1], lage: /** @type {const} */ ('pa') }] : skyltPlats(o);
         ui.handknapp(pt, () => gor(o.id), plats);
         styrAnvand(verb, pt);
+      };
+      // målet i molnet: handen på ca två rutors avstånd (till dörrens tröskel för en dörr)
+      const tidigNara = () => {
+        const o = tidig ? rum.ruta(tidig) : null;
+        if (!o || !ids.includes(o.id)) return null;
+        const d = o.sort === 'utgang' ? Math.hypot(rum.pos.x - framfor(o).x, rum.pos.y - framfor(o).y) : avstandTill(rum.pos, o);
+        return d <= TIDIG_HAND ? o.id : null;
       };
       // en utgång räknas när hjälten går dit. Står han redan där när steget börjar (t.ex. efter FORTSÄTT) väntar
       // spelet tills han gått därifrån, eller tills spelaren trycker på utgången eller använder den.
@@ -972,7 +1024,7 @@ export function skapaSpel(d) {
           if (!framme(id)) vapnadeAndra.add(id);
           else if (vapnadeAndra.has(id) && !lastUpptagen) { vapnadeAndra.delete(id); lastDorr(id); }
         }
-        visaNara(rum.starVid(saker));
+        visaNara(rum.starVid(saker) ?? tidigNara());
         const ut = utgangar.find((id) => vapnade.has(id) && framme(id));
         if (ut) gor(ut);
       }, 60);
@@ -1046,7 +1098,7 @@ export function skapaSpel(d) {
       const fri = frivilligaKvar().filter((id) => id !== st.mal);
       const bortSkyltar = visaUtgangsSkyltar();
       visaMal();
-      const id = await anvand([st.mal, ...sidor, ...fri], { last: st.vid_annan_utgang, framme: skyltMal ? [st.mal] : [] });
+      const id = await anvand([st.mal, ...sidor, ...fri], { last: st.vid_annan_utgang, framme: skyltMal ? [st.mal] : [], tidig: iMolnet ? st.mal : null });
       bortSkyltar();
       if (id === st.mal) {
         // vägvalet: gick han till målet först (apan), eller tog han sidogrenen (buskarna) först?
@@ -1061,6 +1113,9 @@ export function skapaSpel(d) {
     }
     if (skyltMal) skyltStyrs.delete(st.mal); // pusslet tar över skylten (den öppnas inte av sig själv, han står redan där)
     framme();
+    // ett tryck på handen på avstånd (målet i molnet): hjälten går själv sista biten
+    const mo = rum.ruta(st.mal);
+    if (mo && !mo.klattra && !skyltMal && !vidObjekt(rum.pos, mo) && !genom(mo, rum.pos)) await rum.ga(framfor(mo), tid(Math.min(600, 20 * Math.hypot(rum.pos.x - framfor(mo).x, rum.pos.y - framfor(mo).y))));
     // stegen: hjälten klättrar själv upp eller ned tills huvudet når luckan, sedan glider nästa rum in
     const o = rum.ruta(st.mal);
     if (o?.klattra) {
@@ -1218,7 +1273,7 @@ export function skapaSpel(d) {
         const bild = flera ? bilder.html(a.bild || a.id) : a.ord ? '' : bilder.html(a.bild || a.id);
         const etikett = a.ord ? `<span class="kort-etikett">${ui.rader(a.ord, varden(), 'kort-ord')}</span>` : '';
         const klasser = ['kort', v.s.valda.has(a.id) ? 'vald' : '', v.s.pekar === a.id ? 'pekar' : '', a.ord && a.ord.includes(' ') ? 'mening' : '', luckor ? 'lucka' : ''].join(' ');
-        return `<button type="button" class="${klasser}" data-id="${ui.esc(a.id)}">${luckor ? '<span class="lucka-ikon" aria-hidden="true"></span>' : ''}${bild}${etikett}${v.s.pekar === a.id ? '<span class="nos-pekar" aria-hidden="true">👃</span>' : ''}</button>`;
+        return `<button type="button" class="${klasser}" data-id="${ui.esc(a.id)}">${luckor ? '<span class="lucka-ikon" aria-hidden="true"></span>' : ''}${bild}${etikett}${v.s.pekar === a.id ? `<span class="nos-pekar" aria-hidden="true">${ikon('nos', 'stor')}</span>` : ''}</button>`;
       };
       const rita = () => {
         const papper = v.s.text ? `<div class="lapp p-${ui.esc(p.papper || 'lapp')}">${ui.rader(v.s.text, varden())}</div>` : '';
@@ -1228,7 +1283,7 @@ export function skapaSpel(d) {
         const frRad = fr ? fragaRadHtml(fr, luckor ? bildHtml : '') : '';
         const visar = visarFor(p.id);
         if (visar) rum.visaDelar(visar.id, delarAv(p.varianter[v.s.variantNyckel].alternativ.filter((/** @type {any} */ a) => v.s.alternativ.some((x) => x.id === a.id))));
-        ui.visaPlatta(`<div class="pussel-ruta${luckor ? ' luckor' : ''}">${frRad}${papper}${bild}<div class="kortrad ${flera && v.s.klar ? 'packat' : ''}">${v.s.alternativ.map(kortHtml).join('')}</div>${flera ? '<div class="ryggsack" aria-hidden="true">🎒</div>' : ''}</div>`, 'pussel ' + p.typ);
+        ui.visaPlatta(`<div class="pussel-ruta${luckor ? ' luckor' : ''}">${frRad}${papper}${bild}<div class="kortrad ${flera && v.s.klar ? 'packat' : ''}">${v.s.alternativ.map(kortHtml).join('')}</div>${flera ? `<div class="ryggsack" aria-hidden="true">${ikon('ryggsack', 'stor')}</div>` : ''}</div>`, 'pussel ' + p.typ);
         if (fr) plattan().querySelector('.fraga-rad .las-igen')?.addEventListener('click', () => sag(fr));
         if (flera) bockaListan();
         tillatNos(p, spar);
@@ -1321,8 +1376,8 @@ export function skapaSpel(d) {
     // papper, och skylten öppnas när han går dit eller trycker på papperet. Den läses aldrig upp.
     const skylt = p.skylt ? skyltarIRummet().find((x) => x.id === p.skylt) ?? null : null;
     if (p.skylt && !skylt) logg.handelse('FEL', `${p.id}: skylten ${p.skylt} finns inte i rummet`);
-    const fraga = () => visaMoln(skylt ? '<button type="button" class="tanke-lapp tanke-skylt" aria-label="Skylten">📜</button>'
-      : harLapp ? '<button type="button" class="tanke-lapp" aria-label="Lappen">📜</button>'
+    const fraga = () => visaMoln(skylt ? `<button type="button" class="tanke-lapp tanke-skylt" aria-label="Skylten">${ikon('lapp', 'stor')}</button>`
+      : harLapp ? `<button type="button" class="tanke-lapp" aria-label="Lappen">${ikon('lapp', 'stor')}</button>`
       : v.s.bild ? bilder.html(v.s.bild) : v.s.text ? ui.rader(v.s.text, varden()) : null, p.instruktion ?? null);
     if (skylt) {
       skyltStyrs.add(skylt.id); skyltSpar = spar; skyltPusselNu = skylt.id;
@@ -1381,10 +1436,10 @@ export function skapaSpel(d) {
           const o = a.objekt ? rum.ruta(a.objekt) : null;
           if (!o || o.sort !== 'utgang' || !a.ord) continue;
           const vis = (o.lapp && rum.ruta(o.lapp)) || o;
-          const [punkt, plats] = skyltPlats(vis);
+          const [punkt, plats] = o.golv ? skyltPlats(vis) : vaggSkyltPlats(vis);
           const provad = borta.has(a.id);
           lista.push({ objekt: o.id, punkt, plats, vidTryck: () => { if (!provad) anvandAlt(a); },
-            html: `<button type="button" class="kort ${provad ? 'provad' : ''} ${v.s.pekar === a.id ? 'pekar' : ''}${o.golv ? ' stigskylt' : ''}" data-id="${ui.esc(a.id)}"${provad ? ' tabindex="-1"' : ''}><span class="kort-etikett">${ui.rader(a.ord, varden(), 'kort-ord')}</span>${pilFor(o)}</button>` });
+            html: `<button type="button" class="kort ${provad ? 'provad' : ''} ${v.s.pekar === a.id ? 'pekar' : ''}${o.golv ? ' stigskylt' : ' vaggskylt'}" data-id="${ui.esc(a.id)}"${provad ? ' tabindex="-1"' : ''}><span class="kort-etikett">${ui.rader(a.ord, varden(), 'kort-ord')}</span>${pilFor(o)}</button>` });
         }
         ui.skyltar(lista);
         ui.skyltNara(vid && arUtgang(vid) ? vid : null);
@@ -2150,6 +2205,12 @@ export function skapaSpel(d) {
     });
     window.clearInterval(igen); ui.ropa(null); inmatning.rensaGaTill();
     rum.frys(true);
+    // handen visar att han är framme (34.3), och samtalet börjar av sig självt
+    ljud.spela('klick'); logg.handelse('hand', o.id, { avstand: Math.round(avstandTill(rum.pos, o)) });
+    const [pt, plats] = skyltPlats(o);
+    ui.handknapp(pt, () => {}, plats);
+    await vanta(tid(500));
+    ui.handknapp(null);
   }
 
   /**
@@ -2217,7 +2278,7 @@ export function skapaSpel(d) {
         if (st.typ === 'replik') await replik(st);
         else if (st.typ === 'mellanscen' && st.beskrivning) { ui.visaRegi(st.beskrivning, 0); await vanta(tid(1500)); ui.doljRegi(); }
       }
-      const p = ui.visaSkarm(`<div class="pass-slut kapitel-last"><div class="stor-ikon">${SOVER}<span class="stjarna" aria-hidden="true">⭐</span></div><button type="button" class="knapp stor igen" aria-label="Igen">▶</button></div>`);
+      const p = ui.visaSkarm(`<div class="pass-slut kapitel-last"><div class="stor-ikon">${SOVER}<span class="stjarna" aria-hidden="true">${ikon('stjarna', 'stor')}</span></div><button type="button" class="knapp stor igen" aria-label="Igen">▶</button></div>`);
       await new Promise((klar) => p.querySelector('.igen')?.addEventListener('click', () => klar(undefined), { once: true }));
       ui.doljSkarm();
     }
@@ -2274,7 +2335,7 @@ export function skapaSpel(d) {
   };
   /** Ordet läses upp vid tryck (stilguiden §6). @param {string} nyckel */
   const lasOrd = (nyckel) => { const ord = gransnittsOrd(nyckel); if (ord) sag({ talare: 'berattare', text: ord, upplast: true }); };
-  const BILD = { kartan: '🗺️', hjalteboken: '📖', staven: '<span class="stav-ikon"></span>', garderoben: '👑', dinoboken: '🦕' };
+  const BILD = { kartan: ikon('karta', 'stor'), hjalteboken: ikon('bok', 'stor'), staven: '<span class="stav-ikon"></span>', garderoben: ikon('klader', 'stor'), dinoboken: ikon('dinobok', 'stor') };
   /**
    * Pausmenyn: världen står still. KARTAN visar kartbitarna, HJÄLTEBOKEN har flikarna staven (formlerna),
    * garderoben (byt tillbaka det han har på sig) och Dinoboken. En ny flik har en stjärna tills han har tittat.
@@ -2300,7 +2361,7 @@ export function skapaSpel(d) {
       const s2 = layout.skala;
       const ritad = kartbitarHtml(bitar, { hojd: s2.cssHojd * 0.6, bredd: s2.cssBredd * 0.8 });
       const ritade = new Set((ritad?.match(/data-bitar="([^"]*)"/)?.[1] || '').split(',').filter(Boolean).map(Number));
-      html = `${tillbaka}<div class="paus-karta">${ritad ?? ''}${bitar.filter((n) => !ritade.has(n)).map((n) => `<span class="kartbit" aria-label="Kartbit ${n}">🗺️<b>${n}</b></span>`).join('')}</div>${stang}`;
+      html = `${tillbaka}<div class="paus-karta">${ritad ?? ''}${bitar.filter((n) => !ritade.has(n)).map((n) => `<span class="kartbit" aria-label="Kartbit ${n}">${ikon('karta', 'stor')}<b>${n}</b></span>`).join('')}</div>${stang}`;
     } else {
       sett()[vy] = antalI(vy); spara(); // han har tittat: stjärnan släcks
       const flikar = FLIKAR.map((f) => bildknapp(f, BILD[f], `flik ${f === vy ? 'vald' : ''} ${nyFlik(f) ? 'ny' : ''}`)).join('');
@@ -2416,7 +2477,7 @@ export function skapaSpel(d) {
 
   function slutskarm() {
     rum.frys(true);
-    const s = ui.visaSkarm(`<div class="pass-slut"><div class="stor-ikon">⭐</div><p class="vuxen">Slut på gråboxen. Kapitel 1 kommer i fas 3.</p><button type="button" class="knapp stor om" aria-label="Börja om">↺</button></div>`);
+    const s = ui.visaSkarm(`<div class="pass-slut"><div class="stor-ikon">${ikon('stjarna', 'stor')}</div><p class="vuxen">Slut på gråboxen. Kapitel 1 kommer i fas 3.</p><button type="button" class="knapp stor om" aria-label="Börja om">↺</button></div>`);
     s.querySelector('.om')?.addEventListener('click', () => { sparning.nollstall(); location.reload(); });
   }
 

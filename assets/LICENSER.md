@@ -14,6 +14,7 @@ Varje grafik-, ljud- eller typsnittsfil och varje bibliotek som följer med spel
 | Läsplattans bildkort | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/bildkort/` |
 | Sidovyerna (bakgrunder och det som rör sig i dem) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/sidovyer/` |
 | Farfars karta (kartbitarna) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/karta/` |
+| HUD:ens knappar, ikonerna och dörrskyltarna | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/ui/` |
 | Farfars hus: föremålen | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/foremal/hus/` |
 | Farfars hus: rummen (en bild per rum) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/rum/hus/` |
 | Skogens rutor (rutset för Tiled) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/tiles/skog/` |

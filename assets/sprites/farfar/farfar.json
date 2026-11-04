@@ -20,7 +20,7 @@
     "h": 28
    }
   },
-  "farfar_morgon_ner_01": {
+  "farfar_morgon_hoger_01": {
    "frame": {
     "x": 0,
     "y": 29,
@@ -40,7 +40,7 @@
     "h": 24
    }
   },
-  "farfar_natt_ner_01": {
+  "farfar_morgon_ner_01": {
    "frame": {
     "x": 0,
     "y": 54,
@@ -60,10 +60,130 @@
     "h": 24
    }
   },
-  "farfar_portratt_fundersam": {
+  "farfar_morgon_upp_01": {
    "frame": {
     "x": 0,
     "y": 79,
+    "w": 16,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 24
+   }
+  },
+  "farfar_morgon_vanster_01": {
+   "frame": {
+    "x": 0,
+    "y": 104,
+    "w": 16,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 24
+   }
+  },
+  "farfar_natt_hoger_01": {
+   "frame": {
+    "x": 0,
+    "y": 129,
+    "w": 16,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 24
+   }
+  },
+  "farfar_natt_ner_01": {
+   "frame": {
+    "x": 0,
+    "y": 154,
+    "w": 16,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 24
+   }
+  },
+  "farfar_natt_upp_01": {
+   "frame": {
+    "x": 0,
+    "y": 179,
+    "w": 16,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 24
+   }
+  },
+  "farfar_natt_vanster_01": {
+   "frame": {
+    "x": 0,
+    "y": 204,
+    "w": 16,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 24
+   }
+  },
+  "farfar_portratt_fundersam": {
+   "frame": {
+    "x": 0,
+    "y": 229,
     "w": 48,
     "h": 48
    },
@@ -83,7 +203,7 @@
   "farfar_portratt_fundersam_radio": {
    "frame": {
     "x": 0,
-    "y": 128,
+    "y": 278,
     "w": 48,
     "h": 48
    },
@@ -103,7 +223,7 @@
   "farfar_portratt_glad": {
    "frame": {
     "x": 0,
-    "y": 177,
+    "y": 327,
     "w": 48,
     "h": 48
    },
@@ -123,7 +243,7 @@
   "farfar_portratt_glad_radio": {
    "frame": {
     "x": 0,
-    "y": 226,
+    "y": 376,
     "w": 48,
     "h": 48
    },
@@ -146,7 +266,7 @@
   "format": "RGBA8888",
   "size": {
    "w": 49,
-   "h": 275
+   "h": 425
   },
   "scale": "1",
   "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."

@@ -31,6 +31,21 @@ export function skapaLayout({ varld, logg }) {
     r.setProperty('--t', String(t));
     // bildkorten (48 × 48 pixlar) skalas i hela steg i fysiska pixlar, så nära emojins storlek (64 punkter × t) som det går
     r.setProperty('--kort', (Math.max(1, Math.round((64 * t * dpr) / 48)) * 48) / dpr + 'px');
+    // ikonerna (16 × 16) och HUD:ens knappar (24 × 24) i hela steg i fysiska pixlar (10d). En pixel i CSS-punkter:
+    const steg = (/** @type {number} */ mal, /** @type {number} */ px, min = 1) => Math.max(min, Math.round((mal * dpr) / px)) / dpr;
+    r.setProperty('--ipx-text', steg(40 * t, 16) + 'px'); // i en rad med text i 40 punkter
+    r.setProperty('--ipx-stor', steg(96 * t, 16) + 'px'); // festen och pausmenyn
+    r.setProperty('--vpx', s.cssSkala + 'px'); // en av världens pixlar (dörrskyltarnas trä)
+    // HUD:en står i ramen till höger när den är minst 48 punkter bred (beslut 33.2), annars i rummets hörn som förut
+    const ram = Math.max(0, window.innerWidth - (s.vanster + s.cssBredd));
+    const minK = Math.ceil((48 * dpr) / 24);
+    let k = Math.max(minK, Math.round((64 * t * dpr) / 24));
+    const iRamen = ram >= 48;
+    if (iRamen) k = Math.max(minK, Math.min(k, Math.floor(((ram - 8) * dpr) / 24)));
+    r.setProperty('--hudpx', k / dpr + 'px');
+    r.setProperty('--hud', (24 * k) / dpr + 'px');
+    r.setProperty('--ram-hoger', ram + 'px');
+    document.documentElement.classList.toggle('hud-i-ramen', iRamen);
     varld.dataset.skala = String(s.fysisk);
     if (logg) logg.handelse('skärm', `skala ${s.fysisk} (fysisk)`, { fonster: `${window.innerWidth}×${window.innerHeight}`, dpr, reserv });
     for (const f of lyssnare) f(s);

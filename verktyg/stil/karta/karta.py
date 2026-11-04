@@ -205,14 +205,17 @@ flod([(4, 58), (20, 66), (34, 64), (50, 76), (66, 73)])
 for (x, y) in [(14, 84), (40, 90), (56, 56)]: trad(x, y)
 vulkan(40, 40); berg(80, 34, 10, skiss=True); berg(96, 40, 8, skiss=True)
 isberg(150, 30); isberg(176, 24); berg(206, 36, 9, skiss=True)
-luftskepp_skiss(190, 66); berg(176, 92, 8, skiss=True)
+berg(190, 76, 15, skiss=True); berg(176, 92, 8, skiss=True)   # bit 6: ett högt berg vid molnkanten (06 v0.22), inget luftskepp
 kompassros(198, 124, 8)
 # ---------- vägen (streckad, rödbrun) ----------
 VAGEN = [(12, 134), (24, 128), (40, 126), (52, 121), (61, 117), (74, 113), (88, 118), (96, 110), (82, 104), (64, 97),
          (44, 86), (28, 74), (20, 60), (28, 46), (44, 26), (66, 20), (92, 24), (118, 18), (142, 14), (170, 30),
-         (196, 40), (204, 56), (196, 74), (186, 90), (180, 102), (166, 116), (146, 114), (130, 104), (118, 92)]
+         (196, 40), (204, 56), (196, 74), (186, 90), (180, 102), (166, 116), (146, 114), (130, 104), (124, 98)]
 for a, b in zip(VAGEN, VAGEN[1:]): linje(*a, *b, VAG, streckad=True)
-for (x, y) in [(118, 92), (117, 91), (119, 91), (118, 90)]: satt(x, y, VAG)          # vägen slutar i dalen
+# Vägen slutar vid molnkanten (06 v0.22): kartan visar vägen fram till molnen, inte genom dem.
+# Inne i molnen leder ungen med nosen (kapitel 7). Sista strecken tonar bort i molnet.
+for (x, y) in [(124, 98), (123, 97), (122, 96)]: satt(x, y, VAG)
+for (x, y, c) in [(120, 95, '#C8706A'), (119, 94, '#E0B0AC'), (117, 93, '#E0B0AC')]: satt(x, y, rgb(c))
 
 # ---------- ut ----------
 def bitbild(n, glipa=True):

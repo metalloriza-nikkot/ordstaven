@@ -3,6 +3,7 @@
 // helskärmar (start, passets slut) och etiketter över rummets objekt. All läsbar text här, i Lexend.
 import { forSkarm, versaler } from '../karna/text.js';
 import { ljudningsdelar, maxtidMs } from '../karna/ljudning.js';
+import { ikon, laddaSkyltTra, IKON_FOR } from './ikoner.js';
 
 /** @param {string} s */
 export const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c] || c);
@@ -17,12 +18,12 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
   ui.innerHTML = `
     <div id="tona"></div>
     <div id="hud">
-      <button type="button" id="hud-bar" class="hud-knapp" hidden aria-label="Bär"><span class="ikon">🫐</span><span class="tal">0</span></button>
-      <button type="button" id="hud-nos" class="hud-knapp" hidden aria-label="Nosa på ett ord"><span class="ikon">👃</span></button>
-      <button type="button" id="hud-lapp" class="hud-knapp" hidden aria-label="Lappen"><span class="ikon">📜</span></button>
-      <button type="button" id="hud-radio" class="hud-knapp" hidden aria-label="Radion"><span class="ikon">📻</span></button>
+      <button type="button" id="hud-radio" class="hud-knapp" hidden aria-label="Radion">${ikon('radio', 'hud')}</button>
+      <button type="button" id="hud-nos" class="hud-knapp" hidden aria-label="Nosa på ett ord">${ikon('nos', 'hud')}${ikon('nos_aktiv', 'hud').replace('ikon-px', 'ikon-px aktiv')}</button>
+      <button type="button" id="hud-bar" class="hud-knapp" hidden aria-label="Bär">${ikon('bar', 'hud')}<span class="tal">0</span></button>
+      <button type="button" id="hud-lapp" class="hud-knapp" hidden aria-label="Lappen">${ikon('lapp', 'hud')}</button>
     </div>
-    <button type="button" id="hud-paus" class="hud-knapp" hidden aria-label="Paus"><span class="ikon paus-ikon" aria-hidden="true"><i></i><i></i></span></button>
+    <button type="button" id="hud-paus" class="hud-knapp" hidden aria-label="Paus">${ikon('paus', 'hud')}</button>
     <button type="button" id="hud-meny" aria-label="Meny för vuxna (håll inne)">⚙</button>
     <div id="tanke" hidden></div>
     <div id="varldslager">
@@ -31,11 +32,11 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
       <div id="skyltar"></div>
       <div id="rop" hidden></div>
       <div id="ordskylt" hidden></div>
-      <div id="handknapp" hidden><button type="button" aria-label="Använd">✋</button></div>
+      <div id="handknapp" hidden><button type="button" aria-label="Använd">${ikon('hand')}</button></div>
     </div>
     <div id="styrhjalp" hidden></div>
     <div id="regi" hidden></div>
-    <div id="narbild" hidden><span>🗺️</span></div>
+    <div id="narbild" hidden>${ikon('karta', 'stor')}</div>
     <div id="plattan" hidden></div>
     <div id="remsa" hidden></div>
     <div id="fest" hidden></div>
@@ -43,6 +44,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     <div id="pausmeny" hidden></div>
     <div id="vuxenmeny" hidden></div>`;
   document.body.appendChild(ui);
+  laddaSkyltTra();
   const $ = (/** @type {string} */ s) => /** @type {HTMLElement} */ (ui.querySelector(s));
   const plattan = $('#plattan'), regi = $('#regi'), remsa = $('#remsa'), skarm = $('#skarm'), fest = $('#fest');
 
@@ -224,8 +226,21 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
 
   // ---------------------------------------------------------------- plattan och regi
   /** @param {string} html @param {string} [klass] */
+  /**
+   * Knappar och tecken som förut var emoji eller tecken (▶ ◀ ✓ 🔊 📜 ⭐ …) får Stils ikoner (beslut 31.4). Gäller
+   * element utan egna barn vars hela text är ett sådant tecken. @param {HTMLElement} rot
+   */
+  function ikonKnappar(rot) {
+    for (const e of /** @type {HTMLElement[]} */ ([...rot.querySelectorAll('button, span, b')])) {
+      if (e.children.length) continue;
+      const namn = IKON_FOR[(e.textContent || '').trim()];
+      const html = namn ? ikon(namn) : '';
+      if (html) e.innerHTML = html;
+    }
+    return rot;
+  }
   function visaPlatta(html, klass = '') {
-    plattan.className = klass; plattan.innerHTML = html; plattan.hidden = false;
+    plattan.className = klass; plattan.innerHTML = html; plattan.hidden = false; ikonKnappar(plattan);
     ui.classList.add('platta-oppen');
     return plattan;
   }
@@ -254,10 +269,13 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
 
   /**
    * Kort fest: ikon i mitten. En emoji visas som text, en bild ur `bilder.html` som HTML (annars syns koden).
-   * @param {string} ikon @param {number} ms @param {boolean} [html] ikonen är HTML från bildlistan
+   * @param {string} vad emoji, ikon eller HTML @param {number} ms @param {boolean} [html] HTML från bildlistan
    */
-  function visaFest(ikon, ms = 900, html = false) {
-    if (html || ikon.trimStart().startsWith('<')) fest.innerHTML = ikon; else fest.textContent = ikon; fest.hidden = false; fest.classList.remove('pop'); void fest.offsetWidth; fest.classList.add('pop');
+  function visaFest(vad, ms = 900, html = false) {
+    // en emoji som har en ikon (bären, glittret, stjärnan) visas som Stils ikon (beslut 31.4)
+    const ik = IKON_FOR[vad.trim()];
+    if (ik && ikon(ik, 'stor')) fest.innerHTML = ikon(ik, 'stor');
+    else if (html || vad.trimStart().startsWith('<')) fest.innerHTML = vad; else fest.textContent = vad; fest.hidden = false; fest.classList.remove('pop'); void fest.offsetWidth; fest.classList.add('pop');
     return new Promise((r) => setTimeout(() => { fest.hidden = true; r(undefined); }, ms));
   }
 
@@ -275,13 +293,13 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
 
   // ---------------------------------------------------------------- helskärmar
   /** @param {string} html */
-  function visaSkarm(html) { skarm.innerHTML = html; skarm.hidden = false; return skarm; }
+  function visaSkarm(html) { skarm.innerHTML = html; skarm.hidden = false; ikonKnappar(skarm); return skarm; }
   function doljSkarm() { skarm.hidden = true; skarm.innerHTML = ''; }
   /** Menyn för vuxna ligger över allt annat, även startskärmen, och rör inte spelets skärmar. @param {string} html */
   function visaMeny(html) { const m = $('#vuxenmeny'); m.innerHTML = html; m.hidden = false; return m; }
   function doljMeny() { const m = $('#vuxenmeny'); m.hidden = true; m.innerHTML = ''; }
   /** Spelarens pausmeny (kartan och hjälteboken). @param {string} html */
-  function visaPausmeny(html) { const m = $('#pausmeny'); m.innerHTML = html; m.hidden = false; return m; }
+  function visaPausmeny(html) { const m = $('#pausmeny'); m.innerHTML = html; m.hidden = false; ikonKnappar(m); return m; }
   function doljPausmeny() { const m = $('#pausmeny'); m.hidden = true; m.innerHTML = ''; }
 
   /** Etiketter över rummets objekt (gråbox, för den vuxne). @param {{ id: string, x: number, y: number, b: number }[]} objekt @param {(x: number, y: number) => { x: number, y: number }} tillSkarm @param {boolean} visa */
@@ -335,8 +353,14 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
   /** @param {HTMLElement} e @param {{ x: number, y: number }} punkt @param {Plats} [plats] */
   function placera(e, punkt, plats) {
     const lage = plats?.lage || 'over';
-    e.classList.remove('under', 'pa', 'vanster', 'hoger');
+    e.classList.remove('under', 'pa', 'vanster', 'hoger', 'vagg', 'vagg-bak', 'vagg-fram', 'vagg-pa');
     if (plats?.objekt) e.dataset.objekt = plats.objekt; else delete e.dataset.objekt;
+    // dörrskylten på väggen (33.3): alltid på samma ställe, flyttas aldrig
+    if (lage === 'vagg') {
+      e.classList.add('vagg', 'vagg-' + (plats?.vagg || 'bak'));
+      e.style.left = Math.round(punkt.x) + 'px'; e.style.top = Math.round(punkt.y) + 'px';
+      return;
+    }
     if (lage !== 'over') e.classList.add(lage);
     // ett föremål utanför bilden (ett stort område) får sin skylt där föremålet är: den klipps, och syns när kameran kommer dit
     const iBild = !plats?.ram || (punkt.x >= plats.ram.vanster && punkt.x <= plats.ram.hoger);
@@ -378,11 +402,54 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
       d.className = 'skylt'; d.innerHTML = s.html;
       /** @type {any} */ (d).skylt = s;
       e.appendChild(d);
+      tralangd(d);
       d.querySelector('button')?.addEventListener('click', () => { if (!nos.aktiv) s.vidTryck(); });
     }
     ordnaSkyltar();
+    if (e.id === 'skyltar') skyltStor(storNu);
   }
 
+  /**
+   * Dörrskyltens bredd i hela världspixlar: ordets bredd i Lexend plus 12 (10d), så att träet inte blir suddigt.
+   * @param {HTMLElement} d skyltens element
+   */
+  function tralangd(d) {
+    const k = /** @type {HTMLElement | null} */ (d.querySelector('.vaggskylt'));
+    if (!k) return;
+    const vpx = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--vpx')) || 1;
+    const etikett = /** @type {HTMLElement | null} */ (k.querySelector('.kort-etikett'));
+    k.style.width = '';
+    const b = etikett ? etikett.getBoundingClientRect().width : k.getBoundingClientRect().width;
+    k.style.width = Math.ceil(b / vpx + 12) * vpx + 'px';
+  }
+  /**
+   * Skylten vid dörren där hjälten står växer till dubbel storlek in över dörren (33.3). Bara en åt gången, och den
+   * täcker aldrig en annan skylt: grannens ord tonas bort så länge. null = ingen. @param {string | null} objekt
+   */
+  function skyltStor(objekt) {
+    storNu = objekt;
+    const alla = /** @type {HTMLElement[]} */ ([...ui.querySelectorAll('#skyltar .skylt.vagg')]);
+    let stor = null;
+    for (const d of alla) { const ja = !!objekt && d.dataset.objekt === objekt; d.classList.toggle('stor', ja); if (ja) stor = d; }
+    // den stora skyltens ruta: dubbelt så stor, från överkanten (bakvägg) eller nederkanten (främre vägg)
+    let r = null;
+    if (stor) {
+      const k = /** @type {HTMLElement} */ (stor.querySelector('.kort') || stor);
+      const q = k.getBoundingClientRect();
+      // getBoundingClientRect räknar med transformen, som kan vara på väg: räkna från den osträckta storleken
+      const b = k.offsetWidth, h = k.offsetHeight, mx = q.left + q.width / 2;
+      const nedat = !stor.classList.contains('vagg-fram') && !stor.classList.contains('vagg-pa');
+      const topp = nedat ? q.top : q.bottom - 2 * h;
+      r = { left: mx - b, right: mx + b, top: topp, bottom: topp + 2 * h };
+    }
+    for (const d of alla) {
+      if (d === stor || !r) { d.classList.remove('tonad'); continue; }
+      const q = /** @type {HTMLElement} */ (d.querySelector('.kort') || d).getBoundingClientRect();
+      d.classList.toggle('tonad', q.left < r.right && r.left < q.right && q.top < r.bottom && r.top < q.bottom);
+    }
+  }
+  /** @type {string | null} dörren vars skylt är stor just nu */
+  let storNu = null;
   /** @type {{ left: number, top: number, right: number, bottom: number } | null} hjältens ruta på skärmen */
   let hjalteRuta = null;
   /** Dörrarna på skärmen: en skylt som flyttas undan för hjälten ställs aldrig på en dörr (grind A). */
@@ -414,6 +481,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
         const s = /** @type {any} */ (d).skylt;
         if (!s) continue;
         placera(d, s.punkt, { ...s.plats, objekt: s.objekt });
+        if (s.plats?.lage === 'vagg') continue; // dörrskylten sitter på väggen och flyttas aldrig
         const r = d.getBoundingClientRect();
         if (!r.width) continue;
         // utanför bilden (ett stort område): den står där föremålet är och ordnas inte
@@ -544,7 +612,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
   /** Ett bär flyger från räknaren till ungen. @param {{ x: number, y: number }} fran @param {{ x: number, y: number }} till @param {number} ms */
   function flygBar(fran, till, ms) {
     const e = document.createElement('div');
-    e.className = 'flygande-bar'; e.textContent = '🫐';
+    e.className = 'flygande-bar'; e.innerHTML = ikon('bar');
     ui.appendChild(e);
     const mitt = { x: (fran.x + till.x) / 2, y: Math.min(fran.y, till.y) - 60 };
     const anim = e.animate([
@@ -561,10 +629,13 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
    */
   function styrhjalp(typ, punkt) {
     const e = $('#styrhjalp');
-    e.hidden = !typ; e.className = typ || '';
-    if (typ === 'pilar') e.innerHTML = '<span class="tangent upp"><span class="yta">▲</span></span><span class="tangent vanster"><span class="yta">◀</span></span><span class="tangent ner"><span class="yta">▼</span></span><span class="tangent hoger"><span class="yta">▶</span></span>';
-    else if (typ === 'tryck' && punkt) { ankra(e); e.innerHTML = '<span class="finger">👆</span>'; e.style.left = punkt.x + 'px'; e.style.top = punkt.y + 'px'; }
-    else if (typ === 'mellanslag') e.innerHTML = '<span class="tangent mellanslag" aria-hidden="true"><span class="yta"></span></span>'; // en bred tangent som trycks ned
+    e.hidden = !typ; e.className = typ || ''; e.style.left = ''; e.style.top = '';
+    if (typ === 'pilar') e.innerHTML = '<span class="tangent upp"><span class="yta">▲\uFE0E</span></span><span class="tangent vanster"><span class="yta">◀\uFE0E</span></span><span class="tangent ner"><span class="yta">▼\uFE0E</span></span><span class="tangent hoger"><span class="yta">▶\uFE0E</span></span>';
+    else if (typ === 'tryck' && punkt) { ankra(e); e.innerHTML = `<span class="finger">${ikon('hand', 'stor')}</span>`; e.style.left = punkt.x + 'px'; e.style.top = punkt.y + 'px'; }
+    else if (typ === 'mellanslag') { // en bred tangent som trycks ned, bredvid handen (inte över molnet nere till vänster)
+      e.innerHTML = '<span class="tangent mellanslag" aria-hidden="true"><span class="yta"></span></span>';
+      if (punkt) { ankra(e); e.classList.add('vid-hand'); e.style.left = punkt.x + 'px'; e.style.top = punkt.y + 'px'; }
+    }
     else if (typ === 'tab') { // Tab-tangenten, som tänder nosen, under nosknappen
       e.innerHTML = '<span class="tangent tab" aria-hidden="true"><span class="yta">⇥</span></span>';
       if (punkt) { e.style.left = punkt.x + 'px'; e.style.top = punkt.y + 'px'; }
@@ -622,9 +693,9 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     styrhjalp,
     flygBar,
     handknapp,
-    ljudord, visaTanke, placeraTanke, pulseraTanke, ordskylt, skyltar, rumsskyltar, skyltHjalte, sattDorrRutor, ordnaSkyltar, pulseraSkylt, skyltNara, ropa,
+    ljudord, visaTanke, placeraTanke, pulseraTanke, ordskylt, skyltar, rumsskyltar, skyltHjalte, sattDorrRutor, ordnaSkyltar, skyltStor, pulseraSkylt, skyltNara, ropa,
     ui, $, plattan, rader, esc, visaPlatta, doljPlatta, vantaFortsatt, visaRegi, doljRegi, visaFest,
-    uppdateraHud, pulsera, visaSkarm, doljSkarm, visaMeny, doljMeny, visaPausmeny, doljPausmeny, etiketter, sattNos, vaxlaNos, ljuda, arHelord,
+    uppdateraHud, pulsera, ikonKnappar, visaSkarm, doljSkarm, visaMeny, doljMeny, visaPausmeny, doljPausmeny, etiketter, sattNos, vaxlaNos, ljuda, arHelord,
     fanga, tandNos, markeraOrd,
     /** @param {(vad: 'tand' | 'ord', ord?: string) => void} f @returns {() => void} */
     vidNos(f) { nosLyssnare.add(f); return () => nosLyssnare.delete(f); },

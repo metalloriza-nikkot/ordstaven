@@ -68,6 +68,8 @@ export class Rum extends Phaser.Scene {
     /** @type {Map<string, any>} */
     this.ritade = new Map();
     this.fryst = false;
+    this.frysSteg = false;
+    this.pausad = false;
     this.harRum = false;
     this.inomhus = false;
     /** väggarnas mått i rummet (kartan) */
@@ -97,6 +99,10 @@ export class Rum extends Phaser.Scene {
     this.regiLogg = [];
     /** @type {string | null} en hel bild av hjälten i stället för gången (kartbiten upp mot luftskeppet, s22) */
     this.hjaltePose = null;
+    /** @type {{ talare: string, riktning: string } | null} det senaste samtalet (testkroken) */
+    this.samtal = null;
+    /** @type {{ x: number, y: number, till: number } | null} där ungen tittar när den står still (den som talar), en stund */
+    this.ungeTittarPa = null;
     this.tillstand = /** @type {string | null} */ (null);
     /** @type {{ ids: string[], klar: (id: string) => void } | null} */
     this.vantar = null;
@@ -616,6 +622,41 @@ export class Rum extends Phaser.Scene {
   }
 
   /**
+   * Ett samtal börjar (beslut 34.2): hjälten vänder sig mot den som talar, den som talar vänder sig mot hjälten (om
+   * figuren har bilder åt det hållet, `_ner_` byts mot `_upp_`, `_vanster_` eller `_hoger_`), och ungen tittar på
+   * den som talar. Baronen talar från luftskeppet: då tittar hjälten och ungen dit. Inte när hjälten sover eller
+   * klättrar. @param {string} talare @returns {boolean} om någon vände sig
+   */
+  vandMotTalare(talare) {
+    if (!this.harRum || this.sover || this.klattrar || !talare) return false;
+    const o = this.objekt.find((x) => x.talare === talare && this.ritade.has(x.id));
+    let mal = null;
+    if (o) mal = { x: o.x + o.b / 2, y: o.y + o.h - 2 };
+    else if (talare === 'baronen' && this.luft) mal = { x: this.luft.img.x + this.luft.img.width / 2, y: this.luft.img.y + this.luft.img.height };
+    if (!mal) return false;
+    const dx = mal.x - this.pos.x, dy = mal.y - this.pos.y, l = Math.hypot(dx, dy) || 1;
+    this.vand = { x: dx / l, y: dy / l };
+    this.ritaHjalte();
+    // figuren mot hjälten: bara bildens riktning byts, och bara om bilden finns
+    const img = o ? /** @type {any} */ (this.ritade.get(o.id)) : null;
+    const bild = img?.frame?.name;
+    if (bild && /_(ner|upp|vanster|hoger)_/.test(bild)) {
+      const ny = bild.replace(/_(ner|upp|vanster|hoger)_/, `_${riktningFor({ x: -dx / l, y: -dy / l })}_`);
+      if (img.texture.has(ny) && ny !== bild) img.setFrame(ny);
+    }
+    // ungen tittar på den som talar, också om den kommer gående just nu (den vänder sig när den stannar)
+    this.ungeTittarPa = { ...mal, till: this.time.now + 6000 };
+    if (this.unge.visible && !this.ungeMal) {
+      const ux = mal.x - this.ungePos.x, uy = mal.y - this.ungePos.y, ul = Math.hypot(ux, uy) || 1;
+      this.ungeVand = { x: ux / ul, y: uy / ul };
+      this.ritaUngen();
+    }
+    this.samtal = { talare, riktning: riktningFor(this.vand) };
+    this.smutsig = true;
+    return true;
+  }
+
+  /**
    * Hur ser talaren ut i pratrutan just nu (porträttets min)? Baronen är förvånad innan han ser hjälten och när han
    * får syn på kartbiten, och annars stolt. null = som vanligt. Den sura minen (Stil) används inte än: efter
    * trasslet säger han bara något stolt ("Till skolan!"). @param {string} talare
@@ -776,7 +817,7 @@ export class Rum extends Phaser.Scene {
     this.harRum = !!v.rum;
     if (v.nyttRum || !this.harRum) { this.rumsbild = (this.harRum && v.karta?.bild) || null; this.mark = (this.harRum && v.karta?.mark) || null; this.rumId = v.rum; this.markObjekt = v.karta?.objekt || []; }
     this.visaUnge = v.unge;
-    if (v.nyttRum) { this.ungeMal = null; for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas.remove(); this.sover = null; } this.rensaRegi(); }
+    if (v.nyttRum) { this.ungeMal = null; this.ungeTittarPa = null; for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas.remove(); this.sover = null; } this.rensaRegi(); }
     this.tillstand = v.tillstand;
     if (v.nyttRum || !this.harRum) this.inomhus = !!v.karta?.inomhus;
     this.lampor = v.karta?.lampor || [];
@@ -991,7 +1032,12 @@ export class Rum extends Phaser.Scene {
   }
 
   /** Världen stannar när läsplattan är öppen. @param {boolean} pa */
-  frys(pa) { this.fryst = pa; if (pa) this.b.inmatning.rensaGaTill(); }
+  frys(pa) { this.frysSteg = pa; this.fryst = pa || !!this.pausad; if (this.fryst) this.b.inmatning.rensaGaTill(); }
+  /**
+   * Spelet pausas (menyn för vuxna, fliken dold): världen står still så länge, och sedan står den som stegen vill.
+   * Ett steg som släpper världen under pausen (frys(false)) gäller alltså efter pausen. @param {boolean} pa
+   */
+  sattPaus(pa) { this.pausad = pa; this.fryst = !!this.frysSteg || pa; if (this.fryst) this.b.inmatning.rensaGaTill(); }
 
   /** @param {string} id @param {boolean} pa */
   markera(id, pa) {
@@ -1148,6 +1194,8 @@ export class Rum extends Phaser.Scene {
   /** Gå till en punkt (rörelse som spelet styr, t.ex. ett steg tillbaka från en fel dörr). @param {{ x: number, y: number }} mal @param {number} ms */
   ga(mal, ms) {
     const fran = { ...this.pos }, till = this.hinder.narmasteFria(mal);
+    const vx = till.x - fran.x, vy = till.y - fran.y, vl = Math.hypot(vx, vy);
+    if (vl > 1) { this.vand = { x: vx / vl, y: vy / vl }; this.ritaHjalte(); }
     return new Promise((klar) => {
       const p = { ...fran };
       this.tweens.add({ targets: p, x: till.x, y: till.y, duration: Math.max(1, ms), onUpdate: () => { this.pos = { x: p.x, y: p.y }; this.placera(); }, onComplete: () => { this.pos = { ...till }; this.placera(); klar(undefined); } });
@@ -1226,7 +1274,9 @@ export class Rum extends Phaser.Scene {
    * med plats för skyltarna ovanför. null = kameran följer hjälten igen. @param {string[] | null} ids
    */
   visaOmrade(ids) {
-    const rutor = (ids || []).map((id) => this.ruta(id)).filter((o) => !!o);
+    // en dörr tar med sin skylt på väggen, som är bredare än dörren (33.3): hela skylten ska synas när frågan ställs
+    const rutor = (ids || []).map((id) => this.ruta(id)).filter((o) => !!o)
+      .map((o) => (o && o.sort === 'utgang' && !o.golv ? { ...o, x: Math.max(0, o.x - 16), b: o.b + 32 } : o));
     this.omrade = omradeFor(/** @type {any[]} */ (rutor));
   }
 
@@ -1282,7 +1332,12 @@ export class Rum extends Phaser.Scene {
     if (this.paStege && !m) { if (flyttad) this.placera(); return this.vantaPaHandling(inm); }
     const ungenGar = l > narmare;
     if (ungenGar) { const v = Math.min(l - narmare, (dtMs / 1000) * (m ? 110 : 90)); this.ungePos = { x: this.ungePos.x + (dx / l) * v, y: this.ungePos.y + (dy / l) * v }; this.ungeVand = { x: dx / l, y: dy / l }; this.ungeGang = (this.ungeGang || 0) + v; }
-    else if (!m && this.ungeGar) this.ungeVand = { x: this.pos.x - this.ungePos.x, y: 0.01 }; // står den still tittar den mot hjälten
+    else if (!m && this.ungeGar) {
+      // står den still tittar den mot hjälten, eller på den som talar
+      const t = this.ungeTittarPa && this.time.now < this.ungeTittarPa.till ? this.ungeTittarPa : null;
+      if (t) { const ux = t.x - this.ungePos.x, uy = t.y - this.ungePos.y, ul = Math.hypot(ux, uy) || 1; this.ungeVand = { x: ux / ul, y: uy / ul }; }
+      else this.ungeVand = { x: this.pos.x - this.ungePos.x, y: 0.01 };
+    }
     this.ungeGar = ungenGar;
     // andningen och nosandet byter bild också när inget flyttar sig
     if (this.ungeBild && this.unge.visible) this.ritaUngen();

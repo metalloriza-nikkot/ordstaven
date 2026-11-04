@@ -103,7 +103,7 @@ test('radion lärs ut: "Tryck på radion" väntar tills radion har sagt målet i
   await page.locator('#plattan .replik-ruta').click();
   await expect.poll(async () => (await steg(page))?.vantar_pa, { timeout: 5000 }).toBe('radion');
   // instruktionen står i molnet med radion som bild, och världen går
-  await expect(page.locator('#tanke')).toContainText('📻');
+  await expect(page.locator('#tanke img[data-ikon="radio"]')).toBeVisible();
   await page.waitForTimeout(300);
   expect((await steg(page))?.vantar_pa).toBe('radion');
   await page.click('#hud-radio');
@@ -1261,14 +1261,14 @@ test('efter en dialog står målet kvar i molnet med en bild tills han är framm
   expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toMatch(/\[framme\] dorr_mat .*"efter_dialog":true/);
 });
 
-test('dörrarnas lappar täcker aldrig varandra eller hjälten, var han än står i hallen (31.2)', async ({ page }) => {
+test('dörrskyltarna sitter på väggen, täcker aldrig varandra eller hjälten, och den vid dörren växer (31.2, 33.3)', async ({ page }) => {
   test.setTimeout(60000);
   await provscen(page, { id: 't_lappar', pass: 1, rum: 'hallen', tillstand: 'natt', steg: [{ typ: 'ga_till', mal: 'dorr_ut', vid_annan_utgang: { ljud: 'dunk' } }, R('Ute.')] });
   await expect(page.locator('#skyltar .skylt')).toHaveCount(5, { timeout: 5000 });
   const krockar = () => page.evaluate(() => {
     const p = window.__ORDSTAVEN.position(), s = window.__ORDSTAVEN.skala(), k = window.__ORDSTAVEN.kamera();
     const hj = { left: s.vanster + (p.x - 8 - k.x) * s.cssSkala, right: s.vanster + (p.x + 8 - k.x) * s.cssSkala, top: s.topp + (p.y - 26 - k.y) * s.cssSkala, bottom: s.topp + (p.y - k.y) * s.cssSkala };
-    const r = [...document.querySelectorAll('#skyltar .skylt')].map((e) => ({ id: e.dataset.objekt, ...e.getBoundingClientRect().toJSON() }))
+    const r = [...document.querySelectorAll('#skyltar .skylt:not(.tonad) .kort')].map((e) => ({ id: e.closest('.skylt').dataset.objekt, ...e.getBoundingClientRect().toJSON() }))
       .filter((q) => q.right > s.vanster && q.left < s.vanster + s.cssBredd); // de som syns
     const over = (a, b) => a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1;
     const fel = [];
@@ -1279,11 +1279,12 @@ test('dörrarnas lappar täcker aldrig varandra eller hjälten, var han än stå
   // gånger i sekunden, så ett fel räknas när det står kvar i två prov i rad (inte medan han precis har klivit in)
   const fel = new Set();
   let forra = new Set();
-  let undan = 0;
+  const stora = new Set();
   const prova = async () => {
     const lista = await krockar(); const nu = new Set(lista.map((f) => f.split('|')[0]));
     for (const f of lista) if (forra.has(f.split('|')[0])) fel.add(f); forra = nu;
-    undan += await page.locator('#skyltar .skylt[data-undan]').count();
+    for (const id of await page.$$eval('#skyltar .skylt.stor', (es) => es.map((e) => e.dataset.objekt))) stora.add(id);
+    expect(await page.locator('#skyltar .skylt.stor').count()).toBeLessThanOrEqual(1); // bara en stor åt gången
   };
   // upp till bakväggen, där han går rakt under lapparna
   await page.keyboard.down('ArrowLeft'); await page.waitForTimeout(800); await page.keyboard.up('ArrowLeft');
@@ -1296,7 +1297,12 @@ test('dörrarnas lappar täcker aldrig varandra eller hjälten, var han än stå
   }
   await page.screenshot({ path: 'test-results/lappar-hallen.png' });
   expect([...fel]).toEqual([]);
-  expect(undan).toBeGreaterThan(0); // han gick under lapparna, och de flyttade sig
+  expect(stora.size).toBeGreaterThan(0); // han gick förbi dörrarna, och skylten vid dörren växte
+  // skyltarna sitter på väggen: nederkanten ovanför dörrens överkant, och de har trä (9-slice)
+  const vagg = await page.evaluate(() => { const s = window.__ORDSTAVEN.skala(), k = window.__ORDSTAVEN.kamera(), o = window.__ORDSTAVEN.ruta('dorr_bok');
+    const e = document.querySelector('#skyltar .skylt[data-objekt="dorr_bok"]:not(.stor) .kort'); if (!e) return null;
+    const r = e.getBoundingClientRect(); return { botten: r.bottom, dorrTopp: s.topp + (o.y - k.y) * s.cssSkala, tra: getComputedStyle(e).borderImageSource }; });
+  if (vagg) { expect(vagg.botten).toBeLessThanOrEqual(vagg.dorrTopp + 1); expect(vagg.tra).toMatch(/^url\(/); }
 });
 
 test('målet i molnet efter radion: instruktionen före "Tryck på radion" står där, och den följer med till nästa rum (s21, 31.2)', async ({ page }) => {
@@ -1315,4 +1321,62 @@ test('målet i molnet efter radion: instruktionen före "Tryck på radion" står
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 10000 }).toBe('t_malradio_hall');
   await expect(page.locator('#tanke img.malbild[data-bild="dorr_ut"]')).toBeVisible({ timeout: 5000 });
   await expect(page.locator('#tanke .instruktion')).toHaveText('HITTA BITARNA. FÖLJ KNOPP HEM!');
+});
+
+test('HUD:en i ramen till höger när ramen är bred nog, annars i rummets hörn, och inga emoji (31.4, 33.2)', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 664 }); // MacBooken i helskärm: 160 punkter ram på sidan
+  await provscen(page, { id: 't_hud', pass: 3, rum: 'koket', tillstand: 'morgon', steg: [R('Hej på dig!', 'farfar'), R('Klart.')] },
+    (t) => { const av = t.aventyr['den-gomda-dalen']; av.ui = { ...av.ui, nosknappen: true, radioramen: true }; av.bar = 3; });
+  const s = await page.evaluate(() => window.__ORDSTAVEN.skala());
+  const ruta = (sel) => page.locator(sel).boundingBox();
+  for (const id of ['#hud-radio', '#hud-nos', '#hud-bar']) {
+    const r = await ruta(id);
+    expect(r.x, `${id} står i ramen`).toBeGreaterThanOrEqual(s.vanster + s.cssBredd);
+    expect(r.width).toBeGreaterThanOrEqual(48);
+    expect(await page.locator(`${id} img.ikon-px`).first().isVisible()).toBe(true);
+  }
+  // nere till höger, i ordningen radio, nos och bär
+  const [ra, no, ba] = [await ruta('#hud-radio'), await ruta('#hud-nos'), await ruta('#hud-bar')];
+  expect(ra.y < no.y && no.y < ba.y).toBe(true);
+  expect(ba.y + ba.height).toBeGreaterThan(s.topp + s.cssHojd / 2);
+  await expect(page.locator('#hud-bar .tal')).toHaveText('3');
+  // inga emoji i det som syns (⚙ är den vuxnes)
+  const emoji = await page.evaluate(() => (document.querySelector('#ui').innerText.match(/\p{Extended_Pictographic}/gu) || []).filter((c) => c !== '⚙'));
+  expect(emoji).toEqual([]);
+  await page.screenshot({ path: 'test-results/hud-i-ramen.png' });
+  await page.setViewportSize({ width: 1280, height: 800 }); // ingen ram på sidan: knapparna står i rummets hörn som förut
+  await expect.poll(async () => (await ruta('#hud-bar')).x).toBeLessThan(s.vanster + 400);
+});
+
+test('ett samtal: hjälten och Farfar vänder sig mot varandra och ungen tittar på Farfar, men inte genom radion (34.2)', async ({ page }) => {
+  await provscen(page, { id: 't_samtal', pass: 3, rum: 'koket', tillstand: 'morgon', steg: [R('Hitta bitarna.', 'farfar', { via: 'radio' }), R('Hej på dig!', 'farfar'), R('Klart.')] },
+    (t) => { const av = t.aventyr['den-gomda-dalen']; av.ui = { ...av.ui, radioramen: true }; });
+  await expect(page.locator('#plattan .replik-ruta.genom-radio')).toBeVisible({ timeout: 8000 });
+  expect((await page.evaluate(() => window.__ORDSTAVEN.samtal('farfar_vid_bordet'))).talare).toBeUndefined(); // radion: ingen vänder sig
+  await page.locator('#plattan .replik-ruta').click();
+  await expect(page.locator('#plattan .replik-ruta')).toContainText('HEJ PÅ DIG!', { timeout: 8000 });
+  const s = await page.evaluate(() => window.__ORDSTAVEN.samtal('farfar_vid_bordet'));
+  expect(s.talare).toBe('farfar');
+  // Farfar står till vänster om hjälten: hjälten tittar åt vänster eller uppåt, och Farfar mot hjälten (Stils bilder)
+  expect(s.hjalte).toMatch(/hjalte_ga_(vanster|upp)_/);
+  expect(s.figur).toMatch(/farfar_morgon_(hoger|ner)_01/);
+  expect(s.figur).not.toBe('farfar_morgon_ner_01');
+  expect(s.unge).toMatch(/_(vanster|upp)_/);
+});
+
+test('handen vid målet i molnet syns på ca två rutors avstånd, och ett tryck på den går dit (34.3)', async ({ page }) => {
+  test.setTimeout(60000);
+  await provscen(page, { id: 't_handtidig', pass: 3, rum: 'koket', tillstand: 'morgon', steg: [R('Ta min gamla radio på hyllan.', 'farfar'), { typ: 'ga_till', mal: 'radio' }, R('Klart.')] });
+  await page.locator('#plattan .replik-ruta').click({ timeout: 8000 });
+  await expect.poll(async () => (await steg(page))?.typ, { timeout: 8000 }).toBe('ga_till');
+  // gå mot radion tills handen syns, och se hur långt bort han är då
+  const o = await page.evaluate(() => window.__ORDSTAVEN.objekt('radio'));
+  await page.mouse.click(o.x, o.y + 140);
+  await expect(page.locator('#handknapp')).toBeVisible({ timeout: 8000 });
+  const avstand = await page.evaluate(() => { const r = window.__ORDSTAVEN.ruta('radio'), p = window.__ORDSTAVEN.position(); return Math.hypot(Math.max(r.x - p.x, 0, p.x - (r.x + r.b)), Math.max(r.y - p.y, 0, p.y - (r.y + r.h))); });
+  expect(avstand).toBeGreaterThan(24); // längre bort än den vanliga räckvidden (1,5 rutor)
+  expect(avstand).toBeLessThanOrEqual(34);
+  await page.locator('#handknapp button').click();
+  await expect.poll(async () => (await steg(page))?.typ, { timeout: 8000 }).toBe('replik');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toMatch(/\[hand\] radio/);
 });

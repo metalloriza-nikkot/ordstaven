@@ -13,6 +13,10 @@ const kort = (id) => KORT[id] ? `<img class="bild bildkort" data-bild="${id}" sr
 const vik = (s) => s.toLocaleLowerCase('sv-SE').replace(/[åä]/g, 'a').replace(/ö/g, 'o').replace(/é/g, 'e');
 
 import { PALETT, egenskaper } from '../karna/egenskaper.js';
+import { ikon, IKON_FOR } from './ikoner.js';
+
+/** En emoji ur ordlistan som Stil har ritat som ikon (bok, bär, karta …) visas som ikonen (beslut 31.4). @param {string | null} e */
+const somIkon = (e) => (e && IKON_FOR[e] ? ikon(IKON_FOR[e], 'stor') : e);
 
 const FARGER = PALETT;
 /** Äventyrets egna platshållarbilder (kartor/<äventyr>/platshallare.json), sätts av skapaBilder. */
@@ -37,7 +41,7 @@ export function skapaBilder(ordlistor, platshallare = {}) {
   /** @type {Map<string, string>} */
   const emoji = new Map();
   for (const o of ordlistor.ord) if (o.bild) emoji.set(vik(o.ord), o.bild);
-  const hitta = (/** @type {string} */ id) => RITADE[vik(id)]?.() || emoji.get(vik(id)) || EXTRA[id] || null;
+  const hitta = (/** @type {string} */ id) => RITADE[vik(id)]?.() || somIkon(emoji.get(vik(id)) ?? null) || somIkon(EXTRA[id] ?? null) || null;
 
   /**
    * HTML för en platshållarbild.
@@ -51,7 +55,7 @@ export function skapaBilder(ordlistor, platshallare = {}) {
       return `<span class="bild bubbla" data-bild="${id}"><span class="bubbla-ytter">${e}</span><span class="bubbla-prick"></span></span>`;
     }
     const k = kort(id); if (k) return k;
-    if (EXTRA[id]) return `<span class="bild emoji" data-bild="${id}">${EXTRA[id]}</span>`;
+    if (EXTRA[id]) return `<span class="bild emoji" data-bild="${id}">${somIkon(EXTRA[id])}</span>`;
     const farg = delar.map((d) => FARGER[/** @type {keyof FARGER} */ (d)]).find(Boolean);
     const storlek = egenskaper(id).storlek;
     const stor = storlek === 'stor' ? 1.35 : storlek === 'liten' ? 0.7 : 1;

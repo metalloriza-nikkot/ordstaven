@@ -1,0 +1,43 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:Lexend;src:url(lexend-latin-400-normal.woff2)}
+@font-face{font-family:Lexend;font-weight:700;src:url(lexend-latin-700-normal.woff2)}
+:root{--s:4;--t:1.3333}
+body{margin:0;width:1440px;height:900px;background:#2a1a10;overflow:hidden;font-family:Lexend}
+img{image-rendering:pixelated;position:absolute}
+#rum{position:absolute;left:80px;top:66px;width:1280px;height:768px;overflow:hidden}
+#rum img{transform-origin:0 0;transform:scale(var(--s))}
+.skylt{position:absolute;transform-origin:50% 0;display:flex;align-items:center;justify-content:center;
+ border-style:solid;border-width:0 calc(4px*var(--s));border-image:url(skylt9.png) 0 4 fill / 0 calc(4px*var(--s)) stretch;image-rendering:pixelated;
+ height:calc(10px*var(--s));box-sizing:border-box;color:#2B2420;font-size:calc(32px*var(--t));letter-spacing:.03em;transition:transform .15s}
+.skylt.stor{transform:scale(2);z-index:3}
+.hud{position:absolute;width:calc(24px*3);height:calc(24px*3)}
+.hud img{transform-origin:0 0;transform:scale(3);left:0;top:0}
+.hud img.ik{left:12px;top:12px}
+.tal{position:absolute;width:54px;height:42px}
+.tal img{transform-origin:0 0;transform:scale(3)}
+.tal b{position:absolute;inset:3px 0 0 0;display:flex;align-items:center;justify-content:center;font-size:30px;color:#2B2420}
+</style></head><body>
+<div id="rum"></div>
+<script>
+const s=4, q=new URLSearchParams(location.search), stor=q.get('stor');
+const rum=document.getElementById('rum');
+const add=(src,x,y)=>{const i=new Image();i.src=src;i.style.left=x*s+'px';i.style.top=y*s+'px';rum.appendChild(i);return i};
+add('hallen.png',0,0);
+for(const [x,y] of [[56,12],[130,12],[204,12]]) add('dorr.png',x,y);
+add('stege_upp.png',300,6);
+const hx=stor?217:150, hy=stor?62:110;
+add('skugga_16x24.png',hx-8,hy-24); add('hjalte_ga_upp_01.png',hx-8,hy-24); add('stav_hand_upp_01.png',hx-8,hy-24);
+add('unge1_ga_upp_01.png',hx-30,hy-22);
+// skyltarna: bredden ur Lexends bredder (em) gånger textens storlek, i världens pixlar
+const em={FARFAR:4.0,BOK:2.19,MAT:2.17}, t=1.3333, fontV=32*t/s;
+for(const [ord,cx] of [['FARFAR',69],['BOK',143],['MAT',217]]){
+  const b=Math.ceil(em[ord]*fontV*1.03+12);
+  const d=document.createElement('div'); d.className='skylt'+(stor===ord?' stor':''); d.textContent=ord;
+  d.style.width=b*s+'px'; d.style.left=(cx-b/2)*s+'px'; d.style.top=1*s+'px'; rum.appendChild(d);
+}
+// HUD:en i läderramen till höger (nere till höger, stilguiden §3), pausen uppe till höger
+const hud=(ik,x,y,aktiv)=>{const d=document.createElement('div');d.className='hud';d.style.left=x+'px';d.style.top=y+'px';
+ d.innerHTML=`<img src="hud_knapp${aktiv?'_aktiv':''}.png"><img class="ik" src="ikon_${ik}.png">`;document.body.appendChild(d)};
+hud('paus',1364,70); hud('radio',1364,560); hud('nos',1364,640); hud('bar',1364,720);
+const tl=document.createElement('div');tl.className='tal';tl.style.left='1373px';tl.style.top='796px';tl.innerHTML='<img src="hud_tal.png"><b>12</b>';document.body.appendChild(tl);
+</script></body></html>

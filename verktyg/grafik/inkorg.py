@@ -11,6 +11,7 @@ Läser en kopia av Niklas inkorgsmapp och skriver till repot:
 - bildkort/*.png         → assets/bildkort/<id>.png: läsplattans bildkort, en bild per id (textlagret visar dem).
 - sidovyer/*.png         → assets/sidovyer/<namn>.png: sidovyernas bakgrunder och det som rör sig i dem.
 - karta/kartbit_*.png och karta.json → assets/karta/: Farfars karta, en bild per bit och var bitarna ligger.
+- ui/*.png               → assets/ui/<namn>.png: HUD:ens knappar, ikonerna och dörrskyltarnas delar (textlagret visar dem).
 - figurer/*/*_portratt_*.png → också assets/portratt/<namn>.png (ansiktena i pratrutan, i textlagret).
 - ljud/*.wav             → assets/ljud/<namn>.wav, döpta utan mellanslag ("unge_late 2" → unge_late_02).
 
@@ -182,7 +183,7 @@ def main():
         if med(f'foremal/{mapp.name}') and (b := las_bilder(mapp, fel, alla)):
             skriv_atlas(b, repo / 'assets' / 'foremal' / mapp.name, mapp.name, arg.prova)
     # bildkorten och sidovyerna som egna bilder: bildkorten visas i textlagret, sidovyerna är hela skärmar
-    for mapp in ('bildkort', 'sidovyer', 'karta'):
+    for mapp in ('bildkort', 'sidovyer', 'karta', 'ui'):
         if not (med(mapp) and (ink / mapp).is_dir()):
             continue
         for namn, im in las_bilder(ink / mapp, fel, alla).items():

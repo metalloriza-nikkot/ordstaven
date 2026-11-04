@@ -278,14 +278,16 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
         // och på en långsam CI-maskin tar det mer än en kvarts sekund (p0_dorrar på iPad, 0.11.1 och 0.12.2): vänta in läget
         const krockNu = () => page.evaluate(() => {
           const O = window.__ORDSTAVEN, s = O.skala();
-          const r = [...document.querySelectorAll('#skyltar .skylt .kort')].map((e) => e.getBoundingClientRect());
+          // en tonad skylt (grannen till den stora) räknas inte, och den stora växer in över sin egen dörr med flit (33.3)
+          const r = [...document.querySelectorAll('#skyltar .skylt:not(.tonad) .kort')].map((e) => e.getBoundingClientRect());
+          const sma = [...document.querySelectorAll('#skyltar .skylt:not(.tonad):not(.stor) .kort')].map((e) => e.getBoundingClientRect());
           for (const x of r) if (x.left < s.vanster - 1 || x.right > s.vanster + s.cssBredd + 1) return 'utanför rummet';
           const over = (a, b) => a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1;
           for (let i = 0; i < r.length; i++) for (let j = i + 1; j < r.length; j++) if (over(r[i], r[j])) return 'överlappar';
           for (const id of O.rumsobjekt()) {
             const o = O.ruta(id); if (!o || o.sort !== 'utgang' || o.golv) continue;
             const d = { left: s.vanster + o.x * s.cssSkala, right: s.vanster + (o.x + o.b) * s.cssSkala, top: s.topp + o.y * s.cssSkala, bottom: s.topp + (o.y + o.h) * s.cssSkala };
-            for (const x of r) if (over(x, d)) return `en skylt täcker ${id}`;
+            for (const x of sma) if (over(x, d)) return `en skylt täcker ${id}`;
           }
           return null;
         });
@@ -342,7 +344,9 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
     }
     await page.waitForTimeout(80);
   }
-  throw new Error('prologen tog inte slut');
+  // vad som hände sist, så att ett fel som bara kommer ibland går att förstå
+  const lage = await page.evaluate(() => ({ pos: window.__ORDSTAVEN.position(), synlig: window.__ORDSTAVEN.synlig(), fryst: window.__ORDSTAVEN.fryst(), steg: window.__ORDSTAVEN.steg(), logg: window.__ORDSTAVEN.logg().split('\n').filter((r) => /^\d\d:/.test(r) && !/\[(hack|bildrutor|rullning)\]/.test(r)).slice(-25).join('\n') }));
+  throw new Error('prologen tog inte slut\n' + JSON.stringify({ ...lage, logg: undefined }) + '\n' + lage.logg);
 }
 
 test.describe('genomspelning av prologen', () => {
