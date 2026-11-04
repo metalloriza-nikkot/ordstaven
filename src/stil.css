@@ -335,7 +335,7 @@ html, body {
 .stor-ikon { font-size: 140px; }
 .pass-slut .knappar { display: flex; gap: 32px; }
 .vuxen { color: #d8ccb4; font-size: 18px; font-style: italic; }
-.meny { max-height: 90vh; overflow: auto; width: min(92vw, 720px); padding: 20px 24px; border-radius: 16px; background: var(--papper); color: var(--black); font-style: normal; font-size: 18px; }
+.meny { max-height: 90vh; overflow: auto; touch-action: pan-y; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; width: min(92vw, 720px); padding: 20px 24px; border-radius: 16px; background: var(--papper); color: var(--black); font-style: normal; font-size: 18px; }
 .meny h2 { margin: 0 0 10px; font-size: 24px; }
 .menygrupp { margin: 12px 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .menygrupp label { display: block; width: 100%; }

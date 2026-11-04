@@ -129,6 +129,13 @@ test('menyn för vuxna: ett kort tryck visar "håll inne", att hålla öppnar me
   await page.mouse.move(r.x + r.width / 2, r.y + r.height / 2);
   await page.mouse.down(); await page.waitForTimeout(1600); await page.mouse.up(); // marginal mot 800 ms på en belastad testmaskin
   await expect(page.locator('#vuxenmeny .meny')).toBeVisible();
+  // på iPad skrollar menyn med fingret (sidan skrollar aldrig, men menyn gör det), och sista knappen går att nå
+  const drag = await page.evaluate(() => {
+    const prov = (el) => { const e = new Event('touchmove', { bubbles: true, cancelable: true }); el.dispatchEvent(e); return e.defaultPrevented; };
+    const m = document.querySelector('#vuxenmeny .meny');
+    return { meny: prov(m.querySelector('*') || m), varld: prov(document.getElementById('varld')), skrollar: getComputedStyle(m).overflowY, touch: getComputedStyle(m).touchAction };
+  });
+  expect(drag).toEqual({ meny: false, varld: true, skrollar: 'auto', touch: 'pan-y' });
   await page.click('#vuxenmeny .stang');
   await expect(page.locator('#vuxenmeny')).toBeHidden();
   await expect(page.locator('.start-knapp')).toBeVisible();
