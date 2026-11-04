@@ -190,7 +190,24 @@ const spelet = skapaSpel({
   valtKapitel: parametrar.get('kapitel'),
   uppdatering: { tillampa: () => { uppdatering.tillampa(); startlage = false; } },
 });
-/** @type {any} */ (rum).redo.then(() => spelet.spela());
+// Startvakten: kommer rummet inte igång med WebGL (Safari på golvdatorn kan få WebGL men inte rita med det, och
+// står då kvar med en tom ram) startar spelet om med canvas, som när WebGL tappas. ?provstartfel låtsas att det hänger.
+const provStartfel = parametrar.has('provstartfel') && !canvasLage;
+/** @type {Promise<void>} */
+const redo = provStartfel ? new Promise(() => {}) : /** @type {any} */ (rum).redo;
+let startKlar = false;
+const tillCanvas = (/** @type {string} */ varfor) => {
+  if (startKlar || canvasLage) return;
+  startKlar = true;
+  logg.handelse('ritning', `${varfor}: startar om med canvas`);
+  try { localStorage.setItem(NYCKEL_RITNING, JSON.stringify({ typ: 'canvas', t: Date.now() })); } catch (err) { /* ingen lagring */ }
+  logg.spara(true);
+  location.replace(location.href.replace(/[?&]provstartfel\b/, '').replace(/\?$/, ''));
+};
+const startVakt = window.setTimeout(() => tillCanvas('rummet kom inte igång med WebGL på 12 s'), provStartfel ? 1500 : 12000);
+const startFel = (/** @type {ErrorEvent} */ e) => tillCanvas('fel när spelet startade med WebGL (' + (e.message || 'okänt') + ')');
+if (!canvasLage) window.addEventListener('error', startFel);
+redo.then(() => { startKlar = true; window.clearTimeout(startVakt); window.removeEventListener('error', startFel); spelet.spela(); });
 
 // Krokar för testerna (läser tillstånd, ändrar inget).
 /** @type {any} */ (window).__ORDSTAVEN = {

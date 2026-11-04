@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { beraknaSkala, skarmTillRum, rumTillSkarm } from '../../src/karna/skalning.js';
+import { beraknaSkala, beraknaSkalaMedRemsa, remsansHojd, textskala, skarmTillRum, rumTillSkarm } from '../../src/karna/skalning.js';
 
 // Skärmtabellen i stilguiden. "fysisk" = fysiska pixlar per spelpixel (alltid heltal).
 // På retina (dpr 2) kan CSS-skalan bli ett halvt steg (7 fysiska = 3,5 CSS), lika skarpt.
@@ -94,5 +94,29 @@ describe('beraknaSkala', () => {
     const r = skarmTillRum(s, 700, 400);
     const t = rumTillSkarm(s, r.x, r.y);
     expect(t.x).toBeCloseTo(700); expect(t.y).toBeCloseTo(400);
+  });
+});
+
+describe('texten under spelytan (beslut 36.2)', () => {
+  it('har fönstret plats ligger texten under, i full skala', () => {
+    const s = beraknaSkalaMedRemsa({ bredd: 1920, hojd: 1200, dpr: 1 });
+    expect(s.fysisk).toBe(5);
+    expect(s.remsa).toBe(remsansHojd(textskala(1600)));
+    expect(s.topp + s.cssHojd + s.remsa).toBeLessThanOrEqual(1200);
+    expect(s.topp).toBeGreaterThanOrEqual(0);
+  });
+  it('annars ett steg mindre, om spelytan då är minst tre gånger så stor', () => {
+    const s = beraknaSkalaMedRemsa({ bredd: 1920, hojd: 1080, dpr: 1 }); // 5× ryms inte med remsan, 4× gör det
+    expect(s.fysisk).toBe(4);
+    expect(s.remsa).toBeGreaterThan(0);
+    const ipad = beraknaSkalaMedRemsa({ bredd: 1180, hojd: 820, dpr: 2 }); // iPad 10: 3,5× → 3×
+    expect(ipad.cssSkala).toBe(3);
+    expect(ipad.remsa).toBeGreaterThan(0);
+  });
+  it('aldrig mindre än tre gånger: då står texten över spelytan som förut', () => {
+    const mac = beraknaSkalaMedRemsa({ bredd: 1280, hojd: 664, dpr: 2 }); // MacBooken i appen
+    expect(mac).toMatchObject({ fysisk: 6, cssSkala: 3, remsa: 0 });
+    expect(mac).toMatchObject(beraknaSkala({ bredd: 1280, hojd: 664, dpr: 2 }));
+    expect(beraknaSkalaMedRemsa({ bredd: 1280, hojd: 800, dpr: 2 }).remsa).toBe(0); // 4× och 3,5× ryms inte
   });
 });

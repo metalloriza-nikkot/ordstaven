@@ -737,6 +737,55 @@ test('tappar webbläsaren WebGL startar spelet om med canvas och fortsätter dä
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('ordstaven_ritning')).typ)).toBe('canvas');
 });
 
+/** Ligger rutan a och b över varandra? */
+const over = (a, q) => a.left < q.right - 1 && q.left < a.right - 1 && a.top < q.bottom - 1 && q.top < a.bottom - 1;
+test('texten under spelytan (36.2): har fönstret plats står repliken och molnet under världen', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 1000 });
+  await provscen(page, { id: 't_remsa', pass: 1, rum: 'hallen', tillstand: 'natt', steg: [R('Gå ut genom dörren!'), { typ: 'ga_till', mal: 'dorr_bok' }, R('Inne.')] });
+  expect(await page.evaluate(() => document.documentElement.classList.contains('text-under'))).toBe(true);
+  const varld = await page.locator('#varld').boundingBox();
+  const ruta = await page.locator('#plattan.replik .replik-ruta').boundingBox();
+  expect(ruta.y).toBeGreaterThanOrEqual(varld.y + varld.height); // under världen
+  expect(ruta.y + ruta.height).toBeLessThanOrEqual(1000); // och inne i fönstret
+  await page.screenshot({ path: 'test-results/text-under-replik.png' });
+  await page.click('#plattan .replik-ruta');
+  await expect(page.locator('#tanke')).toBeVisible({ timeout: 5000 });
+  const moln = await page.locator('#tanke').boundingBox();
+  expect(moln.y).toBeGreaterThanOrEqual(varld.y + varld.height);
+  expect(moln.y + moln.height).toBeLessThanOrEqual(1000);
+  await page.screenshot({ path: 'test-results/text-under-moln.png' });
+});
+
+test('utan plats står texten över spelytan, men aldrig över målet (36.2, 31.3)', async ({ page }) => {
+  await provscen(page, { id: 't_over', pass: 1, rum: 'hallen', tillstand: 'morgon', steg: [R('Gå ut genom dörren!'), { typ: 'ga_till', mal: 'dorr_ut' }, R('Ute.')] });
+  expect(await page.evaluate(() => document.documentElement.classList.contains('text-under'))).toBe(false);
+  const rutaFor = (id) => page.evaluate((m) => { const r = window.__ORDSTAVEN.rutaPaSkarm(m); return { left: r.x, top: r.y, right: r.x + r.b, bottom: r.y + r.h }; }, id);
+  // repliken skulle täcka ytterdörren nere till höger: den står uppe
+  await expect(page.locator('#plattan.replik')).toHaveClass(/uppe/, { timeout: 5000 });
+  const ruta = await page.locator('#plattan.replik .replik-ruta').evaluate((e) => e.getBoundingClientRect().toJSON());
+  expect(over(ruta, await rutaFor('dorr_ut'))).toBe(false);
+  await page.screenshot({ path: 'test-results/text-over-uppe.png' });
+  await page.click('#plattan .replik-ruta');
+  // molnet med målet täcker inte dörren, inte heller när han går dit och kameran följer
+  await expect(page.locator('#tanke')).toBeVisible({ timeout: 5000 });
+  for (let i = 0; i < 6; i++) {
+    await page.waitForTimeout(300);
+    const moln = await page.locator('#tanke').evaluate((e) => e.getBoundingClientRect().toJSON());
+    expect(over(moln, await rutaFor('dorr_ut'))).toBe(false);
+    if (i === 1) await page.keyboard.down('ArrowRight');
+  }
+  await page.keyboard.up('ArrowRight');
+  await page.screenshot({ path: 'test-results/text-over-moln.png' });
+});
+
+test('kommer spelet inte igång med WebGL (Safari på golvdatorn) startar det om med canvas', async ({ page }) => {
+  await page.goto('./?snabb&ny&provstartfel');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning && window.__ORDSTAVEN.ritning() === 'canvas', null, { timeout: 15000 });
+  await expect(page.locator('.start-knapp')).toBeVisible({ timeout: 10000 });
+  expect(page.url()).not.toContain('provstartfel');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('kom inte igång med WebGL');
+});
+
 test('ett hack i bildrutorna skrivs i loggen med vad som pågick', async ({ page }) => {
   await provscen(page, { id: 't_hack', pass: 1, rum: 'provskogen', steg: [{ typ: 'ga_till', mal: 'sten' }] }, null, { rum: { provskogen: { innehall: ['sten'] } } });
   await page.waitForTimeout(1500); // starten kan ge egna hack: de skrivs först
@@ -1329,6 +1378,22 @@ test('kartbiten: Stils bild i närbilden, i festen och i KARTAN, där den hör h
   await expect(page.locator('#pausmeny .paus-karta .kartbit')).toHaveCount(0); // ingen emoji för en ritad bit
   await page.screenshot({ path: 'test-results/kartbit-kartan.png' });
   await page.click('#pausmeny .paus-stang');
+});
+
+test('kedjan i molnet (36.5): instruktionen följer inte med till nästa mål i samma rum, bara när rummet byts', async ({ page }) => {
+  test.setTimeout(60000);
+  await provscen(page, { id: 't_k1', pass: 1, rum: 'provskogen', steg: [R('Gå till stenen!'), { typ: 'ga_till', mal: 'sten' }] }, null, {
+    rum: { provskogen: { innehall: ['sten', 'lada'] } },
+    efter: [{ id: 't_k2', pass: 1, rum: 'provskogen', steg: [{ typ: 'ga_till', mal: 'lada' }, R('Klart.')] }],
+  });
+  await page.locator('#plattan .replik-ruta').click({ timeout: 8000 });
+  await expect(page.locator('#tanke .instruktion')).toHaveText('GÅ TILL STENEN!', { timeout: 5000 });
+  await tryckPa(page, 'sten');
+  await expect(page.locator('#handknapp')).toBeVisible({ timeout: 8000 });
+  await page.keyboard.press('Space');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 10000 }).toBe('t_k2');
+  await page.waitForTimeout(600);
+  await expect(page.locator('#tanke')).toBeHidden(); // samma rum: ingen gammal instruktion
 });
 
 test('efter en dialog står målet kvar i molnet med en bild tills han är framme, och ungen nosar mot det efter ca 10 s (31.2)', async ({ page }) => {

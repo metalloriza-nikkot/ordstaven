@@ -320,8 +320,10 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
    */
   function placeraTanke(hinder, ram) {
     const t = $('#tanke');
+    const forra = t.style.left ? { x: parseFloat(t.style.left), y: parseFloat(t.style.top) } : null;
     t.style.left = ''; t.style.top = ''; t.style.transform = '';
-    if (t.hidden) return;
+    // texten under spelytan (36.2): molnet står i remsan och täcker aldrig världen
+    if (t.hidden || document.documentElement.classList.contains('text-under')) return;
     const alla = [...hinder, ...[...ui.querySelectorAll('#skyltar .skylt, #hud .hud-knapp, #hud-paus, #hud-meny')].filter((e) => !/** @type {HTMLElement} */ (e).hidden).map((e) => e.getBoundingClientRect()).filter((r) => r.width > 0)];
     const r0 = t.getBoundingClientRect();
     const b = r0.width, h = r0.height, luft = 10;
@@ -329,7 +331,10 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     const mitt = ram.vanster + (ram.bredd - b) / 2, hoger = ram.vanster + ram.bredd - b - luft, vanster = ram.vanster + luft;
     const uppe = ram.topp + luft, nere = ram.topp + ram.hojd - h - luft;
     // molnet hör hemma nere till vänster (stilguiden §3); nere till höger är hans (bären, nosen), och uppe är världen
-    for (const [x, y] of [[vanster, nere], [mitt, nere], [vanster, uppe], [mitt, uppe], [hoger, uppe]]) {
+    // står molnet redan på en plats som är fri står det kvar (det hoppar inte fram och tillbaka)
+    const platser = [[vanster, nere], [mitt, nere], [vanster, uppe], [mitt, uppe], [hoger, uppe]];
+    if (forra && platser.some(([x, y]) => Math.abs(x - forra.x) < 2 && Math.abs(y - forra.y) < 2)) platser.unshift([forra.x, forra.y]);
+    for (const [x, y] of platser) {
       if (!krockar(x, y)) { t.style.transform = 'none'; t.style.left = Math.round(x) + 'px'; t.style.top = Math.round(y) + 'px'; return; }
     }
     t.style.left = ''; t.style.top = ''; t.style.transform = '';

@@ -24,6 +24,40 @@ export function beraknaSkala({ bredd, hojd, dpr = 1, reservNere = 0 }) {
   return { fysisk, cssSkala: fysisk / d, cssBredd, cssHojd, vanster, topp };
 }
 
+/** Rumsbredd (CSS-punkter) där stilguidens textmått gäller: textskalan t = bredd / 960, mellan 1 och 2,4. */
+export const TEXT_BAS = 960;
+/** Textskalan för ett rum som är så här brett i CSS-punkter. @param {number} cssBredd */
+export const textskala = (cssBredd) => Math.max(1, Math.min(2.4, cssBredd / TEXT_BAS));
+/**
+ * Höjden (CSS-punkter) som textremsan under spelytan behöver: två rader uppläst text i 40 punkter × t
+ * (radavstånd 1,35), porträttet eller molnets bild bredvid, och luft runt rutan. @param {number} t
+ */
+export const remsansHojd = (t) => Math.ceil(2 * 40 * 1.35 * t + 48);
+
+/**
+ * Texten under spelytan (beslut 36.2). Har fönstret plats för textremsan under spelytan ligger spelytan överst och
+ * texten i remsan, så att den aldrig täcker världen. Räcker det inte blir spelytan ett helt steg mindre (en fysisk
+ * pixel mindre skala), om den då fortfarande är minst tre gånger så stor (960 × 576 punkter). Annars ligger texten
+ * över spelytan som förut (remsa = 0). Spelytan och remsan står tillsammans mitt i fönstret.
+ * @param {{ bredd: number, hojd: number, dpr?: number }} fonster
+ * @returns {ReturnType<typeof beraknaSkala> & { remsa: number }}
+ */
+export function beraknaSkalaMedRemsa({ bredd, hojd, dpr = 1 }) {
+  const d = dpr > 0 ? dpr : 1;
+  const hel = beraknaSkala({ bredd, hojd, dpr: d });
+  for (const fysisk of [hel.fysisk, hel.fysisk - 1]) {
+    if (fysisk < 1) break;
+    const cssBredd = (RUM.bredd * fysisk) / d, cssHojd = (RUM.hojd * fysisk) / d;
+    if (fysisk !== hel.fysisk && fysisk / d < 3) break;
+    const remsa = remsansHojd(textskala(cssBredd));
+    if (cssHojd + remsa > hojd + 1e-6) continue;
+    const vanster = Math.round(((bredd - cssBredd) / 2) * d) / d;
+    const topp = Math.round(((hojd - cssHojd - remsa) / 2) * d) / d;
+    return { fysisk, cssSkala: fysisk / d, cssBredd, cssHojd, vanster, topp, remsa };
+  }
+  return { ...hel, remsa: 0 };
+}
+
 /**
  * Skärmkoordinat (CSS-pixlar, relativt fönstret) → rumskoordinat.
  * @param {{ cssSkala: number, vanster: number, topp: number }} skala

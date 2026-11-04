@@ -11,7 +11,7 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 6,
+ "nextobjectid": 10,
  "properties": [
   {
    "name": "rum",
@@ -96,8 +96,8 @@
      "id": 3,
      "name": "sang",
      "type": "sak",
-     "x": 220,
-     "y": 90,
+     "x": 34,
+     "y": 52,
      "width": 64,
      "height": 44,
      "rotation": 0,
@@ -106,7 +106,7 @@
       {
        "name": "sida",
        "type": "string",
-       "value": "vanster"
+       "value": "under"
       },
       {
        "name": "bild",
@@ -136,13 +136,90 @@
      "id": 5,
      "name": "lampa",
      "type": "",
-     "x": 208,
-     "y": 100,
+     "x": 109,
+     "y": 54,
      "width": 0,
      "height": 0,
      "rotation": 0,
      "visible": true,
      "point": true
+    },
+    {
+     "id": 6,
+     "name": "nattduksbord",
+     "type": "sak",
+     "x": 100,
+     "y": 50,
+     "width": 18,
+     "height": 26,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "nattduksbord"
+      }
+     ]
+    },
+    {
+     "id": 7,
+     "name": "kista",
+     "type": "sak",
+     "x": 252,
+     "y": 50,
+     "width": 34,
+     "height": 24,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "kista"
+      }
+     ]
+    },
+    {
+     "id": 8,
+     "name": "klader_krok",
+     "type": "sak",
+     "x": 178,
+     "y": 28,
+     "width": 20,
+     "height": 22,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "klader_krok"
+      }
+     ]
+    },
+    {
+     "id": 9,
+     "name": "matta",
+     "type": "sak",
+     "x": 124,
+     "y": 104,
+     "width": 72,
+     "height": 40,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "matta"
+      },
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      }
+     ]
     }
    ]
   }

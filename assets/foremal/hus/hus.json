@@ -140,10 +140,110 @@
     "h": 16
    }
   },
-  "expeditionsbok": {
+  "dorr_oppnas_01": {
    "frame": {
     "x": 0,
     "y": 160,
+    "w": 26,
+    "h": 36
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 26,
+    "h": 36
+   },
+   "sourceSize": {
+    "w": 26,
+    "h": 36
+   }
+  },
+  "dorr_oppnas_02": {
+   "frame": {
+    "x": 27,
+    "y": 160,
+    "w": 26,
+    "h": 36
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 26,
+    "h": 36
+   },
+   "sourceSize": {
+    "w": 26,
+    "h": 36
+   }
+  },
+  "dorr_oppnas_03": {
+   "frame": {
+    "x": 54,
+    "y": 160,
+    "w": 26,
+    "h": 36
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 26,
+    "h": 36
+   },
+   "sourceSize": {
+    "w": 26,
+    "h": 36
+   }
+  },
+  "dorr_sida_hoger": {
+   "frame": {
+    "x": 0,
+    "y": 197,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "dorr_sida_vanster": {
+   "frame": {
+    "x": 33,
+    "y": 197,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   }
+  },
+  "expeditionsbok": {
+   "frame": {
+    "x": 0,
+    "y": 238,
     "w": 20,
     "h": 16
    },
@@ -163,7 +263,7 @@
   "fatolj_hoger": {
    "frame": {
     "x": 0,
-    "y": 177,
+    "y": 255,
     "w": 30,
     "h": 28
    },
@@ -183,7 +283,7 @@
   "fatolj_vanster": {
    "frame": {
     "x": 31,
-    "y": 177,
+    "y": 255,
     "w": 30,
     "h": 28
    },
@@ -203,7 +303,7 @@
   "fonster": {
    "frame": {
     "x": 0,
-    "y": 206,
+    "y": 284,
     "w": 40,
     "h": 24
    },
@@ -223,7 +323,7 @@
   "fonster_fram": {
    "frame": {
     "x": 41,
-    "y": 206,
+    "y": 284,
     "w": 40,
     "h": 16
    },
@@ -240,10 +340,50 @@
     "h": 16
    }
   },
+  "fonster_sida_hoger": {
+   "frame": {
+    "x": 0,
+    "y": 309,
+    "w": 32,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 24
+   }
+  },
+  "fonster_sida_vanster": {
+   "frame": {
+    "x": 33,
+    "y": 309,
+    "w": 32,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 24
+   }
+  },
   "hylla": {
    "frame": {
     "x": 0,
-    "y": 231,
+    "y": 334,
     "w": 72,
     "h": 20
    },
@@ -263,7 +403,7 @@
   "kakaokopp": {
    "frame": {
     "x": 0,
-    "y": 252,
+    "y": 355,
     "w": 10,
     "h": 10
    },
@@ -280,10 +420,50 @@
     "h": 10
    }
   },
+  "kista": {
+   "frame": {
+    "x": 0,
+    "y": 366,
+    "w": 34,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 34,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 34,
+    "h": 24
+   }
+  },
+  "klader_krok": {
+   "frame": {
+    "x": 0,
+    "y": 391,
+    "w": 20,
+    "h": 22
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 22
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 22
+   }
+  },
   "kruka": {
    "frame": {
     "x": 0,
-    "y": 263,
+    "y": 414,
     "w": 16,
     "h": 18
    },
@@ -303,7 +483,7 @@
   "lada_bla": {
    "frame": {
     "x": 0,
-    "y": 282,
+    "y": 433,
     "w": 30,
     "h": 18
    },
@@ -323,7 +503,7 @@
   "lada_bla_stor": {
    "frame": {
     "x": 0,
-    "y": 301,
+    "y": 452,
     "w": 30,
     "h": 18
    },
@@ -343,7 +523,7 @@
   "lada_gul": {
    "frame": {
     "x": 0,
-    "y": 320,
+    "y": 471,
     "w": 30,
     "h": 18
    },
@@ -363,7 +543,7 @@
   "lada_hornet": {
    "frame": {
     "x": 31,
-    "y": 320,
+    "y": 471,
     "w": 30,
     "h": 26
    },
@@ -383,7 +563,7 @@
   "lada_lag": {
    "frame": {
     "x": 62,
-    "y": 320,
+    "y": 471,
     "w": 24,
     "h": 16
    },
@@ -403,7 +583,7 @@
   "lada_lang": {
    "frame": {
     "x": 87,
-    "y": 320,
+    "y": 471,
     "w": 30,
     "h": 18
    },
@@ -423,7 +603,7 @@
   "lada_liten": {
    "frame": {
     "x": 118,
-    "y": 320,
+    "y": 471,
     "w": 20,
     "h": 20
    },
@@ -443,7 +623,7 @@
   "lada_rod": {
    "frame": {
     "x": 139,
-    "y": 320,
+    "y": 471,
     "w": 30,
     "h": 18
    },
@@ -463,7 +643,7 @@
   "lada_rod_liten": {
    "frame": {
     "x": 0,
-    "y": 347,
+    "y": 498,
     "w": 22,
     "h": 13
    },
@@ -483,7 +663,7 @@
   "lada_rod_stor": {
    "frame": {
     "x": 23,
-    "y": 347,
+    "y": 498,
     "w": 30,
     "h": 18
    },
@@ -503,7 +683,7 @@
   "lada_stor": {
    "frame": {
     "x": 0,
-    "y": 366,
+    "y": 517,
     "w": 32,
     "h": 22
    },
@@ -523,7 +703,7 @@
   "laslampa": {
    "frame": {
     "x": 0,
-    "y": 389,
+    "y": 540,
     "w": 12,
     "h": 24
    },
@@ -540,10 +720,50 @@
     "h": 24
    }
   },
+  "matta": {
+   "frame": {
+    "x": 0,
+    "y": 565,
+    "w": 72,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 72,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 72,
+    "h": 40
+   }
+  },
+  "nattduksbord": {
+   "frame": {
+    "x": 0,
+    "y": 606,
+    "w": 18,
+    "h": 26
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 18,
+    "h": 26
+   },
+   "sourceSize": {
+    "w": 18,
+    "h": 26
+   }
+  },
   "radio": {
    "frame": {
     "x": 0,
-    "y": 414,
+    "y": 633,
     "w": 22,
     "h": 18
    },
@@ -563,7 +783,7 @@
   "runt_fonster": {
    "frame": {
     "x": 0,
-    "y": 433,
+    "y": 652,
     "w": 28,
     "h": 22
    },
@@ -583,7 +803,7 @@
   "runt_fonster_natt": {
    "frame": {
     "x": 0,
-    "y": 456,
+    "y": 675,
     "w": 28,
     "h": 22
    },
@@ -603,7 +823,7 @@
   "sang": {
    "frame": {
     "x": 0,
-    "y": 479,
+    "y": 698,
     "w": 64,
     "h": 44
    },
@@ -623,7 +843,7 @@
   "sex_krukor": {
    "frame": {
     "x": 0,
-    "y": 524,
+    "y": 743,
     "w": 144,
     "h": 18
    },
@@ -643,7 +863,7 @@
   "skylt_liten": {
    "frame": {
     "x": 0,
-    "y": 543,
+    "y": 762,
     "w": 14,
     "h": 14
    },
@@ -663,7 +883,7 @@
   "staket": {
    "frame": {
     "x": 0,
-    "y": 558,
+    "y": 777,
     "w": 8,
     "h": 72
    },
@@ -683,7 +903,7 @@
   "stege_ner": {
    "frame": {
     "x": 0,
-    "y": 631,
+    "y": 850,
     "w": 24,
     "h": 20
    },
@@ -703,7 +923,7 @@
   "stege_upp": {
    "frame": {
     "x": 25,
-    "y": 631,
+    "y": 850,
     "w": 24,
     "h": 54
    },
@@ -723,7 +943,7 @@
   "stol": {
    "frame": {
     "x": 0,
-    "y": 686,
+    "y": 905,
     "w": 16,
     "h": 22
    },
@@ -743,7 +963,7 @@
   "tva_buskar": {
    "frame": {
     "x": 0,
-    "y": 709,
+    "y": 928,
     "w": 40,
     "h": 22
    },
@@ -766,7 +986,7 @@
   "format": "RGBA8888",
   "size": {
    "w": 170,
-   "h": 732
+   "h": 951
   },
   "scale": "1",
   "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."

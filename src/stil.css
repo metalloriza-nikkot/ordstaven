@@ -712,3 +712,11 @@ html, body {
 .snabb .skylt .kort.vaggskylt { transition: none; }
 /* Mellanslag-tangenten står bredvid handen när det finns en hand (inte över molnet) */
 #styrhjalp.mellanslag.vid-hand { bottom: auto; transform: translate(calc(40px * var(--t)), -50%); }
+
+/* Texten under spelytan (beslut 36.2): när fönstret har plats står repliken och molnet i en remsa under världen
+   (klassen text-under och --remsa sätts av grans/layout.js). Läsplattan med pussel, boken och mellanscenerna ligger
+   fortfarande över världen. Utan plats står texten över som förut, och repliken flyttas upp om den skulle täcka
+   hjälten, ungen eller målet (.uppe). */
+.text-under #plattan.replik { bottom: auto; top: calc(var(--rum-topp) + var(--rum-hojd) + 8px); }
+.text-under #tanke { top: calc(var(--rum-topp) + var(--rum-hojd) + 20px * var(--t)); transform: none; }
+#plattan.replik.uppe { bottom: auto; top: calc(var(--rum-topp) + 12px); }

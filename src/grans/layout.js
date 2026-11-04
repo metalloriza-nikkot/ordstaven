@@ -2,32 +2,33 @@
 // Placerar pixelvärlden i fönstret med heltalsskala (fysiska pixlar). Ramen fyller resten.
 // Skrivläget: när skärmtangentbordet visas hålls plats nertill, rummet krymper ett steg och glider upp.
 // Textskalan --t växer med rummet; stilguidens mått (48 punkter vid ett 960 punkter brett rum) är minimum.
-import { beraknaSkala } from '../karna/skalning.js';
-
-/** Rumsbredd där stilguidens textmått gäller. */
-const TEXT_BAS = 960;
+import { beraknaSkala, beraknaSkalaMedRemsa, textskala } from '../karna/skalning.js';
 
 /**
  * @param {{ varld: HTMLElement, logg?: { handelse(t: string, m: string, d?: any): void } }} opt
  */
 export function skapaLayout({ varld, logg }) {
-  /** @type {ReturnType<typeof beraknaSkala>} */
-  let skala = beraknaSkala({ bredd: 320, hojd: 192 });
+  /** @type {ReturnType<typeof beraknaSkalaMedRemsa>} */
+  let skala = { ...beraknaSkala({ bredd: 320, hojd: 192 }), remsa: 0 };
   let reserv = 0;
   /** @type {Set<(s: typeof skala) => void>} */
   const lyssnare = new Set();
 
   function uppdatera() {
     const dpr = window.devicePixelRatio || 1;
-    const s = beraknaSkala({ bredd: window.innerWidth, hojd: window.innerHeight, dpr, reservNere: reserv });
+    // Texten under spelytan (36.2) när fönstret har plats, utom i skrivläget, där tangentbordet tar platsen nertill
+    const s = reserv ? { ...beraknaSkala({ bredd: window.innerWidth, hojd: window.innerHeight, dpr, reservNere: reserv }), remsa: 0 }
+      : beraknaSkalaMedRemsa({ bredd: window.innerWidth, hojd: window.innerHeight, dpr });
     skala = s;
+    document.documentElement.classList.toggle('text-under', s.remsa > 0);
+    document.documentElement.style.setProperty('--remsa', s.remsa + 'px');
     const r = document.documentElement.style;
     r.setProperty('--rum-vanster', s.vanster + 'px');
     r.setProperty('--rum-topp', s.topp + 'px');
     r.setProperty('--rum-bredd', s.cssBredd + 'px');
     r.setProperty('--rum-hojd', s.cssHojd + 'px');
     r.setProperty('--reserv', reserv + 'px');
-    const t = Math.max(1, Math.min(2.4, s.cssBredd / TEXT_BAS));
+    const t = textskala(s.cssBredd);
     r.setProperty('--t', String(t));
     // bildkorten (48 × 48 pixlar) skalas i hela steg i fysiska pixlar, så nära emojins storlek (64 punkter × t) som det går
     r.setProperty('--kort', (Math.max(1, Math.round((64 * t * dpr) / 48)) * 48) / dpr + 'px');
@@ -47,7 +48,7 @@ export function skapaLayout({ varld, logg }) {
     r.setProperty('--ram-hoger', ram + 'px');
     document.documentElement.classList.toggle('hud-i-ramen', iRamen);
     varld.dataset.skala = String(s.fysisk);
-    if (logg) logg.handelse('skärm', `skala ${s.fysisk} (fysisk)`, { fonster: `${window.innerWidth}×${window.innerHeight}`, dpr, reserv });
+    if (logg) logg.handelse('skärm', `skala ${s.fysisk} (fysisk)`, { fonster: `${window.innerWidth}×${window.innerHeight}`, dpr, reserv, text: s.remsa ? 'under' : 'över' });
     for (const f of lyssnare) f(s);
   }
 

@@ -166,6 +166,7 @@ export function skapaSpel(d) {
     if (r.via === 'radio' && r.upplast) senaste.set(RADIO, r);
     if (r.via === 'radio') ui.pulsera('#hud-radio');
     const el = ui.visaPlatta(replikHtml(r), 'replik');
+    placeraReplik(el);
     // nosen fungerar på repliker också, gratis (de läses ändå upp), så att "tryck på nosen" alltid ger svar
     ui.sattNos(true, { betala: () => true });
     const rull = rullaOchSag(/** @type {HTMLElement} */ (el.querySelector('.text')), r);
@@ -211,7 +212,44 @@ export function skapaSpel(d) {
     if (b) placeraMoln([]);
   }
   /** Molnet täcker aldrig ett alternativ, en skylt eller en knapp. @param {{ left: number, top: number, right: number, bottom: number }[]} rutor */
-  function placeraMoln(rutor) { const s = layout.skala; ui.placeraTanke(rutor, { vanster: s.vanster, topp: s.topp, bredd: s.cssBredd, hojd: s.cssHojd }); }
+  function placeraMoln(rutor) { const s = layout.skala; ui.placeraTanke([...rutor, ...viktigaRutor()], { vanster: s.vanster, topp: s.topp, bredd: s.cssBredd, hojd: s.cssHojd }); }
+  /** @type {string | null} målet som han är på väg till (ga_till), så att texten inte täcker det */
+  let malNu = null;
+  /** Nästa mål i scenen efter steget som pågår (en replik före ett ga_till), om det finns i rummet. */
+  function nastaMal() {
+    const steg = b?.scen?.steg || [];
+    for (let i = Math.max(0, b?.stegIndex ?? 0); i < steg.length; i++) if (steg[i].typ === 'ga_till' && rum.ruta(steg[i].mal)) return /** @type {string} */ (steg[i].mal);
+    return null;
+  }
+  /**
+   * Det som texten över spelytan aldrig ska täcka (beslut 36.2, 31.3): hjälten, ungen och målet, i skärmpunkter.
+   * @param {string | null} [mal]
+   */
+  function viktigaRutor(mal = malNu) {
+    if (!rum.harRum) return [];
+    const ruta = (/** @type {number} */ x, /** @type {number} */ y, /** @type {number} */ bb, /** @type {number} */ h) => {
+      const a = skarm(x, y), c = skarm(x + bb, y + h); return { left: a.x, top: a.y, right: c.x, bottom: c.y };
+    };
+    const r = [ruta(rum.pos.x - 8, rum.pos.y - 26, 16, 26)];
+    if (rum.unge?.visible) { const u = rum.ungePunkt; r.push(ruta(u.x - 12, u.y - 14, 24, 20)); }
+    const o = mal ? rum.ruta(mal) : null;
+    if (o) r.push(ruta(o.x, o.y, o.b, o.h));
+    return r;
+  }
+  /**
+   * Repliken över spelytan (när texten inte står under den) flyttas upp till rummets överkant om den skulle täcka
+   * hjälten, ungen eller målet, och står kvar nere om den täcker mindre där. @param {HTMLElement} el
+   */
+  function placeraReplik(el) {
+    el.classList.remove('uppe');
+    if (layout.skala.remsa) return;
+    const viktiga = viktigaRutor(malNu ?? nastaMal());
+    const tackt = () => { const q = el.getBoundingClientRect(); return viktiga.reduce((sum, v) => sum + Math.max(0, Math.min(q.right, v.right) - Math.max(q.left, v.left)) * Math.max(0, Math.min(q.bottom, v.bottom) - Math.max(q.top, v.top)), 0); };
+    const nere = tackt();
+    if (!nere) return;
+    el.classList.add('uppe');
+    if (tackt() >= nere) el.classList.remove('uppe');
+  }
   /**
    * Målets bild i molnet: föremålets egen bild ur grafiken, i heltalsskala (fysiska pixlar) så att den inte blir
    * suddig, ca ett bildkorts höjd. null när föremålet inte har någon bild (gråboxen). @param {string} id
@@ -1062,7 +1100,10 @@ export function skapaSpel(d) {
     // framme, och efter ca 10 s nosar ungen mot målet (beslut 31.2, granskningen A 22)
     const instr = instruktionFore(st);
     const iMolnet = !!instr;
+    malNu = st.mal;
     const visaMal = () => { if (!iMolnet) return; visaMoln(malBild(st.mal), instr); placeraMoln([]); };
+    // molnet flyttar undan när kameran eller hjälten rör sig, så att det aldrig täcker målet, hjälten eller ungen
+    const omplacera = window.setInterval(() => { if (iMolnet && !ui.$('#tanke').hidden && ui.plattan.hidden) placeraMoln([]); }, 250);
     const start = performance.now();
     if (iMolnet) logg.handelse('mål', 'i molnet: ' + st.mal);
     const k = knuffKlocka(st.knuff ?? { handling: '' }, () => {
@@ -1070,9 +1111,10 @@ export function skapaSpel(d) {
       if (iMolnet) { const pekar = rum.ungePekar(st.mal); ui.pulseraTanke(); logg.handelse('knuff', 'ungen nosar mot målet: ' + st.mal, { ungenPekar: pekar }); }
     }, undefined, iMolnet ? MAL_KNUFF_MS : KNUFF_MS);
     const framme = () => {
-      window.clearInterval(styr); ui.styrhjalp(null); k.stopp(); rum.markera(st.mal, false); ui.doljRegi();
+      window.clearInterval(styr); window.clearInterval(omplacera); malNu = null; ui.styrhjalp(null); k.stopp(); rum.markera(st.mal, false); ui.doljRegi();
       if (iMolnet) { visaMoln(null); rum.ungePekar(null); }
-      molnKedja = instr;
+      // instruktionen följer med bara om målet var en utgång till ett annat rum (36.5)
+      molnKedja = instr ? { r: instr, rum: aktuelltRum } : null;
       logg.handelse('framme', st.mal, { sek: Math.round((performance.now() - start) / 100) / 10, efter_dialog: iMolnet });
     };
     // en yta (krönet på kullen): framme när han står på den, på dess nivå (han går upp för trappan själv)
@@ -1130,7 +1172,11 @@ export function skapaSpel(d) {
     }
   }
 
-  /** @type {any} instruktionen i molnet vid förra målet: gäller också nästa rums första mål (sovrummet → hallen → köket) */
+  /**
+   * Instruktionen i molnet vid förra målet och rummet där den stod: den gäller också nästa rums första mål
+   * (sovrummet → hallen → köket), men bara när rummet har bytts, och den nollas av varje steg som inte är ett mål
+   * (ett pussel, en replik, en mellanscen), beslut 36.5. @type {{ r: any, rum: string | null | undefined } | null}
+   */
   let molnKedja = null;
   /**
    * Instruktionen som hör till ett mål (beslut 31.2): den senaste upplästa repliken före målet, förbi mellanscener,
@@ -1139,7 +1185,7 @@ export function skapaSpel(d) {
    */
   function instruktionFore(st) {
     const iScenen = aktuelltSteg === st && b.scen?.steg?.[b.stegIndex] === st;
-    if (iScenen && b.stegIndex === 0 && molnKedja) return molnKedja;
+    if (iScenen && b.stegIndex === 0 && molnKedja) return molnKedja.rum !== aktuelltRum ? molnKedja.r : null;
     const fore = iScenen ? b.scen.steg.slice(0, b.stegIndex) : aktuelltSteg && aktuelltSteg !== st ? [aktuelltSteg] : [];
     for (let i = fore.length - 1; i >= 0; i--) {
       const x = fore[i];

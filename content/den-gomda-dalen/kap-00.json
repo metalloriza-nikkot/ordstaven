@@ -114,7 +114,11 @@
    "innehall": [
     "sang",
     "fonster",
-    "dorr_hallen"
+    "dorr_hallen",
+    "nattduksbord",
+    "kista",
+    "klader_krok",
+    "matta"
    ],
    "anteckning": "Gästrummet är hjältens sovrum (id:t sovrummet står kvar). Säng, låda och fönster. Dörren har lappen SOV på hallsidan."
   },
