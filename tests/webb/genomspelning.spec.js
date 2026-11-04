@@ -63,11 +63,15 @@ async function anvand(page, id, satt, klar = async () => false) {
   // att bara stå där räcker inte: steget väntar på att spelaren använder föremålet
   await page.waitForTimeout(150);
   await expect(hand).toBeVisible();
+  const fore = await interaktiva();
   if (satt === 'mellanslag') await page.keyboard.press('Space');
   else if (satt === 'igen') await page.mouse.click(pt.x, pt.y);
   else await hand.locator('button').click();
-  // handen försvinner, eller föremålet är inte längre något att använda (krukorna: handen flyttar till nästa)
-  await expect.poll(async () => (await hand.isHidden()) || !(await interaktiva()).includes(id) || (await klar()), { timeout: 5000 }).toBe(true);
+  // handen försvinner, eller föremålet är inte längre något att använda (krukorna: handen flyttar till nästa).
+  // Krukorna står tätt: hann handen flytta till en granne innan trycket kom, slogs grannen (den handen visade),
+  // och då har en kruka mindre kvar. Testet slår den här krukan i nästa varv.
+  const enMindre = async () => kruka && (await interaktiva()).filter((x) => /_\d$/.test(x)).length < fore.filter((x) => /_\d$/.test(x)).length;
+  await expect.poll(async () => (await hand.isHidden()) || !(await interaktiva()).includes(id) || (await enMindre()) || (await klar()), { timeout: 5000 }).toBe(true);
 }
 
 /** Spela tills slutskärmen syns. felFor = pussel-id där ett fel svar ska väljas först. */

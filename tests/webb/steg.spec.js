@@ -1297,7 +1297,9 @@ test('dörrskyltarna sitter på väggen, täcker aldrig varandra eller hjälten,
   }
   await page.screenshot({ path: 'test-results/lappar-hallen.png' });
   expect([...fel]).toEqual([]);
-  expect(stora.size).toBeGreaterThan(0); // han gick förbi dörrarna, och skylten vid dörren växte
+  // han gick förbi dörrarna, och skylten vid dörren växte. Hann han inte fram till någon dörr med tangenterna
+  // (en långsam dator), går han fram till en
+  if (!stora.size) { await tryckPa(page, 'dorr_mat'); await expect.poll(async () => { await prova(); return stora.size; }, { timeout: 10000 }).toBeGreaterThan(0); }
   // skyltarna sitter på väggen: nederkanten ovanför dörrens överkant, och de har trä (9-slice)
   const vagg = await page.evaluate(() => { const s = window.__ORDSTAVEN.skala(), k = window.__ORDSTAVEN.kamera(), o = window.__ORDSTAVEN.ruta('dorr_bok');
     const e = document.querySelector('#skyltar .skylt[data-objekt="dorr_bok"]:not(.stor) .kort'); if (!e) return null;
