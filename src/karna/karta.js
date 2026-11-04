@@ -17,7 +17,7 @@
 // Höjdnivåer: en ruta med typen "yta" och egenskapen "niva" (1, 2 …) är upphöjd (kullen, krönet), och dess kanter
 // går inte att gå över. En ruta med typen "trappa" eller "stege" förbinder nivåerna och ska ligga över kanten.
 // Saker på ytan (lövhögarna) når han bara uppifrån. Se karna/nivaer.js.
-// "forsvinner_efter" (ett pussels id, en formel): föremålet är borta när hjälten har formeln, t.ex. lianerna som
+// "forsvinner_efter" (ett pussels id, en formel eller P26): föremålet är borta när hjälten har formeln, t.ex. lianerna som
 // SVÄRD kapar. "oppning" på en stig: när den syns skär den igenom hindret den ligger över, t.ex. hålet i häcken.
 // Ett rum som inte är rektangulärt (hallen: en bred entré och en smal korridor) får sin form av rutor med typen
 // "vagg": massiv vägg inne i kartan. De hör till rummets form, inte till innehållet, och har inget namn som används.
@@ -121,6 +121,8 @@ export function lasKarta(tmj) {
       if (egen.sovplats) ut.sovplats = true;
       if (egen.skata_fonster) ut.skataFonster = true;
       if (egen.lyser) ut.lyser = true;
+      // delas: "hela" = när ett pussel delar föremålet (P26) fyller delarna hela föremålet (lianväggen), annars krukor
+      if (egen.delas === 'hela') ut.delasHela = true;
       objekt.push(ut);
     }
   }

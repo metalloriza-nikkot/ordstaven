@@ -25,7 +25,7 @@ import { lasKarta } from './karna/karta.js';
 import { skapaLagring, begarBestandigLagring } from './grans/lagring.js';
 import { skapaLayout } from './grans/layout.js';
 import { kopplaInmatning } from './grans/inmatningDom.js';
-import { kopplaLogg, exportera } from './grans/loggDom.js';
+import { kopplaLogg, exportera, laddaNed, tidsstampel, meddelande } from './grans/loggDom.js';
 import { startaUppdatering } from './grans/uppdatering.js';
 import { skapaRost } from './grans/rost.js';
 import { skapaLjud } from './grans/ljud.js';
@@ -186,6 +186,8 @@ for (const [id, tmj] of Object.entries(testkartor)) kartor[id] = lasKarta(tmj);
 const spelet = skapaSpel({
   aventyr, kartor, kapitel, ordlistor, tillstand, sparning, logg, rost, ljud, ui, rum, layout, inmatning, tangentbord, bilder,
   snabb, pek: () => pek.matches, version: VERSION, exporteraLogg: () => exportera(logg),
+  // sparfilen i menyn för vuxna: hela sparningen som en fil, och tillbaka
+  filer: { laddaNed, tidsstampel, meddelande },
   // ?kapitel=kap-01: börja i ett kapitel som ännu saknar kartor (gråbox för den vuxne)
   valtKapitel: parametrar.get('kapitel'),
   uppdatering: { tillampa: () => { uppdatering.tillampa(); startlage = false; } },

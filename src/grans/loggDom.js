@@ -31,23 +31,35 @@ export function kopplaLogg(logg) {
 export function exportera(logg) {
   logg.handelse('logg', 'exporterad');
   const txt = logg.text();
-  const d = new Date(), p = (/** @type {number} */ n) => String(n).padStart(2, '0');
-  const namn = `ordstaven-logg-${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}.txt`;
-  let sparad = false;
-  try {
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([txt], { type: 'text/plain;charset=utf-8' }));
-    a.download = namn; document.body.appendChild(a); a.click();
-    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
-    sparad = true;
-  } catch (e) { /* ok */ }
+  const namn = `ordstaven-logg-${tidsstampel()}.txt`;
+  const sparad = laddaNed(namn, txt, 'text/plain;charset=utf-8');
   try { navigator.clipboard && navigator.clipboard.writeText(txt).catch(() => {}); } catch (e) { /* ok */ }
   meddelande(sparad ? `Loggen sparad: ${namn} (finns i Hämtade filer och är kopierad)` : 'Loggen är kopierad');
   return txt;
 }
 
+/** Datum och tid för filnamn: 20261104-2305. */
+export function tidsstampel() {
+  const d = new Date(), p = (/** @type {number} */ n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}`;
+}
+
+/**
+ * Lägg en fil i Hämtade filer. @param {string} namn @param {string} text @param {string} typ
+ * @returns {boolean} om nedladdningen startade
+ */
+export function laddaNed(namn, text, typ) {
+  try {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([text], { type: typ }));
+    a.download = namn; document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    return true;
+  } catch (e) { return false; }
+}
+
 /** Kort meddelande till den vuxne (inte spelartext). @param {string} text */
-function meddelande(text) {
+export function meddelande(text) {
   let el = document.getElementById('logg-meddelande');
   if (!el) {
     el = document.createElement('div'); el.id = 'logg-meddelande';

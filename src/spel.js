@@ -25,8 +25,11 @@ const TIDIG_HAND = 32;
 const DORR_STOR = 24;
 /** Talare vars porträtt har radiomärket ritat i nedre hörnet (Stil 21:20). Andra får emojin tills vidare. */
 const MED_RADIOMARKE = new Set(['farfar']);
-/** Ungens knuff när målet står i molnet efter en dialog (beslut 31.2). */
-const MAL_KNUFF_MS = 10000;
+/**
+ * Knuffen när han ska gå någonstans (ga_till, avstickaren): efter 15 s nosar ungen mot målet, och där ungen inte
+ * följer med än glimtar målet (beslut 31.2, 39.4: 15 s i stället för 10, så att han hinner hitta själv).
+ */
+const MAL_KNUFF_MS = 15000;
 const vanta = (/** @type {number} */ ms) => new Promise((r) => setTimeout(r, ms));
 
 /**
@@ -34,7 +37,8 @@ const vanta = (/** @type {number} */ ms) => new Promise((r) => setTimeout(r, ms)
  *           ui: ReturnType<typeof import('./grans/ui.js').skapaUi>, rum: import('./scener/Rum.js').Rum, layout: any,
  *           inmatning: any, tangentbord: ReturnType<typeof import('./grans/tangentbord.js').skapaTangentbord>,
  *           bilder: ReturnType<typeof import('./grans/bilder.js').skapaBilder>, snabb: boolean, pek: () => boolean,
- *           uppdatering: { tillampa(): void }, valtKapitel?: string | null, version?: string, exporteraLogg?: () => void }} d
+ *           uppdatering: { tillampa(): void }, valtKapitel?: string | null, version?: string, exporteraLogg?: () => void,
+ *           filer?: { laddaNed(namn: string, text: string, typ: string): boolean, tidsstampel(): string, meddelande(t: string): void } }} d
  */
 /** Bär per föremål i fri lek (buskarna): två slag var. */
 const BAR_PER_FOREMAL = 2;
@@ -56,7 +60,9 @@ export function skapaSpel(d) {
   let aktuelltRum = /** @type {string | null | undefined} */ (undefined);
   let aktuelltSteg = /** @type {any} */ (null);
 
-  const spara = () => { sparning.spara(tillstand); };
+  // efter en inläst sparfil sparas inget mer från den här sidan, så att ingenting skriver över filen innan sidan laddas om
+  let sparfilInlast = false;
+  const spara = () => { if (!sparfilInlast) sparning.spara(tillstand); };
   /** @type {string | null} varianten i pusslet som pågår (för testerna) */
   let aktuellVariant = null;
   /** Spelet står still (menyn för vuxna är öppen eller fliken är dold). */
@@ -544,10 +550,32 @@ export function skapaSpel(d) {
     for (const o of kartor[r.id]?.objekt || []) {
       if (!o.forsvinnerEfter) continue;
       const p = b.pussel(o.forsvinnerEfter);
-      if (losta.has(o.forsvinnerEfter) || (p && formler.includes(p.svar))) borta.add(o.id);
+      if (losta.has(o.forsvinnerEfter) || (p?.typ === 'P11_formel' && formler.includes(p.svar)) || pusselForbi(o.forsvinnerEfter)) borta.add(o.id);
     }
     return borta.size ? r.innehall.filter((/** @type {any} */ x) => !borta.has(typeof x === 'string' ? x : x.id)) : r.innehall;
   }
+
+  /**
+   * Är pusslet gjort i sparningen? Ett pussel i en scen är gjort när berättelsen har gått förbi steget (också efter
+   * en omstart), och ett pussel i det frivilliga när det frivilliga är gjort. Lianerna som har huggits (k1_lianerna)
+   * står alltså inte där igen. @param {string} pid
+   */
+  function pusselForbi(pid) {
+    const sc = b?.kapitel?.scener || [];
+    for (let si = 0; si < sc.length; si++) {
+      const ti = (sc[si].steg || []).findIndex((/** @type {any} */ st) => st.typ === 'pussel' && st.pussel_id === pid);
+      if (ti < 0) continue;
+      if (b.scenIndex !== si) return b.scenIndex > si;
+      const nu = Math.max(b.stegIndex, av.scen === si ? (av.steg ?? -1) : -1);
+      return nu > ti;
+    }
+    for (const r of b?.kapitel?.rum || []) for (const f of r.frivilligt || []) {
+      if ((f.steg || []).some((/** @type {any} */ st) => st.typ === 'pussel' && st.pussel_id === pid)) return b.frivilligtGjort(`${r.id}/${f.foremal}`) && !friviligtPagar.has(`${r.id}/${f.foremal}`);
+    }
+    return false;
+  }
+  /** Det frivilliga som spelas just nu (det räknas som gjort redan när det börjar). @type {Set<string>} */
+  const friviligtPagar = new Set();
 
   /** Nästa rumsbyte tonas (start, FORTSÄTT, ny dag), i stället för att glida. */
   let tonaNasta = true;
@@ -1097,7 +1125,7 @@ export function skapaSpel(d) {
       styr = window.setInterval(() => { if (Math.hypot(rum.pos.x - start.x, rum.pos.y - start.y) > 6) { ui.styrhjalp(null); window.clearInterval(styr); } }, 100);
     }
     // efter en dialog står målet kvar i molnet nere till vänster, med en bild och instruktionen, tills han är
-    // framme, och efter ca 10 s nosar ungen mot målet (beslut 31.2, granskningen A 22)
+    // framme. Efter ca 15 s nosar ungen mot målet, och följer ungen inte med än glimtar målet (beslut 31.2, 39.4)
     const instr = instruktionFore(st);
     const iMolnet = !!instr;
     malNu = st.mal;
@@ -1108,11 +1136,14 @@ export function skapaSpel(d) {
     if (iMolnet) logg.handelse('mål', 'i molnet: ' + st.mal);
     const k = knuffKlocka(st.knuff ?? { handling: '' }, () => {
       rum.markera(st.mal, true); ui.pulseraSkylt(st.mal);
-      if (iMolnet) { const pekar = rum.ungePekar(st.mal); ui.pulseraTanke(); logg.handelse('knuff', 'ungen nosar mot målet: ' + st.mal, { ungenPekar: pekar }); }
-    }, undefined, iMolnet ? MAL_KNUFF_MS : KNUFF_MS);
+      const pekar = rum.ungePekar(st.mal);
+      if (iMolnet) ui.pulseraTanke();
+      logg.handelse('knuff', pekar ? 'ungen nosar mot målet: ' + st.mal : 'målet glimtar: ' + st.mal, { ungenPekar: pekar });
+    }, undefined, MAL_KNUFF_MS);
     const framme = () => {
       window.clearInterval(styr); window.clearInterval(omplacera); malNu = null; ui.styrhjalp(null); k.stopp(); rum.markera(st.mal, false); ui.doljRegi();
-      if (iMolnet) { visaMoln(null); rum.ungePekar(null); }
+      rum.ungePekar(null);
+      if (iMolnet) visaMoln(null);
       // instruktionen följer med bara om målet var en utgång till ett annat rum (36.5)
       molnKedja = instr ? { r: instr, rum: aktuelltRum } : null;
       logg.handelse('framme', st.mal, { sek: Math.round((performance.now() - start) / 100) / 10, efter_dialog: iMolnet });
@@ -1154,7 +1185,8 @@ export function skapaSpel(d) {
       }
       if (st.fri_vag && sidor.includes(id)) { logg.handelse('vägval', tog.length ? `${id} (sedan ${tog.join(', ')})` : `${id} först`); tog.push(id); }
       k.stopp(); window.clearInterval(styr); ui.styrhjalp(null); rum.markera(st.mal, false);
-      if (iMolnet) { visaMoln(null); rum.ungePekar(null); }
+      rum.ungePekar(null);
+      if (iMolnet) visaMoln(null);
       if (fri.includes(id)) await korFrivilligt(id); else await avstickare(id, st, visaMal);
       rum.frys(false); k.nollstall();
     }
@@ -1218,7 +1250,8 @@ export function skapaSpel(d) {
     logg.handelse('frivilligt', nyckel);
     b.frivilligtKlart(nyckel); spara();
     const forra = aktuelltSteg;
-    for (const st of f.steg) { b.effektUtanfor(st, rumId); await utfor(st); }
+    friviligtPagar.add(nyckel);
+    try { for (const st of f.steg) { b.effektUtanfor(st, rumId); await utfor(st); } } finally { friviligtPagar.delete(nyckel); }
     aktuelltSteg = forra;
     ui.uppdateraHud(av); spara(); rum.frys(false);
   }
@@ -1369,9 +1402,12 @@ export function skapaSpel(d) {
     }
     ui.doljPlatta(); rum.frys(false);
     pusselPagar = false; visaEtiketter();
-    // en formel som kapar något i rummet (lianerna): rummet ritas om utan det
-    if (p.typ === 'P11_formel' && res && aktuelltRum && (kartor[aktuelltRum]?.objekt || []).some((/** @type {any} */ o) => o.forsvinnerEfter === p.id)) {
-      losta.add(p.id); await visaScen(visadScen);
+    // ett pussel som tar bort något i rummet (lianerna som han har huggit): rummet ritas om utan det
+    const forsvinner = res && aktuelltRum ? (kartor[aktuelltRum]?.objekt || []).filter((/** @type {any} */ o) => o.forsvinnerEfter === p.id) : [];
+    if (forsvinner.length) {
+      losta.add(p.id);
+      // det som huggits är redan borta ur rummet, en formel som kapar ritar om rummet
+      if (forsvinner.some((/** @type {any} */ o) => rum.ruta(o.id))) await visaScen(visadScen);
     }
     if (res && res.niva) {
       lasmotor.registrera({ pussel_id: p.id, typ: p.typ, niva: res.niva, ratt: res.forstaForsoket, antal_forsok: res.forsok, hjalp_anvand: res.hjalp, tid: performance.now() - start });
@@ -2075,6 +2111,10 @@ export function skapaSpel(d) {
    */
   async function krukor(p) {
     const k = skapaKrukor(p);
+    // hugga (beslut 39.3): staven är ett svärd, och varje hugg fäller en lian. Samma knapp som att svinga,
+    // inga missar och ingen tid. Svinga: krukor, buskar och löv
+    const hugga = p.verb === 'hugga';
+    if (hugga) rum.svard(true);
     if (p.instruktion) await replik(p.instruktion);
     rum.frys(false);
     /** @type {string[]} */
@@ -2108,8 +2148,9 @@ export function skapaSpel(d) {
       knuff.nollstall(); rum.markera(id, false);
       if (pekad) { rum.markera(pekad, false); rum.ungePekar(null); pekad = null; }
       const fynd = k.sla(ids.indexOf(id));
-      ljud.spela(p.foremal ? 'prassel' : 'sla'); rum.slagen(id);
-      logg.handelse('svinga', `${id}: ${fynd}`);
+      if (hugga) { ljud.spela('hugg'); rum.huggen(id); }
+      else { ljud.spela(p.foremal ? 'prassel' : 'sla'); rum.slagen(id); }
+      logg.handelse(hugga ? 'hugga' : 'svinga', `${id}: ${fynd}`);
       if (fynd === 'bar') { av.bar++; ui.uppdateraHud(av); ljud.spela('bar'); await ui.visaFest('🫐', tid(600)); }
       else if (fynd && fynd === k.sista) { ljud.spela('fest'); await ui.visaFest(fynd.startsWith('kartbit') ? kartbitFest(Number(fynd.split('_')[1])) : bilder.emoji(fynd) || '✨', tid(900), true); }
       else if (fynd && fynd !== 'tom') { ljud.spela('allmant'); await ui.visaFest(bilder.emoji(fynd) || '✨', tid(700)); }
@@ -2117,6 +2158,7 @@ export function skapaSpel(d) {
     }
     knuff.stopp();
     if (pekad) { rum.markera(pekad, false); rum.ungePekar(null); }
+    if (hugga) rum.svard(false);
     if (p.vid_ratt) await reaktion(p.vid_ratt);
     return {};
   }
@@ -2732,6 +2774,8 @@ export function skapaSpel(d) {
       <label><input type="checkbox" class="markeraval" ${inst.markera ? 'checked' : ''}> Markera ordet som läses (stäng av om markeringen hamnar fel på den här datorn)</label></div>
       ${foraldravy()}
       <div class="menygrupp scenlista"><b>Hoppa till scen:</b>${scener}</div>
+      <div class="menygrupp sparfil"><b>Sparfilen:</b> <button type="button" class="menyval spara-fil">Spara sparfilen</button><button type="button" class="menyval las-fil">Läs in en sparfil</button><input type="file" class="las-fil-val" accept=".json,application/json" hidden>
+      <small>Sparfilen har allt spelaren har gjort, också namnen. Lägg den bara på ett privat ställe.</small><span class="sparfil-svar" role="status"></span></div>
       <div class="menygrupp"><button type="button" class="menyval logg">Spara loggen</button><button type="button" class="menyval nollstall">Börja om från början</button><button type="button" class="menyval stang">Stäng</button></div></div>`);
     s.querySelectorAll('.niva').forEach((el) => el.addEventListener('click', () => { lasmotor.sattNiva('L', 'P1_las_och_valj', Number(/** @type {HTMLElement} */ (el).dataset.n)); lasmotor.sattNiva('L', 'P28_packa', Number(/** @type {HTMLElement} */ (el).dataset.n)); spara(); oppnaMeny(); }));
     s.querySelector('.foralder')?.addEventListener('change', (e) => { inst.foralderLaser = /** @type {HTMLInputElement} */ (e.target).checked; spara(); });
@@ -2767,7 +2811,34 @@ export function skapaSpel(d) {
       // ladda om utan ?ny, annars nollställs sparningen igen
       const u = new URL(location.href); u.searchParams.delete('ny'); location.href = u.toString();
     }));
-    s.querySelector('.logg')?.addEventListener('click', () => d.exporteraLogg());
+    s.querySelector('.logg')?.addEventListener('click', () => d.exporteraLogg?.());
+    // sparfilen: hela sparningen ut som en fil, och in igen (den gamla sparningen läggs i backup och kan ångras i koden)
+    const svar = /** @type {HTMLElement} */ (s.querySelector('.sparfil-svar'));
+    s.querySelector('.spara-fil')?.addEventListener('click', () => {
+      spara();
+      const namn = `ordstaven-sparfil-${d.filer?.tidsstampel() ?? 'nu'}.json`;
+      const ok = d.filer?.laddaNed(namn, sparning.tillText(tillstand), 'application/json') ?? false;
+      logg.handelse('sparfil', ok ? 'sparad som fil' : 'kunde inte sparas som fil');
+      svar.textContent = ok ? ` Sparad: ${namn} (i Hämtade filer).` : ' Det gick inte att spara filen.';
+    });
+    const filval = /** @type {HTMLInputElement} */ (s.querySelector('.las-fil-val'));
+    s.querySelector('.las-fil')?.addEventListener('click', () => filval.click());
+    filval.addEventListener('change', async () => {
+      const fil = filval.files?.[0];
+      filval.value = ''; // samma fil går att välja igen
+      if (!fil) return;
+      try {
+        const text = await fil.text();
+        const ny = sparning.franText(text, tillstand);
+        sparfilInlast = true;
+        logg.handelse('sparfil', 'inläst', { fil: fil.name, kapitel: ny.aventyr?.[AVENTYR]?.kapitelId ?? null, scen: ny.aventyr?.[AVENTYR]?.scenId ?? null });
+        svar.textContent = ' Inläst. Spelet startar om.';
+        setTimeout(() => { const u = new URL(location.href); u.searchParams.delete('ny'); location.href = u.toString(); }, 600);
+      } catch (e) {
+        logg.handelse('sparfil', 'kunde inte läsas', String(e));
+        svar.textContent = ` Filen gick inte att läsa: ${String(/** @type {any} */ (e)?.message ?? e)}`;
+      }
+    });
     s.querySelector('.nollstall')?.addEventListener('click', () => { sparning.nollstall(); location.reload(); });
     s.querySelector('.stang')?.addEventListener('click', stangMeny);
   }

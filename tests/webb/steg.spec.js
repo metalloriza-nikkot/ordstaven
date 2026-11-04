@@ -964,6 +964,165 @@ test('kapitel 1 med kartorna (T5): bara varianten syns, den rätta stenen öppna
   await page.screenshot({ path: 'test-results/kapitel1-ostra-skarmen.png' });
 });
 
+/** Hoppa till en scen i kapitel 1 i menyn för vuxna och skriv namnen. */
+async function hoppaKapitel1(page, i) {
+  await page.goto('./?snabb&ny');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.keyboard.press('Control+Shift+KeyM');
+  await page.click(`#vuxenmeny .scen[data-kapitel="kap-01"][data-i="${i}"]`);
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  for (const namn of ['TESTA', 'KNOPP']) {
+    await expect(page.locator('#plattan :is(.dop-ruta, .replik-ruta)')).toBeVisible({ timeout: 10000 });
+    if (await page.locator('#plattan .replik-ruta').isVisible()) await page.click('#plattan .replik-ruta');
+    await expect(page.locator('#plattan .dop-ruta')).toBeVisible({ timeout: 10000 });
+    await page.waitForTimeout(200);
+    await page.keyboard.type(namn);
+    await expect(page.locator('#plattan .namnrutor .ruta.fylld')).toHaveCount(namn.length, { timeout: 5000 });
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#plattan .dop-ruta')).toBeHidden({ timeout: 10000 });
+  }
+}
+/**
+ * Tryck på ett föremål i ett stort område: ligger det utanför skärmen går hjälten först mot det (ett tryck på
+ * golvet vid skärmens kant), och kameran följer med.
+ */
+async function tryckNara(page, id) {
+  for (let i = 0; i < 6; i++) {
+    await page.waitForFunction(() => !window.__ORDSTAVEN.fryst(), null, { timeout: 10000 });
+    const o = await page.evaluate((m) => window.__ORDSTAVEN.objekt(m), id);
+    const s = await page.evaluate(() => window.__ORDSTAVEN.skala());
+    // syns en del av föremålet trycker han där, på en punkt som inte ligger under en knapp
+    const r = await page.evaluate((m) => window.__ORDSTAVEN.rutaPaSkarm(m), id);
+    const v0 = Math.max(r.x, s.vanster + 4), v1 = Math.min(r.x + r.b, s.vanster + s.cssBredd - 4);
+    const t0 = Math.max(r.y, s.topp + 4), t1 = Math.min(r.y + r.h, s.topp + s.cssHojd - 4);
+    if (v1 - v0 > 4 && t1 - t0 > 4) {
+      const pt = await page.evaluate(([a, b, c, d]) => {
+        for (const fy of [0.5, 0.75, 0.25]) for (const fx of [0.5, 0.25, 0.75, 0.1, 0.9]) {
+          const x = a + (b - a) * fx, y = c + (d - c) * fy, e = document.elementFromPoint(x, y);
+          if (e && e.tagName === 'CANVAS') return { x, y };
+        }
+        return null;
+      }, [v0, v1, t0, t1]);
+      if (pt) { await page.mouse.click(pt.x, pt.y); return; }
+    }
+    // annars en bit mot föremålet, inne på skärmen och inte vid knapparna i hörnen
+    const x = Math.min(Math.max(o.x, s.vanster + s.cssBredd * 0.15), s.vanster + s.cssBredd * 0.85), y = Math.min(Math.max(o.y, s.topp + s.cssHojd * 0.3), s.topp + s.cssHojd * 0.7);
+    const fore = await page.evaluate(() => window.__ORDSTAVEN.kamera());
+    await page.mouse.click(x, y);
+    await expect.poll(async () => JSON.stringify(await page.evaluate(() => window.__ORDSTAVEN.kamera())) !== JSON.stringify(fore), { timeout: 8000 }).toBe(true);
+    await page.waitForTimeout(800);
+  }
+  throw new Error('nådde inte ' + id);
+}
+/** Klicka fram repliker tills villkoret gäller. */
+async function framTill(page, villkor, arg, ms = 30000) {
+  const t0 = Date.now();
+  while (!(await page.evaluate(villkor, arg))) {
+    if (Date.now() - t0 > ms) throw new Error('kom inte fram: ' + JSON.stringify(await page.evaluate(() => ({ scen: window.__ORDSTAVEN.scen(), steg: window.__ORDSTAVEN.steg() }))));
+    const v = page.locator('#plattan .vidare, #plattan .replik-ruta').first();
+    if (await v.isVisible()) await v.click({ timeout: 2000 }).catch(() => {}); else await page.waitForTimeout(150);
+  }
+}
+
+test('SVÄRD gör staven till ett svärd, och spelaren hugger själv ned lianerna: varje hugg fäller en, och de kommer inte tillbaka (39.3)', async ({ page }) => {
+  test.setTimeout(120000);
+  await hoppaKapitel1(page, 1); // k1s02_lianerna
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 10000 }).toBe('k1s02_lianerna');
+  await framTill(page, () => window.__ORDSTAVEN.steg()?.mal === 'stig_genom_hacken' && !window.__ORDSTAVEN.fryst());
+  await tryckPa(page, 'stig_genom_hacken');
+  await framTill(page, () => window.__ORDSTAVEN.steg()?.mal === 'trad_med_formel' && !window.__ORDSTAVEN.fryst());
+  await tryckPa(page, 'trad_med_formel');
+  await expect(page.locator('#handknapp')).toBeVisible({ timeout: 8000 });
+  await page.keyboard.press('Space');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('VAD ÄR DET? SKRIV ORDET!', { timeout: 10000 });
+  await page.click('#plattan .vidare');
+  await expect(page.locator('#plattan .formel-bild')).toBeVisible({ timeout: 8000 });
+  for (const b of 'SVÄRD') await bricka(page, b).click();
+  // svärdet sveper inte av sig självt: lianerna står kvar, delade i tre, tills han hugger
+  await framTill(page, () => window.__ORDSTAVEN.rumsobjekt().includes('lianer_0') && !window.__ORDSTAVEN.fryst());
+  const lianer = await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt().filter((id) => /^lianer/.test(id)));
+  expect(lianer).toEqual(['lianer_0', 'lianer_1', 'lianer_2']);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').harSvard)).toBe(true);
+  // de tre fyller hela väggen, så att vägen till stigarna är stängd tills han har huggit
+  const delar = await page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').objekt.filter((o) => /^lianer_/.test(o.id)).map((o) => [o.x, o.b]));
+  expect(delar.reduce((s, [, b]) => s + b, 0)).toBe(312);
+  await page.screenshot({ path: 'test-results/lianerna-hugga.png' });
+  for (const id of lianer) {
+    await tryckNara(page, id);
+    // står han redan vid lianen hugger trycket direkt (som på iPad), annars går han dit och handen kommer
+    await expect.poll(async () => (await page.locator('#handknapp').isVisible()) || !(await page.evaluate((x) => window.__ORDSTAVEN.rumsobjekt().includes(x), id)), { timeout: 8000 }).toBe(true);
+    if (await page.evaluate((x) => window.__ORDSTAVEN.rumsobjekt().includes(x), id)) await page.keyboard.press('Space');
+    await expect.poll(() => page.evaluate((x) => window.__ORDSTAVEN.rumsobjekt().includes(x), id), { timeout: 8000 }).toBe(false);
+  }
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('SVÄRDET SKÄR BARA VÄXTER.', { timeout: 10000 });
+  const logg = await page.evaluate(() => window.__ORDSTAVEN.logg());
+  expect(logg).toContain('[hugga] lianer_0');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').harSvard)).toBe(false);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt().some((id) => /^lianer/.test(id)))).toBe(false);
+  // efter en omstart står lianerna inte där igen
+  await page.goto('./?snabb');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 10000 }).toBe('k1s02_lianerna');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.rumsobjekt().length), { timeout: 10000 }).toBeGreaterThan(3);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt().some((id) => /^lianer/.test(id)))).toBe(false);
+});
+
+test('den lilla lianen: SVÄRD ur minnet, sedan hugger han den, och den är borta (39.3)', async ({ page }) => {
+  test.setTimeout(90000);
+  await hoppaKapitel1(page, 3); // k1s05_glantan: SVÄRD finns på staven
+  await expect.poll(() => page.evaluate(() => { const t = window.__ORDSTAVEN.tillstand(); return `${window.__ORDSTAVEN.scen()} ${t.spelare.hjalte.namn} ${t.spelare.unge.namn}`; }), { timeout: 10000 }).toBe('k1s05_glantan TESTA KNOPP');
+  // sparningen flyttas till vägvalet i skogsbrynet, efter lianerna (SVÄRD finns redan på staven)
+  await page.evaluate(() => {
+    const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
+    av.scen = 1; av.scenId = 'k1s02_lianerna'; av.steg = 17; av.startad = true; // vid vägvalet, efter lianerna
+    localStorage.setItem('ordstaven_spar', JSON.stringify(t));
+  });
+  await page.goto('./?snabb');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  await framTill(page, () => window.__ORDSTAVEN.steg()?.mal === 'stig_glantan' && !window.__ORDSTAVEN.fryst());
+  expect(await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt())).toContain('liten_lian');
+  await tryckNara(page, 'liten_lian');
+  await expect(page.locator('#handknapp')).toBeVisible({ timeout: 8000 });
+  await page.keyboard.press('Space');
+  await expect(page.locator('#plattan .formel-ruta')).toBeVisible({ timeout: 8000 });
+  for (const b of 'SVÄRD') await bricka(page, b).click();
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('HUGG LIANEN!', { timeout: 10000 });
+  await page.click('#plattan .vidare');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').harSvard), { timeout: 5000 }).toBe(true);
+  await tryckNara(page, 'liten_lian');
+  await expect(page.locator('#handknapp')).toBeVisible({ timeout: 8000 });
+  await page.keyboard.press('Space');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.rumsobjekt().includes('liten_lian')), { timeout: 8000 }).toBe(false);
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 8000 }).toContain('[hugga] liten_lian');
+  // tillbaka i rummet efter en omstart: den är borta
+  await page.goto('./?snabb');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.rumsobjekt().length), { timeout: 10000 }).toBeGreaterThan(3);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt())).not.toContain('liten_lian');
+});
+
+test('k1s08: krönet är målet i molnet, och ett tryck på det går uppför trappan (v0.7.5)', async ({ page }) => {
+  test.setTimeout(90000);
+  await hoppaKapitel1(page, 6); // k1s08_loven
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 10000 }).toBe('k1s08_loven');
+  await framTill(page, () => window.__ORDSTAVEN.steg()?.mal === 'kronet' && !window.__ORDSTAVEN.fryst());
+  const moln = page.locator('#tanke');
+  await expect(moln).toBeVisible();
+  await expect(moln.locator('.instruktion')).toHaveText('GÅ UPP PÅ KULLEN!');
+  // målets bild: krönets egen bild när den finns (gråboxen har ingen), aldrig trappans
+  expect(await moln.locator('.malbild:not([data-bild="kronet"])').count()).toBe(0);
+  await page.screenshot({ path: 'test-results/k1s08-kronet.png' });
+  expect(await page.evaluate(() => window.__ORDSTAVEN.niva().niva)).toBe(0);
+  await tryckNara(page, 'kronet');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.steg()?.typ), { timeout: 20000 }).not.toBe('ga_till');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.niva().niva)).toBe(1);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toMatch(/\[framme\] kronet/);
+});
+
 test('menyn för vuxna hoppar till en scen i ett senare kapitel: det som kommer före spolas fram, och ungen är med', async ({ page }) => {
   test.setTimeout(90000);
   await page.goto('./?snabb&ny');
@@ -1101,6 +1260,40 @@ test('menyn för vuxna startar ett pass: pass 3 börjar med morgonen, namnen och
   expect(t.spelare.unge).toMatchObject({ namn: 'KNOPP', folj: true });
   expect(t.aventyr['den-gomda-dalen'].kartbitar).toEqual([1]);
   expect(t.spelare.hjalte.grad).toBe('Lärling');
+});
+
+test('sparfilen: den vuxne sparar hela sparningen som en fil och läser in den igen efter att ha börjat om', async ({ page }, info) => {
+  test.setTimeout(60000);
+  await prologenKlar(page);
+  await page.goto('./?snabb');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.keyboard.press('Control+Shift+KeyM');
+  // spara: en fil i Hämtade filer med hela sparningen
+  const [hamtad] = await Promise.all([page.waitForEvent('download'), page.click('#vuxenmeny .spara-fil')]);
+  expect(hamtad.suggestedFilename()).toMatch(/^ordstaven-sparfil-\d{8}-\d{4}\.json$/);
+  const fil = info.outputPath('sparfil.json');
+  await hamtad.saveAs(fil);
+  const data = JSON.parse(readFileSync(fil, 'utf8'));
+  expect(data).toMatchObject({ app: 'ORDSTAVEN', spelare: { hjalte: { namn: 'TESTA' }, unge: { namn: 'KNOPP' } } });
+  await expect(page.locator('#vuxenmeny .sparfil-svar')).toContainText('Sparad');
+  // börja om: sparningen är tom
+  await page.click('#vuxenmeny .nollstall');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.tillstand().spelare.hjalte.namn ?? null)).toBeFalsy();
+  // en fil som inte är en sparning: ett svar, och inget byts
+  await page.keyboard.press('Control+Shift+KeyM');
+  await page.setInputFiles('#vuxenmeny .las-fil-val', { name: 'fel.json', mimeType: 'application/json', buffer: Buffer.from('{"app":"NAGOT_ANNAT"}') });
+  await expect(page.locator('#vuxenmeny .sparfil-svar')).toContainText('gick inte att läsa');
+  // läs in: spelet startar om med sparningen från filen
+  // (filen läses som innehåll: Chromium tar inte en sökväg med å, ä och ö här)
+  await page.setInputFiles('#vuxenmeny .las-fil-val', { name: 'sparfil.json', mimeType: 'application/json', buffer: readFileSync(fil) });
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning && window.__ORDSTAVEN.tillstand().spelare.hjalte.namn === 'TESTA', null, { timeout: 15000 });
+  const t = await page.evaluate(() => window.__ORDSTAVEN.tillstand());
+  expect(t.spelare.unge.namn).toBe('KNOPP');
+  expect(t.aventyr['den-gomda-dalen']).toMatchObject({ kapitelId: data.aventyr['den-gomda-dalen'].kapitelId, scenId: data.aventyr['den-gomda-dalen'].scenId });
+  expect(t.spelare.larande).toEqual(data.spelare.larande);
+  // den gamla (tomma) sparningen ligger i backup
+  expect(await page.evaluate(() => !!localStorage.getItem('ordstaven_spar_backup'))).toBe(true);
 });
 
 // ---------------------------------------------------------------- textgrammatiken (T4b, beslut 21)
@@ -1396,7 +1589,7 @@ test('kedjan i molnet (36.5): instruktionen följer inte med till nästa mål i 
   await expect(page.locator('#tanke')).toBeHidden(); // samma rum: ingen gammal instruktion
 });
 
-test('efter en dialog står målet kvar i molnet med en bild tills han är framme, och ungen nosar mot det efter ca 10 s (31.2)', async ({ page }) => {
+test('efter en dialog står målet kvar i molnet med en bild tills han är framme, och ungen nosar mot det efter ca 15 s (31.2, 39.4)', async ({ page }) => {
   test.setTimeout(60000);
   await provscen(page, { id: 't_malmoln', pass: 3, rum: 'hallen', tillstand: 'morgon', steg: [R('Frukost! Kom till köket!', 'farfar'), { typ: 'ga_till', mal: 'dorr_mat' }, R('Klart.')] });
   await page.locator('#plattan .replik-ruta').click({ timeout: 8000 });
@@ -1410,14 +1603,26 @@ test('efter en dialog står målet kvar i molnet med en bild tills han är framm
   expect(r.x).toBeLessThan(s.vanster + s.cssBredd / 3);
   expect(r.y + r.height).toBeGreaterThan(s.topp + s.cssHojd / 2);
   await page.screenshot({ path: 'test-results/mal-i-molnet.png' });
-  // ungens knuff efter ca 10 s: den nosar mot dörren
-  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.ungeMal()), { timeout: 13000, intervals: [500] }).not.toBeNull();
+  // ungens knuff efter ca 15 s (39.4): inte efter 11 s, men sedan nosar den mot dörren
+  await page.waitForTimeout(11000);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.ungeMal())).toBeNull();
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.ungeMal()), { timeout: 8000, intervals: [500] }).not.toBeNull();
   expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('[knuff] ungen nosar mot målet: dorr_mat');
   await page.locator('#skyltar .skylt[data-objekt="dorr_mat"] .kort').click();
   await expect.poll(async () => (await steg(page))?.typ, { timeout: 10000 }).toBe('replik');
   await expect(moln).toBeHidden();
   expect(await page.evaluate(() => window.__ORDSTAVEN.ungeMal())).toBeNull();
   expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toMatch(/\[framme\] dorr_mat .*"efter_dialog":true/);
+});
+
+test('knuffen på ett mål utan ungen (39.4): finns ingen unge som följer med glimtar målet efter ca 15 s', async ({ page }) => {
+  test.setTimeout(60000);
+  await provscen(page, { id: 't_malglimt', pass: 1, rum: 'hallen', tillstand: 'morgon', steg: [{ typ: 'unge_folj', folj: false }, { typ: 'ga_till', mal: 'dorr_mat' }, R('Klart.')] });
+  await expect.poll(async () => (await steg(page))?.typ, { timeout: 8000 }).toBe('ga_till');
+  await page.waitForTimeout(11000);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).not.toContain('målet glimtar: dorr_mat');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 8000, intervals: [500] }).toContain('[knuff] målet glimtar: dorr_mat');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.ungeMal())).toBeNull();
 });
 
 test('dörrskyltarna sitter på väggen, täcker aldrig varandra eller hjälten, och den vid dörren växer (31.2, 33.3)', async ({ page }) => {

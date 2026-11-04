@@ -1064,6 +1064,17 @@ export class Rum extends Phaser.Scene {
     const bas = this.objekt.find((x) => x.id === id);
     this.objekt = this.objekt.filter((x) => x.id !== id);
     this.ritade.get(id)?.destroy(); this.ritade.delete(id);
+    // lianväggen (kartans delas: hela): delarna fyller hela föremålet, så att väggen står kvar tills den är huggen
+    if (bas?.delasHela) {
+      for (let i = 0; i < antal; i++) {
+        const x0 = bas.x + Math.round((i * bas.b) / antal), x1 = bas.x + Math.round(((i + 1) * bas.b) / antal);
+        const n = { id: `${id}_${i}`, x: x0, y: bas.y, b: x1 - x0, h: bas.h, sort: /** @type {'sak'} */ ('sak'), ...(bas.sida ? { sida: bas.sida } : {}), ...(bas.bildDel ? { bild: bas.bildDel } : {}) };
+        this.objekt.push(n); this.ritaObjekt(n); nya.push(n.id);
+      }
+      this.byggHinder();
+      this.b.vidAndring?.();
+      return nya;
+    }
     const ryms = bas && bas.b >= antal * 22;
     // tätt ställda krukor (mindre än en hjältebredd emellan) nås bara framifrån: en plats bredvid en kruka
     // hamnar annars vid grannkrukan, och då blir grannen den aktiva (iPad, tryck två gånger)
@@ -1211,6 +1222,28 @@ export class Rum extends Phaser.Scene {
     if (r.setFillStyle) { r.setFillStyle(0x5a554e); r.setSize(18, 8); r.y += 10; return; }
     // en bild: krukan är slagen i bitar, bara skärvorna på golvet syns (den nedre tredjedelen)
     r.setCrop(0, Math.round(r.height * 0.6), r.width, r.height); r.setAlpha(0.8);
+  }
+
+  /**
+   * En huggen lian faller: den glider ned en bit och tonas bort (bara läge och opacitet, §8), och sedan är vägen fri.
+   * @param {string} id
+   */
+  huggen(id) {
+    this.smutsig = true;
+    const r = this.ritade.get(id);
+    this.objekt = this.objekt.filter((x) => x.id !== id);
+    this.ritade.delete(id);
+    this.byggHinder();
+    this.b.vidAndring?.();
+    if (!r) return;
+    this.tweens.add({ targets: r, y: r.y + 6, alpha: 0, duration: 260, onUpdate: () => { this.smutsig = true; }, onComplete: () => { r.destroy(); this.smutsig = true; } });
+  }
+
+  /** Stavens ände är ett svärd av guld medan han hugger (gråbox: staven lyser i guld). @param {boolean} pa */
+  svard(pa) {
+    this.harSvard = pa; this.smutsig = true;
+    if (!this.stav) return;
+    if (pa) this.stav.setTint(0xf2c94c); else this.stav.clearTint();
   }
 
   /** Vilket av objekten står hjälten vid just nu? @param {string[]} ids @returns {string | null} */

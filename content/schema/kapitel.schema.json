@@ -1434,7 +1434,7 @@
       }
     },
     "P26_krukorna": {
-      "description": "Vila: svinga staven mot krukor. Påverkar inte nivån.",
+      "description": "Vila: svinga staven mot krukor (eller hugga lianer med svärdet, verb). Påverkar inte nivån.",
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -1484,6 +1484,13 @@
             "$ref": "#/$defs/id"
           },
           "description": "Föremålen i rummet att svinga mot, ett per post i innehall (buskarna, lövhögarna). Utan foremal delas föremålet som visar pusslet upp i krukor."
+        },
+        "verb": {
+          "enum": [
+            "svinga",
+            "hugga"
+          ],
+          "description": "svinga (förval): staven mot krukor, buskar och löv. hugga (beslut 39.3): staven är ett svärd, och varje hugg fäller en lian, som försvinner. Samma knapp, inga missar och ingen tid."
         }
       }
     },

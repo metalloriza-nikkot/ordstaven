@@ -21,17 +21,20 @@
  },
  "meta": {
   "namn": "Skogen",
-  "version": "0.7.4",
-  "datum": "2026-11-02",
+  "version": "0.7.7",
+  "datum": "2026-11-04",
   "agare": "Innehåll",
-  "kalla": "Manus 15-kapitel1-manus.md v0.12. Byggd på repots kap-01.json (0.14.0, oförändrad sedan 0.12.2) med v0.7.3.",
+  "kalla": "Manus 15-kapitel1-manus.md v0.15. Byggd på v0.7.6, som bygger på repots kap-01.json från 0.19.0.",
   "nya_pusseltyper": [
    "P15_raddning",
    "P9_kodlas"
   ],
-  "teknik": "Teknik har lagt in projektets innehall-kapitel1.json (Innehålls v0.5, meta.version säger fortfarande 0.2) i repot, och ingen text är ändrad. 2026-10-28 (T1): format 1 → 2 (kapitlen är i format 2 sedan P28_packa). Inget annat i strukturen är ändrat. 2026-10-29 (T2): Innehålls förslag 2–14 som struktur, med texterna ur anteckningarna ordagrant. Skyltarna och tavlan står i rummens fält skyltar (beslut 15.2). k1s01: ga_till och mellanscenen vid skylten blir las_skylt. k1s02: fritt och ga_till blir ett ga_till med fri_vag. k1s03 är frivillig och startar i buskarna. Ryggsäcken och taggkammen är ge_sak. Frivilligt per rum (rum.frivilligt). last_lada, lila_lapp och stig_backen är dolda tills visa_foremal. k1s13: paminnelse och unge_tillagg. Pusslen: skylt på stenen och träden, forebild.tacks i SVÄRD, brickor och kasta i apan, visa_forsta, kontroll och svar_lyser_sek i kodlåset, sak_i_sista och foremal i busken och löven, och luckornas knufftid räknas av motorn (efter_sek 30 borttaget). Listan (förslag 1) kommer i T3. 2026-10-30 (T5): data v0.7 inlagd utan ändrad text. alias.rum pekar lianerna till skogsbrynet och gamla_tradet till glantan, så att det som har visats i en äldre sparning följer med. Kartorna finns i kartor/den-gomda-dalen (skogsbrynet 40 × 12, buskarna 20 × 12, glantan 40 × 24). 2026-10-30 (T4): Innehålls FÖRSLAG i k1_svard och k1_svard_igen som struktur (schema 2.10): bild svard_ristat på k1_svard, och forebild.visas vid_fel i båda (brickor_efter_sek borttaget, brickorna kommer direkt). Ingen text ändrad. 2026-10-30 (T6): v0.7.1 inlagd utan ändrad text, med T4:s struktur kvar (bild och forebild.visas i SVÄRD). 2026-10-31 (T4b): ljudord på ljud-stegen ordagrant ur Innehålls F11 (dunk, kra, brum, buhu, tok tok). 2026-11-01: v0.7.2 inlagd utan ändrad text. Baronens papper heter baronens_papper_hjalm (gråboxen ritar det i orange). Id:t lila_lapp står kvar.",
+  "teknik": "Teknik har lagt in projektets innehall-kapitel1.json (Innehålls v0.5, meta.version säger fortfarande 0.2) i repot, och ingen text är ändrad. 2026-10-28 (T1): format 1 → 2 (kapitlen är i format 2 sedan P28_packa). Inget annat i strukturen är ändrat. 2026-10-29 (T2): Innehålls förslag 2–14 som struktur, med texterna ur anteckningarna ordagrant. Skyltarna och tavlan står i rummens fält skyltar (beslut 15.2). k1s01: ga_till och mellanscenen vid skylten blir las_skylt. k1s02: fritt och ga_till blir ett ga_till med fri_vag. k1s03 är frivillig och startar i buskarna. Ryggsäcken och taggkammen är ge_sak. Frivilligt per rum (rum.frivilligt). last_lada, lila_lapp och stig_backen är dolda tills visa_foremal. k1s13: paminnelse och unge_tillagg. Pusslen: skylt på stenen och träden, forebild.tacks i SVÄRD, brickor och kasta i apan, visa_forsta, kontroll och svar_lyser_sek i kodlåset, sak_i_sista och foremal i busken och löven, och luckornas knufftid räknas av motorn (efter_sek 30 borttaget). Listan (förslag 1) kommer i T3. 2026-10-30 (T5): data v0.7 inlagd utan ändrad text. alias.rum pekar lianerna till skogsbrynet och gamla_tradet till glantan, så att det som har visats i en äldre sparning följer med. Kartorna finns i kartor/den-gomda-dalen (skogsbrynet 40 × 12, buskarna 20 × 12, glantan 40 × 24). 2026-10-30 (T4): Innehålls FÖRSLAG i k1_svard och k1_svard_igen som struktur (schema 2.10): bild svard_ristat på k1_svard, och forebild.visas vid_fel i båda (brickor_efter_sek borttaget, brickorna kommer direkt). Ingen text ändrad. 2026-10-30 (T6): v0.7.1 inlagd utan ändrad text, med T4:s struktur kvar (bild och forebild.visas i SVÄRD). 2026-10-31 (T4b): ljudord på ljud-stegen ordagrant ur Innehålls F11 (dunk, kra, brum, buhu, tok tok). 2026-11-01: v0.7.2 inlagd utan ändrad text. Baronens papper heter baronens_papper_hjalm (gråboxen ritar det i orange). Id:t lila_lapp står kvar. 2026-11-04: v0.7.4 inlagd utan ändrad text (stenarna, träden, ekorren och ugglorna i kartorna). 2026-11-04 (0.20.0): v0.7.5–v0.7.7 inlagda utan ändrad text. k1_lianerna och k1_liten_lian har verb hugga (schema 2.17, Innehålls FÖRSLAG): staven är ett svärd, och varje hugg fäller en lian. I kartan visar lianer pusslet k1_lianerna, delas i tre lianer som fyller hela väggen (delas: hela) och försvinner efter k1_lianerna i stället för k1_svard. liten_lian försvinner efter k1_liten_lian. I anteckningen till k1s13 står \"spelarens regel\" i stället för ett namn (repot är publikt).",
   "innehall_v073": "v0.7.3 (Innehåll 2026-11-02, beslut 26): radion i k1s07 har en replik från Farfar att upprepa (\"Kartbiten är nära. Läs min skylt!\"). Två frivilliga småfigurer (26.3), var för sig i rum.frivilligt och möjliga att stryka utan att något annat ändras: ekorre_gren i skogsbrynet (ljudordet kras) och ugglor på krönet i gläntan (ljudordet ho ho). Anteckningarna om buskarna följer beslut 26.2: hjälten kan gå tillbaka dit efter apan.",
-  "innehall_v074": "v0.7.4 (Innehåll 2026-11-02, beslut 29, granskningen A 1–13): lappen löses bara genom att läsa (bron nämns inte före, kartbiten visar flera saker) och är till Herr Skata, L3 har lägesordet BAKOM, L2 har tre stenar och tre träd, apan utan kasta-knapp och med ett pinnsteg per rätt bokstav, k1s05 kortare med fjärilen i bild, instruktion och knuff i buskarna och löven, \"Läs min skylt!\" i k1s01, skylten vid ingången säger \"Farfar var här.\", enklare ord, och slutet smyger förbi bron. Tidigare versioner: Innehålls rapporter (rapport-innehall-arkiv*.md) och 15."
+  "innehall_v074": "v0.7.4 (Innehåll 2026-11-02, beslut 29, granskningen A 1–13): lappen löses bara genom att läsa (bron nämns inte före, kartbiten visar flera saker) och är till Herr Skata, L3 har lägesordet BAKOM, L2 har tre stenar och tre träd, apan utan kasta-knapp och med ett pinnsteg per rätt bokstav, k1s05 kortare med fjärilen i bild, instruktion och knuff i buskarna och löven, \"Läs min skylt!\" i k1s01, skylten vid ingången säger \"Farfar var här.\", enklare ord, och slutet smyger förbi bron. Tidigare versioner: Innehålls rapporter (rapport-innehall-arkiv*.md) och 15.",
+  "innehall_v075": "Beslut 34.6 och 36.5: varje ga_till efter en dialog har en uppläst instruktion med verb och mål, som står i molnet. Nya repliker i k1s01, k1s02 (två), k1s08, k1s09, k1s12 och k1s13. I k1s02 slutar Farfar med \"Gå till trädet! Där finns formeln.\" I k1s08 är trappan och krönet ett mål. Inget rum, område eller moment ändras.",
+  "innehall_v076": "Beslut 38.3–38.4, en rättelse i text: \"Ordkraft! Nu står SVÄRD på din stav!\" i k1s02, och i k1s11 \"Kartbit två! Nu är vi närmare mamma.\" medan ungen sätter nosen på mammas skugga. Inget nytt moment.",
+  "innehall_v077": "Beslut 39.3: spelaren hugger lianerna själv (k1_lianerna, k1_liten_lian). Beslut 38.5: baronen läser sin lapp upp och ned i sidovyn. Genomgången av samspelen (39.1) gav inga fler rättelser i kapitel 1, se 15 v0.15."
  },
  "rum": [
   {
@@ -88,6 +91,10 @@
       {
        "typ": "pussel",
        "pussel_id": "k1_svard_igen"
+      },
+      {
+       "typ": "pussel",
+       "pussel_id": "k1_liten_lian"
       },
       {
        "typ": "ge_bar",
@@ -294,6 +301,12 @@
      "foremal": "skylt_ingang"
     },
     {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Läs skylten vid stenarna!",
+     "upplast": true
+    },
+    {
      "typ": "ga_till",
      "mal": "skylt_farfar_1"
     },
@@ -312,7 +325,7 @@
      "upplast": true
     }
    ],
-   "anteckning": "Kapitlet börjar ofta efter ett uppehåll (premiären kommer några veckor efter pass 3), så Farfar påminner om uppdraget i tre korta repliker: var de är, varför kartan behövs och vad som ska hittas. Skyltarna säger var. Luftskeppet flyger förbi högt uppe: kapplöpningen, ingen jakt (beslut 18.2). Efter stenen syns hålet i häcken, och nästa scen börjar när han går igenom det till östra skärmen. v0.7.4 (A 10): Farfar säger \"Läs min skylt!\" före skylten, och det är den radion upprepar."
+   "anteckning": "Kapitlet börjar ofta efter ett uppehåll (premiären kommer några veckor efter pass 3), så Farfar påminner om uppdraget i tre korta repliker: var de är, varför kartan behövs och vad som ska hittas. Skyltarna säger var. Luftskeppet flyger förbi högt uppe: kapplöpningen, ingen jakt (beslut 18.2). Efter stenen syns hålet i häcken, och nästa scen börjar när han går igenom det till östra skärmen. v0.7.4 (A 10): Farfar säger \"Läs min skylt!\" före skylten, och det är den radion upprepar. v0.7.5 (34.6): \"Läs skylten vid stenarna!\" efter skylten vid ingången, så att målet står i molnet."
   },
   {
    "id": "k1s02_lianerna",
@@ -324,6 +337,12 @@
     "upplast": true
    },
    "steg": [
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Kryp genom hålet!",
+     "upplast": true
+    },
     {
      "typ": "ga_till",
      "mal": "stig_genom_hacken"
@@ -341,14 +360,14 @@
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Titta på trädet! Där finns formeln.",
+     "text": "Jag gjorde en bild i trädet. Du skriver ordet.",
      "upplast": true,
      "via": "radio"
     },
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Jag gjorde en bild i trädet. Du skriver ordet.",
+     "text": "Gå till trädet! Där finns formeln.",
      "upplast": true,
      "via": "radio"
     },
@@ -367,8 +386,16 @@
     {
      "typ": "replik",
      "talare": "berattare",
-     "text": "Nu står SVÄRD på din stav!",
+     "text": "Ordkraft! Nu står SVÄRD på din stav!",
      "upplast": true
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Stavens ände blir ett svärd av guld. Ungen tittar på lianerna och sedan på hjälten."
+    },
+    {
+     "typ": "pussel",
+     "pussel_id": "k1_lianerna"
     },
     {
      "typ": "replik",
@@ -392,12 +419,18 @@
      "upplast": true
     },
     {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Gå dit gråten hörs!",
+     "upplast": true
+    },
+    {
      "typ": "ga_till",
      "mal": "stig_glantan",
      "fri_vag": true
     }
    ],
-   "anteckning": "Östra skärmen av skogsbrynet. Farfar säger på radion var formeln är (beslut 18.7, ingen lista). Fritt vägval: scenen går vidare när han går ut genom stig_glantan, och stig_buskarna leder till den frivilliga scenen k1s03. Han kan också gå tillbaka till buskarna senare i kapitlet (beslut 26.2). k1_svard_igen startar när han använder liten_lian."
+   "anteckning": "Östra skärmen av skogsbrynet. Farfar säger på radion var formeln är (beslut 18.7, ingen lista). Fritt vägval: scenen går vidare när han går ut genom stig_glantan, och stig_buskarna leder till den frivilliga scenen k1s03. Han kan också gå tillbaka till buskarna senare i kapitlet (beslut 26.2). k1_svard_igen startar när han använder liten_lian. v0.7.5 (34.6): \"Kryp genom hålet!\" först. Farfar slutar med \"Gå till trädet! Där finns formeln.\", som radion upprepar. \"Gå dit gråten hörs!\" före vägvalet: molnet pekar på huvudvägen, och buskarna har sin skylt BÄR. v0.7.6 (38.3): \"Ordkraft!\" när SVÄRD har ristats in, så att ordet sägs i stunden då det händer. v0.7.7 (39.3): spelaren hugger själv. SVÄRD gör staven till ett svärd, och han hugger ner tre lianer med samma knapp som mot buskarna (k1_lianerna, P26). Varje hugg fäller en lian."
   },
   {
    "id": "k1s03_buskarna",
@@ -613,16 +646,18 @@
    },
    "steg": [
     {
-     "typ": "ga_till",
-     "mal": "trappa"
-    },
-    {
-     "typ": "mellanscen",
-     "beskrivning": "Hjälten går uppför trappan, och ungen följer. Uppe på kullen breder det gamla trädets krona ut sig, och under den ligger fyra lövhögar."
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Gå upp på kullen!",
+     "upplast": true
     },
     {
      "typ": "ga_till",
      "mal": "kronet"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Uppe på kullen breder det gamla trädets krona ut sig, och under den ligger fyra lövhögar. Ungen kommer efter."
     },
     {
      "typ": "pussel",
@@ -643,7 +678,7 @@
      "upplast": true
     }
    ],
-   "anteckning": "Nordöstra skärmen av gläntan. Han går uppför trappan själv, och ungen följer. rothal i trädets rötter är frivilligt (ungen nosar fram 3 bär).",
+   "anteckning": "Nordöstra skärmen av gläntan. Han går uppför trappan själv, och ungen följer. rothal i trädets rötter är frivilligt (ungen nosar fram 3 bär). v0.7.5 (34.6): \"Gå upp på kullen!\" före målet, och ett mål i stället för två (trappan och krönet). Han går uppför trappan själv, och vägen dit går över trappan.",
    "tillstand": "raddad"
   },
   {
@@ -656,6 +691,12 @@
     "upplast": true
    },
    "steg": [
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Gå till lådan!",
+     "upplast": true
+    },
     {
      "typ": "ga_till",
      "mal": "last_lada"
@@ -680,7 +721,8 @@
      "pussel_id": "k1_luckorna"
     }
    ],
-   "tillstand": "raddad"
+   "tillstand": "raddad",
+   "anteckning": "v0.7.5 (34.6): \"Gå till lådan!\" först."
   },
   {
    "id": "k1s10_koden",
@@ -728,15 +770,15 @@
     {
      "typ": "replik",
      "talare": "berattare",
-     "text": "Kartbit två! Nu ser vi mer av vägen.",
+     "text": "Kartbit två! Nu är vi närmare mamma.",
      "upplast": true
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Ungen tittar länge på mammas skugga."
+     "beskrivning": "Ungen sätter nosen på mammas skugga mitt i dalen och viftar med svansklubban."
     }
    ],
-   "anteckning": "v0.7.4 (A 1): kartbiten visar vägen förbi flera saker, och ingen replik nämner bron, så att lappen i k1s12 måste läsas (Stil).",
+   "anteckning": "v0.7.4 (A 1): kartbiten visar vägen förbi flera saker, och ingen replik nämner bron, så att lappen i k1s12 måste läsas (Stil). v0.7.6 (38.4): kartbiten hänger ihop med vägen hem: \"Nu är vi närmare mamma.\", och ungen sätter nosen på mammas skugga i dalen.",
    "tillstand": "raddad"
   },
   {
@@ -768,6 +810,12 @@
      "upplast": true
     },
     {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Läs lappen!",
+     "upplast": true
+    },
+    {
      "typ": "ga_till",
      "mal": "lila_lapp"
     },
@@ -787,7 +835,7 @@
     }
    ],
    "tillstand": "raddad",
-   "anteckning": "Herr Skata känns igen på skrattet (fagel_late, samma ljud som i prologen), utan ljudord. Lappen är baronens, skriven till Herr Skata, som skulle bära den till honom. v0.7.4 (A 3): \"Baronen vill se vår karta!\" följer av prologen, där han ser kartbiten. Id:t lila_lapp står kvar, fast papperet är orange."
+   "anteckning": "Herr Skata känns igen på skrattet (fagel_late, samma ljud som i prologen), utan ljudord. Lappen är baronens, skriven till Herr Skata, som skulle bära den till honom. v0.7.4 (A 3): \"Baronen vill se vår karta!\" följer av prologen, där han ser kartbiten. Id:t lila_lapp står kvar, fast papperet är orange. v0.7.5 (34.6): \"Läs lappen!\" före målet."
   },
   {
    "id": "k1s13_slutet",
@@ -851,12 +899,18 @@
      "upplast": true
     },
     {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Följ stigen!",
+     "upplast": true
+    },
+    {
      "typ": "ga_till",
      "mal": "stig_backen"
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Sidovy: hjälten och ungen smyger längs bäcken, förbi bron. Baronen står vid bron och spanar med kikaren, åt fel håll, och ser dem inte. Herr Skata landar på tropikhjälmen, och hjälmen åker ner över ögonen."
+     "beskrivning": "Sidovy: hjälten och ungen smyger längs bäcken, förbi bron. Baronen står vid bron och läser sin egen lapp upp och ned, och han ser dem inte. Herr Skata landar på tropikhjälmen, och hjälmen åker ner över ögonen."
     },
     {
      "typ": "replik",
@@ -901,7 +955,7 @@
      "valfri": false
     }
    ],
-   "anteckning": "Omsorgen (06): ett ljud i skogen som ungen inte känner igen, en hackspett som knackar två gånger (bara ljud och ljudord, ingen ny figur). Andra gången är ljudet bekant, och ungen fnissar. Rädslan har inget med baronen att göra (beslut 18.2). \"{unge} är rädd.\" väntar på mata_ungen, och påminnelsen kommer efter 8 s. Har han 0 bär trillar ett bär ner från en buske först. v0.7.4 (A 12): de smyger förbi bron, och baronen ser dem inte (kikaren åt fel håll). Mamma är långt borta men hör ungen.",
+   "anteckning": "Omsorgen (06): ett ljud i skogen som ungen inte känner igen, en hackspett som knackar två gånger (bara ljud och ljudord, ingen ny figur). Andra gången är ljudet bekant, och ungen fnissar. Rädslan har inget med baronen att göra (beslut 18.2). \"{unge} är rädd.\" väntar på mata_ungen, och påminnelsen kommer efter 8 s. Har han 0 bär trillar ett bär ner från en buske först. v0.7.4 (A 12): de smyger förbi bron, och baronen ser dem inte (kikaren åt fel håll). Mamma är långt borta men hör ungen. v0.7.5 (34.6): \"Följ stigen!\" före målet. v0.7.7 (38.5, spelarens regel): baronen läser fel på något varje gång han syns. Här läser han sin egen lapp upp och ned i stället för att spana med kikaren, som han redan har gjort två gånger i prologen. Spelaren har just läst lappen rätt.",
    "tillstand": "raddad"
   }
  ],
@@ -1041,7 +1095,7 @@
    "hjalp": "ett_ord",
    "ratt_bokstav_stannar": true,
    "vid_ratt": {
-    "handling": "SVÄRD lyser en sekund ovanför bilden i trädet. Ett svärd av guld växer ut ur stavens ände, ett svep, och lianerna faller. Ungen hoppar över dem.",
+    "handling": "SVÄRD lyser en sekund ovanför bilden i trädet, och regnbågsljuset pulserar ur staven.",
     "fest": "mellan"
    },
    "vid_fel": {
@@ -1059,12 +1113,36 @@
     "efter_fel": 2,
     "andring": "nästa rätta bokstav blinkar"
    },
-   "anteckning": "SVÄRD skrivs utifrån Farfars bild (beslut 18.5, 08 §2 regel 1): ordet går att ljuda fram, så ingen förebild syns från början. I trädet syns bara den ristade bilden av ett svärd. Brickorna (D R S V Ä, bokstavsordning) kommer direkt. Vid första fel tänds förebilden SVÄRD bredvid bilden (titta), och den tonas bort när han lägger nästa bricka (täck, ungen håller för ögonen). Vid nästa fel tänds den igen och står kvar resten av försöket, och försöket loggas med förebild. Kolla: vid rätt lyser ordet en sekund ovanför bilden. Svärdet är av guld, som formlerna på staven (stilguiden §2).",
+   "anteckning": "SVÄRD skrivs utifrån Farfars bild (beslut 18.5, 08 §2 regel 1): ordet går att ljuda fram, så ingen förebild syns från början. I trädet syns bara den ristade bilden av ett svärd. Brickorna (D R S V Ä, bokstavsordning) kommer direkt. Vid första fel tänds förebilden SVÄRD bredvid bilden (titta), och den tonas bort när han lägger nästa bricka (täck, ungen håller för ögonen). Vid nästa fel tänds den igen och står kvar resten av försöket, och försöket loggas med förebild. Kolla: vid rätt lyser ordet en sekund ovanför bilden. Svärdet är av guld, som formlerna på staven (stilguiden §2). v0.7.7 (39.3): svärdet sveper inte av sig självt. Lianerna faller först när spelaren hugger (k1_lianerna).",
    "instruktion": {
     "talare": "berattare",
     "text": "Vad är det? Skriv ordet!",
     "upplast": true
    }
+  },
+  {
+   "id": "k1_lianerna",
+   "typ": "P26_krukorna",
+   "instruktion": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "Hugg lianerna med svärdet!",
+    "upplast": true
+   },
+   "innehall": [
+    "tom",
+    "tom",
+    "tom"
+   ],
+   "vid_ratt": {
+    "handling": "den sista lianen faller. Ungen hoppar över lianerna och viftar med svansklubban.",
+    "fest": "liten"
+   },
+   "knuff": {
+    "handling": "ungen nosar mot närmaste lian"
+   },
+   "anteckning": "Beslut 39.3: formeln ger förmågan, och spelaren använder den själv. Lianväggen (lianer) delas i tre lianer, som krukorna på vinden. Varje hugg fäller en lian: inga missar, ingen tidspress och samma knapp som mot buskarna. Tar några sekunder. FÖRSLAG till Teknik: lianer i kartan får visar: k1_lianerna, och P26 behöver kunna heta hugga i stället för svinga (verbet, svärdet i handen och ljudet). Gråboxen kan visa lianerna som krukor tills Stils bilder finns.",
+   "verb": "hugga"
   },
   {
    "id": "k1_svard_igen",
@@ -1095,7 +1173,7 @@
    "hjalp": "ett_ord",
    "ratt_bokstav_stannar": true,
    "vid_ratt": {
-    "handling": "lianen faller, och två bär ligger i stubben",
+    "handling": "SVÄRD lyser på staven, och stavens ände blir ett svärd av guld igen",
     "fest": "liten"
    },
    "vid_fel": {
@@ -1109,7 +1187,29 @@
    "knuff": {
     "handling": "SVÄRD lyser på staven"
    },
-   "anteckning": "Frivilligt i skogsbrynet (rum.frivilligt): startar när han använder liten_lian, och bara när SVÄRD finns på staven. Den andra trygga gången med formeln (tumregeln). Han skriver ur minnet: ingen förebild från början. Vid fel lyser SVÄRD på staven och står kvar resten av försöket. Ger 2 bär. FÖRSLAG (schemat): \"forebild\": {\"text\": \"SVÄRD\", \"placering\": \"staven\", \"visas\": \"vid_fel\"}."
+   "anteckning": "Frivilligt i skogsbrynet (rum.frivilligt): startar när han använder liten_lian, och bara när SVÄRD finns på staven. Den andra trygga gången med formeln (tumregeln). Han skriver ur minnet: ingen förebild från början. Vid fel lyser SVÄRD på staven och står kvar resten av försöket. Ger 2 bär. FÖRSLAG (schemat): \"forebild\": {\"text\": \"SVÄRD\", \"placering\": \"staven\", \"visas\": \"vid_fel\"}. v0.7.7 (39.3): sedan hugger han själv (k1_liten_lian)."
+  },
+  {
+   "id": "k1_liten_lian",
+   "typ": "P26_krukorna",
+   "instruktion": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "Hugg lianen!",
+    "upplast": true
+   },
+   "innehall": [
+    "tom"
+   ],
+   "foremal": [
+    "liten_lian"
+   ],
+   "vid_ratt": {
+    "handling": "lianen faller, och två bär ligger i stubben",
+    "fest": "liten"
+   },
+   "anteckning": "Beslut 39.3: den lilla lianen huggs med ett hugg. Bären ges i rum.frivilligt efter pusslet.",
+   "verb": "hugga"
   },
   {
    "id": "k1_busken",

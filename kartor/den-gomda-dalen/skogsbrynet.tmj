@@ -257,7 +257,17 @@
       {
        "name": "forsvinner_efter",
        "type": "string",
-       "value": "k1_svard"
+       "value": "k1_lianerna"
+      },
+      {
+       "name": "visar",
+       "type": "string",
+       "value": "k1_lianerna"
+      },
+      {
+       "name": "delas",
+       "type": "string",
+       "value": "hela"
       }
      ]
     },
@@ -287,6 +297,11 @@
        "name": "sida",
        "type": "string",
        "value": "alla"
+      },
+      {
+       "name": "forsvinner_efter",
+       "type": "string",
+       "value": "k1_liten_lian"
       }
      ]
     },
