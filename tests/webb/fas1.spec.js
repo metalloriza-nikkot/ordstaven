@@ -583,3 +583,33 @@ test('utan WebGL: canvas-ritningen visar rummet, mörkret, skyltarna och rumsbyt
   await page.screenshot({ path: 'tests/skarmdumpar/canvas-hallen.png' });
   expect(fel).toEqual([]);
 });
+
+test('?logg: rutan för den vuxne sparar loggen som fil, också när spelet aldrig kommer igång (1e)', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm' && info.project.name !== 'mac-safari', 'Chromium och Safari räcker');
+  // 1. spelet kommer inte igång: spelets skript går inte att ladda (som en tom brun ram)
+  await page.route(/\/assets\/main-[^/]*\.js$/, (r) => r.abort());
+  await page.goto('./?logg');
+  await expect(page.locator('#startlogg')).toBeVisible();
+  const text = await page.locator('#startlogg .startlogg-text').inputValue();
+  expect(text).toContain('Spelet igång: nej');
+  expect(text).toMatch(/kunde inte ladda: .*main-/);
+  const [fil] = await Promise.all([page.waitForEvent('download'), page.click('#startlogg .startlogg-spara')]);
+  expect(fil.suggestedFilename()).toMatch(/^ordstaven-startlogg-\d{8}-\d{4}\.txt$/);
+  await expect(page.locator('#startlogg .startlogg-svar')).toContainText('Sparad');
+  // 2. spelet går: rutan tar spelets egen logg, och Stäng tar bort den
+  await page.unroute(/\/assets\/main-[^/]*\.js$/);
+  await page.goto('./?logg&snabb');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('#startlogg .startlogg-kopiera').catch(() => {});
+  const t2 = await page.locator('#startlogg .startlogg-text').inputValue();
+  expect(t2).toContain('Spelet igång: ja');
+  expect(t2).toContain('== SPELETS LOGG ==');
+  expect(t2).toContain('felsökningslogg');
+  await page.screenshot({ path: 'test-results/startlogg.png' });
+  await page.click('#startlogg .startlogg-stang');
+  await expect(page.locator('#startlogg')).toHaveCount(0);
+  // utan ?logg syns ingen ruta
+  await page.goto('./?snabb');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await expect(page.locator('#startlogg')).toHaveCount(0);
+});

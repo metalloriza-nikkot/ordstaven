@@ -11,6 +11,95 @@
   <link rel="apple-touch-icon" href="/ordstaven/icons/ikon-180.png">
   <link rel="icon" href="/ordstaven/icons/ikon-192.png">
   <title>ORDSTAVEN</title>
+  <script>
+    // Startloggen (beslut 39.6, Teknik 1e). Ett vanligt skript före spelet, så att det fungerar också när spelet aldrig
+    // kommer igång (Safari visade bara en brun ram). Fel före och under starten sparas i ordstaven_startfel (högst 20).
+    // Med ?logg i adressen visas en ruta för den vuxne som sparar loggen som fil. Ingen spelartext, inget om spelaren.
+    (function () {
+      var NYCKEL = 'ordstaven_startfel', fel = [];
+      try { fel = JSON.parse(localStorage.getItem(NYCKEL) || '[]') || []; } catch (e) { fel = []; }
+      function notera(text) {
+        fel.push(new Date().toISOString() + '  ' + String(text).slice(0, 700));
+        fel = fel.slice(-20);
+        try { localStorage.setItem(NYCKEL, JSON.stringify(fel)); } catch (e) { /* full lagring */ }
+      }
+      window.addEventListener('error', function (e) {
+        var t = e.target;
+        if (t && t !== window && (t.src || t.href)) { notera('kunde inte ladda: ' + (t.src || t.href)); return; }
+        notera((e.message || 'okänt fel') + ' (' + String(e.filename || '').split('/').pop() + ':' + e.lineno + ')' + (e.error && e.error.stack ? '\n' + String(e.error.stack).slice(0, 400) : ''));
+      }, true);
+      window.addEventListener('unhandledrejection', function (e) { notera('promise: ' + ((e.reason && e.reason.message) || e.reason)); });
+      if (!/[?&]logg(=|&|$)/.test(location.search)) return;
+
+      function rad(h) { return h[0] + '  [' + h[1] + '] ' + h[2] + (h[3] ? '  ' + h[3] : ''); }
+      function text() {
+        var L = ['ORDSTAVEN – startloggen (?logg)', 'Tid: ' + new Date().toISOString(), 'Webbläsare: ' + navigator.userAgent,
+          'Fönster: ' + window.innerWidth + '×' + window.innerHeight + ', dpr ' + window.devicePixelRatio, ''];
+        var o = window.__ORDSTAVEN, igang = false;
+        try { igang = !!(o && o.spel && o.spel.isRunning); } catch (e) { /* ok */ }
+        L.push('Spelet igång: ' + (igang ? 'ja' : 'nej'), '', '== FEL UNDER STARTEN (nyast sist) ==');
+        L.push(fel.length ? fel.join('\n') : '(inga)');
+        // spelets egen logg: den som går nu om spelet är igång, annars den som sparades senast
+        var egen = null;
+        try { if (o && o.logg) egen = o.logg(); } catch (e) { /* ok */ }
+        if (egen) { L.push('', '== SPELETS LOGG ==', egen); return L.join('\n'); }
+        var g = null;
+        try { g = JSON.parse(localStorage.getItem('ordstaven_logg') || 'null'); } catch (e) { L.push('', 'Den sparade loggen gick inte att läsa: ' + e); }
+        if (g) {
+          L.push('', '== SENAST SPARADE LOGGEN (startade ' + g.start + ', ' + (g.version || '') + ') ==');
+          if (g.ogonblick) L.push('Sista tillstånd:', JSON.stringify(g.ogonblick, null, 2));
+          for (var i = 0; i < (g.buf || []).length; i++) L.push(rad(g.buf[i]));
+          if (g.tangenter && g.tangenter.length) L.push('', 'Tangenter: ' + g.tangenter.join(' | '));
+        } else L.push('', '(ingen sparad logg)');
+        return L.join('\n');
+      }
+      function stampel() {
+        var d = new Date(), p = function (n) { return (n < 10 ? '0' : '') + n; };
+        return '' + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '-' + p(d.getHours()) + p(d.getMinutes());
+      }
+      function visa() {
+        if (document.getElementById('startlogg')) return;
+        var r = document.createElement('div');
+        r.id = 'startlogg';
+        r.setAttribute('style', 'position:fixed;left:12px;top:12px;z-index:2147483647;width:min(560px,calc(100vw - 24px));background:#F5ECD7;color:#2a1d16;border:3px solid #2a1d16;border-radius:10px;padding:12px;font:15px/1.35 -apple-system,system-ui,sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.4)');
+        r.innerHTML = '<strong>Loggen (för den vuxne)</strong><div style="margin:6px 0 8px">Spara loggen som fil och skicka den till teknikspåret.</div>'
+          + '<button type="button" class="startlogg-spara" style="font:inherit;padding:8px 12px;margin-right:6px">Spara loggen</button>'
+          + '<button type="button" class="startlogg-kopiera" style="font:inherit;padding:8px 12px;margin-right:6px">Kopiera</button>'
+          + '<button type="button" class="startlogg-stang" style="font:inherit;padding:8px 12px">Stäng</button>'
+          + '<div class="startlogg-svar" style="margin-top:6px;min-height:1.3em"></div>'
+          + '<textarea class="startlogg-text" readonly style="width:100%;height:30vh;font:12px/1.3 ui-monospace,Menlo,monospace;box-sizing:border-box"></textarea>';
+        document.body.appendChild(r);
+        var ruta = r.querySelector('.startlogg-text'), svar = r.querySelector('.startlogg-svar');
+        function fyll() { ruta.value = text(); return ruta.value; }
+        fyll();
+        r.querySelector('.startlogg-spara').addEventListener('click', function (e) {
+          e.stopPropagation();
+          var t = fyll(), namn = 'ordstaven-startlogg-' + stampel() + '.txt';
+          try {
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([t], { type: 'text/plain;charset=utf-8' }));
+            a.download = namn; document.body.appendChild(a); a.click();
+            setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+            svar.textContent = 'Sparad: ' + namn + ' (i Hämtade filer).';
+          } catch (err) { svar.textContent = 'Gick inte att spara. Markera texten nedan och kopiera den.'; }
+        });
+        r.querySelector('.startlogg-kopiera').addEventListener('click', function (e) {
+          e.stopPropagation();
+          var t = fyll();
+          ruta.focus(); ruta.select();
+          var klar = function () { svar.textContent = 'Kopierad.'; };
+          try {
+            if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(klar, function () { document.execCommand('copy'); klar(); });
+            else { document.execCommand('copy'); klar(); }
+          } catch (err) { svar.textContent = 'Markera texten nedan och kopiera den.'; }
+        });
+        r.querySelector('.startlogg-stang').addEventListener('click', function (e) { e.stopPropagation(); r.remove(); });
+        // rutan ska inte släppa igenom tryck och tangenter till spelet
+        ['pointerdown', 'pointerup', 'touchstart', 'keydown'].forEach(function (typ) { r.addEventListener(typ, function (e) { e.stopPropagation(); }); });
+      }
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', visa); else visa();
+    })();
+  </script>
 </head>
 <body>
   <div id="ram">

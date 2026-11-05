@@ -627,3 +627,7 @@ Stilguiden §3 gick igenom mot spelet. Det som saknades är byggt här, resten f
 - **Det som står kvar** (`spel.js` `kvarNu`): ett föremål med `forsvinner_efter` och `bild_kvar` som inte längre är med (`innehallNu`) skickas till `rum.visa` som `kvar` och ritas av `ritaKvar` som bild utan ruta, så att stumparna står där efter en omstart och inte stänger vägen.
 - **Hugget** (`Rum.svinga`): hjälten svingar med `hjalte_svinga_<riktning>_01–03` och svärdet (`svard_svinga_*`) eller staven (`stav_svinga_*`) i handen, 80 ms per bild, och står sedan som förut. Med svärdet håller han `svard_hand_<riktning>_01`. Saknas svärdets bilder blir staven guld som i gråboxen.
 
+## 47. Startloggen (0.21.1)
+- **Ett vanligt skript i `index.html`** före spelets modul (Teknik 1e). Det hör inte till `src/` och beror inte på något i spelet, så det går också när spelets skript aldrig laddas eller kraschar innan något syns. Det lyssnar på `error` (i fångstfasen, så att ett skript eller en bild som inte går att ladda kommer med) och `unhandledrejection`, och sparar de senaste 20 felen i `ordstaven_startfel`.
+- **`?logg`** visar rutan `#startlogg` (vanlig skrift, för den vuxne): Spara loggen (`ordstaven-startlogg-<datum>-<tid>.txt`), Kopiera och Stäng, och texten i en ruta som går att markera. Texten är felen under starten, webbläsaren och fönstret, och spelets logg: `__ORDSTAVEN.logg()` om spelet är igång, annars `ordstaven_logg` som spelet sparade senast (var 4:e sekund, så också en start som hänger). Rutan släpper inte igenom tryck och tangenter till spelet.
+
