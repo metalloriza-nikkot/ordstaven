@@ -123,6 +123,11 @@ export function lasKarta(tmj) {
       if (egen.lyser) ut.lyser = true;
       // delas: "hela" = när ett pussel delar föremålet (P26) fyller delarna hela föremålet (lianväggen), annars krukor
       if (egen.delas === 'hela') ut.delasHela = true;
+      // hugget (39.3): bild_rad = bilder som upprepas längs föremålet (lianväggen, en lian var bildbredd),
+      // bild_hugg = bilderna när det huggs, bild_kvar = det som står kvar efteråt (inget hinder)
+      if (egen.bild_rad) ut.bildRad = String(egen.bild_rad).split(',').map((t) => t.trim()).filter(Boolean);
+      if (egen.bild_hugg) ut.bildHugg = String(egen.bild_hugg).split(',').map((t) => t.trim()).filter(Boolean);
+      if (egen.bild_kvar) ut.bildKvar = String(egen.bild_kvar);
       objekt.push(ut);
     }
   }

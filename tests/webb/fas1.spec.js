@@ -26,7 +26,7 @@ async function tillScen(page, index, extra = {}) {
   }, [index, extra]);
   await starta(page);
   await page.click('.start-knapp');
-  for (let k = 0; k < 6; k++) {
+  for (let k = 0; k < 30; k++) {
     if ((await page.evaluate(() => window.__ORDSTAVEN.steg()?.typ)) === 'ga_till') break;
     const r = await page.$('#plattan .replik-ruta'); if (r) await r.click();
     await page.waitForTimeout(120);
@@ -498,7 +498,7 @@ test('boken: uppslag 1 läses av sig själv och sedan glimtar sidhörnet', async
   await startaScen(page, 17);
   for (let k = 0; k < 80 && !(await page.locator('.bok-ruta').isVisible()); k++) {
     const st = await page.evaluate(() => window.__ORDSTAVEN.steg());
-    if (st?.typ === 'ga_till') { const o = await page.evaluate((m) => window.__ORDSTAVEN.objekt(m), st.mal); await page.mouse.click(o.x, o.y); await page.waitForTimeout(800); const h = page.locator('#handknapp'); if (await h.isVisible()) await page.keyboard.press('Space'); }
+    if (st?.typ === 'ga_till' || st?.typ === 'bara') { const o = await page.evaluate((m) => window.__ORDSTAVEN.objekt(m), st.mal || st.till); await page.mouse.click(o.x, o.y); await page.waitForTimeout(800); const h = page.locator('#handknapp'); if (await h.isVisible()) await page.keyboard.press('Space'); }
     const r = await page.$('#plattan .replik-ruta'); if (r) await r.click().catch(() => {});
     await page.waitForTimeout(150);
   }
@@ -573,6 +573,12 @@ test('utan WebGL: canvas-ritningen visar rummet, mörkret, skyltarna och rumsbyt
   const dorr = await page.evaluate(() => window.__ORDSTAVEN.objekt('dorr_hallen'));
   await page.mouse.click(dorr.x, dorr.y);
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 60000 }).toBe('s01b_hallen');
+  // förbi instruktionen (prologen v0.13: "Klättra upp för stegen!")
+  for (const t0 = Date.now(); Date.now() - t0 < 30000 && (await page.evaluate(() => window.__ORDSTAVEN.steg()?.typ)) !== 'ga_till';) {
+    const r = await page.$('#plattan .replik-ruta'); if (r) await r.click().catch(() => {});
+    await page.waitForTimeout(150);
+  }
+  expect(await page.evaluate(() => window.__ORDSTAVEN.steg()?.typ)).toBe('ga_till');
   await expect(page.locator('#skyltar .skylt')).toHaveCount(5, { timeout: 8000 });
   await page.screenshot({ path: 'tests/skarmdumpar/canvas-hallen.png' });
   expect(fel).toEqual([]);

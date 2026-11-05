@@ -1052,8 +1052,12 @@ test('SVÄRD gör staven till ett svärd, och spelaren hugger själv ned lianern
     await tryckNara(page, id);
     // står han redan vid lianen hugger trycket direkt (som på iPad), annars går han dit och handen kommer
     await expect.poll(async () => (await page.locator('#handknapp').isVisible()) || !(await page.evaluate((x) => window.__ORDSTAVEN.rumsobjekt().includes(x), id)), { timeout: 8000 }).toBe(true);
-    if (await page.evaluate((x) => window.__ORDSTAVEN.rumsobjekt().includes(x), id)) await page.keyboard.press('Space');
+    if (await page.evaluate((x) => window.__ORDSTAVEN.rumsobjekt().includes(x), id)) {
+      await page.keyboard.press('Space');
+      if (id === 'lianer_0') { await page.waitForTimeout(60); await page.screenshot({ path: 'test-results/lianerna-hugget.png' }); }
+    }
     await expect.poll(() => page.evaluate((x) => window.__ORDSTAVEN.rumsobjekt().includes(x), id), { timeout: 8000 }).toBe(false);
+    if (id === 'lianer_0') { await page.waitForTimeout(400); await page.screenshot({ path: 'test-results/lianerna-en-huggen.png' }); }
   }
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('SVÄRDET SKÄR BARA VÄXTER.', { timeout: 10000 });
   const logg = await page.evaluate(() => window.__ORDSTAVEN.logg());
@@ -1067,6 +1071,13 @@ test('SVÄRD gör staven till ett svärd, och spelaren hugger själv ned lianern
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 10000 }).toBe('k1s02_lianerna');
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.rumsobjekt().length), { timeout: 10000 }).toBeGreaterThan(3);
   expect(await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt().some((id) => /^lianer/.test(id)))).toBe(false);
+  // stumparna står kvar (Stils lian_kvar), utan att stänga vägen
+  const stumpar = await page.evaluate(() => {
+    const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); let n = 0;
+    const g = (o) => { if (o.frame?.name === 'lian_kvar') n++; (o.list || []).forEach(g); };
+    r.lagerObjekt.list.forEach(g); return n;
+  });
+  expect(stumpar).toBeGreaterThan(0);
 });
 
 test('den lilla lianen: SVÄRD ur minnet, sedan hugger han den, och den är borta (39.3)', async ({ page }) => {
@@ -1745,4 +1756,29 @@ test('handen vid målet i molnet syns på ca två rutors avstånd, och ett tryck
   await page.locator('#handknapp button').click();
   await expect.poll(async () => (await steg(page))?.typ, { timeout: 8000 }).toBe('replik');
   expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toMatch(/\[hand\] radio/);
+});
+
+test('s21b: Farfar står vid ytterdörren, vänder sig mot hjälten och säger hej då', async ({ page }) => {
+  test.setTimeout(60000);
+  await page.goto('./?snabb&ny');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.evaluate(() => {
+    const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
+    t.spelare.hjalte.namn = 'TESTA'; t.spelare.unge.namn = 'KNOPP';
+    Object.assign(av, { kapitelId: 'kap-00', scenId: 's21b_hallen_ut', spolaTill: 's21b_hallen_ut', spolat: [], startad: false, scen: 23 }); delete av.steg;
+    localStorage.setItem('ordstaven_spar', JSON.stringify(t));
+  });
+  await page.goto('./?snabb');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('s21b_hallen_ut');
+  // först "Var var vi?" (omstarten), sedan hejdå
+  await framTill(page, () => /HEJ DÅ/.test(document.querySelector('#plattan .replik-ruta')?.textContent || ''));
+  expect(await page.evaluate(() => window.__ORDSTAVEN.rutaPaSkarm('farfar_vid_dorren'))).not.toBeNull();
+  const s = await page.evaluate(() => window.__ORDSTAVEN.samtal('farfar_vid_dorren'));
+  // hjälten står till vänster om dörren: Farfar vänder sig åt vänster, mot honom
+  expect(s.figur).toMatch(/^farfar_morgon_(vanster|ner|upp)_01$/);
+  expect(s.figur).not.toBe('farfar_morgon_hoger_01');
+  await page.screenshot({ path: 'test-results/s21b-farfar-vid-dorren.png' });
+  await framTill(page, () => window.__ORDSTAVEN.steg()?.typ === 'ga_till');
 });

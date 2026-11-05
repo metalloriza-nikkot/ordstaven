@@ -361,7 +361,14 @@ export class Rum extends Phaser.Scene {
     const px = pose ? -8 : 0, py = pose ? -16 : 0;
     if (this.kropp.x !== px || this.kropp.y !== py) { this.kropp.setPosition(px, py); this.smutsig = true; }
     this.stav?.setVisible(!!this.harStav && !klattrar && !pose);
-    if (this.stav && this.stav.frame.name !== `stav_hand_${r}_01`) this.stav.setFrame(`stav_hand_${r}_01`);
+    if (this.stav && !pose) {
+      // svärdet i handen (16 × 32) ritas 8 pixlar högre än hjälten, eftersom klingan sticker upp (10b)
+      const svard = this.harSvard && this.textures.get(this.stav.texture.key).has(`svard_hand_${r}_01`);
+      const ram = svard ? `svard_hand_${r}_01` : `stav_hand_${r}_01`;
+      if (this.stav.frame.name !== ram) { this.stav.setFrame(ram); this.smutsig = true; }
+      const y = svard ? -8 : 0;
+      if (this.stav.x !== 0 || this.stav.y !== y) { this.stav.setPosition(0, y); this.smutsig = true; }
+    }
     const sida = r === 'hoger' || r === 'vanster';
     this.sackBak?.setVisible(sida).setFrame(`ryggsack_${r}_01`);
     this.sackFram?.setVisible(!sida).setFrame(`ryggsack_${r}_01`);
@@ -810,8 +817,9 @@ export class Rum extends Phaser.Scene {
    * Visa ett rum (eller inget rum, för scener utan rum).
    * @param {{ rum: string | null, tillstand: string | null, innehall: (string | { id: string, syns_i?: string[] })[], unge: boolean, nyttRum: boolean,
    *           karta?: import('../karna/karta.js').Karta | null, franRum?: string | null,
-   *           delar?: Record<string, { farg: number | null, storlek: string | null }[]>, visade?: string[] }} v
-   * visade = dolda föremål som ett steg har visat (visa_foremal)
+   *           delar?: Record<string, { farg: number | null, storlek: string | null }[]>, visade?: string[],
+   *           kvar?: import('../karna/rumslayout.js').Objekt[] }} v
+   * visade = dolda föremål som ett steg har visat (visa_foremal), kvar = det som står kvar efter hugget (bild_kvar)
    */
   visa(v) {
     this.harRum = !!v.rum;
@@ -836,6 +844,7 @@ export class Rum extends Phaser.Scene {
       this.delar = { ...(v.delar || {}) };
       for (const o of [...this.objekt.filter((x) => x.sort === 'yta'), ...this.objekt.filter((x) => x.sort !== 'yta')]) this.ritaObjekt(o);
       for (const id of this.sparrade) { const o = this.ruta(id); if (o) this.ritaGren(o); }
+      this.ritaKvar(v.kvar || []);
       this.byggHinder();
       this.sattInteraktiva(this.interaktiva.filter((id) => this.ruta(id))); this.nara(null);
       if (v.nyttRum || !this.harRum) {
@@ -917,6 +926,13 @@ export class Rum extends Phaser.Scene {
     // grafiken: kartans bild för föremålet (nattens bild på natten), med bildens nederkant mitt på föremålets
     // nederkant mitt (10b), eller på ett annat föremåls (bild_pa: Farfar i fåtöljen). Pusslets delar (dinomatens
     // lådor) och föremål utan bild ritas som i gråboxen.
+    // en rad bilder längs föremålet (lianväggen): bildernas nederkant på föremålets nederkant, en bild per bildbredd
+    if (o.bildRad && foremalsbild(this, o.bildRad[0])) {
+      const rad = this.bildrad(o, o.bildRad);
+      this.lagerObjekt.add(rad);
+      this.ritade.set(o.id, /** @type {any} */ (rad));
+      return;
+    }
     const bildNamn = o.bildNatt && (this.tillstand === 'natt' || this.tillstand === 'natt_upplyst') ? o.bildNatt : o.bild;
     const fb = bildNamn && !this.delar[o.id] ? foremalsbild(this, bildNamn) : null;
     if (fb) {
@@ -954,6 +970,36 @@ export class Rum extends Phaser.Scene {
       return ruta;
     });
     this.ritadeDelar.set(o.id, ritade);
+  }
+
+  /**
+   * Bilder i rad längs ett föremål, omväxlande ur listan (lian_a, lian_b), med nederkanten på föremålets nederkant.
+   * @param {{ x: number, y: number, b: number, h: number }} o @param {string[]} namn @returns {Phaser.GameObjects.Container}
+   */
+  bildrad(o, namn) {
+    const c = this.add.container(0, 0);
+    const forsta = /** @type {{ nyckel: string, ram: string }} */ (foremalsbild(this, namn[0]));
+    const bredd = this.textures.getFrame(forsta.nyckel, forsta.ram)?.width || 24;
+    const antal = Math.max(1, Math.round(o.b / bredd));
+    for (let i = 0; i < antal; i++) {
+      const fb = foremalsbild(this, namn[i % namn.length]) || forsta;
+      c.add(this.add.image(Math.round(o.x + ((i + 0.5) * o.b) / antal), o.y + o.h, fb.nyckel, fb.ram).setOrigin(0.5, 1));
+    }
+    return c;
+  }
+
+  /**
+   * Det som står kvar efter hugget (bild_kvar: lianernas stubbar), ritat utan att vara ett föremål eller ett hinder.
+   * @param {import('../karna/rumslayout.js').Objekt[]} lista
+   */
+  ritaKvar(lista) {
+    for (const o of lista) {
+      if (!o.bildKvar || !foremalsbild(this, o.bildKvar)) continue;
+      if (o.bildRad) { this.lagerObjekt.add(this.bildrad(o, [o.bildKvar])); continue; }
+      const fb = /** @type {{ nyckel: string, ram: string }} */ (foremalsbild(this, o.bildKvar));
+      this.lagerObjekt.add(this.add.image(Math.round(o.x + o.b / 2), o.y + o.h, fb.nyckel, fb.ram).setOrigin(0.5, 1));
+    }
+    this.smutsig = true;
   }
 
   /**
@@ -1068,7 +1114,8 @@ export class Rum extends Phaser.Scene {
     if (bas?.delasHela) {
       for (let i = 0; i < antal; i++) {
         const x0 = bas.x + Math.round((i * bas.b) / antal), x1 = bas.x + Math.round(((i + 1) * bas.b) / antal);
-        const n = { id: `${id}_${i}`, x: x0, y: bas.y, b: x1 - x0, h: bas.h, sort: /** @type {'sak'} */ ('sak'), ...(bas.sida ? { sida: bas.sida } : {}), ...(bas.bildDel ? { bild: bas.bildDel } : {}) };
+        const n = { id: `${id}_${i}`, x: x0, y: bas.y, b: x1 - x0, h: bas.h, sort: /** @type {'sak'} */ ('sak'), ...(bas.sida ? { sida: bas.sida } : {}), ...(bas.bildDel ? { bild: bas.bildDel } : {}),
+          ...(bas.bildRad ? { bildRad: bas.bildRad } : {}), ...(bas.bildHugg ? { bildHugg: bas.bildHugg } : {}), ...(bas.bildKvar ? { bildKvar: bas.bildKvar } : {}) };
         this.objekt.push(n); this.ritaObjekt(n); nya.push(n.id);
       }
       this.byggHinder();
@@ -1230,20 +1277,56 @@ export class Rum extends Phaser.Scene {
    */
   huggen(id) {
     this.smutsig = true;
-    const r = this.ritade.get(id);
+    const r = /** @type {any} */ (this.ritade.get(id));
+    const o = this.objekt.find((x) => x.id === id);
     this.objekt = this.objekt.filter((x) => x.id !== id);
     this.ritade.delete(id);
     this.byggHinder();
     this.b.vidAndring?.();
     if (!r) return;
+    // med Stils bilder: snittet lyser och den nedre delen faller (bild_hugg, ca 80 ms var), sedan står stubben kvar
+    const bilder = [...(o?.bildHugg || []), ...(o?.bildKvar ? [o.bildKvar] : [])].map((n) => foremalsbild(this, n)).filter(Boolean);
+    const delar = /** @type {any[]} */ (r.list ? r.list : r.setFrame ? [r] : []);
+    if (bilder.length && delar.length) {
+      bilder.forEach((fb, i) => this.time.delayedCall(80 * i, () => { for (const d of delar) d.setTexture(fb.nyckel, fb.ram); this.smutsig = true; }));
+      return;
+    }
     this.tweens.add({ targets: r, y: r.y + 6, alpha: 0, duration: 260, onUpdate: () => { this.smutsig = true; }, onComplete: () => { r.destroy(); this.smutsig = true; } });
+  }
+
+  /**
+   * Ett sving med staven, eller ett hugg med svärdet (10b): hjältens tre svingbilder, med staven eller svärdet ovanpå
+   * (under när han svingar uppåt). Gråboxen utan bilderna gör inget. @param {number} [ms] per bild
+   */
+  svinga(ms = 80) {
+    const r = riktningFor(this.vand);
+    const tex = this.textures.exists('hjalte') ? this.textures.get('hjalte') : null;
+    if (!tex?.has(`hjalte_svinga_${r}_01`) || !this.kropp || this.klattrar) return;
+    const verktyg = this.harSvard && this.stav && this.textures.get(this.stav.texture.key).has(`svard_svinga_${r}_01`) ? 'svard' : 'stav';
+    const kvar = this.hjaltePose;
+    for (let i = 0; i < 3; i++) {
+      this.time.delayedCall(ms * i, () => {
+        this.sattPose(`hjalte_svinga_${r}_0${i + 1}`);
+        if (this.stav && this.harStav) {
+          this.stav.setVisible(true).setFrame(`${verktyg}_svinga_${r}_0${i + 1}`);
+          // stavens ruta (32 × 40) ligger som hjältens svingbild, svärdets (48 × 48) 8 till vänster och 4 högre
+          this.stav.setPosition(verktyg === 'svard' ? -16 : -8, verktyg === 'svard' ? -20 : -16);
+          if (r === 'upp') this.hjalte.sendToBack(this.stav); else this.hjalte.bringToTop(this.stav);
+        }
+        this.smutsig = true;
+      });
+    }
+    this.time.delayedCall(ms * 3, () => { this.sattPose(kvar); this.hjalte.bringToTop(this.stav); this.ritaHjalte(); });
   }
 
   /** Stavens ände är ett svärd av guld medan han hugger (gråbox: staven lyser i guld). @param {boolean} pa */
   svard(pa) {
     this.harSvard = pa; this.smutsig = true;
     if (!this.stav) return;
-    if (pa) this.stav.setTint(0xf2c94c); else this.stav.clearTint();
+    // med Stils bilder: svard_hand_<riktning> i handen (ritaHjalte), annars en guldfärgad stav i gråboxen
+    const bild = this.textures.get(this.stav.texture.key).has('svard_hand_ner_01');
+    if (pa && !bild) this.stav.setTint(0xf2c94c); else this.stav.clearTint();
+    this.ritaHjalte();
   }
 
   /** Vilket av objekten står hjälten vid just nu? @param {string[]} ids @returns {string | null} */

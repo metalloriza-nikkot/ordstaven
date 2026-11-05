@@ -11,7 +11,7 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 12,
+ "nextobjectid": 13,
  "properties": [
   {
    "name": "rum",
@@ -328,6 +328,34 @@
      "rotation": 0,
      "visible": true,
      "point": true
+    },
+    {
+     "id": 12,
+     "name": "farfar_vid_dorren",
+     "type": "figur",
+     "x": 326,
+     "y": 148,
+     "width": 16,
+     "height": 24,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "hoger"
+      },
+      {
+       "name": "talare",
+       "type": "string",
+       "value": "farfar"
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "farfar_morgon_ner_01"
+      }
+     ]
     }
    ]
   }

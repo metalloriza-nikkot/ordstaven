@@ -268,6 +268,21 @@
        "name": "delas",
        "type": "string",
        "value": "hela"
+      },
+      {
+       "name": "bild_rad",
+       "type": "string",
+       "value": "lian_a,lian_b"
+      },
+      {
+       "name": "bild_hugg",
+       "type": "string",
+       "value": "lian_hugg_01,lian_hugg_02"
+      },
+      {
+       "name": "bild_kvar",
+       "type": "string",
+       "value": "lian_kvar"
       }
      ]
     },
@@ -302,6 +317,21 @@
        "name": "forsvinner_efter",
        "type": "string",
        "value": "k1_liten_lian"
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "liten_lian"
+      },
+      {
+       "name": "bild_hugg",
+       "type": "string",
+       "value": "liten_lian_hugg_01"
+      },
+      {
+       "name": "bild_kvar",
+       "type": "string",
+       "value": "liten_lian_kvar"
       }
      ]
     },

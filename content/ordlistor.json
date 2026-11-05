@@ -2,14 +2,15 @@
  "$schema": "schema/ordlistor.schema.json",
  "format": 1,
  "meta": {
-  "version": "0.6",
-  "datum": "2026-11-02",
+  "version": "0.7",
+  "datum": "2026-11-04",
   "agare": "Innehåll",
   "textform": "Orden lagras med små bokstäver, formler i versaler. Böjda former (skogen, bron) står med när de används som alternativ.",
   "beskrivning": "Ordlistor 1-6 for ORDSTAVEN. Bilderna ar platshallare (emoji) for grabox. Ett ord ligger i den hogsta lista som nagot av dess drag kraver.",
   "bilder": "Emoji är platshållare. Där emojin är missvisande står ett bild-id i stället (filt).",
   "andrat_v05": "bok och farfar tillagda (prologen v0.11, hallens dörrar).",
-  "andrat_v06": "skolan (prologen v0.11.3, vägskylten), och var, vid, bakom, väntar, busken och skata (kapitel 1 v0.7.4: skylten vid ingången och baronens lapp). Granskningen A 25: varje ord i en lästext ska finnas i ordlistorna."
+  "andrat_v06": "skolan (prologen v0.11.3, vägskylten), och var, vid, bakom, väntar, busken och skata (kapitel 1 v0.7.4: skylten vid ingången och baronens lapp). Granskningen A 25: varje ord i en lästext ska finnas i ordlistorna.",
+  "andrat_v07": "80 ordformer från uppdragslappen (beslut 40.1), så att lappens text står i ordlistorna. Listan följer listornas regler: dubbelteckning ger lista 4, konsonantgrupp i början lista 3, korta ljudenliga ord lista 1 och längre lista 2. ATT, DIG, FÖR och UPP är småord som lärs som ordbilder (lista 6). KARTBITEN, LIANERNA och BARONENS är berättelseord."
  },
  "listor": {
   "1": "Korta ljudenliga ord, 2-3 bokstaver, ingen konsonantgrupp, ingen dubbelteckning",
@@ -1357,6 +1358,715 @@
    "bild": "🐦",
    "tema": "djur",
    "flaggor": []
+  },
+  {
+   "ord": "allt",
+   "lista": 4,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "apan",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "att",
+   "lista": 6,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "ordbild"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "baronens",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "berattelseord"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "boken",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "dags",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "dig",
+   "lista": 6,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "ordbild"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "dinon",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "dit",
+   "lista": 1,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "döp",
+   "lista": 1,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "dörrarna",
+   "lista": 4,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "farfars",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "filten",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "följ",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "för",
+   "lista": 6,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "aao",
+    "ordbild"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "förbi",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "gråten",
+   "lista": 3,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "gråter",
+   "lista": 3,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "gå",
+   "lista": 1,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "hallen",
+   "lista": 4,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "hitta",
+   "lista": 4,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "hos",
+   "lista": 1,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "hugg",
+   "lista": 4,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "huset",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "hämta",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "hörs",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "kartbiten",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "berattelseord"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "koden",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "kom",
+   "lista": 1,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "krukorna",
+   "lista": 3,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "kullen",
+   "lista": 4,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "lapp",
+   "lista": 4,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "lappen",
+   "lista": 4,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "leta",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "lianerna",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "berattelseord"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "listan",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "lucka",
+   "lista": 4,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "lägg",
+   "lista": 4,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "lämna",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "läs",
+   "lista": 1,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "lådan",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "lådorna",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "löven",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "mata",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "mot",
+   "lista": 1,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "namn",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "ner",
+   "lista": 1,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "ordet",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "packa",
+   "lista": 4,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "påse",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "radion",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "rädda",
+   "lista": 4,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "rätt",
+   "lista": 4,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "saga",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "skrev",
+   "lista": 3,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "skriv",
+   "lista": 3,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "sova",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "staven",
+   "lista": 3,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "stegen",
+   "lista": 3,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "stenarna",
+   "lista": 3,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "stigen",
+   "lista": 3,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "sätt",
+   "lista": 4,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "titta",
+   "lista": 4,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "tryck",
+   "lista": 4,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "trädet",
+   "lista": 3,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "trösta",
+   "lista": 3,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "tänd",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "upp",
+   "lista": 6,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "ordbild"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "ur",
+   "lista": 1,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "vad",
+   "lista": 1,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "vem",
+   "lista": 1,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "vi",
+   "lista": 1,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "vifta",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "vinden",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "visa",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "välj",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "värm",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "ägget",
+   "lista": 4,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "äter",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "öppna",
+   "lista": 4,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Uppdragslappen (40.1)"
   }
  ]
 }

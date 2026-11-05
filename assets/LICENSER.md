@@ -16,6 +16,7 @@ Varje grafik-, ljud- eller typsnittsfil och varje bibliotek som följer med spel
 | Farfars karta (kartbitarna) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/karta/` |
 | HUD:ens knappar, ikonerna och dörrskyltarna | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/ui/` |
 | Farfars hus: föremålen | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/foremal/hus/` |
+| Skogens föremål (lianerna, den lilla lianen) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/foremal/skog/` |
 | Farfars hus: rummen (en bild per rum) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/rum/hus/` |
 | Skogens rutor (rutset för Tiled) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/tiles/skog/` |
 | Herr Skatas skratt | Eget, inspelat för spelet och bearbetat (tonhöjd och filter) så att rösten inte går att känna igen | Egna | Ja | `assets/ljud/herr_skata_skratt.wav` |

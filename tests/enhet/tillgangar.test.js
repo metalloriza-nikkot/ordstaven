@@ -104,7 +104,7 @@ describe('kartornas grafik', () => {
       if (ke.mark && !existsSync(new URL(`assets/tiles/${ke.mark}/${ke.mark}.json`, rot))) saknas.push(`${f}: marken ${ke.mark}`);
       for (const l of k.layers) for (const o of l.objects || []) {
         const e = egen(o);
-        for (const b of [e.bild, e.bild_natt, e.bild_del].filter(Boolean)) if (!ramar.has(b)) saknas.push(`${f} ${o.name}: ${b}`);
+        for (const b of [e.bild, e.bild_natt, e.bild_del, e.bild_kvar, ...String(e.bild_rad || "").split(","), ...String(e.bild_hugg || "").split(",")].map((x) => String(x || "").trim()).filter(Boolean)) if (!ramar.has(b)) saknas.push(`${f} ${o.name}: ${b}`);
       }
     }
     expect(saknas).toEqual([]);

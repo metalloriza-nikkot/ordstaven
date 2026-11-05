@@ -1,0 +1,174 @@
+{
+ "frames": {
+  "lian_a": {
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 48
+   }
+  },
+  "lian_b": {
+   "frame": {
+    "x": 25,
+    "y": 0,
+    "w": 24,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 48
+   }
+  },
+  "lian_hugg_01": {
+   "frame": {
+    "x": 0,
+    "y": 49,
+    "w": 24,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 48
+   }
+  },
+  "lian_hugg_02": {
+   "frame": {
+    "x": 25,
+    "y": 49,
+    "w": 24,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 48
+   }
+  },
+  "lian_kvar": {
+   "frame": {
+    "x": 0,
+    "y": 98,
+    "w": 24,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 48
+   }
+  },
+  "liten_lian": {
+   "frame": {
+    "x": 0,
+    "y": 147,
+    "w": 28,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 28,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 28,
+    "h": 28
+   }
+  },
+  "liten_lian_hugg_01": {
+   "frame": {
+    "x": 0,
+    "y": 176,
+    "w": 28,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 28,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 28,
+    "h": 28
+   }
+  },
+  "liten_lian_kvar": {
+   "frame": {
+    "x": 0,
+    "y": 205,
+    "w": 28,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 28,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 28,
+    "h": 28
+   }
+  }
+ },
+ "meta": {
+  "image": "skog.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 50,
+   "h": 234
+  },
+  "scale": "1",
+  "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."
+ }
+}

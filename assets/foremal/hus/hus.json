@@ -1,9 +1,369 @@
 {
  "frames": {
-  "berg": {
+  "agg_01": {
    "frame": {
     "x": 0,
     "y": 0,
+    "w": 32,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 44
+   }
+  },
+  "agg_filt": {
+   "frame": {
+    "x": 33,
+    "y": 0,
+    "w": 32,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 44
+   }
+  },
+  "agg_filt_frost": {
+   "frame": {
+    "x": 0,
+    "y": 45,
+    "w": 32,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 44
+   }
+  },
+  "agg_frys_01": {
+   "frame": {
+    "x": 0,
+    "y": 90,
+    "w": 32,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 44
+   }
+  },
+  "agg_frys_02": {
+   "frame": {
+    "x": 33,
+    "y": 90,
+    "w": 32,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 44
+   }
+  },
+  "agg_gungar_hoger": {
+   "frame": {
+    "x": 0,
+    "y": 135,
+    "w": 32,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 44
+   }
+  },
+  "agg_gungar_vanster": {
+   "frame": {
+    "x": 33,
+    "y": 135,
+    "w": 32,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 44
+   }
+  },
+  "agg_hopp_01": {
+   "frame": {
+    "x": 0,
+    "y": 180,
+    "w": 32,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 44
+   }
+  },
+  "agg_knack_01": {
+   "frame": {
+    "x": 0,
+    "y": 225,
+    "w": 32,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 44
+   }
+  },
+  "agg_knack_02": {
+   "frame": {
+    "x": 33,
+    "y": 225,
+    "w": 32,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 44
+   }
+  },
+  "agg_kras_01": {
+   "frame": {
+    "x": 0,
+    "y": 270,
+    "w": 32,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 44
+   }
+  },
+  "agg_lyser_01": {
+   "frame": {
+    "x": 0,
+    "y": 315,
+    "w": 32,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 44
+   }
+  },
+  "agg_lyser_02": {
+   "frame": {
+    "x": 33,
+    "y": 315,
+    "w": 32,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 44
+   }
+  },
+  "agg_lyser_03": {
+   "frame": {
+    "x": 66,
+    "y": 315,
+    "w": 32,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 44
+   }
+  },
+  "agg_nos_01": {
+   "frame": {
+    "x": 0,
+    "y": 360,
+    "w": 32,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 44
+   }
+  },
+  "agg_skal": {
+   "frame": {
+    "x": 0,
+    "y": 405,
+    "w": 32,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 44
+   }
+  },
+  "agg_ute_01": {
+   "frame": {
+    "x": 0,
+    "y": 450,
+    "w": 32,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 44
+   }
+  },
+  "agg_ute_02": {
+   "frame": {
+    "x": 33,
+    "y": 450,
+    "w": 32,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 44
+   }
+  },
+  "berg": {
+   "frame": {
+    "x": 0,
+    "y": 495,
     "w": 160,
     "h": 20
    },
@@ -23,7 +383,7 @@
   "bokhylla": {
    "frame": {
     "x": 0,
-    "y": 21,
+    "y": 516,
     "w": 84,
     "h": 30
    },
@@ -43,7 +403,7 @@
   "bord": {
    "frame": {
     "x": 0,
-    "y": 52,
+    "y": 547,
     "w": 34,
     "h": 22
    },
@@ -63,7 +423,7 @@
   "bord_med_saker": {
    "frame": {
     "x": 0,
-    "y": 75,
+    "y": 570,
     "w": 70,
     "h": 30
    },
@@ -83,7 +443,7 @@
   "dorr": {
    "frame": {
     "x": 0,
-    "y": 106,
+    "y": 601,
     "w": 26,
     "h": 36
    },
@@ -103,7 +463,7 @@
   "dorr_fram": {
    "frame": {
     "x": 27,
-    "y": 106,
+    "y": 601,
     "w": 28,
     "h": 16
    },
@@ -123,7 +483,7 @@
   "dorr_fram_ute": {
    "frame": {
     "x": 0,
-    "y": 143,
+    "y": 638,
     "w": 28,
     "h": 16
    },
@@ -143,7 +503,7 @@
   "dorr_oppnas_01": {
    "frame": {
     "x": 0,
-    "y": 160,
+    "y": 655,
     "w": 26,
     "h": 36
    },
@@ -163,7 +523,7 @@
   "dorr_oppnas_02": {
    "frame": {
     "x": 27,
-    "y": 160,
+    "y": 655,
     "w": 26,
     "h": 36
    },
@@ -183,7 +543,7 @@
   "dorr_oppnas_03": {
    "frame": {
     "x": 54,
-    "y": 160,
+    "y": 655,
     "w": 26,
     "h": 36
    },
@@ -203,7 +563,7 @@
   "dorr_sida_hoger": {
    "frame": {
     "x": 0,
-    "y": 197,
+    "y": 692,
     "w": 32,
     "h": 40
    },
@@ -223,7 +583,7 @@
   "dorr_sida_vanster": {
    "frame": {
     "x": 33,
-    "y": 197,
+    "y": 692,
     "w": 32,
     "h": 40
    },
@@ -243,7 +603,7 @@
   "expeditionsbok": {
    "frame": {
     "x": 0,
-    "y": 238,
+    "y": 733,
     "w": 20,
     "h": 16
    },
@@ -263,7 +623,7 @@
   "fatolj_hoger": {
    "frame": {
     "x": 0,
-    "y": 255,
+    "y": 750,
     "w": 30,
     "h": 28
    },
@@ -283,7 +643,7 @@
   "fatolj_vanster": {
    "frame": {
     "x": 31,
-    "y": 255,
+    "y": 750,
     "w": 30,
     "h": 28
    },
@@ -303,7 +663,7 @@
   "fonster": {
    "frame": {
     "x": 0,
-    "y": 284,
+    "y": 779,
     "w": 40,
     "h": 24
    },
@@ -323,7 +683,7 @@
   "fonster_fram": {
    "frame": {
     "x": 41,
-    "y": 284,
+    "y": 779,
     "w": 40,
     "h": 16
    },
@@ -343,7 +703,7 @@
   "fonster_sida_hoger": {
    "frame": {
     "x": 0,
-    "y": 309,
+    "y": 804,
     "w": 32,
     "h": 24
    },
@@ -363,7 +723,7 @@
   "fonster_sida_vanster": {
    "frame": {
     "x": 33,
-    "y": 309,
+    "y": 804,
     "w": 32,
     "h": 24
    },
@@ -383,7 +743,7 @@
   "hylla": {
    "frame": {
     "x": 0,
-    "y": 334,
+    "y": 829,
     "w": 72,
     "h": 20
    },
@@ -403,7 +763,7 @@
   "kakaokopp": {
    "frame": {
     "x": 0,
-    "y": 355,
+    "y": 850,
     "w": 10,
     "h": 10
    },
@@ -423,7 +783,7 @@
   "kista": {
    "frame": {
     "x": 0,
-    "y": 366,
+    "y": 861,
     "w": 34,
     "h": 24
    },
@@ -443,7 +803,7 @@
   "klader_krok": {
    "frame": {
     "x": 0,
-    "y": 391,
+    "y": 886,
     "w": 20,
     "h": 22
    },
@@ -463,7 +823,7 @@
   "kruka": {
    "frame": {
     "x": 0,
-    "y": 414,
+    "y": 909,
     "w": 16,
     "h": 18
    },
@@ -480,10 +840,90 @@
     "h": 18
    }
   },
+  "kruka_skarvor": {
+   "frame": {
+    "x": 17,
+    "y": 909,
+    "w": 24,
+    "h": 20
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 20
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 20
+   }
+  },
+  "kruka_spricker_01": {
+   "frame": {
+    "x": 0,
+    "y": 930,
+    "w": 24,
+    "h": 20
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 20
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 20
+   }
+  },
+  "kruka_spricker_02": {
+   "frame": {
+    "x": 25,
+    "y": 930,
+    "w": 24,
+    "h": 20
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 20
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 20
+   }
+  },
+  "kruka_spricker_03": {
+   "frame": {
+    "x": 50,
+    "y": 930,
+    "w": 24,
+    "h": 20
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 20
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 20
+   }
+  },
   "lada_bla": {
    "frame": {
     "x": 0,
-    "y": 433,
+    "y": 951,
     "w": 30,
     "h": 18
    },
@@ -503,7 +943,7 @@
   "lada_bla_stor": {
    "frame": {
     "x": 0,
-    "y": 452,
+    "y": 970,
     "w": 30,
     "h": 18
    },
@@ -523,7 +963,7 @@
   "lada_gul": {
    "frame": {
     "x": 0,
-    "y": 471,
+    "y": 989,
     "w": 30,
     "h": 18
    },
@@ -543,7 +983,7 @@
   "lada_hornet": {
    "frame": {
     "x": 31,
-    "y": 471,
+    "y": 989,
     "w": 30,
     "h": 26
    },
@@ -563,7 +1003,7 @@
   "lada_lag": {
    "frame": {
     "x": 62,
-    "y": 471,
+    "y": 989,
     "w": 24,
     "h": 16
    },
@@ -583,7 +1023,7 @@
   "lada_lang": {
    "frame": {
     "x": 87,
-    "y": 471,
+    "y": 989,
     "w": 30,
     "h": 18
    },
@@ -603,7 +1043,7 @@
   "lada_liten": {
    "frame": {
     "x": 118,
-    "y": 471,
+    "y": 989,
     "w": 20,
     "h": 20
    },
@@ -623,7 +1063,7 @@
   "lada_rod": {
    "frame": {
     "x": 139,
-    "y": 471,
+    "y": 989,
     "w": 30,
     "h": 18
    },
@@ -643,7 +1083,7 @@
   "lada_rod_liten": {
    "frame": {
     "x": 0,
-    "y": 498,
+    "y": 1016,
     "w": 22,
     "h": 13
    },
@@ -663,7 +1103,7 @@
   "lada_rod_stor": {
    "frame": {
     "x": 23,
-    "y": 498,
+    "y": 1016,
     "w": 30,
     "h": 18
    },
@@ -683,7 +1123,7 @@
   "lada_stor": {
    "frame": {
     "x": 0,
-    "y": 517,
+    "y": 1035,
     "w": 32,
     "h": 22
    },
@@ -703,7 +1143,7 @@
   "laslampa": {
    "frame": {
     "x": 0,
-    "y": 540,
+    "y": 1058,
     "w": 12,
     "h": 24
    },
@@ -723,7 +1163,7 @@
   "matta": {
    "frame": {
     "x": 0,
-    "y": 565,
+    "y": 1083,
     "w": 72,
     "h": 40
    },
@@ -743,7 +1183,7 @@
   "nattduksbord": {
    "frame": {
     "x": 0,
-    "y": 606,
+    "y": 1124,
     "w": 18,
     "h": 26
    },
@@ -763,7 +1203,7 @@
   "radio": {
    "frame": {
     "x": 0,
-    "y": 633,
+    "y": 1151,
     "w": 22,
     "h": 18
    },
@@ -783,7 +1223,7 @@
   "runt_fonster": {
    "frame": {
     "x": 0,
-    "y": 652,
+    "y": 1170,
     "w": 28,
     "h": 22
    },
@@ -803,7 +1243,7 @@
   "runt_fonster_natt": {
    "frame": {
     "x": 0,
-    "y": 675,
+    "y": 1193,
     "w": 28,
     "h": 22
    },
@@ -823,7 +1263,7 @@
   "sang": {
    "frame": {
     "x": 0,
-    "y": 698,
+    "y": 1216,
     "w": 64,
     "h": 44
    },
@@ -843,7 +1283,7 @@
   "sex_krukor": {
    "frame": {
     "x": 0,
-    "y": 743,
+    "y": 1261,
     "w": 144,
     "h": 18
    },
@@ -863,7 +1303,7 @@
   "skylt_liten": {
    "frame": {
     "x": 0,
-    "y": 762,
+    "y": 1280,
     "w": 14,
     "h": 14
    },
@@ -883,7 +1323,7 @@
   "staket": {
    "frame": {
     "x": 0,
-    "y": 777,
+    "y": 1295,
     "w": 8,
     "h": 72
    },
@@ -903,7 +1343,7 @@
   "stege_ner": {
    "frame": {
     "x": 0,
-    "y": 850,
+    "y": 1368,
     "w": 24,
     "h": 20
    },
@@ -923,7 +1363,7 @@
   "stege_upp": {
    "frame": {
     "x": 25,
-    "y": 850,
+    "y": 1368,
     "w": 24,
     "h": 54
    },
@@ -943,7 +1383,7 @@
   "stol": {
    "frame": {
     "x": 0,
-    "y": 905,
+    "y": 1423,
     "w": 16,
     "h": 22
    },
@@ -963,7 +1403,7 @@
   "tva_buskar": {
    "frame": {
     "x": 0,
-    "y": 928,
+    "y": 1446,
     "w": 40,
     "h": 22
    },
@@ -986,7 +1426,7 @@
   "format": "RGBA8888",
   "size": {
    "w": 170,
-   "h": 951
+   "h": 1469
   },
   "scale": "1",
   "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."

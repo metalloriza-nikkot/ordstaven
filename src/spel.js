@@ -554,6 +554,11 @@ export function skapaSpel(d) {
     }
     return borta.size ? r.innehall.filter((/** @type {any} */ x) => !borta.has(typeof x === 'string' ? x : x.id)) : r.innehall;
   }
+  /** Det som står kvar efter hugget: kartans föremål som är borta (forsvinner_efter) och har bild_kvar. @param {any} r */
+  function kvarNu(r) {
+    const ids = new Set(innehallNu(r).map((/** @type {any} */ x) => (typeof x === 'string' ? x : x.id)));
+    return (kartor[r.id]?.objekt || []).filter((/** @type {any} */ o) => o.forsvinnerEfter && o.bildKvar && !ids.has(o.id));
+  }
 
   /**
    * Är pusslet gjort i sparningen? Ett pussel i en scen är gjort när berättelsen har gått förbi steget (också efter
@@ -612,7 +617,7 @@ export function skapaSpel(d) {
     let forra = null;
     if (glida) { rum.frys(true); forra = await rum.bild(); }
     if (tonas) { rum.frys(true); await ui.tona(true, tid(300)); }
-    rum.visa({ rum: scen.rum, tillstand: b.rumsTillstand(scen.rum), innehall: r ? innehallNu(r) : [], unge: tillstand.spelare.unge?.folj ?? !!tillstand.spelare.unge?.namn, nyttRum: nytt,
+    rum.visa({ rum: scen.rum, tillstand: b.rumsTillstand(scen.rum), innehall: r ? innehallNu(r) : [], kvar: r ? kvarNu(r) : [], unge: tillstand.spelare.unge?.folj ?? !!tillstand.spelare.unge?.namn, nyttRum: nytt,
       karta: scen.rum ? kartor[scen.rum] ?? null : null, franRum, delar: scen.rum ? delarIRummet(kartor[scen.rum]) : {}, visade: scen.rum ? b.visade(scen.rum) : [] });
     visaRumsskyltar();
     // hjälten sover i sängen när scenen börjar så (scenens hjalte: "sover"), tills han ska röra sig
@@ -659,9 +664,9 @@ export function skapaSpel(d) {
   rum.fragaIgen = (/** @type {any} */ o) => {
     const r = o.talare ? senaste.get(o.talare) : null;
     if (!r || fragar || pausad || !ui.plattan.hidden) return false;
-    // är figuren målet just nu (gå fram till Farfar, ta lappen) går trycket dit i stället
+    // är figuren målet just nu (gå fram till Farfar, ta lappen, bär boken till honom) går trycket dit i stället
     const st = aktuelltSteg;
-    if (st && [st.mal, st.figur, st.fran].includes(o.id)) return false;
+    if (st && [st.mal, st.figur, st.fran, st.till].includes(o.id)) return false;
     fragar = true;
     const varFryst = rum.fryst;
     logg.handelse('fråga igen', o.id);
@@ -2148,6 +2153,9 @@ export function skapaSpel(d) {
       knuff.nollstall(); rum.markera(id, false);
       if (pekad) { rum.markera(pekad, false); rum.ungePekar(null); pekad = null; }
       const fynd = k.sla(ids.indexOf(id));
+      // hjälten svingar (staven eller svärdet), och träffen kommer i svingets mitt
+      rum.svinga(tid(80));
+      await vanta(tid(80));
       if (hugga) { ljud.spela('hugg'); rum.huggen(id); }
       else { ljud.spela(p.foremal ? 'prassel' : 'sla'); rum.slagen(id); }
       logg.handelse(hugga ? 'hugga' : 'svinga', `${id}: ${fynd}`);

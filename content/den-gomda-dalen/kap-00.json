@@ -15,12 +15,14 @@
  },
  "meta": {
   "namn": "Prologen",
-  "version": "0.11.3",
-  "datum": "2026-11-02",
+  "version": "0.13",
+  "datum": "2026-11-04",
   "agare": "Innehåll",
-  "kalla": "Manus 13-prolog-manus.md v1.6. Byggd på repots kap-00.json (0.14.0).",
-  "teknik": "Teknik har lagt in ledningens beslut i formatet, ingen text är ändrad. 2026-10-25: format 2, P28_packa, syns_i på ägget, i_rummet på FILT med lådorna lada_hyllan, lada_hornet och lada_fonstret i stället för hylla_tre_lador, och ga_till till hyllan i s04 borttaget. 2026-10-26 (val i världen): i_rummet och objekt i p0_dorrar och p0_sangen (dorr_mat, dorr_bad, dorr_toa, dorr_sov), p0_skylten (stig_skogen, stig_byn) och p0_dinomat (lada_lang_overst, lada_lang_mitten, lada_lang_nederst, som ersätter tre_langa_lador), foremal lada_med_agg på dunket i s04, och ga_till grind i s22 borttaget (grinden är en öppning i staketet, valet görs på stigarna). 2026-10-27 (hjälpens timing): \"pekar\": true på knuffarna i p0_dorrar (ungen nosar mot dörren med matdoft) och p0_sangen (ungen lutar sig mot rätt dörr). De pekar på svaret och kommer tidigast efter första felet, eller efter 4 s per alternativ och minst 12 s. Övriga knuffar upprepar frågan (p0_filt, p0_skylten) eller hör till uppgifter som inte är läsval (p0_ljus förebild, p0_ungenamn, p0_krukor, gå till lådan i s02) och kommer som förut. Ungens pekning efter tre fel och efter_3_fel kommer efter fel och påverkas inte. 2026-10-27 (v0.10): hallen har åter tillstånden natt och morgon, och s01b, s07, s10, s15 och s17 har tillstand natt, s20 morgon. s01b: vid_annan_utgang med ljudet dunk på ga_till stege_upp (dörrarna är låsta, hjälten tittar upp). s04: ga_till lada_med_agg efter p0_filt är steget bara (filten följer hjälten och läggs om ägget när han når fram). s08: repliken \"Där är ni ju!\" och ga_till farfar_vid_bordet är steget prata med repliken som kall (dialogen börjar inom 1,5 rutor), och repliken med namnet har vid: ungen (namnet syns ovanför ungen). s09: ga_till farfar_vid_bordet är ta_emot (hjälten tar lappen med ett tryck), och \"Tryck på nosen.\" har vantar_pa: nosen. s12: vantar_pa: mata_ungen på bärrepliken. s21: via: radio på provsändningen. 2026-10-27 (grind A, 2f.4): ytterdörren dorr_ut sitter i hallens främre vägg i stället för i köket (koket och hallen i rum), s21 slutar med ga_till dorr_hallen, och den nya scenen s21b_hallen_ut (hallen på morgonen) har ga_till dorr_ut. Scenen har ingen text och ingen vid_omstart än. På natten är ytterdörren låst (kartans last_i): hjälten känner på handtaget. 2026-10-28 (beslut 13.2): s04 börjar med ljudet dunk från lada_med_agg, så att ägglådan hoppar till direkt när ljuset har tänts. Dunket när hjälten står vid lådan finns kvar. 2026-10-29 (T2): skapa_hjalte väljer hudfarg och drakt, hjältens två palettbyten (sparformat 4). Hjälmen och skorna har fasta färger (färger men inte form). 2026-10-30 (T6): v0.11.1 inlagd utan ändrad text. Husets kartor efter stilguiden v0.16: hallen är en entré och en korridor (28 × 12 rutor, kartans typ vagg ger korridoren dess form), och alla fem dörrar står på en skärm minst 3 rutor isär. Nytt rum kontoret (läsrummet). Köket, gästrummet och vinden är omritade, vinden spegelvänd så att stegen står till höger som i hallen. sex_krukor står i en rad nertill (inte två vid väggen och fyra nertill), eftersom P26 utan foremal delar ett föremål. 2026-10-31 (T4b): ljudord på ljud-stegen ordagrant ur Innehålls F11 (dunk, kra, brum, buhu, tok tok). 2026-11-02 (pass 3 med grafik, schema 2.14): s01_natten och s19_morgon har hjalte: \"sover\" (\"Hjälten sover\" i mellanscenen, och morgonen där ungen slickar honom på näsan). Ingen text ändrad. 2026-11-02 (pass 3 komplett, Stil 20:35): mellanscenerna i s19 och s22 har bild (morgonen i sängen, luftskeppets lägen och sidovyn in_i_skogen). v0.11.3 inlagd utan ändrad text (schema 2.15): vantar_pa radion i s21 och kapitelrubrik på \"Kapitel 1. Skogen.\" i s22, så att rubriken inte visas när kapitel 1 är låst. 2026-11-03 (pass 3 för spelaren, Stil 21:20): bild luftskepp_laser_skyltarna på mellanscenen där baronen läser skyltarna med kikaren åt fel håll. Luftskeppet flyger mot SKOLAN och ut ur bild före sidovyn. Ingen text ändrad.",
-  "innehall_v0113": "v0.11.3 (Innehåll 2026-11-02, beslut 29, granskningen A 14–21): bara pass 3. Baronens motiv är kartan, och han läser SKOLAN som SKOGEN. s21 slutar med målet på radion, och radion lärs ut (vantar_pa radion). Packlistan har instruktion och kort som bara är bilder. Tidigare versioner: Innehålls rapporter (rapport-innehall-arkiv*.md) och 13. Tiden per pass räknar kontrollen."
+  "kalla": "Manus 13-prolog-manus.md v1.8. Byggd på v0.12, som bygger på repots kap-00.json från 0.19.0.",
+  "teknik": "Teknik har lagt in ledningens beslut i formatet, ingen text är ändrad. 2026-10-25: format 2, P28_packa, syns_i på ägget, i_rummet på FILT med lådorna lada_hyllan, lada_hornet och lada_fonstret i stället för hylla_tre_lador, och ga_till till hyllan i s04 borttaget. 2026-10-26 (val i världen): i_rummet och objekt i p0_dorrar och p0_sangen (dorr_mat, dorr_bad, dorr_toa, dorr_sov), p0_skylten (stig_skogen, stig_byn) och p0_dinomat (lada_lang_overst, lada_lang_mitten, lada_lang_nederst, som ersätter tre_langa_lador), foremal lada_med_agg på dunket i s04, och ga_till grind i s22 borttaget (grinden är en öppning i staketet, valet görs på stigarna). 2026-10-27 (hjälpens timing): \"pekar\": true på knuffarna i p0_dorrar (ungen nosar mot dörren med matdoft) och p0_sangen (ungen lutar sig mot rätt dörr). De pekar på svaret och kommer tidigast efter första felet, eller efter 4 s per alternativ och minst 12 s. Övriga knuffar upprepar frågan (p0_filt, p0_skylten) eller hör till uppgifter som inte är läsval (p0_ljus förebild, p0_ungenamn, p0_krukor, gå till lådan i s02) och kommer som förut. Ungens pekning efter tre fel och efter_3_fel kommer efter fel och påverkas inte. 2026-10-27 (v0.10): hallen har åter tillstånden natt och morgon, och s01b, s07, s10, s15 och s17 har tillstand natt, s20 morgon. s01b: vid_annan_utgang med ljudet dunk på ga_till stege_upp (dörrarna är låsta, hjälten tittar upp). s04: ga_till lada_med_agg efter p0_filt är steget bara (filten följer hjälten och läggs om ägget när han når fram). s08: repliken \"Där är ni ju!\" och ga_till farfar_vid_bordet är steget prata med repliken som kall (dialogen börjar inom 1,5 rutor), och repliken med namnet har vid: ungen (namnet syns ovanför ungen). s09: ga_till farfar_vid_bordet är ta_emot (hjälten tar lappen med ett tryck), och \"Tryck på nosen.\" har vantar_pa: nosen. s12: vantar_pa: mata_ungen på bärrepliken. s21: via: radio på provsändningen. 2026-10-27 (grind A, 2f.4): ytterdörren dorr_ut sitter i hallens främre vägg i stället för i köket (koket och hallen i rum), s21 slutar med ga_till dorr_hallen, och den nya scenen s21b_hallen_ut (hallen på morgonen) har ga_till dorr_ut. Scenen har ingen text och ingen vid_omstart än. På natten är ytterdörren låst (kartans last_i): hjälten känner på handtaget. 2026-10-28 (beslut 13.2): s04 börjar med ljudet dunk från lada_med_agg, så att ägglådan hoppar till direkt när ljuset har tänts. Dunket när hjälten står vid lådan finns kvar. 2026-10-29 (T2): skapa_hjalte väljer hudfarg och drakt, hjältens två palettbyten (sparformat 4). Hjälmen och skorna har fasta färger (färger men inte form). 2026-10-30 (T6): v0.11.1 inlagd utan ändrad text. Husets kartor efter stilguiden v0.16: hallen är en entré och en korridor (28 × 12 rutor, kartans typ vagg ger korridoren dess form), och alla fem dörrar står på en skärm minst 3 rutor isär. Nytt rum kontoret (läsrummet). Köket, gästrummet och vinden är omritade, vinden spegelvänd så att stegen står till höger som i hallen. sex_krukor står i en rad nertill (inte två vid väggen och fyra nertill), eftersom P26 utan foremal delar ett föremål. 2026-10-31 (T4b): ljudord på ljud-stegen ordagrant ur Innehålls F11 (dunk, kra, brum, buhu, tok tok). 2026-11-02 (pass 3 med grafik, schema 2.14): s01_natten och s19_morgon har hjalte: \"sover\" (\"Hjälten sover\" i mellanscenen, och morgonen där ungen slickar honom på näsan). Ingen text ändrad. 2026-11-02 (pass 3 komplett, Stil 20:35): mellanscenerna i s19 och s22 har bild (morgonen i sängen, luftskeppets lägen och sidovyn in_i_skogen). v0.11.3 inlagd utan ändrad text (schema 2.15): vantar_pa radion i s21 och kapitelrubrik på \"Kapitel 1. Skogen.\" i s22, så att rubriken inte visas när kapitel 1 är låst. 2026-11-03 (pass 3 för spelaren, Stil 21:20): bild luftskepp_laser_skyltarna på mellanscenen där baronen läser skyltarna med kikaren åt fel håll. Luftskeppet flyger mot SKOLAN och ut ur bild före sidovyn. Ingen text ändrad. 2026-11-05 (0.21.0): v0.12 och v0.13 inlagda utan ändrad text. I meta.innehall_v012 står \"spelarens pass 3\" i stället för ett namn (repot är publikt, 41.4). s21b (Innehålls FÖRSLAG, 34.2): Farfar står vid ytterdörren (farfar_vid_dorren i hallen, dold tills visa_foremal först i s21b) och vänder sig mot hjälten när han talar.",
+  "innehall_v0113": "v0.11.3 (Innehåll 2026-11-02, beslut 29, granskningen A 14–21): bara pass 3. Baronens motiv är kartan, och han läser SKOLAN som SKOGEN. s21 slutar med målet på radion, och radion lärs ut (vantar_pa radion). Packlistan har instruktion och kort som bara är bilder. Tidigare versioner: Innehålls rapporter (rapport-innehall-arkiv*.md) och 13. Tiden per pass räknar kontrollen.",
+  "innehall_v012": "Nästa prologversion efter spelarens pass 3 (beslut 34.4–34.6, 36.7, 37.5, 38.2–38.4, granskningen C 26 och 28–30). Hela listan står i 13 v1.7.",
+  "innehall_v013": "Beslut 39.1, genomgången av samspelen: sex instruktioner med verb och mål (s01, s01b, s06, s14, s15, s21) och \"Hej, {hjalte}!\" i s00. Hela genomgången står i 13 v1.8."
  },
  "rum": [
   {
@@ -63,7 +65,11 @@
     "dorr_mat",
     "dorr_sov",
     "dorr_bad",
-    "dorr_ut"
+    "dorr_ut",
+    {
+     "id": "farfar_vid_dorren",
+     "dold": true
+    }
    ],
    "tillstand": [
     "natt",
@@ -160,6 +166,12 @@
      "upplast": true
     },
     {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Vem är du? Välj din hjälte.",
+     "upplast": true
+    },
+    {
      "typ": "skapa_hjalte",
      "delar": [
       "hudfarg",
@@ -168,16 +180,17 @@
      "bara_bilder": true
     },
     {
-     "typ": "replik",
-     "talare": "berattare",
-     "text": "Vem är du? Välj din hjälte.",
-     "upplast": true
-    },
-    {
      "typ": "pussel",
      "pussel_id": "p0_hjaltenamn"
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Hej, {hjalte}!",
+     "upplast": true
     }
-   ]
+   ],
+   "anteckning": "v0.12 (C 30): \"Välj din hjälte.\" kommer före valet, inte efter. v0.13 (39.1): \"Hej, {hjalte}!\" efter namnet, så att valet har ett slut, som \"Hej, {unge}!\" i s06."
   },
   {
    "id": "s01_natten",
@@ -219,7 +232,13 @@
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Hörde du? Mina knän är för stela. Gå upp och titta!",
+     "text": "Hörde du? Mina knän klarar inte stegen.",
+     "upplast": true
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Gå upp och titta!",
      "upplast": true
     },
     {
@@ -227,12 +246,18 @@
      "beskrivning": "Farfar går ut i hallen, mot sitt läsrum."
     },
     {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Gå ut i hallen!",
+     "upplast": true
+    },
+    {
      "typ": "ga_till",
      "mal": "dorr_hallen",
      "visa_styrhjalp": true
     }
    ],
-   "anteckning": "Spelets första steg. Styrbilden för att gå visas här (flyttad från s02)."
+   "anteckning": "Spelets första steg. Styrbilden för att gå visas här (flyttad från s02). v0.12 (C 30): \"Mina knän klarar inte stegen.\" säger konkret varför Farfar inte går upp. Knä-skämtet i s21 står kvar. v0.13 (39.1, loggen 18 s): \"Gå ut i hallen!\" efter att Farfar har gått, eftersom \"Gå upp och titta!\" inte nämner dörren. Farfar som går är slutet på samtalet."
   },
   {
    "id": "s01b_hallen",
@@ -259,6 +284,12 @@
      "beskrivning": "Hjälten tittar upp. Stegen lyser."
     },
     {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Klättra upp för stegen!",
+     "upplast": true
+    },
+    {
      "typ": "ga_till",
      "mal": "stege_upp",
      "vid_annan_utgang": {
@@ -266,7 +297,7 @@
      }
     }
    ],
-   "anteckning": "Dörrarna i hallen är låsta tills ägget har kläckts (teknik 2d.1). Går hjälten till en dörr: dunk ovanifrån och hjälten tittar upp, ingen text. Skyltarna syns redan här, men går inte att välja."
+   "anteckning": "Dörrarna i hallen är låsta tills ägget har kläckts (teknik 2d.1). Går hjälten till en dörr: dunk ovanifrån och hjälten tittar upp, ingen text. Skyltarna syns redan här, men går inte att välja. v0.13 (39.1): \"Klättra upp för stegen!\", annars står \"Gå ut i hallen!\" kvar i molnet när han redan är i hallen."
   },
   {
    "id": "s02_glimten",
@@ -288,7 +319,7 @@
     {
      "typ": "replik",
      "talare": "berattare",
-     "text": "Gå och titta.",
+     "text": "Gå till glimten!",
      "upplast": true
     },
     {
@@ -304,7 +335,8 @@
       }
      }
     }
-   ]
+   ],
+   "anteckning": "v0.12 (34.6): \"Gå till glimten!\" har verb och mål."
   },
   {
    "id": "s03_staven",
@@ -357,6 +389,12 @@
      "beskrivning": "I ljuset syns en låda längre bort, som inte syntes i mörkret."
     },
     {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Gå till lådan!",
+     "upplast": true
+    },
+    {
      "typ": "ga_till",
      "mal": "lada_med_agg"
     },
@@ -387,15 +425,22 @@
      "pussel_id": "p0_filt"
     },
     {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Lägg filten på ägget!",
+     "upplast": true
+    },
+    {
      "typ": "bara",
      "bild": "filt",
      "till": "lada_med_agg"
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Filten läggs om ägget. Frosten smälter."
+     "beskrivning": "Filten läggs om ägget. Frosten smälter, men ägget sover."
     }
-   ]
+   ],
+   "anteckning": "v0.12 (34.6, C 30): \"Gå till lådan!\" efter LJUS och \"Lägg filten på ägget!\" före bara. Filten är omsorg och värmer, men ägget sover tills ordkraften väcker det (C 26, 06 §2)."
   },
   {
    "id": "s05_klackningen",
@@ -409,12 +454,12 @@
    "steg": [
     {
      "typ": "mellanscen",
-     "beskrivning": "Ägget blir varmt och lyser svagt inifrån."
+     "beskrivning": "Ägget börjar lysa i stavens regnbågsfärger, starkare och starkare."
     },
     {
      "typ": "replik",
      "talare": "berattare",
-     "text": "Ägget blir varmt. Det lyser som staven!",
+     "text": "Ägget lyser som staven! Dina ord väckte det.",
      "upplast": true
     },
     {
@@ -452,10 +497,11 @@
     {
      "typ": "replik",
      "talare": "berattare",
-     "text": "Vad var det vid fönstret?",
+     "text": "Någon tittade in genom fönstret!",
      "upplast": true
     }
-   ]
+   ],
+   "anteckning": "v0.12 (C 26, 36.7, 38.3): ägget lyser i stavens färger och kläcks av hans ord, inte av värmen. C 30: frågan vid fönstret blir ett påstående, så att han inte tror att han ska gå dit. Baronen svarar i s22 (\"Herr Skata såg ljuset i natt!\")."
   },
   {
    "id": "s06_namnet",
@@ -486,14 +532,15 @@
     {
      "typ": "replik",
      "talare": "berattare",
-     "text": "Visa {unge} för Farfar!",
+     "text": "Gå ner och visa {unge} för Farfar!",
      "upplast": true
     },
     {
      "typ": "ga_till",
      "mal": "stege_ner"
     }
-   ]
+   ],
+   "anteckning": "v0.13 (39.1): \"Gå ner och visa {unge} för Farfar!\" säger både vart och varför."
   },
   {
    "id": "s07_dorrarna",
@@ -561,13 +608,7 @@
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Staven vaknade för dig. Då har du ordkraft!",
-     "upplast": true
-    },
-    {
-     "typ": "replik",
-     "talare": "farfar",
-     "text": "Jag har väntat på den här natten i många år.",
+     "text": "Staven vaknade för dig. Du har ordkraft!",
      "upplast": true
     },
     {
@@ -605,18 +646,12 @@
      "upplast": true
     },
     {
-     "typ": "replik",
-     "talare": "farfar",
-     "text": "Allt annat berättar jag sen.",
-     "upplast": true
-    },
-    {
      "typ": "sparpunkt",
      "pass_slut": true,
      "valfri": false
     }
    ],
-   "anteckning": "Dialogregeln: Farfar kallar ('Där är ni ju!') när dörren öppnas, och dialogen startar när hjälten är inom ca 1,5 rutor. Namnet läses upp av berättarrösten, som om hjälten svarar. Farfar sitter i läsrummet (kontoret) på natten."
+   "anteckning": "Dialogregeln: Farfar kallar ('Där är ni ju!') när dörren öppnas, och dialogen startar när hjälten är inom ca 1,5 rutor. Namnet läses upp av berättarrösten, som om hjälten svarar. Farfar sitter i läsrummet (kontoret) på natten. v0.12 (C 28): sex repliker i stället för åtta. \"Jag har väntat på den här natten i många år.\" och \"Allt annat berättar jag sen.\" är borttagna."
   },
   {
    "id": "s09_lappen",
@@ -694,11 +729,17 @@
      "upplast": true
     },
     {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Gå upp på vinden!",
+     "upplast": true
+    },
+    {
      "typ": "ga_till",
      "mal": "dorr_hallen"
     }
    ],
-   "anteckning": "Nosen görs av spelaren (teknik 2c.2): nosen glider in och lyser, \"Tryck på nosen.\" väntar tills han har tryckt, sedan trycker han på DINOMAT och hör ordet (gratis). Platsen (vinden) sägs högt, det som ska väljas läses på lappen."
+   "anteckning": "Nosen görs av spelaren (teknik 2c.2): nosen glider in och lyser, \"Tryck på nosen.\" väntar tills han har tryckt, sedan trycker han på DINOMAT och hör ordet (gratis). Platsen (vinden) sägs högt, det som ska väljas läses på lappen. v0.12 (34.6): \"Gå upp på vinden!\" före målet. Den följer med till stegen i hallen (s10), eftersom rummet byts."
   },
   {
    "id": "s10_upp_igen",
@@ -803,14 +844,15 @@
     {
      "typ": "replik",
      "talare": "berattare",
-     "text": "Svinga staven mot krukorna.",
+     "text": "Vifta med staven mot krukorna!",
      "upplast": true
     },
     {
      "typ": "pussel",
      "pussel_id": "p0_krukor"
     }
-   ]
+   ],
+   "anteckning": "v0.12 (37.5): \"Vifta med staven mot krukorna!\", som i kapitel 1. SVINGA har NG."
   },
   {
    "id": "s14_kartbiten",
@@ -850,14 +892,15 @@
     {
      "typ": "replik",
      "talare": "berattare",
-     "text": "Visa kartbiten för Farfar!",
+     "text": "Gå ner och visa kartbiten för Farfar!",
      "upplast": true
     },
     {
      "typ": "ga_till",
      "mal": "stege_ner"
     }
-   ]
+   ],
+   "anteckning": "v0.13 (39.1): \"Gå ner och visa kartbiten för Farfar!\", som i s06."
   },
   {
    "id": "s15_till_koket",
@@ -871,10 +914,17 @@
    },
    "steg": [
     {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Gå in till Farfar!",
+     "upplast": true
+    },
+    {
      "typ": "ga_till",
      "mal": "dorr_bok"
     }
-   ]
+   ],
+   "anteckning": "v0.13 (39.1): \"Gå in till Farfar!\" i hallen. Vilken dörr läser han själv (BOK)."
   },
   {
    "id": "s16_godnattsagan",
@@ -892,8 +942,14 @@
      "beskrivning": "Farfar sitter i sin fåtölj under läslampan. Den andra fåtöljen är ledig."
     },
     {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Gå till Farfar!",
+     "upplast": true
+    },
+    {
      "typ": "ga_till",
-     "mal": "fatolj_vanster"
+     "mal": "farfar_i_fatoljen"
     },
     {
      "typ": "replik",
@@ -912,8 +968,33 @@
      "mal": "expeditionsbok"
     },
     {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Ge boken till Farfar!",
+     "upplast": true
+    },
+    {
+     "typ": "bara",
+     "bild": "expeditionsbok",
+     "till": "farfar_i_fatoljen"
+    },
+    {
      "typ": "mellanscen",
-     "beskrivning": "Hjälten sätter sig med boken. Ungen kryper upp i filten i hans knä."
+     "beskrivning": "Farfar tar boken och slår upp den."
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Sätt dig hos Farfar.",
+     "upplast": true
+    },
+    {
+     "typ": "ga_till",
+     "mal": "fatolj_vanster"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Hjälten sitter i fåtöljen. Ungen kryper upp i filten i hans knä."
     },
     {
      "typ": "bok",
@@ -934,7 +1015,7 @@
        "bildtext": "träd",
        "text": [
         "I dalen växer Ordträdet. Din stav kommer därifrån.",
-        "Den gör ord till saker, om man har ordkraft."
+        "Den gör ord till saker. Som när du tände LJUS!"
        ]
       },
       {
@@ -949,9 +1030,9 @@
        "bild": "unge_farfar_far_agg",
        "bildtext": "ägg",
        "text": [
-        "Dalens ägg kläcks bara av ordkraft.",
-        "Min vän gav mig sitt ägg, så att det skulle kläckas.",
-        "Men min ordkraft hade somnat. Jag lovade att hitta någon."
+        "Dalens ägg är kalla. Bara ordkraft väcker dem.",
+        "Min vän gav mig sitt ägg.",
+        "Min ordkraft hade somnat. Men din väckte ägget!"
        ]
       }
      ]
@@ -959,13 +1040,7 @@
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Nu har jag hållit mitt löfte.",
-     "upplast": true
-    },
-    {
-     "typ": "replik",
-     "talare": "farfar",
-     "text": "Du kan din första magi. Nu är du lärling!",
+     "text": "Du lär dig magi. Därför är du lärling!",
      "upplast": true
     },
     {
@@ -994,7 +1069,7 @@
      "mal": "dorr_hallen"
     }
    ],
-   "anteckning": "Sagan i Farfars läsrum, kortad till ca 1:40 (från ca 2:45 vid grind A): fyra uppslag i stället för fem. Kartan i sju bitar flyttas till uppdraget i s21. Boken: uppslag 1 läses av sig själv, sedan glimtar sidhörnet, och från uppslag 2 bläddrar spelaren själv (teknik 2c.7). Hjälten sätter sig själv i den lediga fåtöljen och hämtar boken i bokhyllan."
+   "anteckning": "Sagan i Farfars läsrum, kortad till ca 1:40 (från ca 2:45 vid grind A): fyra uppslag i stället för fem. Kartan i sju bitar flyttas till uppdraget i s21. Boken: uppslag 1 läses av sig själv, sedan glimtar sidhörnet, och från uppslag 2 bläddrar spelaren själv (teknik 2c.7). v0.12: han går till Farfar, hämtar boken och ger den till Farfar (34.5), och sätter sig själv i fåtöljen (34.4, \"Sätt dig hos Farfar.\" i stället för FÅTÖLJEN, 37.5). Varje mål har en instruktion med verb och mål (34.6). Sagan: uppslag 2 hänvisar till det han har sett (\"Som när du tände LJUS!\", 38.3), och uppslag 4 har regeln om kalla ägg och enklare språk (C 26, C 29). \"Nu har jag hållit mitt löfte.\" är borttagen, och \"Du lär dig magi. Därför är du lärling!\" förklarar graden (C 30)."
   },
   {
    "id": "s17_sovdags",
@@ -1025,6 +1100,12 @@
    },
    "steg": [
     {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Kryp ner i sängen!",
+     "upplast": true
+    },
+    {
      "typ": "ga_till",
      "mal": "sang"
     },
@@ -1043,7 +1124,8 @@
      "pass_slut": true,
      "valfri": false
     }
-   ]
+   ],
+   "anteckning": "v0.12 (34.6): \"Kryp ner i sängen!\" före målet, eftersom kedjan i molnet nollas efter pusslet i hallen."
   },
   {
    "id": "s19_morgon",
@@ -1071,14 +1153,15 @@
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Frukost! Kom till köket!",
+     "text": "Frukost! Kom dit vi äter!",
      "upplast": true
     },
     {
      "typ": "ga_till",
      "mal": "dorr_hallen"
     }
-   ]
+   ],
+   "anteckning": "v0.12 (37.5): \"Kom dit vi äter!\" i stället för KÖKET, som har mjukt K. Han hittar dörren MAT genom att förstå meningen, som BOK i s07."
   },
   {
    "id": "s20_hallen_morgon",
@@ -1187,7 +1270,7 @@
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Hitta bitarna. Följ {unge} hem!",
+     "text": "Kartan visar vägen till mamma. Hitta bitarna!",
      "upplast": true,
      "via": "radio"
     },
@@ -1203,11 +1286,23 @@
      "vantar_pa": "radion"
     },
     {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Kom, jag följer er till dörren.",
+     "upplast": true
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Gå ut i hallen!",
+     "upplast": true
+    },
+    {
      "typ": "ga_till",
      "mal": "dorr_hallen"
     }
    ],
-   "anteckning": "v0.11.3 (A 14, 16–18): kortare, målet i en mening, ingen tjuv. Målet är Farfars enda replik genom radion, så det är den radioknappen upprepar. \"Tryck på radion ...\" säger han i rummet, och scenen väntar tills spelaren har tryckt (som nosen i s09)."
+   "anteckning": "v0.11.3 (A 14, 16–18): kortare, målet i en mening, ingen tjuv. Målet är Farfars enda replik genom radion, så det är den radioknappen upprepar. \"Tryck på radion ...\" säger han i rummet, och scenen väntar tills spelaren har tryckt (som nosen i s09). v0.12 (38.4): radion säger \"Kartan visar vägen till mamma. Hitta bitarna!\", så att kartbitarna hänger ihop med vägen hem. Farfar följer dem till ytterdörren (38.2). v0.13 (39.1, loggen 17 s): \"Gå ut i hallen!\" efter \"Kom, jag följer er till dörren.\", som inte säger vilken dörr."
   },
   {
    "id": "s21b_hallen_ut",
@@ -1215,6 +1310,32 @@
    "rum": "hallen",
    "tillstand": "morgon",
    "steg": [
+    {
+     "typ": "visa_foremal",
+     "foremal": "farfar_vid_dorren"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Farfar står vid ytterdörren. Han kramar hjälten, och ungen slickar honom på näsan."
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Hej då, mina vänner!",
+     "upplast": true
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Jag hör er på radion.",
+     "upplast": true
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Gå ut genom dörren!",
+     "upplast": true
+    },
     {
      "typ": "ga_till",
      "mal": "dorr_ut"
@@ -1224,7 +1345,8 @@
     "talare": "farfar",
     "text": "Var var vi? Farfars lista visar vägen.",
     "upplast": true
-   }
+   },
+   "anteckning": "v0.12 (38.2): Farfars hejdå vid ytterdörren är gränsen mellan huset och äventyret. Han säger det själv och står i hallen, inte på radion. FÖRSLAG till Teknik: Farfar står vid dorr_ut i hallen under s21b och vänder sig mot hjälten (34.2). Efter dörren hörs han bara på radion."
   },
   {
    "id": "s22_tradgarden",
@@ -1315,7 +1437,8 @@
      "typ": "replik",
      "talare": "farfar",
      "text": "Nu tävlar vi! Gå dit listan säger!",
-     "upplast": true
+     "upplast": true,
+     "via": "radio"
     },
     {
      "typ": "pussel",
@@ -1350,7 +1473,7 @@
      "valfri": false
     }
    ],
-   "anteckning": "Baronen presenterar sig, och Herr Skata svarar på frågan från vindsfönstret (samma skratt, fagel_late, inget ljudord). v0.11.3 (A 14, 15, 17, 20): motivet planteras med kartbiten, och efter hjältens rätta val läser baronen slarvigt (\"Skolan... skogen... samma sak!\"). Klantig, aldrig läskig (18.2). Kapitelrubriken visas inte när kapitel 1 är låst (Teknik), och slutrutan står i aventyr.json."
+   "anteckning": "Baronen presenterar sig, och Herr Skata svarar på frågan från vindsfönstret (samma skratt, fagel_late, inget ljudord). v0.11.3 (A 14, 15, 17, 20): motivet planteras med kartbiten, och efter hjältens rätta val läser baronen slarvigt (\"Skolan... skogen... samma sak!\"). Klantig, aldrig läskig (18.2). Kapitelrubriken visas inte när kapitel 1 är låst (Teknik), och slutrutan står i aventyr.json. v0.12: Farfar talar genom radion i trädgården, eftersom han sa hej då vid dörren."
   }
  ],
  "pussel": [
@@ -1401,7 +1524,7 @@
     "replik": {
      "typ": "replik",
      "talare": "berattare",
-     "text": "Du skrev LJUS. Då blev det ljust!",
+     "text": "Du skrev LJUS, och det blev ljust. Det är ordkraft!",
      "upplast": true
     },
     "fest": "mellan"
@@ -1422,7 +1545,7 @@
     "efter_fel": 2,
     "andring": "nästa rätta bokstav blinkar"
    },
-   "anteckning": "Förebilden är inristad längs staven. Kopieringsuppgift, räknas inte som läsuppgift."
+   "anteckning": "Förebilden är inristad längs staven. Kopieringsuppgift, räknas inte som läsuppgift. v0.12 (38.3): ordet ORDKRAFT sägs i stunden då det händer."
   },
   {
    "id": "p0_filt",
@@ -1576,7 +1699,7 @@
         "replik": {
          "typ": "replik",
          "talare": "berattare",
-         "text": "Ring! Där var bara Farfars klocka.",
+         "text": "Ring! Farfar är där böckerna är.",
          "upplast": true
         }
        }
@@ -1601,7 +1724,7 @@
    "efter_3_fel": {
     "handling": "ungen skrapar på rätt dörr"
    },
-   "anteckning": "L1 med slutsats: Farfar ropar 'Jag är där böckerna är!', och tankebubblan visar en bok. Fem dörrar med Farfars lappar. FARFAR är en lockande fälla: dörren heter Farfar, men han sitter i läsrummet. Fel dörr öppnas aldrig, och skämtet hörs bakom dörren. Alla fem dörrar ska synas på samma skärm."
+   "anteckning": "L1 med slutsats: Farfar ropar 'Jag är där böckerna är!', och tankebubblan visar en bok. Fem dörrar med Farfars lappar. FARFAR är en lockande fälla: dörren heter Farfar, men han sitter i läsrummet. Fel dörr öppnas aldrig, och skämtet hörs bakom dörren. Alla fem dörrar ska synas på samma skärm. v0.12 (C 30): felrepliken vid FARFAR upprepar ledtråden (\"Ring! Farfar är där böckerna är.\"), så att felet lär ut slutsatsen: han läste rätt ord, men Farfar sa var han är."
   },
   {
    "id": "p0_dinomat",
@@ -1745,10 +1868,10 @@
        }
       },
       {
-       "id": "lok",
-       "ord": "lök",
+       "id": "sol",
+       "ord": "sol",
        "vid_valj": {
-        "reaktion": "ungen nyser, tårar i ögonen",
+        "reaktion": "en liten sol rullar ut och lyser upp ungens förvånade ansikte",
         "replik": {
          "typ": "replik",
          "talare": "berattare",
@@ -1769,7 +1892,8 @@
    },
    "efter_3_fel": {
     "handling": "ungen nosar mot rätt påse"
-   }
+   },
+   "anteckning": "v0.12 (C 30): LÖK är utbytt mot SOL. LÖK är mat som ungen skulle kunna äta, och dess Ö bryter mot regeln att distraktorerna inte har Å, Ä eller Ö när rätt svar har det (08 §3)."
   },
   {
    "id": "p0_krukor",
