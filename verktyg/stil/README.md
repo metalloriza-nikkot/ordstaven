@@ -9,6 +9,6 @@ inkorgens `skript/stilskript.zip` varje gång zippen uppdateras, efter integrite
 - **Körning:** bilderna i `ut/`-mapparna görs genom att köra skripten i ordningen figurer → `efx` → `prov` → `rutor`
   → `kort` → `hus` → `pass3`, eftersom de senare läser de tidigares bilder. Skripten räknar med att mapparna ligger
   direkt i `/home/claude/` (kopiera dit), och `hus.py` läser kartorna ur en klon av repot i `/home/claude/ordstaven`.
-- **Ut i spelet:** bilderna läggs i Niklas inkorg och förs in i `assets/` med `verktyg/grafik/inkorg.py`.
+- **Ut i spelet:** bilderna läggs i inkorgen och förs in i `assets/` med `verktyg/grafik/inkorg.py`.
 
 Skripten ändras bara av Stil. Teknik byter filerna, ändrar dem inte.

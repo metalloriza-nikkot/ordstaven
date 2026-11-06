@@ -1,0 +1,92 @@
+#!/usr/bin/env python3
+# Namnkontrollen före push (beslut 42.3 och 43.3). Repot är publikt, och git sparar historiken: ett riktigt namn
+# som har pushats går inte att ta tillbaka. Kroken stoppar pushen innan något lämnar datorn.
+#
+# Kroken har inga namn och inga ledtrådar till namn. De står i filer utanför repot:
+#   ~/.config/ordstaven/namn     ett namn per rad (skrivs ur projektets namnlista när en ny chatt börjar)
+#   ~/.config/ordstaven/monster  reguljära uttryck, ett per rad (frivillig), för det som inte är namn
+# Rader som börjar med # hoppas över. Saknas namnfilen, eller är den tom, stoppas pushen.
+#
+# Kroken söker i allt som ska pushas, commit för commit: varje tillagd rad i diffen (också binära filer, så att
+# text i en bilds metadata kommer med), filnamnen, commit-meddelandet och namnen på författare och committer.
+# Ett namn hittas i alla skiftlägen och böjningar (namnet med -s), men inte mitt i ett annat ord.
+#
+# Koppla in: git config core.hooksPath verktyg/git-krokar
+# Kör aldrig git push --no-verify. Säger kroken nej, ta bort namnet och gör om commiten.
+import os, re, subprocess, sys
+
+HEM = os.path.expanduser('~/.config/ordstaven')
+NOLL = '0' * 40
+
+
+def rader(fil):
+    try:
+        with open(fil, encoding='utf-8') as f:
+            return [r.strip() for r in f if r.strip() and not r.lstrip().startswith('#')]
+    except FileNotFoundError:
+        return None
+
+
+def git(*arg):
+    return subprocess.run(['git', *arg], capture_output=True, check=True).stdout.decode('utf-8', errors='replace')
+
+
+def utdrag(text, m, bredd=40):
+    a, b = max(0, m.start() - bredd), min(len(text), m.end() + bredd)
+    return ('…' if a else '') + text[a:b].strip() + ('…' if b < len(text) else '')
+
+
+def main():
+    namn = rader(os.path.join(HEM, 'namn'))
+    if not namn:
+        print('NAMNKONTROLLEN: ~/.config/ordstaven/namn saknas eller är tom. Pushen stoppas.', file=sys.stderr)
+        print('Skriv namnen ur projektets namnlista dit (ett per rad) och pusha igen.', file=sys.stderr)
+        return 1
+    alt = '|'.join(re.escape(n) for n in sorted(set(namn), key=len, reverse=True))
+    regler = [re.compile(r'(?<![A-Za-zÅÄÖåäöÉé])(' + alt + ')', re.IGNORECASE)]
+    for m in rader(os.path.join(HEM, 'monster')) or []:
+        regler.append(re.compile(m, re.IGNORECASE))
+
+    commits = []
+    for rad in sys.stdin.read().splitlines():
+        delar = rad.split()
+        if len(delar) != 4 or delar[1] == NOLL:
+            continue  # en gren som tas bort
+        lokal, fjarr = delar[1], delar[3]
+        omfang = [lokal, '--not', '--remotes'] if fjarr == NOLL else [f'{fjarr}..{lokal}']
+        commits += [c for c in git('rev-list', '--reverse', *omfang).split() if c not in commits]
+
+    fynd = []
+    for c in commits:
+        kort = c[:7]
+        huvud = git('log', '-1', '--format=%an%n%ae%n%cn%n%ce%n%B', c)
+        for r in huvud.splitlines():
+            for rx in regler:
+                for m in rx.finditer(r):
+                    fynd.append(f'{kort} (meddelande eller författare): {utdrag(r, m)}')
+        fil = '?'
+        for r in git('show', '--format=', '--text', '--no-color', '--no-renames', '-U0', c).splitlines():
+            if r.startswith('diff --git '):
+                fil = r.split(' b/', 1)[-1]
+                texten = fil  # filnamnet
+            elif r.startswith('+') and not r.startswith('+++'):
+                texten = r[1:]
+            else:
+                continue
+            for rx in regler:
+                for m in rx.finditer(texten):
+                    fynd.append(f'{kort} {fil}: {utdrag(texten, m)}')
+
+    if fynd:
+        print(f'NAMNKONTROLLEN: {len(fynd)} fynd. Pushen stoppas. Ta bort det och gör om commiten.', file=sys.stderr)
+        for f in fynd[:50]:
+            print('  ' + f, file=sys.stderr)
+        if len(fynd) > 50:
+            print(f'  … och {len(fynd) - 50} till', file=sys.stderr)
+        return 1
+    print(f'Namnkontrollen: {len(commits)} commits utan namn.', file=sys.stderr)
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())

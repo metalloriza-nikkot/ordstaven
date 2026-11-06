@@ -1,4 +1,4 @@
-/* Provsidan för textgrammatiken: en sida för den vuxne (Niklas, Stil). Vanlig skrift, Lexend, läderramen som i spelet. */
+/* Provsidan för textgrammatiken: en sida för den vuxne och Stil. Vanlig skrift, Lexend, läderramen som i spelet. */
 :root {
   --typsnitt: 'Lexend', sans-serif;
   --ram: #2a1d16; --papper: #f5ecd7; --black: #2b2420; --guld: #f2c14e; --som: #6b4c35; --dimma: #d8ccb4;

@@ -2036,7 +2036,8 @@ export function skapaSpel(d) {
         if (medStege) await vanta(tid(600));
         ui.visaPlatta(`<div class="formel-i-luften">${ui.esc(r.s.svar)}</div>`, 'formel-luft');
         await vanta(tid(1000)); ui.doljPlatta();
-        logg.handelse('räddning', r.s.kastat ? 'klar i kasta-läget' : 'klar genom att gissa', { fel: r.s.fel });
+        // "med bokstäverna", inte "genom att gissa": det senare kan läsas som att han gissade (beslut 43.6)
+        logg.handelse('räddning', r.s.kastat ? 'klar i kasta-läget' : 'klar med bokstäverna', { fel: r.s.fel });
         await reaktion(r.s.kastat ? (p.kasta?.vid_ratt ?? p.vid_ratt) : p.vid_ratt);
         // bara kasta-läget räknas som skrivning på S2 (granskningen, B)
         klar({ niva: r.s.kastat ? 'S2' : null, forstaForsoket: r.forstaForsoket, forsok: r.s.fel + 1, hjalp: spar.hjalp });

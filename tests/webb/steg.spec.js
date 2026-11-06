@@ -261,7 +261,7 @@ test('räddningen (apan, v0.7.4): ingen kasta-knapp, ett pinnsteg per fyllt fäl
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('RÄDDAD.', { timeout: 10000 });
   const logg = await page.evaluate(() => window.__ORDSTAVEN.logg());
   expect(logg).toContain('pinnsteg 5 av 5');
-  expect(logg).toContain('klar genom att gissa');
+  expect(logg).toContain('klar med bokstäverna');
 });
 
 test('kodlåset: ungen visar första tecknet, låset kontrolleras när hela ordet är lagt, rätta stannar', async ({ page }) => {

@@ -84,7 +84,7 @@ export const FORMER = [
     namn: 'Instruktion som väntar', plats: 'Tankebubblan uppe i rummet, medan världen går', upplast: 'Ja, igen efter 8 s', visa: 'instruktion',
     kalla: { replik: { kap: 'kap-00', scen: 's12_pasarna', steg: { typ: 'replik', vantar_pa: 'mata_ungen' } } },
     kuliss: { rum: 'inne', saker: [hjalte, unge], hud: ['bar', 'nos'] },
-    not: 'Niklas fråga: den står där frågan annars står. Grundregeln: en uppgift visas med en bild av handlingen. I kapitel 1: "{unge} är rädd." (k1s13).',
+    not: 'Frågan från speltestet: den står där frågan annars står. Grundregeln: en uppgift visas med en bild av handlingen. I kapitel 1: "{unge} är rädd." (k1s13).',
   },
   {
     id: 'inristning', grupp: 'pratar', kap1: 10, skiss: true,

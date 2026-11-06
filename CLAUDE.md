@@ -6,6 +6,7 @@ Läs- och skriväventyr för barn 6–8 år, byggt för en spelare först. Webba
 - Inga uppgifter om den verkliga spelaren i repot: inget namn, ingen ålder, ingen skola, inga bedömningar, inga testobservationer, inga foton. I kod, kommentarer, commit-meddelanden och dokument heter han **"spelaren"**.
 - Testfixturer och exempel använder påhittade namn.
 - `docs/` får bara innehålla design (spelvärld, pussel, stil, teknik). Testloggar och observationer hör inte hemma här.
+- **Namnkontrollen före push** (`verktyg/git-krokar/pre-push`) stoppar en push med ett riktigt namn i en fil, ett filnamn eller ett commit-meddelande. Koppla in den med `git config core.hooksPath verktyg/git-krokar`. Namnen står bara i `~/.config/ordstaven/namn` (och mönster i `~/.config/ordstaven/monster`) på datorn som pushar, aldrig i repot. Saknas filen stoppas pushen. Kör aldrig `git push --no-verify`.
 
 ## Arbetssätt
 - All text i spelet på svenska. Den **visas i VERSALER** men lagras i vanlig skrift (se arkitekturreglerna). Kod, kommentarer och commit-meddelanden på svenska.

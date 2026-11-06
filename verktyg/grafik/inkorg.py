@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Inkorgen → repot (dokument 02 §7, beslut 25.2, 26.5 och 27).
 
-Läser en kopia av Niklas inkorgsmapp och skriver till repot:
+Läser en kopia av inkorgsmappen och skriver till repot:
 
 - figurer/<mapp>/*.png   → assets/sprites/<mapp>/<mapp>.png och .json: ett atlas per mapp (Phaser, JSON Hash).
   Bildens namn i atlaset är filens namn (stilguiden §8 och 10b, t.ex. hjalte_ga_ner_01, unge1_glad_hoger_02).
