@@ -1,5 +1,7 @@
 // @ts-check
-// Uppdragslappen (beslut 37.3 och 40.1, 10d *Uppdragslappen*): kapitlets uppdrag och var i berättelsen de står.
+// Uppdragslappen (beslut 37.3, 40.1, 47 och 48, 10d *Uppdragslappen*): kapitlets uppdrag och var i berättelsen de står.
+// Lappen visar rubriken, bilden, en bock per gjort steg och en tom ring per steg som är kvar. Delstegen har ingen
+// text på lappen (47.2): de styr bara bockarna, ringarna och när stämpeln kommer.
 // Allt räknas ur var berättelsen är (scen och steg), så att lappen alltid stämmer, också efter en omstart, ett hopp i
 // menyn för vuxna eller en framspolning. Inget om lappen sparas, utom vilka påminnelser som har kommit i passet.
 // Rör inte DOM.
@@ -42,8 +44,8 @@ export function hittaSteg(kapitel, scenId, hanv) {
 /**
  * Kapitlets uppdrag med lägena utlästa. Ett uppdrag vars steg inte går att hitta i kapitlet hoppas över (kontrollen
  * säger fel om det i innehållet; i ett provkapitel finns kanske inte scenerna).
- * - Uppdraget **börjar** när berättelsen har ställt frågan: vid den första repliken som lappen ersätter i första
- *   steget, annars vid första stegets eget steg, och aldrig före förra uppdragets stämpel.
+ * - Uppdraget **börjar** vid första stegets eget steg, alltså efter att berättelsen har ställt frågan, och aldrig
+ *   före förra uppdragets stämpel. Fältet `ersatter` används inte (beslut 47.1).
  * - Ett steg är **gjort** när berättelsen har passerat det steg som står i `klart`.
  * - **Stämpeln** kommer när berättelsen har passerat steget i `stampel.efter`.
  * @param {any} kapitel
@@ -60,10 +62,8 @@ export function kompileraUppdrag(kapitel) {
     const stampel = hittaSteg(kapitel, u.stampel?.scen, u.stampel?.efter);
     const saknas = steg.filter((x) => !x.pos).map((x) => x.s.text);
     if (saknas.length || !stampel) { fel.push(`${u.id}: ${saknas.length ? 'stegen ' + saknas.join(', ') : 'stämpeln'} finns inte i kapitlet`); continue; }
-    const forsta = /** @type {Pos} */ (steg[0].pos);
-    const ersatt = (steg[0].s.ersatter || []).map((e) => ersattPos(kapitel, e)).filter((p) => p && jamfor(p, forsta) <= 0);
     /** @type {Pos} */
-    let start = ersatt.length ? /** @type {Pos} */ (ersatt.sort(jamfor)[0]) : forsta;
+    let start = /** @type {Pos} */ (steg[0].pos);
     if (jamfor(start, efterForra) < 0) start = efterForra;
     lista.push({ u, start, steg: /** @type {any} */ (steg), stampel });
     efterForra = [stampel[0], stampel[1] + 1];
@@ -72,52 +72,29 @@ export function kompileraUppdrag(kapitel) {
 }
 
 /**
- * Var en replik som lappen ersätter står: i en scen, eller som instruktionen i ett pussel (scen = pusslets id),
- * och då vid pusslets steg. @param {any} kapitel @param {{ scen: string, text: string }} e @returns {Pos | null}
- */
-function ersattPos(kapitel, e) {
-  const viaScen = hittaSteg(kapitel, e.scen, { replik: e.text });
-  if (viaScen) return viaScen;
-  for (let si = 0; si < kapitel.scener.length; si++) {
-    const ti = kapitel.scener[si].steg.findIndex((/** @type {any} */ st) => st.typ === 'pussel' && st.pussel_id === e.scen);
-    if (ti >= 0) return [si, ti];
-  }
-  return null;
-}
-
-/**
- * Lappen just nu: uppdraget som pågår, de gjorda stegen och steget han gör nu.
+ * Lappen just nu: uppdraget som pågår, de gjorda stegen, steget han gör nu och hur många steg som är kvar (en tom
+ * ring per steg, beslut 48.2). Ett steg som visas med påminnelsen räknas inte förrän påminnelsen har kommit, annars
+ * avslöjar ringen att det finns något mer att göra.
  * @param {KompileratUppdrag[]} lista @param {Pos} pos var berättelsen är (steget som pågår eller kommer)
  * @param {Set<string>} [paminda] steg med `visas: med_paminnelse` vars påminnelse har kommit (`<uppdrag>/<steg>`)
- * @returns {{ k: KompileratUppdrag, gjorda: UppdragsSteg[], nu: UppdragsSteg | null, nuIndex: number } | null}
+ * @returns {{ k: KompileratUppdrag, gjorda: UppdragsSteg[], nu: UppdragsSteg | null, nuIndex: number, kvar: number } | null}
  */
 export function lappenNu(lista, pos, paminda = new Set()) {
   const k = lista.find((x) => jamfor(x.start, pos) <= 0 && jamfor(pos, x.stampel) <= 0);
   if (!k) return null;
   const gjorda = [];
-  let nu = null, nuIndex = -1;
+  let nu = null, nuIndex = -1, kvar = 0, forstaKvar = true;
   for (let i = 0; i < k.steg.length; i++) {
     const { s, pos: p } = k.steg[i];
     if (jamfor(p, pos) < 0) { gjorda.push(s); continue; }
-    if (s.visas !== 'med_paminnelse' || paminda.has(`${k.u.id}/${i}`)) { nu = s; nuIndex = i; }
-    break;
+    const synligt = s.visas !== 'med_paminnelse' || paminda.has(`${k.u.id}/${i}`);
+    if (synligt) kvar++;
+    // steget han gör nu är det första som inte är gjort, om det syns
+    if (forstaKvar && synligt) { nu = s; nuIndex = i; }
+    forstaKvar = false;
   }
-  return { k, gjorda, nu, nuIndex };
+  return { k, gjorda, nu, nuIndex, kvar };
 }
 
 /** Uppdragen som är klara (stämplade) före ett läge, i ordning. @param {KompileratUppdrag[]} lista @param {Pos} pos */
 export const klaraFore = (lista, pos) => lista.filter((x) => jamfor(x.stampel, pos) < 0).map((x) => x.u);
-
-/**
- * Ersätter lappen en replik i en scen (eller instruktionen i ett pussel)? Bara när lappen syns.
- * @param {any} kapitel @param {string} scenEllerPussel scenens eller pusslets id @param {string} text repliken
- */
-export function ersatts(kapitel, scenEllerPussel, text) {
-  return (kapitel.uppdrag || []).some((/** @type {Uppdrag} */ u) => u.steg.some((s) => (s.ersatter || []).some((e) => e.scen === scenEllerPussel && e.text === text)));
-}
-
-/**
- * Det steg i lappen som ett steg i berättelsen gör klart, om det är det steg han gör nu (molnet behövs då inte).
- * @param {ReturnType<typeof lappenNu>} lapp @param {Pos} pos
- */
-export const lappenSagerVad = (lapp, pos) => !!lapp && lapp.nuIndex >= 0 && jamfor(lapp.k.steg[lapp.nuIndex].pos, pos) === 0;

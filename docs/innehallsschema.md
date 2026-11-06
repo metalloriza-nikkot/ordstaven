@@ -1,6 +1,7 @@
 # Innehållsschema – kapitel i format 2
 
-Version 2.21 (2026-11-06). Ägs av teknikspåret.
+Version 2.22 (2026-11-06). Ägs av teknikspåret.
+2.22: **lappen görs om** (beslut 47 och 48, Teknik 2g). Inga nya fält. `steg[].ersatter` används inte längre (Innehåll tar bort det), och `steg[].text` och `steg[].upplast` står inte på lappen: delstegen styr bara bockarna, ringarna och stämpeln. Uppdraget börjar vid första stegets eget steg. Filer i 2.21 gäller fortfarande.
 2.21: **skogens grafik** (Teknik 3). Kartorna utomhus får rutlager (`golv`, `over` och lager med `visas_med`), objekt av typen `omgivning` (det levande i bakgrunden) och objektens **`bild_sedan`** med **`sedan`**, **`bild_anim`** med **`anim_ms`** och **`rutor`**. Mellanscenens `bild` har sidovyn `vid_bron` och `kartbit_unge`. Allt är tillägg, filer i 2.20 gäller fortfarande.
 2.20: **uppdragslappen** (beslut 37.3 och 40.1, Teknik 2d). Kapitlet får fältet **`uppdrag`** (avsnittet *3a. Uppdragen* nedan). Allt är tillägg, filer i 2.19 gäller fortfarande.
 2.19: motorreglerna i 2b. **`bild`** på `ga_till`: bilden i molnet i stället för målets egen bild (krönet i k1s08, `uppdrag_kullen`, beslut 42.4). Molnet står också före `bara`. Ljudorden står kvar ca 2 s. Styrbilden visas första gången i varje pass och när han har stått vid en sak i ca 4,5 s. Dialogrutan täcker aldrig det som ska hittas härnäst. **Kontrollen varnar för varje ord i en lästext som saknas i ordlistorna**, också böjda former. Allt är tillägg, filer i 2.18 gäller fortfarande.
@@ -206,7 +207,7 @@ Låset och nyckeln står på samma skärm. **`visa_forsta`**: ungen visar det f�
 **`verb: "hugga"`** (beslut 39.3, lianerna): formeln ger förmågan, och spelaren använder den själv. Staven är ett svärd medan pusslet pågår, samma knapp som att svinga, och varje hugg fäller en lian, som försvinner. Inga missar och ingen tid. I kartan visar lianväggen pusslet (`visar`), delas i lika många lianer som `innehall` har poster och fyller hela väggen (`delas: "hela"`), och är borta efteråt (`forsvinner_efter`: pusslets id). Den lilla lianen (`foremal: ["liten_lian"]`) huggs med ett hugg.
 
 ## 3a. Uppdragen (2.20)
-Uppdragslappen står i remsan under spelytan, till vänster om textrutan (10d). Kapitlets fält `uppdrag` är en lista i den ordning uppdragen kommer.
+Uppdragslappen (10d, beslut 47 och 48) är hopfälld bakom lappknappen och fälls ut i remsan under spelytan när ett uppdrag börjar, när ett pass börjar och när han trycker på knappen. Den visar rubriken, bilden, en bock per gjort steg och en tom ring per steg som är kvar, aldrig delstegens text. Molnet säger vad han ska göra nu. Kapitlets fält `uppdrag` är en lista i den ordning uppdragen kommer.
 
 ```json
 {"id": "u0_vinden", "rubrik": "TITTA PÅ VINDEN", "bild": "uppdrag_stegen", "pass": 1,
@@ -219,13 +220,13 @@ Uppdragslappen står i remsan under spelytan, till vänster om textrutan (10d). 
 
 | Fält | Betydelse |
 |---|---|
-| `rubrik`, `steg[].text` | Lappens text, **i versaler som på lappen** (Innehålls form), högst fyra ord per steg. `{UNGE}` är ungens namn. Orden ska stå i ordlistorna, och kontrollen prövar spärrade ljud. |
+| `rubrik`, `steg[].text` | Lappens text, **i versaler som på lappen** (Innehålls form). Bara `rubrik` står på lappen och i MIN BOK (högst ca 11 tecken, annars bryts raden). `steg[].text` står i loggen och kontrollen, inte på lappen (2.22). `{UNGE}` är ungens namn. Orden ska stå i ordlistorna, och kontrollen prövar spärrade ljud. |
 | `bild` | Bildkortet överst (48 × 48, `assets/bildkort/`). Ett test kontrollerar att det finns. |
 | `steg[].klart` | Steget i berättelsen som gör delsteget klart: `scen` och ett av `ga_till`, `pussel`, `bara` (sakens `bild` eller `till`), `las_skylt` eller `vantar_pa`. Högst tre steg. |
-| `steg[].upplast: false` | Steget läses aldrig upp, eftersom det är själva läsuppgiften. Andra nya steg läses upp när de kommer. |
-| `steg[].visas: "med_paminnelse"` | Steget syns först när påminnelsen i steget har kommit (bäret i k1s13). Steget måste ha en `paminnelse`. |
-| `steg[].ersatter` | Repliker som lappen ersätter **när den syns**, så att samma sak inte sägs två gånger. `scen` är scenens id, eller pusslets id för pusslets `instruktion`. Utan remsa (texten över spelytan) syns ingen lapp, och då står replikerna och molnet som förut. |
-| `stampel` | Stämpeln kommer när berättelsen har passerat steget i `efter` (`replik`, `pussel`, `ga_till`, `vantar_pa` eller `bild` på en mellanscen), alltså efter berättelsens stund. |
+| `steg[].upplast: false` | Används inte sedan 2.22: stegen läses inte upp (bara rubriken när lappen fälls ut). |
+| `steg[].visas: "med_paminnelse"` | Steget får sin ring först när påminnelsen i steget har kommit (bäret i k1s13, 48.2). Steget måste ha en `paminnelse`. |
+| `steg[].ersatter` | **Används inte sedan 2.22** (beslut 47.1): lappen ersätter inga repliker och inte molnet. Kontrollen prövar fortfarande att repliken finns, tills Innehåll har tagit bort fältet. |
+| `stampel` | Stämpeln kommer när berättelsen har passerat steget i `efter` (`replik`, `pussel`, `ga_till`, `vantar_pa` eller `bild` på en mellanscen), alltså efter berättelsens stund och före nästa steg. Den slår ned på spelytan bredvid hjälten. |
 
 **Hur lappen följer berättelsen** (`src/karna/uppdrag.js`): allt räknas ur var berättelsen är, så att lappen stämmer också efter en omstart, ett hopp i menyn för vuxna eller en framspolning.
 - Ett uppdrag **börjar** vid den första repliken som lappen ersätter i första steget, annars vid första stegets eget steg, och aldrig före förra uppdragets stämpel.

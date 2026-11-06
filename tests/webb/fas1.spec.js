@@ -470,6 +470,8 @@ test('styrbilden för att använda: Mellanslag första gången i passet', async 
   await page.mouse.click(l.x, l.y);
   await expect(page.locator('#handknapp')).toBeVisible({ timeout: 8000 });
   await expect(page.locator('#styrhjalp.mellanslag')).toBeVisible();
+  await expect(page.locator('#styrhjalp .mellanslag-tecken')).toBeVisible(); // ingen tom ruta (47.8)
+  await page.screenshot({ path: 'test-results/mellanslag-vid-handen.png' });
   await page.keyboard.press('Space');
   await expect(page.locator('#styrhjalp.mellanslag')).toBeHidden();
   expect(await page.evaluate(() => window.__ORDSTAVEN.tillstand().aventyr['den-gomda-dalen'].ui.styrAnvand)).toBe(true);

@@ -21,10 +21,11 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
   ui.innerHTML = `
     <div id="tona"></div>
     <div id="hud">
+      <!-- lappknappen överst bland hans knappar (10d, 47.2): uppdragslappen, och Farfars lapp i ett pussel -->
+      <button type="button" id="hud-lapp" class="hud-knapp" hidden aria-label="Lappen">${ikon('lapp', 'hud')}</button>
       <button type="button" id="hud-radio" class="hud-knapp" hidden aria-label="Radion">${ikon('radio', 'hud')}</button>
       <button type="button" id="hud-nos" class="hud-knapp" hidden aria-label="Nosa på ett ord">${ikon('nos', 'hud')}${ikon('nos_aktiv', 'hud').replace('ikon-px', 'ikon-px aktiv')}</button>
       <button type="button" id="hud-bar" class="hud-knapp" hidden aria-label="Bär">${ikon('bar', 'hud')}<span class="tal">0</span></button>
-      <button type="button" id="hud-lapp" class="hud-knapp" hidden aria-label="Lappen">${ikon('lapp', 'hud')}</button>
     </div>
     <button type="button" id="hud-paus" class="hud-knapp" hidden aria-label="Paus">${ikon('paus', 'hud')}</button>
     <button type="button" id="hud-meny" aria-label="Meny för vuxna (håll inne)">⚙</button>
@@ -289,8 +290,15 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     /** @type {HTMLElement} */ (b.querySelector('.tal')).textContent = String(av.bar ?? 0);
     nosKnapp.hidden = !(av.ui && av.ui.nosknappen);
     $('#hud-radio').hidden = !(av.ui && av.ui.radioramen);
-    $('#hud-lapp').hidden = !(av.lappar && av.lappar.length);
+    lapparna = !!(av.lappar && av.lappar.length);
+    $('#hud-lapp').hidden = !(lapparna || uppdragslapp);
   }
+  // lappknappen syns när han har Farfars lapp (dinomaten) eller när ett uppdrag pågår (uppdragslappen, 47.2)
+  let lapparna = false, uppdragslapp = false;
+  /** @param {boolean} finns ett uppdrag pågår */
+  function sattLappknapp(finns) { uppdragslapp = finns; $('#hud-lapp').hidden = !(lapparna || uppdragslapp); }
+  /** En knapp glimtar en gång i vitt (lappknappen efter stämpeln, 10d). @param {string} id */
+  function glimta(id) { const el = $(id); el.classList.remove('glimt'); void el.offsetWidth; el.classList.add('glimt'); }
   /** @param {string} id */
   function pulsera(id) { const el = $(id); el.classList.remove('puls'); void el.offsetWidth; el.classList.add('puls'); }
 
@@ -643,7 +651,8 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     if (typ === 'pilar') e.innerHTML = '<span class="tangent upp"><span class="yta">▲\uFE0E</span></span><span class="tangent vanster"><span class="yta">◀\uFE0E</span></span><span class="tangent ner"><span class="yta">▼\uFE0E</span></span><span class="tangent hoger"><span class="yta">▶\uFE0E</span></span>';
     else if (typ === 'tryck' && punkt) { ankra(e); e.innerHTML = `<span class="finger">${ikon('hand', 'stor')}</span>`; e.style.left = punkt.x + 'px'; e.style.top = punkt.y + 'px'; }
     else if (typ === 'mellanslag') { // en bred tangent som trycks ned, bredvid handen (inte över molnet nere till vänster)
-      e.innerHTML = '<span class="tangent mellanslag" aria-hidden="true"><span class="yta"></span></span>';
+      // tecknet för mellanslag (⎵) ritat i CSS, så att tangenten inte ser ut som en tom ruta (47.8)
+      e.innerHTML = '<span class="tangent mellanslag" aria-hidden="true"><span class="yta"><span class="mellanslag-tecken"></span></span></span>';
       if (punkt) { ankra(e); e.classList.add('vid-hand'); e.style.left = punkt.x + 'px'; e.style.top = punkt.y + 'px'; }
     }
     else if (typ === 'tab') { // Tab-tangenten, som tänder nosen, under nosknappen
@@ -705,7 +714,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     handknapp,
     ljudord, visaTanke, placeraTanke, pulseraTanke, ordskylt, skyltar, rumsskyltar, skyltHjalte, sattDorrRutor, ordnaSkyltar, skyltStor, pulseraSkylt, skyltNara, ropa,
     ui, $, plattan, rader, esc, visaPlatta, doljPlatta, vantaFortsatt, visaRegi, doljRegi, visaFest,
-    uppdateraHud, pulsera, ikonKnappar, visaSkarm, doljSkarm, visaMeny, doljMeny, visaPausmeny, doljPausmeny, etiketter, sattNos, vaxlaNos, ljuda, arHelord,
+    uppdateraHud, sattLappknapp, glimta, pulsera, ikonKnappar, visaSkarm, doljSkarm, visaMeny, doljMeny, visaPausmeny, doljPausmeny, etiketter, sattNos, vaxlaNos, ljuda, arHelord,
     fanga, tandNos, markeraOrd,
     /** @param {(vad: 'tand' | 'ord', ord?: string) => void} f @returns {() => void} */
     vidNos(f) { nosLyssnare.add(f); return () => nosLyssnare.delete(f); },

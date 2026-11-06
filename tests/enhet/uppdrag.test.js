@@ -1,7 +1,7 @@
 // @ts-check
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { kompileraUppdrag, lappenNu, klaraFore, ersatts, lappenSagerVad, hittaSteg } from '../../src/karna/uppdrag.js';
+import { kompileraUppdrag, lappenNu, klaraFore, hittaSteg } from '../../src/karna/uppdrag.js';
 
 const R = (text) => ({ typ: 'replik', talare: 'berattare', text, upplast: true });
 /** Ett påhittat kapitel med två uppdrag (som prologens första): gå ut, gå upp, tänd; sedan värm ägget. */
@@ -26,34 +26,32 @@ const kapitel = () => ({
   ],
 });
 
-describe('uppdragslappen (2d)', () => {
+describe('uppdragslappen (2d, 2g)', () => {
   it('stegen, starten och stämpeln läses ut ur kapitlet', () => {
     const { lista, fel } = kompileraUppdrag(kapitel());
     expect(fel).toEqual([]);
-    expect(lista.map((x) => [x.u.id, x.start, x.stampel])).toEqual([['u1', [0, 1], [1, 2]], ['u2', [2, 0], [2, 3]]]);
+    // uppdraget börjar vid första stegets eget steg, inte vid repliken i ersatter (beslut 47.1)
+    expect(lista.map((x) => [x.u.id, x.start, x.stampel])).toEqual([['u1', [0, 2], [1, 2]], ['u2', [2, 1], [2, 3]]]);
     expect(hittaSteg(kapitel(), 'c', { vantar_pa: 'mata' })).toEqual([2, 2]);
   });
-  it('lappen börjar när berättelsen har ställt frågan, bockar av stegen och slutar efter berättelsens stund', () => {
+  it('lappen börjar efter frågan, bockar av stegen, har en ring per steg som är kvar och slutar efter berättelsens stund', () => {
     const { lista } = kompileraUppdrag(kapitel());
-    expect(lappenNu(lista, [0, 0])).toBeNull(); // före frågan
-    const forst = lappenNu(lista, [0, 1]);
-    expect(forst?.k.u.id).toBe('u1'); expect(forst?.nu?.text).toBe('GÅ UT'); expect(forst?.gjorda).toEqual([]);
-    expect(lappenSagerVad(forst, [0, 2])).toBe(true); // målet är lappens steg: inget moln
+    expect(lappenNu(lista, [0, 1])).toBeNull(); // repliken med frågan: ingen lapp än
+    const forst = lappenNu(lista, [0, 2]);
+    expect(forst?.k.u.id).toBe('u1'); expect(forst?.nu?.text).toBe('GÅ UT'); expect(forst?.gjorda).toEqual([]); expect(forst?.kvar).toBe(3);
     const sen = lappenNu(lista, [1, 1]);
-    expect(sen?.gjorda.map((s) => s.text)).toEqual(['GÅ UT', 'GÅ UPP']); expect(sen?.nu?.text).toBe('TÄND');
-    expect(lappenNu(lista, [1, 2])?.nu).toBeNull(); // alla steg gjorda, stämpeln kommer efter repliken
+    expect(sen?.gjorda.map((s) => s.text)).toEqual(['GÅ UT', 'GÅ UPP']); expect(sen?.nu?.text).toBe('TÄND'); expect(sen?.kvar).toBe(1);
+    expect(lappenNu(lista, [1, 2])?.kvar).toBe(0); // alla steg gjorda, stämpeln kommer efter repliken
     expect(lappenNu(lista, [1, 3])).toBeNull(); // stämplat
     expect(klaraFore(lista, [1, 3]).map((u) => u.id)).toEqual(['u1']);
   });
-  it('ett steg som visas med påminnelsen syns först när den har kommit', () => {
+  it('ett steg som visas med påminnelsen har ingen ring förrän påminnelsen har kommit (48.2)', () => {
     const { lista } = kompileraUppdrag(kapitel());
+    expect(lappenNu(lista, [2, 1])?.kvar).toBe(1); // GÅ TILL LÅDAN syns, MATA inte än
     expect(lappenNu(lista, [2, 2])?.nu).toBeNull();
-    expect(lappenNu(lista, [2, 2], new Set(['u2/1']))?.nu?.text).toBe('MATA');
-  });
-  it('ersatter gäller repliker i scenen och pusslets instruktion', () => {
-    expect(ersatts(kapitel(), 'a', 'Gå ut!')).toBe(true);
-    expect(ersatts(kapitel(), 'a', 'Hej.')).toBe(false);
-    expect(ersatts(kapitel(), 'p_ljus', 'Skriv LJUS!')).toBe(true);
+    expect(lappenNu(lista, [2, 2])?.kvar).toBe(0);
+    const pam = lappenNu(lista, [2, 2], new Set(['u2/1']));
+    expect(pam?.nu?.text).toBe('MATA'); expect(pam?.kvar).toBe(1);
   });
   it('ett uppdrag vars steg inte finns hoppas över (ett provkapitel), och felet sägs', () => {
     const k = kapitel(); k.uppdrag[0].steg[1].klart = { scen: 'b', ga_till: 'finns_inte' };
