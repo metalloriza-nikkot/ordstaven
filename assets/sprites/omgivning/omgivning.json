@@ -1,0 +1,254 @@
+{
+ "frames": {
+  "fagel_flyga_01": {
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 8,
+    "h": 7
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 8,
+    "h": 7
+   },
+   "sourceSize": {
+    "w": 8,
+    "h": 7
+   }
+  },
+  "fagel_flyga_02": {
+   "frame": {
+    "x": 9,
+    "y": 0,
+    "w": 8,
+    "h": 7
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 8,
+    "h": 7
+   },
+   "sourceSize": {
+    "w": 8,
+    "h": 7
+   }
+  },
+  "fagel_sitta_01": {
+   "frame": {
+    "x": 0,
+    "y": 8,
+    "w": 8,
+    "h": 7
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 8,
+    "h": 7
+   },
+   "sourceSize": {
+    "w": 8,
+    "h": 7
+   }
+  },
+  "fagel_sitta_02": {
+   "frame": {
+    "x": 9,
+    "y": 8,
+    "w": 8,
+    "h": 7
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 8,
+    "h": 7
+   },
+   "sourceSize": {
+    "w": 8,
+    "h": 7
+   }
+  },
+  "fjaril_01": {
+   "frame": {
+    "x": 0,
+    "y": 16,
+    "w": 7,
+    "h": 6
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 7,
+    "h": 6
+   },
+   "sourceSize": {
+    "w": 7,
+    "h": 6
+   }
+  },
+  "fjaril_02": {
+   "frame": {
+    "x": 8,
+    "y": 16,
+    "w": 7,
+    "h": 6
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 7,
+    "h": 6
+   },
+   "sourceSize": {
+    "w": 7,
+    "h": 6
+   }
+  },
+  "lov_gron2_01": {
+   "frame": {
+    "x": 0,
+    "y": 23,
+    "w": 5,
+    "h": 4
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 5,
+    "h": 4
+   },
+   "sourceSize": {
+    "w": 5,
+    "h": 4
+   }
+  },
+  "lov_gron2_02": {
+   "frame": {
+    "x": 6,
+    "y": 23,
+    "w": 5,
+    "h": 4
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 5,
+    "h": 4
+   },
+   "sourceSize": {
+    "w": 5,
+    "h": 4
+   }
+  },
+  "lov_gron_01": {
+   "frame": {
+    "x": 0,
+    "y": 28,
+    "w": 5,
+    "h": 4
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 5,
+    "h": 4
+   },
+   "sourceSize": {
+    "w": 5,
+    "h": 4
+   }
+  },
+  "lov_gron_02": {
+   "frame": {
+    "x": 6,
+    "y": 28,
+    "w": 5,
+    "h": 4
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 5,
+    "h": 4
+   },
+   "sourceSize": {
+    "w": 5,
+    "h": 4
+   }
+  },
+  "lov_gulgron_01": {
+   "frame": {
+    "x": 0,
+    "y": 33,
+    "w": 5,
+    "h": 4
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 5,
+    "h": 4
+   },
+   "sourceSize": {
+    "w": 5,
+    "h": 4
+   }
+  },
+  "lov_gulgron_02": {
+   "frame": {
+    "x": 6,
+    "y": 33,
+    "w": 5,
+    "h": 4
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 5,
+    "h": 4
+   },
+   "sourceSize": {
+    "w": 5,
+    "h": 4
+   }
+  }
+ },
+ "meta": {
+  "image": "omgivning.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 18,
+   "h": 38
+  },
+  "scale": "1",
+  "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."
+ }
+}

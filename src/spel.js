@@ -15,7 +15,7 @@ import { HJALTE_FARGER, HJALTE_FAST } from './scener/Rum.js';
 import { lagerFor, bytLager } from './karna/hjalte.js';
 import { TANGENTBORD_HOJD } from './grans/tangentbord.js';
 import { skapaRullning } from './grans/rullning.js';
-import { kartbitarHtml } from './grans/kartbitar.js';
+import { laggUngenPaKartan, kartbitarHtml } from './grans/kartbitar.js';
 import { ikon } from './grans/ikoner.js';
 import { kompileraUppdrag, lappenNu, klaraFore, ersatts, lappenSagerVad, jamfor } from './karna/uppdrag.js';
 import { skapaUppdragslapp, lappText } from './grans/uppdragslapp.js';
@@ -670,6 +670,19 @@ export function skapaSpel(d) {
     }
     return borta.size ? r.innehall.filter((/** @type {any} */ x) => !borta.has(typeof x === 'string' ? x : x.id)) : r.innehall;
   }
+  /**
+   * Det som har bytt bild (kartans bild_sedan och sedan, Teknik 3): häcken med hålet när hålet har visats, stubben med
+   * bären när den lilla lianen är huggen, den öppna skattlådan. `sedan` är ett pussel, en formel eller ett dolt föremål.
+   * @param {any} r rummet i kapitlet @returns {string[]}
+   */
+  function byttaNu(r) {
+    const visade = b.visade(r.id), formler = tillstand.spelare.hjalte.formler || [];
+    return (kartor[r.id]?.objekt || []).filter((/** @type {any} */ o) => {
+      if (!o.sedan) return false;
+      const p = b.pussel(o.sedan);
+      return visade.includes(o.sedan) || losta.has(o.sedan) || (p?.typ === 'P11_formel' && formler.includes(p.svar)) || pusselForbi(o.sedan);
+    }).map((/** @type {any} */ o) => o.id);
+  }
   /** Det som står kvar efter hugget: kartans föremål som är borta (forsvinner_efter) och har bild_kvar. @param {any} r */
   function kvarNu(r) {
     const ids = new Set(innehallNu(r).map((/** @type {any} */ x) => (typeof x === 'string' ? x : x.id)));
@@ -686,6 +699,8 @@ export function skapaSpel(d) {
     for (let si = 0; si < sc.length; si++) {
       const ti = (sc[si].steg || []).findIndex((/** @type {any} */ st) => st.typ === 'pussel' && st.pussel_id === pid);
       if (ti < 0) continue;
+      // en frivillig scen (buskarna) spelas inte i ordning: pusslet är gjort när scenen är gjord
+      if (sc[si].frivillig) return b.frivilligtGjort(sc[si].id);
       if (b.scenIndex !== si) return b.scenIndex > si;
       const nu = Math.max(b.stegIndex, av.scen === si ? (av.steg ?? -1) : -1);
       return nu > ti;
@@ -733,7 +748,7 @@ export function skapaSpel(d) {
     let forra = null;
     if (glida) { rum.frys(true); forra = await rum.bild(); }
     if (tonas) { rum.frys(true); await ui.tona(true, tid(300)); }
-    rum.visa({ rum: scen.rum, tillstand: b.rumsTillstand(scen.rum), innehall: r ? innehallNu(r) : [], kvar: r ? kvarNu(r) : [], unge: tillstand.spelare.unge?.folj ?? !!tillstand.spelare.unge?.namn, nyttRum: nytt,
+    rum.visa({ rum: scen.rum, tillstand: b.rumsTillstand(scen.rum), innehall: r ? innehallNu(r) : [], kvar: r ? kvarNu(r) : [], bytta: r ? byttaNu(r) : [], unge: tillstand.spelare.unge?.folj ?? !!tillstand.spelare.unge?.namn, nyttRum: nytt,
       karta: scen.rum ? kartor[scen.rum] ?? null : null, franRum, delar: scen.rum ? delarIRummet(kartor[scen.rum]) : {}, visade: scen.rum ? b.visade(scen.rum) : [] });
     visaRumsskyltar();
     // hjälten sover i sängen när scenen börjar så (scenens hjalte: "sover"), tills han ska röra sig
@@ -990,6 +1005,11 @@ export function skapaSpel(d) {
         return st.vantar_pa ? replikVantar(st) : st.vid === 'ungen' ? replikVidUngen(st) : replik(st);
       case 'mellanscen': {
         // med bild händer det i rummet (Stils bilder), och beskrivningen behövs inte. Annars som i gråboxen.
+        // ungen på kartbiten (k1s11): i närbildens HTML, med nosen på mammas skugga
+        if (st.bild === 'kartbit_unge') {
+          const el = /** @type {HTMLElement | null} */ (ui.$('#narbild .karta-bitar'));
+          if (el && !ui.$('#narbild').hidden && laggUngenPaKartan(el)) { logg.handelse('narbild', 'ungen på kartbiten'); await vanta(tid(2600)); return; }
+        }
         const regiMs = st.bild ? rum.regi(st.bild) : 0;
         if (regiMs) { await vanta(tid(regiMs)); return; }
         const ms = tid(Math.min(6000, 1800 + st.beskrivning.split(' ').length * 140));
@@ -1550,6 +1570,8 @@ export function skapaSpel(d) {
       // det som huggits är redan borta ur rummet, en formel som kapar ritar om rummet
       if (forsvinner.some((/** @type {any} */ o) => rum.ruta(o.id))) await visaScen(visadScen);
     }
+    // ett pussel som byter en bild i rummet (bild_sedan: stubben med bären, den öppna skattlådan)
+    if (res && aktuelltRum && (kartor[aktuelltRum]?.objekt || []).some((/** @type {any} */ o) => o.sedan === p.id)) { losta.add(p.id); await visaScen(visadScen); }
     if (res && res.niva) {
       lasmotor.registrera({ pussel_id: p.id, typ: p.typ, niva: res.niva, ratt: res.forstaForsoket, antal_forsok: res.forsok, hjalp_anvand: res.hjalp, tid: performance.now() - start });
     }
@@ -2861,6 +2883,8 @@ export function skapaSpel(d) {
         // en instruktionsreplik som lappen redan säger hoppas över när lappen syns (ersatter, 2d)
         const ersatt = lappAktiv() && st.typ === 'replik' && !st.omstart && ersatts(b.kapitel, b.scen.id, st.text);
         if (ersatt) logg.handelse('lappen', 'ersätter: ' + st.text);
+        // en sidovy (in i skogen) tonas bort när han ska röra sig i rummet igen; i slutet av ett pass står den kvar
+        if (!['replik', 'mellanscen', 'ljud', 'sparpunkt', 'unge_folj', 'visa_ui', 'ge_kartbit', 'ge_bar'].includes(st.typ)) rum.doljSidovy?.();
         const res = ersatt ? undefined : await utfor(st);
         // en avstickare hör till steget (ga_till): är steget klart finns den inte längre
         if (!st0.omstart) { aterAvstickare = null; delete av.avstickare; }

@@ -104,10 +104,28 @@ describe('kartornas grafik', () => {
       if (ke.mark && !existsSync(new URL(`assets/tiles/${ke.mark}/${ke.mark}.json`, rot))) saknas.push(`${f}: marken ${ke.mark}`);
       for (const l of k.layers) for (const o of l.objects || []) {
         const e = egen(o);
-        for (const b of [e.bild, e.bild_natt, e.bild_del, e.bild_kvar, ...String(e.bild_rad || "").split(","), ...String(e.bild_hugg || "").split(",")].map((x) => String(x || "").trim()).filter(Boolean)) if (!ramar.has(b)) saknas.push(`${f} ${o.name}: ${b}`);
+        for (const b of [e.bild, e.bild_natt, e.bild_del, e.bild_kvar, e.bild_sedan, ...String(e.bild_rad || "").split(","), ...String(e.bild_hugg || "").split(","), ...String(e.bild_anim || "").split(",")].map((x) => String(x || "").trim()).filter(Boolean)) if (!ramar.has(b)) saknas.push(`${f} ${o.name}: ${b}`);
       }
     }
     expect(saknas).toEqual([]);
+  });
+  it('skogens rutlager (Teknik 3): rätt storlek, bara rutor som finns i rutsetet, och lagret med den hemliga stigen hör till ett föremål', () => {
+    const ts = JSON.parse(las('assets/tiles/skog/skog.json').toString());
+    for (const rum of ['skogsbrynet', 'buskarna', 'glantan']) {
+      const [, k] = kartor.find(([f]) => f === `${rum}.tmj`);
+      const namn = k.layers.filter((l) => l.type === 'tilelayer').map((l) => l.name);
+      expect(namn.slice(0, 2), rum).toEqual(['golv', 'over']);
+      const objekt = new Set(k.layers.flatMap((l) => l.objects || []).map((o) => o.name));
+      for (const l of k.layers.filter((x) => x.type === 'tilelayer')) {
+        expect(l.data.length, `${rum} ${l.name}`).toBe(k.width * k.height);
+        expect(l.data.every((g) => g === 0 || (g >= 1 && g <= ts.tilecount)), `${rum} ${l.name}`).toBe(true);
+        const vm = egen(l).visas_med; if (vm) expect(objekt.has(vm), `${rum} ${l.name}`).toBe(true);
+      }
+      expect(k.layers.find((l) => l.name === 'golv').data.every((g) => g > 0), `${rum}: golvet har en ruta överallt`).toBe(true);
+    }
+  });
+  it('skogens figurer i tomgång byter bild högst fyra gånger per sekund (golvets gräns, 45)', () => {
+    for (const [f, k] of kartor) for (const l of k.layers) for (const o of l.objects || []) { const e = egen(o); if (e.bild_anim) expect(Number(e.anim_ms), `${f} ${o.name}`).toBeGreaterThanOrEqual(250); }
   });
   it('rummets bild har kartans storlek', () => {
     for (const [f, k] of kartor) {
@@ -121,12 +139,13 @@ describe('kartornas grafik', () => {
 describe('mellanscenernas bilder och bildkorten', () => {
   const kapitel = readdirSync(new URL('content/den-gomda-dalen/', rot)).filter((f) => /^kap-\d+\.json$/.test(f)).map((f) => JSON.parse(las('content/den-gomda-dalen/' + f).toString()));
   const ramar = new Set(filer('assets/sprites/', '.json').flatMap((f) => Object.keys(JSON.parse(las(f).toString()).frames)));
-  it('varje mellanscen med bild har grafik (morgonen i sängen, luftskeppets lägen, sidovyerna)', () => {
+  it('varje mellanscen med bild har grafik (morgonen i sängen, luftskeppets lägen, sidovyerna, ungen på kartbiten)', () => {
     const saknas = [];
     for (const k of kapitel) for (const sc of k.scener) for (const st of sc.steg) {
       if (st.typ !== 'mellanscen' || !st.bild) continue;
       const finns = st.bild === 'hjalte_sang_morgon' ? ramar.has('hjalte_sang_morgon_01') && ramar.has('hjalte_sang_morgon_02')
         : st.bild.startsWith('luftskepp_') ? ramar.has(st.bild) || ramar.has(st.bild + '_01')
+          : st.bild === 'kartbit_unge' ? existsSync(new URL('assets/sidovyer/kartbit_unge_01.png', rot)) && existsSync(new URL('assets/sidovyer/kartbit_unge_02.png', rot))
           : existsSync(new URL(`assets/sidovyer/${st.bild}_bakgrund.png`, rot));
       if (!finns) saknas.push(`${k.id} ${sc.id}: ${st.bild}`);
     }

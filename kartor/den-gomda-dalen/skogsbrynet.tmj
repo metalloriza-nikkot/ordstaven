@@ -10,17 +10,77 @@
  "tileheight": 16,
  "infinite": false,
  "compressionlevel": -1,
- "nextlayerid": 2,
- "nextobjectid": 22,
+ "nextlayerid": 14,
+ "nextobjectid": 31,
  "properties": [
+  {
+   "name": "mark",
+   "type": "string",
+   "value": "skog"
+  },
   {
    "name": "rum",
    "type": "string",
    "value": "skogsbrynet"
   }
  ],
- "tilesets": [],
+ "tilesets": [
+  {
+   "firstgid": 1,
+   "source": "../../assets/tiles/skog/skog.json"
+  }
+ ],
  "layers": [
+  {
+   "type": "tilelayer",
+   "id": 12,
+   "name": "golv",
+   "width": 40,
+   "height": 12,
+   "x": 0,
+   "y": 0,
+   "opacity": 1,
+   "visible": true,
+   "data": [
+    1,3,7,6,4,2,5,1,1,5,3,4,2,1,4,3,8,4,1,3,5,4,6,6,7,2,1,17,27,22,4,2,6,3,4,2,1,3,3,3,
+    2,1,2,1,3,4,5,1,3,1,6,2,3,2,7,3,4,1,7,2,3,3,2,4,1,2,1,17,27,22,2,2,2,1,3,2,2,13,15,15,
+    3,8,4,3,2,6,2,3,7,5,1,3,6,1,2,3,2,7,4,4,8,3,7,4,1,4,3,16,24,20,3,7,8,2,2,1,3,16,24,24,
+    4,6,2,4,6,4,1,4,4,2,4,7,4,1,1,5,4,4,2,1,2,2,5,2,4,2,4,5,4,2,1,4,4,2,1,6,2,3,7,4,
+    3,3,6,3,4,1,5,5,2,4,4,1,3,4,5,2,3,1,4,3,1,4,5,8,4,1,1,2,3,7,2,7,2,3,5,6,8,3,6,2,
+    3,3,3,4,3,6,4,1,3,4,7,4,1,4,3,1,3,13,15,15,15,14,3,1,1,1,1,8,7,7,3,3,1,8,4,4,1,2,7,6,
+    4,1,2,8,2,2,7,3,1,4,8,8,2,7,1,4,1,17,27,27,27,22,2,1,7,1,1,1,2,3,3,1,6,1,4,1,3,8,8,3,
+    4,2,1,3,2,4,4,1,1,4,4,6,4,8,4,2,1,16,24,24,24,20,6,3,3,2,3,2,2,7,2,4,3,3,7,7,3,1,4,6,
+    1,2,5,2,4,1,1,2,3,1,4,6,4,4,1,7,4,4,2,3,2,5,2,2,5,2,2,5,4,5,4,1,2,3,2,4,2,8,4,1,
+    1,3,8,1,1,2,3,6,1,1,3,2,3,2,4,4,7,1,1,7,3,3,3,4,3,6,2,5,6,1,3,8,8,4,4,2,1,2,1,3,
+    3,2,4,7,7,1,4,6,8,3,8,1,3,7,2,4,3,5,5,8,3,2,6,2,3,1,2,3,7,4,2,4,4,1,2,3,3,3,2,8,
+    3,2,7,1,6,5,4,1,7,1,7,2,1,4,3,6,1,6,2,4,3,6,3,1,3,1,3,5,2,1,8,5,2,6,7,4,4,6,4,8
+   ]
+  },
+  {
+   "type": "tilelayer",
+   "id": 13,
+   "name": "over",
+   "width": 40,
+   "height": 12,
+   "x": 0,
+   "y": 0,
+   "opacity": 1,
+   "visible": true,
+   "data": [
+    0,0,49,59,58,57,59,59,59,59,59,59,58,56,57,59,59,58,57,59,58,52,0,48,57,59,54,0,0,0,0,48,57,59,58,52,0,0,0,0,
+    47,46,48,56,52,48,56,56,56,56,56,56,52,0,48,56,56,52,48,56,52,0,0,0,48,56,52,0,0,0,0,0,48,56,52,0,0,0,0,0,
+    59,54,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    58,52,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    54,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,45,47,
+    54,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,49,59,
+    55,46,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,57,
+    58,52,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,49,
+    55,46,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,49,
+    58,52,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,45,51,
+    55,47,46,0,0,45,47,47,47,46,0,0,45,47,47,46,0,45,47,47,46,45,46,0,45,47,47,47,47,47,47,47,47,47,46,0,45,47,51,59,
+    59,59,54,0,0,49,59,59,59,55,47,47,51,59,59,55,47,51,59,59,55,51,55,47,51,59,59,59,59,59,59,59,59,59,55,47,51,59,59,59
+   ]
+  },
   {
    "id": 1,
    "name": "foremal",
@@ -40,7 +100,14 @@
      "width": 26,
      "height": 6,
      "rotation": 0,
-     "visible": true
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "gren"
+      }
+     ]
     },
     {
      "id": 2,
@@ -53,6 +120,11 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "skylt_ingang"
+      },
       {
        "name": "sida",
        "type": "string",
@@ -72,6 +144,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "bild",
+       "type": "string",
+       "value": "barbuske"
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"
@@ -89,6 +166,11 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "skylt_farfar"
+      },
       {
        "name": "sida",
        "type": "string",
@@ -108,6 +190,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "bild",
+       "type": "string",
+       "value": "lag_sten"
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"
@@ -125,6 +212,11 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "lag_rund_sten"
+      },
       {
        "name": "sida",
        "type": "string",
@@ -144,6 +236,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "bild",
+       "type": "string",
+       "value": "hog_spetsig_sten"
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"
@@ -161,6 +258,11 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "hog_sten"
+      },
       {
        "name": "sida",
        "type": "string",
@@ -180,6 +282,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "bild",
+       "type": "string",
+       "value": "hog_rund_sten"
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"
@@ -195,7 +302,24 @@
      "width": 24,
      "height": 192,
      "rotation": 0,
-     "visible": true
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "hack"
+      },
+      {
+       "name": "bild_sedan",
+       "type": "string",
+       "value": "hack_oppen"
+      },
+      {
+       "name": "sedan",
+       "type": "string",
+       "value": "stig_genom_hacken"
+      }
+     ]
     },
     {
      "id": 11,
@@ -236,6 +360,11 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "trad_med_formel"
+      },
       {
        "name": "sida",
        "type": "string",
@@ -295,7 +424,24 @@
      "width": 20,
      "height": 14,
      "rotation": 0,
-     "visible": true
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "stubbe"
+      },
+      {
+       "name": "bild_sedan",
+       "type": "string",
+       "value": "stubbe_bar"
+      },
+      {
+       "name": "sedan",
+       "type": "string",
+       "value": "k1_liten_lian"
+      }
+     ]
     },
     {
      "id": 15,
@@ -372,7 +518,14 @@
      "width": 14,
      "height": 14,
      "rotation": 0,
-     "visible": true
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "skylt_bar"
+      }
+     ]
     },
     {
      "id": 18,
@@ -426,6 +579,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "bild",
+       "type": "string",
+       "value": "lag_sten"
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"
@@ -444,9 +602,78 @@
      "visible": true,
      "properties": [
       {
+       "name": "anim_ms",
+       "type": "int",
+       "value": 700
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "ekorre_gren_01"
+      },
+      {
+       "name": "bild_anim",
+       "type": "string",
+       "value": "ekorre_gren_01,ekorre_gren_02"
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 28,
+     "name": "omgivning_fagel_1",
+     "type": "omgivning",
+     "x": 20,
+     "y": 24,
+     "width": 24,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vad",
+       "type": "string",
+       "value": "fagel"
+      }
+     ]
+    },
+    {
+     "id": 29,
+     "name": "omgivning_fagel_2",
+     "type": "omgivning",
+     "x": 44,
+     "y": 20,
+     "width": 20,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vad",
+       "type": "string",
+       "value": "fagel"
+      }
+     ]
+    },
+    {
+     "id": 30,
+     "name": "omgivning_lov_3",
+     "type": "omgivning",
+     "x": 520,
+     "y": 0,
+     "width": 64,
+     "height": 52,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vad",
+       "type": "string",
+       "value": "lov"
       }
      ]
     }

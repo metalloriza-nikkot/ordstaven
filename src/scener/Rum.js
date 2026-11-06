@@ -10,7 +10,8 @@ import { skapaHinder, skarIgenom } from '../karna/vag.js';
 import { skapaNivaer } from '../karna/nivaer.js';
 import { KAMERA, centrera, folj, visaRuta, omradeFor, narmare, enSkarm } from '../karna/kamera.js';
 import { hjaltensByten } from '../karna/fargbyte.js';
-import { laddaGrafik, fargad, riktningFor, foremalsbild, rutnamn } from './figurbilder.js';
+import { laddaGrafik, fargad, riktningFor, foremalsbild, rutnamn, rutanimation } from './figurbilder.js';
+import { Livet } from './livet.js';
 
 const FARG = {
   golv: 0x8c8a86, rutnat: 0x7f7d79, kant: 0x5d5b58,
@@ -165,6 +166,14 @@ export class Rum extends Phaser.Scene {
     this.lagerObjekt = this.add.container(0, 0);
     this.ljusboll = this.add.graphics().setVisible(false);
     this.lagerFigurer = this.add.container(0, 0);
+    // trädridån (rutlagret over) ovanför figurerna, ritad en gång per rum till en egen bild (Teknik 3)
+    this.overBild = this.add.image(0, 0, '__DEFAULT').setOrigin(0, 0).setVisible(false);
+    // liv i skogen (fåglar, löv, fjärilen, ekorren) i världens pixlar, under ridån
+    this.livet = new Livet(this, this.lagerFigurer);
+    /** @type {{ img: any, ramar: string[], ms: number, i: number, senast: number }[]} figurer som rör sig i tomgång (bild_anim) */
+    this.animerade = [];
+    /** @type {Set<any>} höga föremålsbilder (trädkronor) som ritas bland figurerna, i ordning efter fötterna */
+    this.hogaBilder = new Set();
     // det som är i luften (luftskeppet i s22) syns ovanför figurerna
     this.lagerLuft = this.add.container(0, 0);
     this.morker = this.add.graphics();
@@ -249,7 +258,7 @@ export class Rum extends Phaser.Scene {
   ritaGolv(rum) {
     this.smutsig = true;
     const g = this.golv; g.clear();
-    this.golvBild.setVisible(false);
+    this.golvBild.setVisible(false); this.overBild.setVisible(false); this.markAnim = null;
     if (!rum) { g.fillStyle(0x1a1410).fillRect(0, 0, RUM.bredd, RUM.hojd); return; }
     const B = this.storlek.bredd, H = this.storlek.hojd;
     // grafiken: rummets bild (beslut 27.6) eller marken av rutor, ritad en gång till en egen bild (golvdatorn)
@@ -284,6 +293,88 @@ export class Rum extends Phaser.Scene {
   }
 
   /**
+   * Kartans rutlager (Teknik 3, skogen): golvet och de lager som syns med ett föremål (visas_med: den hemliga stigen
+   * längs bäcken) ritas till en bild per vattenbild, och ridån (over) till en egen bild ovanför figurerna. Allt ritas
+   * en gång per rum och läge, så att golvdatorn bara ritar bilderna (dokument 02). Vattnet (rutsetets animation, tre
+   * bilder på 250 ms) byter bild bara när det syns, högst fyra gånger per sekund.
+   * @param {string} zon @param {HTMLImageElement} src @param {number} kol @param {number} B @param {number} H
+   * @returns {string} golvets bild
+   */
+  ritaRutlager(zon, src, kol, B, H) {
+    const visade = new Set(this.synligaIds || []);
+    const lager = (this.rutlager || []).filter((l) => l.namn === 'golv' || (l.visasMed && visade.has(l.visasMed)));
+    const over = (this.rutlager || []).find((l) => l.namn === 'over');
+    const sig = `${zon}_${this.rumId}_${lager.map((l) => l.namn).join('+')}`;
+    const anim = rutanimation(zon);
+    const bredd = Math.ceil(B / 16);
+    const animerade = new Set(lager.flatMap((l) => l.data).filter((id) => anim.has(id)));
+    const antal = Math.max(1, ...[...animerade].map((id) => /** @type {any} */ (anim.get(id)).rutor.length));
+    /** @param {number[]} data @param {CanvasRenderingContext2D} c @param {number} bild */
+    const ritaLager = (data, c, bild) => data.forEach((id, i) => {
+      if (id < 0) return;
+      const a = anim.get(id), r = a ? a.rutor[bild % a.rutor.length] : id;
+      c.drawImage(src, (r % kol) * 16, Math.floor(r / kol) * 16, 16, 16, (i % bredd) * 16, Math.floor(i / bredd) * 16, 16, 16);
+    });
+    const nycklar = [];
+    for (let bild = 0; bild < antal; bild++) {
+      const ut = `rutlager_${sig}_${bild}`;
+      nycklar.push(ut);
+      if (this.textures.exists(ut)) continue;
+      const duk = document.createElement('canvas'); duk.width = B; duk.height = H;
+      const c = /** @type {CanvasRenderingContext2D} */ (duk.getContext('2d'));
+      for (const l of lager) ritaLager(l.data, c, bild);
+      this.textures.addCanvas(ut, duk);
+    }
+    if (over) {
+      const ut = `rutlager_${zon}_${this.rumId}_over`;
+      if (!this.textures.exists(ut)) {
+        const duk = document.createElement('canvas'); duk.width = B; duk.height = H;
+        ritaLager(over.data, /** @type {CanvasRenderingContext2D} */ (duk.getContext('2d')), 0);
+        this.textures.addCanvas(ut, duk);
+      }
+      this.overBild.setTexture(ut).setVisible(true);
+    }
+    // vattnets ruta i världen (för att se om det syns)
+    if (antal > 1) {
+      let x0 = B, y0 = H, x1 = 0, y1 = 0;
+      for (const l of lager) l.data.forEach((id, i) => { if (!anim.has(id)) return; const x = (i % bredd) * 16, y = Math.floor(i / bredd) * 16; x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x + 16); y1 = Math.max(y1, y + 16); });
+      this.markAnim = { nycklar, i: 0, ms: /** @type {any} */ (anim.get([...animerade][0])).ms, senast: 0, ruta: { x: x0, y: y0, b: x1 - x0, h: y1 - y0 } };
+    }
+    return nycklar[0];
+  }
+
+  /** Tomgång (Teknik 3): vattnets rutor och figurernas bild_anim byter bild, bara när de syns och högst fyra gånger per sekund. */
+  tomgang() {
+    const nu = performance.now(), v = this.cameras.main.worldView;
+    const syns = (/** @type {number} */ x, /** @type {number} */ y, /** @type {number} */ b, /** @type {number} */ h) => x < v.right && x + b > v.x && y < v.bottom && y + h > v.y;
+    const a = this.markAnim;
+    if (a && this.golvBild.visible && nu - a.senast >= a.ms) {
+      a.senast = nu;
+      if (syns(a.ruta.x, a.ruta.y, a.ruta.b, a.ruta.h)) { a.i = (a.i + 1) % a.nycklar.length; this.golvBild.setTexture(a.nycklar[a.i]); this.smutsig = true; }
+    }
+    // allt som rör sig utan att man kan göra något med det står stilla när han läser (10e, Liv i skogen)
+    if (this.livet?.steg(this.pos, this.fryst || !!this.b.plattaOppen?.(), v)) this.smutsig = true;
+    if (this.fryst) return;
+    for (const t of this.animerade) {
+      if (nu - t.senast < t.ms || !t.img.active) continue;
+      t.senast = nu;
+      const bx = t.img.getBounds();
+      if (!syns(bx.x, bx.y, bx.width, bx.height)) continue;
+      t.i = (t.i + 1) % t.ramar.length; t.img.setFrame(t.ramar[t.i]); this.smutsig = true;
+    }
+  }
+
+  /** Höga bilder (trädkronor) och figurerna i ordning efter fötterna: den som står längre ned ritas framför. */
+  sorteraFigurer() {
+    if (!this.hogaBilder.size) return;
+    const fot = (/** @type {any} */ g) => (g === this.hjalte ? this.pos.y : g === this.unge ? this.ungePos.y : g.fot ?? g.y + (g.height || 0));
+    const lista = /** @type {any[]} */ (this.lagerFigurer.list);
+    const fore = lista.slice();
+    lista.sort((a, b) => fot(a) - fot(b));
+    if (lista.some((g, i) => g !== fore[i])) this.smutsig = true;
+  }
+
+  /**
    * Marken utomhus av rutor (kartans `mark`, t.ex. skog): gräs i fyra varianter, lite blommor, och stigens rutor under
    * stigarna. Ritas en gång per rum till en egen bild, så att golvdatorn bara ritar en bild. @returns {string | null}
    */
@@ -291,11 +382,13 @@ export class Rum extends Phaser.Scene {
     const zon = /** @type {string} */ (this.mark), nyckel = `rutor_${zon}`;
     if (!this.textures.exists(nyckel)) return null;
     const B = this.storlek.bredd, H = this.storlek.hojd, ut = `mark_${zon}_${this.rumId}_${B}x${H}`;
-    if (this.textures.exists(ut)) return ut;
+    if (this.textures.exists(ut) && !this.rutlager?.length) return ut;
     const n = rutnamn(zon), tex = this.textures.get(nyckel), src = /** @type {HTMLImageElement} */ (tex.getSourceImage());
+    const kol = Math.floor(src.width / 16);
+    // kartans rutlager (Teknik 3): golvet, de lager som syns med ett föremål (den hemliga stigen), och ridån ovanför
+    if (this.rutlager?.some((l) => l.namn === 'golv')) return this.ritaRutlager(zon, src, kol, B, H);
     const duk = document.createElement('canvas'); duk.width = B; duk.height = H;
     const c = /** @type {CanvasRenderingContext2D} */ (duk.getContext('2d'));
-    const kol = Math.floor(src.width / 16);
     const rita = (/** @type {number | undefined} */ id, /** @type {number} */ x, /** @type {number} */ y) => { if (id !== undefined) c.drawImage(src, (id % kol) * 16, Math.floor(id / kol) * 16, 16, 16, x, y, 16, 16); };
     // samma mönster varje gång (ett tal ur rutans läge), mest vanligt gräs
     const gras = ['gras_1', 'gras_2', 'gras_3', 'gras_4', 'gras_1', 'gras_2', 'gras_3', 'gras_4', 'gras_blommor_1', 'gras_flack_1', 'gras_2', 'gras_blommor_2'];
@@ -749,6 +842,29 @@ export class Rum extends Phaser.Scene {
         onUpdate: () => { f.c.x = Math.round(f.c.x); f.img.setFrame(`${f.ram}${1 + (Math.floor(this.time.now / 110) % 4)}`); this.smutsig = true; },
       });
     }
+    // vid bron (k1s13, 10b): baronen läser sin lapp upp och ned vid brons fäste, och Herr Skata flyger in från höger
+    // och landar på tropikhjälmen, så att hjälmen åker ner över ögonen (bild 3). Han ser dem aldrig.
+    if (this.textures.exists(`sidovy_${bild}_baronen_01`)) {
+      const baron = this.add.image(160, 112, `sidovy_${bild}_baronen_01`).setOrigin(0, 0);
+      c.addAt(baron, 1);
+      const las = this.time.addEvent({ delay: 400, loop: true, callback: () => { if (!baron.active) return; baron.setTexture(`sidovy_${bild}_baronen_0${baron.texture.key.endsWith('01') ? 2 : 1}`); this.smutsig = true; } });
+      if (this.textures.exists(`sidovy_${bild}_skata_01`)) {
+        const skata = this.add.image(RUM.bredd + 4, 60, `sidovy_${bild}_skata_01`).setOrigin(0, 0);
+        c.add(skata);
+        this.tweens.add({
+          targets: skata, x: 169, y: 117 - 12, duration: 800, delay: 1500, ease: 'Sine.easeOut',
+          onUpdate: () => { skata.x = Math.round(skata.x); skata.y = Math.round(skata.y); skata.setTexture(`sidovy_${bild}_skata_0${1 + (Math.floor(this.time.now / 120) % 2)}`); this.smutsig = true; },
+          onComplete: () => { las.remove(); skata.destroy(); if (baron.active && this.textures.exists(`sidovy_${bild}_baronen_03`)) baron.setTexture(`sidovy_${bild}_baronen_03`); this.smutsig = true; },
+        });
+      }
+    }
+  }
+
+  /** Sidovyn tonas bort när han ska röra sig i rummet igen (in i skogen i början av k1s01). */
+  doljSidovy() {
+    if (!this.sidovy.visible) return;
+    this.tweens.killTweensOf(this.sidovy);
+    this.tweens.add({ targets: this.sidovy, alpha: 0, duration: 300, onUpdate: () => { this.smutsig = true; }, onComplete: () => this.rensaSidovy() });
   }
 
   /** @private */
@@ -868,13 +984,19 @@ export class Rum extends Phaser.Scene {
     if (v.nyttRum || !this.harRum) this.vagg = v.karta?.vagg || VAGG;
     if (v.nyttRum || !this.harRum) this.massiv = (this.harRum && v.karta?.massiv) || [];
     if (v.nyttRum || !this.harRum) { this.storlek = (this.harRum && v.karta?.storlek) || { bredd: RUM.bredd, hojd: RUM.hojd }; this.omrade = null; }
+    if (v.nyttRum || !this.harRum) { this.rutlager = (this.harRum && v.karta?.rutlager) || []; this.livet?.bygg((this.harRum && v.karta?.omgivning) || []); }
+    // det som syns (de dolda föremål som har visats) styr rutlager som syns med ett föremål (den hemliga stigen)
+    this.synligaIds = this.harRum ? synligaIds(v.innehall, v.tillstand, v.visade) : [];
+    // det som har bytt bild (bild_sedan: häcken med hålet, stubben med bären)
+    this.bytta = new Set(v.bytta || []);
     this.ritaGolv(this.harRum);
     // föremål som bara syns i vissa tillstånd (ägget när ljuset är tänt) gör att rummet byggs om
-    const synliga = this.harRum ? synligaIds(v.innehall, v.tillstand, v.visade).join(' ') : '';
+    const synliga = this.harRum ? [...this.synligaIds, '|', ...[...this.bytta].sort()].join(' ') : '';
     const andrat = synliga !== this.synliga;
     this.synliga = synliga;
     if (v.nyttRum || !this.harRum || andrat) {
       this.objekt = this.harRum ? rumsObjekt(v.innehall, v.tillstand, v.karta, v.visade) : [];
+      for (const g of this.hogaBilder) g.destroy(); this.hogaBilder.clear(); this.animerade = [];
       this.lagerObjekt.removeAll(true); this.lagerLjust.removeAll(true); this.ritade.clear(); this.markerade.clear(); this.ritadeDelar.clear(); this.markramar?.clear();
       this.delar = { ...(v.delar || {}) };
       for (const o of [...this.objekt.filter((x) => x.sort === 'yta'), ...this.objekt.filter((x) => x.sort !== 'yta')]) this.ritaObjekt(o);
@@ -968,15 +1090,26 @@ export class Rum extends Phaser.Scene {
       this.ritade.set(o.id, /** @type {any} */ (rad));
       return;
     }
-    const bildNamn = o.bildNatt && (this.tillstand === 'natt' || this.tillstand === 'natt_upplyst') ? o.bildNatt : o.bild;
+    const bildNamn = o.bildSedan && this.bytta?.has(o.id) ? o.bildSedan : o.bildNatt && (this.tillstand === 'natt' || this.tillstand === 'natt_upplyst') ? o.bildNatt : o.bild;
     const fb = bildNamn && !this.delar[o.id] ? foremalsbild(this, bildNamn) : null;
     if (fb) {
       const pa = (o.bildPa && this.objekt.find((x) => x.id === o.bildPa)) || o;
       const tex = fb.nyckel === 'hjalte' ? this.hjalteTextur || 'hjalte' : fb.nyckel;
       const img = this.add.image(Math.round(pa.x + pa.b / 2), pa.y + pa.h, tex, fb.ram).setOrigin(0.5, 1);
-      (o.lyser || o.skataFonster ? this.lagerLjust : this.lagerObjekt).add(img);
+      // en hög bild (en trädkrona som sticker upp) ritas bland figurerna, så att hjälten kan gå bakom den
+      const hog = !o.lyser && !o.skataFonster && o.sort !== 'yta' && img.height > o.h + 6;
+      if (hog) { /** @type {any} */ (img).fot = pa.y + pa.h; this.lagerFigurer.add(img); this.hogaBilder.add(img); this.sorteraFigurer(); }
+      else (o.lyser || o.skataFonster ? this.lagerLjust : this.lagerObjekt).add(img);
+      // tomgång (bild_anim): bilderna byts var animMs, med ett litet slumpat avstånd mellan figurerna
+      const ramar = (o.bildAnim || []).filter((r) => foremalsbild(this, r)?.nyckel === fb.nyckel);
+      if (ramar.length > 1 && !this.bytta?.has(o.id)) this.animerade.push({ img, ramar, ms: o.animMs || 500, i: 0, senast: performance.now() + Math.random() * 300 });
       this.ritade.set(o.id, /** @type {any} */ (img));
       return;
+    }
+    // ritat i rutlagret (kullen, krönet, bäcken): bara en osynlig ruta, som hindren och tester kan hitta
+    if (o.rutor && this.rutlager?.length) {
+      const r = this.add.rectangle(o.x, o.y, o.b, o.h, 0, 0).setOrigin(0, 0);
+      this.lagerObjekt.add(r); this.ritade.set(o.id, r); return;
     }
     // en dörr i en sidovägg är en mörk öppning i väggen; dörrbladet, karmen och golvremsan ritas i ritaDetaljer
     // utomhus med mark av rutor: det man går på (stigarna, grinden) syns i marken, inte som en ruta
@@ -1098,6 +1231,7 @@ export class Rum extends Phaser.Scene {
   placera() {
     this.hjalte.setPosition(Math.round(this.pos.x - FIGUR.bredd / 2), Math.round(this.pos.y - FIGUR.hojd));
     this.ritaHjalte();
+    this.sorteraFigurer();
     if (this.buren) this.buren.setPosition(Math.round(this.pos.x + 6), Math.round(this.pos.y - FIGUR.hojd - 6 + Math.sin(this.time.now / 300) * 1.5));
     // pekar ungen nosar den mot föremålet: små ryck åt dess håll
     const m = this.ungeMal;
@@ -1437,6 +1571,7 @@ export class Rum extends Phaser.Scene {
   /** @param {number} _t @param {number} dtMs */
   update(_t, dtMs) {
     const inm = this.b.inmatning;
+    if (this.harRum) this.tomgang();
     // kameran följer hjälten också när världen står still (han går tillbaka från kurvan, en fråga ställs)
     if (this.harRum) this.flyttaKameran(dtMs);
     if (!this.harRum || this.fryst || this.klattrar) { if (this.gar) { this.gar = false; this.ritaHjalte(); } return; }

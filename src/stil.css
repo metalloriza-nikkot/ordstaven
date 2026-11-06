@@ -745,3 +745,8 @@ html, body {
 /* textrutan och molnet står bredvid lappen; en textruta som inte ryms bredvid ligger över lappen (.over-lappen) */
 .text-under.lapp-syns #plattan.replik:not(.over-lappen) { left: calc(var(--rum-vanster) + var(--lapp-bredd) + 12px); transform: none; max-width: calc(var(--rum-bredd) - var(--lapp-bredd) - 12px); }
 .text-under.lapp-syns #tanke { left: calc(var(--rum-vanster) + var(--lapp-bredd) + 22px); }
+
+/* ungen på kartbiten (k1s11): svansklubban viftar, två bilder i 250 ms var (bara bildbyte) */
+.kartbit-unge-bild { position: absolute; image-rendering: pixelated; }
+.kartbit-unge-bild.b2 { animation: unge-vifta .5s steps(1) infinite; opacity: 0; }
+@keyframes unge-vifta { 0% { opacity: 0; } 50% { opacity: 1; } }

@@ -671,3 +671,15 @@ Stilguiden §3 gick igenom mot spelet. Det som saknades är byggt här, resten f
 - **Utan remsa** (texten över spelytan) finns ingen lapp: replikerna och molnet står som förut.
 - **Fliken KLART** i hjälteboken visar de klara uppdragen (bild, namn och stämpelns ikon). Ett tryck läser namnet. Fliken har en stjärna när ett nytt uppdrag är klart.
 - **Provscenerna** (`ordstaven_testscen`) kan ha egna `uppdrag`, som då ersätter kapitlets.
+
+## 54. Skogens grafik (0.26.0, Teknik 3)
+- **Rutlagren** (`karna/karta.js` läser `rutlager` och `omgivning`): `Rum.ritaRutlager` ritar `golv` och de synliga lagren med `visas_med` till en duk per vattenbild, och `over` (ridån) till en egen bild ovanför figurerna. Vattnet byter duk i `tomgang()` bara när dess ruta syns i kameran. Rutsetet `assets/tiles/skog/skog.json` har vattnets bilder som Tiled-animation (`rutanimation` i `figurbilder.js`).
+- **`verktyg/kartor/skog.py`** skriver om skogsbrynet, buskarna och gläntan: bilderna på objekten, marken (gräs, stig och vatten med Wang-kanter, kullen med platån), ridån med öppningar vid utgångar, start och föremål (bildens hela yta), och det levande. Det går att köra igen och ger samma kartor. Innehållets id:n och rutor ändras inte.
+- **Y-sortering:** en bild som är högre än sitt föremål (träden) läggs i `lagerFigurer` med sina fötter, och `sorteraFigurer()` sorterar hjälten, ungen och de höga bilderna efter fötterna varje gång något flyttas.
+- **`bild_sedan`:** `byttaNu(rum)` i `spel.js` ger föremålen vars `sedan` är uppfyllt (visade, lösta, formler eller frivilliga scener som är gjorda), och rummet ritas om när listan ändras. Efter ett pussel som ett föremål väntar på ritas rummet om direkt.
+- **`bild_anim`:** bilderna byts i `tomgang()`, minst 250 ms var, bara när föremålet syns och rummet inte är fryst.
+- **Det levande** (`scener/livet.js`, klassen `Livet`): ett steg högst var 250:e ms, och en paus på 8–20 s mellan varje gång. Fåglarna flyger när hjälten är inom 48 pixlar och kommer tillbaka efter 15 s. Allt står still när läsplattan är öppen eller rummet är fryst, så golvdatorn ritar inget extra medan han läser.
+- **Sidovyn `vid_bron`** (`visaSidovy`): baronen byter mellan två bilder var 400:e ms, Herr Skata flyger in efter 1,5 s och landar på hjälmen på 0,8 s, och då har baronen hjälmen över ögonen. Hjälten och ungen smyger förbi som i `in_i_skogen`. **`doljSidovy()`** tonar bort sidovyn (300 ms) när nästa steg är något han gör i rummet.
+- **`kartbit_unge`:** mellanscenen lägger ungen på kartbiten i närbilden (`laggUngenPaKartan` i `grans/kartbitar.js`, två bilder som viftar med CSS-steg), och spelet väntar 2,6 s.
+- Effekterna i atlaset (plopp, löv, fjädrar) används inte än i reaktionerna.
+

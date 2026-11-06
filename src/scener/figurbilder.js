@@ -43,12 +43,21 @@ export function rutnamn(zon) {
 }
 
 /**
+ * Rutsetets animerade rutor (Tileds animation: vattnet, 3 bilder på 250 ms): rutans nummer → bildernas nummer.
+ * @param {string} zon @returns {Map<number, { rutor: number[], ms: number }>}
+ */
+export function rutanimation(zon) {
+  const ts = Object.entries(rutset).find(([f]) => namn(f) === zon)?.[1];
+  return new Map((ts?.tiles || []).filter((/** @type {any} */ t) => t.animation?.length).map((/** @type {any} */ t) => [t.id, { rutor: t.animation.map((/** @type {any} */ a) => a.tileid), ms: t.animation[0].duration || 250 }]));
+}
+
+/**
  * Var finns en föremålsbild? @param {Phaser.Scene} scen @param {string} bild
  * @returns {{ nyckel: string, ram: string } | null}
  */
 export function foremalsbild(scen, bild) {
   for (const n of FOREMAL_ATLAS) if (scen.textures.exists(n) && scen.textures.get(n).has(bild)) return { nyckel: n, ram: bild };
-  for (const n of ['hjalte', 'farfar', 'herr_skata', 'unge', 'baronen']) if (scen.textures.exists(n) && scen.textures.get(n).has(bild)) return { nyckel: n, ram: bild };
+  for (const n of ['hjalte', 'farfar', 'herr_skata', 'unge', 'baronen', 'apa', 'djur', 'omgivning']) if (scen.textures.exists(n) && scen.textures.get(n).has(bild)) return { nyckel: n, ram: bild };
   return null;
 }
 

@@ -31,7 +31,8 @@ import { STORSTA } from './kamera.js';
  *             in: Record<string, { x: number, y: number }>, lampor: { x: number, y: number }[],
  *             vagg: { bak: number, sida: number, fram: number }, morker: number | null,
  *             storlek: { bredd: number, hojd: number }, massiv: { x: number, y: number, b: number, h: number }[],
- *             bild?: string | null, mark?: string | null }} Karta
+ *             bild?: string | null, mark?: string | null, rutlager?: { namn: string, data: number[], visasMed: string | null }[],
+ *             omgivning?: { vad: string, x: number, y: number, b: number, h: number }[] }} Karta
  * bild = rummets bild (assets/rum), mark = rutsetet för marken utomhus (assets/tiles).
  * inomhus = rummet har väggram (bakvägg, sidoväggar, främre kant). in = var hjälten kommer in från ett rum
  * som inte har någon utgång hit (punkter som heter in_<rum>, t.ex. trädgården från köket). lampor = där det lyser i mörkret.
@@ -80,7 +81,21 @@ export function lasKarta(tmj) {
   const lampor = [];
   /** @type {{ x: number, y: number, b: number, h: number }[]} */
   const massiv = [];
+  /** @type {{ vad: string, x: number, y: number, b: number, h: number }[]} */
+  const omgivning = [];
   const kartegen = Object.fromEntries((tmj.properties || []).map((/** @type {any} */ p) => [p.name, p.value]));
+  const tal = (/** @type {any} */ x, /** @type {number} */ d) => (Number.isFinite(Number(x)) && x !== '' && x !== undefined ? Math.round(Number(x)) : d);
+  // rutlagren (Teknik 3): golv (marken), over (trädridån ovanför figurerna) och lager som syns med ett föremål
+  // (visas_med: den hemliga stigen). Rutornas nummer i rutsetet, -1 där lagret är tomt.
+  /** @type {{ namn: string, data: number[], visasMed: string | null }[]} */
+  const rutlager = [];
+  const forsta = (tmj.tilesets || [])[0]?.firstgid ?? 1;
+  for (const lager of tmj.layers || []) {
+    if (lager.type !== 'tilelayer' || !Array.isArray(lager.data)) continue;
+    if (lager.width !== tmj.width || lager.height !== tmj.height) throw new Error(`rutlagret ${lager.name} har fel storlek`);
+    const egen = Object.fromEntries((lager.properties || []).map((/** @type {any} */ p) => [p.name, p.value]));
+    rutlager.push({ namn: String(lager.name), data: lager.data.map((/** @type {number} */ g) => (g ? (g & 0x1fffffff) - forsta : -1)), visasMed: egen.visas_med ? String(egen.visas_med) : null });
+  }
   for (const lager of tmj.layers || []) {
     if (lager.type !== 'objectgroup') continue;
     for (const o of lager.objects || []) {
@@ -93,6 +108,8 @@ export function lasKarta(tmj) {
       }
       const typ = o.type || o.class || '';
       if (typ === 'vagg') { massiv.push({ x: Math.round(o.x), y: Math.round(o.y), b: Math.round(o.width), h: Math.round(o.height) }); continue; }
+      // liv i skogen (26.3, 10b): det som rör sig utan att man kan göra något med det. Inget föremål, inget hinder.
+      if (typ === 'omgivning') { omgivning.push({ vad: String(egen.vad || ''), x: Math.round(o.x), y: Math.round(o.y), b: Math.round(o.width), h: Math.round(o.height) }); continue; }
       /** @type {Objekt} */
       const ut = {
         id: o.name,
@@ -128,12 +145,17 @@ export function lasKarta(tmj) {
       if (egen.bild_rad) ut.bildRad = String(egen.bild_rad).split(',').map((t) => t.trim()).filter(Boolean);
       if (egen.bild_hugg) ut.bildHugg = String(egen.bild_hugg).split(',').map((t) => t.trim()).filter(Boolean);
       if (egen.bild_kvar) ut.bildKvar = String(egen.bild_kvar);
+      // skogens grafik (Teknik 3): bild_sedan = bilden efter att `sedan` har hänt (ett pussel, en formel eller ett
+      // dolt föremål som har visats: häcken med hålet), bild_anim = bilder som byts i tomgång var anim_ms
+      // (minst 250 ms, golvets gräns), rutor = föremålet är ritat i rutlagret (kullen, bäcken) och har ingen egen bild
+      if (egen.bild_sedan && egen.sedan) { ut.bildSedan = String(egen.bild_sedan); ut.sedan = String(egen.sedan); }
+      if (egen.bild_anim) { ut.bildAnim = String(egen.bild_anim).split(',').map((t) => t.trim()).filter(Boolean); ut.animMs = Math.max(250, tal(egen.anim_ms, 500)); }
+      if (egen.rutor) ut.rutor = true;
       objekt.push(ut);
     }
   }
-  const tal = (/** @type {any} */ x, /** @type {number} */ d) => (Number.isFinite(Number(x)) && x !== '' && x !== undefined ? Math.round(Number(x)) : d);
   const vagg = { bak: tal(kartegen.vagg_bak, VAGG.bak), sida: tal(kartegen.vagg_sida, VAGG.sida), fram: tal(kartegen.vagg_fram, VAGG.fram) };
   const m = Number(kartegen.morker);
   const morker = kartegen.morker !== undefined && Number.isFinite(m) ? Math.max(0, Math.min(1, m)) : null;
-  return { objekt, start, inomhus: !!kartegen.inomhus, in: inpunkter, lampor, vagg, morker, storlek: { bredd, hojd }, massiv, bild: kartegen.bild ? String(kartegen.bild) : null, mark: kartegen.mark ? String(kartegen.mark) : null };
+  return { objekt, start, inomhus: !!kartegen.inomhus, in: inpunkter, lampor, vagg, morker, storlek: { bredd, hojd }, massiv, bild: kartegen.bild ? String(kartegen.bild) : null, mark: kartegen.mark ? String(kartegen.mark) : null, rutlager, omgivning };
 }
