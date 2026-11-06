@@ -30,6 +30,8 @@ const MED_RADIOMARKE = new Set(['farfar']);
  * följer med än glimtar målet (beslut 31.2, 39.4: 15 s i stället för 10, så att han hinner hitta själv).
  */
 const MAL_KNUFF_MS = 15000;
+/** Styrbilden kommer igen när han har stått vid en sak så här länge utan att göra något (granskningen A 23). */
+const STYR_STILLA_MS = 4500;
 const vanta = (/** @type {number} */ ms) => new Promise((r) => setTimeout(r, ms));
 
 /**
@@ -221,15 +223,42 @@ export function skapaSpel(d) {
   function placeraMoln(rutor) { const s = layout.skala; ui.placeraTanke([...rutor, ...viktigaRutor()], { vanster: s.vanster, topp: s.topp, bredd: s.cssBredd, hojd: s.cssHojd }); }
   /** @type {string | null} målet som han är på väg till (ga_till), så att texten inte täcker det */
   let malNu = null;
-  /** Nästa mål i scenen efter steget som pågår (en replik före ett ga_till), om det finns i rummet. */
-  function nastaMal() {
+  /**
+   * Det som ska hittas härnäst i scenen, efter steget som pågår (beslut 31.3, 2b): målet i ett ga_till, det han
+   * bär något till, figuren som ska prata eller ge något, skylten han ska läsa, det som dyker upp (visa_foremal),
+   * och sakerna i ett pussel i rummet (lådorna, krukorna, buskarna, lianerna). Bara det som finns i rummet.
+   * @returns {string[]}
+   */
+  function nastaAttHitta() {
     const steg = b?.scen?.steg || [];
-    for (let i = Math.max(0, b?.stegIndex ?? 0); i < steg.length; i++) if (steg[i].typ === 'ga_till' && rum.ruta(steg[i].mal)) return /** @type {string} */ (steg[i].mal);
-    return null;
+    for (let i = Math.max(0, b?.stegIndex ?? 0); i < steg.length; i++) {
+      const st = steg[i];
+      /** @type {string[]} */
+      let ids = [];
+      if (st.typ === 'ga_till') ids = [st.mal];
+      else if (st.typ === 'bara') ids = [st.till];
+      else if (st.typ === 'prata') ids = [st.figur];
+      else if (st.typ === 'ta_emot') ids = [st.fran];
+      else if (st.typ === 'las_skylt' || st.typ === 'visa_foremal') ids = [st.foremal];
+      else if (st.typ === 'pussel') {
+        const p = b.pussel(st.pussel_id);
+        if (p?.i_rummet) ids = Object.values(p.varianter || {}).flatMap((/** @type {any} */ v) => (v.alternativ || []).map((/** @type {any} */ a) => a.objekt));
+        else if (p?.typ === 'P26_krukorna') {
+          const v = visarFor(p.id);
+          ids = p.foremal?.length ? p.foremal : rum.objekt.filter((/** @type {any} */ o) => o.visar === p.id || (v && o.id.startsWith(v.id + '_'))).map((/** @type {any} */ o) => o.id);
+        }
+        else if (p?.skylt) ids = [p.skylt];
+      }
+      ids = ids.filter((id) => id && rum.ruta(id));
+      if (ids.length) return ids;
+      // en replik, en mellanscen eller ett ljud: titta vidare. Allt annat (ett pussel på läsplattan) avslutar
+      if (!['replik', 'mellanscen', 'ljud', 'unge_folj', 'visa_ui'].includes(st.typ)) return [];
+    }
+    return [];
   }
   /**
-   * Det som texten över spelytan aldrig ska täcka (beslut 36.2, 31.3): hjälten, ungen och målet, i skärmpunkter.
-   * @param {string | null} [mal]
+   * Det som texten över spelytan aldrig ska täcka (beslut 36.2, 31.3): hjälten, ungen och det som ska hittas, i
+   * skärmpunkter. @param {string | string[] | null} [mal]
    */
   function viktigaRutor(mal = malNu) {
     if (!rum.harRum) return [];
@@ -238,8 +267,7 @@ export function skapaSpel(d) {
     };
     const r = [ruta(rum.pos.x - 8, rum.pos.y - 26, 16, 26)];
     if (rum.unge?.visible) { const u = rum.ungePunkt; r.push(ruta(u.x - 12, u.y - 14, 24, 20)); }
-    const o = mal ? rum.ruta(mal) : null;
-    if (o) r.push(ruta(o.x, o.y, o.b, o.h));
+    for (const id of Array.isArray(mal) ? mal : mal ? [mal] : []) { const o = rum.ruta(id); if (o) r.push(ruta(o.x, o.y, o.b, o.h)); }
     return r;
   }
   /**
@@ -249,7 +277,7 @@ export function skapaSpel(d) {
   function placeraReplik(el) {
     el.classList.remove('uppe');
     if (layout.skala.remsa) return;
-    const viktiga = viktigaRutor(malNu ?? nastaMal());
+    const viktiga = viktigaRutor(malNu ?? nastaAttHitta());
     const tackt = () => { const q = el.getBoundingClientRect(); return viktiga.reduce((sum, v) => sum + Math.max(0, Math.min(q.right, v.right) - Math.max(q.left, v.left)) * Math.max(0, Math.min(q.bottom, v.bottom) - Math.max(q.top, v.top)), 0); };
     const nere = tackt();
     if (!nere) return;
@@ -1012,24 +1040,36 @@ export function skapaSpel(d) {
   }
 
   /**
-   * Styrbilden för att använda något (första gången hjälten står vid något som går att använda) och för att svinga
-   * staven (första krukan): Mellanslag på datorn, ett finger som trycker på pekskärm. Den försvinner när han har
-   * gjort det en gång, och kommer inte tillbaka (sparas i äventyrets gränssnitt).
+   * Styrbilden för att använda något och för att svinga staven (granskningen A 23): Mellanslag på datorn, ett finger
+   * som trycker på pekskärm. Den visas första gången i varje pass som hjälten står vid något som går att använda,
+   * och sedan när han har stått vid en sak i ca 4,5 s utan att göra något. Den försvinner när han gör det eller går
+   * därifrån. Vilka styrbilder han har använt i passet sparas inte: nästa pass börjar om.
    * @param {'anvand' | 'svinga'} verb @param {{ x: number, y: number } | null} punkt handen på skärmen, null döljer
    */
   function styrAnvand(verb, punkt) {
-    const flagga = verb === 'svinga' ? 'styrSvinga' : 'styrAnvand';
+    window.clearTimeout(styrStilla);
     if (!punkt) { if (ui.$('#styrhjalp').dataset.verb === verb) { ui.styrhjalp(null); delete ui.$('#styrhjalp').dataset.verb; } return; }
-    if (av.ui?.[flagga]) return;
-    ui.styrhjalp(d.pek() ? 'tryck' : 'mellanslag', punkt);
-    ui.$('#styrhjalp').dataset.verb = verb;
+    const visa = () => { ui.styrhjalp(d.pek() ? 'tryck' : 'mellanslag', punkt); ui.$('#styrhjalp').dataset.verb = verb; };
+    if (!styrIPasset.has(styrNyckel(verb))) { visa(); return; }
+    // han står still vid saken: styrbilden kommer igen (verklig tid, också i snabbläget, som knuffen)
+    styrStilla = window.setTimeout(() => {
+      if (pausad || rum.fryst) return;
+      logg.handelse('styrbild', `står vid saken: ${verb}`);
+      visa();
+    }, STYR_STILLA_MS);
   }
-  /** Han har använt eller svingat: styrbilden är lärd. @param {'anvand' | 'svinga'} verb */
+  /** Han har använt eller svingat: styrbilden är lärd i det här passet. @param {'anvand' | 'svinga'} verb */
   function styrGjort(verb) {
     const flagga = verb === 'svinga' ? 'styrSvinga' : 'styrAnvand';
     styrAnvand(verb, null);
+    styrIPasset.add(styrNyckel(verb));
     if (!av.ui?.[flagga]) { av.ui = { ...(av.ui || {}), [flagga]: true }; spara(); }
   }
+  /** Passet styrbilderna räknas i: kapitlet och scenens pass. @param {string} vad */
+  const styrNyckel = (vad) => `${av.kapitelId ?? ''}:${b?.scen?.pass ?? ''}:${vad}`;
+  /** Styrbilderna som han har använt i passet som spelas nu (anvand, svinga, ga). @type {Set<string>} */
+  const styrIPasset = new Set();
+  let styrStilla = 0;
 
   /**
    * @param {string[]} ids
@@ -1124,7 +1164,10 @@ export function skapaSpel(d) {
     // styrhjälpen visar hur man går på just den här enheten: piltangenter på dator, ett finger som trycker på pekskärm.
     // Den försvinner så fort hjälten börjar gå.
     let styr = 0;
-    if (st.visa_styrhjalp) {
+    // styrbilden för att gå: där datan säger det, och vid första målet i varje pass (granskningen A 23)
+    const forstaIPasset = !styrIPasset.has(styrNyckel('ga'));
+    styrIPasset.add(styrNyckel('ga'));
+    if (st.visa_styrhjalp || forstaIPasset) {
       const o = rum.ruta(st.mal), start = { ...rum.pos };
       ui.styrhjalp(d.pek() ? 'tryck' : 'pilar', o ? skarm(o.x + o.b / 2, o.y + o.h / 2) : null);
       styr = window.setInterval(() => { if (Math.hypot(rum.pos.x - start.x, rum.pos.y - start.y) > 6) { ui.styrhjalp(null); window.clearInterval(styr); } }, 100);
@@ -1134,7 +1177,8 @@ export function skapaSpel(d) {
     const instr = instruktionFore(st);
     const iMolnet = !!instr;
     malNu = st.mal;
-    const visaMal = () => { if (!iMolnet) return; visaMoln(malBild(st.mal), instr); placeraMoln([]); };
+    // bilden i molnet: stegets egen bild (krönet, som är en yta utan bild, 42.4), annars målets bild ur grafiken
+    const visaMal = () => { if (!iMolnet) return; visaMoln(st.bild ? bilder.html(st.bild) : malBild(st.mal), instr); placeraMoln([]); };
     // molnet flyttar undan när kameran eller hjälten rör sig, så att det aldrig täcker målet, hjälten eller ungen
     const omplacera = window.setInterval(() => { if (iMolnet && !ui.$('#tanke').hidden && ui.plattan.hidden) placeraMoln([]); }, 250);
     const start = performance.now();
@@ -2391,7 +2435,12 @@ export function skapaSpel(d) {
     const farg = e.farg && PALETT[e.farg] ? parseInt(PALETT[e.farg].slice(1), 16) : 0xc8553d;
     rum.bara(farg);
     rum.markera(st.till, true);
-    await rum.vantaPa([st.till]);
+    // instruktionen står i molnet med målets bild tills han har lagt saken (beslut 41.5), som före ett ga_till
+    const instr = instruktionFore(st);
+    malNu = st.till;
+    if (instr) { visaMoln(malBild(st.till), instr); placeraMoln([]); logg.handelse('mål', 'i molnet: ' + st.till); }
+    const omplacera = window.setInterval(() => { if (instr && !ui.$('#tanke').hidden && ui.plattan.hidden) placeraMoln([]); }, 250);
+    try { await rum.vantaPa([st.till]); } finally { window.clearInterval(omplacera); malNu = null; if (instr) visaMoln(null); }
     rum.markera(st.till, false);
     rum.lagg(st.till);
     ljud.spela('klick');

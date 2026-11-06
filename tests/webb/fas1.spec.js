@@ -463,7 +463,7 @@ async function framTill(page, villkor, varv = 60) {
   throw new Error('kom inte fram');
 }
 
-test('styrbilden för att använda: Mellanslag första gången, sedan aldrig igen', async ({ page }, info) => {
+test('styrbilden för att använda: Mellanslag första gången i passet', async ({ page }, info) => {
   test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
   await tillScen(page, 3); // gå till lådan med staven
   const l = await page.evaluate(() => window.__ORDSTAVEN.objekt('lada_med_stav'));
@@ -574,7 +574,9 @@ test('utan WebGL: canvas-ritningen visar rummet, mörkret, skyltarna och rumsbyt
   await page.mouse.click(dorr.x, dorr.y);
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 60000 }).toBe('s01b_hallen');
   // förbi instruktionen (prologen v0.13: "Klättra upp för stegen!")
-  for (const t0 = Date.now(); Date.now() - t0 < 30000 && (await page.evaluate(() => window.__ORDSTAVEN.steg()?.typ)) !== 'ga_till';) {
+  // (just efter rumsbytet kan steget fortfarande vara förra rummets ga_till, så vänta också tills repliken är borta)
+  const iMalet = () => page.evaluate(() => window.__ORDSTAVEN.steg()?.typ === 'ga_till' && window.__ORDSTAVEN.steg()?.mal === 'stege_upp' && !document.querySelector('#plattan .replik-ruta'));
+  for (const t0 = Date.now(); Date.now() - t0 < 30000 && !(await iMalet());) {
     const r = await page.$('#plattan .replik-ruta'); if (r) await r.click().catch(() => {});
     await page.waitForTimeout(150);
   }

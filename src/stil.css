@@ -626,9 +626,10 @@ html, body {
 #rop { color: #000; font-weight: 600; box-shadow: 0 3px 0 #c8bb9c, 0 0 0 2px #2b2420; }
 #rop::before { content: ''; position: absolute; left: 50%; bottom: -12px; transform: translateX(-50%); border: 10px solid transparent; border-top-color: #2b2420; border-bottom: 0; z-index: -1; }
 /* ett ljud: ljudord i världen vid det som låter, Lexends tyngsta vikt, tjock kontur, snett, poppar och försvinner */
-.ljudord { position: absolute; z-index: 5; transform: translate(-50%, -100%) rotate(-8deg); font-weight: 900; font-size: calc(80px * var(--t)); line-height: 1; letter-spacing: .02em; color: var(--ljudfarg, #f2c14e); -webkit-text-stroke: calc(4px * var(--t)) #1a1410; paint-order: stroke fill; pointer-events: none; white-space: nowrap; animation: ljudord .8s ease-out forwards; }
+.ljudord { position: absolute; z-index: 5; transform: translate(-50%, -100%) rotate(-8deg); font-weight: 900; font-size: calc(80px * var(--t)); line-height: 1; letter-spacing: .02em; color: var(--ljudfarg, #f2c14e); -webkit-text-stroke: calc(4px * var(--t)) #1a1410; paint-order: stroke fill; pointer-events: none; white-space: nowrap; animation: ljudord 2s ease-out forwards; }
 .platta-oppen .ljudord { display: none; } /* ljudet hör till världen: läsplattan täcker det */
-@keyframes ljudord { 0% { opacity: 0; transform: translate(-50%, -80%) rotate(-8deg) scale(.6); } 18% { opacity: 1; transform: translate(-50%, -100%) rotate(-8deg) scale(1.12); } 30% { transform: translate(-50%, -100%) rotate(-8deg) scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -110%) rotate(-8deg) scale(1); } }
+/* ca 2 s (granskningen A 24): popp och studs på ca 0,25 s som förut, sedan står ordet still och tonas bort sist */
+@keyframes ljudord { 0% { opacity: 0; transform: translate(-50%, -80%) rotate(-8deg) scale(.6); } 7% { opacity: 1; transform: translate(-50%, -100%) rotate(-8deg) scale(1.12); } 12% { transform: translate(-50%, -100%) rotate(-8deg) scale(1); } 88% { opacity: 1; transform: translate(-50%, -100%) rotate(-8deg) scale(1); } 100% { opacity: 0; transform: translate(-50%, -110%) rotate(-8deg) scale(1); } }
 
 /* ---------------------------------------------------------------- T4c (stilguiden §3)
    Frågan står kvar ovanför korten: en rad i sin form (stjärnan för berättaren, ansiktet för den som frågade), 40 punkter */

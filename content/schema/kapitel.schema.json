@@ -528,6 +528,10 @@
             "mal": {
               "$ref": "#/$defs/id"
             },
+            "bild": {
+              "$ref": "#/$defs/id",
+              "description": "Bilden i molnet i stället för målets egen bild (ett bildkort), t.ex. krönet, som är en yta utan bild."
+            },
             "visa_styrhjalp": {
               "type": "boolean"
             },

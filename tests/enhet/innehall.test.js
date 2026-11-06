@@ -161,6 +161,14 @@ describe('kontrollen: enhet, alias, nivåer', () => {
     expect(medFel((k) => { k.alias = { scener: { s99_gammal: 's03_staven' } }; })).toBe('');
     expect(medFel((k) => { k.nivaer = { lasning: ['L3', 'L1'] }; })).toMatch(/golvet L3/);
   });
+  it('varnar en gång per ord i en lästext som saknas i ordlistorna, också böjda former (granskningen A 25)', () => {
+    const lapp = (k) => k.pussel.find((p) => p.id === 'p0_dinomat');
+    const v = medVarning((k) => { lapp(k).varianter.L2.text = ['Följ mina skyltar.', 'Följ mina skyltar igen.']; });
+    expect(v).toMatch(/ordet skyltar i en lästext finns inte i ordlistorna \(pussel p0_dinomat L2 text och ett ställe till\)/);
+    expect(v.match(/ordet skyltar/g)).toHaveLength(1);
+    // det som läses upp (en replik) är ingen lästext
+    expect(medVarning((k) => { k.scener[3].steg[0].text = 'Följ mina skyltar.'; })).not.toMatch(/ordet skyltar/);
+  });
   it('ljud från ett föremål: föremålet ska finnas i rummet', () => {
     expect(medFel((k) => { k.scener.find((s) => s.id === 's04_agget').steg.unshift({ typ: 'ljud', id: 'dunk', foremal: 'lada_med_agg' }); })).toBe('');
     expect(medFel((k) => { k.scener.find((s) => s.id === 's04_agget').steg.unshift({ typ: 'ljud', id: 'dunk', foremal: 'pianot' }); })).toMatch(/pianot finns inte/);

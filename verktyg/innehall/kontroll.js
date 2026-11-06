@@ -193,6 +193,8 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
       }
     }
 
+    /** Ord i lästexter som saknas i ordlistorna: ordet → platserna (en varning per ord, granskningen A 25). */
+    const saknade = new Map();
     // Kontroll av en text som visas
     const textKontroll = (text, plats, { lasesSjalv = false, replik = false } = {}) => {
       for (const r of rader(text)) {
@@ -205,6 +207,8 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
         const forsta = r.replace(PLATSHALLARE, 'X').trim()[0];
         if (arMening && forsta && forsta !== versaler(forsta) && !/^[.…"']/.test(forsta)) varningar.push(var_(`${plats}: meningen börjar med liten bokstav: "${r}"`));
         if (lasesSjalv) for (const o of ord(r)) { const s = arSparrat(o); if (s) fel.push(var_(`${plats}: ${o} är spärrat i text spelaren läser själv (${s}: mjukt G/K, NG, SJ m.fl.)`)); }
+        // granskningen A 25: varje ord i en lästext ska stå i ordlistorna, också böjda former (SKYLTAR)
+        if (lasesSjalv) for (const o of ord(r)) { const n = versaler(o); if (!ordmap.has(n) && !formler.has(n)) { if (!saknade.has(n)) saknade.set(n, []); saknade.get(n).push(plats); } }
         const antalOrd = ord(r).length;
         if (lasesSjalv && antalOrd > MAX_ORD_PER_RAD) varningar.push(var_(`${plats}: ${antalOrd} ord på en rad, högst ${MAX_ORD_PER_RAD} i de tidiga kapitlen`));
       }
@@ -350,7 +354,6 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
       for (const [id, sk] of Object.entries(r.skyltar || {})) {
         if (!ids.includes(id)) fel.push(var_(`rum ${r.id}: skylten ${id} finns inte i rummets innehall`));
         textKontroll(sk.text, `rum ${r.id} skylt ${id}`, { lasesSjalv: true });
-        if (ord(rader(sk.text).join(' ')).length === 1 && !ordmap.has(versaler(ord(rader(sk.text).join(' '))[0]))) varningar.push(var_(`rum ${r.id} skylt ${id}: ordet ${rader(sk.text).join(' ')} finns inte i ordlistorna`));
       }
       const frivilliga = new Set();
       (r.frivilligt || []).forEach((fv, j) => {
@@ -395,8 +398,6 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
           for (const a of vari.alternativ) {
             if (a.ord) {
               textKontroll(a.ord, `${vp} alternativ ${a.id}`, { lasesSjalv: true });
-              // Hela meningar som alternativ (luckor, sant/falskt) kontrolleras som text, inte mot ordlistorna.
-              if (ord(a.ord).length === 1 && !ordmap.has(versaler(a.ord))) varningar.push(var_(`${vp}: ordet ${a.ord} finns inte i ordlistorna`));
             }
             handlingKontroll(a.vid_valj, `${vp} alternativ ${a.id}`);
           }
@@ -451,6 +452,10 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
         if (p.foremal && p.foremal.length !== p.innehall.length) fel.push(var_(`${plats}: ${p.foremal.length} föremål men ${p.innehall.length} poster i innehall`));
       }
       if (p.typ === 'P12_dop' && p.min_bokstaver && p.max_bokstaver && p.min_bokstaver > p.max_bokstaver) fel.push(var_(`${plats}: min_bokstaver är större än max_bokstaver`));
+    }
+    for (const [n, platser] of saknade) {
+      const mer = platser.length === 2 ? ' och ett ställe till' : platser.length > 2 ? ` och ${platser.length - 1} ställen till` : '';
+      varningar.push(var_(`ordet ${n.toLocaleLowerCase('sv-SE')} i en lästext finns inte i ordlistorna (${platser[0]}${mer})`));
     }
   }
   return { fel, varningar, pass: passInfo };

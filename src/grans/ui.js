@@ -5,6 +5,9 @@ import { forSkarm, versaler } from '../karna/text.js';
 import { ljudningsdelar, maxtidMs } from '../karna/ljudning.js';
 import { ikon, laddaSkyltTra, IKON_FOR } from './ikoner.js';
 
+/** Hur länge ett ljudord står i världen (granskningen A 24), samma som animationen i stil.css. */
+export const LJUDORD_MS = 2000;
+
 /** @param {string} s */
 export const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c] || c);
 
@@ -574,18 +577,20 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
    * @param {string | null} html @param {{ x: number, y: number }} [punkt] figurens överkant på skärmen
    */
   /**
-   * Ett ljudord i världen vid det som låter (beslut 21.5): poppar upp, studsar och försvinner efter ca 0,8 s.
+   * Ett ljudord i världen vid det som låter (beslut 21.5): poppar upp, studsar och står kvar ca 2 s, så att han hinner läsa det
+   * (granskningen A 24). Reaktionen väntar inte på det, så den blir inte längre.
    * Det ritas i versaler genom text.js, som all text han läser. @param {string} ord vanlig skrift
    * @param {{ x: number, y: number }} punkt skärmpunkt @param {string} [farg] ljudets färg
    */
   function ljudord(ord, punkt, farg) {
+    // samma tid som animationen i stil.css (.ljudord)
     const e = document.createElement('div');
     e.className = 'ljudord'; e.setAttribute('aria-hidden', 'true');
     e.textContent = forSkarm(ord, { varden: {} }).join(' ');
     if (farg) e.style.setProperty('--ljudfarg', farg);
     e.style.left = punkt.x + 'px'; e.style.top = punkt.y + 'px';
     varldslager.appendChild(e); ankra(e);
-    window.setTimeout(() => { ankrade.delete(e); e.remove(); }, 850);
+    window.setTimeout(() => { ankrade.delete(e); e.remove(); }, LJUDORD_MS + 50);
   }
   function ropa(html, punkt) {
     const e = $('#rop');

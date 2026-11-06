@@ -132,6 +132,14 @@ describe('mellanscenernas bilder och bildkorten', () => {
     }
     expect(saknas).toEqual([]);
   });
+  it('ett mål med egen bild i molnet (ga_till med bild) har sitt bildkort (krönet, 42.4)', () => {
+    const saknas = [];
+    for (const k of kapitel) for (const sc of k.scener) for (const st of sc.steg) {
+      if (st.typ === 'ga_till' && st.bild && !existsSync(new URL(`assets/bildkort/${st.bild}.png`, rot))) saknas.push(`${k.id} ${sc.id}: ${st.bild}`);
+    }
+    expect(saknas).toEqual([]);
+    expect(kapitel.find((k) => k.id === 'kap-01').scener.find((sc) => sc.id === 'k1s08_loven').steg.find((st) => st.mal === 'kronet').bild).toBe('uppdrag_kullen');
+  });
   it('luftskeppet har alla bilder som regin använder, och hjälmen som trillar', () => {
     for (const r of ['glider_01', 'glider_02', 'skata_landar', 'ser_hjalten', 'ser_kartan', 'talar_01', 'talar_02', 'skata_putsar_01', 'skata_putsar_02', 'skata_snor', 'trasslar_01', 'trasslar_02',
       'laser_skyltarna', 'laser_skyltarna_talar', 'flyger_fel_01', 'flyger_fel_02']) expect(ramar.has('luftskepp_' + r), r).toBe(true);

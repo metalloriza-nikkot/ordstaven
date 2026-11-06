@@ -1124,8 +1124,9 @@ test('k1s08: krönet är målet i molnet, och ett tryck på det går uppför tra
   const moln = page.locator('#tanke');
   await expect(moln).toBeVisible();
   await expect(moln.locator('.instruktion')).toHaveText('GÅ UPP PÅ KULLEN!');
-  // målets bild: krönets egen bild när den finns (gråboxen har ingen), aldrig trappans
-  expect(await moln.locator('.malbild:not([data-bild="kronet"])').count()).toBe(0);
+  // bilden i molnet: Stils bildkort för krönet (42.4), aldrig trappans bild
+  await expect(moln.locator('.bildkort[data-bild="uppdrag_kullen"]')).toHaveCount(1);
+  expect(await moln.locator('.malbild').count()).toBe(0);
   await page.screenshot({ path: 'test-results/k1s08-kronet.png' });
   expect(await page.evaluate(() => window.__ORDSTAVEN.niva().niva)).toBe(0);
   await tryckNara(page, 'kronet');
