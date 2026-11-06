@@ -262,6 +262,8 @@ test('räddningen (apan, v0.7.4): ingen kasta-knapp, ett pinnsteg per fyllt fäl
   const logg = await page.evaluate(() => window.__ORDSTAVEN.logg());
   expect(logg).toContain('pinnsteg 5 av 5');
   expect(logg).toContain('klar med bokstäverna');
+  expect(logg).toContain('[ordkraft] STEGE'); // ordet blir en stege: ordkraftens ljus (39.2)
+  expect(logg).not.toContain('(utan bild)');
 });
 
 test('kodlåset: ungen visar första tecknet, låset kontrolleras när hela ordet är lagt, rätta stannar', async ({ page }) => {
@@ -361,7 +363,10 @@ test('titta–täck: förebilden tonas bort vid första brickan och tänds igen 
   // förebilden står kvar resten av försöket
   for (const b of 'VÄRD') await bricka(page, b).click();
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('SVÄRDET!', { timeout: 10000 });
-  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('klar med förebild');
+  const logg = await page.evaluate(() => window.__ORDSTAVEN.logg());
+  expect(logg).toContain('klar med förebild');
+  expect(logg).toContain('[ordkraft] SVÄRD'); // formeln blir något: ordkraftens ljus med Stils bilder (39.2)
+  expect(logg).not.toContain('(utan bild)');
 });
 
 test('svinga mot rummets föremål: instruktionen först, knuffen nosar mot närmaste, och saken i sista kommer alltid sist', async ({ page }) => {

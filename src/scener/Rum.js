@@ -333,6 +333,27 @@ export class Rum extends Phaser.Scene {
     this.ritaHjalte();
   }
 
+  /**
+   * Ordkraftens ljus (beslut 39.2, 10b Effekter): efx_ordkraft_01–04, ca 70 ms var, med mitten på stavens kalla ände
+   * (överst i handen, och 8 pixlar högre med svärdet). Bara bildbyten i världens pixlar, inget filter (golvdatorn).
+   * Ligger ovanför mörkret, så att ljuset syns på vinden. Ger false när bilderna saknas.
+   */
+  ordkraft() {
+    if (!this.harRum || !this.textures.exists('effekter') || !this.textures.get('effekter').has('efx_ordkraft_01')) return false;
+    this.ordkraftBild?.destroy();
+    const x = Math.round(this.pos.x), y = Math.round(this.pos.y - FIGUR.hojd - (this.harSvard ? 8 : 0) + 2);
+    const b = this.add.image(x, y, 'effekter', 'efx_ordkraft_01').setOrigin(0.5, 0.5);
+    this.lagerLjust.add(b); this.ordkraftBild = b; this.smutsig = true;
+    let i = 1;
+    this.time.addEvent({ delay: 70, repeat: 3, callback: () => {
+      i++;
+      if (!b.active) return;
+      if (i > 4) { b.destroy(); if (this.ordkraftBild === b) this.ordkraftBild = null; } else b.setFrame(`efx_ordkraft_0${i}`);
+      this.smutsig = true;
+    } });
+    return true;
+  }
+
   /** Har han staven? Den syns i handen från att han har en formel (LJUS). @param {boolean} pa */
   sattStav(pa) {
     if (this.harStav === pa) return;

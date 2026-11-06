@@ -1809,6 +1809,16 @@ export function skapaSpel(d) {
   }
 
   /**
+   * Ordkraftens ljus (39.2): varje gång ett ord blir något (en formel, eller STEGE som blir en stege) pulserar stavens
+   * regnbågsljus ut när ordet har stått i luften. Kodlåset (HEM) och namnet räknas inte: där blir ordet ingen sak.
+   * @param {string} ord
+   */
+  function ordkraft(ord) {
+    const visad = !!rum.ordkraft?.();
+    logg.handelse('ordkraft', `${String(ord).toUpperCase()}${visad ? '' : ' (utan bild)'}`);
+  }
+
+  /**
    * Formel med brickor (P11). Med titta–täck (forebild.tacks, SVÄRD): förebilden syns, brickorna glider in efter en
    * stund, och förebilden tonas bort när första brickan läggs medan ungen håller för ögonen. Vid fel eller knuff tänds
    * den igen och står kvar resten av försöket. Vid rätt lyser den en sekund ovanför hans ord.
@@ -1930,6 +1940,7 @@ export function skapaSpel(d) {
         const ordet = `<div class="formel-luft-ruta">${kolla}<div class="formel-i-luften">${ui.esc(p.svar)}</div></div>`;
         ui.visaPlatta(ordet, 'formel-luft');
         await vanta(tid(1000)); ui.doljPlatta();
+        ordkraft(p.svar);
         if (tt) logg.handelse('formel', `${p.id}: klar ${spar.forebild ? 'med' : 'utan'} förebild`);
         await reaktion(r.reaktion);
         klar({ niva: p.niva, forstaForsoket: f.forstaForsoket, forsok: f.s.fel + 1, hjalp: spar.hjalp });
@@ -2036,6 +2047,7 @@ export function skapaSpel(d) {
         if (medStege) await vanta(tid(600));
         ui.visaPlatta(`<div class="formel-i-luften">${ui.esc(r.s.svar)}</div>`, 'formel-luft');
         await vanta(tid(1000)); ui.doljPlatta();
+        ordkraft(r.s.svar); // ordet blir en stege
         // "med bokstäverna", inte "genom att gissa": det senare kan läsas som att han gissade (beslut 43.6)
         logg.handelse('räddning', r.s.kastat ? 'klar i kasta-läget' : 'klar med bokstäverna', { fel: r.s.fel });
         await reaktion(r.s.kastat ? (p.kasta?.vid_ratt ?? p.vid_ratt) : p.vid_ratt);
