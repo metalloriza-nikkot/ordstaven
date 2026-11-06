@@ -2,6 +2,7 @@
 
 | Version | Datum | Vad |
 |---|---|---|
+| 0.25.2 | 2026-11-06 | **Ordkraftens ljus står en bild längre (48.3):** bild 1, 2, 3, 3 och 4, ca 100 ms var. Ringen går inte runt två gånger, eftersom två varv ser ut som ett blinkande. |
 | 0.25.1 | 2026-11-06 | **Ordkraftens ljus i händelsetakten (2f, 46.5):** ca 100 ms per bild i stället för 70, så att ringen syns i ungefär en halv sekund och går att känna igen. |
 | 0.25.0 | 2026-11-06 | **Uppdragslappen (2d, 37.3 och 40.1).** Innehålls 20 uppdrag (tolv i prologen och åtta i kapitel 1) står på Farfars gulnade papper i remsan under spelytan, till vänster om textrutan: uppdragets bild och namn, en bock per gjort steg och steget han gör nu med pilen. Ett nytt steg kommer med ett pling och läses upp, utom när steget är själva läsuppgiften. Lappen ersätter de instruktionsrepliker och moln som säger samma sak. Efter berättelsens stund slår stämpeln i blått bläck ned, lappen flyger till pausknappen, och uppdraget står i hjältebokens nya flik KLART. Utan remsa står replikerna och molnet som förut. Schema 2.20. |
 | 0.24.1 | 2026-11-06 | **Ordkraftens ljus (2b3, 39.2).** Varje gång ett ord blir något, en formel (LJUS, SVÄRD) eller STEGE som blir en stege, pulserar stavens regnbågsring ut från stavens kalla ände med Stils fyra bilder (ca 70 ms var), när ordet har stått i luften. Bara bildbyten, så golvdatorn klarar det. Effekterna till kapitel 1 ligger i ett eget atlas. |

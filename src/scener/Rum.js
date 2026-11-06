@@ -36,8 +36,10 @@ const GANG_STEG = 5;
  */
 const LAGER_FARG = { taggkam: 0x5fae6a, ryggsack_skog: 0x8a5a2b };
 
-/** Ordkraftens ljus: en bild per 100 ms, fyra bilder (ca 0,4 s), händelsetakten i 10e §7 (46.5). */
+/** Ordkraftens ljus: en bild per 100 ms, händelsetakten i 10e §7 (46.5). */
 export const ORDKRAFT_MS = 100;
+/** Ordkraftens ljus: bildernas ordning (beslut 48.3), ca 0,5 s. */
+export const ORDKRAFT_BILDER = [1, 2, 3, 3, 4];
 
 export class Rum extends Phaser.Scene {
   /**
@@ -337,7 +339,7 @@ export class Rum extends Phaser.Scene {
   }
 
   /**
-   * Ordkraftens ljus (beslut 39.2, 10b Effekter): efx_ordkraft_01–04, ca 100 ms var (händelsetakten i 10e §7, beslut 46.5), med mitten på stavens kalla ände
+   * Ordkraftens ljus (beslut 39.2, 10b Effekter): efx_ordkraft_01–04 i ordningen 1, 2, 3, 3, 4, ca 100 ms var (händelsetakten i 10e §7, beslut 46.5 och 48.3), med mitten på stavens kalla ände
    * (överst i handen, och 8 pixlar högre med svärdet). Bara bildbyten i världens pixlar, inget filter (golvdatorn).
    * Ligger ovanför mörkret, så att ljuset syns på vinden. Ger false när bilderna saknas.
    */
@@ -347,11 +349,12 @@ export class Rum extends Phaser.Scene {
     const x = Math.round(this.pos.x), y = Math.round(this.pos.y - FIGUR.hojd - (this.harSvard ? 8 : 0) + 2);
     const b = this.add.image(x, y, 'effekter', 'efx_ordkraft_01').setOrigin(0.5, 0.5);
     this.lagerLjust.add(b); this.ordkraftBild = b; this.smutsig = true;
-    let i = 1;
-    this.time.addEvent({ delay: ORDKRAFT_MS, repeat: 3, callback: () => {
+    // bild 1, 2, 3, 3 och 4: ringen står en bild längre i stället för att gå runt två gånger (Stil, beslut 48.3)
+    let i = 0;
+    this.time.addEvent({ delay: ORDKRAFT_MS, repeat: ORDKRAFT_BILDER.length - 1, callback: () => {
       i++;
       if (!b.active) return;
-      if (i > 4) { b.destroy(); if (this.ordkraftBild === b) this.ordkraftBild = null; } else b.setFrame(`efx_ordkraft_0${i}`);
+      if (i >= ORDKRAFT_BILDER.length) { b.destroy(); if (this.ordkraftBild === b) this.ordkraftBild = null; } else b.setFrame(`efx_ordkraft_0${ORDKRAFT_BILDER[i]}`);
       this.smutsig = true;
     } });
     return true;
