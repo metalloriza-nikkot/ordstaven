@@ -107,6 +107,11 @@
        "name": "bild",
        "type": "string",
        "value": "fatolj_vanster"
+      },
+      {
+       "name": "bild_sitter",
+       "type": "string",
+       "value": "hjalte_fatolj_vanster"
       }
      ]
     },

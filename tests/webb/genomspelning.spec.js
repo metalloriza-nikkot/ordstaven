@@ -357,7 +357,7 @@ test.describe('genomspelning av prologen', () => {
   test('hela prologen går att spela, med fel svar och omstart mitt i', async ({ page }, info) => {
     test.skip(!process.env.SATT && !['mac-helskarm', 'ipad-10', 'mac-safari'].includes(info.project.name), 'tre projekt räcker');
     test.setTimeout(420000); // hela prologen, två gånger halva: långsamma CI-maskiner behöver marginal
-    const fel = []; page.on('pageerror', (e) => fel.push(String(e)));
+    const fel = []; page.on('pageerror', (e) => { fel.push(String(e)); if (process.env.PW_STACK) console.log('STACK', e.stack); });
     // PW_LANGSAM=4 kör processorn fyra gånger långsammare (Chromium), som en långsam CI-maskin
     if (process.env.PW_LANGSAM) { const c = await page.context().newCDPSession(page); await c.send('Emulation.setCPUThrottlingRate', { rate: Number(process.env.PW_LANGSAM) }); }
     await page.goto('./?snabb&ny' + CANVAS);

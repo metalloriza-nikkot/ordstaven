@@ -290,6 +290,9 @@ html, body {
 .bok-ruta { padding: 20px 24px; display: flex; flex-direction: column; align-items: center; gap: 14px; width: min(88vw, calc(var(--rum-bredd) * .85)); background: #f3e6c8; }
 .uppslag { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .bok-bild { cursor: pointer; width: calc(220px * var(--t)); height: calc(140px * var(--t)); display: flex; align-items: center; justify-content: center; background: #c8bfae; border-radius: 8px; }
+/* Stils bilder i expeditionsboken (110 × 70, akvarell på papper med egen kant): ingen grå ruta bakom */
+.bok-bild:has(> .bild.bildkort) { background: none; width: var(--bokbild-b); height: var(--bokbild-h); }
+.bok-bild > .bild.bildkort { width: var(--bokbild-b); height: var(--bokbild-h); margin: 0; }
 .bildtext { font-size: calc(48px * var(--t)); }
 .boktext { font-size: calc(26px * var(--t)); line-height: 1.5; max-width: 34em; text-align: left; }
 .boktext .rad { white-space: normal; }
@@ -299,6 +302,8 @@ html, body {
 .hjalte-ruta { padding: 20px; display: grid; grid-template-columns: auto auto; align-items: center; gap: 14px 28px; }
 .hjalte-ruta .klar { grid-column: 1 / -1; justify-self: center; }
 .hjalte-bild { display: flex; flex-direction: column; align-items: center; width: 96px; }
+/* Stils hjälte i de valda färgerna (16 × 24), i hela steg: 6 punkter per pixel vid t = 1 */
+.hjalte-sprite { width: calc(16 * var(--ipx-stor)); height: calc(24 * var(--ipx-stor)); image-rendering: pixelated; flex: none; }
 .hb-hjalm { width: 92px; height: 92px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 6px 0 rgba(255, 255, 255, .45), 0 2px 0 #1a1e26; }
 .hb-ansikte { position: relative; width: 66px; height: 62px; border-radius: 45%; }
 .hb-ansikte i { position: absolute; top: 24px; width: 12px; height: 6px; border-radius: 6px; background: #12305a; }
@@ -360,6 +365,8 @@ html, body {
 #tanke .moln-bild { display: inline-flex; align-items: center; }
 #tanke .bild.bubbla .bubbla-ytter { box-shadow: none; background: none; width: auto; height: auto; }
 #tanke .bild.bubbla .bubbla-prick { display: none; }
+/* frågans rader i molnet står under varandra (en rad per .rad), inte i rad bredvid varandra */
+#tanke .moln-text { display: block; }
 #tanke .moln-hogtalare { pointer-events: auto; flex: none; width: 48px; height: 48px; border-radius: 24px; font-size: 24px; background: #efe6d2; align-self: flex-start; }
 #tanke .bild.bubbla { font-size: inherit; }
 /* målet i molnet efter en dialog (beslut 31.2): föremålets egen pixelbild, i heltalsskala */

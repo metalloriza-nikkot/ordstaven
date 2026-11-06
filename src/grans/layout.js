@@ -32,6 +32,10 @@ export function skapaLayout({ varld, logg }) {
     r.setProperty('--t', String(t));
     // bildkorten (48 × 48 pixlar) skalas i hela steg i fysiska pixlar, så nära emojins storlek (64 punkter × t) som det går
     r.setProperty('--kort', (Math.max(1, Math.round((64 * t * dpr) / 48)) * 48) / dpr + 'px');
+    // expeditionsbokens bilder (110 × 70) i bokbildens ruta (220 × 140 × t), i hela steg i fysiska pixlar (10f)
+    const bokSteg = Math.max(1, Math.round((220 * t * dpr) / 110));
+    r.setProperty('--bokbild-b', (bokSteg * 110) / dpr + 'px');
+    r.setProperty('--bokbild-h', (bokSteg * 70) / dpr + 'px');
     // ikonerna (16 × 16) och HUD:ens knappar (24 × 24) i hela steg i fysiska pixlar (10d). En pixel i CSS-punkter:
     const steg = (/** @type {number} */ mal, /** @type {number} */ px, min = 1) => Math.max(min, Math.round((mal * dpr) / px)) / dpr;
     r.setProperty('--ipx-text', steg(40 * t, 16) + 'px'); // i en rad med text i 40 punkter

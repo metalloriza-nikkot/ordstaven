@@ -42,6 +42,17 @@ export const ORDKRAFT_MS = 100;
 /** Ordkraftens ljus: bildernas ordning (beslut 48.3), ca 0,5 s. */
 export const ORDKRAFT_BILDER = [1, 2, 3, 3, 4];
 
+/**
+ * Äggets regi (36.7, 10f): mellanscenens `bild` → äggets bilder. `steg` = ms per bild, `ms` = mellanscenens längd.
+ * @type {Record<string, { ramar: string[], steg?: number, ms: number, slinga?: boolean, tona?: boolean }>}
+ */
+const AGGET = {
+  agg_frost: { ramar: ['agg_01'], ms: 1400 },
+  agg_filt: { ramar: ['agg_filt_frost', 'agg_filt'], tona: true, steg: 900, ms: 1600 },
+  agg_lyser: { ramar: ['agg_lyser_01', 'agg_lyser_02', 'agg_lyser_03'], slinga: true, steg: 150, ms: 1800 },
+  agg_klackning: { ramar: ['agg_knack_01', 'agg_knack_02', 'agg_kras_01', 'agg_nos_01', 'agg_ute_01', 'agg_ute_02', 'agg_hopp_01', 'agg_ute_02'], steg: 450, ms: 3800 },
+};
+
 export class Rum extends Phaser.Scene {
   /**
    * @param {{ inmatning: ReturnType<typeof import('../karna/inmatning.js').skapaInmatning>,
@@ -101,6 +112,14 @@ export class Rum extends Phaser.Scene {
     this.luft = null;
     /** @type {string | null} den senaste sidovyn som visades (för testerna) */
     this.senasteSidovy = null;
+    /** @type {{ id: string, img: any, tex: string, ram: string } | null} föremålet han sitter i (34.4) */
+    this.sitter = null;
+    /** @type {Map<string, string>} föremål som regin har gett en annan bild (ägget), tills rummet byts */
+    this.ramFor = new Map();
+    /** @type {Map<string, Phaser.Time.TimerEvent>} bilder som byts i en slinga (ägget som lyser) */
+    this.ramSlinga = new Map();
+    /** @type {Map<string, Phaser.Time.TimerEvent[]>} bildbyten som väntar (en serie) */
+    this.ramTimrar = new Map();
     /** @type {string[]} luftskeppets lägen i den ordning de visades (för testerna) */
     this.regiLogg = [];
     /** @type {string | null} en hel bild av hjälten i stället för gången (kartbiten upp mot luftskeppet, s22) */
@@ -113,7 +132,7 @@ export class Rum extends Phaser.Scene {
     /** @type {{ ids: string[], klar: (id: string) => void } | null} */
     this.vantar = null;
     this.markerade = new Set();
-    /** @type {Record<string, { farg: number | null, storlek: string | null }[]>} föremål som visar ett pussels alternativ */
+    /** @type {Record<string, { farg: number | null, storlek: string | null, bild?: string | null }[]>} föremål som visar ett pussels alternativ */
     this.delar = {};
     /** @type {Map<string, any[]>} */
     this.ritadeDelar = new Map();
@@ -402,6 +421,16 @@ export class Rum extends Phaser.Scene {
   }
 
   /**
+   * Hjälten i spelarens färger som en bild (data-URL) för textlagret, t.ex. när han väljer hjälte i s00 (10f).
+   * null när bilden inte finns. @param {string} [ram]
+   */
+  hjalteBild(ram = 'hjalte_ga_ner_01') {
+    const nyckel = this.hjalteTextur || 'hjalte';
+    if (!this.textures.exists(nyckel) || !this.textures.get(nyckel).has(ram)) return null;
+    try { return this.textures.getBase64(nyckel, ram) || null; } catch { return null; }
+  }
+
+  /**
    * Hjälten i spelarens färger (valen i skapa hjälten): bilderna av hjälte A med hud och dräkt bytta, staven ovanpå
    * när han har den, och det han har på sig. @param {Record<string, number>} val
    */
@@ -518,6 +547,31 @@ export class Rum extends Phaser.Scene {
     return true;
   }
 
+  /**
+   * Hjälten sätter sig i föremålet han har gått till (34.4): fåtöljen visas med honom i (kartans `bild_sitter`,
+   * `hjalte_fatolj_vanster`), och han själv döljs, tills han ska röra sig igen (`stigUpp`). @param {string} id
+   * @returns {boolean} om han satte sig
+   */
+  sattSig(id) {
+    const o = this.objekt.find((x) => x.id === id), img = /** @type {any} */ (this.ritade.get(id));
+    const fb = o?.bildSitter ? foremalsbild(this, o.bildSitter) : null;
+    if (!fb || !img?.setTexture) return false;
+    this.sitter = { id, img, tex: img.texture.key, ram: img.frame.name };
+    img.setTexture(fb.nyckel === 'hjalte' ? this.hjalteTextur || 'hjalte' : fb.nyckel, fb.ram);
+    this.hjalte.setVisible(false);
+    this.smutsig = true;
+    return true;
+  }
+
+  /** Han reser sig och står framför fåtöljen. */
+  stigUpp() {
+    const s = this.sitter; if (!s) return;
+    this.sitter = null;
+    if (s.img.active) s.img.setTexture(s.tex, s.ram);
+    this.hjalte.setVisible(this.harRum);
+    this.placera(); this.smutsig = true;
+  }
+
   /** Han vaknar och kliver ur sängen: täcket av, han kliver ur, och står framför sängen. @param {number} ms */
   async vakna(ms = 500) {
     const s = this.sover; if (!s) return;
@@ -546,8 +600,9 @@ export class Rum extends Phaser.Scene {
       const forut = { tex: img.texture.key, ram: img.frame.name };
       const bilder = [[1, 150], [2, 150], [3, 350], [4, 700], [5, 200]];
       return (async () => {
-        for (const [n, t] of bilder) { img.setTexture(figur, `runt_fonster_skata_0${n}`); this.smutsig = true; await new Promise((k) => this.time.delayedCall(t, k)); }
-        img.setTexture(forut.tex, forut.ram); this.smutsig = true;
+        // rummet kan ritas om (ett rumsbyte, en omstart) medan han skrattar: då finns fönstret inte längre
+        for (const [n, t] of bilder) { if (!img.active) return; img.setTexture(figur, `runt_fonster_skata_0${n}`); this.smutsig = true; await new Promise((k) => this.time.delayedCall(t, k)); }
+        if (img.active) { img.setTexture(forut.tex, forut.ram); this.smutsig = true; }
       })();
     }
     const k = this.kamera, y = k.y + 34; // under knapparna i hörnen
@@ -599,6 +654,8 @@ export class Rum extends Phaser.Scene {
       const lage = bild.slice('luftskepp_'.length);
       return this.luftskepp(lage) ? ({ glider: 2800, skata_putsar: 2200, trasslar: 2000 })[lage] ?? 1400 : 0;
     }
+    const agg = AGGET[bild];
+    if (agg) return this.aggRegi(agg) ? agg.ms : 0;
     if (this.textures.exists(`sidovy_${bild}_bakgrund`)) {
       // luftskeppet flyger först iväg åt fel håll, mot SKOLAN (Stil 21:20), sedan kommer sidovyn
       const ms = this.luft && this.flygFel() ? 1600 : 0;
@@ -976,7 +1033,7 @@ export class Rum extends Phaser.Scene {
     this.harRum = !!v.rum;
     if (v.nyttRum || !this.harRum) { this.rumsbild = (this.harRum && v.karta?.bild) || null; this.mark = (this.harRum && v.karta?.mark) || null; this.rumId = v.rum; this.markObjekt = v.karta?.objekt || []; }
     this.visaUnge = v.unge;
-    if (v.nyttRum) { this.ungeMal = null; this.ungeTittarPa = null; for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas.remove(); this.sover = null; } this.rensaRegi(); }
+    if (v.nyttRum) { for (const id of [...this.ramSlinga.keys(), ...this.ramTimrar.keys()]) this.stoppaRamar(id); this.ramFor.clear(); this.ungeMal = null; this.ungeTittarPa = null; for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas.remove(); this.sover = null; } this.rensaRegi(); }
     this.tillstand = v.tillstand;
     if (v.nyttRum || !this.harRum) this.inomhus = !!v.karta?.inomhus;
     this.lampor = v.karta?.lampor || [];
@@ -1021,6 +1078,8 @@ export class Rum extends Phaser.Scene {
     if (!this.harRum && (this.kamera.x || this.kamera.y)) this.sattKamera({ x: 0, y: 0 });
     this.hjalte.setVisible(this.harRum && !this.sover);
     this.unge.setVisible(this.harRum && this.visaUnge && !this.sover?.ungeGomd);
+    // han sitter kvar i fåtöljen när rummet ritas om, men inte i ett nytt rum
+    if (this.sitter) { const id = this.sitter.id; this.sitter = null; if (!v.nyttRum) this.sattSig(id); }
     this.ritaLjus();
     this.placera();
     this.b.vidAndring?.();
@@ -1090,8 +1149,12 @@ export class Rum extends Phaser.Scene {
       this.ritade.set(o.id, /** @type {any} */ (rad));
       return;
     }
-    const bildNamn = o.bildSedan && this.bytta?.has(o.id) ? o.bildSedan : o.bildNatt && (this.tillstand === 'natt' || this.tillstand === 'natt_upplyst') ? o.bildNatt : o.bild;
-    const fb = bildNamn && !this.delar[o.id] ? foremalsbild(this, bildNamn) : null;
+    const bildNamn = this.ramFor.has(o.id) ? this.ramFor.get(o.id) : o.bildSedan && this.bytta?.has(o.id) ? o.bildSedan : o.bildNatt && (this.tillstand === 'natt' || this.tillstand === 'natt_upplyst') ? o.bildNatt : o.bild;
+    // ett föremål som är ett alternativ i ett läsval i rummet (dinomatens lådor) har alternativets bild, i den
+    // variant spelaren får (lada_rod, lada_bla_stor …), när Stil har ritat den
+    const delar0 = this.delar[o.id];
+    const altBild = delar0?.length === 1 && delar0[0].bild && foremalsbild(this, delar0[0].bild) ? delar0[0].bild : null;
+    const fb = altBild ? foremalsbild(this, altBild) : bildNamn && !delar0 ? foremalsbild(this, bildNamn) : null;
     if (fb) {
       const pa = (o.bildPa && this.objekt.find((x) => x.id === o.bildPa)) || o;
       const tex = fb.nyckel === 'hjalte' ? this.hjalteTextur || 'hjalte' : fb.nyckel;
@@ -1172,7 +1235,7 @@ export class Rum extends Phaser.Scene {
 
   /**
    * Visa ett pussels alternativ i föremålet (t.ex. lådorna i den variant spelaren har). null = som vanligt.
-   * @param {string} id @param {{ farg: number | null, storlek: string | null }[] | null} delar
+   * @param {string} id @param {{ farg: number | null, storlek: string | null, bild?: string | null }[] | null} delar
    */
   visaDelar(id, delar) {
     const o = this.ruta(id); if (!o) return;
@@ -1433,10 +1496,128 @@ export class Rum extends Phaser.Scene {
   tomt(id) { this.smutsig = true; const r = this.ritade.get(id); if (r) { r.setFillStyle?.(0x6f6a62); r.setAlpha(0.6); } this.markera(id, false); }
 
   /** Visa att en kruka är slagen. @param {string} id */
+  /**
+   * Ägget i lådan (36.7, 10f): regin byter bild på föremålet med äggets bilder (kartans `bild` är `agg_01`).
+   * Bara bildbyten och en toning, så golvdatorn klarar det. @param {typeof AGGET[string]} a @returns {boolean}
+   */
+  aggRegi(a) {
+    const o = this.objekt.find((x) => x.bild === 'agg_01' || x.bildSedan === 'agg_skal');
+    if (!o || !this.ritade.get(o.id) || !foremalsbild(this, a.ramar[0])) return false;
+    // filten som hjälten bar dit ligger i bilden nu (agg_filt), så den lagda filten tas bort
+    if (a.tona) { for (const g of this.lagda.filter((x) => Math.abs(x.x - (o.x + o.b / 2 - 6)) < 4 && Math.abs(x.y - (o.y + o.h / 2 - 4)) < 4)) g.destroy(); this.lagda = this.lagda.filter((x) => x.active); }
+    if (a.slinga) this.slingaRamar(o.id, a.ramar, a.steg ?? 150);
+    else if (a.tona) this.tonaRam(o.id, a.ramar[0], a.ramar[1], a.steg ?? 900);
+    else this.spelaRamar(o.id, a.ramar, a.steg ?? 0);
+    return true;
+  }
+
+  /** Föremålets bild byts (och står kvar tills rummet byts). @param {string} id @param {string} ram */
+  sattRam(id, ram) {
+    const fb = foremalsbild(this, ram);
+    if (!fb) return;
+    this.ramFor.set(id, ram);
+    const r = /** @type {any} */ (this.ritade.get(id));
+    // rummet kan ha ritats om sedan bytet planerades: bara en bild som finns kvar byts
+    if (r?.setTexture && r.active && r.scene) { r.setTexture(fb.nyckel, fb.ram); this.smutsig = true; }
+  }
+
+  /** Bilderna i tur och ordning, steg ms var; den sista står kvar. @param {string} id @param {string[]} ramar @param {number} steg */
+  spelaRamar(id, ramar, steg) {
+    this.stoppaRamar(id);
+    const t = ramar.slice(1).map((ram, i) => this.time.delayedCall(steg * (i + 1), () => this.sattRam(id, ram)));
+    this.sattRam(id, ramar[0]);
+    this.ramTimrar.set(id, t);
+  }
+
+  /** Det som byter bild på föremålet (en serie, en slinga) slutar. @param {string} id */
+  stoppaRamar(id) {
+    this.ramSlinga.get(id)?.remove(); this.ramSlinga.delete(id);
+    for (const t of this.ramTimrar.get(id) || []) t.remove();
+    this.ramTimrar.delete(id);
+  }
+
+  /** Bilderna i en slinga tills något annat byter bild (ägget som lyser). @param {string} id @param {string[]} ramar @param {number} steg */
+  slingaRamar(id, ramar, steg) {
+    this.stoppaRamar(id);
+    let i = 0;
+    this.sattRam(id, ramar[0]);
+    this.ramSlinga.set(id, this.time.addEvent({ delay: Math.max(150, steg), loop: true, callback: () => { i = (i + 1) % ramar.length; this.sattRam(id, ramar[i]); } }));
+  }
+
+  /** Från en bild till en annan med en toning (frosten smälter). @param {string} id @param {string} fran @param {string} till @param {number} ms */
+  tonaRam(id, fran, till, ms) {
+    this.stoppaRamar(id);
+    this.sattRam(id, fran);
+    const r = /** @type {any} */ (this.ritade.get(id)), fb = foremalsbild(this, till);
+    if (!r?.active || !fb) return;
+    const ny = /** @type {any} */ (this.add.image(r.x, r.y, fb.nyckel, fb.ram).setOrigin(r.originX, r.originY).setAlpha(0));
+    ny.fot = r.fot;
+    (r.parentContainer ?? this.lagerObjekt).add(ny);
+    const t = this.tweens.add({ targets: ny, alpha: 1, duration: ms, delay: 300, onUpdate: () => { this.smutsig = true; }, onComplete: () => { if (ny.active) ny.destroy(); this.sattRam(id, till); } });
+    // ritas rummet om under toningen tas den nya bilden bort med det gamla rummet, och toningen slutar
+    ny.once('destroy', () => { if (t.isPlaying()) { t.stop(); this.sattRam(id, till); } });
+  }
+
+  /** Ägget i rummet medan det fryser (agg_01 är dess bild just nu), eller null. */
+  get frysandeAgg() {
+    const o = this.objekt.find((x) => x.bild === 'agg_01');
+    if (!o || !this.ritade.get(o.id)) return null;
+    const nu = this.ramFor.get(o.id) ?? (this.bytta?.has(o.id) ? o.bildSedan : o.bild);
+    return nu === 'agg_01' || nu?.startsWith('agg_frys') || nu?.startsWith('agg_gungar') ? o : null;
+  }
+
+  /** Knuffen i FILT (10f): ägget hackar tänder, ca 1,2 s, och snöflingor lossnar. */
+  aggKnuff() {
+    const o = this.frysandeAgg; if (!o || !foremalsbild(this, 'agg_frys_01')) return false;
+    this.spelaRamar(o.id, [...Array(10)].map((_, i) => `agg_frys_0${1 + (i % 2)}`).concat('agg_01'), 120);
+    return true;
+  }
+
+  /** Efter tre fel i FILT (10f): ägget gungar mot den rätta lådan. @param {string} mot */
+  aggGungar(mot) {
+    const o = this.frysandeAgg, m = this.ruta(mot);
+    if (!o || !m || !foremalsbild(this, 'agg_gungar_hoger')) return false;
+    const sida = m.x + m.b / 2 >= o.x + o.b / 2 ? 'agg_gungar_hoger' : 'agg_gungar_vanster';
+    this.spelaRamar(o.id, [sida, 'agg_01', sida, 'agg_01', sida, 'agg_01'], 260);
+    return true;
+  }
+
+  /** Ungen kliver ur ägget (unge_folj): skalet ligger kvar i lådan, och ungen står framför. */
+  ungenUrAgget() {
+    for (const [id, ram] of this.ramFor) if (ram.startsWith('agg_') && ram !== 'agg_skal') { this.stoppaRamar(id); this.sattRam(id, 'agg_skal'); }
+  }
+
+  /**
+   * En dörr öppnas när hjälten går igenom den (31.7, 10f): `<bild>_oppnas_01–03`, ca 80 ms var, i rummet han lämnar.
+   * Den ritas stängd igen nästa gång rummet visas. En fel dörr öppnas aldrig. @param {string} id @param {number} [ms]
+   */
+  async oppnaDorr(id, ms = 80) {
+    const r = /** @type {any} */ (this.ritade.get(id));
+    const namn = r?.frame?.name;
+    if (!namn || !r.setTexture) return false;
+    const serie = [1, 2, 3].map((i) => foremalsbild(this, `${namn}_oppnas_0${i}`));
+    if (!serie.every(Boolean)) return false;
+    for (const fb of /** @type {{ nyckel: string, ram: string }[]} */ (serie)) {
+      if (!r.active) return false;
+      r.setTexture(fb.nyckel, fb.ram); this.smutsig = true;
+      await new Promise((klar) => this.time.delayedCall(ms, klar));
+    }
+    return true;
+  }
+
   slagen(id) {
     this.smutsig = true; const r = this.ritade.get(id); if (!r) return;
     if (r.setFillStyle) { r.setFillStyle(0x5a554e); r.setSize(18, 8); r.y += 10; return; }
-    // en bild: krukan är slagen i bitar, bara skärvorna på golvet syns (den nedre tredjedelen)
+    // med Stils bilder (36.8, 10f): krukan spricker, delar sig och faller (<bild>_spricker_01–03, ca 80 ms var),
+    // och skärvorna ligger kvar (<bild>_skarvor). Samma nederkant mitt, så bilden byts på plats
+    const namn = /** @type {any} */ (r).frame?.name;
+    const serie = namn ? [1, 2, 3].map((i) => foremalsbild(this, `${namn}_spricker_0${i}`)) : [];
+    const skarvor = namn ? foremalsbild(this, `${namn}_skarvor`) : null;
+    if (serie.every(Boolean) && skarvor && /** @type {any} */ (r).setTexture) {
+      [...serie, skarvor].forEach((fb, i) => this.time.delayedCall(80 * i, () => { if (r.active) { /** @type {any} */ (r).setTexture(fb.nyckel, fb.ram); this.smutsig = true; } }));
+      return;
+    }
+    // annars: krukan är slagen i bitar, bara skärvorna på golvet syns (den nedre tredjedelen)
     r.setCrop(0, Math.round(r.height * 0.6), r.width, r.height); r.setAlpha(0.8);
   }
 

@@ -251,6 +251,8 @@ redo.then(() => { startKlar = true; window.clearTimeout(startVakt); window.remov
   kamera: () => ({ ...rum.kamera, ...rum.storlek }),
   /** Föremålets ruta på skärmen (CSS-pixlar), via kameran: för att se om något syns. */
   varldTillSkarm: (x, y) => varldTillSkarm(layout.skala, rum.kamera, x, y),
+  /** bilden som föremålet ritas med (atlasets ram), eller null */
+  bildFor: (id) => { const r = rum.ritade.get(id); return r?.frame?.name ?? null; },
   rutaPaSkarm: (id) => { const o = rum.ruta(id); if (!o) return null; const a = varldTillSkarm(layout.skala, rum.kamera, o.x, o.y), b = varldTillSkarm(layout.skala, rum.kamera, o.x + o.b, o.y + o.h); return { x: a.x, y: a.y, b: b.x - a.x, h: b.y - a.y }; },
   /** Hur många steg (uppdateringar) rummet har gjort i canvasläget. */
   steg2: () => rum.antalSteg || 0,

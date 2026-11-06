@@ -505,6 +505,14 @@ test('boken: uppslag 1 läses av sig själv och sedan glimtar sidhörnet', async
     await page.waitForTimeout(150);
   }
   await expect(page.locator('.bok-ruta')).toBeVisible();
+  // han sitter i fåtöljen medan sagan läses (34.4)
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('[hjälten] sätter sig: fatolj_vanster');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.bildFor('fatolj_vanster'))).toBe('hjalte_fatolj_vanster');
+  // Stils bild i boken (110 × 70) i hela steg, i stället för emojin (10f)
+  const bild = page.locator('.bok-bild > .bild.bildkort');
+  await expect(bild).toBeVisible();
+  const bb = await bild.boundingBox(); expect(Math.round((bb.width / bb.height) * 70)).toBe(110);
+  await page.screenshot({ path: 'test-results/bok-bild.png' });
   await expect(page.locator('.bok-knappar .fram.glimtar')).toBeVisible({ timeout: 8000 });
 });
 
@@ -533,6 +541,14 @@ test('dinomatens lådor: hjälten står vid en låda från olika håll, bara den
     for (const p of lista) {
       await startaScen(page, s11);
       await framTill(page, async () => (await page.evaluate(() => window.__ORDSTAVEN.steg()?.pussel_id)) === 'p0_dinomat');
+      // lådorna har Stils bilder i den variant han får (L2: röd, blå och gul)
+      if (lada === 'lada_lang_overst' && p === lista[0]) {
+        expect(await page.evaluate(() => ['lada_lang_overst', 'lada_lang_mitten', 'lada_lang_nederst'].map((id) => window.__ORDSTAVEN.bildFor(id)))).toEqual(['lada_gul', 'lada_rod', 'lada_bla']);
+        await page.screenshot({ path: 'test-results/dinomat-ladorna.png' });
+        // frågans två rader i molnet står under varandra
+        const rader = await page.locator('#tanke .moln-text .rad').evaluateAll((r) => r.map((x) => x.getBoundingClientRect().top));
+        if (rader.length > 1) expect(rader[1]).toBeGreaterThan(rader[0]);
+      }
       const s = await page.evaluate(() => window.__ORDSTAVEN.skala());
       await page.mouse.click(s.vanster + p.x * s.cssSkala, s.topp + p.y * s.cssSkala);
       // markeringen (handen) syns vid just den här lådan innan han trycker
@@ -616,4 +632,73 @@ test('?logg: rutan för den vuxne sparar loggen som fil, också när spelet aldr
   await page.goto('./?snabb');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await expect(page.locator('#startlogg')).toHaveCount(0);
+});
+
+test('krukorna går sönder med Stils bilder: spricker, delar sig och skärvorna ligger kvar (36.8)', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(60000);
+  await startaScen(page, 14); // s13_krukorna
+  await framTill(page, async () => (await page.evaluate(() => window.__ORDSTAVEN.steg()?.pussel_id)) === 'p0_krukor');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.rumsobjekt().filter((id) => id.startsWith('sex_krukor_')).length), { timeout: 8000 }).toBe(6);
+  const id = 'sex_krukor_0';
+  expect(await page.evaluate((x) => window.__ORDSTAVEN.bildFor(x), id)).toBe('kruka');
+  const o = await page.evaluate((x) => window.__ORDSTAVEN.objekt(x), id);
+  await page.mouse.click(o.x, o.y);
+  await expect(page.locator(`#handknapp[data-objekt="${id}"]`)).toBeVisible({ timeout: 10000 });
+  const bilder = page.evaluate((x) => new Promise((klar) => { const sett = []; const t0 = performance.now();
+    const steg = () => { const b = window.__ORDSTAVEN.bildFor(x); if (b && sett[sett.length - 1] !== b) sett.push(b); if (b === 'kruka_skarvor' || performance.now() - t0 > 4000) klar(sett); else requestAnimationFrame(steg); }; steg(); }), id);
+  await page.keyboard.press('Space');
+  const sett = await bilder;
+  expect(sett).toEqual(['kruka', 'kruka_spricker_01', 'kruka_spricker_02', 'kruka_spricker_03', 'kruka_skarvor']);
+  await page.screenshot({ path: 'test-results/kruka-skarvor.png' });
+});
+
+test('dörren öppnas när han går igenom den (31.7)', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(60000);
+  await startaScen(page, 1); // s01_natten: ut i hallen
+  await framTill(page, async () => (await page.evaluate(() => window.__ORDSTAVEN.steg()?.mal)) === 'dorr_hallen');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.bildFor('dorr_hallen'))).toBe('dorr');
+  const bilder = page.evaluate(() => new Promise((klar) => { const sett = []; const t0 = performance.now();
+    const steg = () => { const b = window.__ORDSTAVEN.bildFor('dorr_hallen'); if (b && sett[sett.length - 1] !== b) sett.push(b); if (b === 'dorr_oppnas_03' || performance.now() - t0 > 8000) klar(sett); else requestAnimationFrame(steg); }; steg(); }));
+  const o = await page.evaluate(() => window.__ORDSTAVEN.objekt('dorr_hallen'));
+  await page.mouse.click(o.x, o.y);
+  expect(await bilder).toEqual(['dorr', 'dorr_oppnas_01', 'dorr_oppnas_02', 'dorr_oppnas_03']);
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 8000 }).toContain('[dörr] öppnas: dorr_hallen');
+});
+
+test('ägget i lådan: ljuset och kläckningen med Stils bilder, och skalet ligger kvar (36.7)', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(90000);
+  // s05_klackningen, med LJUS (annars är vinden mörk och lådan syns inte)
+  await starta(page, '?snabb&ny');
+  await page.evaluate(() => {
+    const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
+    av.scen = 6; delete av.scenId; delete av.steg; av.startad = false; t.spelare.unge.namn = 'KNOPP'; t.spelare.hjalte.formler = ['LJUS']; av.rumstillstand = { ...(av.rumstillstand || {}), vinden: 'natt_upplyst' };
+    localStorage.setItem('ordstaven_spar', JSON.stringify(t));
+  });
+  await starta(page);
+  await page.click('.start-knapp');
+  await page.evaluate(() => { window.__agg = []; const steg = () => { const b = window.__ORDSTAVEN.bildFor('lada_med_agg'); if (b && window.__agg[window.__agg.length - 1] !== b) window.__agg.push(b); requestAnimationFrame(steg); }; steg(); });
+  await framTill(page, async () => (await page.evaluate(() => window.__ORDSTAVEN.scen())) === 's06_namnet', 200);
+  const sett = await page.evaluate(() => window.__agg);
+  for (const b of ['agg_01', 'agg_lyser_01', 'agg_knack_01', 'agg_skal']) expect(sett, b).toContain(b);
+  expect(sett[sett.length - 1]).toBe('agg_skal');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('[mellanscen] agg_klackning');
+  await page.screenshot({ path: 'test-results/agget-skal.png' });
+});
+
+test('hjälten i s00 är Stils figur i de valda färgerna (10f)', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  await starta(page, '?snabb&ny');
+  await page.click('.start-knapp');
+  await framTill(page, () => page.locator('.hjalte-ruta').isVisible());
+  const bild = page.locator('.hjalte-ruta img.hjalte-sprite');
+  await expect(bild).toBeVisible();
+  const fore = await bild.getAttribute('src');
+  await page.click('.hjalte-ruta .valrad[data-del="drakt"] .farg >> nth=1');
+  await expect.poll(() => page.locator('.hjalte-ruta img.hjalte-sprite').getAttribute('src')).not.toBe(fore);
+  const bb = await page.locator('.hjalte-ruta img.hjalte-sprite').boundingBox();
+  expect(Math.round((bb.height / bb.width) * 16)).toBe(24);
+  await page.screenshot({ path: 'test-results/hjalte-s00.png' });
 });

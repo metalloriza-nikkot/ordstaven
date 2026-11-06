@@ -141,7 +141,17 @@
       {
        "name": "bild",
        "type": "string",
-       "value": "lada_stor"
+       "value": "agg_01"
+      },
+      {
+       "name": "bild_sedan",
+       "type": "string",
+       "value": "agg_skal"
+      },
+      {
+       "name": "sedan",
+       "type": "string",
+       "value": "p0_ungenamn"
       }
      ]
     },

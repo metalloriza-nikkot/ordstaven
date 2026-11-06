@@ -149,6 +149,8 @@ export function lasKarta(tmj) {
       // dolt föremål som har visats: häcken med hålet), bild_anim = bilder som byts i tomgång var anim_ms
       // (minst 250 ms, golvets gräns), rutor = föremålet är ritat i rutlagret (kullen, bäcken) och har ingen egen bild
       if (egen.bild_sedan && egen.sedan) { ut.bildSedan = String(egen.bild_sedan); ut.sedan = String(egen.sedan); }
+      // bild_sitter (34.4): bilden när hjälten sitter i föremålet (fåtöljen med honom i), när han har gått dit
+      if (egen.bild_sitter) ut.bildSitter = String(egen.bild_sitter);
       if (egen.bild_anim) { ut.bildAnim = String(egen.bild_anim).split(',').map((t) => t.trim()).filter(Boolean); ut.animMs = Math.max(250, tal(egen.anim_ms, 500)); }
       if (egen.rutor) ut.rutor = true;
       objekt.push(ut);

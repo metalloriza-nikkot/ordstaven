@@ -104,7 +104,7 @@ describe('kartornas grafik', () => {
       if (ke.mark && !existsSync(new URL(`assets/tiles/${ke.mark}/${ke.mark}.json`, rot))) saknas.push(`${f}: marken ${ke.mark}`);
       for (const l of k.layers) for (const o of l.objects || []) {
         const e = egen(o);
-        for (const b of [e.bild, e.bild_natt, e.bild_del, e.bild_kvar, e.bild_sedan, ...String(e.bild_rad || "").split(","), ...String(e.bild_hugg || "").split(","), ...String(e.bild_anim || "").split(",")].map((x) => String(x || "").trim()).filter(Boolean)) if (!ramar.has(b)) saknas.push(`${f} ${o.name}: ${b}`);
+        for (const b of [e.bild, e.bild_natt, e.bild_del, e.bild_kvar, e.bild_sedan, e.bild_sitter, ...String(e.bild_rad || "").split(","), ...String(e.bild_hugg || "").split(","), ...String(e.bild_anim || "").split(",")].map((x) => String(x || "").trim()).filter(Boolean)) if (!ramar.has(b)) saknas.push(`${f} ${o.name}: ${b}`);
       }
     }
     expect(saknas).toEqual([]);
@@ -138,14 +138,20 @@ describe('kartornas grafik', () => {
 
 describe('mellanscenernas bilder och bildkorten', () => {
   const kapitel = readdirSync(new URL('content/den-gomda-dalen/', rot)).filter((f) => /^kap-\d+\.json$/.test(f)).map((f) => JSON.parse(las('content/den-gomda-dalen/' + f).toString()));
-  const ramar = new Set(filer('assets/sprites/', '.json').flatMap((f) => Object.keys(JSON.parse(las(f).toString()).frames)));
-  it('varje mellanscen med bild har grafik (morgonen i sängen, luftskeppets lägen, sidovyerna, ungen på kartbiten)', () => {
+  const ramar = new Set([...filer('assets/sprites/', '.json'), ...filer('assets/foremal/', '.json')].flatMap((f) => Object.keys(JSON.parse(las(f).toString()).frames)));
+  // äggets regi (Rum.js AGGET, 36.7): bilderna som varje läge använder
+  const AGGET = {
+    agg_frost: ['agg_01'], agg_filt: ['agg_filt_frost', 'agg_filt'], agg_lyser: ['agg_lyser_01', 'agg_lyser_02', 'agg_lyser_03'],
+    agg_klackning: ['agg_knack_01', 'agg_knack_02', 'agg_kras_01', 'agg_nos_01', 'agg_ute_01', 'agg_ute_02', 'agg_hopp_01', 'agg_skal', 'agg_frys_01', 'agg_frys_02', 'agg_gungar_hoger', 'agg_gungar_vanster'],
+  };
+  it('varje mellanscen med bild har grafik (morgonen i sängen, luftskeppets lägen, sidovyerna, ungen på kartbiten, ägget)', () => {
     const saknas = [];
     for (const k of kapitel) for (const sc of k.scener) for (const st of sc.steg) {
       if (st.typ !== 'mellanscen' || !st.bild) continue;
       const finns = st.bild === 'hjalte_sang_morgon' ? ramar.has('hjalte_sang_morgon_01') && ramar.has('hjalte_sang_morgon_02')
         : st.bild.startsWith('luftskepp_') ? ramar.has(st.bild) || ramar.has(st.bild + '_01')
           : st.bild === 'kartbit_unge' ? existsSync(new URL('assets/sidovyer/kartbit_unge_01.png', rot)) && existsSync(new URL('assets/sidovyer/kartbit_unge_02.png', rot))
+          : AGGET[st.bild] ? AGGET[st.bild].every((r) => ramar.has(r))
           : existsSync(new URL(`assets/sidovyer/${st.bild}_bakgrund.png`, rot));
       if (!finns) saknas.push(`${k.id} ${sc.id}: ${st.bild}`);
     }
@@ -188,7 +194,10 @@ describe('mellanscenernas bilder och bildkorten', () => {
   });
   it('bildkorten är 48 × 48, och sidovyns bakgrund fyller skärmen (320 × 192)', () => {
     const storlek = (f) => { const png = las(f); return [png.readUInt32BE(16), png.readUInt32BE(20)]; };
-    for (const f of filer('assets/bildkort/', '.png')) expect(storlek(f), f).toEqual([48, 48]);
+    // expeditionsbokens bilder är 110 × 70 (bokbildens ruta i halva storleken, 10f), alla andra 48 × 48
+    const BOKBILDER = ['dal_i_moln', 'ordtradet', 'unge_farfar_med_dino', 'unge_farfar_far_agg'];
+    for (const f of filer('assets/bildkort/', '.png')) expect(storlek(f), f).toEqual(BOKBILDER.some((b) => f.endsWith(`/${b}.png`)) ? [110, 70] : [48, 48]);
+    for (const b of BOKBILDER) expect(existsSync(new URL(`assets/bildkort/${b}.png`, rot)), b).toBe(true);
     for (const f of filer('assets/sidovyer/', '_bakgrund.png')) expect(storlek(f), f).toEqual([320, 192]);
     expect(existsSync(new URL('assets/bildkort/filt_rod.png', rot))).toBe(true);
   });
