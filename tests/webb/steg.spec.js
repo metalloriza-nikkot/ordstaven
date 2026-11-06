@@ -1024,10 +1024,19 @@ async function tryckNara(page, id) {
 /** Klicka fram repliker tills villkoret gäller. */
 async function framTill(page, villkor, arg, ms = 30000) {
   const t0 = Date.now();
-  while (!(await page.evaluate(villkor, arg))) {
+  for (;;) {
+    // texten på plattan läses före villkoret, och trycket görs bara om den inte har bytts sedan dess: en replik som
+    // kommer mellan villkoret och trycket klickas inte bort innan villkoret har sett den
+    const fore = await page.evaluate(() => document.querySelector('#plattan')?.textContent || '');
+    if (await page.evaluate(villkor, arg)) return;
     if (Date.now() - t0 > ms) throw new Error('kom inte fram: ' + JSON.stringify(await page.evaluate(() => ({ scen: window.__ORDSTAVEN.scen(), steg: window.__ORDSTAVEN.steg() }))));
-    const v = page.locator('#plattan .vidare, #plattan .replik-ruta').first();
-    if (await v.isVisible()) await v.click({ timeout: 2000 }).catch(() => {}); else await page.waitForTimeout(150);
+    const tryckt = await page.evaluate((t) => {
+      const p = document.querySelector('#plattan');
+      if (!p || p.hidden || (p.textContent || '') !== t) return false;
+      const v = /** @type {HTMLElement | null} */ (p.querySelector('.vidare') || p.querySelector('.replik-ruta'));
+      if (!v) return false; v.click(); return true;
+    }, fore);
+    await page.waitForTimeout(tryckt ? 60 : 150);
   }
 }
 
