@@ -2,15 +2,16 @@
  "$schema": "schema/ordlistor.schema.json",
  "format": 1,
  "meta": {
-  "version": "0.7",
-  "datum": "2026-11-04",
+  "version": "0.8",
+  "datum": "2026-11-06",
   "agare": "Innehåll",
   "textform": "Orden lagras med små bokstäver, formler i versaler. Böjda former (skogen, bron) står med när de används som alternativ.",
   "beskrivning": "Ordlistor 1-6 for ORDSTAVEN. Bilderna ar platshallare (emoji) for grabox. Ett ord ligger i den hogsta lista som nagot av dess drag kraver.",
   "bilder": "Emoji är platshållare. Där emojin är missvisande står ett bild-id i stället (filt).",
   "andrat_v05": "bok och farfar tillagda (prologen v0.11, hallens dörrar).",
   "andrat_v06": "skolan (prologen v0.11.3, vägskylten), och var, vid, bakom, väntar, busken och skata (kapitel 1 v0.7.4: skylten vid ingången och baronens lapp). Granskningen A 25: varje ord i en lästext ska finnas i ordlistorna.",
-  "andrat_v07": "80 ordformer från uppdragslappen (beslut 40.1), så att lappens text står i ordlistorna. Listan följer listornas regler: dubbelteckning ger lista 4, konsonantgrupp i början lista 3, korta ljudenliga ord lista 1 och längre lista 2. ATT, DIG, FÖR och UPP är småord som lärs som ordbilder (lista 6). KARTBITEN, LIANERNA och BARONENS är berättelseord."
+  "andrat_v07": "80 ordformer från uppdragslappen (beslut 40.1), så att lappens text står i ordlistorna. Listan följer listornas regler: dubbelteckning ger lista 4, konsonantgrupp i början lista 3, korta ljudenliga ord lista 1 och längre lista 2. ATT, DIG, FÖR och UPP är småord som lärs som ordbilder (lista 6). KARTBITEN, LIANERNA och BARONENS är berättelseord.",
+  "andrat_v08": "13 ordformer som står i lästexter men saknades (Tekniks kontroll i 0.22.0, beslut 43.5): stora, höga, runda, gamla, vita och gula (böjda egenskapsord), stenen, dalens, dinos, fötter och fossil, man och klättrar. Ingen lästext är omskriven, eftersom texterna är spelade och rummen frysta. Listan följer reglerna: dubbelteckning lista 4 (fossil, klättrar, fötter), konsonantgrupp i början lista 3 (stora, stenen), man lista 1 och resten lista 2."
  },
  "listor": {
   "1": "Korta ljudenliga ord, 2-3 bokstaver, ingen konsonantgrupp, ingen dubbelteckning",
@@ -2067,6 +2068,116 @@
     "aao"
    ],
    "varfor": "Uppdragslappen (40.1)"
+  },
+  {
+   "ord": "stora",
+   "lista": 3,
+   "bild": null,
+   "tema": "lästext",
+   "flaggor": [],
+   "varfor": "Lästext i prologen och kapitel 1 (beslut 43.5)"
+  },
+  {
+   "ord": "fossil",
+   "lista": 4,
+   "bild": "🦴",
+   "tema": "lästext",
+   "flaggor": [],
+   "varfor": "Lästext i prologen och kapitel 1 (beslut 43.5)"
+  },
+  {
+   "ord": "höga",
+   "lista": 2,
+   "bild": null,
+   "tema": "lästext",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Lästext i prologen och kapitel 1 (beslut 43.5)"
+  },
+  {
+   "ord": "stenen",
+   "lista": 3,
+   "bild": "🪨",
+   "tema": "lästext",
+   "flaggor": [],
+   "varfor": "Lästext i prologen och kapitel 1 (beslut 43.5)"
+  },
+  {
+   "ord": "runda",
+   "lista": 2,
+   "bild": null,
+   "tema": "lästext",
+   "flaggor": [],
+   "varfor": "Lästext i prologen och kapitel 1 (beslut 43.5)"
+  },
+  {
+   "ord": "man",
+   "lista": 1,
+   "bild": null,
+   "tema": "lästext",
+   "flaggor": [],
+   "varfor": "Lästext i prologen och kapitel 1 (beslut 43.5)"
+  },
+  {
+   "ord": "klättrar",
+   "lista": 4,
+   "bild": null,
+   "tema": "lästext",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Lästext i prologen och kapitel 1 (beslut 43.5)"
+  },
+  {
+   "ord": "gamla",
+   "lista": 2,
+   "bild": null,
+   "tema": "lästext",
+   "flaggor": [],
+   "varfor": "Lästext i prologen och kapitel 1 (beslut 43.5)"
+  },
+  {
+   "ord": "dalens",
+   "lista": 2,
+   "bild": null,
+   "tema": "lästext",
+   "flaggor": [],
+   "varfor": "Lästext i prologen och kapitel 1 (beslut 43.5)"
+  },
+  {
+   "ord": "dinos",
+   "lista": 2,
+   "bild": "🦕",
+   "tema": "lästext",
+   "flaggor": [],
+   "varfor": "Lästext i prologen och kapitel 1 (beslut 43.5)"
+  },
+  {
+   "ord": "fötter",
+   "lista": 4,
+   "bild": "🦶",
+   "tema": "lästext",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Lästext i prologen och kapitel 1 (beslut 43.5)"
+  },
+  {
+   "ord": "vita",
+   "lista": 2,
+   "bild": null,
+   "tema": "lästext",
+   "flaggor": [],
+   "varfor": "Lästext i prologen och kapitel 1 (beslut 43.5)"
+  },
+  {
+   "ord": "gula",
+   "lista": 2,
+   "bild": null,
+   "tema": "lästext",
+   "flaggor": [],
+   "varfor": "Lästext i prologen och kapitel 1 (beslut 43.5)"
   }
  ]
 }
