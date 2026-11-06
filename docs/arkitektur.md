@@ -660,7 +660,7 @@ Stilguiden §3 gick igenom mot spelet. Det som saknades är byggt här, resten f
 - **Manifestet** säger `fullscreen`, men Chrome på datorn öppnar installerade appar i ett fönster ändå. Helskärm är den gröna knappen.
 
 ## 52. Ordkraftens ljus (0.24.1, 2b3)
-- **`Rum.ordkraft()`** visar `efx_ordkraft_01–04` (atlaset `effekter`, Stils `figurer/effekter/`) i 70 ms var, med mitten på stavens kalla ände: överst på hjälten, och 8 pixlar högre med svärdet. Bilden ligger i `lagerLjust`, ovanför mörkret, och tas bort efter sista bilden. Varje bildbyte sätter `smutsig`, så att golvdatorn ritar dem.
+- **`Rum.ordkraft()`** visar `efx_ordkraft_01–04` (atlaset `effekter`, Stils `figurer/effekter/`) i 100 ms var (`ORDKRAFT_MS`, händelsetakten i 10e §7, beslut 46.5, från 0.25.1), med mitten på stavens kalla ände: överst på hjälten, och 8 pixlar högre med svärdet. Bilden ligger i `lagerLjust`, ovanför mörkret, och tas bort efter sista bilden. Varje bildbyte sätter `smutsig`, så att golvdatorn ritar dem.
 - **`ordkraft(ord)` i `spel.js`** anropas när ordet har stått i luften och läsplattan stängs: efter en formel (P11) och efter räddningen (P15, STEGE blir en stege). Kodlåset (HEM) och namnet (P12) räknas inte, eftersom ordet där inte blir en sak. Loggen skriver `[ordkraft] <ORD>`, och `(utan bild)` när atlaset saknas.
 - **Ljudet** är fortfarande `ratt` när ordet kommer (10c: lånat tills stavens klang finns).
 

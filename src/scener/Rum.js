@@ -36,6 +36,9 @@ const GANG_STEG = 5;
  */
 const LAGER_FARG = { taggkam: 0x5fae6a, ryggsack_skog: 0x8a5a2b };
 
+/** Ordkraftens ljus: en bild per 100 ms, fyra bilder (ca 0,4 s), händelsetakten i 10e §7 (46.5). */
+export const ORDKRAFT_MS = 100;
+
 export class Rum extends Phaser.Scene {
   /**
    * @param {{ inmatning: ReturnType<typeof import('../karna/inmatning.js').skapaInmatning>,
@@ -334,7 +337,7 @@ export class Rum extends Phaser.Scene {
   }
 
   /**
-   * Ordkraftens ljus (beslut 39.2, 10b Effekter): efx_ordkraft_01–04, ca 70 ms var, med mitten på stavens kalla ände
+   * Ordkraftens ljus (beslut 39.2, 10b Effekter): efx_ordkraft_01–04, ca 100 ms var (händelsetakten i 10e §7, beslut 46.5), med mitten på stavens kalla ände
    * (överst i handen, och 8 pixlar högre med svärdet). Bara bildbyten i världens pixlar, inget filter (golvdatorn).
    * Ligger ovanför mörkret, så att ljuset syns på vinden. Ger false när bilderna saknas.
    */
@@ -345,7 +348,7 @@ export class Rum extends Phaser.Scene {
     const b = this.add.image(x, y, 'effekter', 'efx_ordkraft_01').setOrigin(0.5, 0.5);
     this.lagerLjust.add(b); this.ordkraftBild = b; this.smutsig = true;
     let i = 1;
-    this.time.addEvent({ delay: 70, repeat: 3, callback: () => {
+    this.time.addEvent({ delay: ORDKRAFT_MS, repeat: 3, callback: () => {
       i++;
       if (!b.active) return;
       if (i > 4) { b.destroy(); if (this.ordkraftBild === b) this.ordkraftBild = null; } else b.setFrame(`efx_ordkraft_0${i}`);
