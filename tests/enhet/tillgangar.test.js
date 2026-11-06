@@ -140,6 +140,15 @@ describe('mellanscenernas bilder och bildkorten', () => {
     expect(saknas).toEqual([]);
     expect(kapitel.find((k) => k.id === 'kap-01').scener.find((sc) => sc.id === 'k1s08_loven').steg.find((st) => st.mal === 'kronet').bild).toBe('uppdrag_kullen');
   });
+  it('uppdragslappen (2d): varje uppdrag har sitt bildkort, och lappens papper, kompassros och stämpel finns', () => {
+    const saknas = [];
+    for (const k of kapitel) for (const u of k.uppdrag || []) if (!existsSync(new URL(`assets/bildkort/${u.bild}.png`, rot))) saknas.push(`${k.id} ${u.id}: ${u.bild}`);
+    expect(saknas).toEqual([]);
+    for (const f of ['lapp_uppdrag', 'lapp_kompassros', 'stampel', 'ikon_uppdrag', 'ikon_klar', 'ikon_fram']) expect(existsSync(new URL(`assets/ui/${f}.png`, rot)), f).toBe(true);
+  });
+  it('ordkraftens ljus har fyra bilder (39.2)', () => {
+    for (const i of [1, 2, 3, 4]) expect(ramar.has(`efx_ordkraft_0${i}`)).toBe(true);
+  });
   it('luftskeppet har alla bilder som regin använder, och hjälmen som trillar', () => {
     for (const r of ['glider_01', 'glider_02', 'skata_landar', 'ser_hjalten', 'ser_kartan', 'talar_01', 'talar_02', 'skata_putsar_01', 'skata_putsar_02', 'skata_snor', 'trasslar_01', 'trasslar_02',
       'laser_skyltarna', 'laser_skyltarna_talar', 'flyger_fel_01', 'flyger_fel_02']) expect(ramar.has('luftskepp_' + r), r).toBe(true);

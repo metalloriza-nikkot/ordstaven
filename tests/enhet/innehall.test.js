@@ -73,6 +73,15 @@ describe('innehållskontrollen', () => {
   it('fångar stavfel i fältnamn (schemat är strikt)', () => {
     expect(medFel((k) => { k.scener[0].steg[1].uppläst = true; })).toMatch(/must NOT have additional properties/);
   });
+  it('fångar ett uppdrag på lappen vars steg, stämpel eller ersatta replik inte finns (2d)', () => {
+    const f = medFel((k) => {
+      const u = k.uppdrag[0];
+      u.steg[0].klart = { scen: u.steg[0].klart.scen, ga_till: 'finns_inte' };
+      u.steg[1].ersatter = [{ scen: k.scener[0].id, text: 'Ingen sådan replik.' }];
+    });
+    expect(f).toMatch(/uppdrag u0_vinden: stegen GÅ UT I HALLEN finns inte/);
+    expect(f).toMatch(/repliken "Ingen sådan replik\." i .*, som lappen ersätter, finns inte/);
+  });
   it('fångar dubbla id:n', () => {
     expect(medFel((k) => { k.pussel[1].id = 'p0_hjaltenamn'; })).toMatch(/används både/);
   });

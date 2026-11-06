@@ -11,10 +11,10 @@ Varje grafik-, ljud- eller typsnittsfil och varje bibliotek som följer med spel
 | PWA-ikoner (tillfälliga) | Egna, ritade av `verktyg/ikoner.py` | Egna | Ja | `public/icons/` |
 | Figurerna: hjälten (gå, svinga, trolla, fira, klättra, sova, sitta, ryggsäck och taggkam), staven, ungen, Herr Skata, Farfar, baronen med luftskeppet och skuggorna, och effekterna i kapitel 1 (ordkraftens ljus, svärdet, plopp, löv, fjädrar, glimt, pinnen) | Egna, ritade för spelet av stilspåret med egna skript (*Så ritas allt*, 10b) | Egna | Ja | `assets/sprites/` (ett atlas per figur, `.png` och `.json`) |
 | Porträtten (ansiktena i pratrutan) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/portratt/` |
-| Läsplattans bildkort | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/bildkort/` |
+| Läsplattans bildkort och uppdragslappens bilder | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/bildkort/` |
 | Sidovyerna (bakgrunder och det som rör sig i dem) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/sidovyer/` |
 | Farfars karta (kartbitarna) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/karta/` |
-| HUD:ens knappar, ikonerna och dörrskyltarna | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/ui/` |
+| HUD:ens knappar, ikonerna, dörrskyltarna och uppdragslappen (papperet, kompassrosen och stämpeln) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/ui/` |
 | Farfars hus: föremålen | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/foremal/hus/` |
 | Skogens föremål (lianerna, den lilla lianen) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/foremal/skog/` |
 | Farfars hus: rummen (en bild per rum) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/rum/hus/` |

@@ -57,6 +57,7 @@ let testkartor = {};
         k.scener.splice(t.index ?? k.scener.length, 0, t.scen, ...(t.efter || [])); // efter = scenerna som kommer direkt efter
         // provpussel, fler scener (frivilliga) och fält i rummen, så att kapitel 1:s steg kan provas i prologens rum
         for (const p of t.pussel || []) k.pussel.push(p);
+        if (t.uppdrag) k.uppdrag = t.uppdrag; // provuppdrag i stället för kapitlets (uppdragslappen, 2d)
         for (const sc of t.scener || []) k.scener.push(sc);
         for (const [id, falt] of Object.entries(t.rum || {})) { const r = k.rum.find((x) => x.id === id); if (r) Object.assign(r, falt); else k.rum.push({ id, namn: id, innehall: [], ...falt }); }
         testkartor = t.kartor || {};

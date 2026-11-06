@@ -4,6 +4,7 @@
 import Ajv from 'ajv/dist/2020.js';
 import { readFileSync } from 'node:fs';
 import { rader, versaler, ord, PLATSHALLARE } from '../../src/karna/text.js';
+import { kompileraUppdrag, hittaSteg } from '../../src/karna/uppdrag.js';
 
 const schema = (namn) => JSON.parse(readFileSync(new URL(`../../content/schema/${namn}.schema.json`, import.meta.url), 'utf8'));
 // teckenbredderna för typsnittet i textlagret (Lexend, beslut 13)
@@ -452,6 +453,37 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
         if (p.foremal && p.foremal.length !== p.innehall.length) fel.push(var_(`${plats}: ${p.foremal.length} föremål men ${p.innehall.length} poster i innehall`));
       }
       if (p.typ === 'P12_dop' && p.min_bokstaver && p.max_bokstaver && p.min_bokstaver > p.max_bokstaver) fel.push(var_(`${plats}: min_bokstaver är större än max_bokstaver`));
+    }
+    // Uppdragslappen (2.20): stegen och stämpeln finns i kapitlet, repliken som lappen ersätter finns, och lappens
+    // text följer reglerna för lästext. Texten står i versaler som på lappen (Innehålls form), och {UNGE} är ungens namn.
+    if (k.uppdrag) {
+      const komp = kompileraUppdrag(k);
+      for (const f of komp.fel) fel.push(var_(`uppdrag ${f}`));
+      const idn = new Set();
+      for (const u of k.uppdrag) {
+        const plats = `uppdrag ${u.id}`;
+        if (idn.has(u.id)) fel.push(var_(`${plats}: id:t finns två gånger`)); idn.add(u.id);
+        for (const [i, st] of u.steg.entries()) {
+          for (const e of st.ersatter || []) {
+            const sc = (k.scener || []).find((x) => x.id === e.scen), pu = k.pussel.find((x) => x.id === e.scen);
+            const finns = sc ? sc.steg.some((x) => x.typ === 'replik' && x.text === e.text) : pu ? pu.instruktion?.text === e.text : false;
+            if (!finns) fel.push(var_(`${plats} steg ${i + 1}: repliken "${e.text}" i ${e.scen}, som lappen ersätter, finns inte`));
+          }
+          if (st.visas === 'med_paminnelse') {
+            const pos = hittaSteg(k, st.klart.scen, st.klart);
+            if (pos && !k.scener[pos[0]].steg[pos[1]].paminnelse) fel.push(var_(`${plats} steg ${i + 1}: visas med påminnelsen, men steget har ingen paminnelse`));
+          }
+        }
+        for (const [i, text] of [u.rubrik, ...u.steg.map((x) => x.text)].entries()) {
+          const ren = text.replace(/\{(UNGE|HJALTE)\}/gi, '');
+          const delar = ord(ren);
+          if (i > 0 && delar.length > 4) varningar.push(var_(`${plats}: "${text}" har ${delar.length} ord, högst fyra på lappen`));
+          for (const o of delar) {
+            const sp = arSparrat(o); if (sp) fel.push(var_(`${plats}: ${o} är spärrat i text spelaren läser själv (${sp})`));
+            const n = versaler(o); if (!ordmap.has(n) && !formler.has(n)) { if (!saknade.has(n)) saknade.set(n, []); saknade.get(n).push(plats); }
+          }
+        }
+      }
     }
     for (const [n, platser] of saknade) {
       const mer = platser.length === 2 ? ' och ett ställe till' : platser.length > 2 ? ` och ${platser.length - 1} ställen till` : '';

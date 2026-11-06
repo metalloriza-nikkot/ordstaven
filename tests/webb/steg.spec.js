@@ -1124,6 +1124,7 @@ test('den lilla lianen: SVÄRD ur minnet, sedan hugger han den, och den är bort
 
 test('k1s08: krönet är målet i molnet, och ett tryck på det går uppför trappan (v0.7.5)', async ({ page }) => {
   test.setTimeout(90000);
+  await page.setViewportSize({ width: 1280, height: 700 }); // utan remsa: molnet (med remsan säger uppdragslappen det)
   await hoppaKapitel1(page, 6); // k1s08_loven
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 10000 }).toBe('k1s08_loven');
   await framTill(page, () => window.__ORDSTAVEN.steg()?.mal === 'kronet' && !window.__ORDSTAVEN.fryst());
@@ -1496,6 +1497,8 @@ test('Pass 3 komplett: luftskeppet i trädgården, baronens porträtt, packlista
   const sett = new Set(); const minerna = new Set();
   let skylt = false; const pose = { sedd: false, stav: false, under: new Set() };
   const texter = []; // allt som står på plattan (slutrutan kan komma innan sidovyn syns i snabbläget)
+  // plattans texter samlas också i sidan, så att en replik som klickas bort mellan två avläsningar kommer med
+  await page.evaluate(() => { const w = /** @type {any} */ (window); w.__texter = []; new MutationObserver(() => { const t = document.querySelector('#plattan')?.textContent; if (t) w.__texter.push(t); }).observe(document.querySelector('#plattan'), { childList: true, subtree: true, characterData: true }); });
   for (let i = 0; i < 160; i++) {
     const g = await grafik();
     const tp = await page.evaluate(() => document.querySelector('#plattan')?.textContent || '');
@@ -1539,6 +1542,7 @@ test('Pass 3 komplett: luftskeppet i trädgården, baronens porträtt, packlista
     await page.locator('#plattan .replik-ruta').click({ timeout: 300 }).catch(() => {});
     await page.waitForTimeout(150);
   }
+  texter.push(...(await page.evaluate(() => /** @type {any} */ (window).__texter)));
   expect(texter.some((t) => t.includes('VAD FINNS I SKOGEN'))).toBe(true);
   expect(texter.some((t) => t.includes('KAPITEL 1'))).toBe(false);
 });

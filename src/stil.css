@@ -723,3 +723,25 @@ html, body {
 .text-under #plattan.replik { bottom: auto; top: calc(var(--rum-topp) + var(--rum-hojd) + 8px); }
 .text-under #tanke { top: calc(var(--rum-topp) + var(--rum-hojd) + 20px * var(--t)); transform: none; }
 #plattan.replik.uppe { bottom: auto; top: calc(var(--rum-topp) + 12px); }
+
+/* Uppdragslappen (beslut 37.3 och 40.1, 10d): i remsan under spelytan, till vänster, med textrutan och molnet
+   bredvid (--lapp-bredd sätts av grans/uppdragslapp.js). Kompakt: rubriken med en bock per gjort steg, och steget han
+   gör nu med pilen. Farfars papper är en 9-slice (--lapp9), lite snett som hans andra papper. Inga skuggor. */
+#uppdragslapp { position: absolute; left: var(--rum-vanster); top: calc(var(--rum-topp) + var(--rum-hojd) + 8px); box-sizing: border-box; max-height: calc(var(--remsa) - 12px);
+  display: flex; flex-direction: column; justify-content: center; gap: calc(2px * var(--t)); padding: 0 calc(30px * var(--t)) 0 calc(4px * var(--t)); color: #2B2420; cursor: pointer;
+  border: calc(16px * var(--t)) solid #f1e2bf; border-image: var(--lapp9) 8 fill / calc(16px * var(--t)) round; background: transparent; image-rendering: pixelated; rotate: -1deg; transition: transform .6s ease-in, opacity .6s ease-in; }
+#uppdragslapp[hidden] { display: none; }
+#uppdragslapp .lapp-topp, #uppdragslapp .lapp-nu { display: flex; align-items: center; gap: calc(10px * var(--t)); white-space: nowrap; font-size: calc(40px * var(--t)); line-height: 1.2; }
+#uppdragslapp .lapp-rubrik { font-weight: 700; }
+#uppdragslapp .lapp-bild { display: inline-flex; flex: none; height: calc(48px * var(--t)); align-items: center; font-size: calc(40px * var(--t)); }
+#uppdragslapp .lapp-bild img, #uppdragslapp .lapp-bild .bild { width: calc(48px * var(--t)); height: calc(48px * var(--t)); image-rendering: pixelated; }
+#uppdragslapp .lapp-bockar { display: inline-flex; gap: calc(2px * var(--t)); }
+#uppdragslapp .lapp-ros { position: absolute; top: calc(-10px * var(--t)); right: calc(-12px * var(--t)); width: calc(33px * var(--t)); height: calc(33px * var(--t)); image-rendering: pixelated; }
+#uppdragslapp .lapp-stampel { position: absolute; right: calc(-30px * var(--t)); top: calc(-24px * var(--t)); width: calc(96px * var(--t)); height: calc(96px * var(--t)); image-rendering: pixelated; animation: stampel .15s ease-out; }
+@keyframes stampel { from { scale: 2; opacity: .3; } to { scale: 1; opacity: 1; } }
+#uppdragslapp.puls { animation: tankepuls .6s ease-in-out 2; }
+#uppdragslapp.flyger { transform: translate(var(--flyg-x), var(--flyg-y)) scale(.15); opacity: .2; }
+.snabb #uppdragslapp { transition: none; }
+/* textrutan och molnet står bredvid lappen; en textruta som inte ryms bredvid ligger över lappen (.over-lappen) */
+.text-under.lapp-syns #plattan.replik:not(.over-lappen) { left: calc(var(--rum-vanster) + var(--lapp-bredd) + 12px); transform: none; max-width: calc(var(--rum-bredd) - var(--lapp-bredd) - 12px); }
+.text-under.lapp-syns #tanke { left: calc(var(--rum-vanster) + var(--lapp-bredd) + 22px); }

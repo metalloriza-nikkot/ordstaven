@@ -19,7 +19,7 @@
   "datum": "2026-11-04",
   "agare": "Innehåll",
   "kalla": "Manus 13-prolog-manus.md v1.8. Byggd på v0.12, som bygger på repots kap-00.json från 0.19.0.",
-  "teknik": "Teknik har lagt in ledningens beslut i formatet, ingen text är ändrad. 2026-10-25: format 2, P28_packa, syns_i på ägget, i_rummet på FILT med lådorna lada_hyllan, lada_hornet och lada_fonstret i stället för hylla_tre_lador, och ga_till till hyllan i s04 borttaget. 2026-10-26 (val i världen): i_rummet och objekt i p0_dorrar och p0_sangen (dorr_mat, dorr_bad, dorr_toa, dorr_sov), p0_skylten (stig_skogen, stig_byn) och p0_dinomat (lada_lang_overst, lada_lang_mitten, lada_lang_nederst, som ersätter tre_langa_lador), foremal lada_med_agg på dunket i s04, och ga_till grind i s22 borttaget (grinden är en öppning i staketet, valet görs på stigarna). 2026-10-27 (hjälpens timing): \"pekar\": true på knuffarna i p0_dorrar (ungen nosar mot dörren med matdoft) och p0_sangen (ungen lutar sig mot rätt dörr). De pekar på svaret och kommer tidigast efter första felet, eller efter 4 s per alternativ och minst 12 s. Övriga knuffar upprepar frågan (p0_filt, p0_skylten) eller hör till uppgifter som inte är läsval (p0_ljus förebild, p0_ungenamn, p0_krukor, gå till lådan i s02) och kommer som förut. Ungens pekning efter tre fel och efter_3_fel kommer efter fel och påverkas inte. 2026-10-27 (v0.10): hallen har åter tillstånden natt och morgon, och s01b, s07, s10, s15 och s17 har tillstand natt, s20 morgon. s01b: vid_annan_utgang med ljudet dunk på ga_till stege_upp (dörrarna är låsta, hjälten tittar upp). s04: ga_till lada_med_agg efter p0_filt är steget bara (filten följer hjälten och läggs om ägget när han når fram). s08: repliken \"Där är ni ju!\" och ga_till farfar_vid_bordet är steget prata med repliken som kall (dialogen börjar inom 1,5 rutor), och repliken med namnet har vid: ungen (namnet syns ovanför ungen). s09: ga_till farfar_vid_bordet är ta_emot (hjälten tar lappen med ett tryck), och \"Tryck på nosen.\" har vantar_pa: nosen. s12: vantar_pa: mata_ungen på bärrepliken. s21: via: radio på provsändningen. 2026-10-27 (grind A, 2f.4): ytterdörren dorr_ut sitter i hallens främre vägg i stället för i köket (koket och hallen i rum), s21 slutar med ga_till dorr_hallen, och den nya scenen s21b_hallen_ut (hallen på morgonen) har ga_till dorr_ut. Scenen har ingen text och ingen vid_omstart än. På natten är ytterdörren låst (kartans last_i): hjälten känner på handtaget. 2026-10-28 (beslut 13.2): s04 börjar med ljudet dunk från lada_med_agg, så att ägglådan hoppar till direkt när ljuset har tänts. Dunket när hjälten står vid lådan finns kvar. 2026-10-29 (T2): skapa_hjalte väljer hudfarg och drakt, hjältens två palettbyten (sparformat 4). Hjälmen och skorna har fasta färger (färger men inte form). 2026-10-30 (T6): v0.11.1 inlagd utan ändrad text. Husets kartor efter stilguiden v0.16: hallen är en entré och en korridor (28 × 12 rutor, kartans typ vagg ger korridoren dess form), och alla fem dörrar står på en skärm minst 3 rutor isär. Nytt rum kontoret (läsrummet). Köket, gästrummet och vinden är omritade, vinden spegelvänd så att stegen står till höger som i hallen. sex_krukor står i en rad nertill (inte två vid väggen och fyra nertill), eftersom P26 utan foremal delar ett föremål. 2026-10-31 (T4b): ljudord på ljud-stegen ordagrant ur Innehålls F11 (dunk, kra, brum, buhu, tok tok). 2026-11-02 (pass 3 med grafik, schema 2.14): s01_natten och s19_morgon har hjalte: \"sover\" (\"Hjälten sover\" i mellanscenen, och morgonen där ungen slickar honom på näsan). Ingen text ändrad. 2026-11-02 (pass 3 komplett, Stil 20:35): mellanscenerna i s19 och s22 har bild (morgonen i sängen, luftskeppets lägen och sidovyn in_i_skogen). v0.11.3 inlagd utan ändrad text (schema 2.15): vantar_pa radion i s21 och kapitelrubrik på \"Kapitel 1. Skogen.\" i s22, så att rubriken inte visas när kapitel 1 är låst. 2026-11-03 (pass 3 för spelaren, Stil 21:20): bild luftskepp_laser_skyltarna på mellanscenen där baronen läser skyltarna med kikaren åt fel håll. Luftskeppet flyger mot SKOLAN och ut ur bild före sidovyn. Ingen text ändrad. 2026-11-05 (0.21.0): v0.12 och v0.13 inlagda utan ändrad text. I meta.innehall_v012 står \"spelarens pass 3\" i stället för ett namn (repot är publikt, 41.4). s21b (Innehålls FÖRSLAG, 34.2): Farfar står vid ytterdörren (farfar_vid_dorren i hallen, dold tills visa_foremal först i s21b) och vänder sig mot hjälten när han talar.",
+  "teknik": "Teknik har lagt in ledningens beslut i formatet, ingen text är ändrad. 2026-10-25: format 2, P28_packa, syns_i på ägget, i_rummet på FILT med lådorna lada_hyllan, lada_hornet och lada_fonstret i stället för hylla_tre_lador, och ga_till till hyllan i s04 borttaget. 2026-10-26 (val i världen): i_rummet och objekt i p0_dorrar och p0_sangen (dorr_mat, dorr_bad, dorr_toa, dorr_sov), p0_skylten (stig_skogen, stig_byn) och p0_dinomat (lada_lang_overst, lada_lang_mitten, lada_lang_nederst, som ersätter tre_langa_lador), foremal lada_med_agg på dunket i s04, och ga_till grind i s22 borttaget (grinden är en öppning i staketet, valet görs på stigarna). 2026-10-27 (hjälpens timing): \"pekar\": true på knuffarna i p0_dorrar (ungen nosar mot dörren med matdoft) och p0_sangen (ungen lutar sig mot rätt dörr). De pekar på svaret och kommer tidigast efter första felet, eller efter 4 s per alternativ och minst 12 s. Övriga knuffar upprepar frågan (p0_filt, p0_skylten) eller hör till uppgifter som inte är läsval (p0_ljus förebild, p0_ungenamn, p0_krukor, gå till lådan i s02) och kommer som förut. Ungens pekning efter tre fel och efter_3_fel kommer efter fel och påverkas inte. 2026-10-27 (v0.10): hallen har åter tillstånden natt och morgon, och s01b, s07, s10, s15 och s17 har tillstand natt, s20 morgon. s01b: vid_annan_utgang med ljudet dunk på ga_till stege_upp (dörrarna är låsta, hjälten tittar upp). s04: ga_till lada_med_agg efter p0_filt är steget bara (filten följer hjälten och läggs om ägget när han når fram). s08: repliken \"Där är ni ju!\" och ga_till farfar_vid_bordet är steget prata med repliken som kall (dialogen börjar inom 1,5 rutor), och repliken med namnet har vid: ungen (namnet syns ovanför ungen). s09: ga_till farfar_vid_bordet är ta_emot (hjälten tar lappen med ett tryck), och \"Tryck på nosen.\" har vantar_pa: nosen. s12: vantar_pa: mata_ungen på bärrepliken. s21: via: radio på provsändningen. 2026-10-27 (grind A, 2f.4): ytterdörren dorr_ut sitter i hallens främre vägg i stället för i köket (koket och hallen i rum), s21 slutar med ga_till dorr_hallen, och den nya scenen s21b_hallen_ut (hallen på morgonen) har ga_till dorr_ut. Scenen har ingen text och ingen vid_omstart än. På natten är ytterdörren låst (kartans last_i): hjälten känner på handtaget. 2026-10-28 (beslut 13.2): s04 börjar med ljudet dunk från lada_med_agg, så att ägglådan hoppar till direkt när ljuset har tänts. Dunket när hjälten står vid lådan finns kvar. 2026-10-29 (T2): skapa_hjalte väljer hudfarg och drakt, hjältens två palettbyten (sparformat 4). Hjälmen och skorna har fasta färger (färger men inte form). 2026-10-30 (T6): v0.11.1 inlagd utan ändrad text. Husets kartor efter stilguiden v0.16: hallen är en entré och en korridor (28 × 12 rutor, kartans typ vagg ger korridoren dess form), och alla fem dörrar står på en skärm minst 3 rutor isär. Nytt rum kontoret (läsrummet). Köket, gästrummet och vinden är omritade, vinden spegelvänd så att stegen står till höger som i hallen. sex_krukor står i en rad nertill (inte två vid väggen och fyra nertill), eftersom P26 utan foremal delar ett föremål. 2026-10-31 (T4b): ljudord på ljud-stegen ordagrant ur Innehålls F11 (dunk, kra, brum, buhu, tok tok). 2026-11-02 (pass 3 med grafik, schema 2.14): s01_natten och s19_morgon har hjalte: \"sover\" (\"Hjälten sover\" i mellanscenen, och morgonen där ungen slickar honom på näsan). Ingen text ändrad. 2026-11-02 (pass 3 komplett, Stil 20:35): mellanscenerna i s19 och s22 har bild (morgonen i sängen, luftskeppets lägen och sidovyn in_i_skogen). v0.11.3 inlagd utan ändrad text (schema 2.15): vantar_pa radion i s21 och kapitelrubrik på \"Kapitel 1. Skogen.\" i s22, så att rubriken inte visas när kapitel 1 är låst. 2026-11-03 (pass 3 för spelaren, Stil 21:20): bild luftskepp_laser_skyltarna på mellanscenen där baronen läser skyltarna med kikaren åt fel håll. Luftskeppet flyger mot SKOLAN och ut ur bild före sidovyn. Ingen text ändrad. 2026-11-05 (0.21.0): v0.12 och v0.13 inlagda utan ändrad text. I meta.innehall_v012 står \"spelarens pass 3\" i stället för ett namn (repot är publikt, 41.4). s21b (Innehålls FÖRSLAG, 34.2): Farfar står vid ytterdörren (farfar_vid_dorren i hallen, dold tills visa_foremal först i s21b) och vänder sig mot hjälten när han talar. 2026-11-06 (0.25.0, 2d): uppdragen ur Innehålls innehall-uppdrag.json v0.1 som struktur, utan ändrad text (schema 2.20). bild är Stils bildkort enligt 10d (uppdrag_stegen, bar, bok, lapp, svard_ristat och de andra) i stället för förslagets namn.",
   "innehall_v0113": "v0.11.3 (Innehåll 2026-11-02, beslut 29, granskningen A 14–21): bara pass 3. Baronens motiv är kartan, och han läser SKOLAN som SKOGEN. s21 slutar med målet på radion, och radion lärs ut (vantar_pa radion). Packlistan har instruktion och kort som bara är bilder. Tidigare versioner: Innehålls rapporter (rapport-innehall-arkiv*.md) och 13. Tiden per pass räknar kontrollen.",
   "innehall_v012": "Nästa prologversion efter spelarens pass 3 (beslut 34.4–34.6, 36.7, 37.5, 38.2–38.4, granskningen C 26 och 28–30). Hela listan står i 13 v1.7.",
   "innehall_v013": "Beslut 39.1, genomgången av samspelen: sex instruktioner med verb och mål (s01, s01b, s06, s14, s15, s21) och \"Hej, {hjalte}!\" i s00. Hela genomgången står i 13 v1.8."
@@ -2162,6 +2162,467 @@
     "handling": "ungen drar hjälten mot skogsstigen"
    },
    "anteckning": "Rätt svar står på listans sista rad. v0.11.3 (A 15): BYN heter SKOLAN, som börjar likadant och är lika lång som SKOGEN. Objektet heter fortfarande stig_byn (stabila id:n). Ingen tidspress."
+  }
+ ],
+ "uppdrag": [
+  {
+   "id": "u0_vinden",
+   "rubrik": "TITTA PÅ VINDEN",
+   "bild": "uppdrag_stegen",
+   "pass": 1,
+   "steg": [
+    {
+     "text": "GÅ UT I HALLEN",
+     "klart": {
+      "scen": "s01_natten",
+      "ga_till": "dorr_hallen"
+     },
+     "ersatter": [
+      {
+       "scen": "s01_natten",
+       "text": "Gå ut i hallen!"
+      }
+     ]
+    },
+    {
+     "text": "GÅ UPP PÅ VINDEN",
+     "klart": {
+      "scen": "s01b_hallen",
+      "ga_till": "stege_upp"
+     },
+     "ersatter": [
+      {
+       "scen": "s01b_hallen",
+       "text": "Klättra upp för stegen!"
+      }
+     ]
+    },
+    {
+     "text": "TÄND STAVEN",
+     "klart": {
+      "scen": "s03_staven",
+      "pussel": "p0_ljus"
+     }
+    }
+   ],
+   "stampel": {
+    "scen": "s03_staven",
+    "efter": {
+     "pussel": "p0_ljus"
+    }
+   }
+  },
+  {
+   "id": "u0_agget",
+   "rubrik": "VÄRM ÄGGET",
+   "bild": "uppdrag_agget",
+   "pass": 1,
+   "steg": [
+    {
+     "text": "GÅ TILL LÅDAN",
+     "klart": {
+      "scen": "s04_agget",
+      "ga_till": "lada_med_agg"
+     },
+     "ersatter": [
+      {
+       "scen": "s04_agget",
+       "text": "Gå till lådan!"
+      }
+     ]
+    },
+    {
+     "text": "LÄS PÅ LÅDORNA",
+     "klart": {
+      "scen": "s04_agget",
+      "pussel": "p0_filt"
+     },
+     "ersatter": [
+      {
+       "scen": "p0_filt",
+       "text": "Gå runt och läs på lådorna."
+      }
+     ]
+    },
+    {
+     "text": "LÄGG FILTEN PÅ ÄGGET",
+     "klart": {
+      "scen": "s04_agget",
+      "bara": "filt"
+     },
+     "ersatter": [
+      {
+       "scen": "s04_agget",
+       "text": "Lägg filten på ägget!"
+      }
+     ]
+    }
+   ],
+   "stampel": {
+    "scen": "s05_klackningen",
+    "efter": {
+     "replik": "En dinounge! Det första den ser är du."
+    }
+   }
+  },
+  {
+   "id": "u0_dop",
+   "rubrik": "DÖP DINON",
+   "bild": "uppdrag_ungen",
+   "pass": 1,
+   "steg": [
+    {
+     "text": "SKRIV ETT NAMN",
+     "klart": {
+      "scen": "s06_namnet",
+      "pussel": "p0_ungenamn"
+     }
+    }
+   ],
+   "stampel": {
+    "scen": "s06_namnet",
+    "efter": {
+     "replik": "Hej, {unge}!"
+    }
+   }
+  },
+  {
+   "id": "u0_farfar",
+   "rubrik": "HITTA FARFAR",
+   "bild": "uppdrag_farfar_natt",
+   "pass": 1,
+   "steg": [
+    {
+     "text": "GÅ NER TILL FARFAR",
+     "klart": {
+      "scen": "s06_namnet",
+      "ga_till": "stege_ner"
+     },
+     "ersatter": [
+      {
+       "scen": "s06_namnet",
+       "text": "Gå ner och visa {unge} för Farfar!"
+      }
+     ]
+    },
+    {
+     "text": "LÄS PÅ DÖRRARNA",
+     "klart": {
+      "scen": "s07_dorrarna",
+      "pussel": "p0_dorrar"
+     }
+    }
+   ],
+   "stampel": {
+    "scen": "s08_farfar",
+    "efter": {
+     "replik": "Hej, lilla {unge}!"
+    }
+   }
+  },
+  {
+   "id": "u0_mata",
+   "rubrik": "MATA {UNGE}",
+   "bild": "bar",
+   "pass": 2,
+   "steg": [
+    {
+     "text": "GÅ UPP PÅ VINDEN",
+     "klart": {
+      "scen": "s10_upp_igen",
+      "ga_till": "stege_upp"
+     },
+     "ersatter": [
+      {
+       "scen": "s09_lappen",
+       "text": "Gå upp på vinden!"
+      }
+     ]
+    },
+    {
+     "text": "ÖPPNA RÄTT LÅDA",
+     "klart": {
+      "scen": "s11_ladorna",
+      "pussel": "p0_dinomat"
+     }
+    },
+    {
+     "text": "VÄLJ RÄTT PÅSE",
+     "klart": {
+      "scen": "s12_pasarna",
+      "pussel": "p0_bar"
+     }
+    }
+   ],
+   "stampel": {
+    "scen": "s12_pasarna",
+    "efter": {
+     "vantar_pa": "mata_ungen"
+    }
+   }
+  },
+  {
+   "id": "u0_krukor",
+   "rubrik": "LETA I KRUKORNA",
+   "bild": "uppdrag_kruka",
+   "pass": 2,
+   "steg": [
+    {
+     "text": "VIFTA MOT KRUKORNA",
+     "klart": {
+      "scen": "s13_krukorna",
+      "pussel": "p0_krukor"
+     },
+     "ersatter": [
+      {
+       "scen": "s13_krukorna",
+       "text": "Vifta med staven mot krukorna!"
+      }
+     ]
+    }
+   ],
+   "stampel": {
+    "scen": "s14_kartbiten",
+    "efter": {
+     "replik": "Det är mamma! {unge} längtar hem."
+    }
+   }
+  },
+  {
+   "id": "u0_visa",
+   "rubrik": "VISA FARFAR",
+   "bild": "uppdrag_kartbit",
+   "pass": 2,
+   "steg": [
+    {
+     "text": "GÅ NER FÖR STEGEN",
+     "klart": {
+      "scen": "s14_kartbiten",
+      "ga_till": "stege_ner"
+     },
+     "ersatter": [
+      {
+       "scen": "s14_kartbiten",
+       "text": "Gå ner och visa kartbiten för Farfar!"
+      }
+     ]
+    },
+    {
+     "text": "GÅ IN TILL FARFAR",
+     "klart": {
+      "scen": "s16_godnattsagan",
+      "ga_till": "farfar_i_fatoljen"
+     },
+     "ersatter": [
+      {
+       "scen": "s15_till_koket",
+       "text": "Gå in till Farfar!"
+      },
+      {
+       "scen": "s16_godnattsagan",
+       "text": "Gå till Farfar!"
+      }
+     ]
+    }
+   ],
+   "stampel": {
+    "scen": "s16_godnattsagan",
+    "efter": {
+     "replik": "En kartbit! Du hittade allt själv."
+    }
+   }
+  },
+  {
+   "id": "u0_saga",
+   "rubrik": "FARFARS SAGA",
+   "bild": "bok",
+   "pass": 2,
+   "steg": [
+    {
+     "text": "HÄMTA BOKEN",
+     "klart": {
+      "scen": "s16_godnattsagan",
+      "ga_till": "expeditionsbok"
+     }
+    },
+    {
+     "text": "LÄMNA BOKEN TILL FARFAR",
+     "klart": {
+      "scen": "s16_godnattsagan",
+      "bara": "expeditionsbok"
+     },
+     "ersatter": [
+      {
+       "scen": "s16_godnattsagan",
+       "text": "Ge boken till Farfar!"
+      }
+     ]
+    },
+    {
+     "text": "SÄTT DIG HOS FARFAR",
+     "klart": {
+      "scen": "s16_godnattsagan",
+      "ga_till": "fatolj_vanster"
+     },
+     "ersatter": [
+      {
+       "scen": "s16_godnattsagan",
+       "text": "Sätt dig hos Farfar."
+      }
+     ]
+    }
+   ],
+   "stampel": {
+    "scen": "s16_godnattsagan",
+    "efter": {
+     "replik": "Så börjar alla trollkarlar."
+    }
+   }
+  },
+  {
+   "id": "u0_sova",
+   "rubrik": "DAGS ATT SOVA",
+   "bild": "uppdrag_manen",
+   "pass": 2,
+   "steg": [
+    {
+     "text": "LÄS PÅ DÖRRARNA",
+     "klart": {
+      "scen": "s17_sovdags",
+      "pussel": "p0_sangen"
+     }
+    },
+    {
+     "text": "LÄGG DIG",
+     "klart": {
+      "scen": "s18_sangen",
+      "ga_till": "sang"
+     },
+     "ersatter": [
+      {
+       "scen": "s18_sangen",
+       "text": "Kryp ner i sängen!"
+      }
+     ]
+    }
+   ],
+   "stampel": {
+    "scen": "s18_sangen",
+    "efter": {
+     "replik": "God natt! {unge} drömmer om mamma."
+    }
+   }
+  },
+  {
+   "id": "u0_koket",
+   "rubrik": "KOM TILL FARFAR",
+   "bild": "uppdrag_farfar_morgon",
+   "pass": 3,
+   "steg": [
+    {
+     "text": "GÅ UT I HALLEN",
+     "klart": {
+      "scen": "s19_morgon",
+      "ga_till": "dorr_hallen"
+     }
+    },
+    {
+     "text": "GÅ DIT VI ÄTER",
+     "klart": {
+      "scen": "s20_hallen_morgon",
+      "ga_till": "dorr_mat"
+     }
+    }
+   ],
+   "stampel": {
+    "scen": "s20_hallen_morgon",
+    "efter": {
+     "ga_till": "dorr_mat"
+    }
+   }
+  },
+  {
+   "id": "u0_packa",
+   "rubrik": "PACKA",
+   "bild": "uppdrag_ryggsacken",
+   "pass": 3,
+   "steg": [
+    {
+     "text": "PACKA ALLT PÅ LISTAN",
+     "klart": {
+      "scen": "s21_uppdraget",
+      "pussel": "p0_packlista"
+     }
+    },
+    {
+     "text": "TA RADION",
+     "klart": {
+      "scen": "s21_uppdraget",
+      "ga_till": "radio"
+     }
+    },
+    {
+     "text": "TRYCK PÅ RADION",
+     "klart": {
+      "scen": "s21_uppdraget",
+      "vantar_pa": "radion"
+     }
+    }
+   ],
+   "stampel": {
+    "scen": "s21_uppdraget",
+    "efter": {
+     "vantar_pa": "radion"
+    }
+   }
+  },
+  {
+   "id": "u0_ut",
+   "rubrik": "FÖLJ LISTAN",
+   "bild": "lapp",
+   "pass": 3,
+   "steg": [
+    {
+     "text": "GÅ UT I HALLEN",
+     "klart": {
+      "scen": "s21_uppdraget",
+      "ga_till": "dorr_hallen"
+     },
+     "ersatter": [
+      {
+       "scen": "s21_uppdraget",
+       "text": "Gå ut i hallen!"
+      }
+     ]
+    },
+    {
+     "text": "GÅ UT UR HUSET",
+     "klart": {
+      "scen": "s21b_hallen_ut",
+      "ga_till": "dorr_ut"
+     },
+     "ersatter": [
+      {
+       "scen": "s21b_hallen_ut",
+       "text": "Gå ut genom dörren!"
+      }
+     ]
+    },
+    {
+     "text": "GÅ MOT SKOGEN",
+     "klart": {
+      "scen": "s22_tradgarden",
+      "pussel": "p0_skylten"
+     },
+     "upplast": false
+    }
+   ],
+   "stampel": {
+    "scen": "s22_tradgarden",
+    "efter": {
+     "bild": "in_i_skogen"
+    }
+   }
   }
  ]
 }
