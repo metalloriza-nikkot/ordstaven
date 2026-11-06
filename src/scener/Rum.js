@@ -216,8 +216,10 @@ export class Rum extends Phaser.Scene {
 
   /**
    * Golvdatorn (canvas i mjukvara): en bildruta ritas bara när något har ändrats. Figurerna, kameran och tweens som
-   * tar slut syns direkt. Glimten (som pågår hela tiden) ritas åtta gånger per sekund. Annat som ändras (en ram,
-   * en låda, ljuset) sätter smutsig. Utan ändringar rör spelet inte duken, och då har datorn inget att rita om.
+   * tar slut syns direkt. Glimten (som pågår hela tiden) ritas fyra gånger per sekund, men bara när något glimtar.
+   * Annat som ändras (en ram, en låda, ljuset) sätter smutsig. Utan ändringar ritas världen två gånger per sekund,
+   * för säkerhets skull. Med läsplattan öppen ritas den högst fyra gånger per sekund. Varje gång duken ritas lägger webbläsaren ihop hela skärmen igen, och det är det som kostar
+   * mest utan grafikkort (2c: ca 4 ms per gång på en snabb dator, flera gånger mer på golvdatorn).
    */
   valjRitning() {
     this.antalSteg = (this.antalSteg || 0) + 1;
@@ -227,7 +229,13 @@ export class Rum extends Phaser.Scene {
     // med läsplattan öppen står världen still bakom texten: den ritas i lugn takt (åtta gånger per sekund), så att
     // datorn inte målar om plattans skuggor över en värld som rör sig (golvdatorn, trädgården i s22)
     const lugn = !!this.b.plattaOppen?.();
-    const rita = this.smutsig || (!lugn && (rorlig || sig !== this.forraSig)) || nu - this.senastRitad >= 125;
+    const glimtar = (this.glimtar.visible && this.glimtar.commandBuffer.length > 0) || (this.naraRam.visible && this.naraRam.commandBuffer.length > 0);
+    const sedan = nu - this.senastRitad;
+    // med läsplattan öppen ritas världen högst fyra gånger per sekund, också när något rör sig bakom texten
+    // (luftskeppet i s22). Annars ritas det som rör sig direkt, glimten fyra gånger per sekund, och resten var 500:e ms.
+    const rita = lugn
+      ? sedan >= 250 && (this.smutsig || rorlig || sig !== this.forraSig || glimtar || sedan >= 500)
+      : this.smutsig || rorlig || sig !== this.forraSig || sedan >= (glimtar ? 250 : 500);
     this.sys.settings.visible = rita;
     if (rita) { this.smutsig = false; this.forraSig = sig; this.senastRitad = nu; this.antalRitade = (this.antalRitade || 0) + 1; }
   }
@@ -649,7 +657,7 @@ export class Rum extends Phaser.Scene {
     const bild = img?.frame?.name;
     if (bild && /_(ner|upp|vanster|hoger)_/.test(bild)) {
       const ny = bild.replace(/_(ner|upp|vanster|hoger)_/, `_${riktningFor({ x: -dx / l, y: -dy / l })}_`);
-      if (img.texture.has(ny) && ny !== bild) img.setFrame(ny);
+      if (img.texture.has(ny) && ny !== bild) { img.setFrame(ny); this.smutsig = true; }
     }
     // ungen tittar på den som talar, också om den kommer gående just nu (den vänder sig när den stannar)
     this.ungeTittarPa = { ...mal, till: this.time.now + 6000 };

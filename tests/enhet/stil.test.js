@@ -31,6 +31,17 @@ describe('stilen och golvdatorn', () => {
   it('inget filter i spelets stil', () => {
     expect(css).not.toMatch(/(^|[;{\s])(backdrop-)?filter\s*:/m);
   });
+  it('inga skuggor med oskärpa (10c, 27.10): skuggor är hårda och glöd är en ring', () => {
+    /** @type {string[]} */
+    const fel = [];
+    for (const m of css.matchAll(/(box-shadow|text-shadow)\s*:\s*([^;}]+)/g)) {
+      for (const del of m[2].split(/,(?![^(]*\))/)) {
+        const tal = del.replace(/rgba?\([^)]*\)|#[0-9a-f]+|var\([^)]*\)|calc\([^)]*\)/gi, '').match(/-?[\d.]+/g) || [];
+        if (tal.length >= 3 && Number(tal[2]) > 0) fel.push(`${m[1]}: ${del.trim()}`);
+      }
+    }
+    expect(fel).toEqual([]);
+  });
   it('inget skakar vid fel, utom ungens nos', () => {
     const skak = keyframes(css).filter((k) => /^skaka/.test(k.namn)).map((k) => k.namn);
     expect(skak).toEqual(['skaka-nos']);

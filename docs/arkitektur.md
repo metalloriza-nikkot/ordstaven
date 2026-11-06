@@ -645,3 +645,10 @@ Stilguiden §3 gick igenom mot spelet. Det som saknades är byggt här, resten f
 - **Varför inte CI:** CI kör efter pushen, och då är historiken publik. En kontrollsumma av ett förnamn går att knäcka med en namnlista.
 - **Testet** (`tests/enhet/namnkrok.test.js`) kör kroken i ett provrepo med ett påhittat namn och ett eget `HOME`.
 
+## 50. Golvdatorn (0.23.0, 2c)
+- **Var tiden går** (mätt med Chromes spårning i Chromium utan grafikkort, `--disable-gpu --disable-gpu-compositing`): målning och rastrering av textlagret tar 4–10 ms per sekund, också med skuggorna med oskärpa. Det som kostar är att skärmen läggs ihop (`SoftwareRenderer::DoDrawQuad`), ca 4 ms varje gång duken ändras på en snabb dator och flera gånger mer på golvdatorn. **Antalet gånger världen ritas om per sekund är alltså det som avgör.**
+- **`Rum.valjRitning`:** det som rör sig ritas direkt (högst 30 per sekund), glimten fyra gånger per sekund när något glimtar, och annars världen var 500:e ms. Med läsplattan öppen ritas världen högst fyra gånger per sekund, också om något rör sig bakom texten (luftskeppet i s22). I mätningen: tomgång med glimt 8 → 4 per sekund, läsplattan öppen med luftskeppet 8 → 2 per sekund (sammanläggningen 37 → 13 ms per sekund), och när han går 20 per sekund som förut.
+- **Inga skuggor med oskärpa** i `stil.css` (10c, 27.10): skuggor är förskjutna utan oskärpa, och glöd är en ring (spridning eller fyra hårda textskuggor). `tests/enhet/stil.test.js` säger fel om en oskärpa kommer tillbaka.
+- **Loggen** (`prestanda.js`, `golv: true` i canvasläget): var 30:e sekund en rad `[golvet]` med bildrutor per sekund, andel långsamma, hur många gånger och hur länge världen ritades (mätt mellan Phasers `prerender` och `postrender` när rummet ritas), och hur stor del av tiden läsplattan var öppen och hur många bildrutor som var långsamma då.
+- **Kvar till golvdatorns logg:** om ritningen själv (ms per gång) är stor på MacBooken, är det bilderna och lagren som kostar, och då säger Teknik till Stil. Är den liten men bildrutorna långsamma, är det sammanläggningen, och då hjälper bara färre omritningar.
+

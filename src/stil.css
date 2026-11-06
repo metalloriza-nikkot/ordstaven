@@ -45,7 +45,7 @@ html, body {
   top: var(--rum-topp);
   width: var(--rum-bredd);
   height: var(--rum-hojd);
-  box-shadow: 0 0 0 3px var(--som), 0 6px 24px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 0 3px var(--som), 0 6px 0 rgba(0, 0, 0, .35);
   overflow: hidden; /* rummen glider inom rummets ruta */
 }
 
@@ -118,7 +118,7 @@ html, body {
   background: var(--papper);
   color: var(--black);
   font: 18px var(--typsnitt);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, .35);
 }
 
 /* ============================================================ gråboxens gränssnitt (fas 2) */
@@ -169,7 +169,7 @@ html, body {
 #plattan { position: absolute; left: calc(var(--rum-vanster) + var(--rum-bredd) / 2); transform: translateX(-50%); max-width: min(92vw, var(--rum-bredd)); width: max-content; color: var(--black); }
 #plattan.replik { bottom: calc(100vh - var(--rum-topp) - var(--rum-hojd) + 12px); }
 #plattan.pussel, #plattan.bok, #plattan.formel-luft { top: calc(var(--rum-topp) + var(--rum-hojd) / 2); transform: translate(-50%, -50%); }
-.replik-ruta, .pussel-ruta, .formel-ruta, .dop-ruta, .bok-ruta, .hjalte-ruta { position: relative; background: var(--papper); border-radius: 18px; box-shadow: 0 8px 28px rgba(0, 0, 0, .5), inset 0 0 0 3px #d9c9a3; }
+.replik-ruta, .pussel-ruta, .formel-ruta, .dop-ruta, .bok-ruta, .hjalte-ruta { position: relative; background: var(--papper); border-radius: 18px; box-shadow: 0 8px 0 rgba(0, 0, 0, .35), inset 0 0 0 3px #d9c9a3; }
 .replik-ruta { display: flex; align-items: flex-end; gap: 16px; padding: 16px 16px 16px 20px; }
 .replik-ruta .text { align-self: center; }
 .replik-ruta .vidare, .pussel-ruta > .vidare { position: static; flex: none; }
@@ -196,13 +196,13 @@ html, body {
 
 /* pussel */
 .pussel-ruta { padding: 20px 24px 24px; display: flex; flex-direction: column; align-items: center; gap: 18px; min-width: min(80vw, 520px); }
-.lapp { background: #fffaf0; padding: 12px 22px; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,.2); transform: rotate(-1deg); }
+.lapp { background: #fffaf0; padding: 12px 22px; border-radius: 6px; box-shadow: 0 3px 0 rgba(0,0,0,.18); transform: rotate(-1deg); }
 /* packlistan: en bock per packad rad; när allt är packat lyser raden som inte är en sak, och sakerna tonas ut */
 .lapp .rad.bockad::after { content: ''; display: inline-block; width: calc(16 * var(--ipx-text)); height: calc(16 * var(--ipx-text)); margin-left: .25em; vertical-align: -.1em; background: url('../assets/ui/ikon_klar.png') 0 0 / 100% 100%; image-rendering: pixelated; }
 .lapp .rad.lyser { background: rgba(242, 193, 78, .5); border-radius: 6px; box-shadow: 0 0 0 4px rgba(242, 193, 78, .5); animation: puls .6s ease 3; }
 .kortrad.packat .kort { opacity: .3; transition: opacity .4s; }
 /* baronens papper i hans orange (spelarens val), med de gamla id:na kvar */
-.lapp.p-lila_papper_blackplumpar, .lapp.p-baronens_papper_hatt, .lapp.p-baronens_papper_hjalm { background: #f6dcc3; box-shadow: 0 2px 6px rgba(0,0,0,.2), inset 0 0 0 4px #e8823a; }
+.lapp.p-lila_papper_blackplumpar, .lapp.p-baronens_papper_hatt, .lapp.p-baronens_papper_hjalm { background: #f6dcc3; box-shadow: 0 3px 0 rgba(0,0,0,.18), inset 0 0 0 4px #e8823a; }
 .lapp.p-traskylt { background: #c9a774; border-radius: 4px; }
 .fraga { font-size: calc(64px * var(--t)); }
 .svar-rad { display: flex; align-items: center; gap: 12px; }
@@ -249,8 +249,8 @@ html, body {
 
 /* formeln */
 .formel-ruta { padding: 22px 28px; display: flex; flex-direction: column; align-items: center; gap: 22px; }
-.forebild { display: flex; gap: 10px; padding: 10px 26px; border-radius: 40px; background: linear-gradient(#8a6a4a, #6b4c35); box-shadow: inset 0 0 12px rgba(242, 193, 78, .5); }
-.forebild .bokstav { color: #ffe9a8; font-size: calc(56px * var(--t)); text-shadow: 0 0 10px rgba(242, 193, 78, .9); }
+.forebild { display: flex; gap: 10px; padding: 10px 26px; border-radius: 40px; background: linear-gradient(#8a6a4a, #6b4c35); box-shadow: inset 0 0 0 4px rgba(242, 193, 78, .5); }
+.forebild .bokstav { color: #ffe9a8; font-size: calc(56px * var(--t)); text-shadow: 2px 0 0 rgba(242, 193, 78, .7), -2px 0 0 rgba(242, 193, 78, .7), 0 2px 0 rgba(242, 193, 78, .7), 0 -2px 0 rgba(242, 193, 78, .7); }
 .forebild .bokstav.blinkar, .bricka.tips { animation: blinka .5s ease-in-out 6; }
 @keyframes blinka { 50% { opacity: .2; } }
 .platser { display: flex; gap: 12px; }
@@ -263,9 +263,9 @@ html, body {
 .plats.flyttbar { background: #fff; border-style: solid; }
 .bricka.lyft, .plats.lyft { opacity: .35; }
 .plats.over { border-color: var(--guld, #f2c14e); background: #fff6d8; }
-.bricka.dras { position: fixed; z-index: 100; pointer-events: none; transform: translate(-50%, -60%) scale(1.1) rotate(-3deg); display: flex; align-items: center; justify-content: center; box-shadow: 0 14px 22px rgba(0, 0, 0, .35); cursor: grabbing; }
+.bricka.dras { position: fixed; z-index: 100; pointer-events: none; transform: translate(-50%, -60%) scale(1.1) rotate(-3deg); display: flex; align-items: center; justify-content: center; box-shadow: 0 14px 0 rgba(0, 0, 0, .25); cursor: grabbing; }
 .bricka.sudda { font-size: 36px; background: #e9dfc8; }
-.formel-i-luften { font-size: calc(96px * var(--t)); color: #ffe9a8; text-shadow: 0 0 24px rgba(242, 193, 78, 1); letter-spacing: .1em; animation: luft 1s ease; }
+.formel-i-luften { font-size: calc(96px * var(--t)); color: #ffe9a8; text-shadow: 4px 0 0 rgba(242, 193, 78, .8), -4px 0 0 rgba(242, 193, 78, .8), 0 4px 0 rgba(242, 193, 78, .8), 0 -4px 0 rgba(242, 193, 78, .8); letter-spacing: .1em; animation: luft 1s ease; }
 @keyframes luft { from { transform: scale(.4); opacity: 0; } }
 
 /* namnet */
@@ -522,7 +522,7 @@ html, body {
 .stav-knapp { position: absolute; z-index: 2; right: -18px; top: -18px; width: calc(72px * var(--t)); height: calc(72px * var(--t)); border-radius: 50%; border: 0; background: #e9dfc8; box-shadow: 0 4px 0 #b7a98a; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .stav-ikon { display: block; width: calc(12px * var(--t)); height: calc(52px * var(--t)); border-radius: 6px; background: linear-gradient(#8a6a4a, #3a2a20); transform: rotate(25deg); box-shadow: 0 0 0 2px rgba(242, 193, 78, .4); }
 .stav-knapp.glimtar { background: var(--guld); box-shadow: 0 4px 0 #b8892b, 0 0 0 6px rgba(242, 193, 78, .45); }
-.stav-knapp.lyft { background: var(--guld); transform: translateY(-6px); box-shadow: 0 10px 0 #b8892b, 0 0 24px rgba(242, 193, 78, .8); }
+.stav-knapp.lyft { background: var(--guld); transform: translateY(-6px); box-shadow: 0 10px 0 #b8892b, 0 0 0 8px rgba(242, 193, 78, .5); }
 /* kasta-läget ser ut som formelvyn: fälten får guldkant och nästa tomma lyser */
 .kastar .plats { border-color: var(--guld); }
 .kastar .plats.nasta { background: #fff6d8; box-shadow: 0 0 0 4px rgba(242, 193, 78, .6); }
@@ -553,7 +553,7 @@ html, body {
 .kod-tecken { display: flex; gap: 12px; }
 .kod-tecken-ruta { display: inline-flex; width: calc(84px * var(--t)); justify-content: center; border-radius: 12px; transition: background .3s; }
 .kod-tecken-ruta .bild.emoji { font-size: calc(56px * var(--t)); }
-.kod-tecken-ruta.ratt { background: rgba(242, 193, 78, .55); box-shadow: 0 0 12px rgba(242, 193, 78, .8); }
+.kod-tecken-ruta.ratt { background: rgba(242, 193, 78, .55); box-shadow: 0 0 0 4px rgba(242, 193, 78, .7); }
 .kod-nyckel { display: grid; grid-template-columns: repeat(3, auto); gap: 8px 18px; background: #f5ecd7; box-shadow: inset 0 0 0 3px #d9c9a3; }
 .kod-par { display: inline-flex; align-items: center; gap: 6px; padding: 2px 6px; border-radius: 10px; }
 .kod-par .bild.emoji { font-size: calc(36px * var(--t)); }
@@ -608,7 +608,7 @@ html, body {
 .pratruta .portratt { width: calc(60px * var(--t)); height: calc(60px * var(--t)); border-radius: 50%; align-self: flex-end; box-shadow: 0 0 0 4px #d9c9a3, inset 0 0 0 4px rgba(0, 0, 0, .15); }
 .portratt.radio { display: flex; align-items: center; justify-content: center; font-size: calc(32px * var(--t)); }
 /* berättaren: rak ruta, svalt blågrått papper, guldstjärnan på ansiktets plats */
-.berattarruta { border-radius: 3px; background: #dfe5ea; box-shadow: 0 8px 28px rgba(0, 0, 0, .5), inset 0 0 0 3px #b4c0ca; }
+.berattarruta { border-radius: 3px; background: #dfe5ea; box-shadow: 0 8px 0 rgba(0, 0, 0, .35), inset 0 0 0 3px #b4c0ca; }
 .portratt.stjarna { display: flex; align-items: center; justify-content: center; background: none; box-shadow: none; width: calc(48px * var(--t)); height: calc(48px * var(--t)); font-size: calc(44px * var(--t)); color: var(--guld); text-shadow: 0 2px 0 #b8892b; }
 /* rullningen: dolda tecken har sin bredd, så raden hoppar aldrig; markeringen är en guldlinje under ordet */
 .tk.dold { visibility: hidden; }
@@ -637,8 +637,10 @@ html, body {
 .fraga-rad .text { font-size: calc(40px * var(--t)); line-height: 1.3; }
 .fraga-rad .portratt { flex: none; cursor: pointer; }
 .fraga-rad .fraga-bild { margin-left: auto; font-size: calc(56px * var(--t)); line-height: 1; }
+/* Inga skuggor med oskärpa (10c, 27.10, 2c): golvdatorn målar om dem varje gång texten under dem ändras. Skuggor
+   är hårda (förskjutning utan oskärpa), och glöd är en ring av pixlar. Ett test säger fel om oskärpan kommer tillbaka. */
 /* luckorna: läsplattan är en närbild av lådans lock. Tre rader i hela bredden, var och en en lucka med gångjärn */
-.pussel-ruta.luckor { background: #d9b98a; box-shadow: 0 8px 28px rgba(0, 0, 0, .5), inset 0 0 0 calc(10px * var(--t)) #8a6a4a; border-radius: 6px; }
+.pussel-ruta.luckor { background: #d9b98a; box-shadow: 0 8px 0 rgba(0, 0, 0, .35), inset 0 0 0 calc(10px * var(--t)) #8a6a4a; border-radius: 6px; }
 .luckor .kortrad { flex-direction: column; flex-wrap: nowrap; align-items: stretch; align-self: stretch; gap: calc(10px * var(--t)); }
 .pussel-ruta.luckor { padding: calc(14px * var(--t)) calc(16px * var(--t)) calc(18px * var(--t)); gap: calc(12px * var(--t)); }
 .kort.lucka { flex-direction: row; justify-content: flex-start; gap: calc(14px * var(--t)); min-height: 0; padding: calc(8px * var(--t)) calc(14px * var(--t)); border-radius: 4px; background: #fff6e0; box-shadow: 0 4px 0 #8a6a4a, 0 0 0 3px #a7845a; text-align: left; }

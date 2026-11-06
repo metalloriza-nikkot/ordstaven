@@ -156,7 +156,13 @@ spel.events.once(Phaser.Core.Events.READY, () => {
 if (canvasSparad) logg.handelse('ritning', 'canvas (WebGL tappades förut på den här datorn)');
 if (canvasLage) logg.handelse('ritning', 'canvas: högst 30 bildrutor per sekund, och bara när något ändras', { webgl: webglFinns });
 // Hack i bildrutorna skrivs i loggen med vad som pågick (golvdatorn ritar utan grafikkort).
-bevakaBildrutor({ logg, sammanhang: () => ({ scen: spelet?.scen, steg: spelet?.steg?.typ, pussel: spelet?.steg?.pussel_id, platta: !ui.plattan.hidden, ritning: spel.renderer?.type === Phaser.CANVAS ? 'canvas' : 'webgl' }) });
+const bevakning = bevakaBildrutor({ logg, golv: canvasLage, plattaOppen: () => !ui.plattan.hidden, sammanhang: () => ({ scen: spelet?.scen, steg: spelet?.steg?.typ, pussel: spelet?.steg?.pussel_id, platta: !ui.plattan.hidden, ritning: spel.renderer?.type === Phaser.CANVAS ? 'canvas' : 'webgl' }) });
+// golvdatorn: hur länge duken ritas, bara de bildrutor då rummet faktiskt ritas (Rum.valjRitning)
+if (canvasLage) {
+  let t0 = 0;
+  spel.events.on(Phaser.Core.Events.PRE_RENDER, () => { t0 = rum.sys.settings.visible ? performance.now() : 0; });
+  spel.events.on(Phaser.Core.Events.POST_RENDER, () => { if (t0) bevakning.ritad(performance.now() - t0); });
+}
 
 // Versionsraden: information till den vuxne, bara där den inte täcker rummet.
 document.fonts.load('32px Lexend').finally(() => {
