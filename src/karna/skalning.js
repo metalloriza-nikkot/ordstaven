@@ -36,8 +36,9 @@ export const remsansHojd = (t) => Math.ceil(2 * 40 * 1.35 * t + 48);
 
 /**
  * Texten under spelytan (beslut 36.2). Har fönstret plats för textremsan under spelytan ligger spelytan överst och
- * texten i remsan, så att den aldrig täcker världen. Räcker det inte blir spelytan ett helt steg mindre (en fysisk
- * pixel mindre skala), om den då fortfarande är minst tre gånger så stor (960 × 576 punkter). Annars ligger texten
+ * texten i remsan, så att den aldrig täcker världen. Räcker det inte blir spelytan högst ett helt steg mindre (ett
+ * CSS-steg: en fysisk pixel vid 1×, två på retina, där halva steget prövas först), om den då fortfarande är minst
+ * tre gånger så stor (960 × 576 punkter). Annars ligger texten
  * över spelytan som förut (remsa = 0). Spelytan och remsan står tillsammans mitt i fönstret.
  * @param {{ bredd: number, hojd: number, dpr?: number }} fonster
  * @returns {ReturnType<typeof beraknaSkala> & { remsa: number }}
@@ -45,7 +46,8 @@ export const remsansHojd = (t) => Math.ceil(2 * 40 * 1.35 * t + 48);
 export function beraknaSkalaMedRemsa({ bredd, hojd, dpr = 1 }) {
   const d = dpr > 0 ? dpr : 1;
   const hel = beraknaSkala({ bredd, hojd, dpr: d });
-  for (const fysisk of [hel.fysisk, hel.fysisk - 1]) {
+  // Högst ett helt steg mindre i CSS-punkter: en fysisk pixel vid 1×, två på retina (helskärm på MacBooken: 4× → 3×)
+  for (let fysisk = hel.fysisk; fysisk >= hel.fysisk - Math.ceil(d - 1e-6); fysisk--) {
     if (fysisk < 1) break;
     const cssBredd = (RUM.bredd * fysisk) / d, cssHojd = (RUM.hojd * fysisk) / d;
     if (fysisk !== hel.fysisk && fysisk / d < 3) break;

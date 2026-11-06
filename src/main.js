@@ -24,6 +24,7 @@ import { RUM, varldTillSkarm } from './karna/skalning.js';
 import { lasKarta } from './karna/karta.js';
 import { skapaLagring, begarBestandigLagring } from './grans/lagring.js';
 import { skapaLayout } from './grans/layout.js';
+import { sakraAppfonster } from './grans/fonster.js';
 import { kopplaInmatning } from './grans/inmatningDom.js';
 import { kopplaLogg, exportera, laddaNed, tidsstampel, meddelande } from './grans/loggDom.js';
 import { startaUppdatering } from './grans/uppdatering.js';
@@ -80,6 +81,8 @@ const tillstand = sparning.las();
 const varld = /** @type {HTMLElement} */ (document.getElementById('varld'));
 const textlager = /** @type {HTMLElement} */ (document.getElementById('textlager'));
 const layout = skapaLayout({ varld, logg });
+// appens fönster minst 762 punkter högt (39.5), en gång när spelet startar
+sakraAppfonster({ logg });
 logg.registrera('skala', () => layout.skala);
 // hur världen ritas (webgl eller canvas): MacBooken vid grind A saknade WebGL
 logg.registrera('ritning', () => { try { return spel.renderer.type === Phaser.CANVAS ? 'canvas' : 'webgl'; } catch (e) { return 'startar'; } });

@@ -757,6 +757,7 @@ test('texten under spelytan (36.2): har fönstret plats står repliken och molne
 });
 
 test('utan plats står texten över spelytan, men aldrig över målet (36.2, 31.3)', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 700 }); // MacBooken med menyraden och Dock: ingen plats för remsan
   await provscen(page, { id: 't_over', pass: 1, rum: 'hallen', tillstand: 'morgon', steg: [R('Gå ut genom dörren!'), { typ: 'ga_till', mal: 'dorr_ut' }, R('Ute.')] });
   expect(await page.evaluate(() => document.documentElement.classList.contains('text-under'))).toBe(false);
   const rutaFor = (id) => page.evaluate((m) => { const r = window.__ORDSTAVEN.rutaPaSkarm(m); return { left: r.x, top: r.y, right: r.x + r.b, bottom: r.y + r.h }; }, id);
@@ -1722,7 +1723,7 @@ test('HUD:en i ramen till höger när ramen är bred nog, annars i rummets hörn
   const emoji = await page.evaluate(() => (document.querySelector('#ui').innerText.match(/\p{Extended_Pictographic}/gu) || []).filter((c) => c !== '⚙'));
   expect(emoji).toEqual([]);
   await page.screenshot({ path: 'test-results/hud-i-ramen.png' });
-  await page.setViewportSize({ width: 1280, height: 800 }); // ingen ram på sidan: knapparna står i rummets hörn som förut
+  await page.setViewportSize({ width: 1280, height: 1000 }); // 4× med remsan, ingen ram på sidan: knapparna står i rummets hörn som förut
   await expect.poll(async () => (await ruta('#hud-bar')).x).toBeLessThan(s.vanster + 400);
 });
 
@@ -1748,8 +1749,8 @@ test('handen vid målet i molnet syns på ca två rutors avstånd, och ett tryck
   await page.locator('#plattan .replik-ruta').click({ timeout: 8000 });
   await expect.poll(async () => (await steg(page))?.typ, { timeout: 8000 }).toBe('ga_till');
   // gå mot radion tills handen syns, och se hur långt bort han är då
-  const o = await page.evaluate(() => window.__ORDSTAVEN.objekt('radio'));
-  await page.mouse.click(o.x, o.y + 140);
+  const o = await page.evaluate(() => window.__ORDSTAVEN.objekt('radio')), sk = (await page.evaluate(() => window.__ORDSTAVEN.skala())).cssSkala;
+  await page.mouse.click(o.x, o.y + 35 * sk); // 35 av världens pixlar under radion, i alla skalor
   await expect(page.locator('#handknapp')).toBeVisible({ timeout: 8000 });
   const avstand = await page.evaluate(() => { const r = window.__ORDSTAVEN.ruta('radio'), p = window.__ORDSTAVEN.position(); return Math.hypot(Math.max(r.x - p.x, 0, p.x - (r.x + r.b)), Math.max(r.y - p.y, 0, p.y - (r.y + r.h))); });
   expect(avstand).toBeGreaterThan(24); // längre bort än den vanliga räckvidden (1,5 rutor)

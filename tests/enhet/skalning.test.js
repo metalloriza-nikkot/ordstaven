@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { planeraFonster } from '../../src/grans/fonster.js';
 import { beraknaSkala, beraknaSkalaMedRemsa, remsansHojd, textskala, skarmTillRum, rumTillSkarm } from '../../src/karna/skalning.js';
 
 // Skärmtabellen i stilguiden. "fysisk" = fysiska pixlar per spelpixel (alltid heltal).
@@ -117,6 +118,34 @@ describe('texten under spelytan (beslut 36.2)', () => {
     const mac = beraknaSkalaMedRemsa({ bredd: 1280, hojd: 664, dpr: 2 }); // MacBooken i appen
     expect(mac).toMatchObject({ fysisk: 6, cssSkala: 3, remsa: 0 });
     expect(mac).toMatchObject(beraknaSkala({ bredd: 1280, hojd: 664, dpr: 2 }));
-    expect(beraknaSkalaMedRemsa({ bredd: 1280, hojd: 800, dpr: 2 }).remsa).toBe(0); // 4× och 3,5× ryms inte
+  });
+  it('högst ett helt steg mindre: helskärm på MacBooken går från 4× till 3× med remsan (39.5)', () => {
+    const helskarm = beraknaSkalaMedRemsa({ bredd: 1280, hojd: 800, dpr: 2 }); // 4× och 3,5× ryms inte, 3× gör det
+    expect(helskarm).toMatchObject({ fysisk: 6, cssSkala: 3 });
+    expect(helskarm.remsa).toBeGreaterThan(0);
+    expect(helskarm.topp + helskarm.cssHojd + helskarm.remsa).toBeLessThanOrEqual(800);
+    const app = beraknaSkalaMedRemsa({ bredd: 1280, hojd: 762, dpr: 2 }); // spelarens app
+    expect(app).toMatchObject({ fysisk: 6, cssSkala: 3 });
+    expect(app.remsa).toBeGreaterThan(0);
+    // vid 1× aldrig mer än en fysisk pixel: 2560 × 1170 är 6×, och varken 6× eller 5× har plats → texten över
+    expect(beraknaSkalaMedRemsa({ bredd: 2560, hojd: 1170, dpr: 1 })).toMatchObject({ fysisk: 6, remsa: 0 });
+  });
+});
+
+describe('appens fönster (beslut 39.5)', () => {
+  const bas = { installerad: true, helskarm: false, pek: false, yttreBredd: 1280, x: 0, y: 50, skarmTopp: 0, skarmHojd: 800 };
+  it('ett för lågt appfönster blir 762 punkter högt inuti', () => {
+    const p = planeraFonster({ ...bas, inreHojd: 664, yttreHojd: 692 });
+    expect(p).toMatchObject({ andra: true, hojd: 790, nyInreHojd: 762, flyttaTill: 10, rackerInte: false });
+  });
+  it('blir aldrig högre än skärmen, och säger till när det inte räcker', () => {
+    const p = planeraFonster({ ...bas, inreHojd: 600, yttreHojd: 628, skarmTopp: 25, skarmHojd: 692 }); // menyraden och Dock syns
+    expect(p).toMatchObject({ andra: true, hojd: 692, nyInreHojd: 664, flyttaTill: 25, rackerInte: true });
+  });
+  it('ändrar inget i en flik, i helskärm, på en pekskärm eller när fönstret räcker', () => {
+    expect(planeraFonster({ ...bas, installerad: false, inreHojd: 600, yttreHojd: 700 }).andra).toBe(false);
+    expect(planeraFonster({ ...bas, helskarm: true, inreHojd: 600, yttreHojd: 600 }).andra).toBe(false);
+    expect(planeraFonster({ ...bas, pek: true, inreHojd: 600, yttreHojd: 600 }).andra).toBe(false);
+    expect(planeraFonster({ ...bas, inreHojd: 762, yttreHojd: 790 }).andra).toBe(false);
   });
 });
