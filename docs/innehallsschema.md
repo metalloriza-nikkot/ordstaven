@@ -1,6 +1,7 @@
 # Innehållsschema – kapitel i format 2
 
-Version 2.23 (2026-11-06). Ägs av teknikspåret.
+Version 2.24 (2026-11-07). Ägs av teknikspåret.
+2.24: **`gransnitt.klart`** i `aventyr.json` (ordet under flikens bild och när stämpeln slår ned, beslut 52.1). Innehålls korta pass: `bild` på mellanscenerna är Innehålls fält. Allt är tillägg, filer i 2.23 gäller fortfarande.
 2.23: **prologens grafik** (Teknik 4). Kartans objekt får **`bild_sitter`** (bilden när hjälten sitter i föremålet, fåtöljen). Mellanscenens `bild` har äggets lägen `agg_frost`, `agg_filt`, `agg_lyser` och `agg_klackning`. Allt är tillägg, filer i 2.22 gäller fortfarande.
 2.22: **lappen görs om** (beslut 47 och 48, Teknik 2g). Inga nya fält. `steg[].ersatter` används inte längre (Innehåll tar bort det), och `steg[].text` och `steg[].upplast` står inte på lappen: delstegen styr bara bockarna, ringarna och stämpeln. Uppdraget börjar vid första stegets eget steg. Filer i 2.21 gäller fortfarande.
 2.21: **skogens grafik** (Teknik 3). Kartorna utomhus får rutlager (`golv`, `over` och lager med `visas_med`), objekt av typen `omgivning` (det levande i bakgrunden) och objektens **`bild_sedan`** med **`sedan`**, **`bild_anim`** med **`anim_ms`** och **`rutor`**. Mellanscenens `bild` har sidovyn `vid_bron` och `kartbit_unge`. Allt är tillägg, filer i 2.20 gäller fortfarande.
@@ -292,6 +293,7 @@ Pausmenyn har två bildknappar, KARTAN och MIN BOK (hjälteboken), och hjältebo
 "gransnitt": { "kartan": "kartan", "hjalteboken": "min bok", "staven": "staven", "garderoben": "kläder", "dinoboken": "Dinoboken" }
 ```
 `sluta_for_idag` har ett eget ord (`sov`, Innehåll F11). Saknas det visar knappen bara den sovande ungen.
+`klart` (2.24) är ordet för fliken KLART och för stämpeln (`klart`). Saknas det visas bara bilden, och stämpeln läses inte upp.
 Saknas ett ord visas bara bilden. Det som står på sidorna kommer från sparningen: formlerna (staven), sakerna hjälten har hittat (`ge_sak`, garderoben), Dinobokens sidor (`dinobok`) och kartbitarna.
 
 ## 4. Ordlistor

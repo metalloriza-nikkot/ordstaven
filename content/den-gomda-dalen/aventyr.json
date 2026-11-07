@@ -5,7 +5,7 @@
  "titel": "Ordstaven. Den gömda dalen.",
  "meta": {
   "agare": "Innehåll (talare och titel), teknik (formatet)",
-  "innehall": "2026-10-25: sluta_for_idag tillagt (förslag). 2026-10-27: sparpunkt_fraga tillagd. 2026-10-30: gransnitt (orden i pausmenyn). Hjälteboken heter \"min bok\" och garderoben \"kläder\", eftersom HJ har ett stumt H och GARDEROBEN är lång. Talaren klaffen heter Baronens fågel tills spelaren har valt namn (id:t står kvar). 2026-11-01 (F10): baronen heter Baronen, och talaren klaffen heter nu herr_skata (Herr Skata, porträtt herr_skata). Ingen scen har den som talare än. 2026-11-02 (v0.11.3, granskningen A 21): slutrutan har en krok (\"Vad finns i skogen?\") i stället för \"Snart går ni in i skogen.\".",
+  "innehall": "2026-10-25: sluta_for_idag tillagt (förslag). 2026-10-27: sparpunkt_fraga tillagd. 2026-10-30: gransnitt (orden i pausmenyn). Hjälteboken heter \"min bok\" och garderoben \"kläder\", eftersom HJ har ett stumt H och GARDEROBEN är lång. Talaren klaffen heter Baronens fågel tills spelaren har valt namn (id:t står kvar). 2026-11-01 (F10): baronen heter Baronen, och talaren klaffen heter nu herr_skata (Herr Skata, porträtt herr_skata). Ingen scen har den som talare än. 2026-11-02 (v0.11.3, granskningen A 21): slutrutan har en krok (\"Vad finns i skogen?\") i stället för \"Snart går ni in i skogen.\". 2026-11-07: gransnitt.klart (\"klart\", läses upp när stämpeln slår ned, beslut 45.5).",
   "teknik": "2026-10-30 (T6): talaren klaffen har rollrösten fagel, en levande fågelröst, i stället för metall (beslut 18.3). Justeras när fågeln är vald. 2026-10-31 (T4b): gransnitt.sluta_for_idag = sov (Innehåll F11). 2026-11-01 (pass 3, beslut 24.2): kapitel_last tillagt. Stegen är ordagrant Innehålls förslag i anteckningen i kap-00 s22. kap-01 är låst från början, och den vuxne öppnar det på enheten i menyn för vuxna. Talaren klaffen heter herr_skata (Innehåll F10). Talarnas id sparas inte, så inget alias behövs."
  },
  "talare": {
@@ -119,6 +119,7 @@
   "staven": "staven",
   "garderoben": "kläder",
   "dinoboken": "Dinoboken",
-  "sluta_for_idag": "sov"
+  "sluta_for_idag": "sov",
+  "klart": "klart"
  }
 }

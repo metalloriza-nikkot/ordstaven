@@ -21,21 +21,22 @@
  },
  "meta": {
   "namn": "Skogen",
-  "version": "0.7.8",
-  "datum": "2026-11-06",
+  "version": "0.7.9",
+  "datum": "2026-11-07",
   "agare": "Innehåll",
-  "kalla": "Manus 15-kapitel1-manus.md v0.16. Byggd på repots kap-01.json från 0.22.0.",
+  "kalla": "Manus 15-kapitel1-manus.md v0.17. Byggd på repots kap-01.json från 0.28.0.",
   "nya_pusseltyper": [
    "P15_raddning",
    "P9_kodlas"
   ],
-  "teknik": "Teknik har lagt in projektets innehall-kapitel1.json (Innehålls v0.5, meta.version säger fortfarande 0.2) i repot, och ingen text är ändrad. 2026-10-28 (T1): format 1 → 2 (kapitlen är i format 2 sedan P28_packa). Inget annat i strukturen är ändrat. 2026-10-29 (T2): Innehålls förslag 2–14 som struktur, med texterna ur anteckningarna ordagrant. Skyltarna och tavlan står i rummens fält skyltar (beslut 15.2). k1s01: ga_till och mellanscenen vid skylten blir las_skylt. k1s02: fritt och ga_till blir ett ga_till med fri_vag. k1s03 är frivillig och startar i buskarna. Ryggsäcken och taggkammen är ge_sak. Frivilligt per rum (rum.frivilligt). last_lada, lila_lapp och stig_backen är dolda tills visa_foremal. k1s13: paminnelse och unge_tillagg. Pusslen: skylt på stenen och träden, forebild.tacks i SVÄRD, brickor och kasta i apan, visa_forsta, kontroll och svar_lyser_sek i kodlåset, sak_i_sista och foremal i busken och löven, och luckornas knufftid räknas av motorn (efter_sek 30 borttaget). Listan (förslag 1) kommer i T3. 2026-10-30 (T5): data v0.7 inlagd utan ändrad text. alias.rum pekar lianerna till skogsbrynet och gamla_tradet till glantan, så att det som har visats i en äldre sparning följer med. Kartorna finns i kartor/den-gomda-dalen (skogsbrynet 40 × 12, buskarna 20 × 12, glantan 40 × 24). 2026-10-30 (T4): Innehålls FÖRSLAG i k1_svard och k1_svard_igen som struktur (schema 2.10): bild svard_ristat på k1_svard, och forebild.visas vid_fel i båda (brickor_efter_sek borttaget, brickorna kommer direkt). Ingen text ändrad. 2026-10-30 (T6): v0.7.1 inlagd utan ändrad text, med T4:s struktur kvar (bild och forebild.visas i SVÄRD). 2026-10-31 (T4b): ljudord på ljud-stegen ordagrant ur Innehålls F11 (dunk, kra, brum, buhu, tok tok). 2026-11-01: v0.7.2 inlagd utan ändrad text. Baronens papper heter baronens_papper_hjalm (gråboxen ritar det i orange). Id:t lila_lapp står kvar. 2026-11-04: v0.7.4 inlagd utan ändrad text (stenarna, träden, ekorren och ugglorna i kartorna). 2026-11-04 (0.20.0): v0.7.5–v0.7.7 inlagda utan ändrad text. k1_lianerna och k1_liten_lian har verb hugga (schema 2.17, Innehålls FÖRSLAG): staven är ett svärd, och varje hugg fäller en lian. I kartan visar lianer pusslet k1_lianerna, delas i tre lianer som fyller hela väggen (delas: hela) och försvinner efter k1_lianerna i stället för k1_svard. liten_lian försvinner efter k1_liten_lian. I anteckningen till k1s13 står \"spelarens regel\" i stället för ett namn (repot är publikt). 2026-11-06 (0.23.1): v0.7.8 inlagd utan ändrad text. 2026-11-06 (0.25.0, 2d): uppdragen ur Innehålls innehall-uppdrag.json v0.1 som struktur, utan ändrad text (schema 2.20). bild är Stils bildkort enligt 10d (uppdrag_stegen, bar, bok, lapp, svard_ristat och de andra) i stället för förslagets namn. 2026-11-06 (Teknik 3): bild in_i_skogen på mellanscenen i k1s01 bild vid_bron på sidovyn i k1s13 och bild kartbit_unge när ungen sätter nosen på mammas skugga i k1s11 (Stils sidovyer, 45.2). Innehåll tar in fälten i nästa version.",
+  "teknik": "Teknik har lagt in projektets innehall-kapitel1.json (Innehålls v0.5, meta.version säger fortfarande 0.2) i repot, och ingen text är ändrad. 2026-10-28 (T1): format 1 → 2 (kapitlen är i format 2 sedan P28_packa). Inget annat i strukturen är ändrat. 2026-10-29 (T2): Innehålls förslag 2–14 som struktur, med texterna ur anteckningarna ordagrant. Skyltarna och tavlan står i rummens fält skyltar (beslut 15.2). k1s01: ga_till och mellanscenen vid skylten blir las_skylt. k1s02: fritt och ga_till blir ett ga_till med fri_vag. k1s03 är frivillig och startar i buskarna. Ryggsäcken och taggkammen är ge_sak. Frivilligt per rum (rum.frivilligt). last_lada, lila_lapp och stig_backen är dolda tills visa_foremal. k1s13: paminnelse och unge_tillagg. Pusslen: skylt på stenen och träden, forebild.tacks i SVÄRD, brickor och kasta i apan, visa_forsta, kontroll och svar_lyser_sek i kodlåset, sak_i_sista och foremal i busken och löven, och luckornas knufftid räknas av motorn (efter_sek 30 borttaget). Listan (förslag 1) kommer i T3. 2026-10-30 (T5): data v0.7 inlagd utan ändrad text. alias.rum pekar lianerna till skogsbrynet och gamla_tradet till glantan, så att det som har visats i en äldre sparning följer med. Kartorna finns i kartor/den-gomda-dalen (skogsbrynet 40 × 12, buskarna 20 × 12, glantan 40 × 24). 2026-10-30 (T4): Innehålls FÖRSLAG i k1_svard och k1_svard_igen som struktur (schema 2.10): bild svard_ristat på k1_svard, och forebild.visas vid_fel i båda (brickor_efter_sek borttaget, brickorna kommer direkt). Ingen text ändrad. 2026-10-30 (T6): v0.7.1 inlagd utan ändrad text, med T4:s struktur kvar (bild och forebild.visas i SVÄRD). 2026-10-31 (T4b): ljudord på ljud-stegen ordagrant ur Innehålls F11 (dunk, kra, brum, buhu, tok tok). 2026-11-01: v0.7.2 inlagd utan ändrad text. Baronens papper heter baronens_papper_hjalm (gråboxen ritar det i orange). Id:t lila_lapp står kvar. 2026-11-04: v0.7.4 inlagd utan ändrad text (stenarna, träden, ekorren och ugglorna i kartorna). 2026-11-04 (0.20.0): v0.7.5–v0.7.7 inlagda utan ändrad text. k1_lianerna och k1_liten_lian har verb hugga (schema 2.17, Innehålls FÖRSLAG): staven är ett svärd, och varje hugg fäller en lian. I kartan visar lianer pusslet k1_lianerna, delas i tre lianer som fyller hela väggen (delas: hela) och försvinner efter k1_lianerna i stället för k1_svard. liten_lian försvinner efter k1_liten_lian. I anteckningen till k1s13 står \"spelarens regel\" i stället för ett namn (repot är publikt). 2026-11-06 (0.23.1): v0.7.8 inlagd utan ändrad text. 2026-11-06 (0.25.0, 2d): uppdragen ur Innehålls innehall-uppdrag.json v0.1 som struktur, utan ändrad text (schema 2.20). bild är Stils bildkort enligt 10d (uppdrag_stegen, bar, bok, lapp, svard_ristat och de andra) i stället för förslagets namn. 2026-11-07 (0.28.1): v0.7.9 inlagd utan ändrad text. Fältet bild på mellanscenerna är Innehålls.",
   "innehall_v073": "v0.7.3 (Innehåll 2026-11-02, beslut 26): radion i k1s07 har en replik från Farfar att upprepa (\"Kartbiten är nära. Läs min skylt!\"). Två frivilliga småfigurer (26.3), var för sig i rum.frivilligt och möjliga att stryka utan att något annat ändras: ekorre_gren i skogsbrynet (ljudordet kras) och ugglor på krönet i gläntan (ljudordet ho ho). Anteckningarna om buskarna följer beslut 26.2: hjälten kan gå tillbaka dit efter apan.",
   "innehall_v074": "v0.7.4 (Innehåll 2026-11-02, beslut 29, granskningen A 1–13): lappen löses bara genom att läsa (bron nämns inte före, kartbiten visar flera saker) och är till Herr Skata, L3 har lägesordet BAKOM, L2 har tre stenar och tre träd, apan utan kasta-knapp och med ett pinnsteg per rätt bokstav, k1s05 kortare med fjärilen i bild, instruktion och knuff i buskarna och löven, \"Läs min skylt!\" i k1s01, skylten vid ingången säger \"Farfar var här.\", enklare ord, och slutet smyger förbi bron. Tidigare versioner: Innehålls rapporter (rapport-innehall-arkiv*.md) och 15.",
   "innehall_v075": "Beslut 34.6 och 36.5: varje ga_till efter en dialog har en uppläst instruktion med verb och mål, som står i molnet. Nya repliker i k1s01, k1s02 (två), k1s08, k1s09, k1s12 och k1s13. I k1s02 slutar Farfar med \"Gå till trädet! Där finns formeln.\" I k1s08 är trappan och krönet ett mål. Inget rum, område eller moment ändras.",
   "innehall_v076": "Beslut 38.3–38.4, en rättelse i text: \"Ordkraft! Nu står SVÄRD på din stav!\" i k1s02, och i k1s11 \"Kartbit två! Nu är vi närmare mamma.\" medan ungen sätter nosen på mammas skugga. Inget nytt moment.",
   "innehall_v077": "Beslut 39.3: spelaren hugger lianerna själv (k1_lianerna, k1_liten_lian). Beslut 38.5: baronen läser sin lapp upp och ned i sidovyn. Genomgången av samspelen (39.1) gav inga fler rättelser i kapitel 1, se 15 v0.15.",
-  "innehall_v078": "Rättelsepasset (beslut 43.5), ingen text i spelet ändrad: bild uppdrag_kullen på målet i k1s08 är Innehålls (Tekniks tillägg i 0.22.0), anteckningen i k1s07 utan namn, och lästextens ord i ordlistorna v0.8. Rummen är frysta (43.1)."
+  "innehall_v078": "Rättelsepasset (beslut 43.5), ingen text i spelet ändrad: bild uppdrag_kullen på målet i k1s08 är Innehålls (Tekniks tillägg i 0.22.0), anteckningen i k1s07 utan namn, och lästextens ord i ordlistorna v0.8. Rummen är frysta (43.1).",
+  "innehall_v079": "Det korta passet (beslut 45.5, 46.4, 47 och 50), ingen ny scen, inget nytt moment, läsval eller replik: rubrikerna LIANERNA, RÄTT TRÄD, PÅ KULLEN och VEMS LAPP? (högst ca 11 tecken, 10d), fältet ersatter borttaget ur uppdragen (47.1), mellanscenen i k1s13 med baronen bakom busken vid bron (50.2), och bild på mellanscenerna i k1s01 (in_i_skogen), k1s11 (kartbit_unge) och k1s13 (vid_bron), Tekniks fält från 0.26.0, är Innehålls."
  },
  "rum": [
   {
@@ -914,7 +915,7 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Sidovy: hjälten och ungen smyger längs bäcken, förbi bron. Baronen står vid bron och läser sin egen lapp upp och ned, och han ser dem inte. Herr Skata landar på tropikhjälmen, och hjälmen åker ner över ögonen.",
+     "beskrivning": "Sidovy: hjälten och ungen smyger längs bäcken, förbi bron. Baronen sitter bakom busken vid bron och läser sin egen lapp upp och ned, och han ser dem inte. Herr Skata landar på tropikhjälmen, och hjälmen åker ner över ögonen.",
      "bild": "vid_bron"
     },
     {
@@ -1684,13 +1685,7 @@
      "klart": {
       "scen": "k1s01_brynet",
       "ga_till": "skylt_farfar_1"
-     },
-     "ersatter": [
-      {
-       "scen": "k1s01_brynet",
-       "text": "Läs skylten vid stenarna!"
-      }
-     ]
+     }
     },
     {
      "text": "VÄLJ RÄTT STEN",
@@ -1709,7 +1704,7 @@
   },
   {
    "id": "u1_lianer",
-   "rubrik": "FÖRBI LIANERNA",
+   "rubrik": "LIANERNA",
    "bild": "svard_ristat",
    "pass": 1,
    "steg": [
@@ -1732,13 +1727,7 @@
      "klart": {
       "scen": "k1s02_lianerna",
       "pussel": "k1_lianerna"
-     },
-     "ersatter": [
-      {
-       "scen": "k1_lianerna",
-       "text": "Hugg lianerna med svärdet!"
-      }
-     ]
+     }
     }
    ],
    "stampel": {
@@ -1759,13 +1748,7 @@
      "klart": {
       "scen": "k1s02_lianerna",
       "ga_till": "stig_glantan"
-     },
-     "ersatter": [
-      {
-       "scen": "k1s02_lianerna",
-       "text": "Gå dit gråten hörs!"
-      }
-     ]
+     }
     },
     {
      "text": "RÄDDA APAN",
@@ -1784,7 +1767,7 @@
   },
   {
    "id": "u1_tradet",
-   "rubrik": "VAR ÄR KARTBITEN?",
+   "rubrik": "RÄTT TRÄD",
    "bild": "uppdrag_kartbit",
    "pass": 2,
    "steg": [
@@ -1812,7 +1795,7 @@
   },
   {
    "id": "u1_kullen",
-   "rubrik": "LETA PÅ KULLEN",
+   "rubrik": "PÅ KULLEN",
    "bild": "uppdrag_lovhog",
    "pass": 2,
    "steg": [
@@ -1821,26 +1804,14 @@
      "klart": {
       "scen": "k1s08_loven",
       "ga_till": "kronet"
-     },
-     "ersatter": [
-      {
-       "scen": "k1s08_loven",
-       "text": "Gå upp på kullen!"
-      }
-     ]
+     }
     },
     {
      "text": "VIFTA MOT LÖVEN",
      "klart": {
       "scen": "k1s08_loven",
       "pussel": "k1_loven"
-     },
-     "ersatter": [
-      {
-       "scen": "k1_loven",
-       "text": "Vifta med staven mot löven!"
-      }
-     ]
+     }
     }
    ],
    "stampel": {
@@ -1861,13 +1832,7 @@
      "klart": {
       "scen": "k1s09_luckorna",
       "ga_till": "last_lada"
-     },
-     "ersatter": [
-      {
-       "scen": "k1s09_luckorna",
-       "text": "Gå till lådan!"
-      }
-     ]
+     }
     },
     {
      "text": "VÄLJ RÄTT LUCKA",
@@ -1893,7 +1858,7 @@
   },
   {
    "id": "u1_lappen",
-   "rubrik": "BARONENS LAPP",
+   "rubrik": "VEMS LAPP?",
    "bild": "uppdrag_baronens_lapp",
    "pass": 2,
    "steg": [
@@ -1902,13 +1867,7 @@
      "klart": {
       "scen": "k1s12_klaffen",
       "pussel": "k1_lappen"
-     },
-     "ersatter": [
-      {
-       "scen": "k1s12_klaffen",
-       "text": "Läs lappen!"
-      }
-     ]
+     }
     }
    ],
    "stampel": {
@@ -1937,13 +1896,7 @@
      "klart": {
       "scen": "k1s13_slutet",
       "ga_till": "stig_backen"
-     },
-     "ersatter": [
-      {
-       "scen": "k1s13_slutet",
-       "text": "Följ stigen!"
-      }
-     ]
+     }
     }
    ],
    "stampel": {

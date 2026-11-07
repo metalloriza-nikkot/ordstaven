@@ -716,3 +716,7 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Lappknappen** (51.2): i ett läsval, när han har en lapp i kapitlet, öppnar knappen den senaste lappen (`[lappen] Farfars lapp`). Utanför pusslen öppnar den uppdragslappen.
 - **Knuffen vid `ta_emot`** (51.3): ungen nosar mot målet efter 15 s (`MAL_KNUFF_MS`), som i alla steg där han ska göra något vid ett mål.
 - **Testläget** `?test&testscen` får sätta en provscen i vanlig takt (förut bara med `snabb`).
+
+## 58. Innehålls korta pass (0.28.2, Teknik 5)
+- Prologen v0.14 är skriven med Innehålls skript (`innehall-skript-prolog-v014.py`, kontrollsumman stämde), och kapitel 1 v0.7.9, äventyret och ordlistorna v0.9 med indrag 1. Ingen text är ändrad av Teknik.
+- Schema 2.24: `gransnitt.klart` i `aventyr.json`. Tekniks rader om `bild` på de sju mellanscenerna är borttagna ur `meta.teknik`, eftersom fältet är Innehålls.
