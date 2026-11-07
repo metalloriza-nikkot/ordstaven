@@ -373,6 +373,8 @@ test('skyltarna syns hela tiden: han läser från mitten av hallen och går rakt
   expect(Math.abs((await pos()).x - malX), `under BOK-dörren (${JSON.stringify(await pos())}, mål ${malX})`).toBeLessThan(8);
   await hall(page, 'ArrowUp', 4000, async () => (await page.evaluate(() => window.__ORDSTAVEN.steg()?.pussel_id ?? null)) !== 'p0_dorrar');
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.steg()?.pussel_id ?? null), { timeout: 5000 }).not.toBe('p0_dorrar');
+  // den rätta dörren öppnas i stället för att skaka (50.5)
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 5000 }).toContain('[dörr] öppnas: dorr_bok');
 });
 
 test('skyltarna: ett tryck på en dörr går rakt igenom, en prövad dörr behåller sin skylt nedtonad', async ({ page }, info) => {
@@ -701,4 +703,51 @@ test('hjälten i s00 är Stils figur i de valda färgerna (10f)', async ({ page 
   const bb = await page.locator('.hjalte-ruta img.hjalte-sprite').boundingBox();
   expect(Math.round((bb.height / bb.width) * 16)).toBe(24);
   await page.screenshot({ path: 'test-results/hjalte-s00.png' });
+});
+
+test('boken: han bär boken och den hamnar hos Farfar, och fåtöljen är tom när han reser sig (50.5)', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(90000);
+  await startaScen(page, 17); // s16_godnattsagan
+  let sagBok = false;
+  for (let k = 0; k < 160; k++) {
+    const st = await page.evaluate(() => window.__ORDSTAVEN.steg());
+    if (st?.typ === 'ga_till' && st.mal === 'dorr_hallen') break;
+    if (st?.typ === 'bara') {
+      // han bär bokens bild, inte gråboxens filt, och boken är inte kvar i hyllan
+      await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.burenBild())).toBe('expeditionsbok');
+      sagBok = true;
+    }
+    if (st?.typ === 'ga_till' || st?.typ === 'bara') { const o = await page.evaluate((m) => window.__ORDSTAVEN.objekt(m), st.mal || st.till); await page.mouse.click(o.x, o.y); await page.waitForTimeout(800); const h = page.locator('#handknapp'); if (await h.isVisible()) await page.keyboard.press('Space'); }
+    if (await page.locator('.bok-ruta').isVisible()) { const st2 = page.locator('.bok-knappar .stang, .bok-knappar .klar, .bok-knappar .fram'); if (await st2.first().isVisible()) await st2.first().click().catch(() => {}); }
+    const r = await page.$('#plattan .replik-ruta'); if (r) await r.click().catch(() => {});
+    await page.waitForTimeout(150);
+  }
+  expect(sagBok).toBe(true);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.burenBild())).toBeNull(); // Farfar har boken
+  // han reser sig när han ska gå: fåtöljen är tom, och han syns
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.bildFor('fatolj_vanster')), { timeout: 5000 }).toBe('fatolj_vanster');
+  await page.screenshot({ path: 'test-results/fatoljen-tom.png' });
+});
+
+test('lappknappen öppnar Farfars lista medan han väljer stig, och uppdragslappen annars (51.2)', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(90000);
+  // s22_tradgarden, med Farfars två lappar (dinomaten och packlistan), som när han har spelat hit
+  await starta(page, '?snabb&ny');
+  await page.evaluate(() => {
+    const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
+    av.scen = 24; delete av.scenId; delete av.steg; av.startad = false; t.spelare.unge.namn = 'KNOPP'; av.lappar = ['p0_dinomat', 'p0_packlista'];
+    localStorage.setItem('ordstaven_spar', JSON.stringify(t));
+  });
+  await starta(page);
+  await page.click('.start-knapp');
+  await framTill(page, async () => (await page.evaluate(() => window.__ORDSTAVEN.steg()?.pussel_id)) === 'p0_skylten', 300);
+  await expect(page.locator('#hud-lapp')).toBeVisible();
+  await expect(page.locator('#plattan')).toBeHidden({ timeout: 8000 });
+  await page.click('#hud-lapp');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 5000 }).toContain('[lappen] Farfars lapp: p0_packlista');
+  await expect(page.locator('#plattan')).toBeVisible();
+  await expect(page.locator('#uppdragslapp')).toBeHidden();
+  await page.screenshot({ path: 'test-results/lappknappen-listan.png' });
 });

@@ -706,3 +706,12 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Fåtöljen** (34.4): kartans `bild_sitter` (`hjalte_fatolj_vanster` på `fatolj_vanster` i kontoret). När ett `ga_till` till föremålet är klart sätter han sig (`Rum.sattSig`), och han döljs. Han reser sig (`stigUpp`) före nästa steg som inte är en replik, en mellanscen, ett ljud, boken eller en sparpunkt. Stolen har ingen plats i berättelsen än.
 - **Hjälten i s00** (`skapaHjalte`): `Rum.hjalteBild` ger hjälten i de valda färgerna som en bild (`textures.getBase64` på den palettbytta texturen), 16 × 24 i hela steg (`--ipx-stor`). Gråboxens figur står kvar om bilden saknas.
 
+
+## 57. Fel i prologen, lappknappen och knuffen (0.28.1, Teknik 6 och 7)
+- **Stegen direkt** (50.5): när en mellanscen eller ett ljud spelas och nästa `ga_till` i scenen går till ett föremål med `klattra`, med bara mellanscener, ljud och repliker emellan, lyssnar `tidigStege` (var 100 ms) efter att han når stegen. Den är skarp först när han har lämnat platsen där han kom in (`rum.inkom`). Når han stegen avbryts regin (`doljRegi`), stegen fram till `ga_till` räknas som klara, och `ga_till` bryter direkt (`redanVid`) så att han klättrar. Loggen: `[stegen] klättrar direkt`.
+- **Rätt dörr öppnas** (50.5): ett rätt val på en dörr (en utgång) i ett läsval öppnar dörren (`Rum.oppnaDorr`) i stället för att den hoppar till. Loggen: `[dörr] öppnas`.
+- **Boken** (50.5): `bara` med en `bild` som finns i grafiken bär den bilden (`expeditionsbok`) och döljer föremålet medan han bär det (`Rum.gomForemal`, nollställs vid rumsbyte). `lagg` på en figur låter det burna flyga till figuren och tona bort, så att boken hamnar hos Farfar. Annars läggs det som förut. Filten i gråboxen är kvar när bilden saknas.
+- **Fåtöljen** (50.5): `sattSig` sparar fåtöljens egen bild från kartan, inte den som står just då, så att ingen kopia av hjälten blir kvar när han reser sig. `ge_grad` får ske medan han sitter.
+- **Lappknappen** (51.2): i ett läsval, när han har en lapp i kapitlet, öppnar knappen den senaste lappen (`[lappen] Farfars lapp`). Utanför pusslen öppnar den uppdragslappen.
+- **Knuffen vid `ta_emot`** (51.3): ungen nosar mot målet efter 15 s (`MAL_KNUFF_MS`), som i alla steg där han ska göra något vid ett mål.
+- **Testläget** `?test&testscen` får sätta en provscen i vanlig takt (förut bara med `snabb`).

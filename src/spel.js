@@ -135,6 +135,8 @@ export function skapaSpel(d) {
   let lappVantar = false;
   /** @type {string | null} pusslet där han har Farfars lapp (dinomaten): lappknappen öppnar den */
   let lappPussel = null;
+  /** @type {string | null} stegen han redan står vid (tidigStege, 50.5): nästa ga_till dit klättrar direkt */
+  let redanVid = null;
   /**
    * Lappen fälls ut: pling, rubriken läses, och efter ca 3 s fälls den ihop igen. vanta = berättelsen väntar tills
    * den är ihopfälld (när ett uppdrag eller ett pass börjar), annars står den medan han spelar (ett tryck på knappen).
@@ -483,7 +485,10 @@ export function skapaSpel(d) {
    */
   async function rattHandelse(objekt) {
     const o = objekt ? rum.ruta(objekt) : null;
-    if (o) { rum.hoppa(o.id); rum.markera(o.id, true); }
+    // en rätt dörr öppnas (31.7) i stället för att hoppa till, som om den vore låst (50.5). En öppning i främre
+    // väggen har ingen dörr: den lyser bara
+    if (o?.sort === 'utgang') { rum.markera(o.id, true); if (await rum.oppnaDorr?.(o.id, tid(80))) logg.handelse('dörr', 'öppnas: ' + o.id); }
+    else if (o) { rum.hoppa(o.id); rum.markera(o.id, true); }
     rum.ungeReagerar(true); ljud.spela('unge');
     logg.handelse('rätt', objekt ?? 'kort');
     await vanta(tid(1100));
@@ -1027,7 +1032,7 @@ export function skapaSpel(d) {
     // han vaknar och kliver ur sängen när något ska göras i rummet (repliker och mellanscener hör han i sängen)
     if (rum.sover && !['replik', 'mellanscen', 'ljud', 'visa_ui'].includes(st.typ)) await rum.vakna(tid(500));
     // han reser sig ur fåtöljen när han ska röra sig (34.4); sagan läser han sittande
-    if (rum.sitter && !['replik', 'mellanscen', 'ljud', 'visa_ui', 'bok', 'sparpunkt'].includes(st.typ)) rum.stigUpp();
+    if (rum.sitter && !['replik', 'mellanscen', 'ljud', 'visa_ui', 'bok', 'sparpunkt', 'ge_grad'].includes(st.typ)) rum.stigUpp();
     switch (st.typ) {
       case 'replik':
         // kapitlets rubrik visas inte när nästa kapitel är låst: slutrutan kommer i stället (granskningen A 21)
@@ -1361,6 +1366,8 @@ export function skapaSpel(d) {
     for (;;) {
       const sidor = st.vid_annan_utgang ? [] : sidoUtgangar(st.mal, !!st.fri_vag);
       const fri = frivilligaKvar().filter((id) => id !== st.mal);
+      // han stod redan vid stegen (tidigStege, 50.5): han klättrar direkt, utan moln och utan tryck
+      if (redanVid === st.mal) { redanVid = null; break; }
       const bortSkyltar = visaUtgangsSkyltar();
       visaMal();
       const id = await anvand([st.mal, ...sidor, ...fri], { last: st.vid_annan_utgang, framme: skyltMal ? [st.mal] : [], tidig: iMolnet ? st.mal : null });
@@ -2412,7 +2419,9 @@ export function skapaSpel(d) {
   ui.$('#hud-lapp').addEventListener('click', () => {
     if (!ui.plattan.hidden || pausad || !b) return;
     const id = (av.lappar || [])[(av.lappar || []).length - 1];
-    if (id && lappPussel === id) { visaLapp(b.pussel(id), false); return; }
+    // medan ett läsval pågår och han har en lapp i kapitlet öppnar knappen den senaste lappen, som före 2g (51.2):
+    // vid skyltarna (s22) står svaret på Farfars lista. Utanför pusslen öppnar den uppdragslappen
+    if (id && b.pussel(id) && (lappPussel === id || aktuelltSteg?.typ === 'pussel')) { logg.handelse('lappen', 'Farfars lapp: ' + id); visaLapp(b.pussel(id), false); return; }
     const l = lappNu();
     if (l) { ljud.spela('klick'); if (lappen.framme) lappen.fallIhop(); else fallUtLappen(l, false); return; }
     if (id && b.pussel(id)) visaLapp(b.pussel(id), false);
@@ -2604,7 +2613,9 @@ export function skapaSpel(d) {
     if (!o) { logg.handelse('FEL', 'bära: målet finns inte i rummet: ' + st.till); return; }
     const e = egenskaper(st.bild);
     const farg = e.farg && PALETT[e.farg] ? parseInt(PALETT[e.farg].slice(1), 16) : 0xc8553d;
-    rum.bara(farg);
+    rum.bara(farg, st.bild);
+    // boken han hämtade är i hans händer nu, inte kvar i hyllan
+    if (st.bild && rum.ruta(st.bild) && rum.ritade.get(st.bild)) rum.gomForemal?.(st.bild, true);
     rum.markera(st.till, true);
     // instruktionen står i molnet med målets bild tills han har lagt saken (beslut 41.5), som före ett ga_till
     const instr = instruktionFore(st);
@@ -2675,7 +2686,13 @@ export function skapaSpel(d) {
     rum.frys(false);
     const o = rum.ruta(st.fran);
     if (!o) { logg.handelse('FEL', 'ta emot: figuren finns inte i rummet: ' + st.fran); return; }
-    await anvand([st.fran]);
+    // ungens knuff efter 15 s, som vid varje mål där han ska göra något (51.3): figuren glimtar, och ungen nosar mot den
+    const k = knuffKlocka(st.knuff ?? { handling: '' }, () => {
+      rum.markera(st.fran, true);
+      const pekar = rum.ungePekar(st.fran);
+      logg.handelse('knuff', pekar ? 'ungen nosar mot målet: ' + st.fran : 'målet glimtar: ' + st.fran, { ungenPekar: pekar });
+    }, undefined, MAL_KNUFF_MS);
+    try { await anvand([st.fran]); } finally { k.stopp(); rum.markera(st.fran, false); rum.ungePekar(null); }
     ljud.spela('klick');
     await ui.visaFest(bilder.html(st.bild), tid(700), true);
   }
@@ -2959,7 +2976,23 @@ export function skapaSpel(d) {
         await uppdateraLapp();
         // en sidovy (in i skogen) tonas bort när han ska röra sig i rummet igen; i slutet av ett pass står den kvar
         if (!['replik', 'mellanscen', 'ljud', 'sparpunkt', 'unge_folj', 'visa_ui', 'ge_kartbit', 'ge_bar'].includes(st.typ)) rum.doljSidovy?.();
-        const res = await utfor(st);
+        // stegen går man på direkt (50.5): når han stegen som scenens nästa mål medan en beskrivning eller ett ljud
+        // pågår, klättrar han med en gång, och stegen fram till klättringen (också instruktionen) hoppas över
+        const tidig = tidigStege(st);
+        let res;
+        if (tidig) {
+          const r = await Promise.race([utfor(st).then((x) => ({ x })), tidig.nadd.then(() => ({ tidig: true }))]);
+          tidig.stopp();
+          if ('tidig' in r) {
+            ui.doljRegi();
+            logg.handelse('stegen', `klättrar direkt: ${tidig.mal}`);
+            while (b.stegIndex < tidig.index && !b.slut) { b.aktuellt(); b.klar({}); }
+            redanVid = tidig.mal;
+            spara();
+            continue;
+          }
+          res = r.x;
+        } else res = await utfor(st);
         lappPussel = null;
         // framme vid fåtöljen: han sätter sig (34.4, kartans bild_sitter)
         if (st.typ === 'ga_till' && rum.ruta(st.mal)?.bildSitter && rum.sattSig(st.mal)) logg.handelse('hjälten', 'sätter sig: ' + st.mal);
@@ -2978,6 +3011,37 @@ export function skapaSpel(d) {
       await uppdateraLapp();
     }
     slutskarm();
+  }
+  /**
+   * Stegen som scenens nästa mål (50.5): är steget en beskrivning eller ett ljud, och kommer ett ga_till till en
+   * stege (klattra) i samma scen med bara beskrivningar, ljud och repliker emellan, väntar spelet samtidigt på att han
+   * når stegen. Annars null. @param {any} st
+   * @returns {{ mal: string, index: number, nadd: Promise<void>, stopp: () => void } | null}
+   */
+  function tidigStege(st) {
+    if (!b || !['mellanscen', 'ljud'].includes(st.typ) || b.stegIndex < 0) return null;
+    const steg = b.scen?.steg || [];
+    for (let i = b.stegIndex + 1; i < steg.length; i++) {
+      const x = steg[i];
+      if (x.typ === 'ga_till') {
+        const o = rum.ruta(x.mal);
+        if (!o?.klattra) return null;
+        /** @type {ReturnType<typeof setInterval> | undefined} */
+        let t;
+        // kom han in i rummet med stegen (från vinden) ska han ha varit borta från den först
+        let vapnad = rum.inkom?.id !== o.id;
+        const nadd = new Promise((klar) => {
+          t = setInterval(() => {
+            if (rum.fryst || pausad || !rum.harRum) return;
+            const vid = vidObjekt(rum.pos, o) || genom(o, rum.pos);
+            if (!vid) vapnad = true; else if (vapnad) klar(undefined);
+          }, 100);
+        });
+        return { mal: x.mal, index: i, nadd: /** @type {Promise<void>} */ (nadd), stopp: () => clearInterval(t) };
+      }
+      if (!['mellanscen', 'ljud', 'replik'].includes(x.typ) || x.vantar_pa) return null;
+    }
+    return null;
   }
   /**
    * Gråboxen spelar bara kapitel vars alla pusseltyper finns och vars alla rum har en karta (kapitel 1 får sina

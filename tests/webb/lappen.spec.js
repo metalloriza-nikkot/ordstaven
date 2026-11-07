@@ -3,7 +3,7 @@
 // Stämpeln slår ned bredvid hjälten, och MIN BOK har fliken KLART som en lista.
 import { test, expect } from '@playwright/test';
 
-async function provscen(page, scen, extra = {}) {
+async function provscen(page, scen, extra = {}, sok = '?snabb&testscen&kapitel=kap-00') {
   await page.goto('./?snabb&ny');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.evaluate(([sc, ex]) => {
@@ -13,7 +13,7 @@ async function provscen(page, scen, extra = {}) {
     t.spelare.hjalte.formler = ['LJUS']; // pausknappen finns
     localStorage.setItem('ordstaven_spar', JSON.stringify(t));
   }, [scen, extra]);
-  await page.goto('./?snabb&testscen&kapitel=kap-00');
+  await page.goto('./' + sok);
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.click('.start-knapp');
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen())).toBe(scen.id);
@@ -166,4 +166,32 @@ test('MIN BOK, fliken KLART: tio rader per uppslag, öppnas på det senaste, och
   }));
   expect(fel).toEqual([]);
   await page.screenshot({ path: 'test-results/klart-uppslag-1.png' });
+});
+
+test('ungen knuffar också när han ska ta emot något och står still (51.3)', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(30000);
+  // knuffen kommer efter 15 s som vid varje mål; här efter 1 s, så att testet går fort
+  const scen = { id: 't_emot', pass: 1, rum: 'kontoret', steg: [R('Nu.'), { typ: 'ta_emot', fran: 'farfar_i_fatoljen', bild: 'lapp', knuff: { efter_sek: 1, handling: '' } }, R('Slut.')] };
+  await provscen(page, scen);
+  await page.click('#plattan .vidare');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.steg()?.typ), { timeout: 8000 }).toBe('ta_emot');
+  await expect.poll(() => logg(page), { timeout: 8000 }).toMatch(/\[knuff\] (ungen nosar mot målet|målet glimtar): farfar_i_fatoljen/);
+});
+
+test('stegen går man på direkt: når han stegen medan beskrivningen och ljudet pågår klättrar han med en gång (50.5)', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(40000);
+  const scen = { id: 't_stegen', pass: 1, rum: 'hallen', tillstand: 'natt', steg: [
+    { typ: 'mellanscen', beskrivning: 'Hallen på natten, med en nattlampa. En bred entré med stegen upp, och en korridor med fem stängda dörrar med Farfars lappar.' },
+    { typ: 'ljud', id: 'dunk', ljudord: 'dunk' },
+    R('Klättra upp för stegen!'), { typ: 'ga_till', mal: 'stege_upp' }, R('Uppe.')] };
+  // utan snabbläget, så att beskrivningen tar sin vanliga tid
+  await provscen(page, scen, {}, '?test&testscen&kapitel=kap-00');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.steg()?.typ), { timeout: 5000 }).toBe('mellanscen');
+  const o = await page.evaluate(() => window.__ORDSTAVEN.objekt('stege_upp'));
+  await page.mouse.click(o.x, o.y);
+  await expect.poll(() => logg(page), { timeout: 10000 }).toContain('[stegen] klättrar direkt: stege_upp');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('UPPE.', { timeout: 15000 });
+  expect(await logg(page)).not.toContain('KLÄTTRA UPP');
 });

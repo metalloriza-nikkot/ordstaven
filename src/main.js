@@ -43,13 +43,13 @@ const allaAventyr = Object.entries(aventyrsfiler).map(([fil, a]) => ({ mapp: map
 const valt = allaAventyr.find((a) => a.data.id === parametrar.get('aventyr')) ?? allaAventyr[0];
 const aventyr = valt.data;
 const kapitel = Object.entries(kapitelfiler).filter(([fil]) => mappAv(fil) === valt.mapp).map(([, k]) => /** @type {any} */ (structuredClone(k)));
-// Bara för webbläsartesterna (?snabb&testscen): en provscen ur localStorage läggs till i första kapitlet, så att
-// motorns steg kan provas innan innehållet använder dem. Påverkar aldrig ett vanligt spel.
+// Bara för webbläsartesterna (?snabb&testscen, eller ?test&testscen i vanlig takt): en provscen ur localStorage läggs
+// till i första kapitlet, så att motorns steg kan provas innan innehållet använder dem. Påverkar aldrig ett vanligt spel.
 /** @type {Record<string, any>} provkartor (Tiled-JSON per rum) för webbläsartesterna */
 let testkartor = {};
 {
   const q = new URLSearchParams(location.search);
-  if (q.has('snabb') && q.has('testscen')) {
+  if ((q.has('snabb') || q.has('test')) && q.has('testscen')) {
     try {
       const t = JSON.parse(localStorage.getItem('ordstaven_testscen') || 'null');
       if (t && kapitel[0]) {
@@ -251,6 +251,8 @@ redo.then(() => { startKlar = true; window.clearTimeout(startVakt); window.remov
   kamera: () => ({ ...rum.kamera, ...rum.storlek }),
   /** Föremålets ruta på skärmen (CSS-pixlar), via kameran: för att se om något syns. */
   varldTillSkarm: (x, y) => varldTillSkarm(layout.skala, rum.kamera, x, y),
+  /** det hjälten bär: sakens bild, 'filt' för gråboxens filt, eller null */
+  burenBild: () => (rum.buren ? rum.buren.list?.[0]?.frame?.name ?? 'filt' : null),
   /** bilden som föremålet ritas med (atlasets ram), eller null */
   bildFor: (id) => { const r = rum.ritade.get(id); return r?.frame?.name ?? null; },
   rutaPaSkarm: (id) => { const o = rum.ruta(id); if (!o) return null; const a = varldTillSkarm(layout.skala, rum.kamera, o.x, o.y), b = varldTillSkarm(layout.skala, rum.kamera, o.x + o.b, o.y + o.h); return { x: a.x, y: a.y, b: b.x - a.x, h: b.y - a.y }; },

@@ -114,6 +114,8 @@ export class Rum extends Phaser.Scene {
     this.senasteSidovy = null;
     /** @type {{ id: string, img: any, tex: string, ram: string } | null} föremålet han sitter i (34.4) */
     this.sitter = null;
+    /** @type {Set<string>} föremål som inte syns just nu (boken han bär), tills rummet byts */
+    this.dolda = new Set();
     /** @type {Map<string, string>} föremål som regin har gett en annan bild (ägget), tills rummet byts */
     this.ramFor = new Map();
     /** @type {Map<string, Phaser.Time.TimerEvent>} bilder som byts i en slinga (ägget som lyser) */
@@ -556,7 +558,10 @@ export class Rum extends Phaser.Scene {
     const o = this.objekt.find((x) => x.id === id), img = /** @type {any} */ (this.ritade.get(id));
     const fb = o?.bildSitter ? foremalsbild(this, o.bildSitter) : null;
     if (!fb || !img?.setTexture) return false;
-    this.sitter = { id, img, tex: img.texture.key, ram: img.frame.name };
+    // fåtöljens egen bild (kartans bild), inte den som står nu: sätter han sig igen i ett rum som inte ritades om
+    // står bilden med honom redan där, och då satt en kopia kvar när han reste sig (50.5)
+    const egen = o?.bild ? foremalsbild(this, o.bild) : null;
+    this.sitter = { id, img, tex: egen?.nyckel ?? img.texture.key, ram: egen?.ram ?? img.frame.name };
     img.setTexture(fb.nyckel === 'hjalte' ? this.hjalteTextur || 'hjalte' : fb.nyckel, fb.ram);
     this.hjalte.setVisible(false);
     this.smutsig = true;
@@ -1033,7 +1038,7 @@ export class Rum extends Phaser.Scene {
     this.harRum = !!v.rum;
     if (v.nyttRum || !this.harRum) { this.rumsbild = (this.harRum && v.karta?.bild) || null; this.mark = (this.harRum && v.karta?.mark) || null; this.rumId = v.rum; this.markObjekt = v.karta?.objekt || []; }
     this.visaUnge = v.unge;
-    if (v.nyttRum) { for (const id of [...this.ramSlinga.keys(), ...this.ramTimrar.keys()]) this.stoppaRamar(id); this.ramFor.clear(); this.ungeMal = null; this.ungeTittarPa = null; for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas.remove(); this.sover = null; } this.rensaRegi(); }
+    if (v.nyttRum) { for (const id of [...this.ramSlinga.keys(), ...this.ramTimrar.keys()]) this.stoppaRamar(id); this.ramFor.clear(); this.dolda.clear(); this.ungeMal = null; this.ungeTittarPa = null; for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas.remove(); this.sover = null; } this.rensaRegi(); }
     this.tillstand = v.tillstand;
     if (v.nyttRum || !this.harRum) this.inomhus = !!v.karta?.inomhus;
     this.lampor = v.karta?.lampor || [];
@@ -1057,6 +1062,7 @@ export class Rum extends Phaser.Scene {
       this.lagerObjekt.removeAll(true); this.lagerLjust.removeAll(true); this.ritade.clear(); this.markerade.clear(); this.ritadeDelar.clear(); this.markramar?.clear();
       this.delar = { ...(v.delar || {}) };
       for (const o of [...this.objekt.filter((x) => x.sort === 'yta'), ...this.objekt.filter((x) => x.sort !== 'yta')]) this.ritaObjekt(o);
+      for (const id of this.dolda) /** @type {any} */ (this.ritade.get(id))?.setVisible?.(false);
       for (const id of this.sparrade) { const o = this.ruta(id); if (o) this.ritaGren(o); }
       this.ritaKvar(v.kvar || []);
       this.byggHinder();
@@ -1413,19 +1419,37 @@ export class Rum extends Phaser.Scene {
 
   /**
    * Hjälten bär en sak som svävar efter honom (som ljusbollen), eller null. @param {number | null} farg
+   * @param {string | null} [bild] sakens bild (expeditionsboken)
    */
-  bara(farg) {
+  bara(farg, bild = null) {
     this.buren?.destroy(); this.buren = null;
     if (farg === null) return;
+    // sakens egen bild när Stil har ritat den (boken, 50.5), annars gråboxens filt
+    const fb = bild ? foremalsbild(this, bild) : null;
+    if (fb) {
+      const img = this.add.image(0, 0, fb.nyckel, fb.ram).setOrigin(0, 0);
+      this.buren = this.add.container(0, 0, [img]); this.placera();
+      return;
+    }
     const g = this.add.container(0, 0);
     g.add(this.add.rectangle(0, 0, 12, 8, farg).setOrigin(0, 0).setStrokeStyle(1, 0x4a3f34));
     for (let x = 1; x < 12; x += 3) g.add(this.add.rectangle(x, 8, 1, 2, farg).setOrigin(0, 0)); // fransar
     this.buren = g; this.placera();
   }
-  /** Lägg saken hjälten bär på ett föremål (filten om ägget). Den ligger kvar där. @param {string} id */
+  /**
+   * Lägg saken hjälten bär på ett föremål (filten om ägget), där den ligger kvar. Är målet en figur (Farfar) tar
+   * figuren emot den: saken glider till händerna och är sedan hos figuren (50.5). @param {string} id
+   */
   lagg(id) {
     const o = this.ruta(id), g = this.buren; if (!o || !g) return;
     this.buren = null;
+    if (o.sort === 'figur') {
+      const b = g.getBounds();
+      this.tweens.add({ targets: g, x: Math.round(o.x + o.b / 2 - b.width / 2), y: Math.round(o.y + o.h * 0.55 - b.height / 2), duration: 250, ease: 'Quad.easeOut',
+        onUpdate: () => { this.smutsig = true; },
+        onComplete: () => this.tweens.add({ targets: g, alpha: 0, delay: 200, duration: 250, onUpdate: () => { this.smutsig = true; }, onComplete: () => g.destroy() }) });
+      return;
+    }
     this.tweens.add({ targets: g, x: Math.round(o.x + o.b / 2 - 6), y: Math.round(o.y + o.h / 2 - 4), duration: 250, ease: 'Quad.easeOut' });
     this.lagda.push(g);
   }
@@ -1580,6 +1604,16 @@ export class Rum extends Phaser.Scene {
     const sida = m.x + m.b / 2 >= o.x + o.b / 2 ? 'agg_gungar_hoger' : 'agg_gungar_vanster';
     this.spelaRamar(o.id, [sida, 'agg_01', sida, 'agg_01', sida, 'agg_01'], 260);
     return true;
+  }
+
+  /**
+   * Ett föremål syns inte en stund (boken han bär är inte kvar i hyllan), tills rummet byts. @param {string} id
+   * @param {boolean} pa
+   */
+  gomForemal(id, pa) {
+    if (pa) this.dolda.add(id); else this.dolda.delete(id);
+    const r = /** @type {any} */ (this.ritade.get(id));
+    if (r?.active) { r.setVisible(!pa); this.smutsig = true; }
   }
 
   /** Ungen kliver ur ägget (unge_folj): skalet ligger kvar i lådan, och ungen står framför. */
