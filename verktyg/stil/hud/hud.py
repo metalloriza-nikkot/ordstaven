@@ -300,23 +300,27 @@ IKON = {'bar': ikon_bar(), 'nos': ikon_nos(), 'nos_aktiv': ikon_nos(True), 'lapp
 # ---------- dörrskylten på väggen ----------
 SKYLT_H = 10
 def skylt_del(del_):
-    """En träskylt med två spikar, i tre delar: vänster (4), mitt (1, upprepas) och höger (4) pixlar breda."""
-    G = ['#2E1C0E', '#5A3A1E', '#7A522C', '#9A6E40', '#BE9260']
+    """En träskylt med två spikar, i tre delar: vänster (4), mitt (1, upprepas) och höger (4) pixlar breda.
+    Ljust trä (beslut 36.9, 2026-11-04): alla rader där ordet kan stå (1–8) har minst 7:1 mot texten #2B2420,
+    som läsplattans papper. Ytan #E2C29A ger 9,0:1, den ljusa raden 11:1 och skuggraden 8,4:1. Bara konturen
+    och kanterna utanför ordet är mörka, så att skylten syns mot ljusa tapeter (köket)."""
+    G = ['#6E4624', '#D8BC90', '#E2C29A', '#E8CC98', '#F0D8B6']     # kontur, skugga, yta, ljus, högdager
     w = {'vanster': 4, 'mitt': 1, 'hoger': 4}[del_]
     im = bild(w, SKYLT_H); p = im.load()
     for y in range(SKYLT_H):
         for x in range(w):
             c = G[3] if y < 3 else G[2]
             if y == 1: c = G[4]
+            if y == 6: c = G[1] if x % 2 == 0 else G[2]                    # en svag ådring, fortfarande över 8:1
             if y == SKYLT_H - 2: c = G[1]
             if y in (0, SKYLT_H - 1): c = G[0]
             if del_ == 'vanster' and x == 0 or del_ == 'hoger' and x == w - 1: c = G[0]
             if del_ == 'vanster' and x == 1 and 0 < y < SKYLT_H - 1: c = G[4] if y < 5 else G[3]
             if del_ == 'hoger' and x == w - 2 and 0 < y < SKYLT_H - 1: c = G[1]
             p[x, y] = hx2(c)
-    if del_ in ('vanster', 'hoger'):                                   # spiken
+    if del_ in ('vanster', 'hoger'):                                   # spiken: mörk på det ljusa träet
         sx = 2 if del_ == 'vanster' else 1
-        p[sx, 4] = hx2('#C9CCD2'); p[sx, 5] = hx2('#6E747F')
+        p[sx, 4] = hx2('#A4A9B3'); p[sx, 5] = hx2('#4A4E58')
     for (x, y) in [(0, 0), (0, SKYLT_H - 1)] if del_ == 'vanster' else ([(w - 1, 0), (w - 1, SKYLT_H - 1)] if del_ == 'hoger' else []):
         p[x, y] = (0, 0, 0, 0)
     return im

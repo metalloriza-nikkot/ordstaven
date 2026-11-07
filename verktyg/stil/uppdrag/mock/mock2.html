@@ -1,0 +1,129 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+/* Skiss 5c (beslut 47): MIN BOK som lista, den korta stämpeln och lappen hopfälld. MacBook i helskärm, spelytan 3x. */
+@font-face{font-family:Lexend;src:url(lexend-latin-400-normal.woff2);font-weight:400}
+@font-face{font-family:Lexend;src:url(lexend-latin-700-normal.woff2);font-weight:700}
+body{margin:0;overflow:hidden;font-family:Lexend;color:#2B2420}
+img{image-rendering:pixelated}
+#spel{position:absolute;overflow:hidden;outline:2px solid #140c06}
+#spel img{position:absolute;transform-origin:0 0}
+.skylt{position:absolute;transform-origin:50% 0;display:flex;align-items:center;justify-content:center;border-style:solid;
+ border-image:url(skylt9.png) 0 4 fill / 0 calc(4px*var(--s)) stretch;image-rendering:pixelated;box-sizing:border-box;letter-spacing:.03em}
+.lapp{position:absolute;box-sizing:border-box;border-style:solid;border-width:24px;
+ border-image:url(lapp_uppdrag.png) 8 fill / 24px round;image-rendering:pixelated;padding:0 6px 0 2px;transform:rotate(-1.2deg);
+ display:flex;align-items:center;gap:16px;font-weight:700;font-size:40px;letter-spacing:.03em}
+.lapp .ros{position:absolute;right:-18px;top:-18px;width:33px}
+.hud{position:absolute;width:72px;height:72px}
+.hud img{position:absolute;transform-origin:0 0;transform:scale(3);left:0;top:0}
+.hud img.ik{left:12px;top:12px}
+.not{position:absolute;font:600 19px/1.3 -apple-system,Helvetica,Arial,sans-serif;color:#FFE9A8;max-width:410px}
+.not strong{color:#FFF6D8}
+.not b{display:inline-flex;width:28px;height:28px;border-radius:50%;background:#FFE9A8;color:#2a1a10;align-items:center;justify-content:center;margin-right:8px;font-size:17px}
+.tit{position:absolute;font:700 21px -apple-system,Helvetica,Arial,sans-serif;color:#FFE9A8;max-width:420px}
+.dim{position:absolute;background:rgba(20,12,6,.55)}
+.bok{position:absolute;display:flex;background:#5A3A1E;border-radius:14px;padding:16px;gap:6px;box-shadow:0 8px 0 #2E1C0E;box-sizing:border-box}
+.sida{background:#F2E8C8;border-radius:6px;padding:14px 22px 0;box-sizing:border-box;position:relative;flex:1}
+.flikar{position:absolute;display:flex;gap:8px}
+.flik{display:flex;align-items:center;gap:8px;background:#E6D6A8;border-radius:10px 10px 0 0;padding:6px 14px 10px;font-size:32px;letter-spacing:.03em;box-shadow:0 0 0 3px #8A6C46 inset}
+.flik.vald{background:#F2E8C8;transform:translateY(4px)}
+.flik img{width:32px;height:32px}
+.rad{display:flex;align-items:center;gap:18px;height:112px;font-weight:700;font-size:40px;letter-spacing:.03em;border-bottom:3px dashed #B8A57A;position:relative;white-space:nowrap}
+.rad:last-child{border-bottom:none}
+.rad img.b{width:96px;height:96px;flex:none}
+.rad img.st{position:absolute;right:-4px;top:10px;width:96px;transform:rotate(-12deg);opacity:.95}
+.rad.ny{background:#FFFBEA;margin:0 -12px;padding:0 12px;border-radius:8px}
+.pil{position:absolute;width:72px;height:72px;bottom:14px}
+.pil img{position:absolute;transform-origin:0 0;transform:scale(3)}
+.prickar{position:absolute;left:50%;bottom:34px;transform:translateX(-50%);display:flex;gap:14px}
+.prickar i{width:16px;height:16px;border-radius:50%;background:#8A6C46;opacity:.4}
+.prickar i.nu{opacity:1}
+.bocker{display:flex;gap:6px;align-items:center;margin-left:6px}
+.bocker img{width:40px;height:40px}
+.bocker .kvar{width:22px;height:22px;border-radius:50%;box-shadow:inset 0 0 0 4px #B8A57A;margin:9px}
+</style></head><body>
+<script>
+const q=new URLSearchParams(location.search), vy=q.get('vy')||'lista';
+const W=1440, H=900, s=3;
+document.body.style.width=(W+460)+'px';document.body.style.height=H+'px';document.body.style.background='#3a2e26';
+const el=(tag,cls,css,html,par=document.body)=>{const d=document.createElement(tag);if(cls)d.className=cls;for(const [k,v] of Object.entries(css||{})){if(k.startsWith('--'))d.style.setProperty(k,v);else d.style[k]=v;}if(html!==undefined)d.innerHTML=html;par.appendChild(d);return d};
+el('div','',{position:'absolute',left:0,top:0,width:W+'px',height:H+'px',background:'#2a1a10',outline:'3px solid #FFE9A8'});
+const noter=(html)=>el('div','not',{left:(W+24)+'px',top:'110px'},html);
+const titel=(t)=>el('div','tit',{left:(W+24)+'px',top:'20px'},t);
+const gx=(W-960)/2, gy=14, gw=960, gh=576;
+// spelytan: hallen i 3x, som i den första skissen
+const spel=el('div','',{left:gx+'px',top:gy+'px',width:gw+'px',height:gh+'px'});spel.id='spel';
+const add=(src,x,y,sk=3,par=spel)=>{const i=new Image();i.src=src;i.style.left=x*s+'px';i.style.top=y*s+'px';i.style.transform=`scale(${sk})`;par.appendChild(i);return i};
+add('hallen.png',0,0);
+for(const [x,y] of [[56,12],[130,12],[204,12]]) add('dorr.png',x,y);
+add('stege_upp.png',300,6);
+const hx=150,hy=110;
+add('skugga_16x24.png',hx-8,hy-24);add('hjalte_ga_upp_01.png',hx-8,hy-24);add('stav_hand_upp_01.png',hx-8,hy-24);
+const em={FARFAR:4.0,BOK:2.19,MAT:2.17}, fontV=32/s;
+for(const [ord,cx] of [['FARFAR',69],['BOK',143],['MAT',217]]){
+  const b=Math.ceil(em[ord]*fontV*1.03+12);
+  const d=el('div','skylt',{'--s':s,width:b*s+'px',left:(cx-b/2)*s+'px',top:s+'px',height:10*s+'px',fontSize:'32px',borderWidth:`0 ${4*s}px`},ord,spel);
+}
+// HUD:en i ramen till höger, med lappknappen överst bland hans knappar
+const hud=(ik,x,y,bas='hud_knapp')=>el('div','hud',{left:x+'px',top:y+'px'},`<img src="${bas}.png"><img class="ik" src="ikon_${ik}.png">`);
+const fx=gx+gw+(gx-72)/2;
+hud('paus',fx,gy+8); const lappk=hud('lapp',fx,gy+gh-332); hud('radio',fx,gy+gh-250); hud('nos',fx,gy+gh-168); hud('bar',fx,gy+gh-86);
+const sy=gy+gh+22;
+
+if(vy==='lista'){
+  titel('MIN BOK, fliken KLART, som lista (47.5)');
+  add('unge1_ga_upp_01.png',hx-30,hy-22);
+  el('div','dim',{left:'0',top:'0',width:W+'px',height:H+'px'});
+  const bx=40, by=gy+64, bw=W-80-110, bh=H-by-40;
+  const f=el('div','flikar',{left:(bx+40)+'px',top:(by-52)+'px'});
+  f.innerHTML=[['stjarna','STAVEN'],['klader','KLÄDER'],['dinobok','DINOBOKEN'],['uppdrag','KLART']].map(([i,t])=>`<div class="flik ${t==='KLART'?'vald':''}"><img src="ikon_${i}.png">${t}</div>`).join('');
+  const b=el('div','bok',{left:bx+'px',top:by+'px',width:bw+'px',height:bh+'px'});
+  const rad=([bild,txt],ny)=>`<div class="rad ${ny?'ny':''}"><img class="b" src="${bild}.png">${txt}<img class="st" src="stampel.png"></div>`;
+  const v=[['uppdrag_farfar_natt','HITTA FARFAR'],['bok','FARFARS SAGA'],['uppdrag_manen','GOD NATT'],['uppdrag_farfar_morgon','TILL FARFAR'],['uppdrag_ryggsacken','PACKA']];
+  const h=[['uppdrag_traskylt','IN I SKOGEN'],['svard_ristat','LIANERNA'],['uppdrag_unge_lyssnar','VEM GRÅTER?']];
+  b.innerHTML=`<div class="sida">${v.map(r=>rad(r)).join('')}<div class="pil" style="left:14px"><img src="hud_knapp.png"><img src="ikon_bak.png" style="left:12px;top:12px"></div></div>`+
+    `<div class="sida">${h.map((r,i)=>rad(r,i===h.length-1)).join('')}<div class="prickar" style="left:-3px"><i></i><i class="nu"></i></div></div>`;
+  noter('<b>1</b>En rad per uppdrag: bilden till vänster (bildkortet i dubbel storlek, 96 punkter), rubriken i mitten (fet, 40 punkter) och stämpeln till höger (96 punkter, lite sned, ca −12°).<br><br>'+
+   '<b>2</b>I den ordning han gjorde dem, uppifrån och ned och från vänster sida till höger, så att listan läses som berättelsen. <strong>Boken öppnas på det senaste uppslaget,</strong> och den nyaste raden har ljusare papper tills han har tittat.<br><br>'+
+   '<b>3</b>Fem rader per sida, tio per uppslag, så att prologen och kapitel 1 (ca 20 uppdrag) ryms på två uppslag. Ingen rad skärs av. Stora pilar nere i hörnen (samma knappar som HUD:en), och prickarna visar var i boken han är. Pilen syns bara när det finns något åt det hållet.<br><br>'+
+   '<b>4</b>Ett tryck på en rad läser rubriken. Raden blir lite ljusare medan den läses.<br><br>'+
+   '<b>5</b>Rubriken får plats om den är högst ca 11 tecken (som HITTA FARFAR har 12 och ryms precis). Längre rubriker bryts inte, så de kortas i datan (46.4). Rubrikerna här är exempel.');
+}
+
+if(vy==='stampel'){
+  titel('Stämpeln, den korta (47.4): ca 1,5 s över spelvärlden');
+  // ungen hoppar till, med ett läte
+  add('unge1_glad_ner_02.png',hx-30,hy-26);
+  // stämpeln mitt på spelytan, lite ovanför hjälten, 64 av världens pixlar
+  const st=add('stampel.png',160-32,64-32,6);
+  st.style.transform='scale(6) rotate(-12deg)';st.style.transformOrigin='16px 16px';st.style.left=(228-16)*s+'px';st.style.top=(84-16)*s+'px';
+  for(const [x,y] of [[186,46],[262,52],[190,112],[264,108]]) add('efx_glimt_01.png',x,y);
+  // lappknappen glimtar (vit glimt, inte guld)
+  for(const [dx,dy] of [[-10,-10],[58,-6],[60,58]]) el('img','',{position:'absolute',left:(fx+dx)+'px',top:(gy+gh-332+dy)+'px',width:'24px'}).src='efx_glimt_01.png';
+  el('div','',{position:'absolute',left:(fx-8)+'px',top:(gy+gh-340)+'px',width:'88px',height:'88px',borderRadius:'50%',boxShadow:'0 0 0 4px #FFFFFF',opacity:.8});
+  // tidslinjen under spelytan
+  const tl=el('div','',{position:'absolute',left:gx+'px',top:(sy+10)+'px',width:gw+'px',height:'150px',font:'600 18px/1.3 -apple-system,Helvetica,Arial,sans-serif',color:'#FFE9A8'});
+  const fas=[[0,0.15,'slår ned'],[0.15,1.0,'står kvar · ungen hoppar till'],[1.0,1.5,'tonas bort · lappknappen glimtar']];
+  tl.innerHTML=fas.map(([a,b,t])=>`<div style="position:absolute;left:${a/1.5*100}%;width:${(b-a)/1.5*100}%;top:34px;height:30px;box-sizing:border-box;border:2px solid #FFE9A8;background:rgba(255,233,168,${a===0?.6:.2})"></div><div style="position:absolute;left:${a/1.5*100}%;top:74px;width:${Math.max(b-a,.4)/1.5*100}%">${t}</div>`).join('')+
+    [0,0.15,1.0,1.5].map(x=>`<div style="position:absolute;left:calc(${x/1.5*100}% - 14px);top:6px;white-space:nowrap">${String(x).replace('.',',')} s</div>`).join('');
+  noter('<b>1</b>Efter berättelsens stund och innan nästa moln, aldrig mitt i en dialog eller ett läsval. Remsan är tom under tiden.<br><br>'+
+   '<b>2</b>Stämpeln slår ned på spelytan bredvid hjälten, så att den aldrig täcker honom eller ungen: 64 av världens pixlar (bilden 32 × 32 i dubbel storlek), lite sned. Den kommer från skala 1,6 och opacitet 0 till skala 1 på 0,15 s, med stämpelljudet, och KLART läses upp. Fyra vita glimtar runt om.<br><br>'+
+   '<b>3</b>Samtidigt hoppar ungen till: glad hopp (3 bilder) med ett glatt läte.<br><br>'+
+   '<b>4</b>Stämpeln tonas bort (0,5 s), och lappknappen i HUD:en glimtar en gång i vitt. Där ligger lappen, och fliken KLART får sin stjärna. <strong>Ingen flygande lapp.</strong><br><br>'+
+   '<b>5</b>Ett tryck var som helst hoppar till slutet. Bara opacitet och läge animeras, så golvdatorn klarar det.<br><br>'+
+   '<b>6</b>Blått bläck, aldrig guld eller rött. Den stora animationen sparas till kapitlets slut.');
+}
+
+if(vy==='lappen'){
+  titel('Lappen hopfälld och framfälld (47.2–47.3)');
+  add('unge1_ga_upp_01.png',hx-30,hy-22);
+  const L=el('div','lapp',{left:gx+'px',top:sy+'px',height:'150px'},
+    `<img class="ros" src="lapp_kompassros.png"><img src="bar.png" style="width:96px;height:96px">MATA UNGEN<span class="bocker"><img src="ikon_klar.png"><img src="ikon_klar.png"><span class="kvar"></span></span><img src="ikon_hogtalare.png" style="width:40px;height:40px;margin-left:18px">`);
+  // pil från lappen till lappknappen: dit fälls den ihop
+  const x0=gx+L.offsetWidth+30, y0=sy+60, x1=fx-8, y1=gy+gh-296;
+  el('div','',{position:'absolute',left:0,top:0}).innerHTML=`<svg width="${W}" height="${H}" style="position:absolute"><path d="M${x0} ${y0} C ${x1-60} ${y0}, ${x1-90} ${y1}, ${x1} ${y1}" stroke="#FFE9A8" stroke-width="4" fill="none" stroke-dasharray="10 10"/></svg>`;
+  noter('<b>1</b>Hopfälld är lappen bara lappknappen i HUD:en (<code>ikon_lapp</code>), överst bland hans knappar.<br><br>'+
+   '<b>2</b>Framme står den ensam i remsan: bilden (96 punkter), rubriken (fet, 40 punkter), en bock per gjort steg och högtalaren. <strong>Ingen text för delstegen,</strong> så den kan aldrig säga något annat än molnet.<br><br>'+
+   '<b>3</b>Förslag: en tom ring per steg som är kvar, så att han ser hur långt han har kommit. Det är ingen text och avslöjar inget. Stryk ringarna om ledningen vill ha bara bockar.<br><br>'+
+   '<b>4</b>Den fälls fram när ett uppdrag börjar (läses upp och fälls ihop efter ca 3 s), när ett nytt pass börjar och när han trycker på lappknappen. Den fälls ihop mot knappen på ca 0,3 s, eller direkt när en dialog eller molnet ska ha remsan.<br><br>'+
+   '<b>5</b>Papperet och kompassrosen är desamma som förut. Lappen är ca 150 punkter hög, så den ryms också i iPadens lägre remsa.');
+}
+</script></body></html>

@@ -199,6 +199,16 @@
        "name": "bild_pa",
        "type": "string",
        "value": "fatolj_hoger"
+      },
+      {
+       "name": "bild_ta_emot",
+       "type": "string",
+       "value": "farfar_fatolj_ta_emot_01,farfar_fatolj_ta_emot_02"
+      },
+      {
+       "name": "bild_las",
+       "type": "string",
+       "value": "farfar_fatolj_las_01,farfar_fatolj_las_02"
       }
      ]
     },

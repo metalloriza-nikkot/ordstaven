@@ -3,7 +3,7 @@
 // helskärmar (start, passets slut) och etiketter över rummets objekt. All läsbar text här, i Lexend.
 import { forSkarm, versaler } from '../karna/text.js';
 import { ljudningsdelar, maxtidMs } from '../karna/ljudning.js';
-import { ikon, laddaSkyltTra, IKON_FOR } from './ikoner.js';
+import { ikon, laddaSkyltTra, IKON_FOR, uiBild } from './ikoner.js';
 
 /** Hur länge ett ljudord står i världen (granskningen A 24), samma som animationen i stil.css. */
 export const LJUDORD_MS = 2000;
@@ -645,10 +645,31 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
    * Styrhjälpen, utan text: piltangenter (dator) eller ett finger som trycker på målet (pekskärm). null döljer.
    * @param {'pilar' | 'tryck' | 'mellanslag' | 'tab' | null} typ @param {{ x: number, y: number } | null} [punkt] målet på skärmen
    */
+  /**
+   * Stils ritade tangent (50.3, 10b: tangent_<namn>_01 uppe och _02 nedtryckt), i hela pixelsteg, eller null om den
+   * inte är ritad. Bilderna byts med CSS, så att tangenten trycks ned och släpps. @param {string} namn @param {string} klass
+   */
+  const ritadTangent = (namn, klass) => {
+    const a = uiBild(`tangent_${namn}_01`), b = uiBild(`tangent_${namn}_02`);
+    return a && b ? `<span class="tangent-bild ${klass}" aria-hidden="true"><img class="uppe" src="${a}" alt="" draggable="false"><img class="nere" src="${b}" alt="" draggable="false"></span>` : null;
+  };
   function styrhjalp(typ, punkt) {
     const e = $('#styrhjalp');
     e.hidden = !typ; e.className = typ || ''; e.style.left = ''; e.style.top = '';
-    if (typ === 'pilar') e.innerHTML = '<span class="tangent upp"><span class="yta">▲\uFE0E</span></span><span class="tangent vanster"><span class="yta">◀\uFE0E</span></span><span class="tangent ner"><span class="yta">▼\uFE0E</span></span><span class="tangent hoger"><span class="yta">▶\uFE0E</span></span>';
+    // på datorn Stils ritade tangenter (50.3), och de som CSS ritar om bilderna saknas. På pekskärmen bara handen
+    const pilar = ['upp', 'vanster', 'ner', 'hoger'].map((h) => ritadTangent(`pil_${h}`, h));
+    if (typ === 'pilar' && pilar.every(Boolean)) { e.classList.add('ritad'); e.innerHTML = pilar.join(''); }
+    else if (typ === 'mellanslag' && ritadTangent('mellanslag', 'mellanslag')) {
+      // vid handen bara tangenten (handen står redan där), annars handen som trycker på tangenten
+      e.classList.add('ritad');
+      e.innerHTML = /** @type {string} */ (punkt ? ritadTangent('mellanslag', 'mellanslag') : ritadTangent('mellanslag_hand', 'mellanslag hand') || ritadTangent('mellanslag', 'mellanslag'));
+      if (punkt) { ankra(e); e.classList.add('vid-hand'); e.style.left = punkt.x + 'px'; e.style.top = punkt.y + 'px'; }
+    }
+    else if (typ === 'tab' && ritadTangent('tab', 'tab')) {
+      e.classList.add('ritad'); e.innerHTML = /** @type {string} */ (ritadTangent('tab', 'tab'));
+      if (punkt) { e.style.left = punkt.x + 'px'; e.style.top = punkt.y + 'px'; }
+    }
+    else if (typ === 'pilar') e.innerHTML = '<span class="tangent upp"><span class="yta">▲\uFE0E</span></span><span class="tangent vanster"><span class="yta">◀\uFE0E</span></span><span class="tangent ner"><span class="yta">▼\uFE0E</span></span><span class="tangent hoger"><span class="yta">▶\uFE0E</span></span>';
     else if (typ === 'tryck' && punkt) { ankra(e); e.innerHTML = `<span class="finger">${ikon('hand', 'stor')}</span>`; e.style.left = punkt.x + 'px'; e.style.top = punkt.y + 'px'; }
     else if (typ === 'mellanslag') { // en bred tangent som trycks ned, bredvid handen (inte över molnet nere till vänster)
       // tecknet för mellanslag (⎵) ritat i CSS, så att tangenten inte ser ut som en tom ruta (47.8)

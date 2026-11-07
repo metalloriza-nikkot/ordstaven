@@ -354,6 +354,16 @@
        "name": "bild",
        "type": "string",
        "value": "farfar_morgon_ner_01"
+      },
+      {
+       "name": "kommer_fran",
+       "type": "string",
+       "value": "dorr_mat"
+      },
+      {
+       "name": "bild_vinka",
+       "type": "string",
+       "value": "farfar_morgon_vinka_ner_01,farfar_morgon_vinka_ner_02"
       }
      ]
     }

@@ -31,6 +31,7 @@ BILDER = {
         'lag_sten': 'lag_sten', 'lag_sten_2': 'lag_sten', 'lag_rund_sten': 'lag_rund_sten', 'hog_spetsig_sten': 'hog_spetsig_sten',
         'hog_sten': 'hog_sten', 'hog_rund_sten': 'hog_rund_sten', 'hack': 'hack', 'trad_med_formel': 'trad_med_formel',
         'stubbe': 'stubbe', 'skylt_bar': 'skylt_bar', 'gren': 'gren', 'ekorre_gren': 'ekorre_gren_01',
+        'lianer': 'lian_gang_a',  # 5d: gången (bild_rad lian_gang_a,lian_gang_b står på föremålet)
     },
     'buskarna': {'buske_1': 'buske_gron', 'buske_2': 'buske_gul', 'buske_3': 'buske_rod', 'buske_4': 'buske_gron', 'skattlada': 'skattlada'},
     'glantan': {
@@ -39,7 +40,9 @@ BILDER = {
         'ungt_trad': 'trad_stort_ungt', 'stort_ungt_trad': 'trad_stort_ungt', 'ungt_trad_2': 'trad_stort_ungt',
         'litet_gammalt_trad': 'trad_litet_gammalt', 'gammalt_trad': 'trad_stort_gammalt', 'stort_gammalt_trad': 'trad_stort_gammalt',
         'lovhog_1': 'lovhog', 'lovhog_2': 'lovhog', 'lovhog_3': 'lovhog', 'lovhog_4': 'lovhog', 'last_lada': 'last_lada',
-        'rothal': 'rothal', 'lila_lapp': 'baronens_lapp', 'bron': 'bro', 'tavla_bron': 'tavla_bron', 'buske_vid_bron': 'buske',
+        'rothal': 'rothal', 'lila_lapp': 'baronens_lapp', 'bron': 'bro', 'tavla_bron': 'tavla_bron', 'buske_vid_bron': 'buske_hjalm',
+        # 5d: sydost, det som bara står där (nya id:n, inget att göra med dem)
+        'dekor_stubbe': 'stubbe_svamp', 'dekor_sten_1': 'sten_mossa', 'dekor_sten_2': 'stenar_sma', 'dekor_svampar': 'svampar', 'dekor_sten_3': 'sten_mossa',
     },
 }
 # bilder i rad längs föremålet: de tre ugglorna i kronan (samma figur tre gånger)
@@ -57,12 +60,27 @@ SEDAN = {
 LIVET = {
     'skogsbrynet': [('fagel', 20, 24, 24, 16), ('fagel', 44, 20, 20, 16), ('lov', 520, 0, 64, 52)],
     'buskarna': [('ekorre', 256, 16, 60, 14), ('lov', 0, 30, 40, 48)],
-    'glantan': [('fjaril', 120, 200, 64, 48)],
+    'glantan': [('fjaril', 120, 200, 64, 48), ('fjaril', 392, 236, 64, 48), ('fagel', 456, 320, 24, 16)],  # 5d: liv i sydost
 }
+# lövhögarna sjunker ihop när han slår på dem (5d): bilderna när de slås och det som ligger kvar
+HUGG = {'glantan': {f'lovhog_{i}': ('lovhog_hugg_01,lovhog_hugg_02', 'lovhog_kvar') for i in range(1, 5)}}
+# det som ritas ovanpå trädkronorna (5d): ugglorna i det gamla trädets krona
+OVANPA = {'glantan': {'ugglor'}}
+# var han ställer sig (5d): apan hänger över plattformen, så han ställer sig till höger om trädet, på marken
+SIDA = {'glantan': {'apan_i_nat': 'hoger'}}
+# stegen står framför stammen (5d): den skär en öppning i trädets hinder, så att han når den
+OPPNING = {'glantan': {'stege'}}
 # det som ritas i rutlagret och inte som ett föremål
-RUTOR = {'glantan': {'kulle', 'kronet', 'backen'}}
+RUTOR = {'glantan': {'kulle', 'kronet', 'backen'}, 'skogsbrynet': {'snar_vast', 'snar_ost'}}  # 5d: snåren kring liangången
+# 5d: tät skog inne i rummet (ridåns rutor, ovanför figurerna), indragen 8 px mot gången så att ingen ruta täcker lianerna
+SNAR = {'skogsbrynet': ['snar_vast', 'snar_ost']}
+# 5d: bäckarmen på baronens sida (vatten, bara rutor: hjälten når den aldrig) och baronens stig längs östra stranden
+BIVATTEN = {'glantan': [(600, 288, 40, 0)]}
+STIG_DEKOR = {'glantan': [(612, 0, 20, 384)]}
+# 5d: fler blommor i gräset i sydost
+BLOMMOR = {'glantan': [(336, 176, 208, 176)]}
 # stigar som är dolda tills de visas får ett eget lager, som ritas när föremålet syns
-EGNA_STIGAR = {'glantan': {'stig_backen': (520, 0, 28, 56)}}
+EGNA_STIGAR = {'glantan': {'stig_backen': (540, 0, 8, 168)}}  # 5d: längs bäcken, mellan kullen och vattnet
 
 
 def h(x, y, s=0):
@@ -105,6 +123,10 @@ def rita(rum, karta, rutnr, storlek):
         o = by['backen']
         x0 = -(-int(o['x']) // R) * R
         vatten = {(cx, cy) for cy in range(Hh) for cx in range(W) if x0 <= cx * R <= o['x'] + o['width'] and o['y'] <= cy * R <= o['y'] + o['height']}
+    for (x, y, b, hh) in BIVATTEN.get(rum, []):  # 5d
+        vatten |= horn_i((x, y, b, hh))
+    for rekt in STIG_DEKOR.get(rum, []):  # 5d
+        stig |= horn_i(rekt)
     kulle = by.get('kulle') if rum == 'glantan' else None
 
     def wang(sort, mangd, x, y):
@@ -127,7 +149,10 @@ def rita(rum, karta, rutnr, storlek):
                 else:
                     namn = f'kulle_{rad}{kol}' if rad else f'kulle_{kol}'
             if namn is None:
-                namn = wang('vatten', vatten, x, y) or wang('stig', stig, x, y) or gras[h(x, y) % len(gras)]
+                blom = any(bx <= x * R < bx + bb and by_ <= y * R < by_ + bh for (bx, by_, bb, bh) in BLOMMOR.get(rum, []))  # 5d
+                g = gras[h(x, y) % len(gras)]
+                if blom and h(x, y, 5) % 3 == 0: g = ['gras_blommor_1', 'gras_blommor_2'][h(x, y, 6) % 2]
+                namn = wang('vatten', vatten, x, y) or wang('stig', stig, x, y) or g
             golv.append(rutnr[namn])
     # trädridån längs kanterna (ovanför figurerna), med öppningar vid utgångar, starten och bäcken
     oppet = set()
@@ -141,6 +166,8 @@ def rita(rum, karta, rutnr, storlek):
             bw, bh = storlek.get(BILDER.get(rum, {}).get(o['name']), (o['width'], o['height']))
             x = min(o['x'], o['x'] + o['width'] / 2 - bw / 2); y = min(o['y'], o['y'] + o['height'] - bh)
             oppet |= horn_i((x - 8, y - 8, max(o['width'], bw) + 16, max(o['height'], o['y'] + o['height'] - y) + 16))
+    for (x, y, b, hh) in STIG_DEKOR.get(rum, []):  # 5d: baronens stig syns
+        oppet |= horn_i((x - 8, y, b + 16, hh))
     if kulle:  # kullen är öppen upptill (krönet når kanten), ridån står inte på den
         oppet |= horn_i((kulle['x'], kulle['y'], kulle['width'], kulle['height']))
     skog = set()
@@ -151,6 +178,9 @@ def rita(rum, karta, rutnr, storlek):
                 continue
             if kant == 0 or (kant == 1 and h(cx, cy, 7) % 3 != 0):
                 skog.add((cx, cy))
+    for namn_ in SNAR.get(rum, []):  # 5d: snåren
+        o = by[namn_]
+        skog |= horn_i((o['x'] + 8, o['y'], o['width'] - 16, o['height']))
     over = [rutnr[n] + 1 if (n := wang('skog', skog, x, y)) else 0 for y in range(H) for x in range(B)]
     lager = [{'namn': 'golv', 'data': [n + 1 for n in golv]}, {'namn': 'over', 'data': over}]
     for oid, rekt in EGNA_STIGAR.get(rum, {}).items():
@@ -185,6 +215,14 @@ def kor(prova=False):
                 satt(o, 'bild_sedan', SEDAN[rum][n][0]); satt(o, 'sedan', SEDAN[rum][n][1])
             if n in RUTOR.get(rum, set()):
                 satt(o, 'rutor', True)
+            if n in HUGG.get(rum, {}):
+                satt(o, 'bild_hugg', HUGG[rum][n][0]); satt(o, 'bild_kvar', HUGG[rum][n][1])
+            if n in OVANPA.get(rum, set()):
+                satt(o, 'ovanpa', True)
+            if n in SIDA.get(rum, {}):
+                satt(o, 'sida', SIDA[rum][n])
+            if n in OPPNING.get(rum, set()):
+                satt(o, 'oppning', True)
         # liv i skogen: objekt med typen omgivning (tas bort och läggs till på nytt, så att skriptet kan köras om)
         obj[:] = [o for o in obj if o.get('type') != 'omgivning']
         nasta = max([o.get('id', 0) for o in obj] + [karta.get('nextobjectid', 1) - 1]) + 1

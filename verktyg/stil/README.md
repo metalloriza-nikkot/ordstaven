@@ -13,7 +13,10 @@ namnkontrollen. Repot är publikt, så inga riktiga namn står i skripten eller 
   - stilprovet av gläntan: `prov`, rutorna och skogens föremål: `rutor`, skogsbrynets sista föremål: `bryn`;
   - bildkorten: `kort`, krönets bildkort: `kron`, uppdragslappen och uppdragens bilder: `uppdrag`;
   - huset: `hus`, pass 3: `pass3`, ägget, kläckningen och krukorna: `agg`, expeditionsboken: `bok`;
-  - Farfars karta: `karta`, HUD:en, ikonerna och dörrskyltarna: `hud`, och sidovyerna: `sidovy`.
+  - Farfars karta: `karta`, HUD:en, ikonerna och dörrskyltarna: `hud`, och sidovyerna: `sidovy`;
+  - kapitel 1:s rättelser och prologens nya animationer (beslut 50–51): `kap1`. Där finns också `kartor5d.py`,
+    som skriver Stils förslag till kartorna (kopior, aldrig repots kartor) med `skog_forslag.py`, och `rendera.py`,
+    som ritar en karta till en provbild.
 - **Körning:** bilderna i `ut/`-mapparna görs genom att köra skripten i ordningen figurer → `efx` → `prov` → `rutor`
   → `kort` → `hus` → `pass3` → resten, eftersom de senare läser de tidigares bilder och inkorgens bilder. Skripten
   räknar med att mapparna ligger direkt i `/home/claude/` (kopiera dit), med inkorgen i `/home/claude/inkorg/`, och

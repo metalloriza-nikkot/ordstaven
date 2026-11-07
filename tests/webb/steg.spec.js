@@ -676,6 +676,11 @@ test('höjdnivåer: han går upp för trappan själv, kanten går inte att gå �
   await expect.poll(async () => (await niva()).niva, { timeout: 4000 }).toBe(1);
   await page.keyboard.up('ArrowUp');
   expect((await niva()).stege).toBe(false);
+  // ungen klättrar själv efter honom med sina två bilder (5d, 15: "ungen klättrar efter"), och står sedan uppe
+  const ungenRam = () => page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').ungeBild?.frame?.name);
+  await expect.poll(ungenRam, { timeout: 2000, intervals: [50] }).toMatch(/^unge1_klattra_upp_0[12]$/);
+  await expect.poll(ungenRam, { timeout: 4000 }).not.toMatch(/klattra/);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').ungePos.y)).toBeLessThan(112);
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('UPPE.', { timeout: 8000 });
   await page.click('#plattan .vidare');
   // ned igen med trappan, och upp igen av sig själv när han trycker på lövhögen (vägen går över trappan)
@@ -1040,7 +1045,7 @@ async function framTill(page, villkor, arg, ms = 30000) {
   }
 }
 
-test('SVÄRD gör staven till ett svärd, och spelaren hugger själv ned lianerna: varje hugg fäller en, och de kommer inte tillbaka (39.3)', async ({ page }) => {
+test('SVÄRD gör staven till ett svärd, och spelaren hugger sig igenom liangången: varje hugg fäller en, huggen växlar, och de kommer inte tillbaka (39.3, 50.2, 51.5)', async ({ page }) => {
   test.setTimeout(120000);
   await hoppaKapitel1(page, 1); // k1s02_lianerna
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 10000 }).toBe('k1s02_lianerna');
@@ -1054,29 +1059,35 @@ test('SVÄRD gör staven till ett svärd, och spelaren hugger själv ned lianern
   await page.click('#plattan .vidare');
   await expect(page.locator('#plattan .formel-bild')).toBeVisible({ timeout: 8000 });
   for (const b of 'SVÄRD') await bricka(page, b).click();
-  // svärdet sveper inte av sig självt: lianerna står kvar, delade i tre, tills han hugger
+  // svärdet sveper inte av sig självt: lianerna står kvar, en per del i pusslet, tills han hugger
   await framTill(page, () => window.__ORDSTAVEN.rumsobjekt().includes('lianer_0') && !window.__ORDSTAVEN.fryst());
   const lianer = await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt().filter((id) => /^lianer/.test(id)));
   expect(lianer).toEqual(['lianer_0', 'lianer_1', 'lianer_2']);
   expect(await page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').harSvard)).toBe(true);
-  // de tre fyller hela väggen, så att vägen till stigarna är stängd tills han har huggit
-  const delar = await page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').objekt.filter((o) => /^lianer_/.test(o.id)).map((o) => [o.x, o.b]));
-  expect(delar.reduce((s, [, b]) => s + b, 0)).toBe(312);
+  // de står efter varandra i gången (delas: djup, 50.2) och fyller den, så att vägen norrut är stängd tills han har huggit
+  const delar = await page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').objekt.filter((o) => /^lianer_/.test(o.id)).map((o) => [o.y, o.h, o.b]));
+  expect(delar.reduce((s, [, h]) => s + h, 0)).toBe(48);
+  expect(delar.every(([, , b]) => b === 32)).toBe(true);
   await page.screenshot({ path: 'test-results/lianerna-hugga.png' });
-  for (const id of lianer) {
+  // den södra står närmast: han hugger sig norrut genom gången
+  for (const id of [...lianer].reverse()) {
     await tryckNara(page, id);
     // står han redan vid lianen hugger trycket direkt (som på iPad), annars går han dit och handen kommer
     await expect.poll(async () => (await page.locator('#handknapp').isVisible()) || !(await page.evaluate((x) => window.__ORDSTAVEN.rumsobjekt().includes(x), id)), { timeout: 8000 }).toBe(true);
     if (await page.evaluate((x) => window.__ORDSTAVEN.rumsobjekt().includes(x), id)) {
       await page.keyboard.press('Space');
-      if (id === 'lianer_0') { await page.waitForTimeout(60); await page.screenshot({ path: 'test-results/lianerna-hugget.png' }); }
+      if (id === lianer.at(-1)) { await page.waitForTimeout(60); await page.screenshot({ path: 'test-results/lianerna-hugget.png' }); }
     }
     await expect.poll(() => page.evaluate((x) => window.__ORDSTAVEN.rumsobjekt().includes(x), id), { timeout: 8000 }).toBe(false);
-    if (id === 'lianer_0') { await page.waitForTimeout(400); await page.screenshot({ path: 'test-results/lianerna-en-huggen.png' }); }
+    if (id === lianer.at(-1)) { await page.waitForTimeout(400); await page.screenshot({ path: 'test-results/lianerna-en-huggen.png' }); }
   }
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('SVÄRDET SKÄR BARA VÄXTER.', { timeout: 10000 });
   const logg = await page.evaluate(() => window.__ORDSTAVEN.logg());
   expect(logg).toContain('[hugga] lianer_0');
+  // tre hugg som växlar (51.5): från sidan, uppifrån, och snurren på den sista lianen
+  const hugg = [...logg.matchAll(/\[hugg\] (\w+): lianer_/g)].map((m) => m[1]);
+  expect(hugg.at(-1)).toBe('snurr');
+  expect(hugg.slice(0, 2)).toEqual(['sida', 'uppifran'].slice(0, Math.min(2, hugg.length - 1)));
   expect(await page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').harSvard)).toBe(false);
   expect(await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt().some((id) => /^lianer/.test(id)))).toBe(false);
   // efter en omstart står lianerna inte där igen
@@ -1086,10 +1097,10 @@ test('SVÄRD gör staven till ett svärd, och spelaren hugger själv ned lianern
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 10000 }).toBe('k1s02_lianerna');
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.rumsobjekt().length), { timeout: 10000 }).toBeGreaterThan(3);
   expect(await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt().some((id) => /^lianer/.test(id)))).toBe(false);
-  // stumparna står kvar (Stils lian_kvar), utan att stänga vägen
+  // det som ligger kvar är låga högar (Stils lian_gang_kvar), som inte stänger vägen
   const stumpar = await page.evaluate(() => {
     const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); let n = 0;
-    const g = (o) => { if (o.frame?.name === 'lian_kvar') n++; (o.list || []).forEach(g); };
+    const g = (o) => { if (o.frame?.name === 'lian_gang_kvar') n++; (o.list || []).forEach(g); };
     r.lagerObjekt.list.forEach(g); return n;
   });
   expect(stumpar).toBeGreaterThan(0);
@@ -1799,8 +1810,8 @@ test('s21b: Farfar står vid ytterdörren, vänder sig mot hjälten och säger h
   await framTill(page, () => /HEJ DÅ/.test(document.querySelector('#plattan .replik-ruta')?.textContent || ''));
   expect(await page.evaluate(() => window.__ORDSTAVEN.rutaPaSkarm('farfar_vid_dorren'))).not.toBeNull();
   const s = await page.evaluate(() => window.__ORDSTAVEN.samtal('farfar_vid_dorren'));
-  // hjälten står till vänster om dörren: Farfar vänder sig åt vänster, mot honom
-  expect(s.figur).toMatch(/^farfar_morgon_(vanster|ner|upp)_01$/);
+  // hjälten står till vänster om dörren: Farfar vänder sig åt vänster, mot honom (och vinkar, 51.4)
+  expect(s.figur).toMatch(/^farfar_morgon_((vanster|ner|upp)_01|vinka_(vanster|ner)_0[12])$/);
   expect(s.figur).not.toBe('farfar_morgon_hoger_01');
   await page.screenshot({ path: 'test-results/s21b-farfar-vid-dorren.png' });
   await framTill(page, () => window.__ORDSTAVEN.steg()?.typ === 'ga_till');

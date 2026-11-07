@@ -195,3 +195,106 @@ test('stegen går man på direkt: når han stegen medan beskrivningen och ljudet
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('UPPE.', { timeout: 15000 });
   expect(await logg(page)).not.toContain('KLÄTTRA UPP');
 });
+
+test('liangången i vanlig takt: sex lianer, från första hugget tills vägen är fri på högst ca 15 s (50.2, 51.5)', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(90000);
+  const { readFileSync } = await import('node:fs');
+  const kap1 = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-01.json', import.meta.url), 'utf8'));
+  const brynet = kap1.rum.find((r) => r.id === 'skogsbrynet');
+  // pusslet med sex delar, som Innehåll gör det i sitt andra pass (52.5)
+  const pussel = { ...kap1.pussel.find((p) => p.id === 'k1_lianerna'), innehall: ['tom', 'tom', 'tom', 'tom', 'tom', 'tom'] };
+  const scen = { id: 't_lianer', pass: 1, rum: 'skogsbrynet', steg: [{ typ: 'visa_foremal', foremal: 'stig_genom_hacken' }, { typ: 'pussel', pussel_id: 'k1_lianerna' }, R('Vägen är fri.')] };
+  await provscen(page, scen, { pussel: [pussel], rum: { skogsbrynet: { innehall: brynet.innehall, skyltar: brynet.skyltar } } }, '?test&testscen&kapitel=kap-00');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('HUGG LIANERNA MED SVÄRDET!', { timeout: 15000 });
+  for (let k = 0; k < 40 && (await page.locator('#plattan .replik-ruta').isVisible()); k++) { await page.click('#plattan .replik-ruta').catch(() => {}); await page.waitForTimeout(300); }
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.rumsobjekt().filter((id) => /^lianer_/.test(id)).length), { timeout: 10000 }).toBe(6);
+  // han står nedanför gången (östra skärmen) och trycker Mellanslag så fort handen syns: det som mäts är spelets tid
+  await page.evaluate(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); r.pos = { x: 464, y: 112 }; r.ungePos = { x: 448, y: 112 }; r.placera(); });
+  await page.waitForTimeout(1500); // kameran glider dit
+  for (let i = 5; i >= 0; i--) {
+    const id = `lianer_${i}`;
+    const o = await page.evaluate((x) => window.__ORDSTAVEN.objekt(x), id);
+    await page.mouse.click(o.x, o.y);
+    await expect.poll(async () => (await page.locator('#handknapp').isVisible()) || !(await page.evaluate((x) => window.__ORDSTAVEN.rumsobjekt().includes(x), id)), { timeout: 20000 }).toBe(true);
+    if (await page.evaluate((x) => window.__ORDSTAVEN.rumsobjekt().includes(x), id)) await page.keyboard.press('Space');
+    await expect.poll(() => page.evaluate((x) => window.__ORDSTAVEN.rumsobjekt().includes(x), id), { timeout: 10000 }).toBe(false);
+  }
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('VÄGEN ÄR FRI.', { timeout: 15000 });
+  // tiden i loggen: från första hugget till att pusslet är klart och berättelsen går vidare
+  const rader = (await logg(page)).split('\n').filter((r) => /^\d\d:\d\d:\d\d\.\d{3}/.test(r));
+  const tid = (r) => { const [h, m, s] = r.slice(0, 12).split(':'); return (Number(h) * 3600 + Number(m) * 60 + Number(s)) * 1000; };
+  const forsta = rader.find((r) => r.includes('[hugg] ')), sista = rader.filter((r) => r.includes('[hugga] lianer_')).at(-1);
+  const hugg = rader.filter((r) => r.includes('[hugg] ')).map((r) => r.match(/\[hugg\] (\w+)/)[1]);
+  expect(hugg).toEqual(['sida', 'uppifran', 'sida', 'uppifran', 'sida', 'snurr']);
+  const ms = tid(sista) - tid(forsta);
+  console.log(`liangången: sex lianer på ${ms} ms från första hugget till sista`);
+  expect(ms).toBeLessThan(15000);
+  await page.screenshot({ path: 'test-results/liangangen-fri.png' });
+});
+
+test('sidovyn vid bron (5d): baronen sitter bakom busken på andra stranden, och Herr Skata landar på hjälmen', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(40000);
+  const scen = { id: 't_bron', pass: 1, rum: 'hallen', tillstand: 'natt', steg: [
+    { typ: 'mellanscen', beskrivning: 'Sidovy vid bron.', bild: 'vid_bron' }, R('Förbi.')] };
+  await provscen(page, scen, {}, '?test&testscen&kapitel=kap-00');
+  const baron = () => page.evaluate(() => {
+    const r = window.__ORDSTAVEN.spel.scene.getScene('Rum');
+    const b = r.sidovy.list.find((x) => /baronen/.test(x.texture?.key || ''));
+    return b ? { x: b.x, y: b.y, b: b.width, h: b.height, bild: b.texture.key } : null;
+  });
+  await expect.poll(baron, { timeout: 5000 }).toMatchObject({ x: 252, y: 86, b: 48, h: 40 });
+  await page.waitForTimeout(1200);
+  await page.screenshot({ path: 'test-results/sidovy-vid-bron.png' });
+  await expect.poll(async () => (await baron())?.bild, { timeout: 6000 }).toBe('sidovy_vid_bron_baronen_03');
+});
+
+test('sängdags (51.4): han lägger sig med hjälmen på, och ungen hoppar upp, trampar runt och somnar', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(40000);
+  const scen = { id: 't_sang', pass: 1, rum: 'sovrummet', tillstand: 'natt', steg: [R('Kryp ner i sängen!'), { typ: 'ga_till', mal: 'sang' }, { typ: 'mellanscen', beskrivning: 'Hjälten kryper ner.' }, R('God natt.')] };
+  await provscen(page, scen, {}, '?test&testscen&kapitel=kap-00');
+  for (let k = 0; k < 20 && (await page.evaluate(() => window.__ORDSTAVEN.steg()?.typ)) !== 'ga_till'; k++) { await page.click('#plattan .replik-ruta').catch(() => {}); await page.waitForTimeout(300); }
+  const o = await page.evaluate(() => window.__ORDSTAVEN.objekt('sang'));
+  await page.mouse.click(o.x, o.y);
+  await expect(page.locator('#handknapp')).toBeVisible({ timeout: 8000 });
+  await page.keyboard.press('Space');
+  await expect.poll(() => logg(page), { timeout: 10000 }).toContain('[hjälten] lägger sig: sang');
+  const ungen = () => page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').ungeBild?.frame?.name);
+  const sett = new Set();
+  for (let k = 0; k < 40; k++) { sett.add(await ungen()); if ((await ungen())?.startsWith('unge1_sover')) break; await page.waitForTimeout(150); }
+  expect([...sett].some((n) => /unge1_glad_ner/.test(n || ''))).toBe(true); // hoppet
+  expect([...sett].filter((n) => /unge1_tomgang_/.test(n || '')).length).toBeGreaterThanOrEqual(3); // varven
+  expect(await ungen()).toMatch(/^unge1_sover_ner_0[12]$/);
+  // han sover i sängen (bilderna med hjälmen på), och han syns inte bredvid den
+  expect(await page.evaluate(() => window.__ORDSTAVEN.bildFor('sang'))).toMatch(/^hjalte_sang_0[34]$/);
+  await page.screenshot({ path: 'test-results/sangdags.png' });
+});
+
+test('farväl (51.4): Farfar går själv från köket till ytterdörren och vinkar, och hjälten vinkar mot huset i trädgården', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(60000);
+  const scen = { id: 't_farval', pass: 1, rum: 'hallen', tillstand: 'morgon', steg: [{ typ: 'visa_foremal', foremal: 'farfar_vid_dorren' }, R('Hej då!'), { typ: 'ga_till', mal: 'dorr_ut' }] };
+  const ute = { id: 't_ute', pass: 1, rum: 'tradgarden', steg: [R('Ute.')] };
+  await provscen(page, scen, { efter: [ute] }, '?test&testscen&kapitel=kap-00');
+  await expect.poll(() => logg(page), { timeout: 10000 }).toContain('[figur] farfar_vid_dorren kommer från dorr_mat');
+  // han går: läget ändras, med gångbilderna
+  const farfar = () => page.evaluate(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum').ritade.get('farfar_vid_dorren'); return r ? { x: r.x, y: r.y, bild: r.frame.name } : null; });
+  const bilder = new Set(); const lagen = new Set();
+  for (let k = 0; k < 60; k++) { const f = await farfar(); bilder.add(f?.bild); lagen.add(`${f?.x},${f?.y}`); if (/vinka/.test(f?.bild || '')) break; await page.waitForTimeout(150); }
+  expect([...bilder].some((b) => /^farfar_morgon_(ner|upp|hoger|vanster)_0[234]$/.test(b || ''))).toBe(true);
+  expect(lagen.size).toBeGreaterThan(5);
+  await expect.poll(async () => (await farfar())?.bild, { timeout: 15000 }).toMatch(/^farfar_morgon_vinka_(ner|vanster|hoger)_0[12]$/);
+  const fram = await farfar(); expect(fram).toMatchObject({ x: 334, y: 172 }); // vid ytterdörren, där kartan har honom
+  await page.screenshot({ path: 'test-results/farval-hallen.png' });
+  for (let k = 0; k < 20 && (await page.evaluate(() => window.__ORDSTAVEN.steg()?.typ)) !== 'ga_till'; k++) { await page.click('#plattan .replik-ruta').catch(() => {}); await page.waitForTimeout(300); }
+  const d = await page.evaluate(() => window.__ORDSTAVEN.objekt('dorr_ut'));
+  await page.mouse.click(d.x, d.y);
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 15000 }).toBe('t_ute');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').hjaltePose), { timeout: 5000, intervals: [50] }).toMatch(/^hjalte_vinka_upp_0[12]$/);
+  // husets fasad står i trädgårdens kant (berg har bilden fasad)
+  expect(await page.evaluate(() => window.__ORDSTAVEN.bildFor('berg'))).toBe('fasad');
+  await page.waitForTimeout(300);
+  await page.screenshot({ path: 'test-results/farval-tradgarden.png' });
+});

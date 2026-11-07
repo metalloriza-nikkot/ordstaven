@@ -13,7 +13,7 @@ const FIGUR_HOJD = 24;
  *             riktning?: 'vanster' | 'hoger' | 'upp' | 'ned', klattra?: 'upp' | 'ned', ute?: boolean, lapp?: string,
  *             talare?: string, lastI?: string[], storlek?: { bredd: number, hojd: number }, forsvinnerEfter?: string, oppning?: boolean,
  *             bildSitter?: string, bildSedan?: string, sedan?: string, bildAnim?: string[], animMs?: number, rutor?: boolean,
- *             bild?: string, bildNatt?: string, bildPa?: string, bildDel?: string, sovplats?: boolean, skataFonster?: boolean, lyser?: boolean, delasHela?: boolean,
+ *             bild?: string, bildNatt?: string, bildPa?: string, bildDel?: string, sovplats?: boolean, skataFonster?: boolean, lyser?: boolean, delasHela?: boolean, delasDjup?: boolean, dekor?: boolean, ovanpa?: boolean, delar?: number, bildTaEmot?: string[], bildLas?: string[], kommerFran?: string, bildVinka?: string[],
  *             bildRad?: string[], bildHugg?: string[], bildKvar?: string }} Objekt
  * till = rummet en utgång leder till, sida = var hjälten ställer sig, golv = man går på det (stig, grind).
  * sida 'alla' = föremålet har ingen framsida (krukor, buskar, en låda mitt på golvet): det går att använda från alla håll.
@@ -223,7 +223,8 @@ export function stigStart(o) {
  * @param {Objekt[]} objekt
  */
 export function hinderFran(objekt) {
-  return objekt.filter((o) => !o.golv && o.sort !== 'yta' && !/^(stig_|grind)/.test(o.id));
+  // dekor (52.2) står i vägen bara när den är snår i rutlagret: stenarna, stubben och svamparna går han förbi
+  return objekt.filter((o) => !o.golv && o.sort !== 'yta' && !/^(stig_|grind)/.test(o.id) && !(o.dekor && !o.rutor));
 }
 
 /**
@@ -239,7 +240,8 @@ export function rumsObjekt(innehall, tillstand, karta, visade = []) {
   if (!karta) return placeraObjekt(ids);
   // i ett område som är större än skärmen räknas föremålen mot områdets kanter
   const storlek = karta.storlek && (karta.storlek.bredd !== RUM.bredd || karta.storlek.hojd !== RUM.hojd) ? { storlek: karta.storlek } : {};
-  const iKartan = karta.objekt.filter((o) => ids.includes(o.id)).map((o) => ({ ...o, ...storlek }));
+  // dekor (52.2) står bara i kartan: den ritas alltid och har inget samspel
+  const iKartan = karta.objekt.filter((o) => ids.includes(o.id) || o.dekor).map((o) => ({ ...o, ...storlek }));
   const saknas = ids.filter((id) => !iKartan.some((o) => o.id === id));
   return [...iKartan, ...placeraObjekt(saknas).map((o) => ({ ...o, ...storlek }))];
 }

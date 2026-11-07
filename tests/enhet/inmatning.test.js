@@ -416,8 +416,9 @@ describe('kapitel 1: kartorna (T5)', () => {
         const { n, per } = hinderI(obj, karta);
         const mark = per(0);
         const starter = [karta.start, ...obj.filter((o) => o.till).map(framfor)].filter(Boolean).map((p) => mark.narmasteFria(p));
-        // fossilet i apans bo nås först när stegen står där (efter räddningen)
-        const forst = (o) => t === 'fangen' && o.id === 'fossil';
+        // fossilet i apans bo nås först när stegen står där (efter räddningen), och apan i nätet hänger över
+        // plattformen (5d): räddningen sker på läsplattan, och ingen går dit
+        const forst = (o) => t === 'fangen' && (o.id === 'fossil' || o.id === 'apan_i_nat');
         for (const start of starter) for (const o of obj.filter((x) => !dekor.has(x.id) && !x.forbinder && x.sort !== 'yta' && !forst(x))) {
           const niva = n.nivaFor(o);
           // uppe: först till trappan eller stegen på marken, sedan vidare på nivån

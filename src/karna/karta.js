@@ -140,6 +140,12 @@ export function lasKarta(tmj) {
       if (egen.lyser) ut.lyser = true;
       // delas: "hela" = när ett pussel delar föremålet (P26) fyller delarna hela föremålet (lianväggen), annars krukor
       if (egen.delas === 'hela') ut.delasHela = true;
+      // delas: "djup" (50.2) = delarna står efter varandra från norr till söder (liangången), den södra närmast
+      if (egen.delas === 'djup') ut.delasDjup = true;
+      // dekor (52.2) = står i kartan och ritas, utan samspel och utan text, och behöver inte stå i rummets innehåll
+      if (egen.dekor) ut.dekor = true;
+      // ovanpa (5d) = ritas ovanpå trädkronorna och figurerna (ugglorna i kronan)
+      if (egen.ovanpa) ut.ovanpa = true;
       // hugget (39.3): bild_rad = bilder som upprepas längs föremålet (lianväggen, en lian var bildbredd),
       // bild_hugg = bilderna när det huggs, bild_kvar = det som står kvar efteråt (inget hinder)
       if (egen.bild_rad) ut.bildRad = String(egen.bild_rad).split(',').map((t) => t.trim()).filter(Boolean);
@@ -151,6 +157,13 @@ export function lasKarta(tmj) {
       if (egen.bild_sedan && egen.sedan) { ut.bildSedan = String(egen.bild_sedan); ut.sedan = String(egen.sedan); }
       // bild_sitter (34.4): bilden när hjälten sitter i föremålet (fåtöljen med honom i), när han har gått dit
       if (egen.bild_sitter) ut.bildSitter = String(egen.bild_sitter);
+      // prologens nya animationer (51.4, 10f v0.3): bild_ta_emot = figuren tar emot det han bär (Farfar och boken),
+      // bild_las = sedan läser figuren (en slinga), kommer_fran = figuren går själv hit från en utgång när den visas
+      // (Farfar från köket till ytterdörren), bild_vinka = figuren vinkar när den har kommit fram
+      if (egen.bild_ta_emot) ut.bildTaEmot = String(egen.bild_ta_emot).split(',').map((t) => t.trim()).filter(Boolean);
+      if (egen.bild_las) ut.bildLas = String(egen.bild_las).split(',').map((t) => t.trim()).filter(Boolean);
+      if (egen.kommer_fran) ut.kommerFran = String(egen.kommer_fran);
+      if (egen.bild_vinka) ut.bildVinka = String(egen.bild_vinka).split(',').map((t) => t.trim()).filter(Boolean);
       if (egen.bild_anim) { ut.bildAnim = String(egen.bild_anim).split(',').map((t) => t.trim()).filter(Boolean); ut.animMs = Math.max(250, tal(egen.anim_ms, 500)); }
       if (egen.rutor) ut.rutor = true;
       objekt.push(ut);
@@ -159,5 +172,7 @@ export function lasKarta(tmj) {
   const vagg = { bak: tal(kartegen.vagg_bak, VAGG.bak), sida: tal(kartegen.vagg_sida, VAGG.sida), fram: tal(kartegen.vagg_fram, VAGG.fram) };
   const m = Number(kartegen.morker);
   const morker = kartegen.morker !== undefined && Number.isFinite(m) ? Math.max(0, Math.min(1, m)) : null;
-  return { objekt, start, inomhus: !!kartegen.inomhus, in: inpunkter, lampor, vagg, morker, storlek: { bredd, hojd }, massiv, bild: kartegen.bild ? String(kartegen.bild) : null, mark: kartegen.mark ? String(kartegen.mark) : null, rutlager, omgivning };
+  // vinka_fran (51.4): kommer han in från det rummet vinkar han mot huset (trädgården, när han har sagt hejdå)
+  const vinkaFran = kartegen.vinka_fran ? String(kartegen.vinka_fran) : null;
+  return { vinkaFran, objekt, start, inomhus: !!kartegen.inomhus, in: inpunkter, lampor, vagg, morker, storlek: { bredd, hojd }, massiv, bild: kartegen.bild ? String(kartegen.bild) : null, mark: kartegen.mark ? String(kartegen.mark) : null, rutlager, omgivning };
 }

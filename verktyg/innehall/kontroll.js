@@ -84,7 +84,9 @@ function kontrolleraKartor(k, kartor, fel, varningar) {
     for (const id of ids) if (!iKartan.has(id)) fel.push(`${k.id} rum ${r.id}: ${id} saknas i kartan`);
     for (const fran of Object.keys(karta.in || {})) if (!allaRum.has(fran)) fel.push(`kartan ${r.id}: in_${fran} gäller ett rum som inte finns i ${k.id}`);
     for (const o of karta.objekt) {
-      if (!ids.includes(o.id)) fel.push(`kartan ${r.id}: ${o.id} finns inte i rummets innehåll`);
+      // dekor (52.2) står bara i kartan: inget samspel och ingen text, så den behöver inte stå i innehållet
+      if (o.dekor && ids.includes(o.id)) varningar.push(`kartan ${r.id}: ${o.id} är dekor men står i rummets innehåll`);
+      if (!ids.includes(o.id) && !o.dekor) fel.push(`kartan ${r.id}: ${o.id} finns inte i rummets innehåll`);
       const S = karta.storlek || { bredd: 320, hojd: 192 };
       if (o.x < 0 || o.y < 0 || o.x + o.b > S.bredd || o.y + o.h > S.hojd) fel.push(`kartan ${r.id}: ${o.id} går utanför rummet`);
       if (o.forsvinnerEfter && !k.pussel.some((p) => p.id === o.forsvinnerEfter && (p.typ === 'P11_formel' || p.typ === 'P26_krukorna'))) fel.push(`kartan ${r.id}: ${o.id} försvinner efter ${o.forsvinnerEfter}, som inte är en formel eller ett P26 i ${k.id}`);

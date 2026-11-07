@@ -540,10 +540,330 @@
     "h": 32
    }
   },
-  "svard_svinga_hoger_01": {
+  "svard_hugg_hoger_01": {
    "frame": {
     "x": 0,
     "y": 478,
+    "w": 48,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 48,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 48,
+    "h": 48
+   }
+  },
+  "svard_hugg_hoger_02": {
+   "frame": {
+    "x": 49,
+    "y": 478,
+    "w": 48,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 48,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 48,
+    "h": 48
+   }
+  },
+  "svard_hugg_hoger_03": {
+   "frame": {
+    "x": 98,
+    "y": 478,
+    "w": 48,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 48,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 48,
+    "h": 48
+   }
+  },
+  "svard_hugg_ner_01": {
+   "frame": {
+    "x": 0,
+    "y": 527,
+    "w": 48,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 48,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 48,
+    "h": 48
+   }
+  },
+  "svard_hugg_ner_02": {
+   "frame": {
+    "x": 49,
+    "y": 527,
+    "w": 48,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 48,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 48,
+    "h": 48
+   }
+  },
+  "svard_hugg_ner_03": {
+   "frame": {
+    "x": 98,
+    "y": 527,
+    "w": 48,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 48,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 48,
+    "h": 48
+   }
+  },
+  "svard_hugg_upp_01": {
+   "frame": {
+    "x": 0,
+    "y": 576,
+    "w": 48,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 48,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 48,
+    "h": 48
+   }
+  },
+  "svard_hugg_upp_02": {
+   "frame": {
+    "x": 49,
+    "y": 576,
+    "w": 48,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 48,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 48,
+    "h": 48
+   }
+  },
+  "svard_hugg_upp_03": {
+   "frame": {
+    "x": 98,
+    "y": 576,
+    "w": 48,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 48,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 48,
+    "h": 48
+   }
+  },
+  "svard_hugg_vanster_01": {
+   "frame": {
+    "x": 0,
+    "y": 625,
+    "w": 48,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 48,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 48,
+    "h": 48
+   }
+  },
+  "svard_hugg_vanster_02": {
+   "frame": {
+    "x": 49,
+    "y": 625,
+    "w": 48,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 48,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 48,
+    "h": 48
+   }
+  },
+  "svard_hugg_vanster_03": {
+   "frame": {
+    "x": 98,
+    "y": 625,
+    "w": 48,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 48,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 48,
+    "h": 48
+   }
+  },
+  "svard_snurr_01": {
+   "frame": {
+    "x": 0,
+    "y": 674,
+    "w": 64,
+    "h": 64
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 64
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 64
+   }
+  },
+  "svard_snurr_02": {
+   "frame": {
+    "x": 65,
+    "y": 674,
+    "w": 64,
+    "h": 64
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 64
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 64
+   }
+  },
+  "svard_snurr_03": {
+   "frame": {
+    "x": 130,
+    "y": 674,
+    "w": 64,
+    "h": 64
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 64
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 64
+   }
+  },
+  "svard_snurr_04": {
+   "frame": {
+    "x": 195,
+    "y": 674,
+    "w": 64,
+    "h": 64
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 64
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 64
+   }
+  },
+  "svard_svinga_hoger_01": {
+   "frame": {
+    "x": 0,
+    "y": 739,
     "w": 48,
     "h": 48
    },
@@ -563,7 +883,7 @@
   "svard_svinga_hoger_02": {
    "frame": {
     "x": 49,
-    "y": 478,
+    "y": 739,
     "w": 48,
     "h": 48
    },
@@ -583,7 +903,7 @@
   "svard_svinga_hoger_03": {
    "frame": {
     "x": 98,
-    "y": 478,
+    "y": 739,
     "w": 48,
     "h": 48
    },
@@ -603,7 +923,7 @@
   "svard_svinga_ner_01": {
    "frame": {
     "x": 0,
-    "y": 527,
+    "y": 788,
     "w": 48,
     "h": 48
    },
@@ -623,7 +943,7 @@
   "svard_svinga_ner_02": {
    "frame": {
     "x": 49,
-    "y": 527,
+    "y": 788,
     "w": 48,
     "h": 48
    },
@@ -643,7 +963,7 @@
   "svard_svinga_ner_03": {
    "frame": {
     "x": 98,
-    "y": 527,
+    "y": 788,
     "w": 48,
     "h": 48
    },
@@ -663,7 +983,7 @@
   "svard_svinga_upp_01": {
    "frame": {
     "x": 0,
-    "y": 576,
+    "y": 837,
     "w": 48,
     "h": 48
    },
@@ -683,7 +1003,7 @@
   "svard_svinga_upp_02": {
    "frame": {
     "x": 49,
-    "y": 576,
+    "y": 837,
     "w": 48,
     "h": 48
    },
@@ -703,7 +1023,7 @@
   "svard_svinga_upp_03": {
    "frame": {
     "x": 98,
-    "y": 576,
+    "y": 837,
     "w": 48,
     "h": 48
    },
@@ -723,7 +1043,7 @@
   "svard_svinga_vanster_01": {
    "frame": {
     "x": 0,
-    "y": 625,
+    "y": 886,
     "w": 48,
     "h": 48
    },
@@ -743,7 +1063,7 @@
   "svard_svinga_vanster_02": {
    "frame": {
     "x": 49,
-    "y": 625,
+    "y": 886,
     "w": 48,
     "h": 48
    },
@@ -763,7 +1083,7 @@
   "svard_svinga_vanster_03": {
    "frame": {
     "x": 98,
-    "y": 625,
+    "y": 886,
     "w": 48,
     "h": 48
    },
@@ -785,8 +1105,8 @@
   "image": "stav.png",
   "format": "RGBA8888",
   "size": {
-   "w": 147,
-   "h": 674
+   "w": 260,
+   "h": 935
   },
   "scale": "1",
   "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."

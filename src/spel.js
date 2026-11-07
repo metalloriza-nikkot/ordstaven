@@ -719,7 +719,9 @@ export function skapaSpel(d) {
   /** Det som står kvar efter hugget: kartans föremål som är borta (forsvinner_efter) och har bild_kvar. @param {any} r */
   function kvarNu(r) {
     const ids = new Set(innehallNu(r).map((/** @type {any} */ x) => (typeof x === 'string' ? x : x.id)));
-    return (kartor[r.id]?.objekt || []).filter((/** @type {any} */ o) => o.forsvinnerEfter && o.bildKvar && !ids.has(o.id));
+    // en gång på djupet (50.2) har lika många högar kvar som pusslet hade lianer
+    return (kartor[r.id]?.objekt || []).filter((/** @type {any} */ o) => o.forsvinnerEfter && o.bildKvar && !ids.has(o.id))
+      .map((/** @type {any} */ o) => (o.delasDjup && o.visar ? { ...o, delar: b.pussel(o.visar)?.innehall?.length } : o));
   }
 
   /**
@@ -1030,7 +1032,8 @@ export function skapaSpel(d) {
     aktuelltSteg = st;
     if (st.typ !== 'ga_till') molnKedja = null;
     // han vaknar och kliver ur sängen när något ska göras i rummet (repliker och mellanscener hör han i sängen)
-    if (rum.sover && !['replik', 'mellanscen', 'ljud', 'visa_ui'].includes(st.typ)) await rum.vakna(tid(500));
+    // vid passets slut (sparpunkten) sover han kvar: han har just lagt sig (51.4)
+    if (rum.sover && !['replik', 'mellanscen', 'ljud', 'visa_ui', 'sparpunkt'].includes(st.typ)) await rum.vakna(tid(500));
     // han reser sig ur fåtöljen när han ska röra sig (34.4); sagan läser han sittande
     if (rum.sitter && !['replik', 'mellanscen', 'ljud', 'visa_ui', 'bok', 'sparpunkt', 'ge_grad'].includes(st.typ)) rum.stigUpp();
     switch (st.typ) {
@@ -1104,6 +1107,12 @@ export function skapaSpel(d) {
     await visaScen(visadScen, st);
     const o = rum.ruta(st.foremal);
     if (!o) { logg.handelse('FEL', 'visa_foremal: föremålet finns inte i rummet: ' + st.foremal); return; }
+    // en figur som kommer gående (kartans kommer_fran, 51.4): Farfar går själv från köket till ytterdörren
+    if (o.kommerFran && rum.figurKommer) {
+      logg.handelse('figur', `${o.id} kommer från ${o.kommerFran}`);
+      await Promise.race([rum.figurKommer(o.id), vanta(12000)]);
+      return;
+    }
     ljud.spela('prassel'); rum.hoppa(o.id); rum.markera(o.id, true);
     await vanta(tid(900));
     rum.markera(o.id, false);
@@ -2368,10 +2377,14 @@ export function skapaSpel(d) {
       knuff.nollstall(); rum.markera(id, false);
       if (pekad) { rum.markera(pekad, false); rum.ungePekar(null); pekad = null; }
       const fynd = k.sla(ids.indexOf(id));
-      // hjälten svingar (staven eller svärdet), och träffen kommer i svingets mitt
-      rum.svinga(tid(80));
-      await vanta(tid(80));
-      if (hugga) { ljud.spela('hugg'); rum.huggen(id); }
+      // hjälten svingar (staven eller svärdet), och träffen kommer i svingets mitt. Med svärdet växlar huggen
+      // (51.5): från sidan, uppifrån, och snurren på den sista lianen, som fäller den med flest löv
+      const sista = hugga && kvar.length === 1 && ids.length > 1;
+      const typ = !hugga ? 'sida' : sista ? 'snurr' : (ids.length - kvar.length) % 2 ? 'uppifran' : 'sida';
+      rum.svinga(tid(80), typ);
+      if (hugga) logg.handelse('hugg', `${typ}: ${id}`);
+      await vanta(tid(typ === 'snurr' ? 160 : 80));
+      if (hugga) { ljud.spela('hugg'); rum.lovYr?.(id, sista ? 3 : 1); rum.huggen(id); }
       else { ljud.spela(p.foremal ? 'prassel' : 'sla'); rum.slagen(id); }
       logg.handelse(hugga ? 'hugga' : 'svinga', `${id}: ${fynd}`);
       if (fynd === 'bar') { av.bar++; ui.uppdateraHud(av); ljud.spela('bar'); await ui.visaFest('🫐', tid(600)); }
@@ -2996,6 +3009,8 @@ export function skapaSpel(d) {
         lappPussel = null;
         // framme vid fåtöljen: han sätter sig (34.4, kartans bild_sitter)
         if (st.typ === 'ga_till' && rum.ruta(st.mal)?.bildSitter && rum.sattSig(st.mal)) logg.handelse('hjälten', 'sätter sig: ' + st.mal);
+        // framme vid sängen: han lägger sig med hjälmen på, och ungen hoppar upp och somnar (51.4)
+        if (st.typ === 'ga_till' && rum.ruta(st.mal)?.sovplats && rum.laggSig?.(st.mal)) logg.handelse('hjälten', 'lägger sig: ' + st.mal);
         // en avstickare hör till steget (ga_till): är steget klart finns den inte längre
         if (!st0.omstart) { aterAvstickare = null; delete av.avstickare; }
         // efter en omstart upprepar radion Farfars senaste replik genom radion i scenen före steget han fortsätter på

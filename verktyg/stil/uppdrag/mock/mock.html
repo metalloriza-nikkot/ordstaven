@@ -1,0 +1,124 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:Lexend;src:url(lexend-latin-400-normal.woff2);font-weight:400}
+@font-face{font-family:Lexend;src:url(lexend-latin-700-normal.woff2);font-weight:700}
+body{margin:0;background:#2a1a10;overflow:hidden;font-family:Lexend;color:#2B2420}
+img{image-rendering:pixelated}
+#spel{position:absolute;overflow:hidden;outline:2px solid #140c06}
+#spel img{position:absolute;transform-origin:0 0}
+.skylt{position:absolute;transform-origin:50% 0;display:flex;align-items:center;justify-content:center;border-style:solid;
+ border-image:url(skylt9.png) 0 4 fill / 0 calc(4px*var(--s)) stretch;image-rendering:pixelated;box-sizing:border-box;letter-spacing:.03em}
+/* uppdragslappen */
+.lapp{position:absolute;box-sizing:border-box;border-style:solid;border-width:calc(8px*var(--p));
+ border-image:url(lapp_uppdrag.png) 8 fill / calc(8px*var(--p)) round;image-rendering:pixelated;
+ padding:2px 8px 0 4px;transform:rotate(-1.2deg)}
+.lapp .ros{position:absolute;right:-6px;top:-6px;width:33px}
+.lapp .hogt{position:absolute;right:-4px;bottom:-6px;width:32px;opacity:.9}
+.lapp .huvud{display:flex;align-items:center;gap:12px;height:var(--hh);font-weight:700;font-size:40px;letter-spacing:.03em}
+.lapp .huvud img{width:48px;height:48px}
+.lapp .rad{display:flex;align-items:center;gap:10px;height:var(--rh);font-size:40px;letter-spacing:.03em;white-space:nowrap}
+.lapp .rad img{width:32px;height:32px;flex:none}
+.lapp .rad.klar{color:#6A5A3A}
+.lapp .rad.nu img{animation:none}
+.lapp .linje{height:3px;margin:2px 0 4px 0;background:repeating-linear-gradient(90deg,#B8A57A 0 9px,transparent 9px 15px)}
+/* textrutan bredvid */
+.ruta{position:absolute;box-sizing:border-box;background:#FBF4E4;border-radius:22px;box-shadow:0 5px 0 #c8bb9c,0 0 0 3px #e5d9bd;
+ display:flex;gap:18px;align-items:flex-start;padding:18px 24px;font-size:40px;line-height:1.4;letter-spacing:.03em}
+.ruta .ans{width:96px;height:96px;flex:none;border-radius:50%;background:#E6D6A8;box-shadow:0 0 0 4px #8A6A20}
+.hud{position:absolute;width:72px;height:72px}
+.hud img{position:absolute;transform-origin:0 0;transform:scale(3);left:0;top:0}
+.hud img.ik{left:12px;top:12px}
+.not{position:absolute;font:600 19px/1.3 -apple-system,Helvetica,Arial,sans-serif;color:#FFE9A8;max-width:330px}
+.not b{display:inline-flex;width:28px;height:28px;border-radius:50%;background:#FFE9A8;color:#2a1a10;align-items:center;justify-content:center;margin-right:8px;font-size:17px}
+.tit{position:absolute;left:24px;top:14px;font:700 24px -apple-system,Helvetica,Arial,sans-serif;color:#FFE9A8}
+.dim{position:absolute;background:rgba(20,12,6,.55)}
+/* boken */
+.bok{position:absolute;display:flex;background:#5A3A1E;border-radius:14px;padding:16px;gap:6px;box-shadow:0 8px 0 #2E1C0E}
+.sida{background:#F2E8C8;border-radius:6px;padding:18px 22px;box-sizing:border-box;position:relative}
+.flikar{position:absolute;display:flex;gap:8px}
+.flik{display:flex;align-items:center;gap:8px;background:#E6D6A8;border-radius:10px 10px 0 0;padding:6px 14px 10px;font-size:32px;letter-spacing:.03em;box-shadow:0 0 0 3px #8A6C46 inset}
+.flik.vald{background:#F2E8C8;transform:translateY(4px)}
+.flik img{width:32px;height:32px}
+.mini{display:flex;align-items:center;gap:12px;height:76px;font-weight:700;font-size:40px;letter-spacing:.03em;border-bottom:3px dashed #B8A57A;position:relative}
+.mini img.b{width:48px;height:48px}
+.mini img.st{position:absolute;right:0;top:4px;width:64px;transform:rotate(-14deg);opacity:.92}
+.mini.vald{background:#FFFBEA;margin:0 -10px;padding:0 10px;border-radius:8px}
+</style></head><body>
+<script>
+const q=new URLSearchParams(location.search), vy=q.get('vy')||'mac';
+const ipad=vy==='ipad', W=ipad?1180:1440, H=ipad?820:900, s=3;
+document.body.style.width=(W+460)+'px';document.body.style.height=H+'px';document.body.style.background='#3a2e26';
+const skarm=document.createElement('div');Object.assign(skarm.style,{position:'absolute',left:0,top:0,width:W+'px',height:H+'px',background:'#2a1a10',outline:'3px solid #FFE9A8'});document.body.appendChild(skarm);
+const noter=(html)=>{const d=document.createElement('div');d.className='not';Object.assign(d.style,{left:(W+24)+'px',top:'96px',maxWidth:'410px'});d.innerHTML=html;document.body.appendChild(d);};
+const gx=(W-960)/2, gy=ipad?6:14, gw=960, gh=576;
+const el=(tag,cls,css,html)=>{const d=document.createElement(tag);if(cls)d.className=cls;for(const [k,v] of Object.entries(css||{})){if(k.startsWith('--'))d.style.setProperty(k,v);else d.style[k]=v;}if(html!==undefined)d.innerHTML=html;document.body.appendChild(d);return d};
+// spelytan: hallen i 3x
+const spel=el('div','',{left:gx+'px',top:gy+'px',width:gw+'px',height:gh+'px'});spel.id='spel';
+const add=(src,x,y,par=spel)=>{const i=new Image();i.src=src;i.style.left=x*s+'px';i.style.top=y*s+'px';i.style.transform='scale(3)';par.appendChild(i);return i};
+add('hallen.png',0,0);
+for(const [x,y] of [[56,12],[130,12],[204,12]]) add('dorr.png',x,y);
+add('stege_upp.png',300,6);
+const hx=150,hy=110;
+add('skugga_16x24.png',hx-8,hy-24);add('hjalte_ga_upp_01.png',hx-8,hy-24);add('stav_hand_upp_01.png',hx-8,hy-24);add('unge1_ga_upp_01.png',hx-30,hy-22);
+const em={FARFAR:4.0,BOK:2.19,MAT:2.17}, t=1, fontV=32*t/s;
+for(const [ord,cx] of [['FARFAR',69],['BOK',143],['MAT',217]]){
+  const b=Math.ceil(em[ord]*fontV*1.03+12);
+  const d=document.createElement('div');d.className='skylt';d.textContent=ord;
+  d.style.setProperty('--s',s);Object.assign(d.style,{width:b*s+'px',left:(cx-b/2)*s+'px',top:s+'px',height:10*s+'px',fontSize:32+'px',borderWidth:`0 ${4*s}px`});spel.appendChild(d);
+}
+// HUD:en i ramen till höger
+const hud=(ik,x,y)=>el('div','hud',{left:x+'px',top:y+'px'},`<img src="hud_knapp.png"><img class="ik" src="ikon_${ik}.png">`);
+const fx=gx+gw+(gx-72)/2;
+const paus=hud('paus',fx,gy+8); hud('radio',fx,gy+gh-250); hud('nos',fx,gy+gh-168); hud('bar',fx,gy+gh-86);
+
+// uppdragslappen
+const RH=ipad?46:52, HH=ipad?58:64;
+function lapp(x,y,rader,kompakt){
+  const L=el('div','lapp',{left:x+'px',top:y+'px','--p':3,'--rh':RH+'px','--hh':HH+'px'});
+  const klara=rader.filter(r=>r[1]==='klar').length;
+  const bockar=kompakt?Array(klara).fill('<img src="ikon_klar.png" style="width:32px;height:32px">').join(''):'';
+  if(kompakt) rader=rader.filter(r=>r[1]!=='klar');
+  L.innerHTML=`<img class="ros" src="lapp_kompassros.png"><div class="huvud"><img src="bar.png">MATA UNGEN<span style="display:inline-flex">${bockar}</span><img src="ikon_hogtalare.png" style="width:32px;height:32px;margin-left:auto;margin-right:22px"></div><div class="linje"></div>`+
+    rader.map(([txt,st])=>`<div class="rad ${st}"><img src="ikon_${st==='klar'?'klar':'fram'}.png">${txt}</div>`).join('');
+  return L;
+}
+const sy=gy+gh+(ipad?10:22);
+const tit=el('div','tit',{left:(W+24)+'px',top:'16px',maxWidth:'420px',fontSize:'20px'},'');
+if(vy==='mac'||vy==='ipad'){
+  tit.textContent=ipad?'Uppdragslappen – iPad (1180 × 820), spelytan 3×':'Uppdragslappen – MacBook i helskärm (1440 × 900), spelytan 3×';
+  const L=lapp(gx,sy,[['GÅ TILL KÖKET','klar'],['TA BÄREN','klar'],['GE UNGEN BÄR','nu']],ipad);
+  const lw=L.offsetWidth;
+  if(!ipad) el('div','ruta',{left:(gx+lw+28)+'px',top:sy+'px',width:(W-20-(gx+lw+28))+'px',minHeight:(ipad?150:170)+'px',padding:ipad?'14px 20px':'18px 24px',gap:ipad?'14px':'18px'},
+    `<img class="ans" src="farfar_portratt_glad_radio.png"><div>HÖR DU? UNGENS<br>MAGE KURRAR!</div>`);
+  noter(ipad?
+   '<b>1</b>Kompakt lapp när remsan är låg (under ca 280 punkter, som på iPad 3×): uppdraget med en bock per klart steg, och bara steget han gör nu.<br><br><b>2</b>Ett tryck på lappen läser den, också de klara stegen. Lappen växer aldrig ut över spelytan.<br><br><b>3</b>När Farfar eller berättaren talar och remsan inte rymmer båda, ligger textrutan över lappen. Lappen syns igen när rutan stängs. Det han läser nu går före det han kan läsa igen.<br><br><b>4</b>Ramen bredvid spelytan är 110 punkter. Lappen ryms inte där, men knapparna gör det.'
+   :'<b>1</b>Uppdraget överst: en bild och 1–3 ord, fetstil, 40 punkter. Högtalaren läser lappen igen, och första gången läses den av sig själv.<br><br><b>2</b>Delstegen, högst tre. Bara det han har gjort (bock, blekare text #6A5A3A, 5,5:1) och det han gör nu (pilen, mörk text). Aldrig de som kommer.<br><br><b>3</b>Lappen är Farfars gulnade papper med riven kant och kompassrosen i mässing, som de andra papperen från Farfar. Den ersätter molnet.<br><br><b>4</b>Platsen: till vänster i textremsan under spelytan, med textrutan bredvid. I ramen bara när den är minst ca 480 punkter bred (en bred skärm). På MacBooken är ramen 240 vid 3× och 80 vid 4×, och det räcker inte för 40 punkter.<br><br><b>5</b>Knapparna står kvar i ramen till höger.');
+}
+if(vy==='klart'){
+  tit.textContent='När hela uppdraget är klart: bock, stämpel, och lappen flyger till pausknappen';
+  const L=lapp(gx,sy,[['GÅ TILL KÖKET','klar'],['TA BÄREN','klar'],['GE UNGEN BÄR','klar']]);
+  const st=el('img','',{position:'absolute',left:(gx+L.offsetWidth-62)+'px',top:(sy+96)+'px',width:'128px',transform:'rotate(-14deg)'});st.src='stampel.png';
+  for(const [dx,dy] of [[-30,-20],[L.offsetWidth-10,-10],[L.offsetWidth+10,150],[-24,170]]){const g=el('img','',{position:'absolute',left:(gx+dx)+'px',top:(sy+dy)+'px',width:'48px'});g.src='ikon_glitter.png';}
+  // lappens väg till pausknappen
+  const sv=el('div','',{position:'absolute',left:0,top:0,width:W+'px',height:H+'px',pointerEvents:'none'});
+  const x0=gx+L.offsetWidth+4, y0=sy+30, x1=fx+36, y1=gy+80;
+  sv.innerHTML=`<svg width="${W}" height="${H}"><path d="M${x0} ${y0} C ${x1} ${y0+10}, ${x1-20} ${y1+260}, ${x1} ${y1}" stroke="#FFE9A8" stroke-width="4" fill="none" stroke-dasharray="10 10"/><circle cx="${x1}" cy="${y1-36}" r="48" fill="none" stroke="#FFE9A8" stroke-width="3"/></svg>`;
+  const g2=el('img','',{position:'absolute',left:(fx+52)+'px',top:(gy-2)+'px',width:'36px'});g2.src='ikon_glitter.png';
+  const mini=el('img','',{position:'absolute',left:(x1-90)+'px',top:(sy-60)+'px',width:'48px',opacity:.9});mini.src='ikon_uppdrag.png';
+  noter(
+    '<b>1</b>Sista bocken. Stämpeln slår ned (skala 2 → 1 på ca 0,15 s) med ett kort ljud, och glittret blinkar.<br><br><b>2</b>Lappen krymper och flyger in i pausknappen (ca 0,6 s). Pausknappen glimtar en gång, och fliken KLART i MIN BOK får en stjärna tills han har tittat (10e §6).<br><br><b>3</b>Nästa uppdrag glider in på samma plats och läses upp.<br><br><b>4</b>Stämpeln är blått bläck med Farfars kompassros och en bock. Inte guld (rätt svar) och inte rött (fel är aldrig rött). Ordet KLART läses upp.');
+}
+if(vy==='bok'){
+  tit.textContent='MIN BOK, fliken KLART: alla uppdrag han har gjort';
+  el('div','dim',{left:gx+'px',top:gy+'px',width:gw+'px',height:gh+'px'});
+  const bx=gx-60, by=gy+70, bw=gw+120;
+  const f=el('div','flikar',{left:(bx+40)+'px',top:(by-52)+'px'});
+  f.innerHTML=[['stav','STAVEN'],['klader','KLÄDER'],['dinobok','DINOBOKEN'],['uppdrag','KLART']].map(([i,t])=>`<div class="flik ${t==='KLART'?'vald':''}"><img src="${i==='stav'?'ikon_stjarna':'ikon_'+i}.png">${t}</div>`).join('');
+  const b=el('div','bok',{left:bx+'px',top:by+'px',width:bw+'px',height:'560px',boxSizing:'border-box'});
+  const minis=[['bok.png','HÄMTA BOKEN'],['filt.png','VÄRM ÄGGET'],['bar.png','MATA UNGEN']];
+  b.innerHTML=`<div class="sida" style="flex:1">${minis.map(([i,t],k)=>`<div class="mini ${k===2?'vald':''}"><img class="b" src="${i}">${t}<img class="st" src="stampel.png"></div>`).join('')}</div>`+
+   `<div class="sida" style="flex:1"><div class="huvud" style="display:flex;align-items:center;gap:12px;font-weight:700;font-size:48px;height:80px"><img src="bar.png" style="width:96px;height:96px">MATA UNGEN</div>`+
+   [['GÅ TILL KÖKET'],['TA BÄREN'],['GE UNGEN BÄR']].map(([t])=>`<div style="display:flex;align-items:center;gap:12px;height:66px;font-size:48px;letter-spacing:.03em"><img src="ikon_klar.png" style="width:48px">${t}</div>`).join('')+
+   `<img src="stampel.png" style="position:absolute;right:28px;bottom:24px;width:160px;transform:rotate(-12deg)"><img src="ikon_hogtalare.png" style="position:absolute;left:20px;bottom:18px;width:48px"></div>`;
+  noter('<b>1</b>Vänster sida: uppdragen i den ordning han klarade dem, med bild, namn och stämpel. Ett tryck visar lappen till höger. <b>2</b>Höger sida: lappen med alla steg bockade, i läsplattans storlek (48 punkter), och högtalaren som läser den.<br><br><b>3</b>Fliken heter KLART: fem bokstäver som låter som de skrivs, och ett ord han hör när stämpeln slår. UPPDRAG har dubbel-P och är längre. Ikonen är en lapp med stämpeln.<br><br><b>4</b>Boken ligger över världen, som läsplattan. Världen står still.');
+}
+</script></body></html>

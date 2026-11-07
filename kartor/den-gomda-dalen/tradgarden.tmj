@@ -22,6 +22,11 @@
    "name": "mark",
    "type": "string",
    "value": "skog"
+  },
+  {
+   "name": "vinka_fran",
+   "type": "string",
+   "value": "hallen"
   }
  ],
  "layers": [
@@ -40,16 +45,16 @@
      "name": "berg",
      "type": "sak",
      "x": 20,
-     "y": 2,
+     "y": 0,
      "width": 160,
-     "height": 20,
+     "height": 22,
      "rotation": 0,
      "visible": true,
      "properties": [
       {
        "name": "bild",
        "type": "string",
-       "value": "berg"
+       "value": "fasad"
       }
      ]
     },

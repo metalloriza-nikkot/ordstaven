@@ -720,3 +720,24 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 ## 58. Innehålls korta pass (0.28.2, Teknik 5)
 - Prologen v0.14 är skriven med Innehålls skript (`innehall-skript-prolog-v014.py`, kontrollsumman stämde), och kapitel 1 v0.7.9, äventyret och ordlistorna v0.9 med indrag 1. Ingen text är ändrad av Teknik.
 - Schema 2.24: `gransnitt.klart` i `aventyr.json`. Tekniks rader om `bild` på de sju mellanscenerna är borttagna ur `meta.teknik`, eftersom fältet är Innehålls.
+
+## 59. Kapitel 1:s rättelser (0.29.0, Teknik 8)
+- **Kartorna** är Stils förslag (`rum/kap1_forslag/`, 52.2) med föremålens lägen, och `verktyg/kartor/skog.py` skriver rutorna med Stils ändringar: snåren kring liangången, bäckarmen och baronens stig, blommorna i sydost och den hemliga stigens nya läge. Skriptet sätter också `bild_hugg` och `bild_kvar` på lövhögarna, `ovanpa` på ugglorna, `sida` på apan i nätet och `oppning` på stegen till apans bo (den skär en öppning i trädets hinder).
+- **Två lägen är flyttade** för att han ska nå dem utan att gå ut genom stigen till gläntan, som ligger i gångens övre ände: skylten BÄR (y 8) och den lilla lianen med stubben (söder om snåret, väster om formelträdet).
+- **`delas: djup`** (`Rum.dela`): delarna står efter varandra från norr till söder, och den södra står främst. Varje del har sin bild ur `bild_rad` och ritas bland figurerna efter fötterna. I vila ritas gången med en bild per 8 pixlar (`bilddjup`), och efter hugget en låg hög per lian (`kvarNu` räknar lianerna ur pusslet).
+- **De tre huggen** (51.5): `krukor` väljer hugget: från sidan och uppifrån växelvis, och snurren på den sista (`Rum.svinga(ms, typ)`, loggen `[hugg]`). Uppifrån är `hjalte_hugg` med `svard_hugg` (samma läge som svinga), och snurren `hjalte_svinga_<håll>_02` åt alla fyra håll med `svard_snurr_01–04` (16 till vänster och 12 högre än hjältens svingbild). `Rum.lovYr` visar `efx_lov_yr_01–03`, tre gånger vid snurren.
+- **Lövhögarna** (`Rum.slagen`): `bild_hugg` och sedan `bild_kvar`, med löv som yr. Högen står kvar.
+- **`dekor`**: ritas alltid, finns inte i rummets innehåll, går inte att trycka på och står inte i vägen (utom snåren, som är rutor). Innehållskontrollen godtar dekor som inte står i innehållet.
+- **Ungen klättrar** (`ungeKlattrar`): när han går av stegen uppåt klättrar ungen från stegens fot till toppen med `unge1_klattra_upp_01–02`, ca 180 ms var, också medan världen står still.
+- **Styrhjälpen** (`ui.styrhjalp`): Stils `tangent_<namn>_01–02` i hela pixelsteg (`--ipx-text` är 16 bildpixlar), där bild 02 är nedtryckt. Vid handen bara tangenten, annars `tangent_mellanslag_hand`. På pekskärmen bara handen. CSS-tangenterna står kvar om bilderna saknas.
+- **Sidovyn vid bron**: baronen (48 × 40) på x 252, y 86, och Herr Skata landar på hjälmen (x 265, y 93).
+- **Mätt:** sex lianer från första hugget till att vägen är fri på ca 2,7 s i spelets takt (webbtestet i `lappen.spec.js`).
+- `stilskript.zip` med 79 filer ligger i `verktyg/stil/` (52.6).
+
+## 60. Prologens nya animationer (0.29.0, Teknik 9)
+- **Farfar tar emot boken** (`Rum.lagg` till en figur med `bild_ta_emot`): `farfar_fatolj_ta_emot_01` (handen ut) när boken flyger dit, `_02` (boken i handen), och sedan `bild_las` (`farfar_fatolj_las_01–02`) i en slinga var 1,5 s tills rummet byts.
+- **Sängdags** (`Rum.laggSig`, när ett `ga_till` till en säng med `sovplats` är klart): `hjalte_sang_01` och `_02`, sedan sover han och andas som i `sov`. Ungen hoppar i en kort båge upp på sängens fotända (`unge1_glad_ner`, `ungeLyft`), trampar tre varv (`unge1_tomgang` ner, höger, upp och vänster, 250 ms var) och sover (`unge1_sover_ner_01–02`), också medan världen står still. Vid passets slut (sparpunkten) sover han kvar.
+- **Farfar går till ytterdörren** (`Rum.figurKommer`, i `visa_foremal` när figuren har `kommer_fran`): från utgångens framsida runt hindren till kartans plats, ca 40 pixlar per sekund, med `farfar_morgon_<håll>_01–04`. Framme vinkar han (`bild_vinka`, 300 ms var) tills rummet byts. Steget väntar högst 12 s.
+- **Hjälten vinkar** (`Rum.vinkaHjalte`, kartans `vinka_fran` i trädgården): när han kommer ut ur huset vänder han sig mot det och vinkar tre gånger (`hjalte_vinka_upp_01–02`). Vinkbilden är i gångens storlek, så staven ritas som när han går.
+- **Husets fasad:** `berg` i trädgården har bilden `fasad` (y 0, h 22), och id:t står kvar.
+- **Köket:** Farfar går inte genom köket på skärmen. Han syns gå från köksdörren i hallen till ytterdörren, eftersom köket och hallen är två rum och hjälten går före.

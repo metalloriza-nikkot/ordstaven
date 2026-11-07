@@ -10,8 +10,8 @@
  "tileheight": 16,
  "infinite": false,
  "compressionlevel": -1,
- "nextlayerid": 14,
- "nextobjectid": 14,
+ "nextlayerid": 32,
+ "nextobjectid": 32,
  "properties": [
   {
    "name": "mark",
@@ -33,7 +33,7 @@
  "layers": [
   {
    "type": "tilelayer",
-   "id": 12,
+   "id": 30,
    "name": "golv",
    "width": 20,
    "height": 12,
@@ -58,7 +58,7 @@
   },
   {
    "type": "tilelayer",
-   "id": 13,
+   "id": 31,
    "name": "over",
    "width": 20,
    "height": 12,
@@ -252,7 +252,7 @@
      "point": true
     },
     {
-     "id": 12,
+     "id": 30,
      "name": "omgivning_ekorre_1",
      "type": "omgivning",
      "x": 256,
@@ -270,7 +270,7 @@
      ]
     },
     {
-     "id": 13,
+     "id": 31,
      "name": "omgivning_lov_2",
      "type": "omgivning",
      "x": 0,

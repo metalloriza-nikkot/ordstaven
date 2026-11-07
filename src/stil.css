@@ -798,3 +798,17 @@ html, body {
 .kartbit-unge-bild { position: absolute; image-rendering: pixelated; }
 .kartbit-unge-bild.b2 { animation: unge-vifta .5s steps(1) infinite; opacity: 0; }
 @keyframes unge-vifta { 0% { opacity: 0; } 50% { opacity: 1; } }
+
+/* Stils ritade tangenter i styrhjälpen (50.3, 10b): bild 01 uppe och 02 nedtryckt, i hela pixelsteg (som ikonerna,
+   --ipx-text är 16 bildpixlar). Bara på datorn: pekskärmen visar handen */
+#styrhjalp .tangent-bild { position: relative; display: block; image-rendering: pixelated; }
+#styrhjalp .tangent-bild img { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+#styrhjalp .tangent-bild .nere { animation: tangentbild 1.2s steps(1, end) infinite; opacity: 0; }
+#styrhjalp .tangent-bild.mellanslag { width: calc(48 * var(--ipx-text) / 16); height: calc(16 * var(--ipx-text) / 16); }
+#styrhjalp .tangent-bild.mellanslag.hand { height: calc(30 * var(--ipx-text) / 16); }
+#styrhjalp .tangent-bild.tab { width: calc(24 * var(--ipx-text) / 16); height: var(--ipx-text); }
+#styrhjalp.pilar.ritad { grid-template-columns: repeat(3, var(--ipx-text)); grid-template-rows: var(--ipx-text) var(--ipx-text); gap: calc(2 * var(--ipx-text) / 16); }
+#styrhjalp.pilar.ritad .tangent-bild { width: var(--ipx-text); height: var(--ipx-text); }
+#styrhjalp.pilar.ritad .vanster .nere { animation-delay: .3s; } #styrhjalp.pilar.ritad .ner .nere { animation-delay: .6s; } #styrhjalp.pilar.ritad .hoger .nere { animation-delay: .9s; }
+@keyframes tangentbild { 0% { opacity: 0; } 50% { opacity: 1; } }
+.snabb #styrhjalp .tangent-bild .nere { animation: none; }

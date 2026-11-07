@@ -472,7 +472,9 @@ test('styrbilden för att använda: Mellanslag första gången i passet', async 
   await page.mouse.click(l.x, l.y);
   await expect(page.locator('#handknapp')).toBeVisible({ timeout: 8000 });
   await expect(page.locator('#styrhjalp.mellanslag')).toBeVisible();
-  await expect(page.locator('#styrhjalp .mellanslag-tecken')).toBeVisible(); // ingen tom ruta (47.8)
+  // Stils ritade tangent (50.3), inte en tom ruta (47.8): bilden är laddad och syns
+  await expect(page.locator('#styrhjalp .tangent-bild.mellanslag img.uppe')).toBeVisible();
+  expect(await page.locator('#styrhjalp .tangent-bild.mellanslag img.uppe').evaluate((i) => i.complete && i.naturalWidth)).toBe(48);
   await page.screenshot({ path: 'test-results/mellanslag-vid-handen.png' });
   await page.keyboard.press('Space');
   await expect(page.locator('#styrhjalp.mellanslag')).toBeHidden();
@@ -705,12 +707,14 @@ test('hjälten i s00 är Stils figur i de valda färgerna (10f)', async ({ page 
   await page.screenshot({ path: 'test-results/hjalte-s00.png' });
 });
 
-test('boken: han bär boken och den hamnar hos Farfar, och fåtöljen är tom när han reser sig (50.5)', async ({ page }, info) => {
+test('boken: han bär boken och den hamnar hos Farfar, som tar emot den och läser, och fåtöljen är tom när han reser sig (50.5, 51.4)', async ({ page }, info) => {
   test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
   test.setTimeout(90000);
   await startaScen(page, 17); // s16_godnattsagan
   let sagBok = false;
+  const farfar = new Set(); // Farfars bilder i fåtöljen (51.4): tar emot boken och läser
   for (let k = 0; k < 160; k++) {
+    farfar.add(await page.evaluate(() => window.__ORDSTAVEN.bildFor('farfar_i_fatoljen')));
     const st = await page.evaluate(() => window.__ORDSTAVEN.steg());
     if (st?.typ === 'ga_till' && st.mal === 'dorr_hallen') break;
     if (st?.typ === 'bara') {
@@ -725,6 +729,9 @@ test('boken: han bär boken och den hamnar hos Farfar, och fåtöljen är tom n�
   }
   expect(sagBok).toBe(true);
   expect(await page.evaluate(() => window.__ORDSTAVEN.burenBild())).toBeNull(); // Farfar har boken
+  // Farfar tog emot boken och läser i den (51.4)
+  expect([...farfar].some((b) => /^farfar_fatolj_(ta_emot|las)_0/.test(b || ''))).toBe(true);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.bildFor('farfar_i_fatoljen'))).toMatch(/^farfar_fatolj_las_0[12]$/);
   // han reser sig när han ska gå: fåtöljen är tom, och han syns
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.bildFor('fatolj_vanster')), { timeout: 5000 }).toBe('fatolj_vanster');
   await page.screenshot({ path: 'test-results/fatoljen-tom.png' });

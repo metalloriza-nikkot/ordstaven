@@ -15,9 +15,9 @@ Varje grafik-, ljud- eller typsnittsfil och varje bibliotek som följer med spel
 | Läsplattans bildkort, expeditionsbokens bilder och uppdragslappens bilder | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/bildkort/` |
 | Sidovyerna (bakgrunder och det som rör sig i dem: in i skogen, vid bron och ungen på kartbiten) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/sidovyer/` |
 | Farfars karta (kartbitarna) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/karta/` |
-| HUD:ens knappar, ikonerna, dörrskyltarna och uppdragslappen (papperet, kompassrosen och stämpeln) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/ui/` |
+| HUD:ens knappar, ikonerna, dörrskyltarna, uppdragslappen (papperet, kompassrosen och stämpeln) och tangenterna i styrhjälpen | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/ui/` |
 | Farfars hus: föremålen | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/foremal/hus/` |
-| Skogens föremål (lianerna, buskarna, träden, stenarna, skyltarna, häcken, stubben, skattlådan, lövhögarna, ugglorna och de andra) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/foremal/skog/` |
+| Skogens föremål (lianerna och liangången, buskarna, träden, stenarna, skyltarna, häcken, stubben, skattlådan, lövhögarna, ugglorna, bron, svamparna och de andra) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/foremal/skog/` |
 | Farfars hus: rummen (en bild per rum) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/rum/hus/` |
 | Skogens rutor (rutset för Tiled) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/tiles/skog/` |
 | Herr Skatas skratt | Eget, inspelat för spelet och bearbetat (tonhöjd och filter) så att rösten inte går att känna igen | Egna | Ja | `assets/ljud/herr_skata_skratt.wav` |
