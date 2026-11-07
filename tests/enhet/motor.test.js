@@ -454,7 +454,7 @@ describe('spola fram ett kapitel (den vuxne hoppar till kapitel 1)', () => {
     const av = t.aventyr[AVENTYR];
     expect(t.spelare.unge.folj).toBe(true);
     expect(t.spelare.hjalte.formler).toEqual(['LJUS', 'SVÄRD']);
-    expect(av.visade.glantan).toEqual(['trappa']); // trappan från k1s07, men inte lådan från k1s08
+    expect(av.visade.glantan).toEqual(['ugglor', 'trappa']); // ugglorna och trappan från k1s07 (52.3), men inte lådan från k1s08
     expect(t.spelare.hjalte.lager.hjalmdekor).toBe('taggkam');
     expect(t.spelare.hjalte.lager.ryggsack ?? null).toBeNull(); // buskarna är frivilliga
     // mitt i prologen: namnet på ungen frågas efter om hoppet går förbi dopet

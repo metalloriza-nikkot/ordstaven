@@ -21,22 +21,23 @@
  },
  "meta": {
   "namn": "Skogen",
-  "version": "0.7.9",
+  "version": "0.7.10",
   "datum": "2026-11-07",
   "agare": "Innehåll",
-  "kalla": "Manus 15-kapitel1-manus.md v0.17. Byggd på repots kap-01.json från 0.28.0.",
+  "kalla": "Manus 15-kapitel1-manus.md v0.18. Byggd på repots kap-01.json från 0.29.0.",
   "nya_pusseltyper": [
    "P15_raddning",
    "P9_kodlas"
   ],
-  "teknik": "Teknik har lagt in projektets innehall-kapitel1.json (Innehålls v0.5, meta.version säger fortfarande 0.2) i repot, och ingen text är ändrad. 2026-10-28 (T1): format 1 → 2 (kapitlen är i format 2 sedan P28_packa). Inget annat i strukturen är ändrat. 2026-10-29 (T2): Innehålls förslag 2–14 som struktur, med texterna ur anteckningarna ordagrant. Skyltarna och tavlan står i rummens fält skyltar (beslut 15.2). k1s01: ga_till och mellanscenen vid skylten blir las_skylt. k1s02: fritt och ga_till blir ett ga_till med fri_vag. k1s03 är frivillig och startar i buskarna. Ryggsäcken och taggkammen är ge_sak. Frivilligt per rum (rum.frivilligt). last_lada, lila_lapp och stig_backen är dolda tills visa_foremal. k1s13: paminnelse och unge_tillagg. Pusslen: skylt på stenen och träden, forebild.tacks i SVÄRD, brickor och kasta i apan, visa_forsta, kontroll och svar_lyser_sek i kodlåset, sak_i_sista och foremal i busken och löven, och luckornas knufftid räknas av motorn (efter_sek 30 borttaget). Listan (förslag 1) kommer i T3. 2026-10-30 (T5): data v0.7 inlagd utan ändrad text. alias.rum pekar lianerna till skogsbrynet och gamla_tradet till glantan, så att det som har visats i en äldre sparning följer med. Kartorna finns i kartor/den-gomda-dalen (skogsbrynet 40 × 12, buskarna 20 × 12, glantan 40 × 24). 2026-10-30 (T4): Innehålls FÖRSLAG i k1_svard och k1_svard_igen som struktur (schema 2.10): bild svard_ristat på k1_svard, och forebild.visas vid_fel i båda (brickor_efter_sek borttaget, brickorna kommer direkt). Ingen text ändrad. 2026-10-30 (T6): v0.7.1 inlagd utan ändrad text, med T4:s struktur kvar (bild och forebild.visas i SVÄRD). 2026-10-31 (T4b): ljudord på ljud-stegen ordagrant ur Innehålls F11 (dunk, kra, brum, buhu, tok tok). 2026-11-01: v0.7.2 inlagd utan ändrad text. Baronens papper heter baronens_papper_hjalm (gråboxen ritar det i orange). Id:t lila_lapp står kvar. 2026-11-04: v0.7.4 inlagd utan ändrad text (stenarna, träden, ekorren och ugglorna i kartorna). 2026-11-04 (0.20.0): v0.7.5–v0.7.7 inlagda utan ändrad text. k1_lianerna och k1_liten_lian har verb hugga (schema 2.17, Innehålls FÖRSLAG): staven är ett svärd, och varje hugg fäller en lian. I kartan visar lianer pusslet k1_lianerna, delas i tre lianer som fyller hela väggen (delas: hela) och försvinner efter k1_lianerna i stället för k1_svard. liten_lian försvinner efter k1_liten_lian. I anteckningen till k1s13 står \"spelarens regel\" i stället för ett namn (repot är publikt). 2026-11-06 (0.23.1): v0.7.8 inlagd utan ändrad text. 2026-11-06 (0.25.0, 2d): uppdragen ur Innehålls innehall-uppdrag.json v0.1 som struktur, utan ändrad text (schema 2.20). bild är Stils bildkort enligt 10d (uppdrag_stegen, bar, bok, lapp, svard_ristat och de andra) i stället för förslagets namn. 2026-11-07 (0.28.1): v0.7.9 inlagd utan ändrad text. Fältet bild på mellanscenerna är Innehålls.",
+  "teknik": "Teknik har lagt in projektets innehall-kapitel1.json (Innehålls v0.5, meta.version säger fortfarande 0.2) i repot, och ingen text är ändrad. 2026-10-28 (T1): format 1 → 2 (kapitlen är i format 2 sedan P28_packa). Inget annat i strukturen är ändrat. 2026-10-29 (T2): Innehålls förslag 2–14 som struktur, med texterna ur anteckningarna ordagrant. Skyltarna och tavlan står i rummens fält skyltar (beslut 15.2). k1s01: ga_till och mellanscenen vid skylten blir las_skylt. k1s02: fritt och ga_till blir ett ga_till med fri_vag. k1s03 är frivillig och startar i buskarna. Ryggsäcken och taggkammen är ge_sak. Frivilligt per rum (rum.frivilligt). last_lada, lila_lapp och stig_backen är dolda tills visa_foremal. k1s13: paminnelse och unge_tillagg. Pusslen: skylt på stenen och träden, forebild.tacks i SVÄRD, brickor och kasta i apan, visa_forsta, kontroll och svar_lyser_sek i kodlåset, sak_i_sista och foremal i busken och löven, och luckornas knufftid räknas av motorn (efter_sek 30 borttaget). Listan (förslag 1) kommer i T3. 2026-10-30 (T5): data v0.7 inlagd utan ändrad text. alias.rum pekar lianerna till skogsbrynet och gamla_tradet till glantan, så att det som har visats i en äldre sparning följer med. Kartorna finns i kartor/den-gomda-dalen (skogsbrynet 40 × 12, buskarna 20 × 12, glantan 40 × 24). 2026-10-30 (T4): Innehålls FÖRSLAG i k1_svard och k1_svard_igen som struktur (schema 2.10): bild svard_ristat på k1_svard, och forebild.visas vid_fel i båda (brickor_efter_sek borttaget, brickorna kommer direkt). Ingen text ändrad. 2026-10-30 (T6): v0.7.1 inlagd utan ändrad text, med T4:s struktur kvar (bild och forebild.visas i SVÄRD). 2026-10-31 (T4b): ljudord på ljud-stegen ordagrant ur Innehålls F11 (dunk, kra, brum, buhu, tok tok). 2026-11-01: v0.7.2 inlagd utan ändrad text. Baronens papper heter baronens_papper_hjalm (gråboxen ritar det i orange). Id:t lila_lapp står kvar. 2026-11-04: v0.7.4 inlagd utan ändrad text (stenarna, träden, ekorren och ugglorna i kartorna). 2026-11-04 (0.20.0): v0.7.5–v0.7.7 inlagda utan ändrad text. k1_lianerna och k1_liten_lian har verb hugga (schema 2.17, Innehålls FÖRSLAG): staven är ett svärd, och varje hugg fäller en lian. I kartan visar lianer pusslet k1_lianerna, delas i tre lianer som fyller hela väggen (delas: hela) och försvinner efter k1_lianerna i stället för k1_svard. liten_lian försvinner efter k1_liten_lian. I anteckningen till k1s13 står \"spelarens regel\" i stället för ett namn (repot är publikt). 2026-11-06 (0.23.1): v0.7.8 inlagd utan ändrad text. 2026-11-06 (0.25.0, 2d): uppdragen ur Innehålls innehall-uppdrag.json v0.1 som struktur, utan ändrad text (schema 2.20). bild är Stils bildkort enligt 10d (uppdrag_stegen, bar, bok, lapp, svard_ristat och de andra) i stället för förslagets namn. 2026-11-07 (0.28.1): v0.7.9 inlagd utan ändrad text. Fältet bild på mellanscenerna är Innehålls. 2026-11-07 (0.29.1): v0.7.10 inlagd med Innehålls skript (innehall-skript-v015-v0710.py, kontrollsummorna stämde), utan ändrad text.",
   "innehall_v073": "v0.7.3 (Innehåll 2026-11-02, beslut 26): radion i k1s07 har en replik från Farfar att upprepa (\"Kartbiten är nära. Läs min skylt!\"). Två frivilliga småfigurer (26.3), var för sig i rum.frivilligt och möjliga att stryka utan att något annat ändras: ekorre_gren i skogsbrynet (ljudordet kras) och ugglor på krönet i gläntan (ljudordet ho ho). Anteckningarna om buskarna följer beslut 26.2: hjälten kan gå tillbaka dit efter apan.",
   "innehall_v074": "v0.7.4 (Innehåll 2026-11-02, beslut 29, granskningen A 1–13): lappen löses bara genom att läsa (bron nämns inte före, kartbiten visar flera saker) och är till Herr Skata, L3 har lägesordet BAKOM, L2 har tre stenar och tre träd, apan utan kasta-knapp och med ett pinnsteg per rätt bokstav, k1s05 kortare med fjärilen i bild, instruktion och knuff i buskarna och löven, \"Läs min skylt!\" i k1s01, skylten vid ingången säger \"Farfar var här.\", enklare ord, och slutet smyger förbi bron. Tidigare versioner: Innehålls rapporter (rapport-innehall-arkiv*.md) och 15.",
   "innehall_v075": "Beslut 34.6 och 36.5: varje ga_till efter en dialog har en uppläst instruktion med verb och mål, som står i molnet. Nya repliker i k1s01, k1s02 (två), k1s08, k1s09, k1s12 och k1s13. I k1s02 slutar Farfar med \"Gå till trädet! Där finns formeln.\" I k1s08 är trappan och krönet ett mål. Inget rum, område eller moment ändras.",
   "innehall_v076": "Beslut 38.3–38.4, en rättelse i text: \"Ordkraft! Nu står SVÄRD på din stav!\" i k1s02, och i k1s11 \"Kartbit två! Nu är vi närmare mamma.\" medan ungen sätter nosen på mammas skugga. Inget nytt moment.",
   "innehall_v077": "Beslut 39.3: spelaren hugger lianerna själv (k1_lianerna, k1_liten_lian). Beslut 38.5: baronen läser sin lapp upp och ned i sidovyn. Genomgången av samspelen (39.1) gav inga fler rättelser i kapitel 1, se 15 v0.15.",
   "innehall_v078": "Rättelsepasset (beslut 43.5), ingen text i spelet ändrad: bild uppdrag_kullen på målet i k1s08 är Innehålls (Tekniks tillägg i 0.22.0), anteckningen i k1s07 utan namn, och lästextens ord i ordlistorna v0.8. Rummen är frysta (43.1).",
-  "innehall_v079": "Det korta passet (beslut 45.5, 46.4, 47 och 50), ingen ny scen, inget nytt moment, läsval eller replik: rubrikerna LIANERNA, RÄTT TRÄD, PÅ KULLEN och VEMS LAPP? (högst ca 11 tecken, 10d), fältet ersatter borttaget ur uppdragen (47.1), mellanscenen i k1s13 med baronen bakom busken vid bron (50.2), och bild på mellanscenerna i k1s01 (in_i_skogen), k1s11 (kartbit_unge) och k1s13 (vid_bron), Tekniks fält från 0.26.0, är Innehålls."
+  "innehall_v079": "Det korta passet (beslut 45.5, 46.4, 47 och 50), ingen ny scen, inget nytt moment, läsval eller replik: rubrikerna LIANERNA, RÄTT TRÄD, PÅ KULLEN och VEMS LAPP? (högst ca 11 tecken, 10d), fältet ersatter borttaget ur uppdragen (47.1), mellanscenen i k1s13 med baronen bakom busken vid bron (50.2), och bild på mellanscenerna i k1s01 (in_i_skogen), k1s11 (kartbit_unge) och k1s13 (vid_bron), Tekniks fält från 0.26.0, är Innehålls.",
+  "innehall_v0710": "Det andra korta passet (beslut 52.3 och 52.5), ingen ny scen, inget nytt moment, läsval eller replik: k1_lianerna har sex delar (liangången, 52.2), ugglorna är dolda tills k1_tradet är löst och syns med visa_foremal i k1s07 före trappan, i L2 och L3 (52.3), vid_ratt i k1_tradet säger att ugglorna landar i kronan, och rummens anteckningar i skogsbrynet och gläntan följer Stils kartor och Tekniks karta i 0.29.0 (häcken från norr till söder, liangången mellan snåren, den lilla lianen och stubben söder om snåret, skylten BÄR, bäcken med bäckarmen och baronens strand, den hemliga stigen och sydost). Dekor-id:na står bara i kartan."
  },
  "rum": [
   {
@@ -67,7 +68,7 @@
     "stubbe",
     "ekorre_gren"
    ],
-   "anteckning": "Rumsplan i 15 v0.9 (beslut 18.1). 2 × 1 skärmar (40 × 12). Västra skärmen: in från söder, skylt_ingang vid ingången, en tät häck (hack) tvärs över skärmen ca 4 rutor från norra kanten, skylt_farfar_1 mitt på skärmen där alla stenarna syns, och stenarna utspridda framför häcken minst 3 rutor isär. L2 har hog_sten, lag_sten och lag_sten_2 (v0.7.4, A 5), L3 hog_rund_sten, hog_spetsig_sten och lag_rund_sten. Den rätta stenen (hog_sten i L2, hog_rund_sten i L3) står alltid på samma plats, framför hålet i häcken (stig_genom_hacken, dold tills visa_foremal). Ingen synlig utgång från västra skärmen. gren spärrar prövade stenar efter 2 fel. Östra skärmen: stig_genom_hacken kommer in från väster, trad_med_formel (en ristad bild av ett svärd) söder om lianväggen, lianer tvärs över skärmens norra och östra del, bakom dem stig_glantan (norra kanten) och stig_buskarna (östra kanten) med skylt_bar. liten_lian framför stubbe norr om lianväggen. Ersätter rummen skogsbrynet och lianerna.",
+   "anteckning": "Rumsplan efter Stils kartor (10b, Kapitel 1:s rättelser, beslut 50 och 52.2) och Tekniks karta i 0.29.0. 2 × 1 skärmar (40 × 12). Västra skärmen: in från söder, skylt_ingang vid ingången, skylt_farfar_1 där alla stenarna syns, och stenarna utspridda minst 3 rutor isär. L2 har hog_sten, lag_sten och lag_sten_2 (v0.7.4, A 5), L3 hog_rund_sten, hog_spetsig_sten och lag_rund_sten. En tät häck (hack) går från norr till söder mellan de två skärmarna. Den rätta stenen (hog_sten i L2, hog_rund_sten i L3) står alltid på samma plats, framför hålet i häcken (stig_genom_hacken, dold tills visa_foremal). Ingen synlig utgång från västra skärmen. gren spärrar prövade stenar efter 2 fel. barbuske_brynet står i nordväst. Östra skärmen: stig_genom_hacken kommer in från väster. Längs norra delen står två täta snår (snar_vast och snar_ost, dekor) med en gång emellan, och i gången står lianer: sex lianer efter varandra som han hugger sig igenom norrut (k1_lianerna). Gången slutar vid stig_glantan i norra kanten. trad_med_formel (en ristad bild av ett svärd) står söder om gången. liten_lian med stubbe står söder om det västra snåret, väster om formelträdet. Längst i nordost, norr om det östra snåret, går stig_buskarna österut med skylt_bar ovanför. ekorre_gren sitter på en gren söder om det östra snåret. Ersätter rummen skogsbrynet och lianerna.",
    "skyltar": {
     "skylt_ingang": {
      "text": "Farfar var här.",
@@ -196,13 +197,16 @@
      "id": "stig_backen",
      "dold": true
     },
-    "ugglor"
+    {
+     "id": "ugglor",
+     "dold": true
+    }
    ],
    "tillstand": [
     "fangen",
     "raddad"
    ],
-   "anteckning": "Stilprovet. Rumsplan i 15 v0.9 (beslut 18.1). 2 × 2 skärmar (40 × 24). Sydväst: in från söder (stig_brynet), apans_trad med apan_i_nat högt uppe (fangen) och apans_bo på en plattform; efter räddningen står stegen kvar upp till boet (höjdnivå), och apan stannar (raddad). Fossilet ligger i boet. Nordväst: skylt_farfar_3 och träden på en skärm, minst 3 rutor isär. L2 har gammalt_trad, ungt_trad och ungt_trad_2 (v0.7.4, A 5), L3 stort_gammalt_trad, stort_ungt_trad och litet_gammalt_trad. Det rätta trädet står alltid på samma plats, vid foten av kullen i skärmens nordöstra hörn, och bakom stammen finns trappan (dold tills visa_foremal). Nordost: kulle (höjdnivå 1) med kronet överst, minst 10 × 6 rutor med 2 rutor mellan sakerna: det gamla trädets krona, lovhog_1–4, last_lada (dold), rothal och lila_lapp (dold, baronens orange lapp). backen längs norra och östra kanten, bron långt borta med tavla_bron och buske_vid_bron (ingen utgång dit), stig_backen (dold) genom norra kanten. Sydost: öppen gräsmark. Ersätter rummen gläntan och det gamla trädet.",
+   "anteckning": "Stilprovet. Rumsplan efter Stils kartor (10b, Kapitel 1:s rättelser, beslut 50 och 52.2) och Tekniks karta i 0.29.0. 2 × 2 skärmar (40 × 24). Sydväst: in från söder (stig_brynet), apans_trad med en plattform, apans_bo och nätet, apan_i_nat högt uppe (fangen). Efter räddningen står stegen kvar upp till boet (höjdnivå), och apan stannar (raddad). Ungen klättrar själv upp. Fossilet ligger i boet. Nordväst: skylt_farfar_3 och träden på en skärm, minst 3 rutor isär. L2 har gammalt_trad, ungt_trad och ungt_trad_2 (v0.7.4, A 5), L3 stort_gammalt_trad, stort_ungt_trad och litet_gammalt_trad. Det rätta trädet står alltid på samma plats, vid foten av kullen, och bakom stammen finns trappan (dold tills visa_foremal). Ugglorna sitter i det rätta trädets krona och är dolda tills trädet är löst (52.3). Nordost: kulle (höjdnivå 1, 16 px smalare än förut) med kronet överst: lovhog_1–4, last_lada (dold), rothal och lila_lapp (dold, baronens orange lapp). Östra kanten: backen (bäcken) från norr till söder, och mellan kullen och vattnet går stig_backen (dold, den hemliga stigen) upp genom norra kanten, minst en ruta från vattnet och aldrig över det. På andra stranden, baronens, går hans stig, och vid en bäckarm står bron med buske_vid_bron. tavla_bron står på hjältens sida av vattnet. Ingen väg på hjältens sida slutar vid bron, och ingen utgång går dit (50.8). Sydost: öppen gräsmark med blommor, en stubbe med svampar, svampar och tre mossiga stenar (dekor_stubbe, dekor_svampar och dekor_sten_1–3, dekor), två fjärilar och en fågel. Inget där går att använda. Ersätter rummen gläntan och det gamla trädet.",
    "skyltar": {
     "tavla_bron": {
      "text": "bron"
@@ -250,7 +254,7 @@
        "beskrivning": "Ugglorna öppnar ögonen och vrider huvudet nästan ett helt varv. Ungen försöker göra likadant och blir yr."
       }
      ],
-     "anteckning": "Småfigur (beslut 26.3), frivillig. Samma tre ugglor som jublar HO HO vid rätt träd. De sitter i det gamla trädets krona över krönet och går att nå först när trappan har kommit fram, så de avslöjar aldrig läsvalet. Kan strykas utan att något annat ändras: ta bort posten och id:t i innehall."
+     "anteckning": "Småfigur (beslut 26.3), frivillig. Samma tre ugglor som jublar HO HO vid rätt träd. De sitter i det gamla trädets krona över krönet och är dolda tills k1_tradet är löst (beslut 52.3). De syns och går att nå först när trappan har kommit fram, så de avslöjar aldrig läsvalet. Kan strykas utan att något annat ändras: ta bort posten, id:t i innehall och visa_foremal i k1s07."
     }
    ]
   }
@@ -433,7 +437,7 @@
      "fri_vag": true
     }
    ],
-   "anteckning": "Östra skärmen av skogsbrynet. Farfar säger på radion var formeln är (beslut 18.7, ingen lista). Fritt vägval: scenen går vidare när han går ut genom stig_glantan, och stig_buskarna leder till den frivilliga scenen k1s03. Han kan också gå tillbaka till buskarna senare i kapitlet (beslut 26.2). k1_svard_igen startar när han använder liten_lian. v0.7.5 (34.6): \"Kryp genom hålet!\" först. Farfar slutar med \"Gå till trädet! Där finns formeln.\", som radion upprepar. \"Gå dit gråten hörs!\" före vägvalet: molnet pekar på huvudvägen, och buskarna har sin skylt BÄR. v0.7.6 (38.3): \"Ordkraft!\" när SVÄRD har ristats in, så att ordet sägs i stunden då det händer. v0.7.7 (39.3): spelaren hugger själv. SVÄRD gör staven till ett svärd, och han hugger ner tre lianer med samma knapp som mot buskarna (k1_lianerna, P26). Varje hugg fäller en lian."
+   "anteckning": "Östra skärmen av skogsbrynet. Farfar säger på radion var formeln är (beslut 18.7, ingen lista). Fritt vägval: scenen går vidare när han går ut genom stig_glantan, och stig_buskarna leder till den frivilliga scenen k1s03. Han kan också gå tillbaka till buskarna senare i kapitlet (beslut 26.2). k1_svard_igen startar när han använder liten_lian. v0.7.5 (34.6): \"Kryp genom hålet!\" först. Farfar slutar med \"Gå till trädet! Där finns formeln.\", som radion upprepar. \"Gå dit gråten hörs!\" före vägvalet: molnet pekar på huvudvägen, och buskarna har sin skylt BÄR. v0.7.6 (38.3): \"Ordkraft!\" när SVÄRD har ristats in, så att ordet sägs i stunden då det händer. v0.7.7 (39.3): spelaren hugger själv. SVÄRD gör staven till ett svärd, och han hugger ner tre lianer med samma knapp som mot buskarna (k1_lianerna, P26). Varje hugg fäller en lian. v0.7.10 (50.2, 52.2): lianerna står i en gång mellan två snår, sex efter varandra, och han hugger sig norrut genom dem. Huggen växlar, och snurrhugget fäller den sista (51.5)."
   },
   {
    "id": "k1s03_buskarna",
@@ -627,6 +631,10 @@
     },
     {
      "typ": "visa_foremal",
+     "foremal": "ugglor"
+    },
+    {
+     "typ": "visa_foremal",
      "foremal": "trappa"
     },
     {
@@ -636,7 +644,7 @@
      "upplast": true
     }
    ],
-   "anteckning": "Nordvästra skärmen av gläntan. Kameran visar skylten och alla träden när frågan ställs. Farfars replik på radion är den som radioknappen upprepar i scenen (i genomspelningen av 0.12.2 trycktes radion två gånger, och den var tyst). Stegen till apans bo och fossilet går att ta när som helst (rum.frivilligt, stegen som riktig stege i T5)."
+   "anteckning": "Nordvästra skärmen av gläntan. Kameran visar skylten och alla träden när frågan ställs. Farfars replik på radion är den som radioknappen upprepar i scenen (i genomspelningen av 0.12.2 trycktes radion två gånger, och den var tyst). Stegen till apans bo och fossilet går att ta när som helst (rum.frivilligt, stegen som riktig stege i T5). v0.7.10 (52.3): ugglorna i det rätta trädets krona är dolda tills trädet är valt, och syns före trappan. Annars kunde han välja trädet med ugglorna utan att läsa."
   },
   {
    "id": "k1s08_loven",
@@ -1138,6 +1146,9 @@
    "innehall": [
     "tom",
     "tom",
+    "tom",
+    "tom",
+    "tom",
     "tom"
    ],
    "vid_ratt": {
@@ -1147,7 +1158,7 @@
    "knuff": {
     "handling": "ungen nosar mot närmaste lian"
    },
-   "anteckning": "Beslut 39.3: formeln ger förmågan, och spelaren använder den själv. Lianväggen (lianer) delas i tre lianer, som krukorna på vinden. Varje hugg fäller en lian: inga missar, ingen tidspress och samma knapp som mot buskarna. Tar några sekunder. FÖRSLAG till Teknik: lianer i kartan får visar: k1_lianerna, och P26 behöver kunna heta hugga i stället för svinga (verbet, svärdet i handen och ljudet). Gråboxen kan visa lianerna som krukor tills Stils bilder finns.",
+   "anteckning": "Beslut 39.3: formeln ger förmågan, och spelaren använder den själv. Lianerna står i en gång mellan två snår (beslut 50.2 och 52.2): sex lianer efter varandra, och han hugger sig norrut genom dem. Varje hugg fäller en lian: inga missar, ingen tidspress och samma knapp som mot buskarna. Huggen växlar: från sidan, uppifrån och ett snurrhugg på den sista (51.5). Hela gången tar högst ca 15 s (Teknik mätte ca 3 s). Motorn delar gången i så många lianer som innehall har.",
    "verb": "hugga"
   },
   {
@@ -1368,7 +1379,7 @@
     }
    },
    "vid_ratt": {
-    "handling": "tre ugglor (samma figur tre gånger) i trädets krona öppnar ögonen samtidigt: HO-HO! Bakom den tjocka stammen syns en stentrappa upp på kullen.",
+    "handling": "tre ugglor (samma figur tre gånger) landar i det gamla trädets krona och öppnar ögonen samtidigt: HO-HO! Bakom den tjocka stammen syns en stentrappa upp på kullen.",
     "fest": "liten",
     "ljudord": "ho ho"
    },
@@ -1382,7 +1393,7 @@
    "efter_3_fel": {
     "handling": "apan hoppar till rätt träd och pekar"
    },
-   "anteckning": "Val i världen (beslut 18.1): objekt är trädet själv. Han går till trädet och använder det. Varianten bestäms när han kommer in i området. Det rätta trädet står alltid vid foten av kullen, och scenen visar sedan trappan bakom stammen. Det gamla trädet har knotiga grenar och mossa, det unga är slätt och smalt. En prövad sak tonas ut direkt och går inte att välja igen (beslut 20.2), som lådorna på vinden. L2 har tre saker sedan v0.7.4 (A 5), en rätt och två fel, så gissning ger en på tre. Efter två fel finns bara rätt sak kvar. forenkla och efter_3_fel pekar på svaret.",
+   "anteckning": "Val i världen (beslut 18.1): objekt är trädet själv. Han går till trädet och använder det. Varianten bestäms när han kommer in i området. Det rätta trädet står alltid vid foten av kullen, och scenen visar sedan trappan bakom stammen. Det gamla trädet har knotiga grenar och mossa, det unga är slätt och smalt. En prövad sak tonas ut direkt och går inte att välja igen (beslut 20.2), som lådorna på vinden. L2 har tre saker sedan v0.7.4 (A 5), en rätt och två fel, så gissning ger en på tre. Efter två fel finns bara rätt sak kvar. forenkla och efter_3_fel pekar på svaret. Ugglorna är dolda (dold) tills trädet är valt och syns först efter pusslet (visa_foremal), i både L2 och L3, så att de aldrig visar vilket träd som är rätt (beslut 52.3).",
    "skylt": "skylt_farfar_3"
   },
   {

@@ -741,3 +741,8 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Hjälten vinkar** (`Rum.vinkaHjalte`, kartans `vinka_fran` i trädgården): när han kommer ut ur huset vänder han sig mot det och vinkar tre gånger (`hjalte_vinka_upp_01–02`). Vinkbilden är i gångens storlek, så staven ritas som när han går.
 - **Husets fasad:** `berg` i trädgården har bilden `fasad` (y 0, h 22), och id:t står kvar.
 - **Köket:** Farfar går inte genom köket på skärmen. Han syns gå från köksdörren i hallen till ytterdörren, eftersom köket och hallen är två rum och hjälten går före.
+
+## 61. Innehålls andra korta pass (0.29.1, Teknik 10)
+- Prologen v0.15 och kapitel 1 v0.7.10 är skrivna med Innehålls skript (`innehall-skript-v015-v0710.py`), som prövar kontrollsummorna före och efter. Ingen text är ändrad av Teknik.
+- `k1_lianerna` har sex delar, så gången blir sex lianer (§59). Ugglorna är dolda tills `k1_tradet` är löst och visas med `visa_foremal` före trappan (52.3).
+- **En sparning som redan är förbi k1s07** har inte ugglorna i `visade`, så de syns där först när scenen spelas om. Spelarens sparning har inte kommit till kapitel 1, så ingen migrering behövs.

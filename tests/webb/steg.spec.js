@@ -1062,7 +1062,7 @@ test('SVÄRD gör staven till ett svärd, och spelaren hugger sig igenom liangå
   // svärdet sveper inte av sig självt: lianerna står kvar, en per del i pusslet, tills han hugger
   await framTill(page, () => window.__ORDSTAVEN.rumsobjekt().includes('lianer_0') && !window.__ORDSTAVEN.fryst());
   const lianer = await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt().filter((id) => /^lianer/.test(id)));
-  expect(lianer).toEqual(['lianer_0', 'lianer_1', 'lianer_2']);
+  expect(lianer).toEqual(['lianer_0', 'lianer_1', 'lianer_2', 'lianer_3', 'lianer_4', 'lianer_5']); // sex i gången (52.5)
   expect(await page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').harSvard)).toBe(true);
   // de står efter varandra i gången (delas: djup, 50.2) och fyller den, så att vägen norrut är stängd tills han har huggit
   const delar = await page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').objekt.filter((o) => /^lianer_/.test(o.id)).map((o) => [o.y, o.h, o.b]));
@@ -1197,6 +1197,8 @@ test('menyn för vuxna hoppar till en scen i ett senare kapitel: det som kommer 
   await expect(page.locator('#hud-bar')).toBeVisible();
   // stegen står kvar vid apans bo (gläntan i tillståndet räddad)
   expect(await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt())).toContain('stege');
+  // ugglorna i det rätta trädets krona är dolda tills trädet är valt (52.3): de visar aldrig läsvalet
+  expect(await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt())).not.toContain('ugglor');
 });
 
 // ---------------------------------------------------------------- T4c (stilguiden §3)
