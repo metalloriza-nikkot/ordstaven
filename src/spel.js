@@ -8,7 +8,7 @@ import { egenskaper, PALETT } from './karna/egenskaper.js';
 import { skapaValj, skapaFormel, skapaDop, skapaKrukor, skapaRaddning } from './karna/pussel.js';
 import { forSkarm, versaler } from './karna/text.js';
 import { rumTillSkarm, varldTillSkarm, RUM, textskala } from './karna/skalning.js';
-import { framfor, framforFran, lasplats, vidObjekt, genom, stigStart } from './karna/rumslayout.js';
+import { framfor, lasplats, vidObjekt, genom, stigStart } from './karna/rumslayout.js';
 import { aventyrFor } from './karna/sparning.js';
 import { pekningOmMs, skapaHjalpSpar, knufftidMs } from './karna/hjalp.js';
 import { HJALTE_FARGER, HJALTE_FAST } from './scener/Rum.js';
@@ -984,7 +984,7 @@ export function skapaSpel(d) {
           if (skyltStyrs.has(sk.id) && skyltPusselNu !== sk.id) { rum.tryckPa?.(sk.id); return; }
           lasSkyltText(sk); return;
         }
-        const f = framforFran(o, rum.pos, rum.inomhus, rum.vagg, rum.massiv); inmatning.sattGaTill(f.x, f.y);
+        const f = rum.standplats(o); inmatning.sattGaTill(f.x, f.y);
       } };
     }));
   }

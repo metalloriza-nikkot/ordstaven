@@ -253,6 +253,7 @@ redo.then(() => { startKlar = true; window.clearTimeout(startVakt); window.remov
   varldTillSkarm: (x, y) => varldTillSkarm(layout.skala, rum.kamera, x, y),
   /** det hjälten bär: sakens bild, 'filt' för gråboxens filt, eller null */
   burenBild: () => (rum.buren ? rum.buren.list?.[0]?.frame?.name ?? 'filt' : null),
+  hjaltar: () => rum.hjaltarSomSyns?.() ?? 0,
   /** bilden som föremålet ritas med (atlasets ram), eller null */
   bildFor: (id) => { const r = rum.ritade.get(id); return r?.frame?.name ?? null; },
   rutaPaSkarm: (id) => { const o = rum.ruta(id); if (!o) return null; const a = varldTillSkarm(layout.skala, rum.kamera, o.x, o.y), b = varldTillSkarm(layout.skala, rum.kamera, o.x + o.b, o.y + o.h); return { x: a.x, y: a.y, b: b.x - a.x, h: b.y - a.y }; },

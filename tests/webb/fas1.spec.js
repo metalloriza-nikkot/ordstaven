@@ -711,6 +711,8 @@ test('boken: han bär boken och den hamnar hos Farfar, som tar emot den och läs
   test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
   test.setTimeout(90000);
   await startaScen(page, 17); // s16_godnattsagan
+  // aldrig två hjältar (56.2): han i fåtöljen och han själv syns aldrig samtidigt
+  await page.evaluate(() => { const w = /** @type {any} */ (window); w.__maxHjaltar = 0; w.__hjaltarTid = setInterval(() => { w.__maxHjaltar = Math.max(w.__maxHjaltar, w.__ORDSTAVEN.hjaltar()); }, 20); });
   let sagBok = false;
   const farfar = new Set(); // Farfars bilder i fåtöljen (51.4): tar emot boken och läser
   for (let k = 0; k < 160; k++) {
@@ -735,6 +737,7 @@ test('boken: han bär boken och den hamnar hos Farfar, som tar emot den och läs
   // han reser sig när han ska gå: fåtöljen är tom, och han syns
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.bildFor('fatolj_vanster')), { timeout: 5000 }).toBe('fatolj_vanster');
   await page.screenshot({ path: 'test-results/fatoljen-tom.png' });
+  expect(await page.evaluate(() => /** @type {any} */ (window).__maxHjaltar)).toBe(1);
 });
 
 test('lappknappen öppnar Farfars lista medan han väljer stig, och uppdragslappen annars (51.2)', async ({ page }, info) => {

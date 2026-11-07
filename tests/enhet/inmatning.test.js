@@ -394,15 +394,15 @@ describe('stigar', () => {
 
 import { skarIgenom } from '../../src/karna/vag.js';
 import { skapaNivaer } from '../../src/karna/nivaer.js';
+import { rumsHinder } from '../../src/karna/rumshinder.js';
 import { omradeFor } from '../../src/karna/kamera.js';
 
 describe('kapitel 1: kartorna (T5)', () => {
   const las = async (vag) => { const { readFileSync } = await import('node:fs'); return JSON.parse(readFileSync(new URL(vag, import.meta.url), 'utf8')); };
   /** Hindren på varje nivå, som i rummet (Rum.byggHinder). */
   const hinderI = (obj, karta) => {
-    const rutor = [...skarIgenom(hinderFran(obj), obj.filter((o) => o.oppning)), ...(karta.inomhus ? vaggar(karta.vagg, karta.storlek) : [])];
-    const n = skapaNivaer(obj);
-    return { n, per: (niva) => skapaHinder(rutor, n.finns ? (p) => n.tillaten(p, niva) : undefined, karta.storlek) };
+    const h = rumsHinder(obj, { inomhus: karta.inomhus, vagg: karta.vagg, storlek: karta.storlek, massiv: karta.massiv, over: karta.overHinder });
+    return { n: h.nivaer, per: (niva) => h.per.get(niva) };
   };
   /** Allt syns (dolda föremål visade), och det som en formel kapar är borta: läget när kapitlet är spelat. */
   const allt = (rum) => rum.innehall.map((x) => (typeof x === 'string' ? x : x.id));
@@ -429,7 +429,9 @@ describe('kapitel 1: kartorna (T5)', () => {
             expect(v0.length, `${rum.id}/${t}: ${o.id}, trappan nås inte`).toBeGreaterThan(0);
             fran = v0.at(-1); h = per(niva);
           }
-          const v = h.vag(fran, framfor(o));
+          // som i rummet: han ställer sig på den sida han kommer från (framforFran), inte alltid framför
+          const nar = (p) => { const w = h.vag(fran, p); return w.length > 0 && vidObjekt(w.at(-1), o); };
+          const v = h.vag(fran, framforFran(o, fran, karta.inomhus, karta.vagg, karta.massiv, nar));
           expect(v.length, `${rum.id}/${t}: ${o.id}`).toBeGreaterThan(0);
           const slut = v.at(-1);
           expect(vidObjekt(slut, o) || (o.sort === 'utgang' && genom(o, slut)), `${rum.id}/${t}: ${o.id} nås inte (hamnar ${slut.x},${slut.y})`).toBe(true);

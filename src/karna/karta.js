@@ -32,12 +32,15 @@ import { STORSTA } from './kamera.js';
  *             vagg: { bak: number, sida: number, fram: number }, morker: number | null,
  *             storlek: { bredd: number, hojd: number }, massiv: { x: number, y: number, b: number, h: number }[],
  *             bild?: string | null, mark?: string | null, rutlager?: { namn: string, data: number[], visasMed: string | null }[],
- *             omgivning?: { vad: string, x: number, y: number, b: number, h: number }[] }} Karta
+ *             omgivning?: { vad: string, x: number, y: number, b: number, h: number }[],
+ *             overHinder?: { x: number, y: number, b: number, h: number }[] }} Karta
  * bild = rummets bild (assets/rum), mark = rutsetet för marken utomhus (assets/tiles).
  * inomhus = rummet har väggram (bakvägg, sidoväggar, främre kant). in = var hjälten kommer in från ett rum
  * som inte har någon utgång hit (punkter som heter in_<rum>, t.ex. trädgården från köket). lampor = där det lyser i mörkret.
  * storlek = områdets storlek i pixlar (kartans bredd och höjd): en skärm (320×192) eller större, högst 640×384.
  * massiv = väggar inne i rummet (typen vagg), som ger rummet en annan form än en rektangel.
+ * overHinder = ridåns rutor (rutlagret over) som hinder, en ruta per rad av rutor bredvid varandra (56.3): ridån
+ * ligger under figurerna, och fötterna står aldrig i den.
  */
 
 const UTGANG = /^(stege_|dorr_|grind|stig_)/;
@@ -55,6 +58,25 @@ export const innehallsId = (x) => (typeof x === 'string' ? x : x.id);
  */
 export function synligaIds(innehall, tillstand, visade = []) {
   return innehall.filter((x) => typeof x === 'string' || ((!x.syns_i || (tillstand !== null && x.syns_i.includes(tillstand))) && (!x.dold || visade.includes(x.id)))).map(innehallsId);
+}
+
+/**
+ * Ridåns rutor som hinder (56.3): rutorna i rutlagret over, ihop till en ruta per rad av rutor bredvid varandra.
+ * Rutorna är hela (skogens rutor har gräs där kronan inte når), så det fötterna inte får stå i är hela rutan.
+ * @param {{ namn: string, data: number[] }[]} rutlager @param {number} kol @param {number} rb @param {number} rh
+ * @returns {{ x: number, y: number, b: number, h: number }[]}
+ */
+export function overSomHinder(rutlager, kol, rb = 16, rh = 16) {
+  const over = rutlager.find((l) => l.namn === 'over');
+  /** @type {{ x: number, y: number, b: number, h: number }[]} */
+  const ut = [];
+  if (!over) return ut;
+  for (let i = 0; i < over.data.length; i++) {
+    if (over.data[i] < 0) continue;
+    const x = (i % kol) * rb, y = Math.floor(i / kol) * rh, forra = ut.at(-1);
+    if (forra && forra.y === y && forra.x + forra.b === x) forra.b += rb; else ut.push({ x, y, b: rb, h: rh });
+  }
+  return ut;
 }
 
 /** Sort efter id när kartan inte säger något. @param {string} id @returns {Objekt['sort']} */
@@ -163,6 +185,9 @@ export function lasKarta(tmj) {
       if (egen.bild_ta_emot) ut.bildTaEmot = String(egen.bild_ta_emot).split(',').map((t) => t.trim()).filter(Boolean);
       if (egen.bild_las) ut.bildLas = String(egen.bild_las).split(',').map((t) => t.trim()).filter(Boolean);
       if (egen.kommer_fran) ut.kommerFran = String(egen.kommer_fran);
+      // klattrar_fran (56.4) = figuren klättrar ned för stegen när den visas i ett rum han redan är i (apan när den
+      // är räddad), med bilderna <namn>_klattra_ned_01–02 (annars <namn>_klattra_01–02)
+      if (egen.klattrar_fran) ut.klattrarFran = String(egen.klattrar_fran);
       if (egen.bild_vinka) ut.bildVinka = String(egen.bild_vinka).split(',').map((t) => t.trim()).filter(Boolean);
       if (egen.bild_anim) { ut.bildAnim = String(egen.bild_anim).split(',').map((t) => t.trim()).filter(Boolean); ut.animMs = Math.max(250, tal(egen.anim_ms, 500)); }
       if (egen.rutor) ut.rutor = true;
@@ -174,5 +199,5 @@ export function lasKarta(tmj) {
   const morker = kartegen.morker !== undefined && Number.isFinite(m) ? Math.max(0, Math.min(1, m)) : null;
   // vinka_fran (51.4): kommer han in från det rummet vinkar han mot huset (trädgården, när han har sagt hejdå)
   const vinkaFran = kartegen.vinka_fran ? String(kartegen.vinka_fran) : null;
-  return { vinkaFran, objekt, start, inomhus: !!kartegen.inomhus, in: inpunkter, lampor, vagg, morker, storlek: { bredd, hojd }, massiv, bild: kartegen.bild ? String(kartegen.bild) : null, mark: kartegen.mark ? String(kartegen.mark) : null, rutlager, omgivning };
+  return { vinkaFran, objekt, start, overHinder: overSomHinder(rutlager, tmj.width, tmj.tilewidth, tmj.tileheight), inomhus: !!kartegen.inomhus, in: inpunkter, lampor, vagg, morker, storlek: { bredd, hojd }, massiv, bild: kartegen.bild ? String(kartegen.bild) : null, mark: kartegen.mark ? String(kartegen.mark) : null, rutlager, omgivning };
 }

@@ -13,7 +13,7 @@ const FIGUR_HOJD = 24;
  *             riktning?: 'vanster' | 'hoger' | 'upp' | 'ned', klattra?: 'upp' | 'ned', ute?: boolean, lapp?: string,
  *             talare?: string, lastI?: string[], storlek?: { bredd: number, hojd: number }, forsvinnerEfter?: string, oppning?: boolean,
  *             bildSitter?: string, bildSedan?: string, sedan?: string, bildAnim?: string[], animMs?: number, rutor?: boolean,
- *             bild?: string, bildNatt?: string, bildPa?: string, bildDel?: string, sovplats?: boolean, skataFonster?: boolean, lyser?: boolean, delasHela?: boolean, delasDjup?: boolean, dekor?: boolean, ovanpa?: boolean, delar?: number, bildTaEmot?: string[], bildLas?: string[], kommerFran?: string, bildVinka?: string[],
+ *             bild?: string, bildNatt?: string, bildPa?: string, bildDel?: string, sovplats?: boolean, skataFonster?: boolean, lyser?: boolean, delasHela?: boolean, delasDjup?: boolean, dekor?: boolean, ovanpa?: boolean, delar?: number, bildTaEmot?: string[], bildLas?: string[], kommerFran?: string, klattrarFran?: string, bildVinka?: string[],
  *             bildRad?: string[], bildHugg?: string[], bildKvar?: string }} Objekt
  * till = rummet en utgång leder till, sida = var hjälten ställer sig, golv = man går på det (stig, grind).
  * sida 'alla' = föremålet har ingen framsida (krukor, buskar, en låda mitt på golvet): det går att använda från alla håll.
@@ -143,8 +143,9 @@ export function glipa(a, b) {
  * @param {Objekt} o @param {{ x: number, y: number }} pos @param {boolean} [inomhus]
  * @param {{ bak: number, sida: number, fram: number }} [v] väggarnas mått
  * @param {{ x: number, y: number, b: number, h: number }[]} [massiv] väggar inne i rummet (kartans vagg)
+ * @param {((p: { x: number, y: number }) => boolean) | null} [nar] kan han gå dit? Då väljs den närmaste sidan han når.
  */
-export function framforFran(o, pos, inomhus = false, v = VAGG, massiv = []) {
+export function framforFran(o, pos, inomhus = false, v = VAGG, massiv = [], nar = null) {
   if (o.sida !== 'alla') return framfor(o);
   const S = ytan(o);
   const mx = Math.round(o.x + o.b / 2), my = Math.min(S.hojd, o.y + o.h);
@@ -156,7 +157,9 @@ export function framforFran(o, pos, inomhus = false, v = VAGG, massiv = []) {
   ].filter((p) => !inomhus || (p.x > v.sida + 6 && p.x < S.bredd - v.sida - 6 && p.y > v.bak + 4 && p.y < S.hojd - v.fram))
     .filter((p) => !massiv.some((m) => p.x > m.x - 6 && p.x < m.x + m.b + 6 && p.y > m.y - 2 && p.y < m.y + m.h + 4));
   if (!kandidater.length) return framfor(o);
-  return kandidater.sort((a, c) => Math.hypot(a.x - pos.x, a.y - pos.y) - Math.hypot(c.x - pos.x, c.y - pos.y))[0];
+  const sorterade = kandidater.sort((a, c) => Math.hypot(a.x - pos.x, a.y - pos.y) - Math.hypot(c.x - pos.x, c.y - pos.y));
+  // den närmaste sidan han kan gå till (en sten vid ridån har ingen plats under sig, 56.3)
+  return (nar && sorterade.find(nar)) || sorterade[0];
 }
 
 /**

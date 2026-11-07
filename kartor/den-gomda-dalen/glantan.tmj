@@ -10,8 +10,8 @@
  "tileheight": 16,
  "infinite": false,
  "compressionlevel": -1,
- "nextlayerid": 47,
- "nextobjectid": 71,
+ "nextlayerid": 53,
+ "nextobjectid": 77,
  "properties": [
   {
    "name": "mark",
@@ -33,7 +33,7 @@
  "layers": [
   {
    "type": "tilelayer",
-   "id": 44,
+   "id": 50,
    "name": "golv",
    "width": 40,
    "height": 24,
@@ -70,7 +70,7 @@
   },
   {
    "type": "tilelayer",
-   "id": 45,
+   "id": 51,
    "name": "over",
    "width": 40,
    "height": 24,
@@ -107,7 +107,7 @@
   },
   {
    "type": "tilelayer",
-   "id": 46,
+   "id": 52,
    "name": "stig_backen",
    "width": 40,
    "height": 24,
@@ -414,6 +414,11 @@
        "name": "bild_anim",
        "type": "string",
        "value": "apa_vinka_01,apa_vinka_02"
+      },
+      {
+       "name": "klattrar_fran",
+       "type": "string",
+       "value": "stege"
       },
       {
        "name": "sida",
@@ -1035,7 +1040,7 @@
      ]
     },
     {
-     "id": 68,
+     "id": 74,
      "name": "omgivning_fjaril_1",
      "type": "omgivning",
      "x": 120,
@@ -1053,7 +1058,7 @@
      ]
     },
     {
-     "id": 69,
+     "id": 75,
      "name": "omgivning_fjaril_2",
      "type": "omgivning",
      "x": 392,
@@ -1071,7 +1076,7 @@
      ]
     },
     {
-     "id": 70,
+     "id": 76,
      "name": "omgivning_fagel_3",
      "type": "omgivning",
      "x": 456,

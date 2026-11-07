@@ -4,9 +4,10 @@
 import Phaser from 'phaser';
 import { RUM } from '../karna/skalning.js';
 import { FIGUR, steg } from '../karna/rorelse.js';
-import { rumsObjekt, framfor, framforFran, vidObjekt, aktivSak, hinderFran, vaggar, VAGG, objektFarg, lasplats, arSidodorr, stigStart } from '../karna/rumslayout.js';
+import { rumsObjekt, framfor, framforFran, vidObjekt, aktivSak, VAGG, objektFarg, lasplats, arSidodorr, stigStart } from '../karna/rumslayout.js';
 import { synligaIds } from '../karna/karta.js';
-import { skapaHinder, skarIgenom } from '../karna/vag.js';
+import { skapaHinder } from '../karna/vag.js';
+import { rumsHinder } from '../karna/rumshinder.js';
 import { skapaNivaer } from '../karna/nivaer.js';
 import { KAMERA, centrera, folj, visaRuta, omradeFor, narmare, enSkarm } from '../karna/kamera.js';
 import { hjaltensByten } from '../karna/fargbyte.js';
@@ -93,6 +94,8 @@ export class Rum extends Phaser.Scene {
     this.vagg = VAGG;
     /** @type {{ x: number, y: number, b: number, h: number }[]} väggar inne i rummet (kartans vagg) */
     this.massiv = [];
+    /** @type {{ x: number, y: number, b: number, h: number }[]} ridåns rutor som hinder (kartans overHinder) */
+    this.overHinder = [];
     /** @type {{ x: number, y: number }[]} lampor som lyser när rummet är mörkt */
     this.lampor = [];
     /** @type {number | null} hur mörkt rummet är på natten (kartans morker) */
@@ -114,6 +117,8 @@ export class Rum extends Phaser.Scene {
     this.senasteSidovy = null;
     /** @type {{ id: string, img: any, tex: string, ram: string } | null} föremålet han sitter i (34.4) */
     this.sitter = null;
+    /** @type {any} han kliver ur sängen just nu (vakna), och syns inte bredvid den förrän han är ute (56.2) */
+    this.vaknar = null;
     /** @type {Set<string>} föremål som inte syns just nu (boken han bär), tills rummet byts */
     this.dolda = new Set();
     /** @type {Map<string, string>} föremål som regin har gett en annan bild (ägget), tills rummet byts */
@@ -185,11 +190,12 @@ export class Rum extends Phaser.Scene {
     this.golvBild = this.add.image(0, 0, '__DEFAULT').setOrigin(0, 0).setVisible(false);
     this.golv = this.add.graphics();
     this.lagerObjekt = this.add.container(0, 0);
+    // trädridån (rutlagret over), ritad en gång per rum till en egen bild (Teknik 3). Den ligger under figurerna,
+    // och fötterna står aldrig i den (kartans overHinder), så en figur framför ridån skyms aldrig av den (56.3)
+    this.overBild = this.add.image(0, 0, '__DEFAULT').setOrigin(0, 0).setVisible(false);
     this.ljusboll = this.add.graphics().setVisible(false);
     this.lagerFigurer = this.add.container(0, 0);
-    // trädridån (rutlagret over) ovanför figurerna, ritad en gång per rum till en egen bild (Teknik 3)
-    this.overBild = this.add.image(0, 0, '__DEFAULT').setOrigin(0, 0).setVisible(false);
-    // liv i skogen (fåglar, löv, fjärilen, ekorren) i världens pixlar, under ridån
+    // liv i skogen (fåglar, löv, fjärilen, ekorren) i världens pixlar
     this.livet = new Livet(this, this.lagerFigurer);
     /** @type {{ img: any, ramar: string[], ms: number, i: number, senast: number }[]} figurer som rör sig i tomgång (bild_anim) */
     this.animerade = [];
@@ -246,7 +252,7 @@ export class Rum extends Phaser.Scene {
     if (vidObjekt(this.pos, o) && this.tryckPa && this.tryckPa(o.id)) return;
     // dialogregeln: ett tryck på en figur upprepar dess senaste instruktion (fråga igen)
     if (o.sort === 'figur' && this.fragaIgen?.(o)) return;
-    const f = this.malFor?.(o) ?? framforFran(o, this.pos, this.inomhus, this.vagg, this.massiv); this.b.inmatning.sattGaTill(f.x, f.y);
+    const f = this.malFor?.(o) ?? this.standplats(o); this.b.inmatning.sattGaTill(f.x, f.y);
   }
 
 
@@ -549,12 +555,41 @@ export class Rum extends Phaser.Scene {
     if (!o || !img || !img.setFrame || !this.textures.get('hjalte').has('hjalte_sang_03')) return false;
     if (this.sover) { this.sover.andas?.remove(); this.sover = null; } // han hade redan lagt sig (laggSig)
     this.ungeSang = null; this.ungeLyft = 0;
-    this.sover = { id: o.id, img, tex: img.texture.key, ram: img.frame.name, ungeGomd: false, andas: /** @type {any} */ (null) };
+    // sängens egen bild ur kartan, inte den som står nu: har han lagt sig i samma rum står bilden med honom redan
+    // där, och då låg en kopia kvar i sängen när han vaknade (56.2)
+    const s = (this.sover = { id: o.id, img, ...this.egenBild(o, img), ungeGomd: false, andas: /** @type {any} */ (null) });
     img.setTexture(this.hjalteTextur || 'hjalte', 'hjalte_sang_03');
     this.hjalte.setVisible(false);
-    this.sover.andas = this.time.addEvent({ delay: 900, loop: true, callback: () => { img.setFrame(img.frame.name === 'hjalte_sang_03' ? 'hjalte_sang_04' : 'hjalte_sang_03'); this.smutsig = true; } });
+    s.andas = this.andas(s);
     this.smutsig = true;
     return true;
+  }
+
+  /** Han andas i sängen (bild 03 och 04). @param {{ img: any }} s */
+  andas(s) {
+    return this.time.addEvent({ delay: 900, loop: true, callback: () => { if (!s.img.active) return; s.img.setFrame(s.img.frame.name === 'hjalte_sang_03' ? 'hjalte_sang_04' : 'hjalte_sang_03'); this.smutsig = true; } });
+  }
+
+  /**
+   * Föremålets egen bild ur kartan just nu (nattens bild på natten, bytt bild när den är bytt), utan hjälten i: den
+   * som fåtöljen och sängen får tillbaka när han reser sig eller kliver ur (56.2).
+   * @param {import('../karna/rumslayout.js').Objekt} o @param {any} img bilden som står nu (om kartan inte har någon)
+   * @returns {{ tex: string, ram: string }}
+   */
+  egenBild(o, img) {
+    const natt = this.tillstand === 'natt' || this.tillstand === 'natt_upplyst';
+    const namn = o.bildSedan && this.bytta?.has(o.id) ? o.bildSedan : o.bildNatt && natt ? o.bildNatt : o.bild;
+    const fb = namn ? foremalsbild(this, namn) : null;
+    return fb ? { tex: fb.nyckel, ram: fb.ram } : { tex: img.texture.key, ram: img.frame.name };
+  }
+
+  /**
+   * Hur många hjältar syns: hjälten själv och föremål som visar honom (sängen, fåtöljen). Aldrig fler än en (56.2).
+   * @returns {number}
+   */
+  hjaltarSomSyns() {
+    const hans = (/** @type {any} */ g) => g?.visible && g.active && /^hjalte(:|$)/.test(g.texture?.key || '');
+    return (this.hjalte.visible ? 1 : 0) + [...this.ritade.values()].filter(hans).length;
   }
 
   /**
@@ -565,14 +600,14 @@ export class Rum extends Phaser.Scene {
   laggSig(id, ms = 250) {
     const o = this.objekt.find((x) => x.id === id), img = /** @type {any} */ (this.ritade.get(id));
     if (!o?.sovplats || !img?.setTexture || !this.textures.get('hjalte').has('hjalte_sang_01')) return false;
-    const tex = img.texture.key, ram = img.frame.name;
+    // han ligger i sängen från första bilden: ritas rummet om medan han kryper ned, syns han inte på golvet (56.2)
+    const s = (this.sover = { id: o.id, img, ...this.egenBild(o, img), ungeGomd: false, andas: /** @type {any} */ (null) });
     this.hjalte.setVisible(false);
     img.setTexture(this.hjalteTextur || 'hjalte', 'hjalte_sang_01');
-    this.time.delayedCall(ms * 2, () => { if (img.active) { img.setFrame('hjalte_sang_02'); this.smutsig = true; } });
+    this.time.delayedCall(ms * 2, () => { if (this.sover === s && s.img.active) { s.img.setFrame('hjalte_sang_02'); this.smutsig = true; } });
     this.time.delayedCall(ms * 4, () => {
-      if (!img.active) return;
-      this.sover = { id: o.id, img, tex, ram, ungeGomd: false, andas: this.time.addEvent({ delay: 900, loop: true, callback: () => { img.setFrame(img.frame.name === 'hjalte_sang_03' ? 'hjalte_sang_04' : 'hjalte_sang_03'); this.smutsig = true; } }) };
-      img.setFrame('hjalte_sang_03'); this.smutsig = true;
+      if (this.sover !== s || !s.img.active || s.andas) return;
+      s.img.setFrame('hjalte_sang_03'); s.andas = this.andas(s); this.smutsig = true;
     });
     // ungen: ett hopp i en kort båge upp på fotändan, tre varv på stället (ner, höger, upp, vänster), och sedan sover den
     if (this.unge.visible && this.ungeBild && this.textures.get('unge').has('unge1_sover_ner_01')) {
@@ -660,8 +695,7 @@ export class Rum extends Phaser.Scene {
     if (!fb || !img?.setTexture) return false;
     // fåtöljens egen bild (kartans bild), inte den som står nu: sätter han sig igen i ett rum som inte ritades om
     // står bilden med honom redan där, och då satt en kopia kvar när han reste sig (50.5)
-    const egen = o?.bild ? foremalsbild(this, o.bild) : null;
-    this.sitter = { id, img, tex: egen?.nyckel ?? img.texture.key, ram: egen?.ram ?? img.frame.name };
+    this.sitter = { id, img, ...this.egenBild(/** @type {any} */ (o), img) };
     img.setTexture(fb.nyckel === 'hjalte' ? this.hjalteTextur || 'hjalte' : fb.nyckel, fb.ram);
     this.hjalte.setVisible(false);
     this.smutsig = true;
@@ -672,7 +706,8 @@ export class Rum extends Phaser.Scene {
   stigUpp() {
     const s = this.sitter; if (!s) return;
     this.sitter = null;
-    if (s.img.active) s.img.setTexture(s.tex, s.ram);
+    const o = this.ruta(s.id), img = /** @type {any} */ (this.ritade.get(s.id)) ?? s.img;
+    if (img.active) { const e = o ? this.egenBild(o, img) : s; img.setTexture(e.tex, e.ram); }
     this.hjalte.setVisible(this.harRum);
     this.placera(); this.smutsig = true;
   }
@@ -680,11 +715,15 @@ export class Rum extends Phaser.Scene {
   /** Han vaknar och kliver ur sängen: täcket av, han kliver ur, och står framför sängen. @param {number} ms */
   async vakna(ms = 500) {
     const s = this.sover; if (!s) return;
-    this.sover = null; this.ungeSang = null; this.ungeLyft = 0;
-    s.andas.remove();
-    for (const ram of ['hjalte_sang_02', 'hjalte_sang_01']) { s.img.setFrame(ram); this.smutsig = true; await new Promise((k) => this.time.delayedCall(Math.max(1, ms / 2), k)); }
-    s.img.setTexture(s.tex, s.ram);
+    // han är i sängen tills han har klivit ur: ritas rummet om under tiden, syns han inte bredvid sängen (56.2)
+    this.vaknar = s; this.sover = null; this.ungeSang = null; this.ungeLyft = 0;
+    s.andas?.remove();
+    for (const ram of ['hjalte_sang_02', 'hjalte_sang_01']) { if (s.img.active) s.img.setFrame(ram); this.smutsig = true; await new Promise((k) => this.time.delayedCall(Math.max(1, ms / 2), k)); }
+    this.vaknar = null;
     const o = this.ruta(s.id);
+    // sängens bild nu (dagens bild på morgonen), på bilden som står nu (rummet kan ha ritats om)
+    const img = /** @type {any} */ (this.ritade.get(s.id)) ?? s.img;
+    if (img.active) { const e = o ? this.egenBild(o, img) : s; img.setTexture(e.tex, e.ram); }
     if (o) { this.pos = this.hinder.narmasteFria(framforFran(o, { x: o.x + o.b / 2, y: o.y + o.h + 12 }, this.inomhus, this.vagg, this.massiv)); this.vand = { x: 0, y: 1 }; }
     // ungen låg på täcket (morgonen i sängen): den hoppar ned bredvid honom
     if (s.ungeGomd) { this.ungePos = this.hinder.narmasteFria({ x: this.pos.x - 18, y: this.pos.y }); this.unge.setVisible(this.harRum && this.visaUnge); }
@@ -779,14 +818,47 @@ export class Rum extends Phaser.Scene {
     if (this.sidovy) this.rensaSidovy();
   }
 
+  /**
+   * En figur klättrar ned för stegen (kartans `klattrar_fran`, 56.4): apan från plattformen till sin plats vid
+   * stegens fot, med <namn>_klattra_ned_01–02 (annars <namn>_klattra_01–02) växelvis ca 180 ms, och sedan står den
+   * som förut (och vinkar). Det går också medan en replik står. Finns inga klätterbilder står den där direkt.
+   * @param {string} id @returns {boolean} om den klättrar
+   */
+  figurKlattrar(id) {
+    const o = this.ruta(id), r = /** @type {any} */ (this.ritade.get(id)), stege = o?.klattrarFran ? this.ruta(o.klattrarFran) : null;
+    if (!o || !stege || !r?.setFrame || !r.texture) return false;
+    const bas = String(o.bild || '').replace(/_[a-z]+_\d\d$/, '');
+    const ramar = [`${bas}_klattra_ned_01`, `${bas}_klattra_ned_02`].every((n) => r.texture.has(n)) ? [`${bas}_klattra_ned_01`, `${bas}_klattra_ned_02`]
+      : [`${bas}_klattra_01`, `${bas}_klattra_02`].every((n) => r.texture.has(n)) ? [`${bas}_klattra_01`, `${bas}_klattra_02`] : null;
+    if (!ramar) return false;
+    const slut = { x: r.x, y: r.y, ram: r.frame.name };
+    const anim = this.animerade.find((t) => t.img === r);
+    if (anim) this.animerade = this.animerade.filter((t) => t !== anim);
+    // från stegens topp (plattformen) till dess fot, mitt på stegen, och sedan ett kliv till sin plats
+    const x = Math.round(stege.x + stege.b / 2), y0 = stege.y + 6, y1 = stege.y + stege.h;
+    const ms = Math.round(((y1 - y0) / 40) * 1000);
+    r.setPosition(x, y0).setFrame(ramar[0]);
+    let i = 0;
+    const byt = this.time.addEvent({ delay: 180, loop: true, callback: () => { if (!r.active) return; i++; r.setFrame(ramar[i % 2]); this.smutsig = true; } });
+    this.tweens.add({ targets: r, y: y1, duration: ms, onUpdate: () => { r.y = Math.round(r.y); this.smutsig = true; }, onComplete: () => {
+      byt.remove();
+      if (!r.active) return;
+      r.setFrame(slut.ram);
+      this.tweens.add({ targets: r, x: slut.x, y: slut.y, duration: 200, onComplete: () => { if (anim && r.active) this.animerade.push(anim); this.smutsig = true; } });
+    } });
+    this.b.logg?.handelse('figur', `${id} klättrar ned från ${stege.id}`);
+    this.smutsig = true;
+    return true;
+  }
+
   /** Morgonen i sängen (s19): han är vaken och skrattar, och ungen på täcket slickar honom på näsan. @returns {boolean} */
   morgonISangen() {
     const s = this.sover;
-    if (!s || !s.img.texture.has('hjalte_sang_morgon_01')) return false;
-    s.andas.remove();
+    if (!s || !s.img.active || !s.img.texture.has('hjalte_sang_morgon_01')) return false;
+    s.andas?.remove();
     s.ungeGomd = true; this.unge.setVisible(false);
     s.img.setFrame('hjalte_sang_morgon_01');
-    s.andas = this.time.addEvent({ delay: 260, loop: true, callback: () => { s.img.setFrame(s.img.frame.name === 'hjalte_sang_morgon_01' ? 'hjalte_sang_morgon_02' : 'hjalte_sang_morgon_01'); this.smutsig = true; } });
+    s.andas = this.time.addEvent({ delay: 260, loop: true, callback: () => { if (!s.img.active) return; s.img.setFrame(s.img.frame.name === 'hjalte_sang_morgon_01' ? 'hjalte_sang_morgon_02' : 'hjalte_sang_morgon_01'); this.smutsig = true; } });
     this.smutsig = true;
     return true;
   }
@@ -1146,7 +1218,7 @@ export class Rum extends Phaser.Scene {
     this.harRum = !!v.rum;
     if (v.nyttRum || !this.harRum) { this.rumsbild = (this.harRum && v.karta?.bild) || null; this.mark = (this.harRum && v.karta?.mark) || null; this.rumId = v.rum; this.markObjekt = v.karta?.objekt || []; }
     this.visaUnge = v.unge;
-    if (v.nyttRum) { for (const id of [...this.ramSlinga.keys(), ...this.ramTimrar.keys()]) this.stoppaRamar(id); this.ramFor.clear(); this.dolda.clear(); this.ungeMal = null; this.ungeTittarPa = null; this.ungeKlattrar = null; this.stegeNu = null; this.ungeSang = null; this.ungeLyft = 0; for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas.remove(); this.sover = null; } this.rensaRegi(); }
+    if (v.nyttRum) { for (const id of [...this.ramSlinga.keys(), ...this.ramTimrar.keys()]) this.stoppaRamar(id); this.ramFor.clear(); this.dolda.clear(); this.ungeMal = null; this.ungeTittarPa = null; this.ungeKlattrar = null; this.stegeNu = null; this.ungeSang = null; this.ungeLyft = 0; for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas?.remove(); this.sover = null; } this.vaknar = null; this.rensaRegi(); }
     this.tillstand = v.tillstand;
     if (v.nyttRum || !this.harRum) this.inomhus = !!v.karta?.inomhus;
     this.lampor = v.karta?.lampor || [];
@@ -1154,7 +1226,7 @@ export class Rum extends Phaser.Scene {
     if (v.nyttRum || !this.harRum) this.vagg = v.karta?.vagg || VAGG;
     if (v.nyttRum || !this.harRum) this.massiv = (this.harRum && v.karta?.massiv) || [];
     if (v.nyttRum || !this.harRum) { this.storlek = (this.harRum && v.karta?.storlek) || { bredd: RUM.bredd, hojd: RUM.hojd }; this.omrade = null; }
-    if (v.nyttRum || !this.harRum) { this.rutlager = (this.harRum && v.karta?.rutlager) || []; this.livet?.bygg((this.harRum && v.karta?.omgivning) || []); }
+    if (v.nyttRum || !this.harRum) { this.rutlager = (this.harRum && v.karta?.rutlager) || []; this.overHinder = (this.harRum && v.karta?.overHinder) || []; this.livet?.bygg((this.harRum && v.karta?.omgivning) || []); }
     // det som syns (de dolda föremål som har visats) styr rutlager som syns med ett föremål (den hemliga stigen)
     this.synligaIds = this.harRum ? synligaIds(v.innehall, v.tillstand, v.visade) : [];
     // det som har bytt bild (bild_sedan: häcken med hålet, stubben med bären)
@@ -1165,7 +1237,10 @@ export class Rum extends Phaser.Scene {
     const andrat = synliga !== this.synliga;
     this.synliga = synliga;
     if (v.nyttRum || !this.harRum || andrat) {
+      const fore = new Set((this.objekt || []).map((o) => o.id));
       this.objekt = this.harRum ? rumsObjekt(v.innehall, v.tillstand, v.karta, v.visade) : [];
+      // en figur som klättrar ned när den visas (apan när den är räddad, 56.4): bara i rummet han redan är i
+      const klattrar = v.nyttRum ? [] : this.objekt.filter((o) => o.klattrarFran && !fore.has(o.id)).map((o) => o.id);
       for (const g of this.hogaBilder) g.destroy(); this.hogaBilder.clear(); this.animerade = [];
       this.lagerObjekt.removeAll(true); this.lagerLjust.removeAll(true); this.ritade.clear(); this.markerade.clear(); this.ritadeDelar.clear(); this.markramar?.clear();
       this.delar = { ...(v.delar || {}) };
@@ -1173,7 +1248,14 @@ export class Rum extends Phaser.Scene {
       for (const id of this.dolda) /** @type {any} */ (this.ritade.get(id))?.setVisible?.(false);
       for (const id of this.sparrade) { const o = this.ruta(id); if (o) this.ritaGren(o); }
       this.ritaKvar(v.kvar || []);
+      // han ligger kvar i sängen när rummet ritas om (natt till morgon): den nya bilden av sängen visar honom (56.2)
+      for (const s of [this.sover, this.vaknar]) {
+        const ny = s && /** @type {any} */ (this.ritade.get(s.id));
+        if (!s || !ny?.setTexture || ny === s.img) continue;
+        ny.setTexture(this.hjalteTextur || 'hjalte', s.img.active ? s.img.frame.name : 'hjalte_sang_03'); s.img = ny;
+      }
       this.byggHinder();
+      for (const id of klattrar) this.figurKlattrar(id);
       this.sattInteraktiva(this.interaktiva.filter((id) => this.ruta(id))); this.nara(null);
       if (v.nyttRum || !this.harRum) {
         // hjälten kommer in genom utgången från förra rummet, annars vid kartans startpunkt
@@ -1192,7 +1274,7 @@ export class Rum extends Phaser.Scene {
       } else this.pos = this.hinder.narmasteFria(this.pos);
     }
     if (!this.harRum && (this.kamera.x || this.kamera.y)) this.sattKamera({ x: 0, y: 0 });
-    this.hjalte.setVisible(this.harRum && !this.sover);
+    this.hjalte.setVisible(this.harRum && !this.sover && !this.vaknar);
     this.unge.setVisible(this.harRum && this.visaUnge && !this.sover?.ungeGomd);
     // han sitter kvar i fåtöljen när rummet ritas om, men inte i ett nytt rum
     if (this.sitter) { const id = this.sitter.id; this.sitter = null; if (!v.nyttRum) this.sattSig(id); }
@@ -1224,16 +1306,21 @@ export class Rum extends Phaser.Scene {
     if (o.sort === 'sak') g.fillStyle(0xfff2b0, 0.9).fillRect(o.x + 2, o.y - 4, o.b - 4, 2);
   }
 
+  /**
+   * Var hjälten ställer sig för att använda föremålet: den närmaste sidan han kan gå till från där han står.
+   * @param {import('../karna/rumslayout.js').Objekt} o @returns {{ x: number, y: number }}
+   */
+  standplats(o) {
+    const nar = (/** @type {{ x: number, y: number }} */ p) => { const v = this.hinder.vag(this.pos, p); return v.length > 0 && vidObjekt(v[v.length - 1], o); };
+    return framforFran(o, this.pos, this.inomhus, this.vagg, this.massiv, nar);
+  }
+
   byggHinder() {
     const sparrade = this.objekt.filter((o) => this.sparrade.has(o.id));
-    // en stig som är en öppning skär igenom häcken den ligger över (hålet bakom stenen), när den syns
-    const oppningar = this.objekt.filter((o) => o.oppning);
-    const rutor = [...skarIgenom(hinderFran(this.objekt), oppningar), ...sparrade, ...(this.inomhus ? vaggar(this.vagg, this.storlek) : []), ...this.massiv];
-    // en uppsättning hinder per nivå: på marken går det inte att gå upp på kullen utom på trappan, och tvärtom
-    const n = (this.nivaer = skapaNivaer(this.objekt));
-    this.hinderPer = new Map(n.nivaer.map((niva) => [niva, skapaHinder(rutor, n.finns ? (p) => n.tillaten(p, niva) : undefined, this.storlek)]));
-    // på trappan eller stegen gäller båda nivåerna: han kan gå av uppe eller nere (men aldrig över kanten)
-    this.hinderForbindelse = n.finns ? skapaHinder(rutor, (p) => n.nivaer.some((niva) => n.tillaten(p, niva)), this.storlek) : null;
+    const h = rumsHinder(this.objekt, { sparrade, inomhus: this.inomhus, vagg: this.vagg, storlek: this.storlek, massiv: this.massiv, over: this.overHinder });
+    this.nivaer = h.nivaer;
+    this.hinderPer = h.per;
+    this.hinderForbindelse = h.forbindelse;
     if (!this.hinderPer.has(this.niva)) this.niva = 0;
     this.hinder = /** @type {ReturnType<typeof skapaHinder>} */ (this.hinderPer.get(this.niva));
     this.vag = []; this.vagMal = null;
@@ -1551,7 +1638,7 @@ export class Rum extends Phaser.Scene {
     const o = this.ruta(id);
     if (!o || !this.unge.visible) return false;
     // ställ ungen en bit in i rummet från föremålet, på sidan mot hjälten, och låt den nosa mot det
-    const f = o.sort === 'utgang' ? lasplats(o) : framforFran(o, this.pos, this.inomhus, this.vagg, this.massiv);
+    const f = o.sort === 'utgang' ? lasplats(o) : this.standplats(o);
     const p = this.hinder.narmasteFria({ x: f.x, y: f.y });
     const cx = o.x + o.b / 2, cy = o.y + o.h / 2;
     this.ungeMal = { x: p.x, y: p.y, mot: Math.atan2(cy - p.y, cx - p.x) };

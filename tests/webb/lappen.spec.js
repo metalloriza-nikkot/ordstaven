@@ -272,6 +272,49 @@ test('sängdags (51.4): han lägger sig med hjälmen på, och ungen hoppar upp, 
   await page.screenshot({ path: 'test-results/sangdags.png' });
 });
 
+/** Räknar hur många hjältar som syns, var 20:e ms, tills mätningen läses (56.2). */
+const raknaHjaltar = (page) => page.evaluate(() => {
+  const w = /** @type {any} */ (window);
+  w.__hjaltar = { max: 0, fler: [] };
+  clearInterval(w.__hjaltarTid);
+  w.__hjaltarTid = setInterval(() => {
+    const n = w.__ORDSTAVEN.hjaltar();
+    w.__hjaltar.max = Math.max(w.__hjaltar.max, n);
+    if (n > 1 && w.__hjaltar.fler.length < 5) w.__hjaltar.fler.push({ n, scen: w.__ORDSTAVEN.scen(), sang: w.__ORDSTAVEN.bildFor('sang'), synlig: w.__ORDSTAVEN.synlig() });
+  }, 20);
+});
+const hjaltarHittills = (page) => page.evaluate(() => /** @type {any} */ (window).__hjaltar);
+
+test('aldrig två hjältar (56.2): han lägger sig, sover, vaknar på morgonen och kliver ur, utan en kopia på golvet eller i sängen', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(60000);
+  // som s18 och s19: samma rum, så att sängen inte ritas om mellan kvällen och morgonen
+  const kvall = { id: 't_kvall', pass: 1, rum: 'sovrummet', tillstand: 'natt', steg: [R('Kryp ner i sängen!'), { typ: 'ga_till', mal: 'sang' }, { typ: 'mellanscen', beskrivning: 'Hjälten kryper ner.' }, R('God natt.')] };
+  const morgon = { id: 't_morgon', pass: 1, rum: 'sovrummet', tillstand: 'morgon', hjalte: 'sover', steg: [{ typ: 'mellanscen', beskrivning: 'Morgon.', bild: 'hjalte_sang_morgon' }, R('God morgon!'), { typ: 'ga_till', mal: 'dorr_hallen' }] };
+  await provscen(page, kvall, { efter: [morgon] }, '?test&testscen&kapitel=kap-00');
+  await raknaHjaltar(page);
+  for (let k = 0; k < 20 && (await page.evaluate(() => window.__ORDSTAVEN.steg()?.typ)) !== 'ga_till'; k++) { await page.click('#plattan .replik-ruta').catch(() => {}); await page.waitForTimeout(300); }
+  const o = await page.evaluate(() => window.__ORDSTAVEN.objekt('sang'));
+  await page.mouse.click(o.x, o.y);
+  await expect(page.locator('#handknapp')).toBeVisible({ timeout: 8000 });
+  await page.keyboard.press('Space');
+  await expect.poll(() => logg(page), { timeout: 10000 }).toContain('[hjälten] lägger sig: sang');
+  // repliken direkt efter: rummet ritas om medan han kryper ned
+  for (let k = 0; k < 30 && (await page.evaluate(() => window.__ORDSTAVEN.scen())) !== 't_morgon'; k++) { await page.click('#plattan .replik-ruta').catch(() => {}); await page.waitForTimeout(250); }
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 10000 }).toBe('t_morgon');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.bildFor('sang')), { timeout: 5000 }).toMatch(/^hjalte_sang_(0[34]|morgon_0[12])$/);
+  await page.screenshot({ path: 'test-results/hjaltar-morgon.png' });
+  for (let k = 0; k < 20 && (await page.evaluate(() => window.__ORDSTAVEN.steg()?.typ)) !== 'ga_till'; k++) { await page.click('#plattan .replik-ruta').catch(() => {}); await page.waitForTimeout(250); }
+  // han kliver ur: sängen är tom (dagens bild), och han står bredvid den
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.synlig()), { timeout: 5000 }).toBe(true);
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.bildFor('sang')), { timeout: 5000 }).toBe('sang');
+  await page.waitForTimeout(300);
+  await page.screenshot({ path: 'test-results/hjaltar-uppe.png' });
+  const m = await hjaltarHittills(page);
+  expect(m.fler, JSON.stringify(m.fler)).toEqual([]);
+  expect(m.max).toBe(1);
+});
+
 test('farväl (51.4): Farfar går själv från köket till ytterdörren och vinkar, och hjälten vinkar mot huset i trädgården', async ({ page }, info) => {
   test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
   test.setTimeout(60000);
@@ -297,4 +340,27 @@ test('farväl (51.4): Farfar går själv från köket till ytterdörren och vink
   expect(await page.evaluate(() => window.__ORDSTAVEN.bildFor('berg'))).toBe('fasad');
   await page.waitForTimeout(300);
   await page.screenshot({ path: 'test-results/farval-tradgarden.png' });
+});
+
+test('apan klättrar ned för stegen när den är räddad, och vinkar sedan (56.4)', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(40000);
+  const fangen = { id: 't_fangen', pass: 1, rum: 'glantan', tillstand: 'fangen', steg: [R('Apan hänger i nätet.')] };
+  const raddad = { id: 't_raddad', pass: 1, rum: 'glantan', tillstand: 'raddad', steg: [R('Apan är räddad!'), R('Tack.')] };
+  // gläntan som i kapitel 1, i prologen där provscenerna står
+  const { readFileSync } = await import('node:fs');
+  const glantan = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-01.json', import.meta.url), 'utf8')).rum.find((r) => r.id === 'glantan');
+  await provscen(page, fangen, { efter: [raddad], rum: { glantan: { innehall: glantan.innehall, tillstand: glantan.tillstand } } }, '?test&testscen&kapitel=kap-00');
+  const apan = () => page.evaluate(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum').ritade.get('apan'); return r?.active ? { x: r.x, y: r.y, bild: r.frame.name } : null; });
+  expect(await apan()).toBeNull();
+  for (let k = 0; k < 10 && (await page.evaluate(() => window.__ORDSTAVEN.scen())) !== 't_raddad'; k++) { await page.click('#plattan .replik-ruta').catch(() => {}); await page.waitForTimeout(300); }
+  await expect.poll(() => logg(page), { timeout: 8000 }).toContain('[figur] apan klättrar ned från stege');
+  const bilder = new Set(), y = new Set();
+  for (let k = 0; k < 40; k++) { const a = await apan(); bilder.add(a?.bild); y.add(a?.y); if (/vinka/.test(a?.bild || '') && a?.x === 104) break; await page.waitForTimeout(80); }
+  expect([...bilder].some((b) => /^apa_klattra(_ned)?_0[12]$/.test(b || ''))).toBe(true);
+  expect(y.size).toBeGreaterThan(3); // den flyttas nedför stegen
+  // framme: på sin plats vid stegens fot, och den vinkar som förut
+  await expect.poll(apan, { timeout: 5000 }).toMatchObject({ x: 104, y: 282 });
+  await expect.poll(async () => (await apan())?.bild, { timeout: 3000 }).toMatch(/^apa_vinka_0[12]$/);
+  await page.screenshot({ path: 'test-results/apan-nere.png' });
 });

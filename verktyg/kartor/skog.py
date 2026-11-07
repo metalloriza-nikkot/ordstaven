@@ -68,17 +68,25 @@ HUGG = {'glantan': {f'lovhog_{i}': ('lovhog_hugg_01,lovhog_hugg_02', 'lovhog_kva
 OVANPA = {'glantan': {'ugglor'}}
 # var han ställer sig (5d): apan hänger över plattformen, så han ställer sig till höger om trädet, på marken
 SIDA = {'glantan': {'apan_i_nat': 'hoger'}}
+# apan klättrar ned för stegen när den är räddad (56.4)
+KLATTRAR = {'glantan': {'apan': 'stege'}}
 # stegen står framför stammen (5d): den skär en öppning i trädets hinder, så att han når den
 OPPNING = {'glantan': {'stege'}}
 # det som ritas i rutlagret och inte som ett föremål
 RUTOR = {'glantan': {'kulle', 'kronet', 'backen'}, 'skogsbrynet': {'snar_vast', 'snar_ost'}}  # 5d: snåren kring liangången
 # 5d: tät skog inne i rummet (ridåns rutor, ovanför figurerna), indragen 8 px mot gången så att ingen ruta täcker lianerna
-SNAR = {'skogsbrynet': ['snar_vast', 'snar_ost']}
+# 56.3: det östra snåret börjar en ruta lägre (hörnen från y 64), så att vägen ovanför det till stigen mot buskarna
+# går söder om gångens mynning mot gläntan: annars gick han ut till gläntan på vägen
+SNAR = {'skogsbrynet': [('snar_vast', 0), ('snar_ost', 16)]}
 # 5d: bäckarmen på baronens sida (vatten, bara rutor: hjälten når den aldrig) och baronens stig längs östra stranden
 BIVATTEN = {'glantan': [(600, 288, 40, 0)]}
 STIG_DEKOR = {'glantan': [(612, 0, 20, 384)]}
 # 5d: fler blommor i gräset i sydost
 BLOMMOR = {'glantan': [(336, 176, 208, 176)]}
+# 56.3: ridån är ett hinder för fötterna och ligger under figurerna. Där han går mellan två ställen längs kanten
+# står ingen ridå: hörnen i rutan (x, y, bredd, höjd) tas bort. Skogsbrynet: från gången norrut till stigen mot
+# buskarna, ovanför snåren (bara hörnen på y 16, så att kantens översta rad står kvar).
+PASSAGE = {'skogsbrynet': [(480, 16, 128, 0)]}
 # stigar som är dolda tills de visas får ett eget lager, som ritas när föremålet syns
 EGNA_STIGAR = {'glantan': {'stig_backen': (540, 0, 8, 168)}}  # 5d: längs bäcken, mellan kullen och vattnet
 
@@ -168,6 +176,8 @@ def rita(rum, karta, rutnr, storlek):
             oppet |= horn_i((x - 8, y - 8, max(o['width'], bw) + 16, max(o['height'], o['y'] + o['height'] - y) + 16))
     for (x, y, b, hh) in STIG_DEKOR.get(rum, []):  # 5d: baronens stig syns
         oppet |= horn_i((x - 8, y, b + 16, hh))
+    for rekt in PASSAGE.get(rum, []):  # 56.3
+        oppet |= horn_i(rekt)
     if kulle:  # kullen är öppen upptill (krönet når kanten), ridån står inte på den
         oppet |= horn_i((kulle['x'], kulle['y'], kulle['width'], kulle['height']))
     skog = set()
@@ -178,9 +188,9 @@ def rita(rum, karta, rutnr, storlek):
                 continue
             if kant == 0 or (kant == 1 and h(cx, cy, 7) % 3 != 0):
                 skog.add((cx, cy))
-    for namn_ in SNAR.get(rum, []):  # 5d: snåren
+    for namn_, topp in SNAR.get(rum, []):  # 5d: snåren
         o = by[namn_]
-        skog |= horn_i((o['x'] + 8, o['y'], o['width'] - 16, o['height']))
+        skog |= horn_i((o['x'] + 8, o['y'] + topp, o['width'] - 16, o['height'] - topp))
     over = [rutnr[n] + 1 if (n := wang('skog', skog, x, y)) else 0 for y in range(H) for x in range(B)]
     lager = [{'namn': 'golv', 'data': [n + 1 for n in golv]}, {'namn': 'over', 'data': over}]
     for oid, rekt in EGNA_STIGAR.get(rum, {}).items():
@@ -221,6 +231,8 @@ def kor(prova=False):
                 satt(o, 'ovanpa', True)
             if n in SIDA.get(rum, {}):
                 satt(o, 'sida', SIDA[rum][n])
+            if n in KLATTRAR.get(rum, {}):
+                satt(o, 'klattrar_fran', KLATTRAR[rum][n])
             if n in OPPNING.get(rum, set()):
                 satt(o, 'oppning', True)
         # liv i skogen: objekt med typen omgivning (tas bort och läggs till på nytt, så att skriptet kan köras om)
