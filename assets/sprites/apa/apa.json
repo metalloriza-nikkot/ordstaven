@@ -140,10 +140,50 @@
     "h": 16
    }
   },
-  "apa_sprattla_01": {
+  "apa_klattra_ned_01": {
    "frame": {
     "x": 0,
     "y": 98,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "apa_klattra_ned_02": {
+   "frame": {
+    "x": 17,
+    "y": 98,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "apa_sprattla_01": {
+   "frame": {
+    "x": 0,
+    "y": 115,
     "w": 20,
     "h": 26
    },
@@ -163,7 +203,7 @@
   "apa_sprattla_02": {
    "frame": {
     "x": 21,
-    "y": 98,
+    "y": 115,
     "w": 20,
     "h": 26
    },
@@ -183,7 +223,7 @@
   "apa_sucka_01": {
    "frame": {
     "x": 0,
-    "y": 125,
+    "y": 142,
     "w": 20,
     "h": 26
    },
@@ -203,7 +243,7 @@
   "apa_sucka_02": {
    "frame": {
     "x": 21,
-    "y": 125,
+    "y": 142,
     "w": 20,
     "h": 26
    },
@@ -223,7 +263,7 @@
   "apa_taggkam_01": {
    "frame": {
     "x": 0,
-    "y": 152,
+    "y": 169,
     "w": 16,
     "h": 20
    },
@@ -243,7 +283,7 @@
   "apa_taggkam_02": {
    "frame": {
     "x": 17,
-    "y": 152,
+    "y": 169,
     "w": 16,
     "h": 20
    },
@@ -263,7 +303,7 @@
   "apa_vinka_01": {
    "frame": {
     "x": 0,
-    "y": 173,
+    "y": 190,
     "w": 16,
     "h": 16
    },
@@ -283,7 +323,7 @@
   "apa_vinka_02": {
    "frame": {
     "x": 17,
-    "y": 173,
+    "y": 190,
     "w": 16,
     "h": 16
    },
@@ -306,7 +346,7 @@
   "format": "RGBA8888",
   "size": {
    "w": 42,
-   "h": 190
+   "h": 207
   },
   "scale": "1",
   "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."

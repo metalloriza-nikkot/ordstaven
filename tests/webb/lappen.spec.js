@@ -357,7 +357,7 @@ test('apan klättrar ned för stegen när den är räddad, och vinkar sedan (56.
   await expect.poll(() => logg(page), { timeout: 8000 }).toContain('[figur] apan klättrar ned från stege');
   const bilder = new Set(), y = new Set();
   for (let k = 0; k < 40; k++) { const a = await apan(); bilder.add(a?.bild); y.add(a?.y); if (/vinka/.test(a?.bild || '') && a?.x === 104) break; await page.waitForTimeout(80); }
-  expect([...bilder].some((b) => /^apa_klattra(_ned)?_0[12]$/.test(b || ''))).toBe(true);
+  expect([...bilder].some((b) => /^apa_klattra_ned_0[12]$/.test(b || ''))).toBe(true); // Stils bilder (57.5)
   expect(y.size).toBeGreaterThan(3); // den flyttas nedför stegen
   // framme: på sin plats vid stegens fot, och den vinkar som förut
   await expect.poll(apan, { timeout: 5000 }).toMatchObject({ x: 104, y: 282 });
