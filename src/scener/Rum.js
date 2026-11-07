@@ -1634,7 +1634,8 @@ export class Rum extends Phaser.Scene {
     for (const fb of /** @type {{ nyckel: string, ram: string }[]} */ (serie)) {
       if (!r.active) return false;
       r.setTexture(fb.nyckel, fb.ram); this.smutsig = true;
-      await new Promise((klar) => this.time.delayedCall(ms, klar));
+      // en vanlig timer, inte scenens klocka: berättelsen väntar på öppningen och får aldrig fastna på den
+      await new Promise((klar) => setTimeout(klar, ms));
     }
     return true;
   }
@@ -1672,7 +1673,7 @@ export class Rum extends Phaser.Scene {
     const bilder = [...(o?.bildHugg || []), ...(o?.bildKvar ? [o.bildKvar] : [])].map((n) => foremalsbild(this, n)).filter(Boolean);
     const delar = /** @type {any[]} */ (r.list ? r.list : r.setFrame ? [r] : []);
     if (bilder.length && delar.length) {
-      bilder.forEach((fb, i) => this.time.delayedCall(80 * i, () => { for (const d of delar) d.setTexture(fb.nyckel, fb.ram); this.smutsig = true; }));
+      bilder.forEach((fb, i) => this.time.delayedCall(80 * i, () => { for (const d of delar) if (d.active) d.setTexture(fb.nyckel, fb.ram); this.smutsig = true; })); // ritas rummet om under tiden finns delarna inte längre
       return;
     }
     this.tweens.add({ targets: r, y: r.y + 6, alpha: 0, duration: 260, onUpdate: () => { this.smutsig = true; }, onComplete: () => { r.destroy(); this.smutsig = true; } });

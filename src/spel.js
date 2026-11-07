@@ -487,7 +487,7 @@ export function skapaSpel(d) {
     const o = objekt ? rum.ruta(objekt) : null;
     // en rätt dörr öppnas (31.7) i stället för att hoppa till, som om den vore låst (50.5). En öppning i främre
     // väggen har ingen dörr: den lyser bara
-    if (o?.sort === 'utgang') { rum.markera(o.id, true); if (await rum.oppnaDorr?.(o.id, tid(80))) logg.handelse('dörr', 'öppnas: ' + o.id); }
+    if (o?.sort === 'utgang') { rum.markera(o.id, true); if (await Promise.race([rum.oppnaDorr?.(o.id, tid(80)), vanta(1000).then(() => false)])) logg.handelse('dörr', 'öppnas: ' + o.id); }
     else if (o) { rum.hoppa(o.id); rum.markera(o.id, true); }
     rum.ungeReagerar(true); ljud.spela('unge');
     logg.handelse('rätt', objekt ?? 'kort');
@@ -3030,11 +3030,17 @@ export function skapaSpel(d) {
         let t;
         // kom han in i rummet med stegen (från vinden) ska han ha varit borta från den först
         let vapnad = rum.inkom?.id !== o.id;
+        // han ska stå vid stegen (still i ca 0,3 s) eller gå in i den: går han bara förbi på väg någon annanstans
+        // (till dörren i s01b) klättrar han inte
+        let stilla = 0, forra = '';
         const nadd = new Promise((klar) => {
           t = setInterval(() => {
             if (rum.fryst || pausad || !rum.harRum) return;
-            const vid = vidObjekt(rum.pos, o) || genom(o, rum.pos);
-            if (!vid) vapnad = true; else if (vapnad) klar(undefined);
+            const pos = `${Math.round(rum.pos.x)},${Math.round(rum.pos.y)}`;
+            const vid = vidObjekt(rum.pos, o);
+            stilla = vid && pos === forra ? stilla + 1 : 0; forra = pos;
+            if (!vid && !genom(o, rum.pos)) vapnad = true;
+            else if (vapnad && (genom(o, rum.pos) || stilla >= 3)) klar(undefined);
           }, 100);
         });
         return { mal: x.mal, index: i, nadd: /** @type {Promise<void>} */ (nadd), stopp: () => clearInterval(t) };

@@ -1119,8 +1119,11 @@ test('den lilla lianen: SVÄRD ur minnet, sedan hugger han den, och den är bort
   await page.click('#plattan .vidare');
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').harSvard), { timeout: 5000 }).toBe(true);
   await tryckNara(page, 'liten_lian');
-  await expect(page.locator('#handknapp')).toBeVisible({ timeout: 8000 });
-  await page.keyboard.press('Space');
+  // står han redan vid lianen hugger trycket direkt (det hände på en långsam CI-maskin). Annars kommer handen,
+  // och Mellanslag hugger
+  const huggen = async () => (await page.evaluate(() => window.__ORDSTAVEN.logg())).includes('[hugga] liten_lian');
+  await expect.poll(async () => (await huggen()) || page.locator('#handknapp').isVisible(), { timeout: 8000 }).toBe(true);
+  if (!(await huggen())) await page.keyboard.press('Space');
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.rumsobjekt().includes('liten_lian')), { timeout: 8000 }).toBe(false);
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 8000 }).toContain('[hugga] liten_lian');
   // tillbaka i rummet efter en omstart: den är borta

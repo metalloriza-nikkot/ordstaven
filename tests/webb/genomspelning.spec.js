@@ -299,7 +299,11 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
         if (dumpa && !sparadeDumpar.has(`${nyckel}-lapp`)) { sparadeDumpar.add(`${nyckel}-lapp`); await page.screenshot({ path: `tests/skarmdumpar/prolog/${String(sparadeDumpar.size).padStart(2, '0')}-${nyckel}-lapp.png` }); }
         // ett tryck på dörren (iPad och dator) eller på skylten (Safari) går rakt igenom
         // världen ska gå igen (efter en fel stig går han tillbaka till vägskälet): ett tryck medan den står still glöms
-        await page.waitForFunction(() => !window.__ORDSTAVEN.fryst(), null, { timeout: 20000 }); // längre på en långsam CI-maskin
+        await page.waitForFunction(() => !window.__ORDSTAVEN.fryst(), null, { timeout: 20000 }).catch(async (e) => { // längre på en långsam CI-maskin
+          // vad som hände sist, så att ett fel som bara kommer på CI-maskinen går att förstå
+          const l = await page.evaluate(() => ({ steg: window.__ORDSTAVEN.steg(), scen: window.__ORDSTAVEN.scen(), platta: !document.querySelector('#plattan')?.hidden, logg: window.__ORDSTAVEN.logg().split('\n').filter((r) => /^\d\d:/.test(r) && !/\[(hack|bildrutor|rullning)\]/.test(r)).slice(-30).join('\n') }));
+          throw new Error(`världen gick inte igen vid ${p.id}\n${JSON.stringify({ ...l, logg: undefined })}\n${l.logg}\n${e}`);
+        });
         if (satt === 'hand') await skylt.click(); else await page.mouse.click(pt.x, pt.y);
       } else {
         // föremål: närlappen syns när han står vid det. Står han redan där går nästa tryck igenom: tryck inte då
