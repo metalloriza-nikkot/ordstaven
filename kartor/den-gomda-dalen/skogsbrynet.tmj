@@ -656,9 +656,9 @@
      "name": "snar_ost",
      "type": "sak",
      "x": 480,
-     "y": 40,
+     "y": 48,
      "width": 160,
-     "height": 48,
+     "height": 40,
      "rotation": 0,
      "visible": true,
      "properties": [

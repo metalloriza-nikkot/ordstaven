@@ -2082,3 +2082,107 @@ test('en mellanscen som redan syns (syns_redan, beslut 65) visar ingen ruta, och
   await expect(page.locator('#regi')).toHaveText('Det här syns inte än.', { timeout: 8000 });
   await expect(replikText).toHaveText('TVÅ.', { timeout: 10000 });
 });
+
+test('skogsbrynet efter hugget (beslut 66.1): från liangången norrut och österut till buskarna, och tillbaka, med piltangenterna', async ({ page }) => {
+  test.setTimeout(120000);
+  await page.goto('./?snabb&ny&kapitel=kap-01');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  for (const namn of ['TESTA', 'KNOPP']) {
+    await expect(page.locator('#plattan :is(.dop-ruta, .replik-ruta)')).toBeVisible({ timeout: 10000 });
+    if (await page.locator('#plattan .replik-ruta').isVisible()) await page.click('#plattan .replik-ruta');
+    await expect(page.locator('#plattan .dop-ruta')).toBeVisible({ timeout: 10000 });
+    await page.waitForTimeout(200);
+    await page.keyboard.type(namn);
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#plattan .dop-ruta')).toBeHidden({ timeout: 10000 });
+  }
+  await page.waitForTimeout(500);
+  // sparat i k1s02 när han ska gå dit gråten hörs: lianerna är huggna, hålet i häcken syns, och buskarna är redan gjorda
+  // (så att han kan gå tillbaka direkt)
+  await page.evaluate(() => {
+    const t = window.__ORDSTAVEN.tillstand(); const a = t.aventyr['den-gomda-dalen'];
+    a.scenId = 'k1s02_lianerna'; a.scen = 1; a.steg = 17; a.visade = { ...(a.visade || {}), skogsbrynet: ['stig_genom_hacken'] };
+    a.frivilligt = [...new Set([...(a.frivilligt || []), 'k1s03_buskarna'])];
+    t.spelare.hjalte.formler = [...new Set([...(t.spelare.hjalte.formler || []), 'SVÄRD'])];
+    localStorage.setItem('ordstaven_spar', JSON.stringify(t));
+  });
+  await page.goto('./?snabb&kapitel=kap-01');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  // "Var var vi?" och repliken före målet klickas fram
+  for (let i = 0; i < 60 && (await page.evaluate(() => window.__ORDSTAVEN.steg()?.mal)) !== 'stig_glantan'; i++) {
+    const v = page.locator('#plattan:not([hidden]) .vidare'); if (await v.isVisible()) await v.click().catch(() => {}); else await page.waitForTimeout(200);
+  }
+  expect(await page.evaluate(() => window.__ORDSTAVEN.steg()?.mal)).toBe('stig_glantan');
+  const pos = () => page.evaluate(() => window.__ORDSTAVEN.position());
+  const rummet = () => page.evaluate(() => (window.__ORDSTAVEN.rumsobjekt().includes('stig_lianerna') ? 'buskarna' : window.__ORDSTAVEN.rumsobjekt().includes('stig_buskarna') ? 'skogsbrynet' : 'annat'));
+  const tryck = async (t, ms) => { await page.keyboard.down(t); await page.waitForTimeout(ms); await page.keyboard.up(t); await page.waitForTimeout(60); };
+  /** Gå mot en punkt med piltangenterna (x-led först, eller y-led), och stanna om han står still. */
+  const gaTill = async (x, y, forstY = false) => {
+    for (let i = 0; i < 40; i++) {
+      for (const v of await page.locator('#plattan:not([hidden]) .vidare').all()) await v.click().catch(() => {});
+      const p = await pos();
+      const dx = x - p.x, dy = y - p.y;
+      if (Math.abs(dx) < 3 && Math.abs(dy) < 3) return p;
+      const yled = forstY ? Math.abs(dy) >= 3 : Math.abs(dx) < 3;
+      if (yled) await tryck(dy > 0 ? 'ArrowDown' : 'ArrowUp', Math.min(400, Math.abs(dy) * 12));
+      else await tryck(dx > 0 ? 'ArrowRight' : 'ArrowLeft', Math.min(400, Math.abs(dx) * 12));
+      const q = await pos();
+      if (Math.abs(q.x - p.x) < 0.5 && Math.abs(q.y - p.y) < 0.5) return q;
+    }
+    return pos();
+  };
+  await tryck('ArrowRight', 200);
+  // genom hålet i häcken, runt stubben och formelträdet, upp genom liangången och österut i gången norr om snåret
+  for (const [x, y, fy] of [[64, 126, true], [286, 126, false], [286, 106, true], [332, 106, false], [332, 140, true], [390, 140, false], [390, 104, true], [464, 104, false], [464, 44, true], [600, 44, false]]) {
+    const p = await gaTill(x, y, fy);
+    expect(Math.hypot(p.x - x, p.y - y), `fastnade vid ${Math.round(p.x)},${Math.round(p.y)} på väg mot ${x},${y}`).toBeLessThan(6);
+  }
+  expect(await rummet()).toBe('skogsbrynet');
+  await gaTill(600, 38, true);
+  await gaTill(640, 38);
+  await expect.poll(rummet, { timeout: 10000 }).toBe('buskarna');
+  // och tillbaka: ut åt väster, in i skogsbrynet vid stigen, och till liangången
+  await gaTill(0, (await pos()).y);
+  await expect.poll(rummet, { timeout: 10000 }).toBe('skogsbrynet');
+  for (const [x, y, fy] of [[560, 44, true], [464, 44, false], [464, 104, true]]) {
+    const p = await gaTill(x, y, fy);
+    expect(Math.hypot(p.x - x, p.y - y), `fastnade vid ${Math.round(p.x)},${Math.round(p.y)} på väg tillbaka mot ${x},${y}`).toBeLessThan(6);
+  }
+  expect(await rummet()).toBe('skogsbrynet');
+});
+
+test('gläntans träd i L3 har Stils bilder (beslut 66.2): inget av de tre träden ritas som gråbox', async ({ page }) => {
+  test.setTimeout(90000);
+  await page.goto('./?snabb&ny&kapitel=kap-01');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  for (const namn of ['TESTA', 'KNOPP']) {
+    await expect(page.locator('#plattan :is(.dop-ruta, .replik-ruta)')).toBeVisible({ timeout: 10000 });
+    if (await page.locator('#plattan .replik-ruta').isVisible()) await page.click('#plattan .replik-ruta');
+    await expect(page.locator('#plattan .dop-ruta')).toBeVisible({ timeout: 10000 });
+    await page.waitForTimeout(200);
+    await page.keyboard.type(namn);
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#plattan .dop-ruta')).toBeHidden({ timeout: 10000 });
+  }
+  await page.waitForTimeout(500);
+  // sparat i k1s07 med läsnivå L3: varianten med det stora gamla, det stora unga och det lilla gamla trädet
+  await page.evaluate(() => {
+    const t = window.__ORDSTAVEN.tillstand(); const a = t.aventyr['den-gomda-dalen'];
+    a.scenId = 'k1s07_stigarna'; a.scen = 5; a.steg = 0;
+    const l = t.spelare.larande.lasning; l.P1_las_och_valj = { ...(l.P1_las_och_valj || {}), niva: 3 };
+    t.spelare.hjalte.formler = [...new Set([...(t.spelare.hjalte.formler || []), 'SVÄRD'])];
+    localStorage.setItem('ordstaven_spar', JSON.stringify(t));
+  });
+  await page.goto('./?snabb&kapitel=kap-01');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.rumsobjekt().includes('stort_gammalt_trad')), { timeout: 15000 }).toBe(true);
+  const bilder = await page.evaluate(() => ['stort_gammalt_trad', 'stort_ungt_trad', 'litet_gammalt_trad'].map((id) => window.__ORDSTAVEN.bildFor(id)));
+  expect(bilder).toEqual(['trad_stort_gammalt', 'trad_stort_ungt', 'trad_litet_gammalt']);
+  // L2:s träd syns inte i L3
+  expect(await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt().filter((id) => /^(gammalt|ungt)_trad/.test(id)))).toEqual([]);
+  await page.screenshot({ path: 'test-results/glantan-l3-traden.png' });
+});

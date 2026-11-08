@@ -7,7 +7,10 @@
 //  c) ingen stig han går på ligger över något han inte får gå över (vatten, en häck, en vägg);
 //  d) varje läsval i rummet ryms på en skärm;
 //  e) inget som ritas ovanför figurerna ligger där han kan gå: ridåns rutor står aldrig under fötterna, och det som
-//     ligger ovanpå allt (ugglorna, det som lyser) skymmer aldrig en figur som står där han kan gå.
+//     ligger ovanpå allt (ugglorna, det som lyser) skymmer aldrig en figur som står där han kan gå;
+//  f) med fritt vägval (fri_vag) går varje annan utgång att nå utan att han går genom en tredje, efter allt som har
+//     ändrat kartan (beslut 66.3: vägen till buskarna efter hugget), och sidogrenarna nås när de erbjuds;
+//  g) inget osynligt hinder: ett snår i rutlagret (dekor med rutor) står inte i vägen där inga buskar är ritade.
 import { describe, it, expect } from 'vitest';
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { lasKarta } from '../../src/karna/karta.js';
@@ -203,12 +206,23 @@ function kontrollera(/** @type {string} */ kapId) {
       // det frivilliga (bärbusken, ekorren) och utgångarna (stigen till buskarna) ska gå att nå någon gång när han är i
       // rummet: på östra skärmen först när hålet i häcken syns, i apans bo först när stegen står där
       const scenensMal = new Set(scen.steg.filter((/** @type {any} */ x) => x.typ === 'ga_till').map((/** @type {any} */ x) => x.mal));
+      const frivilligaOchUtgangar = () => obj.filter((x) => x.till || (rum.frivilligt || []).some((/** @type {any} */ f) => f.foremal === x.id));
+      const andraUtgangar = (/** @type {any} */ o, /** @type {string | undefined} */ mal) => obj.filter((x) => x.sort === 'utgang' && x.till && (kanda.has(x.till) || x.id === mal || scenensMal.has(x.id)) && x !== o);
       const provaNagonGang = (/** @type {string | undefined} */ mal = undefined) => {
-        for (const o of obj.filter((x) => x.till || (rum.frivilligt || []).some((/** @type {any} */ f) => f.foremal === x.id))) {
+        for (const o of frivilligaOchUtgangar()) {
           const id = `L${niva} ${rum.id}/${o.id}`;
           if (nagonGang.get(id) === '') continue;
-          const g = gaTill(h, k, pos, nivaNu, o, obj.filter((x) => x.sort === 'utgang' && x.till && (kanda.has(x.till) || x.id === mal || scenensMal.has(x.id)) && x !== o));
+          const g = gaTill(h, k, pos, nivaNu, o, andraUtgangar(o, mal));
           nagonGang.set(id, g.fel ? `${kapId} ${id}: ${o.till ? 'utgången' : 'det frivilliga'} nås aldrig (${g.fel})` : '');
+        }
+      };
+      /** det frivilliga och utgångarna han når härifrån, med kartan som den är nu */
+      const naas = () => new Set(frivilligaOchUtgangar().filter((o) => !gaTill(h, k, pos, nivaNu, o, andraUtgangar(o)).fel).map((o) => o.id));
+      /** f) efter ett steg som ändrar kartan: det han nådde före steget når han också efter (beslut 66.3) */
+      const efterAndring = (/** @type {any} */ st, /** @type {Set<string>} */ fore) => {
+        for (const o of frivilligaOchUtgangar().filter((x) => fore.has(x.id))) {
+          const g = gaTill(h, k, pos, nivaNu, o, andraUtgangar(o));
+          if (g.fel) fel.push(`${var_}: ${o.till ? 'utgången' : 'det frivilliga'} ${o.id} gick att nå före ${st.typ === 'pussel' ? st.pussel_id : st.foremal} men inte efter, från ${Math.round(pos.x)},${Math.round(pos.y)} (${g.fel})`);
         }
       };
       provaNagonGang();
@@ -216,6 +230,14 @@ function kontrollera(/** @type {string} */ kapId) {
       for (const st of scen.steg) {
         if (ute) break;
         if (st.typ === 'ga_till' || st.typ === 'pussel') provaNagonGang(st.typ === 'ga_till' ? st.mal : undefined);
+        // f) fritt vägval: de andra utgångarna (sidogrenen) nås, och vägen dit går inte genom en annan utgång.
+        // Han kommer ut genom den utgång han går in i, så varje utgång räknas, också målet.
+        if (st.typ === 'ga_till' && st.fri_vag) {
+          for (const x of obj.filter((o) => o.sort === 'utgang' && o.till && o.id !== st.mal)) {
+            const g = gaTill(h, k, pos, nivaNu, x, obj.filter((e) => e.sort === 'utgang' && e !== x && (e.till || e.id === st.mal)));
+            if (g.fel) fel.push(`${var_}: med fritt vägval nås utgången ${x.id} (till ${x.till}) inte från ${Math.round(pos.x)},${Math.round(pos.y)} (${g.fel})`);
+          }
+        }
         for (const id of malI(kap, st, obj, niva)) {
           const o = obj.find((x) => x.id === id);
           if (!o) { if (k.objekt.some((/** @type {any} */ x) => x.id === id) || rum.innehall.map(idFor).includes(id)) fel.push(`${var_}: målet ${id} syns inte i rummet`); continue; }
@@ -231,9 +253,11 @@ function kontrollera(/** @type {string} */ kapId) {
         if (st.typ === 'pussel') losta.add(st.pussel_id);
         if (st.typ === 'visa_foremal') { (visade[rum.id] = visade[rum.id] || []).push(st.foremal); }
         if (st.typ === 'pussel' || st.typ === 'visa_foremal') {
+          const fore = naas();
           obj = foremalNu(kap, rum, k, lage());
           h = hinderI(obj, k);
           pos = /** @type {any} */ (h.per.get(nivaNu) ?? h.per.get(0)).narmasteFria(pos);
+          efterAndring(st, fore);
         }
       }
       if (!ute) provaNagonGang();
@@ -273,6 +297,13 @@ function stigarOchOvanpa(/** @type {string} */ rumId, /** @type {any} */ k, /** 
       const under = obj.find((o) => !o.golv && !o.oppning && !o.forsvinnerEfter && o.sort !== 'yta' && (o.rutor || o.id === 'backen') && overlapp(ruta, o));
       if (under) fel.push(`${var_}: stigen ${l.visasMed} har en ruta över ${under.id} vid ${ruta.x},${ruta.y}`);
     });
+  }
+  // g) inget osynligt hinder: ett snår i rutlagret står i vägen bara där buskarna är ritade (ridåns rutor)
+  for (const o of obj.filter((x) => x.dekor && x.rutor)) {
+    for (let y = o.y; y < o.y + o.h; y += 4) {
+      const remsa = { x: o.x, y, b: o.b, h: Math.min(4, o.y + o.h - y) };
+      if (!(k.overHinder || []).some((/** @type {any} */ r) => overlapp(r, remsa))) { fel.push(`${var_}: ${o.id} står i vägen vid y ${y}, där inga buskar är ritade (ett osynligt hinder)`); break; }
+    }
   }
   // e) det han kan nå på varje nivå (från där han kommer in, och från trappan eller stegen)
   const starter = [pos, ...obj.filter((o) => o.till).map(framfor), ...(h.nivaer.finns ? h.nivaer.forbindelser.map((f) => /** @type {any} */ (h.nivaer.passage({ x: f.x + f.b / 2, y: f.y + f.h / 2 }))) : [])];

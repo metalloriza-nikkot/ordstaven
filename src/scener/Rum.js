@@ -12,6 +12,7 @@ import { skapaNivaer } from '../karna/nivaer.js';
 import { KAMERA, centrera, folj, visaRuta, omradeFor, narmare, enSkarm } from '../karna/kamera.js';
 import { hjaltensByten } from '../karna/fargbyte.js';
 import { laddaGrafik, fargad, riktningFor, foremalsbild, rutnamn, rutanimation } from './figurbilder.js';
+import { foremaletsBild } from '../karna/egenskaper.js';
 import { Livet } from './livet.js';
 
 const FARG = {
@@ -141,7 +142,7 @@ export class Rum extends Phaser.Scene {
     /** @type {{ ids: string[], klar: (id: string) => void } | null} */
     this.vantar = null;
     this.markerade = new Set();
-    /** @type {Record<string, { farg: number | null, storlek: string | null, bild?: string | null }[]>} föremål som visar ett pussels alternativ */
+    /** @type {Record<string, { farg: number | null, storlek: string | null, bild?: string | null, egen?: boolean }[]>} föremål som visar ett pussels alternativ */
     this.delar = {};
     /** @type {Map<string, any[]>} */
     this.ritadeDelar = new Map();
@@ -1409,10 +1410,10 @@ export class Rum extends Phaser.Scene {
     }
     const bildNamn = this.ramFor.has(o.id) ? this.ramFor.get(o.id) : o.bildSedan && this.bytta?.has(o.id) ? o.bildSedan : o.bildNatt && (this.tillstand === 'natt' || this.tillstand === 'natt_upplyst') ? o.bildNatt : o.bild;
     // ett föremål som är ett alternativ i ett läsval i rummet (dinomatens lådor) har alternativets bild, i den
-    // variant spelaren får (lada_rod, lada_bla_stor …), när Stil har ritat den
-    const delar0 = this.delar[o.id];
-    const altBild = delar0?.length === 1 && delar0[0].bild && foremalsbild(this, delar0[0].bild) ? delar0[0].bild : null;
-    const fb = altBild ? foremalsbild(this, altBild) : bildNamn && !delar0 ? foremalsbild(this, bildNamn) : null;
+    // variant spelaren får (lada_rod, lada_bla_stor …), när Stil har ritat den. Är föremålet alternativets eget
+    // (gläntans träd i L3) visar kartans bild alternativet (66.2).
+    const valt = foremaletsBild({ kartbild: bildNamn, delar: this.delar[o.id] }, (n) => !!foremalsbild(this, n));
+    const fb = valt ? foremalsbild(this, valt) : null;
     if (fb) {
       const pa = (o.bildPa && this.objekt.find((x) => x.id === o.bildPa)) || o;
       const tex = fb.nyckel === 'hjalte' ? this.hjalteTextur || 'hjalte' : fb.nyckel;
@@ -1510,7 +1511,7 @@ export class Rum extends Phaser.Scene {
 
   /**
    * Visa ett pussels alternativ i föremålet (t.ex. lådorna i den variant spelaren har). null = som vanligt.
-   * @param {string} id @param {{ farg: number | null, storlek: string | null, bild?: string | null }[] | null} delar
+   * @param {string} id @param {{ farg: number | null, storlek: string | null, bild?: string | null, egen?: boolean }[] | null} delar
    */
   visaDelar(id, delar) {
     const o = this.ruta(id); if (!o) return;

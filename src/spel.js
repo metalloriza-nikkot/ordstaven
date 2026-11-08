@@ -4,7 +4,7 @@
 import { skapaBerattelse, spolaFram, aterstallFramsteg, barFore } from './karna/berattelse.js';
 import { sammanfatta } from './karna/foraldravy.js';
 import { skapaLasmotor, valjVariant } from './karna/lasmotor.js';
-import { egenskaper, PALETT } from './karna/egenskaper.js';
+import { egenskaper, egetForemal, PALETT } from './karna/egenskaper.js';
 import { skapaValj, skapaFormel, skapaDop, skapaKrukor, skapaRaddning } from './karna/pussel.js';
 import { forSkarm, versaler } from './karna/text.js';
 import { rumTillSkarm, varldTillSkarm, RUM, textskala } from './karna/skalning.js';
@@ -671,10 +671,14 @@ export function skapaSpel(d) {
   // ------------------------------------------------------------------ rummet
   /** Föremålet i rummet som visar ett pussels alternativ (kartans "visar"). @param {string} pusselId */
   const visarFor = (pusselId) => rum.objekt.find((o) => o.visar === pusselId) ?? null;
-  /** Alternativen som rutor i rätt färg och storlek. @param {any[]} alternativ */
-  const delarAv = (alternativ) => alternativ.map((a) => {
+  /**
+   * Alternativen som rutor i rätt färg och storlek. Med pusslet: `egen` när föremålet bara hör till alternativet,
+   * så att kartans bild visar det när Stil inte har ritat alternativets egen bild (66.2).
+   * @param {any[]} alternativ @param {any} [p]
+   */
+  const delarAv = (alternativ, p) => alternativ.map((a) => {
     const e = egenskaper(a.bild || a.id);
-    return { farg: e.farg ? parseInt(PALETT[e.farg].slice(1), 16) : null, storlek: e.storlek, bild: a.bild ?? null };
+    return { farg: e.farg ? parseInt(PALETT[e.farg].slice(1), 16) : null, storlek: e.storlek, bild: a.bild ?? null, egen: !!(p && a.objekt && egetForemal(p, a.objekt)) };
   });
   /** Delar för alla föremål i ett rum som visar ett läs och välj-pussel, i den variant spelaren får. @param {any} karta */
   function delarIRummet(karta) {
@@ -693,7 +697,7 @@ export function skapaSpel(d) {
       const [, v] = valjVariant(p.varianter, nivaFor(p));
       for (const a of v.alternativ) {
         const e = egenskaper(a.bild || a.id);
-        if (a.objekt && iKartan.has(a.objekt) && (e.farg || e.storlek)) ut[a.objekt] = delarAv([a]);
+        if (a.objekt && iKartan.has(a.objekt) && (e.farg || e.storlek)) ut[a.objekt] = delarAv([a], p);
       }
     }
     return ut;
@@ -2038,7 +2042,7 @@ export function skapaSpel(d) {
           }
           if (nySpikad) ljud.spela('bonk'); // en fel dörr spikas igen: två komiska bonk (10c)
           // varianten kan ha bytts (förenkling): lådorna visar de nya alternativens färg och storlek
-          for (const a of v.s.alternativ) { const e = egenskaper(a.bild || a.id); if (a.objekt && (e.farg || e.storlek)) rum.visaDelar(a.objekt, delarAv([a])); }
+          for (const a of v.s.alternativ) { const e = egenskaper(a.bild || a.id); if (a.objekt && (e.farg || e.storlek)) rum.visaDelar(a.objekt, delarAv([a], p)); }
           rum.sattInteraktiva(kvarSaker());
           ritaSkyltar();
           const pekar = v.s.pekar ? v.s.alternativ.find((a) => a.id === v.s.pekar) : null;

@@ -29,3 +29,28 @@ export function ljushet(hex) {
   const y = 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2];
   return y > 0.008856 ? 116 * Math.cbrt(y) - 16 : 903.3 * y;
 }
+
+/**
+ * Föremålet hör bara till ett alternativ i en variant (beslut 66.2): inget alternativ i en annan variant av pusslet
+ * står i samma föremål. Då visar kartans bild redan alternativet (gläntans träd i L3), och färgen och storleken
+ * behöver inte ritas ovanpå. Lådorna på vinden delas av L2 och L3 och har alltså inte egna föremål.
+ * @param {{ varianter?: Record<string, { alternativ?: { objekt?: string }[] }> }} pussel @param {string} objekt
+ */
+export function egetForemal(pussel, objekt) {
+  const varianter = Object.values(pussel.varianter || {}).filter((v) => (v.alternativ || []).some((a) => a.objekt === objekt));
+  return varianter.length === 1;
+}
+
+/**
+ * Bilden ett föremål ritas med (beslut 66.2): alternativets bild när Stil har ritat den (lada_rod_stor), annars
+ * kartans bild när föremålet inte visar ett alternativ eller är alternativets eget föremål. Annars null: då ritas
+ * delarna som i gråboxen, i alternativets färg och storlek.
+ * @param {{ kartbild?: string | null, delar?: { bild?: string | null, egen?: boolean }[] | null }} o
+ * @param {(bild: string) => boolean} finns om bilden finns i en atlas
+ * @returns {string | null}
+ */
+export function foremaletsBild({ kartbild, delar }, finns) {
+  if (delar?.length === 1 && delar[0].bild && finns(delar[0].bild)) return delar[0].bild;
+  if (kartbild && (!delar || delar.every((d) => d.egen)) && finns(kartbild)) return kartbild;
+  return null;
+}

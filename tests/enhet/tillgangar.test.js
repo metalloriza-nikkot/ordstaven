@@ -2,6 +2,8 @@
 // och figurernas storlek. Filerna skrivs av verktyg/grafik/inkorg.py.
 import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { egenskaper, egetForemal, foremaletsBild } from '../../src/karna/egenskaper.js';
+import { valjVariant } from '../../src/karna/lasmotor.js';
 
 const rot = new URL('../../', import.meta.url);
 const las = (p) => readFileSync(new URL(p, rot));
@@ -108,6 +110,47 @@ describe('kartornas grafik', () => {
       }
     }
     expect(saknas).toEqual([]);
+  });
+  it('varje föremål i varje nivåvariant har en bild (beslut 66.3): i ett kapitel med grafik ritas inget läsval som gråbox', () => {
+    // samma val som motorn (Rum.ritaObjekt): alternativets bild när den finns, annars kartans när föremålet är
+    // alternativets eget. En variant som bara får gråboxens rutor är ett fel i ett kapitel där rummen har grafik.
+    const kartaFor = new Map(kartor.map(([f, k]) => [f.replace(/\.tmj$/, ''), k]));
+    const kapitelmapp = 'content/den-gomda-dalen/';
+    const fel = [];
+    let provade = 0;
+    for (const fil of readdirSync(new URL(kapitelmapp, rot)).filter((f) => /^kap-\d+\.json$/.test(f))) {
+      const kap = JSON.parse(las(kapitelmapp + fil).toString());
+      const kartorna = (kap.rum || []).map((r) => kartaFor.get(r.id)).filter(Boolean);
+      const medGrafik = kartorna.some((k) => egen(k).bild || egen(k).mark);
+      if (!medGrafik) continue;
+      const objektI = new Map(kartorna.flatMap((k) => k.layers.flatMap((l) => l.objects || [])).map((o) => [o.name, egen(o)]));
+      for (const p of kap.pussel.filter((x) => x.i_rummet && x.varianter)) {
+        for (const tal of [1, 2, 3, 4]) {
+          const [vn, v] = valjVariant(p.varianter, tal);
+          for (const a of v.alternativ.filter((x) => x.objekt && objektI.has(x.objekt))) {
+            const e = egenskaper(a.bild || a.id);
+            const delar = e.farg || e.storlek ? [{ bild: a.bild ?? null, egen: egetForemal(p, a.objekt) }] : null;
+            const kart = objektI.get(a.objekt);
+            // det som inte ritas som bild i världen: stigar och dörrar i marken eller rummets bild, skyltar i textlagret
+            if (!kart.bild && !delar) continue;
+            provade++;
+            if (!foremaletsBild({ kartbild: kart.bild ?? null, delar }, (n) => ramar.has(n))) fel.push(`${fil} ${p.id} ${vn} (L${tal}): ${a.objekt} har ingen bild (${a.bild || a.id}${kart.bild ? ', kartans ' + kart.bild : ''})`);
+          }
+        }
+      }
+    }
+    expect(provade).toBeGreaterThan(20);
+    expect([...new Set(fel)]).toEqual([]);
+  });
+  it('alternativets eget föremål: kartans bild visar det, men lådorna som delas av två varianter visar sin färg (66.2)', () => {
+    const finns = (n) => ['trad_stort_gammalt', 'lada_lang', 'lada_rod'].includes(n);
+    const p = { varianter: { L2: { alternativ: [{ objekt: 'lada_1' }, { objekt: 'gammalt_trad' }] }, L3: { alternativ: [{ objekt: 'lada_1' }, { objekt: 'stort_gammalt_trad' }] } } };
+    expect(egetForemal(p, 'stort_gammalt_trad')).toBe(true);
+    expect(egetForemal(p, 'lada_1')).toBe(false);
+    expect(foremaletsBild({ kartbild: 'trad_stort_gammalt', delar: [{ bild: 'stort_gammalt_trad', egen: true }] }, finns)).toBe('trad_stort_gammalt');
+    expect(foremaletsBild({ kartbild: 'lada_lang', delar: [{ bild: 'lada_rod', egen: false }] }, finns)).toBe('lada_rod');
+    expect(foremaletsBild({ kartbild: 'lada_lang', delar: [{ bild: 'lada_gron', egen: false }] }, finns)).toBe(null);
+    expect(foremaletsBild({ kartbild: 'lada_lang', delar: null }, finns)).toBe('lada_lang');
   });
   it('skogens rutlager (Teknik 3): rätt storlek, bara rutor som finns i rutsetet, och lagret med den hemliga stigen hör till ett föremål', () => {
     const ts = JSON.parse(las('assets/tiles/skog/skog.json').toString());
