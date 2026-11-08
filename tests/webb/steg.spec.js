@@ -1246,7 +1246,7 @@ test('luckorna: frågan och bilden överst, tre rader i hela bredden som är luc
 
 // ---------------------------------------------------------------- pass 3 och låset (beslut 24.2)
 /** En sparning där prologen är spelad till slut, med namnen. */
-async function prologenKlar(page) {
+async function prologenKlar(page, extra = null) {
   await page.goto('./?snabb&ny');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.evaluate((n) => {
@@ -1254,8 +1254,9 @@ async function prologenKlar(page) {
     t.spelare.hjalte.namn = 'TESTA'; t.spelare.unge.namn = 'KNOPP'; t.spelare.unge.folj = true; t.spelare.hjalte.formler = ['LJUS'];
     av.kapitelId = 'kap-00'; av.scenId = 's22_tradgarden'; av.scen = n.i; av.steg = n.steg; av.startad = true; av.spolat = [];
     av.ui = { nosknappen: true, barraknaren: true, radioramen: true };
+    if (n.extra) (0, eval)(`(${n.extra})`)(t);
     localStorage.setItem('ordstaven_spar', JSON.stringify(t));
-  }, { i: kap00.scener.length - 1, steg: kap00.scener.at(-1).steg.length });
+  }, { i: kap00.scener.length - 1, steg: kap00.scener.at(-1).steg.length, extra: extra ? String(extra) : null });
 }
 const kap00 = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-00.json', import.meta.url), 'utf8'));
 
@@ -1850,4 +1851,75 @@ test('Var var vi (F2): ett pass utan post har bara vid_omstart, som förut', asy
     (t) => { t.aventyr['den-gomda-dalen'].startad = true; }, {}, '&sedan=9');
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('GAMMAL.', { timeout: 8000 });
   expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).not.toContain('[var var vi]');
+});
+
+test('menyn sätter tillbaka lärandet till passets början, utan spår av det som kom efter (F3, 32.2)', async ({ page }) => {
+  test.setTimeout(60000);
+  await prologenKlar(page, (t) => {
+    const av = t.aventyr['den-gomda-dalen'];
+    const post = (niva) => ({ niva, streak: 0, miss: 0, uppgifter: 3, forstaForsok: 3, hjalp: 0, aa: 0 });
+    // en vuxen har spelat kapitel 1 snabbt i spelarens app: nivån har gått upp till L4
+    t.spelare.larande.lasning = { P1_las_och_valj: post(4) };
+    t.spelare.larande.historik = [{ pussel_id: 'p0_dinomat', typ: 'P1_las_och_valj', niva: 'L2', ratt: true, nar: 1000 }, { pussel_id: 'k1_skylt', typ: 'P1_las_och_valj', niva: 'L3', ratt: true, nar: 5000 }];
+    const bild = (kapitel, pass, ordning, tid, niva) => ({ kapitel, pass, ordning, tid, larande: { lasning: { P1_las_och_valj: post(niva) }, skrivning: {}, ord: {}, matte: {} } });
+    av.passbilder = [bild('kap-00', 3, 3, 3000, 2), bild('kap-01', 1, 1001, 4000, 3)];
+  });
+  await page.goto('./?snabb');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.keyboard.press('Control+Shift+KeyM');
+  // passen utan bild av lärandet är märkta
+  await expect(page.locator('#vuxenmeny .pass-start[data-bild="nej"]')).toHaveText(['Prologen, pass 2 *', 'Skogen, pass 2 *']);
+  await expect(page.locator('#vuxenmeny .utan-bild')).toBeVisible();
+  await page.screenshot({ path: 'test-results/meny-larandet.png' });
+  await Promise.all([page.waitForEvent('load'), page.locator('#vuxenmeny .pass-start', { hasText: 'Prologen, pass 3' }).click()]);
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  let t = await page.evaluate(() => window.__ORDSTAVEN.tillstand());
+  expect(t.spelare.larande.lasning.P1_las_och_valj.niva).toBe(2);
+  expect(t.spelare.larande.historik.map((h) => h.nar)).toEqual([1000]);
+  expect(t.aventyr['den-gomda-dalen'].passbilder.map((b) => `${b.kapitel}:${b.pass}`)).toEqual(['kap-00:3']);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toMatch(/sparningen satt tillbaka till passets början.*"larande":"bild"/);
+  // passet börjar: en ny bild av lärandet, med nivån som den är nu
+  await page.click('.start-knapp');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 10000 }).toBe('s19_morgon');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('[lärandet] bild vid kap-00 pass 3');
+  t = await page.evaluate(() => window.__ORDSTAVEN.tillstand());
+  expect(t.aventyr['den-gomda-dalen'].passbilder.map((b) => `${b.kapitel}:${b.pass}:L${b.larande.lasning.P1_las_och_valj.niva}`)).toEqual(['kap-00:3:L2']);
+});
+
+test('menyn låser kapitel 1 igen: sparningen står i slutet av prologen, utan något från kapitlet, och slutrutan kommer (F3)', async ({ page }) => {
+  test.setTimeout(60000);
+  await prologenKlar(page, (t) => {
+    const av = t.aventyr['den-gomda-dalen'];
+    const post = (niva) => ({ niva, streak: 0, miss: 0, uppgifter: 3, forstaForsok: 3, hjalp: 0, aa: 0 });
+    // mitt i kapitel 1, med SVÄRD och kartbit 2
+    av.kapitelId = 'kap-01'; av.scenId = 'k1s07_stigarna'; av.scen = 5; av.steg = 0; av.kartbitar = [1, 2]; av.spolat = ['kap-00'];
+    t.spelare.hjalte.formler = ['LJUS', 'SVÄRD'];
+    t.installningar = { ...t.installningar, oppnadeKapitel: ['kap-01'] };
+    t.spelare.larande.lasning = { P1_las_och_valj: post(3) };
+    av.passbilder = [{ kapitel: 'kap-01', pass: 1, ordning: 1001, tid: 4000, larande: { lasning: { P1_las_och_valj: post(2) }, skrivning: {}, ord: {}, matte: {} } }];
+  });
+  await page.goto('./?snabb');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.keyboard.press('Control+Shift+KeyM');
+  await Promise.all([page.waitForEvent('load'), page.locator('#vuxenmeny .kapitel-oppet[data-kapitel="kap-01"]').click()]);
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  const t = await page.evaluate(() => window.__ORDSTAVEN.tillstand());
+  expect(t.installningar.oppnadeKapitel || []).not.toContain('kap-01');
+  expect(t.spelare.larande.lasning.P1_las_och_valj.niva).toBe(2);
+  expect(t.spelare.hjalte.namn).toBe('TESTA');
+  await page.click('.start-knapp');
+  for (let i = 0; i < 40 && !(await page.locator('.pass-slut.kapitel-last').isVisible()); i++) {
+    const r = page.locator('#plattan .replik-ruta');
+    if (await r.isVisible()) await r.click();
+    await page.waitForTimeout(150);
+  }
+  await expect(page.locator('.pass-slut.kapitel-last')).toBeVisible();
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('kapitlet är låst: kap-01');
+  // prologen är spolad fram igen, och inget från kapitel 1 finns kvar
+  const efter = await page.evaluate(() => window.__ORDSTAVEN.tillstand());
+  expect(efter.spelare.hjalte.formler).toContain('LJUS');
+  expect(efter.spelare.hjalte.formler).not.toContain('SVÄRD');
+  expect(efter.aventyr['den-gomda-dalen'].kartbitar).toEqual([1]);
+  expect(efter.aventyr['den-gomda-dalen'].kapitelId).toBe('kap-00');
+  await page.screenshot({ path: 'test-results/kapitel-last-igen.png' });
 });

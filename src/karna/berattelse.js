@@ -262,8 +262,10 @@ export function aterstallFramsteg({ tillstand, aventyrId, maxBar }) {
   // äventyrets del töms på plats (gränssnittet håller en referens till den)
   const av = aventyrFor(tillstand, aventyrId);
   const bar = Math.max(0, Math.min(av.bar || 0, maxBar));
+  // bilderna av lärandet vid passens början står kvar: menyn sätter tillbaka lärandet med dem (F3, larandebild.js)
+  const passbilder = av.passbilder;
   for (const k of Object.keys(av)) delete av[k];
-  Object.assign(av, { kapitel: 0, flaggor: {}, bar, kartbitar: [] });
+  Object.assign(av, { kapitel: 0, flaggor: {}, bar, kartbitar: [] }, passbilder ? { passbilder } : {});
   return av;
 }
 

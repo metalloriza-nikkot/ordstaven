@@ -510,6 +510,14 @@ describe('tillbaka till början av ett pass (beslut 26.6)', () => {
     expect(t.spelare.unge.namn).toBe('Pip'); expect(t.spelare.larande.historik).toHaveLength(1);
     expect(t.installningar.rost).toBe(false);
   });
+  it('bilderna av lärandet vid passens början står kvar (F3)', () => {
+    const t = nyttTillstand('test'); const av = aventyrFor(t, AVENTYR);
+    av.passbilder = [{ kapitel: 'kap-00', pass: 2, ordning: 2, tid: 1, larande: { lasning: {}, skrivning: {}, ord: {}, matte: {} } }];
+    av.kapitelId = 'kap-01';
+    aterstallFramsteg({ tillstand: t, aventyrId: AVENTYR, maxBar: 6 });
+    expect(aventyrFor(t, AVENTYR).passbilder).toHaveLength(1);
+    expect(aventyrFor(t, AVENTYR).kapitelId).toBeUndefined();
+  });
   it('färre bär än prologen kan ge står kvar', () => {
     const t = nyttTillstand('test'); aventyrFor(t, AVENTYR).bar = 2;
     aterstallFramsteg({ tillstand: t, aventyrId: AVENTYR, maxBar: 6 });
