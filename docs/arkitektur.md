@@ -269,7 +269,7 @@ content/*.json ──► karna/berattelse.js ──► spel.js ──► scener/
 - **Bilden stämmer med texten** (0.3.2): färg och storlek som en läsuppgift nämner syns i bilden. Gråboxens färger (`karna/egenskaper.js`) skiljer sig minst 10 L* i ljushet, och ett test kontrollerar att varje rätt alternativ har den färg och storlek texten säger. Ett föremål i kartan med `visar: <pussel>` ritar pusslets alternativ i rummet i samma färg och storlek, i den variant spelaren får.
 - **Bärräknaren matar ungen** (0.3.2): ett tryck när världen går får ett bär att flyga till ungen, ungen hoppar och låter glad. Vid 0 bär rycker ungen på axlarna. Ingen tangent (alla bokstäver ska gå att skriva), musen eller ett tryck räcker.
 - **Styrhjälpen** (`visa_styrhjalp`): piltangenter på dator, ett finger som trycker på målet på pekskärm. Utan text, försvinner när hjälten börjar gå. Kontrollen varnar för instruktioner som nämner en enhet (piltangent, mus, klicka m.fl.).
-- **Meny för vuxna**: håll inne ⚙ (eller Ctrl+Skift+M). En ring fylls medan man håller, ett kort tryck visar "Håll inne". Menyn ligger i ett eget lager och går att öppna även på startskärmen. Läsnivå, föräldern läser Farfar, objektens namn, hoppa till scen, spara loggen, börja om.
+- **INSTÄLLNINGAR** (förut menyn för vuxna): håll inne ⚙ (eller Ctrl+Skift+M). En ring fylls medan man håller, ett kort tryck visar "Håll inne". Menyn ligger i ett eget lager och går att öppna även på startskärmen. Läsnivå, föräldern läser Farfar, objektens namn, hoppa till scen, spara loggen, börja om.
 - **Testläge**: `?snabb` stänger av rösten, animationerna och kortar pauserna. `?ny` börjar om från början.
 - **Kapitel 1** finns som data och går igenom kontrollen, men spelas inte: P15 och P9 byggs i fas 3. Gråboxen slutar efter prologen.
 
@@ -287,7 +287,7 @@ Spelet är byggt i lager. Djupnumren (CSS `z-index`, med luckor för det som kom
 | 5 | Saker i rummet som väntar på spelaren | `#tanke`, `#ordskylt`, `#handknapp` | Frågan när man läser i rummet, ordet ovanför lådan, handen. Döljs när läsplattan är öppen. |
 | 4 | Helskärmar | `#skarm` | Startskärmen, passets slut och paus. Kan vara genomskinlig (fri lek) och släpper då bara igenom ▶. |
 | 6 | Menyknappen | `#hud-meny` | Ligger över helskärmarna, så att menyn går att öppna överallt. |
-| 7 | Menyn för vuxna | `#vuxenmeny` | Pausar spelet (se nedan). Ligger över allt. |
+| 7 | INSTÄLLNINGAR | `#vuxenmeny` | Pausar spelet (se nedan). Ligger över allt. |
 | — | Skärmtangentbordet | `#tangentbord` | Bara när ett namn skrivs på pekskärm. Rummet krymper så att inget täcks. |
 | — | Felsökningsloggen | Ctrl+Skift+L | Ritas utanför spelet, rör inte tillståndet. |
 
@@ -295,7 +295,7 @@ Spelet är byggt i lager. Djupnumren (CSS `z-index`, med luckor för det som kom
 
 **När världen står still.** Läsplattan, helskärmar och pausen fryser världen (`rum.frys`). Hjälten går inte, knuffar väntar, handen och glimtarna visas inte. Röst och ljud fortsätter bara i det lager som syns.
 
-**Paus.** Menyn för vuxna och en dold flik pausar spelet (`pausa` / `fortsatt` i `spel.js`). Då stannar världen, rösten och ljudningen tystnar, knuffarnas klockor väntar, handlingar når inga steg och spelet sparas. Allt annat ligger kvar som det var, så att spelet fortsätter exakt där det stod.
+**Paus.** INSTÄLLNINGAR och en dold flik pausar spelet (`pausa` / `fortsatt` i `spel.js`). Då stannar världen, rösten och ljudningen tystnar, knuffarnas klockor väntar, handlingar når inga steg och spelet sparas. Allt annat ligger kvar som det var, så att spelet fortsätter exakt där det stod.
 
 **Från varje tillstånd finns en väg ut.**
 
@@ -308,7 +308,7 @@ Spelet är byggt i lager. Djupnumren (CSS `z-index`, med luckor för det som kom
 | Passets slut, paus | ▶ (💤 visar en pausbild med ▶) |
 | Fri lek | Tar slut av sig själv: när föremålen har gett sina bär, när hjälten går mot en utgång eller genom en öppning (grinden), eller efter en stund utan att något händer (0.5.1) |
 | Namn med skärmtangentbord | ✓ (minst en bokstav) |
-| Menyn för vuxna | Stäng, Escape |
+| INSTÄLLNINGAR | Stäng, Escape |
 | Dold flik | Visa fliken igen |
 
 Genomspelningstestet öppnar menyn över varje sorts lager (replik, kort, formel, namn, bok, lapp, passets slut, hjälten, rummet), kontrollerar att spelet står still och tar sig ut med Escape. Det stänger också fliken mitt i en scen i varje pass och kontrollerar att spelet fortsätter på samma steg.
@@ -486,7 +486,7 @@ Efter den externa granskningen: det ska aldrig löna sig att gissa eller vänta 
 
 ## 28. Hopp till en scen i menyn (0.8.1)
 
-- Menyn för vuxna listar alla kapitlens scener. Ett hopp sätter `av.kapitelId`, `av.scenId` och `av.spolaTill` och laddar om.
+- INSTÄLLNINGAR listar alla kapitlens scener. Ett hopp sätter `av.kapitelId`, `av.scenId` och `av.spolaTill` och laddar om.
 - Kapitlen före spolas fram som vid `?kapitel=` (`av.spolat` töms, spolningen gör inget två gånger). I hoppets kapitel spolas scenerna före hoppet fram (`spolaFram({ tillScen })`): frivilliga scener och bär räknas inte. Namn som saknas frågas efter med dop-pusslen.
 - Ett hopp bakåt tar inte bort det som redan har getts (formler, gåvor). För ett rent prov finns Börja om från början.
 
@@ -503,7 +503,7 @@ Efter den externa granskningen: det ska aldrig löna sig att gissa eller vänta 
 - **Samma fel igen** (`kortReaktion`): bara ljudet och ungens frågande blick, ca 0,6 s. Det gäller samma fel ord i en formel eller i kodlåset (`samma` i `kontrollera`, `karna/pussel.js`) och en prövad stig som han går in på igen. Andra alternativ kan inte väljas två gånger (de tonas ut eller spikas).
 - **Rätt val** (`rattHandelse`): föremålet han valde hoppar och lyser, och ungen gör ett glädjehopp, samtidigt som `vid_ratt` spelas (ca 1,1 s). På läsplattan hoppar ungen. Loggen skriver `[rätt]`.
 - **SLUTA FÖR IDAG** (`slutaForIdag`): från pausmenyn (bilden med den sovande ungen) och från knappen vid passets slut. Spelet sparar, `sluta_for_idag.med_ungen` eller `fore_ungen` spelas, och sedan den sovande ungen och ▶, som fortsätter där han var. Pausknappen finns först när hjälteboken har något (från LJUS i s03).
-- **Föräldravyn** (`karna/foraldravy.js`, menyn för vuxna): per pusseltyp nivån, antalet uppgifter, rätt på första försöket utan hjälp, vad slumpen hade gett i läsvalen (1 av antalet alternativ i varianten), hur ofta hjälpen användes och mediantiden. Ur `larande.historik`.
+- **Föräldravyn** (`karna/foraldravy.js`, INSTÄLLNINGAR): per pusseltyp nivån, antalet uppgifter, rätt på första försöket utan hjälp, vad slumpen hade gett i läsvalen (1 av antalet alternativ i varianten), hur ofta hjälpen användes och mediantiden. Ur `larande.historik`.
 - **Vägvalet** (beslut 17.1): ett `ga_till` med `fri_vag` loggar `[vägval]`, till exempel `stig_buskarna först` och sedan `stig_glantan efter stig_buskarna`, eller `stig_glantan först` med sidogrenarna som fanns kvar.
 
 ## 31. Startskärmen och rösten efter ett avbrott (0.8.4)
@@ -523,8 +523,8 @@ Efter den externa granskningen: det ska aldrig löna sig att gissa eller vänta 
 Beslut 21 och stilguiden §3: fyra familjer som i serier.
 - **Någon säger något** (`.pratruta`): varm ruta med rundade hörn, en spets ner mot ansiktet, och ansiktet i en rund ram. Genom radion är ansiktet radions högtalare (📻 i ramen, inte på en egen rad). **Berättaren** (`.berattarruta`): rak ruta, svalt blågrått papper och guldstjärnan. Formen väljs av talaren i `spel.replikHtml`.
 - **Rullningen** (`grans/rullning.js`): repliker rullas fram med 40 tecken per sekund (`karna/framskrivning.js`: `RULLNING`, `teckenTid`). Varje tecken är ett eget span som är dolt med `visibility`, så orden har sin plats från början och raden hoppar aldrig. Orden (`.ord`) behåller sina spans för nosen och markeringen. Ett tryck (eller Mellanslag) medan texten rullar visar allt, och nästa tryck går vidare (`ui.vantaFortsatt(..., forst)`). I snabbläget syns allt direkt, utom med `?rulla` (testet).
-- **Markeringen** följer rösten från första ordet: röstens ordsignal (`onboundary`), och uppskattad takt tills den kommer. Den kan stängas av i menyn för vuxna (villkoret i 15.1: hamnar den fel på en enhet stängs den av där).
-- **Utan röst** (menyn för vuxna: rösten av, eller ingen svensk röst) piper rullningen lågt i ordtakt, med en ton per rollröst (`ljud.pip`). När föräldern läser Farfar är det tyst.
+- **Markeringen** följer rösten från första ordet: röstens ordsignal (`onboundary`), och uppskattad takt tills den kommer. Den kan stängas av i INSTÄLLNINGAR (villkoret i 15.1: hamnar den fel på en enhet stängs den av där).
+- **Utan röst** (INSTÄLLNINGAR: rösten av, eller ingen svensk röst) piper rullningen lågt i ordtakt, med en ton per rollröst (`ljud.pip`). När föräldern läser Farfar är det tyst.
 - **Golvdatorn:** rullningen räknar fram tecknen ur tiden, inte ur antalet bildrutor, så en långsam dator rullar lika fort men i större steg. Loggen skriver varje rullning (`[rullning] N tecken på M ms (tecken), längsta glapp G ms`). Kommer tre glapp över 80 ms i samma replik rullar texten resten av passet ett ord i taget i samma takt, och loggen säger det.
 - **Ljudord** (`ui.ljudord`, `spel.visaLjudord`): fältet `ljudord` på `ljud`-steget och på reaktioner. Ordet står i världslagret vid det som låter, i Lexend 900 med kontur och snett, i ljudets färg (`ljud.farg`), och försvinner efter 0,8 s. Läsplattan täcker det.
 - **Papper och saker:** lappen har riven kant nertill (`clip-path`) och sitter 2° snett. Farfars skylt med en mening är en träram med ljust papper. Skyltarna vid dörrar och stigar och tavlorna i världen har en träram, eller sten (`papper: "sten"`).
@@ -533,7 +533,7 @@ Beslut 21 och stilguiden §3: fyra familjer som i serier.
 ## 34. Pass 3 och låsta kapitel (beslut 24.2, 0.11.0)
 - **Låsta kapitel** (`spel.kapitelLast`): ett kapitel i `aventyr.kapitel_last.last` är låst tills den vuxne öppnar det (`installningar.oppnadeKapitel`, per enhet). `?kapitel=<id>` går förbi låset. I `spela()` hoppar loopen inte in i ett låst kapitel: förra kapitlets sista rum visas, och `visaKapitelLast` spelar slutrutan (`kapitel_last.steg`) och står sedan kvar med den sovande ungen, en stjärna och ▶ (som spelar slutrutan igen). Kapitlets sista sparpunkt hoppar över frågan när nästa kapitel är låst.
 - **Ett klart kapitel förblir klart** (`skapaBerattelse`): står sparningen på sista scenens sista steg (`av.steg` ≥ antalet steg) är kapitlet slut, och det börjar inte om på sparpunkten med "Var var vi?".
-- **Börja ett pass** (menyn för vuxna): en knapp per pass och kapitel, till passets första scen. Samma hopp som scenlistan (§28): det som kommer före spolas fram, och namnen och det som har getts finns kvar. Ett hopp in i ett låst kapitel öppnar det på enheten.
+- **Börja ett pass** (INSTÄLLNINGAR): en knapp per pass och kapitel, till passets första scen. Samma hopp som scenlistan (§28): det som kommer före spolas fram, och namnen och det som har getts finns kvar. Ett hopp in i ett låst kapitel öppnar det på enheten.
 - **Herr Skata:** talaren `herr_skata` (rollrösten `fagel`) och lätet `fagel_late` som ett skrockande skratt i tre stötar (`ljud.skata`), tills Stil gör det riktiga ljudet.
 
 ## 35. T4c: molnet, frågan ovanför korten och luckorna (0.12.0)
@@ -554,7 +554,7 @@ Stilguiden §3 gick igenom mot spelet. Det som saknades är byggt här, resten f
 - **Figurerna i världen** (`src/scener/figurbilder.js`): scenen laddar atlasen i `preload`. Hjälten är bilderna av hjälte A med hud och dräkt bytta (`karna/fargbyte.js`: hudens tre toner flyttas med samma steg i nyans, mättnad och ljus som förlagan, dräkten har en ton), en textur per val. Staven är ett eget lager ovanpå, med knytnäven i hudens färg, och syns från att hjälten har en formel. Bilden väljs efter riktningen (`vand`), och gången byter bild var femte pixel. Ryggsäcken och hjälmdekoren är gråbox tills Stil ritar lagren.
 - **Herr Skata** flyger förbi högt uppe när hans läte spelas (`FLYGER_VID_LJUD` i `spel.js`), utan att berättelsen väntar. Sitta och titta finns i atlasen för mellanscenerna senare.
 - **Ljuden** (`grans/ljud.js`): de inspelade lätena avkodas när ljudet startar och ersätter syntesen för `fagel_late`, ungens tre läten och ungens reaktioner (ett av de tre). Ett ljudsteg väntar tills lätet har låtit klart, högst 1,6 s.
-- **Tillbaka till ett pass** (beslut 26.6): ett hopp i menyn för vuxna kör `aterstallFramsteg` (karna/berattelse.js) före spolningen. Det som berättelsen ger töms, och spolningen ger tillbaka det som kapitlen före passet ger. Bären får vara kvar men aldrig fler än `barFore` (ge_bar, krukornas bär, buskarna i fri lek). Kapitel efter passet som står i `kapitel_last` och är öppnade låses igen. Fliktavlorna (stjärnorna i MIN BOK) sätts till det som spolades tillbaka.
+- **Tillbaka till ett pass** (beslut 26.6): ett hopp i INSTÄLLNINGAR kör `aterstallFramsteg` (karna/berattelse.js) före spolningen. Det som berättelsen ger töms, och spolningen ger tillbaka det som kapitlen före passet ger. Bären får vara kvar men aldrig fler än `barFore` (ge_bar, krukornas bär, buskarna i fri lek). Kapitel efter passet som står i `kapitel_last` och är öppnade låses igen. Fliktavlorna (stjärnorna i MIN BOK) sätts till det som spolades tillbaka.
 
 ## 38. Farfars hus i grafik (0.14.0)
 - **Skriptet** (`verktyg/grafik/inkorg.py`) tar hela inkorgen: `figurer/<mapp>` blir ett atlas per mapp i `assets/sprites/`, `foremal/<zon>` ett atlas per zon i `assets/foremal/`, `rum/<zon>/<rum>.png` en bild per rum i `assets/rum/`, `rutor/<zon>` rutsetet i `assets/tiles/`, och porträtten också egna bilder i `assets/portratt/`. `--bara` väljer mappar. Färgerna och genomskinligheten (skuggorna) står kvar som Stil ritade dem. `assets/palett.json` är en förteckning över färgerna, inte längre ett lås (283 färger, stilguiden §2 säger 48: Stils sak).
@@ -618,7 +618,7 @@ Stilguiden §3 gick igenom mot spelet. Det som saknades är byggt här, resten f
 - **Kartans `delas: "hela"`** (`karta.js` `delasHela`): när ett P26 utan `foremal` delar föremålet som visar pusslet fyller delarna hela föremålet i stället för att bli krukor i rad (`Rum.dela`). Lianväggen står alltså kvar och stänger vägen tills varje del är huggen.
 - **`forsvinner_efter`** gäller nu också P26. Ett föremål är borta när pusslet är löst i passet (`losta`), när formeln finns på staven (bara P11), eller när sparningen har gått förbi pusslet (`pusselForbi`: steget i scenen är passerat, eller det frivilliga som kör pusslet är gjort och inte pågår). Därför står huggna lianer inte där igen efter en omstart, och ingen ny del i sparformatet behövs. Kontrollen godtar P11 och P26.
 - **Knuffen på mål** (beslut 39.4): `MAL_KNUFF_MS` är 15 s och gäller varje `ga_till` och avstickaren, med eller utan molnet. Ungen nosar mot målet (`rum.ungePekar`), och följer ungen inte med (s01) glimtar målet som förut. Loggen skriver `ungen nosar mot målet` eller `målet glimtar`. Läsplattans knufftid (`karna/hjalp.js`) är oförändrad.
-- **Sparfilen** (menyn för vuxna): Spara sparfilen laddar ned `sparning.tillText` som `ordstaven-sparfil-<datum>-<tid>.json` (`loggDom.laddaNed`). Läs in en sparfil läser filen med `sparning.franText` (migreringarna gäller, och en fil som inte är en ORDSTAVEN-sparning ger ett svar i menyn), lägger den gamla sparningen i backup, stänger av sparandet på sidan och laddar om.
+- **Sparfilen** (INSTÄLLNINGAR): Spara sparfilen laddar ned `sparning.tillText` som `ordstaven-sparfil-<datum>-<tid>.json` (`loggDom.laddaNed`). Läs in en sparfil läser filen med `sparning.franText` (migreringarna gäller, och en fil som inte är en ORDSTAVEN-sparning ger ett svar i menyn), lägger den gamla sparningen i backup, stänger av sparandet på sidan och laddar om.
 
 ## 46. Prologen v0.13 och bilderna till hugget (0.21.0)
 - **Bära till en figur** (s16, `spel.js` `rum.fragaIgen`): ett tryck på en figur upprepar dess senaste replik, utom när figuren är målet i steget som pågår. Målet är nu också `till` i `bara`, så att ett tryck på Farfar går dit och lägger boken hos honom.
@@ -761,7 +761,7 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - `skapaSparning({ …, plats })` läser och skriver platsens nycklar, och `main.js` väljer den aktiva platsen innan spelet startar. `?ny` nollställer bara den aktiva platsen.
 - **NYTT ÄVENTYR raderar aldrig något.** Det gör en ny plats med ett nytt tillstånd, och den blir den aktiva. Enhetens inställningar (rösten, de öppna kapitlen) och den vuxnes del följer med. En plats där ingen har börjat används igen, så att platserna inte blir fler. Ett borttaget nummer används inte igen så länge dess backup finns.
 - **Startskärmen** (`startskarm` i `spel.js`): första gången bara ▶ (som förut). Har han börjat: ett stort FORTSÄTT med hjälten i hans färger och ungen (Rum `hjalteBild`, `ungeBildUrl`), en rad med spelarkort (hjältens bild, `hjalteBildFor`, och namnet han skrev) och ett mindre kort med + för NYTT ÄVENTYR. Första trycket på + gör kortet redo (det lyser och växer i 4 s), det andra gör den nya platsen och laddar om. Ett annat spelarkort väljer den platsen och laddar om. Orden under kommer från `gransnitt.fortsatt` och `gransnitt.nytt_aventyr` när äventyret har dem, annars syns bara bilderna. Figurerna är 24 bildpixlar höga och skalas i hela steg (`--ipx-figur`, `--ipx-figur-liten` i `layout.js`). Bilden av rummet där han är kommer med Stils skiss (F4).
-- **Menyn för vuxna, Spelare:** alla platser, vilken som spelas, Spela för att byta, och Ta bort (två klick) för en som inte spelas. Sparningen läggs i platsens backup.
+- **INSTÄLLNINGAR, Spelare:** alla platser, vilken som spelas, Spela för att byta, och Ta bort (två klick) för en som inte spelas. Sparningen läggs i platsens backup.
 - Webbtesterna skriver fortfarande `ordstaven_spar` direkt, och det är plats 1.
 
 ## 64. Farfars "Var var vi?" (0.32.0, F2)
@@ -782,7 +782,7 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 
 ## 66. Läsnivån mellan kapitlen och räddningens knuff (0.34.0, 14 och 17)
 - **Läsnivån följer med mellan kapitlen** och har gjort det hela tiden: den hålls per pusseltyp i `spelare.larande` (läsmotorn), och kapitlets `nivaer.lasning` säger bara vilken variant han får (golv och tak, `lasniva`). En post skapas bara där den saknas (`post()` i läsmotorn). Ett webbtest prövar det med en påhittad sparning: prologen slutar på L4, kapitel 1 börjar på L4 (varianten L3, kapitlets tak), och ett hopp till kapitlets början flyttar den inte.
-- **Menyn för vuxna** visar vad nivån betyder i kapitlet han är i (`nivaIKapitlet`: "I Skogen får han L3, kapitlet har L2–L3"), knapparna går upp till nivån om den är över L4, och **att sätta nivån för hand loggas** (`[inställning] läsnivån satt för hand: L4 → L2`). Utan raden gick det inte att se i loggen när nivån hade satts för hand.
+- **INSTÄLLNINGAR** visar vad nivån betyder i kapitlet han är i (`nivaIKapitlet`: "I Skogen får han L3, kapitlet har L2–L3"), knapparna går upp till nivån om den är över L4, och **att sätta nivån för hand loggas** (`[inställning] läsnivån satt för hand: L4 → L2`). Utan raden gick det inte att se i loggen när nivån hade satts för hand.
 - **Räddningens knuff** (P15, `raddning()`, beslut 58.2): före första felet efter 15 s utan tryck (`RADDNING_KNUFF_MS`), och en rätt bokstav startar om klockan. Efter första felet kommer den efter `knuff.efter_sek` (15 s om det saknas), räknat från när felreaktionen är klar, och bara en gång. Förut startades klockan om vid varje tryck, så knuffen kom efter varje bokstav. En bricka som studsar i kasta-läget räknas som ett fel. Schema 2.28.
 
 ## 67. En knuff före valet räknas som hjälp för nivån (0.35.0, beslut 62.2)
@@ -790,3 +790,13 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Läsmotorn:** ett rätt val efter en knuff räknas som rätt på första försöket (`forstaForsok`, och föräldravyn räknar det som rätt), men inte mot nästa nivå: streaken går ned ett steg, som när han har tagit hjälp av nosen. `hjalp` räknas inte upp, eftersom det är nosen. Historiken har `knuff_fore`.
 - Nivån stiger alltså bara på det han läser utan hjälp. Med regeln hade spelarens premiär slutat på L3, utan handgrepp i menyn (14).
 
+
+## 68. Startskärmen med Stils bilder och fotot av rummet (0.36.0, F4, 10e v0.4)
+- **`grans/startskarm.js`** (`visaStartskarm`): Farfars skrivbord (`assets/ui/start/bord`), namnet på mässingsskylten i textlagret (Lexend fet, mörk mässing), fotot i `foto_ram` med den stora pilen (FORTSÄTT, `.start-knapp.fortsatt`), NYTT ÄVENTYR som boken `bok_ny`, spelarna i en kolumn till vänster (`spelare_ram`, hjältens huvud i rundeln genom `spelare_mask`, ritat på en liten duk) och plusset under den sista. Första gången finns bara den stora boken med pilen (`.start-knapp.forsta`). **Inga ord under knapparna** (62.5). Spelarens namn står under hans bild, eftersom det är hans eget ord.
+- **Allt står i världens pixlar** över spelytan (`.startbord` har spelytans läge och storlek) och skalas med `--vpx` (en av världens pixlar i CSS-punkter, i hela steg). Bilderna har `image-rendering: pixelated`. Ett tryck flyttar knappen en pixel ned. Inget filter och inga skuggor med oskärpa.
+- **NYTT ÄVENTYR, två tryck:** första trycket lyfter fram `bok_ny_stor` med bocken och pilen bakåt, och resten tonas ned till 45 %. Bocken startar ett nytt äventyr, bakåt eller ett tryck någon annanstans lägger tillbaka boken (trycket fångas, så att fotot inte startar spelet då). **Det nya äventyret har samma hjälte** (`platser.ny(mall, version, { sammaHjalte: true })`): hjältens id, namn och färger och lärandet (läsnivån följer barnet) kopieras till en egen plats, och äventyret och ungen börjar från början. Plusset är en ny spelare som förut (F1). Inget raderas.
+- **En ram per hjälte** (`spelareAttVisa` i `karna/sparning.js`): har samma hjälte flera platser (ett nytt äventyr), visas platsen som spelas, annars den som sparades senast. De andra nås i INSTÄLLNINGAR (SPELARE). Platser utan hjälte-id räknas var för sig. Ett tryck på en annan hjälte väljer hans plats och laddar om (som F1).
+- **Ungen** står bredvid fotot. Står skärmen orörd i 25 s gäspar den och somnar (bildbyten), och ett tryck väcker den.
+- **Fotot** (`Rum.foto`): en bild av spelytan (samma som glidningen mellan rummen använder, `Rum.bild`, nu i kö så att två bilder aldrig tas samtidigt), utskuren 160 × 96 runt hjälten, som PNG (ca 5–15 kB). Det tas en stund efter att ett rum syns (högst var 20:e sekund), när pausmenyn öppnas och när han slutar för idag, och sparas per plats i `ordstaven_spar_foto` (plats 1) och `ordstaven_spar_<plats>_foto` (`fotoNyckel`, `platser.foto`, `platser.sparaFoto`). Det hör inte till sparningen eller sparfilen, och det tas bort med platsen. Utan foto (en sidovy, en ny plats, en äldre sparning) står hjälten och ungen i dubbel storlek i ramen.
+- **Bilderna** kommer från inkorgens `ui/intro/`, `ui/start/` och `ui/meny/` genom `verktyg/grafik/inkorg.py`, som nu läser de tre mapparna (och `ui/intro/intro.json`) med palettkontrollen. Introt, pausmenyn och INSTÄLLNINGAR med Stils bilder kommer i nästa versioner.
+- Menyn för vuxna heter **INSTÄLLNINGAR** (62.4).

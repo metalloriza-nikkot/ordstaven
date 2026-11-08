@@ -68,6 +68,8 @@ export class Rum extends Phaser.Scene {
     super({ key: 'Rum' });
     this.b = b;
     this.pos = { x: RUM.bredd / 2, y: RUM.hojd - 12 };
+    /** @type {Promise<HTMLImageElement | null> | null} bilden av rummet som tas nu (bild()) */
+    this.bildKo = null;
     /**
      * Kamerans läge i världen (beslut 14): punkten i skärmens övre vänstra hörn, i hela pixlar. I ett område som ryms
      * på en skärm står den i (0, 0). I ett större område följer den hjälten (karna/kamera.js).
@@ -1182,11 +1184,40 @@ export class Rum extends Phaser.Scene {
 
   /** En bild av rummet som det ser ut nu (för glidningen mellan rum). @returns {Promise<HTMLImageElement | null>} */
   bild() {
-    this.smutsig = true;
-    return new Promise((klar) => {
+    // en bild i taget: ritningen har bara en väntande bild, så glidningen och fotot (F4) står i kö
+    /** @type {Promise<HTMLImageElement | null>} */
+    const p = (this.bildKo || Promise.resolve(null)).then(() => new Promise((klar) => {
+      this.smutsig = true;
       try { this.game.renderer.snapshot((img) => klar(/** @type {HTMLImageElement} */ (img))); } catch (e) { klar(null); }
       setTimeout(() => klar(null), 500);
-    });
+    }));
+    this.bildKo = p;
+    return p;
+  }
+
+  /**
+   * Startskärmens foto (10e, F4): rummet där han är, 160 × 96 runt hjälten, som PNG. Ingen bild när inget rum
+   * syns (en sidovy, en mellanscen) eller när ritningen inte ger någon. Billigt: en bild av hela ytan (320 × 192)
+   * som redan finns för glidningen, och en liten duk som skärs ut ur den.
+   * @returns {Promise<string | null>}
+   */
+  async foto() {
+    if (!this.harRum || this.sidovy?.visible) return null;
+    const sx = this.pos.x - this.kamera.x, sy = this.pos.y - this.kamera.y - 10;
+    const img = await this.bild();
+    if (!img) return null;
+    try {
+      const B = 160, H = 96;
+      const x = Math.max(0, Math.min(RUM.bredd - B, Math.round(sx - B / 2))), y = Math.max(0, Math.min(RUM.hojd - H, Math.round(sy - H / 2)));
+      const c = document.createElement('canvas'); c.width = B; c.height = H;
+      const g = c.getContext('2d');
+      if (!g) return null;
+      g.imageSmoothingEnabled = false;
+      // bilden har duken storlek (320 × 192), men räkna om för säkerhets skull
+      const k = (img.naturalWidth || img.width || RUM.bredd) / RUM.bredd;
+      g.drawImage(img, x * k, y * k, B * k, H * k, 0, 0, B, H);
+      return c.toDataURL('image/png');
+    } catch (e) { return null; }
   }
 
   ritaUnge() {
@@ -1550,7 +1581,7 @@ export class Rum extends Phaser.Scene {
   /** Världen stannar när läsplattan är öppen. @param {boolean} pa */
   frys(pa) { this.frysSteg = pa; this.fryst = pa || !!this.pausad; if (this.fryst) this.b.inmatning.rensaGaTill(); }
   /**
-   * Spelet pausas (menyn för vuxna, fliken dold): världen står still så länge, och sedan står den som stegen vill.
+   * Spelet pausas (INSTÄLLNINGAR, fliken dold): världen står still så länge, och sedan står den som stegen vill.
    * Ett steg som släpper världen under pausen (frys(false)) gäller alltså efter pausen. @param {boolean} pa
    */
   sattPaus(pa) { this.pausad = pa; this.fryst = !!this.frysSteg || pa; if (this.fryst) this.b.inmatning.rensaGaTill(); }

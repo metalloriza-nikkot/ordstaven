@@ -1,3 +1,4 @@
+# Introt och startskärmen med menyerna är egna zoner (fas 4, 2026-11-08).
 # Trädgården räknar också fasaden (5e, 2026-11-07).
 # Trädgården räknar bara trädgårdens föremål ur huset (2026-11-04).
 # Räknar färgerna per zon efter låsningen: allt som kan synas samtidigt i spelvärlden. Taket är 256 per zon.
@@ -11,6 +12,8 @@ ZONER = {
  'huset (inne)': ['rum/hus/*', 'foremal/hus/*', 'figurer/farfar/*', 'figurer/herr_skata/runt_*'] + FIG,
  'trädgården (s20–s22)': ['rutor/skog/*'] + [f'foremal/hus/{n}*' for n in ('staket', 'berg', 'fasad', 'skylt_liten', 'tva_buskar', 'dorr_fram_ute', 'kruka')] + ['figurer/farfar/*', 'figurer/baronen/luftskepp_*', 'figurer/baronen/baronen_hjalm*'] + FIG,
  'skogen (kapitel 1)': ['rutor/skog/*', 'foremal/skog/*', 'figurer/herr_skata/herr_*', 'figurer/apa/*', 'figurer/djur/*', 'figurer/effekter/*', 'figurer/omgivning/*', 'figurer/baronen/baronen_hjalm*'] + FIG,
+ 'introt': ['ui/intro/*', 'figurer/effekter/efx_ordkraft*'],
+ 'startskärmen och menyerna': ['ui/start/*', 'ui/meny/*', 'figurer/unge/*', 'figurer/hjalte/*', 'figurer/effekter/efx_ordkraft*', 'ui/*'],
  'bildkort': ['bildkort/*'], 'sidovyer': ['sidovyer/*'], 'porträtt': ['figurer/*/*portratt*'],
 }
 for z, mon in ZONER.items():

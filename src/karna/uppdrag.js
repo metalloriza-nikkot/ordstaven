@@ -3,7 +3,7 @@
 // Lappen visar rubriken, bilden, en bock per gjort steg och en tom ring per steg som är kvar. Delstegen har ingen
 // text på lappen (47.2): de styr bara bockarna, ringarna och när stämpeln kommer.
 // Allt räknas ur var berättelsen är (scen och steg), så att lappen alltid stämmer, också efter en omstart, ett hopp i
-// menyn för vuxna eller en framspolning. Inget om lappen sparas, utom vilka påminnelser som har kommit i passet.
+// INSTÄLLNINGAR eller en framspolning. Inget om lappen sparas, utom vilka påminnelser som har kommit i passet.
 // Rör inte DOM.
 
 /**

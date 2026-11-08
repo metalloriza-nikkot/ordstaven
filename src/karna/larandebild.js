@@ -42,7 +42,7 @@ export function sparaPassbild({ tillstand, aventyrId, kapitelOrdning, kapitelId,
 }
 
 /**
- * Sätt tillbaka lärandet till början av ett pass (menyn för vuxna).
+ * Sätt tillbaka lärandet till början av ett pass (INSTÄLLNINGAR).
  * - Finns en bild av passet: nivåerna blir bildens, och historiken efter bildens tid tas bort.
  * - Äventyrets första pass utan bild (en sparning från före bilderna): lärandet börjar om helt, eftersom inget var
  *   lärt när äventyret började.

@@ -16,6 +16,7 @@ Varje grafik-, ljud- eller typsnittsfil och varje bibliotek som följer med spel
 | Sidovyerna (bakgrunder och det som rör sig i dem: in i skogen, vid bron och ungen på kartbiten) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/sidovyer/` |
 | Farfars karta (kartbitarna) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/karta/` |
 | HUD:ens knappar, ikonerna, dörrskyltarna, uppdragslappen (papperet, kompassrosen och stämpeln) och tangenterna i styrhjälpen | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/ui/` |
+| Introt (utsikten genom Farfars fönster, solarna, kameran som backar och blicken ned mot skrivbordet), startskärmen (Farfars skrivbord, mässingsskylten, Ordstaven, fotoramen, pilarna, böckerna och spelarnas ramar), pausmenyn och INSTÄLLNINGAR (fönstren och knapparna i 9-slice, volymknapparna och markören) | Egna, ritade för spelet av stilspåret med egna skript (`verktyg/stil/fas4/`) | Egna | Ja | `assets/ui/intro/`, `assets/ui/start/`, `assets/ui/meny/` |
 | Farfars hus: föremålen | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/foremal/hus/` |
 | Skogens föremål (lianerna och liangången, buskarna, träden, stenarna, skyltarna, häcken, stubben, skattlådan, lövhögarna, ugglorna, bron, svamparna och de andra) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/foremal/skog/` |
 | Farfars hus: rummen (en bild per rum) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/rum/hus/` |

@@ -1,0 +1,119 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:Lexend;src:url(lexend-latin-400-normal.woff2)}
+@font-face{font-family:Lexend;font-weight:700;src:url(lexend-latin-700-normal.woff2)}
+body{margin:0;width:1440px;height:960px;background:#2a1a10;overflow:hidden;font-family:Lexend;color:#2B2420}
+#rum{position:absolute;left:80px;top:66px;width:1280px;height:768px;overflow:hidden;outline:6px solid #6b4c35}
+#rum img{position:absolute;image-rendering:pixelated;transform-origin:0 0;transform:scale(4)}
+.ord{position:absolute;transform:translateX(-50%);white-space:nowrap;background:#F2E8C8;border:4px solid #5A4A30;
+  box-shadow:8px 8px 0 rgba(20,12,6,.45);padding:2px 22px 6px;font-weight:700;letter-spacing:.04em;line-height:1.1}
+.ord.stor{font-size:56px}.ord.liten{font-size:30px;padding:0 14px 3px}.ord.namn{font-size:24px;padding:0 10px 2px}
+.ord.dim{opacity:.45}
+.titel{position:absolute;left:640px;top:38px;transform:translateX(-50%);font-weight:700;font-size:58px;letter-spacing:.14em;padding-left:.14em;color:#3A2A0A;
+  text-shadow:0 3px 0 #FFF0B0}
+.kugg{position:absolute;right:14px;bottom:12px;width:44px;height:44px;border-radius:50%;background:#3A2414;border:4px solid #C8A040;
+  color:#E8C868;font-size:30px;line-height:44px;text-align:center}
+.not{position:absolute;left:80px;top:846px;width:1280px;color:#E6D6A8;font-size:21px;line-height:1.35}
+.not b{color:#FFF0B0}
+.etikett{position:absolute;left:80px;top:14px;color:#E6D6A8;font-size:22px}
+.etikett b{color:#FFF0B0;font-size:26px;margin-right:12px}
+.markering{position:absolute;border:4px dashed #FFF0B0;border-radius:6px}
+/* vuxenmenyn: vanlig text, inte världens pixlar */
+.vuxen{position:absolute;left:180px;top:66px;width:1080px;height:768px;background:#F2E8C8;border:4px solid #5A4A30;box-shadow:12px 12px 0 rgba(0,0,0,.4);
+  font-size:20px;line-height:1.4;padding:0}
+.vuxen h1{margin:0;background:#E8C868;border-bottom:4px solid #4A3A10;font-size:30px;padding:10px 26px;letter-spacing:.06em}
+.vuxen h1 small{font-weight:400;font-size:18px;margin-left:14px}
+.vuxen .kol{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:18px 26px}
+.grupp{background:#FFFBEA;border:3px solid #B8A57A;padding:10px 16px 12px}
+.grupp h2{margin:0 0 6px;font-size:21px}
+.grupp p{margin:4px 0;font-size:17px;color:#5A4A30}
+.knapp{display:inline-block;border:3px solid #8A6A20;background:#E8C868;border-radius:4px;padding:1px 12px;margin:3px 6px 3px 0;font-size:18px}
+.knapp.fara{border-color:#6A1A14;background:#F2E8C8;color:#6A1A14}
+.knapp.vald{background:#3A2414;color:#FFF0B0;border-color:#C8A040}
+.pass{display:flex;align-items:center;gap:10px;border-bottom:1px solid #E6D6A8;padding:3px 0;font-size:17px}
+.pass .n{flex:1}.pass .knapp{font-size:15px;padding:0 8px}
+.las{font-size:15px;color:#2E6A30}
+</style></head><body>
+<div class="etikett" id="etikett"></div>
+<div id="rum"></div>
+<div class="not" id="not"></div>
+<script>
+const s=4, rum=document.getElementById('rum'), q=new URLSearchParams(location.search), vy=q.get('vy')||'fortsatt';
+const bild=(n,x,y,stil)=>{const i=new Image();i.src=n+'.png';i.style.left=x*s+'px';i.style.top=y*s+'px';if(stil)i.style.cssText+=stil;rum.appendChild(i);return i};
+const ord=(t,x,y,kl)=>{const d=document.createElement('div');d.className='ord '+kl;d.textContent=t;d.style.left=x*s+'px';d.style.top=y*s+'px';rum.appendChild(d);return d};
+const text=(id,h)=>document.getElementById(id).innerHTML=h;
+const kugg=()=>{const d=document.createElement('div');d.className='kugg';d.textContent='⚙';rum.appendChild(d)};
+const titel=()=>{bild('skylt',94,6);const d=document.createElement('div');d.className='titel';d.textContent='ORDSTAVEN';rum.appendChild(d)};
+const V={
+ forsta(){
+  text('etikett','<b>1. Startskärmen första gången</b> ingen sparning finns');
+  bild('bord',0,0);titel();
+  bild('bok_stor',122,40); bild('ring32_aktiv',178,108);
+  ord('NYTT ÄVENTYR',161,148,'stor'); kugg();
+  text('not','<b>En enda knapp.</b> Boken är tom och har ett plus: här börjar ett nytt äventyr. Ett tryck var som helst på boken eller pilen startar prologen, och namnet ORDSTAVEN läses upp första gången. Han behöver inte kunna läsa NYTT ÄVENTYR: bilden och pilen räcker.');
+ },
+ fortsatt(){
+  text('etikett','<b>2. Startskärmen med en sparning</b> det vanliga');
+  bild('bord',0,0);titel();
+  bild('portratt_a',12,40); ord('KIM',26,70,'namn'); bild('portratt_ny',12,90);
+  bild('foto',60,38); bild('ring32_aktiv',214,118);
+  ord('FORTSÄTT',144,152,'stor');
+  bild('bok_ny',262,100); ord('NYTT ÄVENTYR',282,150,'liten'); kugg();
+  text('not','<b>FORTSÄTT är störst:</b> en bild av hjälten och ungen där de är, i en mässingsram, med en stor pil. Hela bilden är knappen. <b>NYTT ÄVENTYR</b> är en liten tom bok och kräver två tryck (bild 4). Till vänster väljs spelaren med sin hjältebild och sitt namn. Plus = en ny spelare. ⚙ hålls inne för vuxna.');
+ },
+ tva(){
+  text('etikett','<b>3. Två spelare</b> den valda har ljus ring');
+  bild('bord',0,0);titel();
+  bild('portratt_a',12,36); ord('KIM',26,66,'namn'); bild('portratt_b',12,80); ord('SAM',26,110,'namn'); bild('portratt_ny',12,126);
+  bild('foto',60,38); bild('ring32_aktiv',214,118);
+  ord('FORTSÄTT',144,152,'stor');
+  bild('bok_ny',262,100); ord('NYTT ÄVENTYR',282,150,'liten'); kugg();
+  text('not','<b>Varje spelare har sin hjältebild</b> i de färger han valde och sitt eget namn, som han har skrivit själv. Ett tryck på en annan bild byter FORTSÄTT-bilden till den spelarens ställe. Inget raderas här, och ingen sparning skrivs över.');
+ },
+ nytt(){
+  text('etikett','<b>4. NYTT ÄVENTYR, efter första trycket</b>');
+  bild('bord',0,0);titel();
+  bild('portratt_a',12,40,';opacity:.45'); ord('KIM',26,70,'namn dim'); bild('portratt_ny',12,90,';opacity:.45');
+  bild('foto_dim',60,38);
+  ord('FORTSÄTT',144,152,'stor dim');
+  bild('bok_stor',196,34); bild('ring32_klar',248,100); bild('ring24_bak',178,104);
+  ord('NYTT ÄVENTYR',236,148,'liten'); kugg();
+  text('not','<b>Första trycket</b> lyfter fram boken och visar en bock. <b>Andra trycket, på bocken,</b> startar ett nytt äventyr på en egen plats, med samma hjälte. Pilen bakåt, eller ett tryck var som helst annars, lägger tillbaka boken. FORTSÄTT tonas ned men finns kvar. Den gamla sparningen rörs aldrig.');
+ },
+ paus(){
+  text('etikett','<b>5. Pausmenyn</b> i HUD:ens läder och mässing');
+  bild('spel_dim',0,0); bild('panel',36,40);
+  const k=[['KARTAN','ikon_karta',3],['MIN BOK','ikon_bok',3],['SOV','unge_sover',2]];
+  k.forEach(([t,ik,sk],i)=>{const x=48+i*76, y=50; bild('kort',x,y); const im=bild(ik,x+8,y+4); im.style.transform='scale('+(s*sk)+')';
+    const d=document.createElement('div');d.textContent=t;d.style.cssText=`position:absolute;left:${(x+32)*s}px;top:${(y+54)*s}px;transform:translateX(-50%);font-weight:700;font-size:34px;letter-spacing:.04em;white-space:nowrap`;rum.appendChild(d)});
+  bild('ring32_aktiv',264,118);
+  text('not','<b>Tre papperskort på läder:</b> KARTAN, MIN BOK och SOV (sluta för idag, med ungen som sover). Varje kort är en bild och ett ord, och ordet läses upp vid tryck, som i dag. Den stora pilen tar honom tillbaka till spelet. Inuti MIN BOK står flikarna STAVEN, KLÄDER, DINOBOKEN och KLART som i dag, med samma kort och samma mässingspil.');
+ },
+ vuxen(){
+  text('etikett','<b>6. Menyn för vuxna</b> (⚙ hålls inne) vanlig text, inte världens pixlar');
+  rum.style.display='none';
+  const v=document.createElement('div');v.className='vuxen';v.innerHTML=`<h1>FÖR VUXNA <small>Ordstaven 0.31.0 · Den gömda dalen</small></h1>
+  <div class="kol"><div>
+   <div class="grupp"><h2>Spelare</h2><span class="knapp vald">KIM</span><span class="knapp">SAM</span>
+    <p>Allt nedan gäller den valda spelaren.</p></div>
+   <div class="grupp" style="margin-top:18px"><h2>Tillbaka till ett pass</h2><p>Sparningen sätts tillbaka till passets början, utan spår av det som kom efter, också i läsnivån.</p>
+    <div class="pass"><span class="n">Prologen, pass 1–3</span><span class="knapp">Välj</span></div>
+    <div class="pass"><span class="n">Kapitel 1, pass 1</span><span class="knapp">Hit</span></div>
+    <div class="pass"><span class="n">Kapitel 1, pass 2</span><span class="knapp">Hit</span></div>
+    <div class="pass"><span class="n"><b>Kapitel 1, pass 3</b> · här är han nu</span></div>
+    <div class="pass"><span class="n">Kapitel 1</span><span class="las">öppet</span><span class="knapp">Lås igen</span></div>
+    <div class="pass"><span class="n">Kapitel 2</span><span class="las">låst</span><span class="knapp">Öppna</span></div>
+   </div></div><div>
+   <div class="grupp"><h2>Läsning och röst</h2>
+    <p>Läsnivå: <span class="knapp">L1</span><span class="knapp">L2</span><span class="knapp vald">L3</span><span class="knapp">L4</span></p>
+    <p><span class="knapp vald">Rösten på</span><span class="knapp">Föräldern läser Farfar</span></p>
+    <p>Musik <span class="knapp">−</span>▮▮▮▯▯<span class="knapp">+</span> &nbsp; Ljud <span class="knapp">−</span>▮▮▮▮▯<span class="knapp">+</span></p></div>
+   <div class="grupp" style="margin-top:18px"><h2>Sparfil och logg</h2><span class="knapp">Spara sparfilen</span><span class="knapp">Läs in en sparfil</span><span class="knapp">Spara loggen</span>
+    <p>Sparfilen har allt spelaren har gjort, också namnet. Lägg den bara på ett privat ställe.</p></div>
+   <div class="grupp" style="margin-top:18px"><h2>Föräldravyn</h2><p>Läsvalen rätt direkt, hjälp, tid per pass (som i dag).</p></div>
+   <div class="grupp" style="margin-top:18px"><h2>Radera</h2><span class="knapp fara">Radera KIM (håll inne 3 s)</span>
+    <p>Det enda stället där något raderas.</p></div>
+  </div></div>`;document.body.appendChild(v);
+  text('not','<b>Det som finns i dag, ordnat:</b> spelare, tillbaka till ett pass och låsa kapitel (F3), läsning och röst, sparfil och logg, föräldravyn och radera. Hoppa till scen och objektens namn flyttas till ett testläge (<code>?test</code>) och syns inte här. Pappret och mässingen är HUD:ens, men texten är vanlig och liten, för det här läser bara en vuxen.');
+ }};
+V[vy]();
+</script></body></html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:Lexend;src:url(lexend-latin-400-normal.woff2)}
+@font-face{font-family:Lexend;font-weight:700;src:url(lexend-latin-700-normal.woff2)}
+body{margin:0;width:1440px;height:960px;background:#2a1a10;overflow:hidden;font-family:Lexend;color:#2B2420}
+#rum{position:absolute;left:80px;top:66px;width:1280px;height:768px;overflow:hidden;outline:6px solid #6b4c35}
+#rum img{position:absolute;image-rendering:pixelated;transform-origin:0 0;transform:scale(4)}
+.ord{position:absolute;transform:translateX(-50%);white-space:nowrap;background:#F2E8C8;border:4px solid #5A4A30;text-align:center;
+  box-shadow:8px 8px 0 rgba(20,12,6,.45);padding:2px 22px 6px;font-weight:700;letter-spacing:.04em;line-height:1.1}
+.ord.stor{font-size:56px}.ord.liten{font-size:28px;padding:2px 12px 4px}.ord.namn{font-size:24px;padding:0 10px 2px}
+.ord.dim{opacity:.45}
+.titel{position:absolute;left:640px;top:38px;transform:translateX(-50%);font-weight:700;font-size:58px;letter-spacing:.14em;padding-left:.14em;color:#3A2A0A;
+  text-shadow:0 3px 0 #FFF0B0;white-space:nowrap}
+.kugg{position:absolute;right:12px;bottom:6px;width:40px;height:40px;border-radius:50%;background:#3A2414;border:4px solid #C8A040;
+  color:#E8C868;font-size:26px;line-height:40px;text-align:center}
+.not{position:absolute;left:80px;top:846px;width:1280px;color:#E6D6A8;font-size:21px;line-height:1.35}
+.not b{color:#FFF0B0}
+.etikett{position:absolute;left:80px;top:14px;color:#E6D6A8;font-size:22px}
+.etikett b{color:#FFF0B0;font-size:26px;margin-right:12px}
+.t{position:absolute;white-space:nowrap;color:#F2E8C8;font-size:24px;line-height:1}
+.t.rub{font-weight:700;font-size:30px;letter-spacing:.08em;color:#FFF0B0}
+.t.dim{color:#B8A57A}.t.liten{font-size:19px;color:#B8A57A}
+.t.val{color:#FFF0B0;font-weight:700}
+.chip{position:absolute;white-space:nowrap;font-size:21px;padding:2px 10px 4px;border:4px solid #8A6A20;color:#B8A57A;background:#140C06}
+.chip.pa{background:#E8C868;color:#2B2420;border-color:#4A3A10;font-weight:700}
+.chip.fara{border-color:#8a2a20;color:#F2A0A0}
+.rad{position:absolute;height:64px;background:#5A3A1E}
+.flyg{position:absolute;font-weight:700;font-size:58px;color:#FFFBEA;text-shadow:0 0 10px #6EC6E6,0 0 18px #F2A0C0,0 0 26px #F08A2A}
+.puls{position:absolute;border-radius:50%;border:6px solid rgba(255,240,176,.35)}
+</style></head><body>
+<div class="etikett" id="etikett"></div>
+<div id="rum"></div>
+<div class="not" id="not"></div>
+<script>
+const s=4, rum=document.getElementById('rum'), q=new URLSearchParams(location.search), vy=q.get('vy')||'fortsatt';
+const bild=(n,x,y,stil)=>{const i=new Image();i.src=n+'.png';i.style.left=x*s+'px';i.style.top=y*s+'px';if(stil)i.style.cssText+=stil;rum.appendChild(i);return i};
+const ord=(t,x,y,kl)=>{const d=document.createElement('div');d.className='ord '+kl;d.innerHTML=t;d.style.left=x*s+'px';d.style.top=y*s+'px';rum.appendChild(d);return d};
+const tx=(t,x,y,kl)=>{const d=document.createElement('div');d.className='t '+(kl||'');d.innerHTML=t;d.style.left=x*s+'px';d.style.top=y*s+'px';rum.appendChild(d);return d};
+const chip=(t,x,y,kl)=>{const d=document.createElement('div');d.className='chip '+(kl||'');d.textContent=t;d.style.left=x*s+'px';d.style.top=y*s+'px';rum.appendChild(d);return d};
+const div=(kl,x,y,w,h,txt)=>{const d=document.createElement('div');d.className=kl;d.style.cssText=`left:${x*s}px;top:${y*s}px;width:${w*s}px;height:${h*s}px`;if(txt)d.innerHTML=txt;rum.appendChild(d);return d};
+const text=(id,h)=>document.getElementById(id).innerHTML=h;
+const kugg=()=>{const d=document.createElement('div');d.className='kugg';d.textContent='⚙';rum.appendChild(d)};
+const titel=(t='ORDSTAVEN')=>{bild('skylt',94,6);const d=document.createElement('div');d.className='titel';d.textContent=t;rum.appendChild(d);return d};
+const bord=(b='bord2')=>{bild(b,0,0); bild('stav_bord_skugga',108,29)};
+const slider=(x,y,n)=>{for(let i=0;i<10;i++) bild(i<n?'pip_1':'pip_0',x+i*7,y)};
+const meny=(val)=>{
+  bild('bord2_gryning',0,0);
+  bild('fonster_titel',4,3); tx('INSTÄLLNINGAR',14,9,'rub'); tx('Ordstaven 0.31.0 · Den gömda dalen',132,11,'liten'); chip('◀ TILLBAKA',262,7);
+  bild('fonster_vanster',4,28); bild('fonster_hoger',106,28);
+  const kat=['SPELARE','PASS OCH KAPITEL','LÄSNING','LJUD OCH RÖST','SKÄRM','SPARFIL','FRAMSTEG','OM SPELET'];
+  kat.forEach((k,i)=>{const y=36+i*18; if(k===val){div('rad',8,y-3,90,16); bild('markor',11,y);} tx(k,22,y,k===val?'val':'')});
+};
+const V={
+ fortsatt(){
+  text('etikett','<b>2. Startskärmen, skrivbordet</b> med en sparning');
+  bord(); titel();
+  bild('portratt_a',8,52); ord('KIM',22,82,'namn'); bild('portratt_ny',8,100);
+  bild('foto',76,50); bild('ring32_aktiv',230,128);
+  ord('FORTSÄTT',160,156,'stor');
+  bild('bok_ny',276,96); ord('NYTT<br>ÄVENTYR',296,144,'liten'); kugg();
+  text('not','<b>Ett skrivbord, inte ett golv:</b> en hel bordsskiva med ådring och utan plankfogar, en framkant med tjocklek, ett grönt skrivunderlägg i läder och Farfars saker (lampan, glasögonen, kompassen och bläckhornet). Solen faller in genom ett fönster med spröjs. <b>Ordstaven</b> ligger under mässingsskylten, med LJUS ristat.');
+ },
+ tva(){
+  text('etikett','<b>3. Två spelare</b>');
+  bord(); titel();
+  bild('portratt_a',8,48); ord('KIM',22,78,'namn'); bild('portratt_b',8,94); ord('SAM',22,124,'namn'); bild('portratt_ny',8,140);
+  bild('foto',76,50); bild('ring32_aktiv',230,128);
+  ord('FORTSÄTT',160,156,'stor');
+  bild('bok_ny',276,96); ord('NYTT<br>ÄVENTYR',296,144,'liten'); kugg();
+  text('not','Varje spelare har sin hjältebild och sitt namn. Ett tryck på en annan bild byter FORTSÄTT-bilden.');
+ },
+ intro1(){
+  text('etikett','<b>Intro 1. Före första trycket</b> (tyst, gryning)');
+  bild('bord2_gryning',0,0); bild('stav_gryning',108,29); bild('skylt',94,6,';filter:brightness(.45)');
+  bild('unge_sover',200,96); bild('foto_dim',76,50,';opacity:0');
+  div('puls',148,84,24,24); bild('ring32_aktiv',144,80);
+  text('not','<b>Det här är vår PRESS START.</b> Webbläsaren spelar inget ljud förrän man har tryckt en gång, så första trycket behövs ändå. Rummet är i gryningens blå. Staven ligger på bordet, skylten är tom och ungen sover på underlägget (bara om han har en sparning). En stor pil pulserar långsamt. Inget att läsa.');
+ },
+ intro2(){
+  text('etikett','<b>Intro 2. Trycket: solen går upp</b> (ca 1,5 s)');
+  bild('ljus_halvt',0,0); bild('stav_bord_skugga',108,29); bild('skylt',94,6,';filter:brightness(.7)');
+  bild('unge_sover',200,96);
+  ['efx_ordkraft_02','efx_ordkraft_03'].forEach((n,i)=>bild(n,i?204:96,22));
+  text('not','Musiken börjar. Solfältet glider in över bordet från fönstret, och staven vaknar: båda ändarna lyser och ordkraftens ljus (som i spelet, stavens färger, inget guld) tänds i ändarna. Ett tryck till hoppar över resten av introt.');
+ },
+ intro3(){
+  text('etikett','<b>Intro 3. Staven skriver namnet</b> (ca 2,5 s)');
+  bild('bord2',0,0); bild('stav_bord_skugga',108,29); bild('skylt',94,6);
+  const d=titel(''); d.innerHTML='ORDST<span style="opacity:0">AVEN</span>';
+  [['A',96,46],['V',70,66],['E',92,92],['N',128,110]].forEach(([c,x,y])=>{const f=document.createElement('div');f.className='flyg';f.textContent=c;f.style.left=(x*s)+'px';f.style.top=(y*s)+'px';rum.appendChild(f)});
+  bild('efx_ordkraft_03',96,22); bild('unge_gaspar',200,96);
+  text('not','Bokstäverna flyger en i taget ur stavens kalla ände (den vänstra) och landar på skylten med en liten klang var, som när han skriver en formel. När ORDSTAVEN står där läses namnet upp. Ungen vaknar och gäspar.');
+ },
+ intro4(){
+  text('etikett','<b>Intro 4. Startskärmen</b> (allt glider på plats, ca 1 s)');
+  bord(); titel();
+  bild('portratt_a',8,52); ord('KIM',22,82,'namn'); bild('portratt_ny',8,100);
+  bild('foto',76,50); bild('ring32_aktiv',230,128);
+  ord('FORTSÄTT',160,156,'stor');
+  bild('bok_ny',276,96); ord('NYTT<br>ÄVENTYR',296,144,'liten'); bild('unge_glad',52,148); kugg();
+  text('not','Fotot faller ned på underlägget som ett kort som läggs på bordet, böckerna och hjältebilderna glider in från kanterna, och ungen hoppar upp bredvid fotot. <b>Står startskärmen orörd</b> en stund gäspar ungen och somnar igen (som SNES-spelens demo när ingen trycker), och ett tryck väcker den. Introt visas bara när spelet startas, inte när han kommer tillbaka från pausmenyn.');
+ },
+ i_1(){
+  text('etikett','<b>Intro 1. Före första trycket</b> gryning, tyst');
+  bild('intro_hog_gryning',0,0);
+  div('puls',148,58,24,24); bild('ring32_aktiv',144,54);
+  text('not','Fönstret i Farfars kontor står öppet. Ute är det gryning: stjärnor, bergen i blått och molnhavet som döljer dalen. Den stora pilen pulserar långsamt. <b>Det här är vår PRESS START</b>, och webbläsaren behöver trycket för att få spela ljud.');
+ },
+ i_2(){
+  text('etikett','<b>Intro 2. Trycket: de tre solarna går upp</b> ca 2 s');
+  bild('intro_hog',0,0);
+  text('not','Musiken börjar. Himlen ljusnar i band, som i SNES-spelen, de tre solarna stiger bakom bergen och molnhavet får rosa kanter. Ett tryck till hoppar över resten av introt.');
+ },
+ i_3(){
+  text('etikett','<b>Intro 3. Namnet stiger ur molnen</b> ca 2,5 s');
+  bild('intro_hog',0,0);
+  const L='ORDSTAVEN'.split(''); L.forEach((c,i)=>{const f=document.createElement('div');f.className='flyg';f.textContent=c;
+    const x=78+i*19, y= i<6 ? 26 : 62+(i-6)*8; f.style.left=(x*s)+'px';f.style.top=(y*s)+'px'; if(i>=6) f.style.opacity=.7; rum.appendChild(f)});
+  bild('efx_ordkraft_02',168,64);
+  text('not','Bokstäverna stiger en i taget ur molnen över den gömda dalen, med ordkraftens ljus i stavens färger, och ställer sig i en rad över bergen. Varje bokstav har en liten klang. När ORDSTAVEN står där läses namnet upp. <b>Dalen avslöjas inte:</b> den syns bara som moln, som på Farfars karta.');
+ },
+ i_4(){
+  text('etikett','<b>Intro 4. Blicken ned mot skrivbordet</b> ca 1,5 s');
+  const cy=96; bild('intro_hog',0,-cy);
+  bild('skylt',94,166-cy); bild('stav_bord_skugga',108,189-cy);
+  const L='ORDSTAVEN'.split(''); L.forEach((c,i)=>{const f=document.createElement('div');f.className='flyg';f.textContent=c;
+    const x=104+i*14, y=40+Math.abs(i-4)*3; f.style.left=(x*s)+'px';f.style.top=(y*s)+'px'; rum.appendChild(f)});
+  text('not','Kameran glider ned från fönstret till skrivbordet, som när kameran i ett SNES-spel följer med ned i en ny del av rummet. Bokstäverna följer med ned och lägger sig på mässingsskylten. När de landar vaknar staven: båda ändarna lyser upp.');
+ },
+ i_5(){
+  text('etikett','<b>Intro 5. Startskärmen</b>');
+  bord(); titel(); bild('efx_ordkraft_03',96,22); bild('efx_ordkraft_03',196,22);
+  bild('portratt_a',8,52); ord('KIM',22,82,'namn'); bild('portratt_ny',8,100);
+  bild('foto',76,50); bild('ring32_aktiv',230,128);
+  ord('FORTSÄTT',160,156,'stor');
+  bild('bok_ny',276,96); ord('NYTT<br>ÄVENTYR',296,144,'liten'); bild('unge_glad',52,148); kugg();
+  text('not','Fotot läggs på underlägget, böckerna och hjältebilderna glider in och ungen hoppar upp. Står skärmen orörd somnar ungen, och ett tryck väcker den (vår demo). Introt visas bara när spelet startas. Inget i det kräver läsning.');
+ },
+ vuxen_ljud(){
+  text('etikett','<b>6a. Inställningar</b> (⚙ hålls inne): LJUD OCH RÖST');
+  meny('LJUD OCH RÖST');
+  const R=[['Musik',36],['Ljudeffekter',54],['Rösten',72]]; R.forEach(([t,y],i)=>{tx(t,116,y); slider(220,y+1,[6,8,9][i])});
+  tx('Rösten läser',116,92); chip('LÅNGSAMT',190,90); chip('LAGOM',246,90,'pa');
+  tx('Farfar',116,110); chip('DATORRÖSTEN',160,108,'pa'); chip('EN VUXEN LÄSER',232,108);
+  tx('Musiken sänks när något läses',116,128); chip('PÅ',268,126,'pa');
+  tx('Tio steg. Ändringen hörs direkt.',114,168,'liten');
+  text('not','<b>SNES-stil:</b> fönster med mässingsram och mörkt läder, en pekhand i vänsterkolumnen och värden som rader av mässingsknappar, som i inställningarna i A Link to the Past, Chrono Trigger och EarthBound. <b>Texten står fortfarande i Lexend</b> (texten är aldrig pixlig), men i spelets stora rutnät.');
+ },
+ vuxen_pass(){
+  text('etikett','<b>6b. Inställningar:</b> PASS OCH KAPITEL (F3)');
+  meny('PASS OCH KAPITEL');
+  tx('KIM',116,36,'val'); tx('Tillbaka till början av ett pass, utan spår.',140,37,'liten');
+  const P=[['Prologen','pass 1–3','öppet'],['Kapitel 1','pass 1','HIT'],['','pass 2','HIT'],['','pass 3 · här nu',''],['Kapitel 2','','LÅST']];
+  P.forEach(([k,p,v],i)=>{const y=54+i*18; tx(k,116,y); tx(p,176,y,'dim'); if(v==='HIT') chip('HIT',272,y-2); if(v==='LÅST') {tx('låst',236,y,'dim'); chip('ÖPPNA',272,y-2)} if(v==='öppet') {tx('öppet',224,y,'dim'); chip('LÅS IGEN',258,y-2)}});
+  tx('Läsnivån sätts tillbaka till den han hade då.',114,150,'liten');
+  tx('Inget raderas här.',114,162,'liten');
+  text('not','Samma fönster för alla delar. <b>FRAMSTEG</b> är föräldravyn, <b>SKÄRM</b> är helskärm och styrhjälpen, och <b>OM SPELET</b> har versionen, uppdateringen och medverkande med ljudens licenser. Att radera en spelare ligger under SPELARE och kräver att man håller inne i 3 s.');
+ }};
+V[vy]();
+</script></body></html>

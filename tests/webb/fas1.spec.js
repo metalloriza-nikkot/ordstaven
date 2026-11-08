@@ -762,65 +762,118 @@ test('lappknappen öppnar Farfars lista medan han väljer stig, och uppdragslapp
   await page.screenshot({ path: 'test-results/lappknappen-listan.png' });
 });
 
-test('startskärmen: FORTSÄTT med hjälten, och NYTT ÄVENTYR kräver två tryck och raderar ingenting (F1)', async ({ page }, info) => {
+test('startskärmen (F1, F4): fotot är FORTSÄTT, NYTT ÄVENTYR är en bok med två tryck och samma hjälte, plusset en ny spelare, och inget raderas', async ({ page }, info) => {
   test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
-  test.setTimeout(60000);
-  // första gången: bara ▶
+  test.setTimeout(90000);
+  // första gången: bara den stora boken med pilen, inga spelare och inga ord
   await starta(page, '?snabb&ny');
   await expect(page.locator('.start-knapp')).toHaveAttribute('aria-label', 'Starta');
-  await expect(page.locator('.spelarkort')).toHaveCount(0);
-  // en hjälte som har spelat en bit (påhittat namn)
+  await expect(page.locator('.startbord .spelarkort')).toHaveCount(0);
+  await expect(page.locator('.skylt-namn')).toHaveText('ORDSTAVEN');
+  // Stils bilder i hela steg: bordet är 320 × 192 av världens pixlar och fyller spelytan
+  const bord = await page.locator('.startbord img.bord').boundingBox();
+  const varld = await page.locator('#varld').boundingBox();
+  expect(bord).toEqual(varld);
+  const dpr = await page.evaluate(() => devicePixelRatio);
+  expect(Number.isInteger(Math.round((bord.width * dpr) / 320 * 1000) / 1000)).toBe(true);
+  await page.screenshot({ path: 'test-results/start-forsta.png' });
+  // en hjälte som har spelat en bit (påhittat namn), med ett foto av rummet där han är
   await page.evaluate(() => {
     const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
     t.spelare.hjalte.namn = 'Ture'; t.spelare.hjalte.utseende = { hudfarg: 1, drakt: 2 }; t.spelare.unge.namn = 'KNOPP';
+    t.spelare.larande.lasning = { P1_las_och_valj: { niva: 3, streak: 0, miss: 0, forstaForsok: 4 } };
     av.scen = 5; av.scenId = 's05'; av.startad = true;
     localStorage.setItem('ordstaven_spar', JSON.stringify(t));
   });
   await starta(page);
-  const fortsatt = page.locator('.start-knapp.fortsatt-kort');
+  const fortsatt = page.locator('.start-knapp.fortsatt');
   await expect(fortsatt).toBeVisible();
-  await expect(fortsatt.locator('img.figur-px')).toHaveCount(2); // hjälten och ungen
+  // inget foto än: hjälten och ungen står i ramen
+  await expect(fortsatt.locator('.foto.tom img')).toHaveCount(2);
+  await expect(page.locator('.startbord .unge')).toBeVisible();
   await expect(page.locator('.spelarkort.vald')).toContainText('TURE');
-  // figurerna är skalade i hela steg
-  const bb = await fortsatt.locator('img.figur-px >> nth=0').boundingBox();
-  const dpr = await page.evaluate(() => devicePixelRatio);
-  expect(Math.abs(((bb.height * dpr) / 24) - Math.round((bb.height * dpr) / 24))).toBeLessThan(0.01);
+  await expect(page.locator('.start-ord')).toHaveCount(0); // inga ord under knapparna (62.5)
   await page.screenshot({ path: 'test-results/start-fortsatt.png' });
   const utanTid = () => page.evaluate(() => { const t = JSON.parse(localStorage.getItem('ordstaven_spar') || 'null'); delete t.sparad; return t; });
   const fore = await utanTid();
-  // ett tryck: knappen blir redo, inget händer
+  // NYTT ÄVENTYR, första trycket: boken lyfts fram, resten tonas ned, och inget händer
   await page.click('.nytt-aventyr');
-  await expect(page.locator('.nytt-aventyr.redo')).toBeVisible();
-  await page.screenshot({ path: 'test-results/start-nytt-redo.png' });
+  await expect(page.locator('.startbord.lyft')).toBeVisible();
+  await expect(page.locator('.ny-bok .bekrafta')).toBeVisible();
+  await page.screenshot({ path: 'test-results/start-nytt-lyft.png' });
   expect(await page.evaluate(() => localStorage.getItem('ordstaven_platser'))).toBeNull();
-  // det andra trycket: en ny hjälte på en egen plats, och den gamla sparningen är orörd
-  await Promise.all([page.waitForEvent('load'), page.click('.nytt-aventyr')]);
+  // pilen bakåt lägger tillbaka boken, och ett tryck på fotot då startar inget (det lägger bara tillbaka boken)
+  await page.click('.ny-bok .tillbaka');
+  await expect(page.locator('.startbord.lyft')).toHaveCount(0);
+  await page.click('.nytt-aventyr');
+  await page.locator('.start-knapp.fortsatt').click({ force: true });
+  await expect(page.locator('.startbord.lyft')).toHaveCount(0);
+  await expect(page.locator('#skarm')).toBeVisible();
+  // bocken: samma hjälte och samma läsnivå på en egen plats, äventyret från början, och den gamla sparningen är orörd
+  await page.click('.nytt-aventyr');
+  await Promise.all([page.waitForEvent('load'), page.click('.ny-bok .bekrafta')]);
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning && window.__ORDSTAVEN.spel.scene.isActive('Rum'));
-  const platser = await page.evaluate(() => JSON.parse(localStorage.getItem('ordstaven_platser') || 'null'));
-  expect(platser).toMatchObject({ aktiv: 'p2', platser: ['1', 'p2'] });
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('ordstaven_platser') || 'null'))).toMatchObject({ aktiv: 'p2', platser: ['1', 'p2'] });
   expect(await utanTid()).toEqual(fore);
-  expect(await page.evaluate(() => window.__ORDSTAVEN.tillstand().spelare.hjalte.namn)).toBe('');
-  await expect(page.locator('.start-knapp')).toHaveAttribute('aria-label', 'Starta');
-  await expect(page.locator('.spelarkort[data-plats="1"]')).toContainText('TURE');
-  await expect(page.locator('.nytt-aventyr')).toHaveCount(0);
-  await page.screenshot({ path: 'test-results/start-ny-hjalte.png' });
-  // tillbaka till den gamla hjälten
-  await Promise.all([page.waitForEvent('load'), page.click('.spelarkort[data-plats="1"]')]);
+  const ny = await page.evaluate(() => window.__ORDSTAVEN.tillstand());
+  expect(ny.spelare.hjalte.namn).toBe('Ture');
+  expect(ny.spelare.hjalte.id).toBe(fore.spelare.hjalte.id);
+  expect(ny.spelare.larande.lasning.P1_las_och_valj.niva).toBe(3);
+  expect(ny.spelare.unge.namn).toBe('');
+  const nyttAv = ny.aventyr['den-gomda-dalen'] || {};
+  expect([nyttAv.scenId, nyttAv.startad, nyttAv.scen ?? 0]).toEqual([undefined, undefined, 0]);
+  // samma hjälte syns en gång: den nya platsen, som spelas
+  await expect(page.locator('.startbord .spelarkort')).toHaveCount(1);
+  await expect(page.locator('.spelarkort.vald')).toHaveAttribute('data-plats', 'p2');
+  await expect(page.locator('.start-knapp.fortsatt .foto.tom img')).toHaveCount(1); // hjälten, ingen unge än
+  // plusset: en ny spelare på en egen plats, utan namn, och de andra hjältarna att byta tillbaka till
+  await Promise.all([page.waitForEvent('load'), page.click('.ny-spelare')]);
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning && window.__ORDSTAVEN.spel.scene.isActive('Rum'));
-  await expect(page.locator('.start-knapp.fortsatt-kort')).toBeVisible();
-  expect(await page.evaluate(() => window.__ORDSTAVEN.tillstand().spelare.hjalte.namn)).toBe('Ture');
-  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('ordstaven_platser') || 'null').aktiv)).toBe('1');
-  // menyn för vuxna: spelarna, och den som inte spelas kan tas bort med två klick (den hamnar i sin backup)
+  expect(await page.evaluate(() => window.__ORDSTAVEN.tillstand().spelare.hjalte.namn)).toBe('');
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('ordstaven_platser') || 'null'))).toMatchObject({ aktiv: 'p3', platser: ['1', 'p2', 'p3'] });
+  await expect(page.locator('.start-knapp')).toHaveAttribute('aria-label', 'Starta');
+  await expect(page.locator('.startbord .spelarkort')).toHaveCount(1);
+  await expect(page.locator('.ny-spelare')).toHaveCount(0);
+  await page.screenshot({ path: 'test-results/start-ny-spelare.png' });
+  // tillbaka till hjälten: den senast sparade platsen med honom
+  await Promise.all([page.waitForEvent('load'), page.click('.startbord .spelarkort[data-plats="p2"]')]);
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning && window.__ORDSTAVEN.spel.scene.isActive('Rum'));
+  await expect(page.locator('.start-knapp.fortsatt')).toBeVisible();
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('ordstaven_platser') || 'null').aktiv)).toBe('p2');
+  // INSTÄLLNINGAR: alla platser, och den som inte spelas kan tas bort med två klick (den hamnar i sin backup)
   await page.click('.start-knapp');
   await page.keyboard.press('Control+Shift+M');
   const grupp = page.locator('.menygrupp.spelare');
   await expect(grupp).toContainText('TURE');
-  await expect(grupp.locator('.spelare-rad')).toHaveCount(2);
+  await expect(grupp.locator('.spelare-rad')).toHaveCount(3);
   await page.screenshot({ path: 'test-results/meny-spelare.png' });
-  await grupp.locator('.spelare-rad[data-plats="p2"] .spelare-bort').click();
+  await grupp.locator('.spelare-rad[data-plats="p3"] .spelare-bort').click();
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('ordstaven_platser') || 'null').platser)).toEqual(['1', 'p2', 'p3']);
+  await grupp.locator('.spelare-rad[data-plats="p3"] .spelare-bort').click();
+  await expect(page.locator('.menygrupp.spelare .spelare-rad')).toHaveCount(2);
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('ordstaven_platser') || 'null').platser)).toEqual(['1', 'p2']);
-  await grupp.locator('.spelare-rad[data-plats="p2"] .spelare-bort').click();
-  await expect(page.locator('.menygrupp.spelare .spelare-rad')).toHaveCount(1);
-  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('ordstaven_platser') || 'null').platser)).toEqual(['1']);
-  expect(await page.evaluate(() => localStorage.getItem('ordstaven_spar_p2_backup'))).not.toBeNull();
+  expect(await page.evaluate(() => localStorage.getItem('ordstaven_spar_p3_backup'))).not.toBeNull();
 });
+
+test('startskärmens foto (F4): rummet där han är, 160 × 96 runt hjälten, och det är FORTSÄTT nästa gång', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(60000);
+  await starta(page, '?snabb&ny');
+  await page.evaluate(() => {
+    const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
+    t.spelare.hjalte.namn = 'Ture'; t.spelare.unge.namn = 'KNOPP';
+    av.scen = 5; delete av.scenId; av.startad = false;
+    localStorage.setItem('ordstaven_spar', JSON.stringify(t));
+  });
+  await starta(page);
+  await page.click('.start-knapp');
+  await page.waitForFunction(() => !!localStorage.getItem('ordstaven_spar_foto'), null, { timeout: 15000 });
+  const matt = await page.evaluate(() => new Promise((klar) => { const i = new Image(); i.onload = () => klar([i.naturalWidth, i.naturalHeight]); i.src = localStorage.getItem('ordstaven_spar_foto'); }));
+  expect(matt).toEqual([160, 96]);
+  const foto = await page.evaluate(() => localStorage.getItem('ordstaven_spar_foto'));
+  expect(foto.length).toBeLessThan(40000); // en liten bild (localStorage delas med andra spel)
+  await starta(page);
+  await expect(page.locator('.start-knapp.fortsatt img.foto')).toHaveAttribute('src', foto);
+  await page.screenshot({ path: 'test-results/start-foto.png' });
+});
+

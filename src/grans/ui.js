@@ -28,7 +28,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
       <button type="button" id="hud-bar" class="hud-knapp" hidden aria-label="Bär">${ikon('bar', 'hud')}<span class="tal">0</span></button>
     </div>
     <button type="button" id="hud-paus" class="hud-knapp" hidden aria-label="Paus">${ikon('paus', 'hud')}</button>
-    <button type="button" id="hud-meny" aria-label="Meny för vuxna (håll inne)">⚙</button>
+    <button type="button" id="hud-meny" aria-label="INSTÄLLNINGAR (håll inne)">⚙</button>
     <div id="tanke" hidden></div>
     <div id="varldslager">
       <div id="etiketter"></div>

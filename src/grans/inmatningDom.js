@@ -33,7 +33,7 @@ export function kopplaInmatning({ inmatning, layout, yta, logg, kamera = () => (
   for (const typ of ['gesturestart', 'gesturechange', 'dblclick', 'contextmenu']) {
     document.addEventListener(typ, (e) => e.preventDefault(), { passive: false });
   }
-  // Sidan skrollar aldrig, men en meny som är längre än skärmen (menyn för vuxna på iPad) skrollar själv.
+  // Sidan skrollar aldrig, men en meny som är längre än skärmen (INSTÄLLNINGAR på iPad) skrollar själv.
   document.addEventListener('touchmove', (e) => {
     const t = /** @type {Element | null} */ (e.target instanceof Element ? e.target : null);
     if (t?.closest('.meny')) return;

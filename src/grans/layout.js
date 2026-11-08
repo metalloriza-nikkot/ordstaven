@@ -40,8 +40,6 @@ export function skapaLayout({ varld, logg }) {
     const steg = (/** @type {number} */ mal, /** @type {number} */ px, min = 1) => Math.max(min, Math.round((mal * dpr) / px)) / dpr;
     r.setProperty('--ipx-text', steg(40 * t, 16) + 'px'); // i en rad med text i 40 punkter
     r.setProperty('--ipx-stor', steg(96 * t, 16) + 'px'); // festen och pausmenyn
-    r.setProperty('--ipx-figur', steg(168 * t, 24) + 'px'); // startskärmens hjälte och unge (24 pixlar höga) ca 168 punkter
-    r.setProperty('--ipx-figur-liten', steg(72 * t, 24) + 'px'); // spelarkorten
     r.setProperty('--vpx', s.cssSkala + 'px'); // en av världens pixlar (dörrskyltarnas trä)
     // HUD:en står i ramen till höger när den är minst 48 punkter bred (beslut 33.2), annars i rummets hörn som förut
     const ram = Math.max(0, window.innerWidth - (s.vanster + s.cssBredd));

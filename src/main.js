@@ -203,7 +203,7 @@ for (const [id, tmj] of Object.entries(testkartor)) kartor[id] = lasKarta(tmj);
 const spelet = skapaSpel({
   aventyr, kartor, kapitel, ordlistor, tillstand, sparning, platser, logg, rost, ljud, ui, rum, layout, inmatning, tangentbord, bilder,
   snabb, pek: () => pek.matches, version: VERSION, exporteraLogg: () => exportera(logg),
-  // sparfilen i menyn för vuxna: hela sparningen som en fil, och tillbaka
+  // sparfilen i INSTÄLLNINGAR: hela sparningen som en fil, och tillbaka
   filer: { laddaNed, tidsstampel, meddelande },
   // ?kapitel=kap-01: börja i ett kapitel som ännu saknar kartor (gråbox för den vuxne)
   valtKapitel: parametrar.get('kapitel'),

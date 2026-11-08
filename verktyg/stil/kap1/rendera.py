@@ -57,11 +57,11 @@ def rendera(karta, kartfil=None, dolda=True):
             if o.get('type') == 'yta': ytor.append((b, x, y))
             elif b.height > o['height'] + 6: hoga.append((o['y'] + o['height'], b, x, y))
             else: platt.append((b, x, y))
-    # som spelet: ytorna, sedan de låga föremålen, sedan de höga bilderna bland figurerna (efter foten), sist ridån
+    # som spelet (0.30.0): ytorna, de låga föremålen, ridån, sedan de höga bilderna bland figurerna (efter foten)
     for b, x, y in ytor + platt: im.alpha_composite(b, (x, y))
+    for L in over: lager(L, im)
     for _, b, x, y in sorted(hoga, key=lambda t: t[0]): im.alpha_composite(b, (x, y))
     for b, x, y in ovanpa: im.alpha_composite(b, (x, y))
-    for L in over: lager(L, im)
     return im
 
 if __name__ == '__main__':

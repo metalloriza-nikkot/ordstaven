@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { geSak, bytLager, lagerFor } from '../../src/karna/hjalte.js';
 import { readFileSync, readdirSync } from 'node:fs';
-import { skapaSparning, skapaPlatser, nyckelFor, nyttTillstand, migrera, FORMAT, NYCKEL, NYCKEL_TRASIG, NYCKEL_PLATSER, aventyrFor } from '../../src/karna/sparning.js';
+import { skapaSparning, skapaPlatser, nyckelFor, fotoNyckel, spelareAttVisa, nyttTillstand, migrera, FORMAT, NYCKEL, NYCKEL_TRASIG, NYCKEL_PLATSER, aventyrFor } from '../../src/karna/sparning.js';
 const AVENTYR = 'den-gomda-dalen';
 import { skapaLogg } from '../../src/karna/logg.js';
 
@@ -191,6 +191,45 @@ describe('spelarna på enheten (F1)', () => {
     expect(JSON.parse(l.getItem(nyckelFor('p2') + '_backup')).tillstand.spelare.hjalte.namn).toBe('Vilma');
     // numret används inte igen så länge backupen finns
     expect(p.ny(null)).toBe('p3');
+  });
+
+  it('NYTT ÄVENTYR (F4): samma hjälte och samma lärande på en egen plats, äventyret och ungen från början', () => {
+    const l = minne(); const gammal = spelad(l, '1', 'Ture');
+    gammal.spelare.unge.namn = 'KNOPP'; gammal.spelare.larande.lasning = { P1_las_och_valj: { niva: 3 } }; gammal.spelare.hjalte.formler = ['LJUS'];
+    skapaSparning({ lagring: l, spelversion: '0.1.0', plats: '1' }).spara(gammal);
+    const fore = l.getItem(NYCKEL);
+    const p = skapaPlatser({ lagring: l });
+    expect(p.ny(gammal, '0.36.0', { sammaHjalte: true })).toBe('p2');
+    expect(l.getItem(NYCKEL)).toBe(fore);
+    const t = skapaSparning({ lagring: l, spelversion: '0.36.0', plats: 'p2' }).las();
+    expect(t.spelare.hjalte).toMatchObject({ id: gammal.spelare.hjalte.id, namn: 'Ture', utseende: { hudfarg: 2, drakt: 1 }, formler: [] });
+    expect(t.spelare.larande.lasning).toEqual({ P1_las_och_valj: { niva: 3 } });
+    expect(t.spelare.unge.namn).toBe('');
+    expect(t.aventyr).toEqual({});
+  });
+
+  it('startskärmens foto hör till platsen och tas bort med den', () => {
+    const l = minne(); spelad(l, '1', 'Ture');
+    const p = skapaPlatser({ lagring: l });
+    expect(fotoNyckel('1')).toBe('ordstaven_spar_foto');
+    expect(fotoNyckel('p2')).toBe('ordstaven_spar_p2_foto');
+    p.ny(null); spelad(l, 'p2', 'Vilma');
+    expect(p.sparaFoto('p2', 'data:image/png;base64,AAA')).toBe(true);
+    expect(p.foto('p2')).toBe('data:image/png;base64,AAA');
+    expect(p.foto('1')).toBeNull();
+    p.valj('1'); p.taBort('p2');
+    expect(l.getItem(fotoNyckel('p2'))).toBeNull();
+  });
+
+  it('spelarna på startskärmen: en per hjälte, den som spelas eller den som sparades senast', () => {
+    const x = (plats, hjalteId, sparad, borjat = true) => ({ plats, hjalteId, sparad, borjat });
+    // samma hjälte på plats 1 och p3 (ett nytt äventyr), en annan på p2, och en tom plats som inte visas
+    const alla = [x('1', 'a', '2026-11-01'), x('p2', 'b', '2026-11-02'), x('p3', 'a', '2026-11-05'), x('p4', 'c', null, false)];
+    expect(spelareAttVisa(alla, 'p2').map((s) => s.plats)).toEqual(['p3', 'p2']);
+    expect(spelareAttVisa(alla, '1').map((s) => s.plats)).toEqual(['1', 'p2']);
+    // platsen som spelas syns alltid, och äldre platser utan hjälte-id räknas var för sig
+    expect(spelareAttVisa(alla, 'p4').map((s) => s.plats)).toEqual(['p3', 'p2', 'p4']);
+    expect(spelareAttVisa([x('1', null, 'b'), x('p2', null, 'a')], '1').map((s) => s.plats)).toEqual(['1', 'p2']);
   });
 
   it('ett trasigt platsregister börjar om från sparningarna', () => {

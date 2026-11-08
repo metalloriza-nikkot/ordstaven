@@ -234,7 +234,7 @@ Uppdragslappen (10d, beslut 47 och 48) är hopfälld bakom lappknappen och fäll
 | `steg[].ersatter` | **Används inte sedan 2.22** (beslut 47.1): lappen ersätter inga repliker och inte molnet. Kontrollen prövar fortfarande att repliken finns, tills Innehåll har tagit bort fältet. |
 | `stampel` | Stämpeln kommer när berättelsen har passerat steget i `efter` (`replik`, `pussel`, `ga_till`, `vantar_pa` eller `bild` på en mellanscen), alltså efter berättelsens stund och före nästa steg. Den slår ned på spelytan bredvid hjälten. |
 
-**Hur lappen följer berättelsen** (`src/karna/uppdrag.js`): allt räknas ur var berättelsen är, så att lappen stämmer också efter en omstart, ett hopp i menyn för vuxna eller en framspolning.
+**Hur lappen följer berättelsen** (`src/karna/uppdrag.js`): allt räknas ur var berättelsen är, så att lappen stämmer också efter en omstart, ett hopp i INSTÄLLNINGAR eller en framspolning.
 - Ett uppdrag **börjar** vid den första repliken som lappen ersätter i första steget, annars vid första stegets eget steg, och aldrig före förra uppdragets stämpel.
 - Ett steg är **gjort** när berättelsen har passerat steget i `klart`. Gjorda steg är bockar på rubrikens rad, och steget han gör nu står under med pilen (kompakt lapp, 10d).
 - Säger lappen vad han ska göra i ett `ga_till` eller `bara`, står inget moln.
@@ -314,7 +314,7 @@ Kontrollen säger fel om ett föremål saknas i kartan, om kartan har föremål 
 Ett kapitel kan vara låst tills den vuxne öppnar det på enheten (beslut 24.2: spelaren spelar varje kapitel en gång, som en premiär). `last` listar kapitlen som är låsta från början, och `steg` är slutrutan (`mellanscen` och `replik`, som `sluta_for_idag`).
 - När nästa kapitel är låst spelas slutrutan i stället för frågan vid kapitlets sista sparpunkt (`pass_slut`). Sedan står den sovande ungen och en stjärna kvar, och ▶ spelar slutrutan igen.
 - FORTSÄTT kommer till slutrutan igen så länge kapitlet är låst. Inget raderas och inget börjar om.
-- Den vuxne öppnar kapitlet i menyn för vuxna (en kryssruta per kapitel i `last`), eller genom att hoppa till en scen i det. Inställningen gäller bara den enheten. `?kapitel=<id>` går alltid förbi låset.
+- Den vuxne öppnar kapitlet i INSTÄLLNINGAR (en kryssruta per kapitel i `last`), eller genom att hoppa till en scen i det. Inställningen gäller bara den enheten. `?kapitel=<id>` går alltid förbi låset.
 
 ### Pausmenyn: `gransnitt` i aventyr.json
 Pausmenyn har två bildknappar, KARTAN och MIN BOK (hjälteboken), och hjälteboken har flikarna STAVEN, KLÄDER (garderoben) och DINOBOKEN (stilguiden §6, beslut 22.2). Varje knapp och flik är en bild och ett ord, och ordet läses upp vid tryck. Orden står i `aventyr.json` (nycklarna har dokumentens namn):
@@ -323,7 +323,7 @@ Pausmenyn har två bildknappar, KARTAN och MIN BOK (hjälteboken), och hjältebo
 ```
 `sluta_for_idag` har ett eget ord (`sov`, Innehåll F11). Saknas det visar knappen bara den sovande ungen.
 `klart` (2.24) är ordet för fliken KLART och för stämpeln (`klart`). Saknas det visas bara bilden, och stämpeln läses inte upp.
-`fortsatt` och `nytt_aventyr` (2.27) står under startskärmens ▶ (FORTSÄTT) och + (NYTT ÄVENTYR). Saknas de visas bara bilderna, och startskärmen kräver ingen läsning.
+`fortsatt` och `nytt_aventyr` (2.27) **används inte** sedan startskärmen fick Stils bilder (0.36.0, F4): inga ord under knapparna (beslut 62.5), och Innehåll lägger inte in dem. Fälten får stå kvar i schemat, men spelet visar dem inte.
 Saknas ett ord visas bara bilden. Det som står på sidorna kommer från sparningen: formlerna (staven), sakerna hjälten har hittat (`ge_sak`, garderoben), Dinobokens sidor (`dinobok`) och kartbitarna.
 
 ## 4. Ordlistor

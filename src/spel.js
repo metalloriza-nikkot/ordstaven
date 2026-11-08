@@ -9,7 +9,7 @@ import { skapaValj, skapaFormel, skapaDop, skapaKrukor, skapaRaddning } from './
 import { forSkarm, versaler } from './karna/text.js';
 import { rumTillSkarm, varldTillSkarm, RUM, textskala } from './karna/skalning.js';
 import { framfor, lasplats, vidObjekt, genom, stigStart } from './karna/rumslayout.js';
-import { aventyrFor } from './karna/sparning.js';
+import { aventyrFor, spelareAttVisa } from './karna/sparning.js';
 import { varVarVi, senastSpelad } from './karna/varvarvi.js';
 import { sparaPassbild, aterstallLarande, forstaIPasset } from './karna/larandebild.js';
 import { pekningOmMs, skapaHjalpSpar, knufftidMs } from './karna/hjalp.js';
@@ -19,6 +19,7 @@ import { TANGENTBORD_HOJD } from './grans/tangentbord.js';
 import { skapaRullning } from './grans/rullning.js';
 import { laggUngenPaKartan, kartbitarHtml } from './grans/kartbitar.js';
 import { ikon, uiBild } from './grans/ikoner.js';
+import { visaStartskarm } from './grans/startskarm.js';
 import { kompileraUppdrag, lappenNu, klaraFore, jamfor } from './karna/uppdrag.js';
 import { skapaUppdragslapp, lappText, stampelPlats, visaStampel, LAPP_IHOP_MS } from './grans/uppdragslapp.js';
 
@@ -78,7 +79,7 @@ export function skapaSpel(d) {
   const spara = () => { if (!sparfilInlast) sparning.spara(tillstand); };
   /** @type {string | null} varianten i pusslet som pågår (för testerna) */
   let aktuellVariant = null;
-  /** Spelet står still (menyn för vuxna är öppen eller fliken är dold). */
+  /** Spelet står still (INSTÄLLNINGAR är öppet eller fliken är dold). */
   let pausad = false;
   /** @type {Set<string>} orsakerna till pausen */
   const pausorsaker = new Set();
@@ -239,14 +240,14 @@ export function skapaSpel(d) {
 
   // ------------------------------------------------------------------ hjälpare
   /** Lyssna på handlingar (tangenter) så länge ett steg pågår. */
-  // När spelet är pausat (menyn för vuxna, dold flik) når inga handlingar stegen.
+  // När spelet är pausat (INSTÄLLNINGAR, dold flik) når inga handlingar stegen.
   const lyssnaHandling = (/** @type {(h: any) => void} */ f) => inmatning.lyssna((/** @type {any} */ h) => { if (!pausad) f(h); });
 
   /** Läser föräldern den här talarens repliker (Farfar)? @param {any} r */
   const foraldernLaser = (r) => inst.foralderLaser && (aventyr.talare[r?.talare] || {}).rost === 'foraldern_eller_datorrost';
   /** Repliken som den sägs: vanlig skrift, platshållarna ersatta. @param {any} r */
   const talText = (r) => forSkarm(r.text, { varden: varden(), skrift: 'vanlig' }).join(' ');
-  /** Säg en replik högt (om den ska läsas upp). Rösten kan stängas av i menyn för vuxna. @param {any} r */
+  /** Säg en replik högt (om den ska läsas upp). Rösten kan stängas av i INSTÄLLNINGAR. @param {any} r */
   function sag(r) {
     if (!r || !r.upplast || !inst.rost) return Promise.resolve();
     if (foraldernLaser(r)) return Promise.resolve();
@@ -2763,7 +2764,7 @@ export function skapaSpel(d) {
   // ------------------------------------------------------------------ låsta kapitel (aventyr.json: kapitel_last)
   /**
    * Ett kapitel är låst när äventyret listar det i kapitel_last.last och den vuxne inte har öppnat det på den här
-   * enheten (menyn för vuxna, installningar.oppnadeKapitel). ?kapitel=<id> går alltid förbi låset (för den vuxne).
+   * enheten (INSTÄLLNINGAR, installningar.oppnadeKapitel). ?kapitel=<id> går alltid förbi låset (för den vuxne).
    * @param {string} id
    */
   const kapitelLast = (id) => (aventyr.kapitel_last?.last || []).includes(id) && !(inst.oppnadeKapitel || []).includes(id) && d.valtKapitel !== id;
@@ -2800,6 +2801,7 @@ export function skapaSpel(d) {
     const s = aventyr.sluta_for_idag;
     const medUngen = !!tillstand.spelare.unge?.folj && !!tillstand.spelare.unge?.namn;
     logg.handelse('sluta för idag', medUngen ? 'med ungen' : 'före ungen');
+    await taFoto('sluta för idag', true);
     spara();
     const varFryst = rum.fryst;
     rum.frys(true);
@@ -2879,6 +2881,7 @@ export function skapaSpel(d) {
   function oppnaPaus(vy = 'start') {
     if (!b) return;
     klartUppslagNu = null; // fliken KLART öppnas på det senaste uppslaget
+    taFoto('paus', true);
     pausa('pausmeny');
     ritaPaus(vy);
   }
@@ -2945,62 +2948,59 @@ export function skapaSpel(d) {
 
   // ------------------------------------------------------------------ start, slut, meny
   /**
-   * Startskärmen (F1, brief 9a och 10e): en stor FORTSÄTT med hjälten och ungen där de är, spelarna som kort med
-   * hjältens bild och namnet han skrev, och ett mindre NYTT ÄVENTYR som kräver två tryck och aldrig raderar något
-   * (en ny hjälte får en egen sparplats). Ingenting kräver läsning: ▶ och + räcker, orden står under när
-   * äventyret har dem (gransnitt.fortsatt och gransnitt.nytt_aventyr). Första gången finns bara ▶.
-   * Gråbox: bilden av rummet kommer med Stils skiss (F4).
+   * Startskärmen (F1 och F4, brief 9a och 10e v0.4): Farfars skrivbord med fotot av rummet där han är (FORTSÄTT),
+   * spelarna med sina hjältebilder och plusset (en ny spelare), och NYTT ÄVENTYR som en tom bok med två tryck: samma
+   * hjälte, äventyret från början på en egen plats. Inget raderas, och inga ord under knapparna (62.5). Första
+   * gången finns bara den stora boken. Bilderna och trycken står i grans/startskarm.js.
    */
   async function startskarm() {
     const platser = d.platser;
     const aktiv = platser?.aktiv() ?? '1';
     const lista = platser ? platser.lista() : [aktiv];
-    const borjat = !!tillstand.spelare.hjalte.namn || !!av.startad || !!av.scenId || !!av.kapitelId || (av.scen ?? 0) > 0;
-    const bild = (/** @type {string | null} */ src, klass = '') => (src ? `<img class="figur-px ${klass}" src="${src}" alt="" aria-hidden="true" draggable="false">` : '');
-    const ord = (/** @type {string} */ nyckel) => { const o = gransnittsOrd(nyckel); return o ? `<span class="start-ord">${ui.rader(o, {}, 'kort-ord')}</span>` : ''; };
-    const andra = lista.filter((p) => p !== aktiv).map((p) => platser?.info(p)).filter((x) => x && x.borjat);
-    const kort = (/** @type {any} */ x, vald = false) => `<button type="button" class="spelarkort ${vald ? 'vald' : ''}" data-plats="${ui.esc(x.plats)}" aria-label="${ui.esc(x.namn || 'spelare')}">${bild(rum.hjalteBildFor?.(x.utseende) ?? null, 'liten')}${x.namn ? `<span class="spelarnamn">${ui.rader(x.namn, {}, 'kort-ord')}</span>` : ''}</button>`;
-    const jag = { plats: aktiv, namn: tillstand.spelare.hjalte.namn || '', utseende: tillstand.spelare.hjalte.utseende || {} };
-    const spelare = (andra.length || borjat)
-      // en ny hjälte som inte har börjat har redan ett nytt äventyr: då finns bara de andra hjältarna att byta till
-      ? `<div class="spelarrad">${borjat ? kort(jag, true) : ''}${andra.map((x) => kort(x)).join('')}${borjat ? `<button type="button" class="spelarkort nytt-aventyr" aria-label="Nytt äventyr"><span class="plus" aria-hidden="true">+</span>${ord('nytt_aventyr')}</button>` : ''}</div>`
-      : '';
-    const fortsatt = borjat
-      ? `<button type="button" class="knapp start-knapp fortsatt-kort" aria-label="Fortsätt"><span class="fortsatt-figurer">${bild(rum.hjalteBild?.() ?? null)}${tillstand.spelare.unge?.namn ? bild(rum.ungeBildUrl?.(`unge${tillstand.spelare.unge.steg || 1}_glad_ner_01`) ?? rum.ungeBildUrl?.() ?? null, 'unge') : ''}</span><span class="fortsatt-pil">▶</span>${ord('fortsatt')}</button>`
-      : `<div class="stav-glimt" aria-hidden="true"></div><button type="button" class="knapp start-knapp" aria-label="Starta">▶</button>`;
-    const s = ui.visaSkarm(`<div class="start${borjat ? ' med-fortsatt' : ''}">${fortsatt}${spelare}</div>`);
-    logg.handelse('start', 'startskärmen', { plats: aktiv, spelare: lista.length, borjat });
-    /** @type {ReturnType<typeof setTimeout> | undefined} */
-    let bekrafta;
-    await new Promise((klar) => {
-      s.querySelector('.start-knapp')?.addEventListener('click', () => klar(undefined), { once: true });
-      // en annan spelare: hans plats väljs, och spelet startar om på den
-      s.querySelectorAll('.spelarkort[data-plats]').forEach((el) => el.addEventListener('click', () => {
-        const p = /** @type {HTMLElement} */ (el).dataset.plats || '';
-        if (p === aktiv) { klar(undefined); return; }
-        ljud.spela('klick');
-        if (platser?.valj(p)) { logg.handelse('spelare', 'byter till plats ' + p); logg.spara?.(true); laddaOm(); }
-      }));
-      // NYTT ÄVENTYR: första trycket gör knappen redo (den lyser och växer), det andra inom 4 s startar en ny hjälte
-      const ny = /** @type {HTMLElement | null} */ (s.querySelector('.nytt-aventyr'));
-      ny?.addEventListener('click', () => {
-        ljud.spela('klick');
-        if (!ny.classList.contains('redo')) {
-          ny.classList.add('redo'); clearTimeout(bekrafta);
-          bekrafta = setTimeout(() => ny.classList.remove('redo'), 4000);
-          return;
-        }
-        clearTimeout(bekrafta);
-        spara();
-        const p = platser?.ny(tillstand, String(d.version ?? ''));
-        logg.handelse('spelare', 'nytt äventyr på plats ' + p);
-        logg.spara?.(true); laddaOm();
-      });
+    const h = tillstand.spelare.hjalte;
+    const borjat = !!h.namn || !!av.startad || !!av.scenId || !!av.kapitelId || (av.scen ?? 0) > 0;
+    const jag = { plats: aktiv, namn: h.namn || '', utseende: h.utseende || {}, borjat, hjalteId: h.id || null, sparad: tillstand.sparad || null };
+    const infos = lista.map((p) => (p === aktiv ? jag : platser?.info(p))).filter((x) => !!x);
+    // en ny hjälte som inte har börjat har redan ett nytt äventyr: då visas bara de andra hjältarna att byta till
+    const visas = spelareAttVisa(/** @type {any[]} */ (infos), aktiv).filter((x) => x.plats !== aktiv || borjat);
+    const unge = tillstand.spelare.unge, ungeSteg = unge?.steg || 1;
+    const ungeUrl = (/** @type {string} */ r) => rum.ungeBildUrl?.(`unge${ungeSteg}_${r}`) ?? null;
+    const foto = borjat ? platser?.foto(aktiv) ?? null : null;
+    const sk = visaStartskarm({
+      skarm: ui.$('#skarm'), ord: (t) => ui.rader(t, {}, 'kort-ord'), borjat, foto,
+      figurer: { hjalte: rum.hjalteBild?.() ?? null, unge: unge?.namn ? (ungeUrl('glad_ner_01') ?? rum.ungeBildUrl?.() ?? null) : null },
+      ungeRam: unge?.namn ? ungeUrl : null,
+      spelare: visas.map((x) => ({ plats: x.plats, namn: x.namn, hjalte: rum.hjalteBildFor?.(x.utseende) ?? null, vald: x.plats === aktiv })),
+      kanNySpelare: borjat, tid, klick: () => ljud.spela('klick'), logg,
     });
-    clearTimeout(bekrafta);
+    logg.handelse('start', 'startskärmen', { plats: aktiv, spelare: lista.length, visas: visas.length, borjat, foto: !!foto });
+    const v = await sk.val;
+    sk.stang();
+    if (v.vad !== 'start') {
+      spara();
+      const p = v.vad === 'spelare' ? (platser?.valj(v.plats) ? v.plats : null)
+        : platser?.ny(tillstand, String(d.version ?? ''), { sammaHjalte: v.vad === 'nytt_aventyr' }) ?? null;
+      logg.handelse('spelare', v.vad === 'spelare' ? 'byter till plats ' + p : `${v.vad === 'nytt_aventyr' ? 'nytt äventyr med samma hjälte' : 'ny spelare'} på plats ${p}`);
+      logg.spara?.(true);
+      if (p) { laddaOm(); await new Promise(() => {}); }
+      return startskarm();
+    }
     ljud.starta(); rost.lasUpp();
     d.uppdatering.tillampa();
     ui.doljSkarm();
+  }
+  let fotoTid = 0;
+  /**
+   * Startskärmens foto (F4): rummet där han är, sparat för platsen. Högst var 20:e sekund när han går, och alltid när
+   * han pausar eller slutar för idag. Det är en liten bild (160 × 96) av det som redan ritas.
+   * @param {string} orsak @param {boolean} [tvinga]
+   */
+  async function taFoto(orsak, tvinga = false) {
+    const p = d.platser;
+    if (!p || !rum.foto || (!tvinga && Date.now() - fotoTid < 20000)) return;
+    fotoTid = Date.now();
+    const url = await rum.foto();
+    if (url && p.sparaFoto(p.aktiv(), url)) logg.handelse('foto', orsak, { kb: Math.round(url.length / 1024) });
   }
   /** Starta om sidan på den valda platsen (utan ?ny, som annars nollställer sparningen). */
   function laddaOm() { const u = new URL(location.href); u.searchParams.delete('ny'); location.href = u.toString(); }
@@ -3067,9 +3067,11 @@ export function skapaSpel(d) {
       forstaKapitlet = false;
       while (!b.slut) {
         await visaScen();
+        // startskärmens foto: rummet en stund efter att det syns (högst var 20:e sekund)
+        setTimeout(() => { if (!pausad) taFoto('rummet'); }, tid(1500));
         let st0 = b.aktuellt();
         if (!st0) break;
-        // ett pass börjar: en bild av lärandet, som menyn för vuxna sätter tillbaka till (F3, 32.2)
+        // ett pass börjar: en bild av lärandet, som INSTÄLLNINGAR sätter tillbaka till (F3, 32.2)
         const passNyckel = `${kapitel.id}/${b.scenIndex}`;
         if (passbildFor !== passNyckel && (av.steg ?? 0) === 0 && forstaIPasset(kapitel, b.scenIndex)) {
           passbildFor = passNyckel;
@@ -3179,7 +3181,7 @@ export function skapaSpel(d) {
     s.querySelector('.om')?.addEventListener('click', () => { sparning.nollstall(); location.reload(); });
   }
 
-  // gråboxens meny för vuxna: håll inne ⚙ en stund (en ring fylls). Ett kort tryck visar att man ska hålla.
+  // INSTÄLLNINGAR (förut menyn för vuxna): håll inne ⚙ en stund (en ring fylls). Ett kort tryck visar att man ska hålla.
   // Hållet räknas på hela knappen och tål att fingret glider lite, så att det fungerar på iPad.
   const HALL_MS = 800;
   let hallTimer = 0;
@@ -3229,7 +3231,7 @@ export function skapaSpel(d) {
       <small>Rätt direkt = rätt på första försöket utan hjälp. Slumpen = vad gissningar hade gett i läsvalen.</small></div>`;
   }
   /**
-   * Vad nivån betyder i kapitlet han är i (menyn för vuxna, 14): kapitlet har ett golv och ett tak, så nivån i
+   * Vad nivån betyder i kapitlet han är i (INSTÄLLNINGAR, 14): kapitlet har ett golv och ett tak, så nivån i
    * läsmotorn kan vara högre än den variant han får. Utan kapitel (startskärmen) står inget.
    */
   const nivaIKapitlet = () => {
@@ -3243,7 +3245,7 @@ export function skapaSpel(d) {
   const forstaScenIPass = (k, pass) => Math.max(0, k.scener.findIndex((/** @type {any} */ x) => !x.frivillig && x.pass === pass));
 
   /**
-   * Sätt tillbaka sparningen till en scen (menyn för vuxna, beslut 26.6 och 32.2, F3), utan spår av det som kom
+   * Sätt tillbaka sparningen till en scen (INSTÄLLNINGAR, beslut 26.6 och 32.2, F3), utan spår av det som kom
    * efter: det som berättelsen ger töms, och kapitlen och scenerna före spolas fram igen när sidan laddas om.
    * Lärandet sätts tillbaka till hur det var när passet började (larandebild.js), så att en vuxens spel aldrig
    * flyttar ett barns nivå. Namnen, hjältens utseende och inställningarna står kvar.
@@ -3302,7 +3304,7 @@ export function skapaSpel(d) {
     const utanBild = passStart.includes('data-bild="nej"');
     const lasbara = (aventyr.kapitel_last?.last || []).filter((/** @type {string} */ id) => aventyr.kapitel.includes(id));
     const las = lasbara.map((/** @type {string} */ id) => `<label><input type="checkbox" class="kapitel-oppet" data-kapitel="${ui.esc(id)}" ${(inst.oppnadeKapitel || []).includes(id) ? 'checked' : ''}> Kapitlet ${ui.esc(d.kapitel.find((k) => k.id === id)?.meta?.namn ?? id)} är öppet på den här enheten (annars är det låst efter kapitlet före, och har han kommit dit sätts sparningen tillbaka till slutet av kapitlet före)</label>`).join('');
-    const s = ui.visaMeny(`<div class="meny vuxen"><h2>Gråboxen <small>${ui.esc(String(d.version))}</small></h2>
+    const s = ui.visaMeny(`<div class="meny vuxen"><h2>INSTÄLLNINGAR <small>${ui.esc(String(d.version))}</small></h2>
       <div class="menygrupp passlista"><b>Börja ett pass</b> <small>(namnen och det som kommer före finns kvar, och lärandet blir som när passet började):</small> ${passStart}${utanBild ? '<small class="utan-bild">* Där står lärandet kvar som det är nu, eftersom det inte finns någon bild av det från passets början.</small>' : ''}${las ? `<div class="kapitel-las">${las}</div>` : ''}</div>
       <div class="menygrupp lasniva"><b>Läsnivå (läs och välj):</b> ${Array.from({ length: Math.max(4, niva) }, (_, i) => i + 1).map((n) => `<button type="button" class="menyval niva ${n === niva ? 'nu' : ''}" data-n="${n}">L${n}</button>`).join('')} <small class="niva-i-kapitlet">${nivaIKapitlet()}</small></div>
       <div class="menygrupp"><label><input type="checkbox" class="foralder" ${inst.foralderLaser ? 'checked' : ''}> Föräldern läser ${ui.esc(Object.values(aventyr.talare).filter((/** @type {any} */ t) => t.rost === 'foraldern_eller_datorrost').map((/** @type {any} */ t) => t.namn).join(' och ') || 'rollernas')} repliker</label>

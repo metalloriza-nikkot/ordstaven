@@ -12,6 +12,8 @@ Läser en kopia av inkorgsmappen och skriver till repot:
 - sidovyer/*.png         → assets/sidovyer/<namn>.png: sidovyernas bakgrunder och det som rör sig i dem.
 - karta/kartbit_*.png och karta.json → assets/karta/: Farfars karta, en bild per bit och var bitarna ligger.
 - ui/*.png               → assets/ui/<namn>.png: HUD:ens knappar, ikonerna och dörrskyltarnas delar (textlagret visar dem).
+- ui/intro, ui/start och ui/meny → assets/ui/<mapp>/<namn>.png: introt, startskärmen, pausmenyn och INSTÄLLNINGAR
+  (fas 4, 10e), och ui/intro/intro.json med introts tider och lägen.
 - figurer/*/*_portratt_*.png → också assets/portratt/<namn>.png (ansiktena i pratrutan, i textlagret).
 - ljud/*.wav             → assets/ljud/<namn>.wav, döpta utan mellanslag ("unge_late 2" → unge_late_02).
 
@@ -183,7 +185,7 @@ def main():
         if med(f'foremal/{mapp.name}') and (b := las_bilder(mapp, fel, alla)):
             skriv_atlas(b, repo / 'assets' / 'foremal' / mapp.name, mapp.name, arg.prova)
     # bildkorten och sidovyerna som egna bilder: bildkorten visas i textlagret, sidovyerna är hela skärmar
-    for mapp in ('bildkort', 'sidovyer', 'karta', 'ui'):
+    for mapp in ('bildkort', 'sidovyer', 'karta', 'ui', 'ui/intro', 'ui/start', 'ui/meny'):
         if not (med(mapp) and (ink / mapp).is_dir()):
             continue
         for namn, im in las_bilder(ink / mapp, fel, alla).items():
@@ -197,6 +199,12 @@ def main():
         print('assets/karta/karta.json')
         if not arg.prova:
             (repo / 'assets' / 'karta' / 'karta.json').write_text(json.dumps(data, indent=1, ensure_ascii=False) + '\n')
+    # introts tider och lägen (fas 4): samma sak, bara det som tolkas som JSON följer med
+    if med('ui/intro') and (ink / 'ui' / 'intro' / 'intro.json').is_file():
+        data = json.loads((ink / 'ui' / 'intro' / 'intro.json').read_text())
+        print('assets/ui/intro/intro.json')
+        if not arg.prova:
+            (repo / 'assets' / 'ui' / 'intro' / 'intro.json').write_text(json.dumps(data, indent=1, ensure_ascii=False) + '\n')
     for mapp in sorted((ink / 'rum').glob('*/')):
         if not med(f'rum/{mapp.name}'):
             continue
