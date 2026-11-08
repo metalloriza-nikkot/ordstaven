@@ -54,6 +54,8 @@ const BAR_PER_FOREMAL = 2;
  * skratt, vid vindsfönstret och i trädgården.
  */
 const FLYGER_VID_LJUD = /** @type {Record<string, string>} */ ({ fagel_late: 'herr_skata' });
+/** Räddningens knuff före första felet: 15 s utan tryck, som ungens knuff vid målen (beslut 39.4 och 58.2). */
+const RADDNING_KNUFF_MS = 15000;
 /** Menyn låser ett kapitel igen: kapitlet före spolas fram helt (inget scen-id är `*`). */
 const SPOLA_HELA = '*';
 
@@ -2152,9 +2154,18 @@ export function skapaSpel(d) {
       const medStege = p.variant === 'apan';
       const pinnar = () => r.s.falt.filter(Boolean).length;
       const knuffExtra = () => ui.plattan.querySelector('.lapp')?.classList.add('puls');
-      const knuffFore = p.knuff?.efter_sek ? { ...p.knuff, efter_sek: undefined } : p.knuff;
-      let k = knuffKlocka(knuffFore, knuffExtra, undefined, knufftidMs({ text: p.kategori }));
-      let knuffEfterFel = !p.knuff?.efter_sek;
+      // Räddningens knuff (beslut 58.2, 04 v0.10): före första felet kommer den efter 15 s utan tryck, och en rätt
+      // bokstav startar om klockan (han är på väg). Efter första felet kommer den efter efter_sek, räknat från när
+      // felreaktionen är klar, och bara en gång: senare tryck startar inte om den (förut kom den efter varje tryck).
+      let k = knuffKlocka(p.knuff ? { ...p.knuff, efter_sek: undefined } : null, knuffExtra, undefined, RADDNING_KNUFF_MS);
+      let efterFel = false, knuffEfterFel = false;
+      const tryckRatt = () => { if (!efterFel) k.nollstall(); };
+      const tryckFel = () => { if (!efterFel) { efterFel = true; k.stopp(); } };
+      const startaKnuffEfterFel = () => {
+        if (!efterFel || knuffEfterFel || !p.knuff) return;
+        knuffEfterFel = true;
+        k = knuffKlocka({ ...p.knuff, efter_sek: p.knuff.efter_sek ?? RADDNING_KNUFF_MS / 1000 }, knuffExtra);
+      };
       const stege = () => {
         if (!medStege) return '';
         const n = pinnar(), alla = r.s.falt.length;
@@ -2184,12 +2195,13 @@ export function skapaSpel(d) {
       };
       const tryck = async (/** @type {number} */ id) => {
         if (upptagen || ui.nosAktiv) return;
-        k.nollstall();
         if (r.s.kastar) {
           const res = r.kasta(id);
           if (res.resultat === 'ingen') return;
           logg.handelse('val', `${p.id}: kasta ${r.s.brickor.find((x) => x.id === id)?.bokstav} på plats ${res.plats + 1}`, { resultat: res.resultat });
-          if (res.resultat === 'studs') { ljud.spela('pff'); rita(); studsa(id); return; }
+          // en bricka som studsar är ett fel för knuffen (ingen reaktion att vänta på)
+          if (res.resultat === 'studs') { tryckFel(); startaKnuffEfterFel(); ljud.spela('pff'); rita(); studsa(id); return; }
+          tryckRatt();
           ljud.spela('bricka'); rita();
           if (res.resultat === 'klar') await fardig();
           return;
@@ -2199,11 +2211,14 @@ export function skapaSpel(d) {
         logg.handelse('val', `${p.id}: ${r.s.brickor.find((x) => x.id === id)?.bokstav}`, { resultat: res.resultat });
         upptagen = true;
         if (res.resultat === 'fel') {
-          if (!knuffEfterFel) { knuffEfterFel = true; k.stopp(); k = knuffKlocka(p.knuff, knuffExtra); }
+          tryckFel();
           ljud.spela('fel'); nyaPinnar = 0; blundar = medStege; rita();
           await reaktion(p.vid_fel);
-          blundar = false; upptagen = false; rita(); return;
+          blundar = false; upptagen = false; rita();
+          startaKnuffEfterFel();
+          return;
         }
+        tryckRatt();
         nyaPinnar = res.nya?.length || 0;
         if (medStege) logg.handelse('räddning', `pinnsteg ${pinnar()} av ${r.s.falt.length}`);
         ljud.spela('ratt'); rita();
@@ -3212,6 +3227,15 @@ export function skapaSpel(d) {
     return `<div class="menygrupp foraldravy"><b>Hur det går:</b><table><thead><tr><th>Uppgift</th><th>Nivå</th><th>Antal</th><th>Rätt direkt</th><th>Slumpen</th><th>Med hjälp</th><th>Tid</th></tr></thead><tbody>${tr}</tbody></table>
       <small>Rätt direkt = rätt på första försöket utan hjälp. Slumpen = vad gissningar hade gett i läsvalen.</small></div>`;
   }
+  /**
+   * Vad nivån betyder i kapitlet han är i (menyn för vuxna, 14): kapitlet har ett golv och ett tak, så nivån i
+   * läsmotorn kan vara högre än den variant han får. Utan kapitel (startskärmen) står inget.
+   */
+  const nivaIKapitlet = () => {
+    if (!b?.kapitel) return '';
+    const [golv, tak] = (b.kapitel.nivaer?.lasning || ['L1', 'L7']);
+    return ui.esc(`I ${b.kapitel.meta?.namn ?? b.kapitel.id} får han L${lasniva('P1_las_och_valj')} (kapitlet har ${golv}–${tak}). Nivån följer med till nästa kapitel.`);
+  };
   /** Läsnivån i läs och välj för loggen, utan att skapa en post (läsmotorns niva gör det). */
   const lasNivaNu = () => { const n = tillstand.spelare.larande?.lasning?.P1_las_och_valj?.niva; return n ? `L${n}` : '-'; };
   /** Den första scenen i ett pass i kapitlet (frivilliga räknas inte). @param {any} k @param {number} pass */
@@ -3279,7 +3303,7 @@ export function skapaSpel(d) {
     const las = lasbara.map((/** @type {string} */ id) => `<label><input type="checkbox" class="kapitel-oppet" data-kapitel="${ui.esc(id)}" ${(inst.oppnadeKapitel || []).includes(id) ? 'checked' : ''}> Kapitlet ${ui.esc(d.kapitel.find((k) => k.id === id)?.meta?.namn ?? id)} är öppet på den här enheten (annars är det låst efter kapitlet före, och har han kommit dit sätts sparningen tillbaka till slutet av kapitlet före)</label>`).join('');
     const s = ui.visaMeny(`<div class="meny vuxen"><h2>Gråboxen <small>${ui.esc(String(d.version))}</small></h2>
       <div class="menygrupp passlista"><b>Börja ett pass</b> <small>(namnen och det som kommer före finns kvar, och lärandet blir som när passet började):</small> ${passStart}${utanBild ? '<small class="utan-bild">* Där står lärandet kvar som det är nu, eftersom det inte finns någon bild av det från passets början.</small>' : ''}${las ? `<div class="kapitel-las">${las}</div>` : ''}</div>
-      <div class="menygrupp"><b>Läsnivå (läs och välj):</b> ${[1, 2, 3, 4].map((n) => `<button type="button" class="menyval niva ${n === niva ? 'nu' : ''}" data-n="${n}">L${n}</button>`).join('')}</div>
+      <div class="menygrupp lasniva"><b>Läsnivå (läs och välj):</b> ${Array.from({ length: Math.max(4, niva) }, (_, i) => i + 1).map((n) => `<button type="button" class="menyval niva ${n === niva ? 'nu' : ''}" data-n="${n}">L${n}</button>`).join('')} <small class="niva-i-kapitlet">${nivaIKapitlet()}</small></div>
       <div class="menygrupp"><label><input type="checkbox" class="foralder" ${inst.foralderLaser ? 'checked' : ''}> Föräldern läser ${ui.esc(Object.values(aventyr.talare).filter((/** @type {any} */ t) => t.rost === 'foraldern_eller_datorrost').map((/** @type {any} */ t) => t.namn).join(' och ') || 'rollernas')} repliker</label>
       <label><input type="checkbox" class="etiketter" ${inst.vuxenEtiketter ? 'checked' : ''}> Visa objektens namn (inte under pussel)</label>
       <label><input type="checkbox" class="rostval" ${inst.rost ? 'checked' : ''}> Datorrösten läser upp (av: rullningen piper i ordtakt)</label>
@@ -3290,7 +3314,14 @@ export function skapaSpel(d) {
       <div class="menygrupp sparfil"><b>Sparfilen:</b> <button type="button" class="menyval spara-fil">Spara sparfilen</button><button type="button" class="menyval las-fil">Läs in en sparfil</button><input type="file" class="las-fil-val" accept=".json,application/json" hidden>
       <small>Sparfilen har allt spelaren har gjort, också namnen. Lägg den bara på ett privat ställe.</small><span class="sparfil-svar" role="status"></span></div>
       <div class="menygrupp"><button type="button" class="menyval logg">Spara loggen</button><button type="button" class="menyval nollstall">Börja om från början</button><button type="button" class="menyval stang">Stäng</button></div></div>`);
-    s.querySelectorAll('.niva').forEach((el) => el.addEventListener('click', () => { lasmotor.sattNiva('L', 'P1_las_och_valj', Number(/** @type {HTMLElement} */ (el).dataset.n)); lasmotor.sattNiva('L', 'P28_packa', Number(/** @type {HTMLElement} */ (el).dataset.n)); spara(); oppnaMeny(); }));
+    s.querySelectorAll('.niva').forEach((el) => el.addEventListener('click', () => {
+      // den vuxne sätter nivån för hand: det syns i loggen (14: utan raden gick det inte att se varför nivån ändrades)
+      const n = Number(/** @type {HTMLElement} */ (el).dataset.n);
+      const fore = { P1: lasNivaNu(), P28: tillstand.spelare.larande?.lasning?.P28_packa?.niva };
+      lasmotor.sattNiva('L', 'P1_las_och_valj', n); lasmotor.sattNiva('L', 'P28_packa', n);
+      logg.handelse('inställning', `läsnivån satt för hand: ${fore.P1} → L${n}`, { P28_fore: fore.P28 ? `L${fore.P28}` : '-' });
+      spara(); oppnaMeny();
+    }));
     s.querySelector('.foralder')?.addEventListener('change', (e) => { inst.foralderLaser = /** @type {HTMLInputElement} */ (e.target).checked; spara(); });
     s.querySelector('.rostval')?.addEventListener('change', (e) => { inst.rost = /** @type {HTMLInputElement} */ (e.target).checked; logg.handelse('inställning', `rösten ${inst.rost ? 'på' : 'av'}`); spara(); });
     s.querySelector('.markeraval')?.addEventListener('change', (e) => { inst.markera = /** @type {HTMLInputElement} */ (e.target).checked; logg.handelse('inställning', `markeringen ${inst.markera ? 'på' : 'av'}`); spara(); });

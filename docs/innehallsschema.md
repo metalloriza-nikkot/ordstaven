@@ -1,6 +1,7 @@
 # Innehållsschema – kapitel i format 2
 
-Version 2.27 (2026-11-08). Ägs av teknikspåret.
+Version 2.28 (2026-11-08). Ägs av teknikspåret.
+2.28: **räddningens knuff** (P15, beslut 58.2) följer Innehålls regel i 04 v0.10 (avsnittet om P15 nedan). Inga nya fält.
 2.27: **startskärmen och Farfars "Var var vi?"** (F1 och F2, beslut 61). Kapitlet får fältet **`var_var_vi`** (avsnittet *3c* nedan), och `aventyr.json` får orden **`gransnitt.fortsatt`** och **`gransnitt.nytt_aventyr`** under startskärmens knappar. Allt är tillägg, filer i 2.26 gäller fortfarande.
 2.26: **rättelserna efter den sista genomspelningen** (Teknik 13). Kartans objekt får **`klattrar_fran`** (figuren klättrar ned för stegen med det id:t när den visas i rummet han redan är i: apan när den är räddad). **Ridåns rutor** (rutlagret `over`) ligger under figurerna och är hinder för fötterna, och kartkontrollen prövar alla kartor (beslut 56.3 och 56.7). Allt är tillägg, filer i 2.25 gäller fortfarande.
 2.25: **kapitel 1:s rättelser** (Teknik 8). Kartans objekt får **`delas: djup`** (delarna står efter varandra från norr till söder, liangången), **`dekor`** (står bara i kartan, ritas utan samspel och utan text, behöver inte stå i rummets innehåll, och står inte i vägen om den inte är snår i rutlagret), **`ovanpa`** (ritas ovanpå trädkronorna, ugglorna) och `bild_hugg` och `bild_kvar` på det som svingas (lövhögarna). Prologens animationer (Teknik 9): **`bild_ta_emot`** och **`bild_las`** på en figur (Farfar tar emot det han bär och läser), **`kommer_fran`** och **`bild_vinka`** på en figur (den går själv från utgången när `visa_foremal` visar den, och vinkar när den är framme), och kartans **`vinka_fran`** (kommer han in från det rummet vinkar han mot huset). En säng med `sovplats` som han går till med `ga_till` lägger han sig i. Allt är tillägg, filer i 2.24 gäller fortfarande.
@@ -197,7 +198,7 @@ Hänga apan-familjen. `kategori` (text spelaren läser själv), `svar` (ett ord,
 
 **`kasta`** (`erbjudande`, `vid_ratt`): efter första rätta bokstaven lyser staven, och `erbjudande` läses upp (det väntar inte). Ett tryck på staven ger formelvyn: fälten får guldkant, och nästa tomma fält lyser. Han fyller bara de tomma fälten. En fel bricka studsar tillbaka, de rätta ligger kvar, och efter två fel på samma plats blinkar rätt bricka. Inget fel räknas. Ett nytt tryck på staven lämnar läget. Rätt i kasta-läget ger `kasta.vid_ratt`.
 
-**Utan `kasta`** (kapitel 1, beslut 29.2) erbjuds staven aldrig. **`variant: "apan"`**: bredvid fälten står stegen under nätet, med ett pinnsteg per fält. Varje fyllt fält fäller ut ett pinnsteg nerifrån, och apan klättrar ner ett steg (E fyller två och ger två). Vid fel blundar apan. **`knuff.efter_sek`** börjar räkna först efter första felet. Före det gäller läsplattans tid efter textmängden.
+**Utan `kasta`** (kapitel 1, beslut 29.2) erbjuds staven aldrig. **`variant: "apan"`**: bredvid fälten står stegen under nätet, med ett pinnsteg per fält. Varje fyllt fält fäller ut ett pinnsteg nerifrån, och apan klättrar ner ett steg (E fyller två och ger två). Vid fel blundar apan. **Knuffen** (2.28, beslut 58.2): före första felet kommer den efter 15 s utan tryck, och en rätt bokstav startar om klockan. Efter första felet kommer den efter **`knuff.efter_sek`** (15 s om det inte står), räknat från när felreaktionen är klar, och bara en gång. En bricka som studsar i kasta-läget räknas som ett fel.
 
 ### P9_kodlas (fas 3)
 

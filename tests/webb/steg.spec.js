@@ -1923,3 +1923,68 @@ test('menyn låser kapitel 1 igen: sparningen står i slutet av prologen, utan n
   expect(efter.aventyr['den-gomda-dalen'].kapitelId).toBe('kap-00');
   await page.screenshot({ path: 'test-results/kapitel-last-igen.png' });
 });
+
+test('räddningens knuff (beslut 58.2): 15 s utan tryck före första felet, en rätt bokstav startar om klockan, och efter ett fel kommer den en gång', async ({ page }) => {
+  test.setTimeout(90000);
+  const knuffar = async () => ((await page.evaluate(() => window.__ORDSTAVEN.logg())).match(/\[knuff\] ungen pekar på kategorin/g) || []).length;
+  await provscen(page, { id: 't_apan2', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'pussel', pussel_id: 'k1_apan' }, R('Räddad.')] }, null, { pussel: [P1('k1_apan')] });
+  await expect(page.locator('#plattan .raddning-ruta .lapp')).toHaveText('MAN KLÄTTRAR UPP MED DEN.', { timeout: 8000 });
+  // en rätt bokstav efter 7 s: klockan börjar om, så ingen knuff 12 s senare (förut kom den efter textens tid, ca 11 s)
+  await page.waitForTimeout(7000);
+  expect(await knuffar()).toBe(0);
+  await bricka(page, 'S').click();
+  await page.waitForTimeout(12000);
+  expect(await knuffar()).toBe(0);
+  // 15 s efter den rätta bokstaven kommer den
+  await expect.poll(knuffar, { timeout: 8000, intervals: [250] }).toBe(1);
+  // ett fel: knuffen kommer 3 s efter felreaktionen, en gång
+  await bricka(page, 'O').click();
+  await expect(bricka(page, 'O')).toHaveClass(/tonad/, { timeout: 5000 });
+  await expect.poll(knuffar, { timeout: 10000, intervals: [250] }).toBe(2);
+  // fler tryck, rätta och fel, ger ingen knuff till (förut kom den efter varje tryck)
+  await bricka(page, 'R').click();
+  await expect(bricka(page, 'R')).toHaveClass(/tonad/, { timeout: 5000 });
+  await page.waitForTimeout(1500);
+  await bricka(page, 'E').click();
+  await page.waitForTimeout(600);
+  await bricka(page, 'T').click();
+  await page.waitForTimeout(5000);
+  expect(await knuffar()).toBe(2);
+  await bricka(page, 'G').click();
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('RÄDDAD.', { timeout: 10000 });
+  expect(await knuffar()).toBe(2);
+});
+
+test('läsnivån följer med mellan kapitlen (14): prologen slutar på L4, kapitel 1 börjar på L4 och får kapitlets tak, och menyn visar och loggar nivån', async ({ page }) => {
+  test.setTimeout(60000);
+  const post = (niva, streak, uppgifter) => ({ niva, streak, miss: 0, uppgifter, forstaForsok: uppgifter, hjalp: 0, aa: 0 });
+  // en påhittad sparning: prologen spelad med sex rätta läsval i följd, så att nivån har gått upp till L4
+  await prologenKlar(page, (t) => { t.spelare.larande.lasning = { P1_las_och_valj: { niva: 4, streak: 0, miss: 0, uppgifter: 6, forstaForsok: 6, hjalp: 0, aa: 0 }, P28_packa: { niva: 2, streak: 1, miss: 0, uppgifter: 1, forstaForsok: 1, hjalp: 0, aa: 0 } }; });
+  await page.goto('./?snabb');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  // den vuxne öppnar kapitel 1, och spelet fortsätter dit
+  await page.keyboard.press('Control+Shift+KeyM');
+  await expect(page.locator('#vuxenmeny .lasniva .niva.nu')).toHaveText('L4');
+  await page.locator('#vuxenmeny .kapitel-oppet[data-kapitel="kap-01"]').check();
+  await page.goto('./?snabb');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 10000 }).toBe('k1s01_brynet');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg())).toMatch(/\[lärandet\] bild vid kap-01 pass 1 .*"niva":"L4"/);
+  let t = await page.evaluate(() => window.__ORDSTAVEN.tillstand());
+  // samma post, inte en ny: nivån och antalet uppgifter står kvar
+  expect(t.spelare.larande.lasning.P1_las_och_valj).toMatchObject({ niva: 4, uppgifter: 6 });
+  // menyn visar vad nivån betyder i kapitlet (taket L3), och ett hopp till kapitlets början flyttar den inte
+  await page.keyboard.press('Control+Shift+KeyM');
+  await expect(page.locator('#vuxenmeny .niva-i-kapitlet')).toContainText('får han L3 (kapitlet har L2–L3)');
+  await page.screenshot({ path: 'test-results/meny-lasniva.png' });
+  await Promise.all([page.waitForEvent('load'), page.locator('#vuxenmeny .pass-start', { hasText: 'Skogen, pass 1' }).click()]);
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  t = await page.evaluate(() => window.__ORDSTAVEN.tillstand());
+  expect(t.spelare.larande.lasning.P1_las_och_valj).toMatchObject({ niva: 4, uppgifter: 6 });
+  // att sätta nivån för hand står i loggen, med nivån före
+  await page.keyboard.press('Control+Shift+KeyM');
+  await page.locator('#vuxenmeny .lasniva .niva', { hasText: 'L2' }).click();
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toMatch(/\[inställning\] läsnivån satt för hand: L4 → L2 .*"P28_fore":"L2"/);
+});
+
