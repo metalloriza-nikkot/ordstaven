@@ -117,6 +117,13 @@
       "items": {
         "$ref": "#/$defs/uppdrag"
       }
+    },
+    "var_var_vi": {
+      "type": "array",
+      "description": "Farfars \"Var var vi?\" (2.27, F2, dokument 18): en post per pass. När ett pass börjar efter FORTSÄTT kommer den korta påminnelsen (eller den långa när han inte har spelat på mer än 3 dygn) i stället för scenens vid_omstart. Mitt i ett pass kommer den långa före scenens vid_omstart, bara efter lång tid. Ett pass utan post har bara vid_omstart.",
+      "items": {
+        "$ref": "#/$defs/var_var_vi"
+      }
     }
   },
   "$defs": {
@@ -1986,6 +1993,86 @@
               "description": "Stämpeln kommer efter det här steget i scenen: efter berättelsens stund."
             }
           }
+        }
+      }
+    },
+    "var_var_vi_replik": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "talare",
+        "text"
+      ],
+      "description": "En replik i \"Var var vi?\". Den läses alltid upp (upplast är true om den inte står).",
+      "properties": {
+        "talare": {
+          "$ref": "#/$defs/id"
+        },
+        "text": {
+          "$ref": "#/$defs/text"
+        },
+        "upplast": {
+          "type": "boolean"
+        },
+        "via": {
+          "enum": [
+            "radio"
+          ],
+          "description": "Farfar talar genom radion (kapitel 1 och senare)."
+        }
+      }
+    },
+    "var_var_vi": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pass",
+        "ord",
+        "kort",
+        "lang"
+      ],
+      "properties": {
+        "pass": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Passet påminnelsen hör till (scenernas pass)."
+        },
+        "ord": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "ord"
+          ],
+          "description": "Ordet han läser (L1), stort på läsplattan med sin bild medan Farfar talar. Det läses inte upp, men nosen kan läsa det.",
+          "properties": {
+            "ord": {
+              "$ref": "#/$defs/text"
+            },
+            "bild": {
+              "$ref": "#/$defs/id"
+            }
+          }
+        },
+        "kort": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "$ref": "#/$defs/var_var_vi_replik"
+          },
+          "description": "En replik, när det har gått kort tid."
+        },
+        "lang": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/$defs/var_var_vi_replik"
+          },
+          "description": "Två eller tre repliker, när det har gått lång tid."
+        },
+        "anteckning": {
+          "$ref": "#/$defs/anteckning"
         }
       }
     }

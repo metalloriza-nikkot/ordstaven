@@ -58,6 +58,7 @@ let testkartor = {};
         // provpussel, fler scener (frivilliga) och fält i rummen, så att kapitel 1:s steg kan provas i prologens rum
         for (const p of t.pussel || []) k.pussel.push(p);
         if (t.uppdrag) k.uppdrag = t.uppdrag; // provuppdrag i stället för kapitlets (uppdragslappen, 2d)
+        if (t.var_var_vi) k.var_var_vi = t.var_var_vi; // Farfars "Var var vi?" (F2)
         for (const sc of t.scener || []) k.scener.push(sc);
         for (const [id, falt] of Object.entries(t.rum || {})) { const r = k.rum.find((x) => x.id === id); if (r) Object.assign(r, falt); else k.rum.push({ id, namn: id, innehall: [], ...falt }); }
         testkartor = t.kartor || {};
@@ -81,6 +82,8 @@ const plats = platser.aktiv();
 const sparning = skapaSparning({ lagring, spelversion: VERSION, logg, plats });
 if (parametrar.has('ny')) sparning.nollstall();
 const tillstand = sparning.las();
+// bara i testläge (?snabb eller ?test): ?sedan=<dygn> låtsas att han spelade senast för så länge sedan (F2, Farfars långa "Var var vi?")
+if ((parametrar.has('snabb') || parametrar.has('test')) && parametrar.has('sedan')) tillstand.sparad = new Date(Date.now() - Number(parametrar.get('sedan')) * 864e5).toISOString();
 if (plats !== '1') logg.handelse('spelare', 'plats ' + plats);
 
 const varld = /** @type {HTMLElement} */ (document.getElementById('varld'));

@@ -197,6 +197,16 @@
         "klart": {
           "type": "string",
           "minLength": 1
+        },
+        "fortsatt": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Under startskärmens FORTSÄTT (2.27, F1)."
+        },
+        "nytt_aventyr": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Under startskärmens NYTT ÄVENTYR (2.27, F1)."
         }
       }
     }

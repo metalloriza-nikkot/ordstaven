@@ -82,6 +82,18 @@ describe('innehållskontrollen', () => {
     expect(f).toMatch(/uppdrag u0_vinden: stegen GÅ UT I HALLEN finns inte/);
     expect(f).toMatch(/repliken "Ingen sådan replik\." i .*, som lappen ersätter, finns inte/);
   });
+  it('Var var vi (2.27): godkänd post, och fel pass, dubbla poster, flera ord och upplast false fångas', () => {
+    const post = (pass, x = {}) => ({ pass, ord: { ord: 'mat', bild: 'dinomat' }, kort: [{ talare: 'farfar', text: 'Var var vi? {unge} är hungrig.' }], lang: [{ talare: 'farfar', text: 'Var var vi? Staven vaknade i natt.' }, { talare: 'farfar', text: 'Nu är {unge} hungrig.' }], ...x });
+    const d = riktigt(); d.kapitel[0].var_var_vi = [post(2)];
+    expect(kontrollera(d).fel).toEqual([]);
+    const f = medFel((k) => { k.var_var_vi = [post(9), post(2), post(2, { ord: { ord: 'mat och bär' } }), post(3, { kort: [{ talare: 'farfar', text: 'Hej.', upplast: false }] })]; });
+    expect(f).toContain('kapitlet har inget pass 9');
+    expect(f).toContain('pass 2 har två poster');
+    expect(f).toContain('ordet att läsa är ett enda ord');
+    expect(f).toContain('upplast: false går inte här');
+    expect(medFel((k) => { k.var_var_vi = [post(2, { lang: [] })]; })).toMatch(/lang/);
+  });
+
   it('fångar dubbla id:n', () => {
     expect(medFel((k) => { k.pussel[1].id = 'p0_hjaltenamn'; })).toMatch(/används både/);
   });

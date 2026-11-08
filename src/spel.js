@@ -10,6 +10,7 @@ import { forSkarm, versaler } from './karna/text.js';
 import { rumTillSkarm, varldTillSkarm, RUM, textskala } from './karna/skalning.js';
 import { framfor, lasplats, vidObjekt, genom, stigStart } from './karna/rumslayout.js';
 import { aventyrFor } from './karna/sparning.js';
+import { varVarVi, senastSpelad } from './karna/varvarvi.js';
 import { pekningOmMs, skapaHjalpSpar, knufftidMs } from './karna/hjalp.js';
 import { HJALTE_FARGER, HJALTE_FAST } from './scener/Rum.js';
 import { lagerFor, bytLager } from './karna/hjalte.js';
@@ -56,6 +57,8 @@ const FLYGER_VID_LJUD = /** @type {Record<string, string>} */ ({ fagel_late: 'he
 export function skapaSpel(d) {
   const { aventyr, kartor = {}, tillstand, sparning, logg, rost, ljud, ui, rum, layout, inmatning, tangentbord, bilder, snabb } = d;
   const AVENTYR = aventyr.id;
+  // när han spelade senast (F2): läses innan något sparas, eftersom varje sparning skriver en ny tid
+  const senast = senastSpelad(tillstand);
   const av = aventyrFor(tillstand, AVENTYR);
   // vuxenEtiketter: föremålens namn i gråboxen, för den vuxne. Avstängt från början (inget för den vuxne syns under ett pass).
   const inst = (tillstand.installningar = { foralderLaser: false, vuxenEtiketter: false, rost: true, markera: true, ...tillstand.installningar });
@@ -282,7 +285,9 @@ export function skapaSpel(d) {
    */
   const replikHtml = (r) => {
     const familj = r.talare === 'berattare' ? 'berattarruta' : 'pratruta';
-    return `<div class="replik-ruta ${familj}${r.via === 'radio' ? ' genom-radio' : ''}">${portratt(r.talare, r.via === 'radio')}<div class="text">${ui.rader(r.text, varden())}</div><button type="button" class="vidare" aria-label="Vidare">▶</button></div>`;
+    // "Var var vi?" (F2): ordet att läsa står stort bredvid repliken, med sin bild. Det läses inte upp (nosen kan).
+    const ord = r.ordAttLasa ? `<div class="vvv-ord">${r.ordAttLasa.bild ? `<span class="vvv-bild" aria-hidden="true">${bilder.html(r.ordAttLasa.bild)}</span>` : ''}<span class="vvv-text">${ui.rader(r.ordAttLasa.ord, varden(), 'kort-ord')}</span></div>` : '';
+    return `<div class="replik-ruta ${familj}${r.via === 'radio' ? ' genom-radio' : ''}${ord ? ' med-ord' : ''}">${portratt(r.talare, r.via === 'radio')}<div class="text">${ui.rader(r.text, varden())}</div>${ord}<button type="button" class="vidare" aria-label="Vidare">▶</button></div>`;
   };
 
   /** Visa en replik på läsplattan och vänta tills spelaren går vidare. @param {any} r */
@@ -2988,6 +2993,8 @@ export function skapaSpel(d) {
     await startskarm();
     /** @type {any[]} namn som saknas efter ett hopp förbi tidigare kapitel (dop-pusslen frågar efter dem) */
     let dopAttFraga = [];
+    /** Det första kapitlet som spelas efter start: där kommer Farfars "Var var vi?" (F2). */
+    let forstaKapitlet = true;
     for (const kapitelId of aventyr.kapitel) {
       const kapitel = d.kapitel.find((k) => k.id === kapitelId);
       if (!kapitel) continue;
@@ -3034,10 +3041,20 @@ export function skapaSpel(d) {
       // hör han dess vid_omstart ("Var var vi? Vi letar i buskarna."). Annars den pågående scenens.
       aterAvstickare = av.avstickare && b.rum(av.avstickare.rum) && b.aktuellt()?.omstart ? { ...av.avstickare } : null;
       if (av.avstickare && !aterAvstickare) { delete av.avstickare; spara(); }
+      // Farfars "Var var vi?" (F2): när ett pass börjar efter FORTSÄTT, och mitt i ett pass när det har gått lång tid
+      let vvv = forstaKapitlet ? varVarVi({ kapitel, scenIndex: b.scenIndex, steg: av.steg ?? 0, senast, nu: Date.now() }) : null;
+      forstaKapitlet = false;
       while (!b.slut) {
         await visaScen();
-        const st0 = b.aktuellt();
+        let st0 = b.aktuellt();
         if (!st0) break;
+        if (vvv) {
+          const p = vvv; vvv = null;
+          logg.handelse('var var vi', `${kapitel.id} pass ${p.pass}, ${p.lang ? 'lång' : 'kort'}`, { ersatter_vid_omstart: p.ersatterOmstart && !!st0.omstart, sedan_h: senast ? Math.round((Date.now() - senast) / 36e5) : null });
+          for (const r of p.repliker) await replik({ ...r, ordAttLasa: p.ord });
+          // i början av ett pass ersätter påminnelsen scenens egen vid_omstart
+          if (p.ersatterOmstart && st0.omstart) { b.klar({}); spara(); st0 = b.aktuellt(); if (!st0) break; }
+        }
         const sido = st0.omstart && aterAvstickare?.scen ? b.kapitel.scener.find((/** @type {any} */ x) => x.id === aterAvstickare?.scen) : null;
         const st = sido?.vid_omstart ? { ...st0, ...sido.vid_omstart } : st0;
         await uppdateraLapp();

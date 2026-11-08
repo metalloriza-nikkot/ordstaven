@@ -1818,3 +1818,36 @@ test('s21b: Farfar står vid ytterdörren, vänder sig mot hjälten och säger h
   await page.screenshot({ path: 'test-results/s21b-farfar-vid-dorren.png' });
   await framTill(page, () => window.__ORDSTAVEN.steg()?.typ === 'ga_till');
 });
+
+test('Var var vi (F2): i början av ett pass den korta med ordet, i stället för vid_omstart', async ({ page }) => {
+  const vvv = [{ pass: 1, ord: { ord: 'apa', bild: 'apa' }, kort: [{ talare: 'farfar', text: 'Kort påminnelse.' }], lang: [{ talare: 'farfar', text: 'Lång ett.' }, { talare: 'farfar', text: 'Lång två.' }] }];
+  await provscen(page, { id: 't_vvv', pass: 1, rum: 'koket', tillstand: 'natt', vid_omstart: R('Gammal.', 'farfar'), steg: [R('Klart.')] },
+    (t) => { t.aventyr['den-gomda-dalen'].startad = true; }, { var_var_vi: vvv });
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('KORT PÅMINNELSE.', { timeout: 8000 });
+  await expect(page.locator('#plattan .replik-ruta .vvv-ord .vvv-text')).toHaveText('APA');
+  await page.screenshot({ path: 'test-results/var-var-vi-kort.png' });
+  await page.click('#plattan .replik-ruta');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('KLART.', { timeout: 8000 });
+  await expect(page.locator('#plattan .vvv-ord')).toHaveCount(0);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('[var var vi] kap-00 pass 1, kort');
+});
+
+test('Var var vi (F2): mitt i ett pass efter lång tid den långa, och sedan scenens vid_omstart', async ({ page }) => {
+  const vvv = [{ pass: 1, ord: { ord: 'apa' }, kort: [{ talare: 'farfar', text: 'Kort påminnelse.' }], lang: [{ talare: 'farfar', text: 'Lång ett.', via: 'radio' }, { talare: 'farfar', text: 'Lång två.', via: 'radio' }] }];
+  await provscen(page, { id: 't_vvv2', pass: 1, rum: 'koket', tillstand: 'natt', vid_omstart: R('Gammal.', 'farfar'), steg: [R('Ett.'), R('Två.')] },
+    (t) => { const av = t.aventyr['den-gomda-dalen']; av.startad = true; av.scenId = 't_vvv2'; av.steg = 1; }, { var_var_vi: vvv }, '&sedan=5');
+  const text = page.locator('#plattan .replik-ruta .text');
+  for (const t of ['LÅNG ETT.', 'LÅNG TVÅ.', 'GAMMAL.', 'TVÅ.']) {
+    await expect(text).toHaveText(t, { timeout: 8000 });
+    if (t === 'LÅNG ETT.') { await expect(page.locator('#plattan .replik-ruta.genom-radio .vvv-text')).toHaveText('APA'); await page.screenshot({ path: 'test-results/var-var-vi-lang.png' }); }
+    if (t !== 'TVÅ.') await page.click('#plattan .replik-ruta');
+  }
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('[var var vi] kap-00 pass 1, lång');
+});
+
+test('Var var vi (F2): ett pass utan post har bara vid_omstart, som förut', async ({ page }) => {
+  await provscen(page, { id: 't_vvv3', pass: 1, rum: 'koket', tillstand: 'natt', vid_omstart: R('Gammal.', 'farfar'), steg: [R('Klart.')] },
+    (t) => { t.aventyr['den-gomda-dalen'].startad = true; }, {}, '&sedan=9');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('GAMMAL.', { timeout: 8000 });
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).not.toContain('[var var vi]');
+});

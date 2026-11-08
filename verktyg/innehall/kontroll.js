@@ -370,6 +370,22 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
         });
       });
     }
+    // Farfars "Var var vi?" (2.27, F2): en post per pass som finns, och allt läses upp utom ordet
+    const vvvPass = new Set();
+    (k.var_var_vi || []).forEach((v, j) => {
+      const vp = `var_var_vi ${j + 1} (pass ${v.pass})`;
+      if (!k.scener.some((s) => !s.frivillig && s.pass === v.pass)) fel.push(var_(`${vp}: kapitlet har inget pass ${v.pass}`));
+      if (vvvPass.has(v.pass)) fel.push(var_(`${vp}: pass ${v.pass} har två poster`));
+      vvvPass.add(v.pass);
+      textKontroll(v.ord.ord, `${vp} ord`, { lasesSjalv: true });
+      if (rader(v.ord.ord).join(' ').trim().split(/\s+/).length > 1) fel.push(var_(`${vp}: ordet att läsa är ett enda ord`));
+      for (const [del, lista] of [['kort', v.kort], ['lang', v.lang]]) {
+        lista.forEach((r, i) => {
+          if (r.upplast === false) fel.push(var_(`${vp} ${del} ${i + 1}: läses alltid upp (upplast: false går inte här)`));
+          replikKontroll({ upplast: true, ...r }, `${vp} ${del} ${i + 1}`);
+        });
+      }
+    });
     for (const [nr, pp] of perPass) {
       const minuter = Math.round((pp.sek / 60) * 10) / 10;
       passInfo.push({ kapitel: k.id, pass: nr, minuter, lasuppgifter: pp.lasuppgifter });

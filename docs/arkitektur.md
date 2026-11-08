@@ -764,3 +764,13 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Menyn för vuxna, Spelare:** alla platser, vilken som spelas, Spela för att byta, och Ta bort (två klick) för en som inte spelas. Sparningen läggs i platsens backup.
 - Webbtesterna skriver fortfarande `ordstaven_spar` direkt, och det är plats 1.
 
+## 64. Farfars "Var var vi?" (0.32.0, F2)
+- **FORTSÄTT tar honom dit han var:** samma kapitel, scen, steg och rum, som förut (sparningen har `scen`, `steg` och avstickaren). Det nya är påminnelsen.
+- **`karna/varvarvi.js`** (`varVarVi`): ren logik. Kapitlets `var_var_vi` (schema 2.27, avsnitt 3c) har en post per pass. Står han vid passets första scen från dess första steg, kommer den korta påminnelsen, eller den långa om det är mer än 3 dygn sedan han spelade (`LANG_TID_DAGAR`), och den ersätter scenens `vid_omstart`. Mitt i ett pass kommer den långa före `vid_omstart`, bara efter lång tid. Ett pass utan post har bara `vid_omstart`, som förut.
+- **Tiden** är sparningens `sparad`, som `skapaSpel` läser innan något sparas (`senastSpelad`). Varje sparning skriver en ny tid, så det är när han spelade senast.
+- **Bara när spelet startar:** det första kapitlet som spelas efter start får påminnelsen (`forstaKapitlet` i `spela`). Spelar han vidare till nästa pass utan att stänga, kommer ingen.
+- **Repliken** är en vanlig replik (`replik`), så radion, rösten, föräldern som läser och ett tryck som hoppar över fungerar som överallt. Ordet att läsa står stort i rutan med sin bild (`.vvv-ord`), läses inte upp, och nosen kan läsa det. Loggen skriver `[var var vi] <kapitel> pass <n>, kort|lång`.
+- **Testläge:** `?test&sedan=5` (eller `?snabb&sedan=5`) låtsas att han spelade senast för 5 dygn sedan, så att den långa påminnelsen går att se.
+- **Platshållare:** innehållet har inga poster ännu. Tills Innehåll lägger in texten (dokument 18, när den är godkänd) hörs scenens `vid_omstart` som förut. Webbtesterna provar påminnelsen med en provscen (`var_var_vi` i `ordstaven_testscen`).
+- Kontrollen (`verktyg/innehall/kontroll.js`) prövar posterna (passet finns, en post per pass, ett ord, allt läses upp).
+

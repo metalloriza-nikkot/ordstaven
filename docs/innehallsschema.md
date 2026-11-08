@@ -1,6 +1,7 @@
 # Innehållsschema – kapitel i format 2
 
-Version 2.26 (2026-11-07). Ägs av teknikspåret.
+Version 2.27 (2026-11-08). Ägs av teknikspåret.
+2.27: **startskärmen och Farfars "Var var vi?"** (F1 och F2, beslut 61). Kapitlet får fältet **`var_var_vi`** (avsnittet *3c* nedan), och `aventyr.json` får orden **`gransnitt.fortsatt`** och **`gransnitt.nytt_aventyr`** under startskärmens knappar. Allt är tillägg, filer i 2.26 gäller fortfarande.
 2.26: **rättelserna efter den sista genomspelningen** (Teknik 13). Kartans objekt får **`klattrar_fran`** (figuren klättrar ned för stegen med det id:t när den visas i rummet han redan är i: apan när den är räddad). **Ridåns rutor** (rutlagret `over`) ligger under figurerna och är hinder för fötterna, och kartkontrollen prövar alla kartor (beslut 56.3 och 56.7). Allt är tillägg, filer i 2.25 gäller fortfarande.
 2.25: **kapitel 1:s rättelser** (Teknik 8). Kartans objekt får **`delas: djup`** (delarna står efter varandra från norr till söder, liangången), **`dekor`** (står bara i kartan, ritas utan samspel och utan text, behöver inte stå i rummets innehåll, och står inte i vägen om den inte är snår i rutlagret), **`ovanpa`** (ritas ovanpå trädkronorna, ugglorna) och `bild_hugg` och `bild_kvar` på det som svingas (lövhögarna). Prologens animationer (Teknik 9): **`bild_ta_emot`** och **`bild_las`** på en figur (Farfar tar emot det han bär och läser), **`kommer_fran`** och **`bild_vinka`** på en figur (den går själv från utgången när `visa_foremal` visar den, och vinkar när den är framme), och kartans **`vinka_fran`** (kommer han in från det rummet vinkar han mot huset). En säng med `sovplats` som han går till med `ga_till` lägger han sig i. Allt är tillägg, filer i 2.24 gäller fortfarande.
 2.24: **`gransnitt.klart`** i `aventyr.json` (ordet under flikens bild och när stämpeln slår ned, beslut 52.1). Innehålls korta pass: `bild` på mellanscenerna är Innehålls fält. Allt är tillägg, filer i 2.23 gäller fortfarande.
@@ -240,6 +241,31 @@ Uppdragslappen (10d, beslut 47 och 48) är hopfälld bakom lappknappen och fäll
 
 Kontrollen säger fel när ett steg, en stämpel eller en ersatt replik inte finns i kapitlet.
 
+## 3c. Var var vi? (2.27)
+Farfars påminnelse när spelet startar igen (F2, brief 9a, Innehålls dokument 18). Den finns bredvid scenernas `vid_omstart`, som står kvar som den är. En post per pass i kapitlet:
+```json
+"var_var_vi": [
+  {
+    "pass": 2,
+    "ord": { "ord": "mat", "bild": "dinomat" },
+    "kort": [ { "talare": "farfar", "text": "Var var vi? {unge} är hungrig." } ],
+    "lang": [
+      { "talare": "farfar", "text": "Var var vi? Staven vaknade i natt." },
+      { "talare": "farfar", "text": "Du kläckte ett ägg. Det blev {unge}!" },
+      { "talare": "farfar", "text": "Nu är {unge} hungrig." }
+    ]
+  }
+]
+```
+- **När passet börjar** (han trycker på FORTSÄTT och står vid passets första scen, från dess första steg): `kort`, eller `lang` om det är mer än 3 dygn sedan han spelade. Påminnelsen kommer **i stället för** scenens `vid_omstart`. Det gäller också i början av ett kapitel.
+- **Mitt i ett pass:** efter mer än 3 dygn `lang` och sedan scenens `vid_omstart`. Efter kortare tid bara `vid_omstart`, som förut.
+- Bara när spelet startar. Spelar han vidare från ett pass till nästa utan att stänga, kommer ingen påminnelse.
+- **Ett pass utan post** (prologens första pass) har bara `vid_omstart`.
+- `kort` är en replik och `lang` en till tre. Allt läses upp (`upplast` är `true` om det inte står), och `via: "radio"` går att sätta. Repliken följer reglerna för repliker (talare, högst två rader).
+- `ord.ord` är ett enda ord som han läser själv. Det står stort i repliken med bilden `ord.bild` (ett bildkort, eller en bild som redan finns tills Stil har ritat den) under alla replikerna i posten. Det läses inte upp, men nosen kan läsa det.
+- Tiden är när sparningen skrevs senast. Gränsen (3 dygn, `LANG_TID_DAGAR` i `src/karna/varvarvi.js`) ändrar Teknik om ledningen vill.
+- Kontrollen säger fel om passet inte finns, om ett pass har två poster, om ordet är mer än ett ord och om en replik har `upplast: false`.
+
 ## 3b. Rummens kartor (Tiled)
 
 Innehållet säger **vad** som finns i ett rum, kartan säger **var** det står. Kartorna ägs av teknik (i gråboxen) och stil (när grafiken kommer) och ligger i `kartor/<äventyr>/<rum>.tmj`. Öppna dem i Tiled.
@@ -296,6 +322,7 @@ Pausmenyn har två bildknappar, KARTAN och MIN BOK (hjälteboken), och hjältebo
 ```
 `sluta_for_idag` har ett eget ord (`sov`, Innehåll F11). Saknas det visar knappen bara den sovande ungen.
 `klart` (2.24) är ordet för fliken KLART och för stämpeln (`klart`). Saknas det visas bara bilden, och stämpeln läses inte upp.
+`fortsatt` och `nytt_aventyr` (2.27) står under startskärmens ▶ (FORTSÄTT) och + (NYTT ÄVENTYR). Saknas de visas bara bilderna, och startskärmen kräver ingen läsning.
 Saknas ett ord visas bara bilden. Det som står på sidorna kommer från sparningen: formlerna (staven), sakerna hjälten har hittat (`ge_sak`, garderoben), Dinobokens sidor (`dinobok`) och kartbitarna.
 
 ## 4. Ordlistor

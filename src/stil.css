@@ -172,6 +172,10 @@ html, body {
 .replik-ruta, .pussel-ruta, .formel-ruta, .dop-ruta, .bok-ruta, .hjalte-ruta { position: relative; background: var(--papper); border-radius: 18px; box-shadow: 0 8px 0 rgba(0, 0, 0, .35), inset 0 0 0 3px #d9c9a3; }
 .replik-ruta { display: flex; align-items: flex-end; gap: 16px; padding: 16px 16px 16px 20px; }
 .replik-ruta .text { align-self: center; }
+/* "Var var vi?" (F2): ordet att läsa med sin bild, stort bredvid repliken (Innehålls dokument 18) */
+.replik-ruta .vvv-ord { flex: none; align-self: center; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 14px; border-radius: 14px; background: #fff8e6; box-shadow: inset 0 0 0 3px var(--guld); }
+.replik-ruta .vvv-text { font-size: calc(64px * var(--t)); line-height: 1.1; font-weight: 600; letter-spacing: .04em; }
+.replik-ruta .vvv-bild .bild.bildkort { width: var(--kort, 96px); height: var(--kort, 96px); }
 .replik-ruta .vidare, .pussel-ruta > .vidare { position: static; flex: none; }
 .pussel-ruta > .vidare { align-self: flex-end; }
 .replik-ruta .text, .svar-rad .text, .lapp { font-size: calc(48px * var(--t)); line-height: 1.4; letter-spacing: 0; } /* Lexend har redan luftigt avstånd */
