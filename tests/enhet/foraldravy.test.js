@@ -18,5 +18,9 @@ describe('föräldravyn', () => {
     expect(r[0].slump).toBeCloseTo((1 / 2 + 1 / 3 + 1 / 3) / 3);
     expect(r[1]).toMatchObject({ typ: 'P11_formel', slag: 'S', antal: 1, rattForsta: 1, slump: null });
   });
+  it('ett rätt val efter en knuff är rätt på första försöket (beslut 62.2)', () => {
+    const r = sammanfatta([{ pussel_id: 'a', typ: 'P1_las_och_valj', niva: 'L2', ratt: true, hjalp_anvand: false, knuff_fore: true, tid: 4000 }], pussel);
+    expect(r[0]).toMatchObject({ antal: 1, rattForsta: 1, hjalp: 0 });
+  });
   it('tom historik ger inga rader', () => { expect(sammanfatta([], pussel)).toEqual([]); });
 });

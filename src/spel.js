@@ -1634,7 +1634,8 @@ export function skapaSpel(d) {
     // ett pussel som byter en bild i rummet (bild_sedan: stubben med bären, den öppna skattlådan)
     if (res && aktuelltRum && (kartor[aktuelltRum]?.objekt || []).some((/** @type {any} */ o) => o.sedan === p.id)) { losta.add(p.id); await visaScen(visadScen); }
     if (res && res.niva) {
-      lasmotor.registrera({ pussel_id: p.id, typ: p.typ, niva: res.niva, ratt: res.forstaForsoket, antal_forsok: res.forsok, hjalp_anvand: res.hjalp, tid: performance.now() - start });
+      // en knuff före valet räknas som hjälp för nivån, men valet är rätt i föräldravyn (beslut 62.2)
+      lasmotor.registrera({ pussel_id: p.id, typ: p.typ, niva: res.niva, ratt: res.forstaForsoket, antal_forsok: res.forsok, hjalp_anvand: res.hjalp, knuff_fore: !!res.knuffFore, tid: performance.now() - start });
     }
     spara();
     return res;
@@ -1736,7 +1737,7 @@ export function skapaSpel(d) {
           await reaktion(r.reaktion);
           await vanta(tid(600));
           ui.doljPlatta();
-          klar({ niva: v.s.variantNyckel, forstaForsoket: v.forstaForsoket, forsok: v.s.forsok, hjalp: spar.hjalp });
+          klar({ niva: v.s.variantNyckel, forstaForsoket: v.forstaForsoket, forsok: v.s.forsok, hjalp: spar.hjalp, knuffFore: hjalpSpar.fore().knuff_fore });
           return;
         } else {
           ljud.spela('ratt'); kort?.classList.add('ratt');
@@ -1744,7 +1745,7 @@ export function skapaSpel(d) {
           await vanta(tid(500));
           ui.doljPlatta();
           await Promise.all([rattHandelse(null), reaktion(r.reaktion)]);
-          klar({ niva: v.s.variantNyckel, forstaForsoket: v.forstaForsoket, forsok: v.s.forsok, hjalp: spar.hjalp });
+          klar({ niva: v.s.variantNyckel, forstaForsoket: v.forstaForsoket, forsok: v.s.forsok, hjalp: spar.hjalp, knuffFore: hjalpSpar.fore().knuff_fore });
           return;
         }
         upptagen = false;
@@ -1968,7 +1969,7 @@ export function skapaSpel(d) {
         for (const a of v.s.alternativ) if (a.objekt) rum.markera(a.objekt, false);
         rum.frys(true);
         await Promise.all([rattHandelse(alt?.objekt ?? null), reaktion(r.reaktion, alt?.objekt ?? null)]);
-        klar({ niva: v.s.variantNyckel, forstaForsoket: v.forstaForsoket, forsok: v.s.forsok, hjalp: spar.hjalp });
+        klar({ niva: v.s.variantNyckel, forstaForsoket: v.forstaForsoket, forsok: v.s.forsok, hjalp: spar.hjalp, knuffFore: hjalpSpar.fore().knuff_fore });
       };
     });
   }

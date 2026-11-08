@@ -25,6 +25,22 @@ describe('läsmotorn', () => {
     r(true, true); expect(larande.lasning.P1_las_och_valj.streak).toBe(0);
     expect(larande.historik).toHaveLength(6);
   });
+  it('en knuff före valet räknas som hjälp för nivån, men valet är rätt på första försöket (beslut 62.2)', () => {
+    const larande = {}; const m = skapaLasmotor({ larande });
+    const r = (knuff) => m.registrera({ pussel_id: 'x', typ: 'P1_las_och_valj', niva: 'L2', ratt: true, antal_forsok: 1, hjalp_anvand: false, knuff_fore: knuff, tid: 1000 });
+    r(false); r(false); r(true); // tredje rätta kom efter en knuff: ingen ny nivå, och streaken går ned ett steg
+    expect(m.niva('L', 'P1_las_och_valj')).toBe(2);
+    expect(larande.lasning.P1_las_och_valj).toMatchObject({ streak: 1, forstaForsok: 3, hjalp: 0, uppgifter: 3 });
+    r(false); r(false); // två rätta utan knuff: tre i rad räknat från streaken
+    expect(m.niva('L', 'P1_las_och_valj')).toBe(3);
+    // historiken har knuffen, och föräldravyn räknar valet som rätt på första försöket
+    expect(larande.historik[2]).toMatchObject({ ratt: true, hjalp_anvand: false, knuff_fore: true });
+  });
+  it('en knuff ändrar inget vid fel', () => {
+    const larande = {}; const m = skapaLasmotor({ larande });
+    for (let i = 0; i < 2; i++) m.registrera({ pussel_id: 'x', typ: 'P1_las_och_valj', niva: 'L2', ratt: false, antal_forsok: 2, hjalp_anvand: false, knuff_fore: true, tid: 1 });
+    expect(m.niva('L', 'P1_las_och_valj')).toBe(1);
+  });
   it('gemener räknas för sig', () => {
     const m = skapaLasmotor({ larande: {} });
     for (let i = 0; i < 2; i++) m.registrera({ pussel_id: 'x', typ: 'P1_las_och_valj', niva: 'L2', ratt: false, antal_forsok: 2, hjalp_anvand: false, tid: 1, gemener: true });

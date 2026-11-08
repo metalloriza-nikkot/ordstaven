@@ -1988,3 +1988,20 @@ test('läsnivån följer med mellan kapitlen (14): prologen slutar på L4, kapit
   expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toMatch(/\[inställning\] läsnivån satt för hand: L4 → L2 .*"P28_fore":"L2"/);
 });
 
+test('en knuff före valet räknas som hjälp för nivån (beslut 62.2): tredje rätta i rad efter en knuff ger ingen ny nivå, men valet är rätt i föräldravyn', async ({ page }) => {
+  test.setTimeout(60000);
+  const luckor = kap01.pussel.find((p) => p.id === 'k1_luckorna');
+  await provscen(page, { id: 't_knuffhjalp', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'pussel', pussel_id: 't_luckorna2' }, R('Klart.')] },
+    (t) => { t.spelare.larande.lasning = { P1_las_och_valj: { niva: 2, streak: 2, miss: 0, uppgifter: 2, forstaForsok: 2, hjalp: 0, aa: 0 } }; },
+    { pussel: [{ ...luckor, id: 't_luckorna2', knuff: { ...luckor.knuff, efter_sek: 2 } }] });
+  await page.click('#plattan .replik-ruta');
+  await expect(page.locator('#plattan .kort.lucka')).toHaveCount(3, { timeout: 5000 });
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 8000 }).toContain('[knuff] ungen sträcker fram fötterna igen');
+  await page.locator('#plattan .kort.lucka', { hasText: 'BLÅ' }).click();
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('KLART.', { timeout: 10000 });
+  const t = await page.evaluate(() => window.__ORDSTAVEN.tillstand());
+  expect(t.spelare.larande.lasning.P1_las_och_valj).toMatchObject({ niva: 2, streak: 1, forstaForsok: 3, hjalp: 0 });
+  expect(t.spelare.larande.historik.at(-1)).toMatchObject({ pussel_id: 't_luckorna2', ratt: true, hjalp_anvand: false, knuff_fore: true });
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).not.toContain('[nivå] P1_las_och_valj L2 → L3');
+});
+

@@ -64,8 +64,9 @@ export function skapaLasmotor({ larande, klocka = () => Date.now(), logg }) {
     /**
      * Ett avslutat pussel. Vilouppgifter och fritt skrivande registreras inte.
      * @param {{ pussel_id: string, typ: string, niva: string, ratt: boolean, antal_forsok: number,
-     *           hjalp_anvand: boolean, tid: number, aa_forvaxling?: boolean, gemener?: boolean }} r
-     *   ratt = löst på första försöket
+     *           hjalp_anvand: boolean, tid: number, aa_forvaxling?: boolean, gemener?: boolean, knuff_fore?: boolean }} r
+     *   ratt = löst på första försöket. knuff_fore = en knuff kom före valet (beslut 62.2): valet är rätt på första
+     *   försöket (föräldravyn), men det räknas inte mot nästa nivå, som när han har tagit hjälp av nosen.
      */
     registrera(r) {
       const { slag } = tolkaNiva(r.niva);
@@ -74,13 +75,15 @@ export function skapaLasmotor({ larande, klocka = () => Date.now(), logg }) {
       p.uppgifter++;
       if (r.hjalp_anvand) p.hjalp++;
       if (r.aa_forvaxling) p.aa++;
-      if (r.ratt && !r.hjalp_anvand) {
+      if (r.ratt && !r.hjalp_anvand && !r.knuff_fore) {
         p.forstaForsok++; p.streak++; p.miss = 0;
         if (p.streak >= 3 && p.niva < TAK[slag]) { p.niva++; p.streak = 0; }
       } else if (!r.ratt) {
         p.miss++; p.streak = 0;
         if (p.miss >= 2 && p.niva > 1) { p.niva--; p.miss = 0; }
       } else {
+        // rätt med hjälp (nosen) eller efter en knuff: inte mot nästa nivå. Efter en knuff är det ändå rätt på första försöket.
+        if (!r.hjalp_anvand) p.forstaForsok++;
         p.streak = Math.max(0, p.streak - 1);
       }
       larande.historik.push({ ...r, tid: Math.round(r.tid), nar: klocka() });

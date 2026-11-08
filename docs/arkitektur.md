@@ -785,3 +785,8 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Menyn för vuxna** visar vad nivån betyder i kapitlet han är i (`nivaIKapitlet`: "I Skogen får han L3, kapitlet har L2–L3"), knapparna går upp till nivån om den är över L4, och **att sätta nivån för hand loggas** (`[inställning] läsnivån satt för hand: L4 → L2`). Utan raden gick det inte att se i loggen när nivån hade satts för hand.
 - **Räddningens knuff** (P15, `raddning()`, beslut 58.2): före första felet efter 15 s utan tryck (`RADDNING_KNUFF_MS`), och en rätt bokstav startar om klockan. Efter första felet kommer den efter `knuff.efter_sek` (15 s om det saknas), räknat från när felreaktionen är klar, och bara en gång. Förut startades klockan om vid varje tryck, så knuffen kom efter varje bokstav. En bricka som studsar i kasta-läget räknas som ett fel. Schema 2.28.
 
+## 67. En knuff före valet räknas som hjälp för nivån (0.35.0, beslut 62.2)
+- Läsvalen (P1 och P28) skickar med om en knuff kom före valet (`knuffFore` ur hjälpspåret), och läsmotorn får den som `knuff_fore`.
+- **Läsmotorn:** ett rätt val efter en knuff räknas som rätt på första försöket (`forstaForsok`, och föräldravyn räknar det som rätt), men inte mot nästa nivå: streaken går ned ett steg, som när han har tagit hjälp av nosen. `hjalp` räknas inte upp, eftersom det är nosen. Historiken har `knuff_fore`.
+- Nivån stiger alltså bara på det han läser utan hjälp. Med regeln hade spelarens premiär slutat på L3, utan handgrepp i menyn (14).
+
