@@ -1511,7 +1511,8 @@ test('Farfars hus i grafik: rummets bild, föremålen som bilder, och hjälten s
   expect(await page.evaluate(() => window.__ORDSTAVEN.grafik())).toMatchObject({ sang: 'sang', unge: true });
   await tryckPa(page, 'dorr_hallen');
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 10000 }).toBe('s20_hallen_morgon');
-  expect((await page.evaluate(() => window.__ORDSTAVEN.grafik())).golv).toBe('rum_hallen');
+  // rummets bild kommer när glidningen är klar (scenen byter först)
+  await expect.poll(async () => (await page.evaluate(() => window.__ORDSTAVEN.grafik())).golv, { timeout: 5000 }).toBe('rum_hallen');
   await page.screenshot({ path: 'test-results/hus-hallen.png' });
 });
 
