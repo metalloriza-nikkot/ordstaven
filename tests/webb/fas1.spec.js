@@ -139,7 +139,7 @@ test('menyn för vuxna: ett kort tryck visar "håll inne", att hålla öppnar me
   expect(drag).toEqual({ meny: false, varld: true, skrollar: 'auto', touch: 'pan-y' });
   // INSTÄLLNINGAR i SNES-stil (F4): rubriken, delarna i en kolumn med markören och den valda delen till höger
   await expect(page.locator('#vuxenmeny h2')).toHaveText('INSTÄLLNINGAR');
-  await expect(page.locator('#vuxenmeny .del')).toHaveText(['SPELARE', 'PASS OCH KAPITEL', 'LÄSNING', 'LJUD OCH RÖST', 'SKÄRM', 'SPARFIL', 'FRAMSTEG', 'OM SPELET']);
+  await expect(page.locator('#vuxenmeny .del')).toHaveText(['SPELARE', 'PASS OCH KAPITEL', 'LÄSNING', 'LJUD OCH RÖST', 'SKÄRM', 'SPARFIL', 'FRAMSTEG', 'OM SPELET', 'TESTLÄGE']);
   await page.click('#vuxenmeny .del[data-del="ljud"]');
   await expect(page.locator('#vuxenmeny .del.vald')).toHaveText('LJUD OCH RÖST');
   await expect(page.locator('#vuxenmeny .menydel[data-del="ljud"]')).toBeVisible();
@@ -152,7 +152,7 @@ test('menyn för vuxna: ett kort tryck visar "håll inne", att hålla öppnar me
   // i spelet: hoppa till köket
   await page.click('.start-knapp');
   await page.keyboard.press('Control+Shift+KeyM');
-  await page.click('#vuxenmeny .del[data-del="pass"]');
+  await page.click('#vuxenmeny .del[data-del="test"]');
   await page.click('#vuxenmeny .scen[data-i="9"]');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.click('.start-knapp');
@@ -963,4 +963,47 @@ test('musiken (F5): menyns slinga i introt, på startskärmen, i pausmenyn och i
   expect(filer.meny.slinga).toBeCloseTo(41.739, 3);
   expect(filer.spel.slinga).toBeCloseTo(48.0, 3);
   for (const f of Object.values(filer)) { expect(f.langd).toBeGreaterThanOrEqual(f.slinga + 0.5); expect(f.skarv).toBeLessThan(0.2); }
+});
+
+test('INSTÄLLNINGAR (25, beslut 62.6): röstens tempo och volym, helskärm, när sparfilen hämtades, OM SPELET, och testläget bara med ?test', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(60000);
+  await starta(page, '?snabb&ny');
+  const inst = () => page.evaluate(() => window.__ORDSTAVEN.tillstand().installningar);
+  await page.keyboard.press('Control+Shift+KeyM');
+  await page.click('#vuxenmeny .del[data-del="ljud"]');
+  // röstens tempo: lagom från början, långsamt sparas
+  await expect(page.locator('#vuxenmeny .tempo.nu')).toHaveText('LAGOM');
+  await page.click('#vuxenmeny .tempo[data-v="langsamt"]');
+  await expect(page.locator('#vuxenmeny .tempo.nu')).toHaveText('LÅNGSAMT');
+  expect((await inst()).rostTempo).toBe('langsamt');
+  // röstens volym: tio knappar, och den sjunde ger 7 av 10
+  await expect(page.locator('#vuxenmeny .rost-volym .pip')).toHaveCount(10);
+  await expect(page.locator('#vuxenmeny .rost-volym .pip.pa')).toHaveCount(10);
+  await page.click('#vuxenmeny .rost-volym .pip[data-n="7"]');
+  await expect(page.locator('#vuxenmeny .rost-volym .pip.pa')).toHaveCount(7);
+  expect((await inst()).rostVolym).toBe(7);
+  await page.screenshot({ path: 'test-results/installningar-ljud.png' });
+  // helskärm: en knapp, eller en rad om varför det inte går
+  await page.click('#vuxenmeny .del[data-del="skarm"]');
+  await expect(page.locator('#vuxenmeny .menydel[data-del="skarm"]')).toContainText(/Helskärm|hemskärmen/);
+  // sparfilen: när den hämtades senast
+  await page.click('#vuxenmeny .del[data-del="sparfil"]');
+  await expect(page.locator('#vuxenmeny .sparfil-senast')).toContainText('har inte hämtats');
+  await Promise.all([page.waitForEvent('download'), page.click('#vuxenmeny .spara-fil')]);
+  await expect(page.locator('#vuxenmeny .sparfil-senast')).toContainText('hämtades senast');
+  expect((await inst()).sparfilSparad).toBeTruthy();
+  // OM SPELET
+  await page.click('#vuxenmeny .del[data-del="om"]');
+  await expect(page.locator('#vuxenmeny .om-spelet')).toContainText('Inget skickas någonstans');
+  await expect(page.locator('#vuxenmeny .om-spelet')).toContainText('Lexend');
+  await page.screenshot({ path: 'test-results/installningar-om.png' });
+  // testläget finns i snabbläget (testerna), men inte i det vanliga spelet
+  await expect(page.locator('#vuxenmeny .del[data-del="test"]')).toHaveCount(1);
+  await page.goto('./');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.keyboard.press('Control+Shift+KeyM');
+  await expect(page.locator('#vuxenmeny .del')).toHaveCount(8);
+  await expect(page.locator('#vuxenmeny .del[data-del="test"]')).toHaveCount(0);
+  await expect(page.locator('#vuxenmeny .scen:not(.pass-start)')).toHaveCount(0);
 });

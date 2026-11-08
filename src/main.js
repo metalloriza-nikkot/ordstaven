@@ -98,7 +98,12 @@ logg.registrera('ritning', () => { try { return spel.renderer.type === Phaser.CA
 const inmatning = skapaInmatning();
 kopplaInmatning({ inmatning, layout, yta: /** @type {HTMLElement} */ (document.getElementById('ram')), logg, kamera: () => rum.kamera });
 
-const rost = skapaRost({ logg, tyst: () => snabb });
+// röstens tempo och volym (INSTÄLLNINGAR, 62.6): långsamt är 0,8 av rösternas vanliga fart
+const rost = skapaRost({
+  logg, tyst: () => snabb,
+  tempo: () => (tillstand.installningar?.rostTempo === 'langsamt' ? 0.8 : 1),
+  volym: () => Math.max(0, Math.min(10, Number(tillstand.installningar?.rostVolym ?? 10))) / 10,
+});
 const ljud = skapaLjud({ tyst: () => snabb });
 const ui = skapaUi({ ordlistor, rost, ljud, logg });
 const platshallare = /** @type {any} */ (Object.entries(platshallarfiler).find(([fil]) => mappAv(fil) === valt.mapp)?.[1])?.bilder ?? {};
@@ -213,6 +218,8 @@ const spelet = skapaSpel({
   valtKapitel: parametrar.get('kapitel'),
   // introt (F4): när spelet startar, inte i snabbläget (?intro visar det ändå) och inte efter ett byte av spelare
   intro: utanIntro() ? false : (parametrar.has('intro') || !snabb),
+  // testläget (62.6): Hoppa till scen och objektens namn i INSTÄLLNINGAR, bara med ?test (och ?snabb, testernas läge)
+  testlage: parametrar.has('test') || snabb,
   // irisen från startskärmen in i spelet (62.5), inte i snabbläget (?iris visar den ändå)
   iris: !snabb || parametrar.has('iris'),
   uppdatering: { tillampa: () => { uppdatering.tillampa(); startlage = false; } },

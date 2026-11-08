@@ -38,7 +38,11 @@ export function tonFor(roll, text) {
  * @param {{ logg?: { handelse(t: string, m: string, d?: any): void }, tyst?: () => boolean }} opt
  *   tyst() = true när rösten är avstängd (inställning eller testläge)
  */
-export function skapaRost({ logg, tyst = () => false }) {
+/**
+ * @param {{ logg?: any, tyst?: () => boolean, tempo?: () => number, volym?: () => number }} opt tempo: röstens fart som
+ *   faktor (INSTÄLLNINGAR: långsamt 0,8 eller lagom 1), volym: 0–1 (INSTÄLLNINGAR, 62.6)
+ */
+export function skapaRost({ logg, tyst = () => false, tempo = () => 1, volym = () => 1 }) {
   const synt = typeof window !== 'undefined' && 'speechSynthesis' in window ? window.speechSynthesis : null;
   /** @type {SpeechSynthesisVoice | null} */
   let rost = null;
@@ -59,7 +63,7 @@ export function skapaRost({ logg, tyst = () => false }) {
   if (synt) { valj(); synt.addEventListener?.('voiceschanged', valj); }
 
   /** Uppskattad tid för en text när ingen röst finns. @param {string} t */
-  const uppskattad = (t) => 500 + t.split(/\s+/).length * 380;
+  const uppskattad = (t) => (500 + t.split(/\s+/).length * 380) / Math.max(0.5, tempo());
 
   /**
    * Säg en text. Löser sig när den är uppläst, avbruten eller maxtiden gått.
@@ -90,7 +94,7 @@ export function skapaRost({ logg, tyst = () => false }) {
       /** Ett yttrande med texten. Ett nytt görs om det första inte startar. */
       const nytt = () => {
         const x = new SpeechSynthesisUtterance(text);
-        x.lang = 'sv-SE'; x.voice = rost; x.pitch = rr.pitch; x.rate = rr.rate;
+        x.lang = 'sv-SE'; x.voice = rost; x.pitch = rr.pitch; x.rate = rr.rate * tempo(); x.volume = Math.max(0, Math.min(1, volym()));
         x.onstart = () => { startad = true; };
         x.onend = () => sluta('klar'); x.onerror = () => sluta('avbruten');
         if (vidOrd) x.onboundary = (e) => { if (!klar && min === token && (!e.name || e.name === 'word')) { startad = true; try { vidOrd(e.charIndex); } catch (fel) { /* får inte stoppa rösten */ } } };

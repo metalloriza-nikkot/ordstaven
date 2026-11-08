@@ -126,7 +126,7 @@ test('MIN BOK, fliken KLART: tio rader per uppslag, öppnas på det senaste, och
   await page.goto('./?snabb&ny');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.keyboard.press('Control+Shift+KeyM');
-  await page.click('#vuxenmeny .del[data-del="pass"]');
+  await page.click('#vuxenmeny .del[data-del="test"]');
   await page.click('#vuxenmeny .scen[data-kapitel="kap-01"][data-i="11"]'); // k1s13: prologen och sju uppdrag i kapitel 1
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.click('.start-knapp');

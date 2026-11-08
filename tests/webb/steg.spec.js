@@ -981,7 +981,7 @@ async function hoppaKapitel1(page, i) {
   await page.goto('./?snabb&ny');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.keyboard.press('Control+Shift+KeyM');
-  await page.click('#vuxenmeny .del[data-del="pass"]');
+  await page.click('#vuxenmeny .del[data-del="test"]');
   await page.click(`#vuxenmeny .scen[data-kapitel="kap-01"][data-i="${i}"]`);
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.click('.start-knapp');
@@ -1174,7 +1174,7 @@ test('menyn för vuxna hoppar till en scen i ett senare kapitel: det som kommer 
   await page.click('.start-knapp');
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('s00_start');
   await page.keyboard.press('Control+Shift+KeyM');
-  await page.click('#vuxenmeny .del[data-del="pass"]');
+  await page.click('#vuxenmeny .del[data-del="test"]');
   await expect(page.locator('#vuxenmeny .kapitelrad')).toHaveCount(2);
   await page.screenshot({ path: 'test-results/meny-alla-kapitel.png' });
   await page.click('#vuxenmeny .scen[data-kapitel="kap-01"][data-i="5"]'); // k1s07_stigarna, pass 2

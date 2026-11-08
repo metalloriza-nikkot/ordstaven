@@ -821,3 +821,11 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Sänkt ca 12 dB när något läses** (`sank`, `MUSIK_SANKT_DB`): när rösten talar (`rost.talar`), läsplattan är öppen eller pratrutan syns, prövat var 200:e ms. Nivån glider ned på ca 0,1 s och upp på ca 0,5 s.
 - **Snabbläget** spelar ingen musik, men läget följs (`__ORDSTAVEN.musik()`), så att testerna kan se vilken slinga som ska spela och om den är sänkt. Ett webbtest avkodar Stils filer och prövar att ljudet efter slutpunkten är detsamma som efter startpunkten.
 - `verktyg/grafik/inkorg.py` för in `ljud/musik/*.m4a` och `*.ogg` utan metadata (ffmpeg, ljudet kopieras som det är). Ljudeffekterna kommer när Stil har levererat dem.
+
+## 72. INSTÄLLNINGAR enligt beslut 62.6 (0.40.0, Teknik 25)
+- **LJUD OCH RÖST:** *Rösten läser* LÅNGSAMT eller LAGOM (`installningar.rostTempo`; långsamt är 0,8 av rollrösternas fart, och maxtiden och den uppskattade tiden räknas om med samma faktor) och **röstens volym** i tio steg med Stils mässingsknappar (`installningar.rostVolym`, 1–10, förvalt 10; `utterance.volume`). Båda hörs direkt med en kort mening. `skapaRost` tar `tempo` och `volym` som funktioner (`main.js`).
+- **SKÄRM:** en knapp för helskärm (Fullscreen API, också med webkit-prefix), eller en rad om att lägga spelet på hemskärmen där webbläsaren inte kan.
+- **SPARFIL:** när sparfilen senast hämtades på enheten (`installningar.sparfilSparad`), eftersom Safari kan rensa det som sparas i webbläsaren.
+- **OM SPELET:** versionen, äventyret, de medverkande (utan namn), licenserna (egen grafik, egna ljud och egen musik, Lexend under OFL, Phaser och Workbox under MIT) och en rad om att inget skickas någonstans.
+- **Testläget** (`d.testlage`: `?test`, och `?snabb`, testernas läge): delen TESTLÄGE med *Hoppa till scen* och objektens namn. Utan testläget finns delen inte, och objektens namn visas aldrig, också om en äldre sparning har dem på. *Börja ett pass* och att låsa ett kapitel står kvar under PASS OCH KAPITEL.
+- Med testläget är delarna nio, och raderna står då 16 pixlar isär.

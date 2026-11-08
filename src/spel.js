@@ -846,7 +846,7 @@ export function skapaSpel(d) {
    */
   function visaEtiketter() {
     const s = layout.skala;
-    ui.etiketter(rum.objekt.filter((o) => o.sort !== 'utgang' && !doljEtikett.has(o.id)), (x, y) => skarm(x, y), inst.vuxenEtiketter && !pusselPagar && rum.harRum);
+    ui.etiketter(rum.objekt.filter((o) => o.sort !== 'utgang' && !doljEtikett.has(o.id)), (x, y) => skarm(x, y), !!d.testlage && inst.vuxenEtiketter && !pusselPagar && rum.harRum);
   }
   // dialogregeln: ett tryck på en figur (kartans "talare") upprepar dess senaste instruktion
   let fragar = false;
@@ -3353,6 +3353,35 @@ export function skapaSpel(d) {
     laddaOm();
   }
 
+  /** Röstens volym i tio steg (INSTÄLLNINGAR, 62.6). */
+  const rostVolym = () => Math.max(0, Math.min(10, Number(inst.rostVolym ?? 10)));
+  const fs = /** @type {any} */ (document);
+  const helskarmKan = () => !!(fs.fullscreenEnabled || fs.webkitFullscreenEnabled);
+  const helskarmNu = () => !!(fs.fullscreenElement || fs.webkitFullscreenElement);
+  /** Helskärm av och på (INSTÄLLNINGAR, SKÄRM). @returns {Promise<void>} */
+  async function vaxlaHelskarm() {
+    const el = /** @type {any} */ (document.documentElement);
+    try {
+      if (helskarmNu()) await (fs.exitFullscreen?.() ?? fs.webkitExitFullscreen?.());
+      else await (el.requestFullscreen?.() ?? el.webkitRequestFullscreen?.());
+      logg.handelse('inställning', helskarmNu() ? 'helskärm' : 'inte helskärm');
+    } catch (e) { logg.handelse('inställning', 'helskärm gick inte', String(e)); }
+  }
+  /** När sparfilen senast hämtades (Safari kan rensa det som sparas i webbläsaren, 62.6). */
+  function sparfilSenast() {
+    const t = inst.sparfilSparad ? new Date(inst.sparfilSparad) : null;
+    if (!t || isNaN(t.getTime())) return 'Sparfilen har inte hämtats på den här enheten. Safari kan rensa det som sparas i webbläsaren, så hämta den ibland.';
+    const dagar = Math.floor((Date.now() - t.getTime()) / 864e5);
+    const nar = t.toLocaleString('sv-SE', { dateStyle: 'medium', timeStyle: 'short' });
+    return `Sparfilen hämtades senast ${nar}${dagar >= 1 ? ` (för ${dagar} ${dagar === 1 ? 'dag' : 'dagar'} sedan)` : ''}.`;
+  }
+  /** OM SPELET (62.6): versionen, de medverkande, licenserna och att inget skickas någonstans. */
+  function omSpelet() {
+    return `<div class="menygrupp om-spelet"><b>Ordstaven ${ui.esc(String(d.version))}</b><small>${ui.esc(aventyr.meta?.namn ?? aventyr.id)}</small>
+      <p><b>Medverkande.</b> Idén, berättelsen, bilderna, ljudet och koden är gjorda av familjen bakom spelet tillsammans med Claude (Anthropic).</p>
+      <p><b>Licenser.</b> All grafik, alla ljudeffekter och musiken är egna, gjorda för spelet. Typsnittet Lexend: SIL Open Font License 1.1. Spelmotorn Phaser och Workbox: MIT.</p>
+      <p><b>Inget skickas någonstans.</b> Allt sparas bara i den här webbläsaren. Loggen och sparfilen lämnar enheten bara om du själv hämtar dem.</p></div>`;
+  }
   /** Delen i INSTÄLLNINGAR som visas (den står kvar när menyn ritas om). */
   let menyDel = 'spelare';
   function oppnaMeny() {
@@ -3378,23 +3407,28 @@ export function skapaSpel(d) {
     // den valda delen i fönstret till höger. Allt i världens pixlar över spelytan, texten i Lexend.
     const delar = [
       ['spelare', 'SPELARE', spelargrupp() || '<div class="menygrupp"><small>En spelare på den här enheten.</small></div>'],
-      ['pass', 'PASS OCH KAPITEL', `<div class="menygrupp passlista"><b>Börja ett pass</b> <small>(namnen och det som kommer före finns kvar, och lärandet blir som när passet började):</small> ${passStart}${utanBild ? '<small class="utan-bild">* Där står lärandet kvar som det är nu, eftersom det inte finns någon bild av det från passets början.</small>' : ''}${las ? `<div class="kapitel-las">${las}</div>` : ''}</div>
-        <div class="menygrupp scenlista"><b>Hoppa till scen:</b>${scener}</div>`],
+      ['pass', 'PASS OCH KAPITEL', `<div class="menygrupp passlista"><b>Börja ett pass</b> <small>(namnen och det som kommer före finns kvar, och lärandet blir som när passet började):</small> ${passStart}${utanBild ? '<small class="utan-bild">* Där står lärandet kvar som det är nu, eftersom det inte finns någon bild av det från passets början.</small>' : ''}${las ? `<div class="kapitel-las">${las}</div>` : ''}</div>`],
       ['lasning', 'LÄSNING', `<div class="menygrupp lasniva"><b>Läsnivå (läs och välj):</b> ${Array.from({ length: Math.max(4, niva) }, (_, i) => i + 1).map((n) => `<button type="button" class="menyval niva ${n === niva ? 'nu' : ''}" data-n="${n}">L${n}</button>`).join('')} <small class="niva-i-kapitlet">${nivaIKapitlet()}</small></div>`],
       ['ljud', 'LJUD OCH RÖST', `<div class="menygrupp"><label><input type="checkbox" class="foralder" ${inst.foralderLaser ? 'checked' : ''}> Föräldern läser ${ui.esc(Object.values(aventyr.talare).filter((/** @type {any} */ t) => t.rost === 'foraldern_eller_datorrost').map((/** @type {any} */ t) => t.namn).join(' och ') || 'rollernas')} repliker</label>
         <label><input type="checkbox" class="rostval" ${inst.rost ? 'checked' : ''}> Datorrösten läser upp (av: rullningen piper i ordtakt)</label>
-        <label><input type="checkbox" class="markeraval" ${inst.markera ? 'checked' : ''}> Markera ordet som läses (stäng av om markeringen hamnar fel på den här datorn)</label></div>`],
-      ['skarm', 'SKÄRM', `<div class="menygrupp"><label><input type="checkbox" class="etiketter" ${inst.vuxenEtiketter ? 'checked' : ''}> Visa objektens namn (inte under pussel)</label></div>`],
+        <label><input type="checkbox" class="markeraval" ${inst.markera ? 'checked' : ''}> Markera ordet som läses (stäng av om markeringen hamnar fel på den här datorn)</label></div>
+        <div class="menygrupp rost-tempo"><span class="etikett-vuxen">Rösten läser</span>${[['langsamt', 'LÅNGSAMT'], ['lagom', 'LAGOM']].map(([v, t]) => `<button type="button" class="menyval tempo ${(inst.rostTempo || 'lagom') === v ? 'nu' : ''}" data-v="${v}">${t}</button>`).join('')}</div>
+        <div class="menygrupp rost-volym"><span class="etikett-vuxen">Röstens volym</span><span class="pips">${Array.from({ length: 10 }, (_, i) => `<button type="button" class="pip ${i < rostVolym() ? 'pa' : ''}" data-n="${i + 1}" aria-label="Volym ${i + 1} av 10"><img src="${menyBild(i < rostVolym() ? 'pip_1' : 'pip_0') || ''}" alt="" draggable="false"></button>`).join('')}</span><small>Tio steg. Ändringen hörs direkt.</small></div>`],
+      ['skarm', 'SKÄRM', `<div class="menygrupp helskarm-grupp">${helskarmKan() ? `<button type="button" class="menyval helskarm">${helskarmNu() ? 'Lämna helskärm' : 'Helskärm'}</button>` : ''}<small>${helskarmKan() ? 'Helskärm döljer webbläsarens ramar. Esc tar en ut.' : 'Den här webbläsaren kan inte visa helskärm härifrån. Lägg spelet på hemskärmen, så öppnas det utan ramar.'}</small></div>`],
       ['sparfil', 'SPARFIL', `<div class="menygrupp sparfil"><b>Sparfilen:</b> <button type="button" class="menyval spara-fil">Spara sparfilen</button><button type="button" class="menyval las-fil">Läs in en sparfil</button><input type="file" class="las-fil-val" accept=".json,application/json" hidden>
-        <small>Sparfilen har allt spelaren har gjort, också namnen. Lägg den bara på ett privat ställe.</small><span class="sparfil-svar" role="status"></span></div>
+        <small>Sparfilen har allt spelaren har gjort, också namnen. Lägg den bara på ett privat ställe.</small><span class="sparfil-svar" role="status"></span>
+        <small class="sparfil-senast">${sparfilSenast()}</small></div>
         <div class="menygrupp"><button type="button" class="menyval logg">Spara loggen</button><button type="button" class="menyval nollstall">Börja om från början</button></div>`],
       ['framsteg', 'FRAMSTEG', foraldravy()],
-      ['om', 'OM SPELET', `<div class="menygrupp om-spelet"><b>Ordstaven ${ui.esc(String(d.version))}</b><small>${ui.esc(aventyr.meta?.namn ?? aventyr.id)}</small></div>`],
+      ['om', 'OM SPELET', omSpelet()],
+      // testläget (62.6): bara med ?test (och ?snabb, testernas läge)
+      ...(d.testlage ? [['test', 'TESTLÄGE', `<div class="menygrupp scenlista"><b>Hoppa till scen:</b>${scener}</div>
+        <div class="menygrupp"><label><input type="checkbox" class="etiketter" ${inst.vuxenEtiketter ? 'checked' : ''}> Visa objektens namn (inte under pussel)</label></div>`]] : []),
     ];
     if (!delar.some(([id]) => id === menyDel)) menyDel = 'spelare';
     const s = ui.visaMeny(`<div class="meny vuxen installningar" data-del="${menyDel}">
       <div class="fonster rubrik" style="${vlage(4, 3, 312, 22)}"><h2>INSTÄLLNINGAR</h2><small class="menyversion">Ordstaven ${ui.esc(String(d.version))}</small><button type="button" class="menyval stang">◀ TILLBAKA</button></div>
-      <div class="fonster delar" style="${vlage(4, 28, 98, 160)}">${delar.map(([id, namn], i) => `<button type="button" class="del ${id === menyDel ? 'vald' : ''}" data-del="${id}" style="top:calc(${i * 18 - 1} * var(--vpx))"><img class="markor" src="${menyBild('markor') || ''}" alt="" draggable="false">${namn}</button>`).join('')}</div>
+      <div class="fonster delar" style="${vlage(4, 28, 98, 160)}">${delar.map(([id, namn], i) => `<button type="button" class="del ${id === menyDel ? 'vald' : ''}" data-del="${id}" style="top:calc(${i * (delar.length > 8 ? 16 : 18) - 1} * var(--vpx))"><img class="markor" src="${menyBild('markor') || ''}" alt="" draggable="false">${namn}</button>`).join('')}</div>
       <div class="fonster innehall" style="${vlage(106, 28, 208, 160)}">${delar.map(([id, , html]) => `<section class="menydel" data-del="${id}"${id === menyDel ? '' : ' hidden'}>${html}</section>`).join('')}</div></div>`);
     s.querySelectorAll('.del').forEach((el) => el.addEventListener('click', () => {
       menyDel = /** @type {HTMLElement} */ (el).dataset.del || 'spelare';
@@ -3410,6 +3444,19 @@ export function skapaSpel(d) {
       logg.handelse('inställning', `läsnivån satt för hand: ${fore.P1} → L${n}`, { P28_fore: fore.P28 ? `L${fore.P28}` : '-' });
       spara(); oppnaMeny();
     }));
+    s.querySelectorAll('.tempo').forEach((el) => el.addEventListener('click', () => {
+      inst.rostTempo = /** @type {HTMLElement} */ (el).dataset.v || 'lagom';
+      logg.handelse('inställning', `rösten läser ${inst.rostTempo}`); spara(); oppnaMeny();
+      if (inst.rost) rost.saga('Så här läser jag.', 'berattare');
+    }));
+    s.querySelectorAll('.rost-volym .pip').forEach((el) => el.addEventListener('click', () => {
+      inst.rostVolym = Number(/** @type {HTMLElement} */ (el).dataset.n) || 10;
+      logg.handelse('inställning', `röstens volym ${inst.rostVolym} av 10`); spara(); oppnaMeny();
+      if (inst.rost) rost.saga('Så här låter jag.', 'berattare');
+    }));
+    s.querySelector('.helskarm')?.addEventListener('click', () => {
+      vaxlaHelskarm().finally(() => setTimeout(() => { if (!ui.$('#vuxenmeny').hidden) oppnaMeny(); }, 300));
+    });
     s.querySelector('.foralder')?.addEventListener('change', (e) => { inst.foralderLaser = /** @type {HTMLInputElement} */ (e.target).checked; spara(); });
     s.querySelector('.rostval')?.addEventListener('change', (e) => { inst.rost = /** @type {HTMLInputElement} */ (e.target).checked; logg.handelse('inställning', `rösten ${inst.rost ? 'på' : 'av'}`); spara(); });
     s.querySelector('.markeraval')?.addEventListener('change', (e) => { inst.markera = /** @type {HTMLInputElement} */ (e.target).checked; logg.handelse('inställning', `markeringen ${inst.markera ? 'på' : 'av'}`); spara(); });
@@ -3451,6 +3498,7 @@ export function skapaSpel(d) {
       const ok = d.filer?.laddaNed(namn, sparning.tillText(tillstand), 'application/json') ?? false;
       logg.handelse('sparfil', ok ? 'sparad som fil' : 'kunde inte sparas som fil');
       svar.textContent = ok ? ` Sparad: ${namn} (i Hämtade filer).` : ' Det gick inte att spara filen.';
+      if (ok) { inst.sparfilSparad = new Date().toISOString(); spara(); const e = s.querySelector('.sparfil-senast'); if (e) e.textContent = sparfilSenast(); }
     });
     const filval = /** @type {HTMLInputElement} */ (s.querySelector('.las-fil-val'));
     s.querySelector('.las-fil')?.addEventListener('click', () => filval.click());

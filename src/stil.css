@@ -411,7 +411,14 @@ html, body {
 .installningar .foraldravy table { font-size: calc(4.75 * var(--vpx)); }
 .installningar .foraldravy th, .installningar .foraldravy td { border-bottom-color: #5A3A1E; padding: 0 calc(1.5 * var(--vpx)); }
 .installningar .kapitelrad small { margin-right: calc(2 * var(--vpx)); }
-.installningar .om-spelet { flex-direction: column; align-items: flex-start; }
+.installningar .om-spelet { flex-direction: column; align-items: flex-start; gap: calc(1 * var(--vpx)); }
+.installningar .om-spelet p { margin: 0; font-size: calc(5 * var(--vpx)); }
+.installningar .etikett-vuxen { display: inline-block; min-width: calc(42 * var(--vpx)); }
+/* röstens volym: tio mässingsknappar (pip_1 och pip_0, 6 × 7, var sjunde pixel) */
+.installningar .pips { display: inline-flex; gap: var(--vpx); }
+.installningar .pip { width: calc(6 * var(--vpx)); height: calc(7 * var(--vpx)); padding: 0; border: 0; background: none; cursor: pointer; }
+.installningar .pip img { display: block; width: 100%; height: 100%; image-rendering: pixelated; pointer-events: none; }
+.installningar .rost-volym small { width: 100%; }
 
 /* testläget: inga animationer, så att testerna kan trycka på knapparna */
 .snabb *, .snabb *::before, .snabb *::after { animation: none !important; transition: none !important; }
