@@ -1125,6 +1125,8 @@ test('den lilla lianen: SVÄRD ur minnet, sedan hugger han den, och den är bort
   expect(await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt())).toContain('liten_lian');
   await tryckNara(page, 'liten_lian');
   await expect(page.locator('#handknapp')).toBeVisible({ timeout: 8000 });
+  // Stils ljusa lian i gångens grön (28 × 38) hänger ned ur snåret framför stubben (18, F6)
+  await page.screenshot({ path: 'test-results/skogsbrynet-liten-lian.png' });
   await page.keyboard.press('Space');
   await expect(page.locator('#plattan .formel-ruta')).toBeVisible({ timeout: 8000 });
   for (const b of 'SVÄRD') await bricka(page, b).click();

@@ -377,9 +377,9 @@
      "name": "lianer",
      "type": "sak",
      "x": 448,
-     "y": 40,
+     "y": 48,
      "width": 32,
-     "height": 48,
+     "height": 40,
      "rotation": 0,
      "visible": true,
      "properties": [
@@ -467,7 +467,7 @@
       {
        "name": "bild_hugg",
        "type": "string",
-       "value": "liten_lian_hugg_01"
+       "value": "liten_lian_hugg_01,liten_lian_hugg_02"
       },
       {
        "name": "bild_kvar",
@@ -600,7 +600,7 @@
      "name": "ekorre_gren",
      "type": "sak",
      "x": 536,
-     "y": 90,
+     "y": 80,
      "width": 16,
      "height": 14,
      "rotation": 0,
