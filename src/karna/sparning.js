@@ -13,6 +13,16 @@ export const NYCKEL_BACKUP = 'ordstaven_spar_backup';
 export const NYCKEL_TRASIG = 'ordstaven_spar_trasig';
 
 /**
+ * Sparplatserna (fas 4, F1, brief 9a): en sparning per spelare, så att NYTT ÄVENTYR aldrig raderar något. Plats "1"
+ * är den gamla sparningen (ordstaven_spar), så alla sparningar från före platserna läses som förut. Listan över
+ * platserna och vilken som spelas ligger i en egen nyckel med eget formatfält.
+ */
+export const NYCKEL_PLATSER = 'ordstaven_platser';
+export const PLATSER_FORMAT = 1;
+/** Sparningens nyckel för en plats. @param {string} plats */
+export const nyckelFor = (plats) => (plats === '1' ? NYCKEL : `${NYCKEL}_${plats}`);
+
+/**
  * Migreringar: MIGRERINGAR[n] gör om format n till n + 1. Läggs till när formatet ändras.
  * @type {Record<number, (data: any) => any>}
  */
@@ -120,10 +130,12 @@ export function migrera(data) {
 }
 
 /**
- * @param {{ lagring: Lagring, spelversion: string, klocka?: () => Date, logg?: { handelse(t: string, m: string, d?: any): void } }} opt
+ * @param {{ lagring: Lagring, spelversion: string, klocka?: () => Date, logg?: { handelse(t: string, m: string, d?: any): void }, plats?: string }} opt
  */
-export function skapaSparning({ lagring, spelversion, klocka = () => new Date(), logg }) {
+export function skapaSparning({ lagring, spelversion, klocka = () => new Date(), logg, plats = '1' }) {
   const L = (/** @type {string} */ m, /** @type {any} */ d) => logg && logg.handelse('spara', m, d);
+  // platsens nycklar: plats 1 har de gamla (ordstaven_spar, _backup, _trasig)
+  const NYCKEL = nyckelFor(plats), NYCKEL_BACKUP = `${NYCKEL}_backup`, NYCKEL_TRASIG = `${NYCKEL}_trasig`;
 
   return {
     /** Läs sparningen, eller ett nytt tillstånd. Trasiga sparningar läggs undan, aldrig raderas. */
@@ -179,6 +191,88 @@ export function skapaSparning({ lagring, spelversion, klocka = () => new Date(),
     hjalteTillText(tillstand) {
       return JSON.stringify({ app: APP + '-HJALTE', format: HJALTE_FORMAT, sparad: klocka().toISOString(), hjalte: tillstand.spelare.hjalte }, null, 1);
     },
+  };
+}
+
+/**
+ * Sparplatserna: vilka spelare som finns på den här enheten och vilken som spelas. Varje plats har en hel egen
+ * sparning (hjälten, ungen, lärandet och äventyret). En ny plats raderar aldrig en annan, och att ta bort en går
+ * bara i menyn för vuxna (den läggs då i platsens backup).
+ * @param {{ lagring: Lagring, logg?: { handelse(t: string, m: string, d?: any): void } }} opt
+ */
+export function skapaPlatser({ lagring, logg }) {
+  const L = (/** @type {string} */ m, /** @type {any} */ d) => logg && logg.handelse('spelare', m, d);
+  const finns = (/** @type {string} */ p) => { try { return !!lagring.getItem(nyckelFor(p)); } catch (e) { return false; } };
+  /** @returns {{ format: number, aktiv: string, platser: string[] }} */
+  const las = () => {
+    /** @type {any} */ let d = null;
+    try { d = JSON.parse(lagring.getItem(NYCKEL_PLATSER) || 'null'); } catch (e) { /* trasig: börja om från sparningarna */ }
+    if (!d || !Array.isArray(d.platser)) d = { format: PLATSER_FORMAT, aktiv: '1', platser: finns('1') ? ['1'] : [] };
+    // den aktiva platsen står alltid i listan (en sparning skrivs först när han spelar)
+    if (!d.platser.includes(d.aktiv)) d.platser = [...d.platser, d.aktiv];
+    return d;
+  };
+  const skriv = (/** @type {any} */ d) => { try { lagring.setItem(NYCKEL_PLATSER, JSON.stringify({ ...d, format: PLATSER_FORMAT })); } catch (e) { L('kunde inte spara platserna', String(e)); } };
+  /**
+   * Det startskärmen visar för en plats: hjältens namn och färger, ungen, och om han har börjat.
+   * @returns {{ plats: string, namn: string, utseende: Record<string, number>, unge: { namn: string, steg: number } | null, borjat: boolean }}
+   */
+  const info = (/** @type {string} */ plats) => {
+    /** @type {any} */ let t = null;
+    try { const text = lagring.getItem(nyckelFor(plats)); t = text ? migrera(JSON.parse(text)) : null; } catch (e) { t = null; }
+    const h = t?.spelare?.hjalte, u = t?.spelare?.unge;
+    const borjat = !!t && (!!h?.namn || Object.values(t.aventyr || {}).some((/** @type {any} */ a) => a && (a.startad || a.scenId || a.kapitelId || (a.scen ?? 0) > 0)));
+    return { plats, namn: h?.namn || '', utseende: { ...(h?.utseende || {}) }, unge: u?.namn ? { namn: u.namn, steg: u.steg || 1 } : null, borjat };
+  };
+  return {
+    /** Platsernas id i ordning. */
+    lista: () => las().platser,
+    /** Platsen som spelas. */
+    aktiv: () => las().aktiv,
+    /** Spela en annan plats (som finns). @param {string} plats */
+    valj(plats) {
+      const d = las();
+      if (!d.platser.includes(plats)) return false;
+      skriv({ ...d, aktiv: plats }); L('vald', { plats });
+      return true;
+    },
+    /**
+     * En ny plats för en ny spelare, med en kopia av enhetens inställningar (rösten, de öppna kapitlen) och den
+     * vuxnes (pin, egna ord). Den blir den som spelas. @param {any} [mall] sparningen att ta inställningarna från
+     * @param {string} [spelversion] @returns {string} platsens id
+     */
+    ny(mall, spelversion = '') {
+      const d = las();
+      // en plats där ingen har börjat (ett nytt äventyr som aldrig spelades) används igen, så att platserna inte blir fler
+      const tom = d.platser.find((p) => p !== d.aktiv && !info(p).borjat);
+      // en borttagen plats har kvar sin backup: det numret används inte igen
+      const upptagen = (/** @type {string} */ p) => d.platser.includes(p) || finns(p) || (() => { try { return !!lagring.getItem(`${nyckelFor(p)}_backup`); } catch (e) { return false; } })();
+      let n = 2; while (upptagen(`p${n}`)) n++;
+      const plats = tom ?? `p${n}`;
+      const t = nyttTillstand(spelversion);
+      if (mall) { t.installningar = JSON.parse(JSON.stringify(mall.installningar || {})); t.foraldra = JSON.parse(JSON.stringify(mall.foraldra || t.foraldra)); }
+      try { lagring.setItem(nyckelFor(plats), JSON.stringify(t)); } catch (e) { L('kunde inte skapa platsen', String(e)); }
+      skriv({ ...d, aktiv: plats, platser: d.platser.includes(plats) ? d.platser : [...d.platser, plats] });
+      L('ny', { plats });
+      return plats;
+    },
+    /**
+     * Ta bort en plats (menyn för vuxna). Sparningen läggs i platsens backup, så att den kan tas tillbaka.
+     * Den som spelas kan inte tas bort. @param {string} plats
+     */
+    taBort(plats) {
+      const d = las();
+      if (plats === d.aktiv || !d.platser.includes(plats)) return false;
+      try {
+        const nu = lagring.getItem(nyckelFor(plats));
+        if (nu) lagring.setItem(`${nyckelFor(plats)}_backup`, JSON.stringify({ tid: new Date().toISOString(), tillstand: JSON.parse(nu) }));
+        lagring.removeItem(nyckelFor(plats));
+      } catch (e) { /* ok */ }
+      skriv({ ...d, platser: d.platser.filter((p) => p !== plats) });
+      L('borttagen', { plats });
+      return true;
+    },
+    info,
   };
 }
 

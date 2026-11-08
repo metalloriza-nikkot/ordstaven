@@ -761,3 +761,66 @@ test('lappknappen öppnar Farfars lista medan han väljer stig, och uppdragslapp
   await expect(page.locator('#uppdragslapp')).toBeHidden();
   await page.screenshot({ path: 'test-results/lappknappen-listan.png' });
 });
+
+test('startskärmen: FORTSÄTT med hjälten, och NYTT ÄVENTYR kräver två tryck och raderar ingenting (F1)', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(60000);
+  // första gången: bara ▶
+  await starta(page, '?snabb&ny');
+  await expect(page.locator('.start-knapp')).toHaveAttribute('aria-label', 'Starta');
+  await expect(page.locator('.spelarkort')).toHaveCount(0);
+  // en hjälte som har spelat en bit (påhittat namn)
+  await page.evaluate(() => {
+    const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
+    t.spelare.hjalte.namn = 'Ture'; t.spelare.hjalte.utseende = { hudfarg: 1, drakt: 2 }; t.spelare.unge.namn = 'KNOPP';
+    av.scen = 5; av.scenId = 's05'; av.startad = true;
+    localStorage.setItem('ordstaven_spar', JSON.stringify(t));
+  });
+  await starta(page);
+  const fortsatt = page.locator('.start-knapp.fortsatt-kort');
+  await expect(fortsatt).toBeVisible();
+  await expect(fortsatt.locator('img.figur-px')).toHaveCount(2); // hjälten och ungen
+  await expect(page.locator('.spelarkort.vald')).toContainText('TURE');
+  // figurerna är skalade i hela steg
+  const bb = await fortsatt.locator('img.figur-px >> nth=0').boundingBox();
+  const dpr = await page.evaluate(() => devicePixelRatio);
+  expect(Math.abs(((bb.height * dpr) / 24) - Math.round((bb.height * dpr) / 24))).toBeLessThan(0.01);
+  await page.screenshot({ path: 'test-results/start-fortsatt.png' });
+  const utanTid = () => page.evaluate(() => { const t = JSON.parse(localStorage.getItem('ordstaven_spar') || 'null'); delete t.sparad; return t; });
+  const fore = await utanTid();
+  // ett tryck: knappen blir redo, inget händer
+  await page.click('.nytt-aventyr');
+  await expect(page.locator('.nytt-aventyr.redo')).toBeVisible();
+  await page.screenshot({ path: 'test-results/start-nytt-redo.png' });
+  expect(await page.evaluate(() => localStorage.getItem('ordstaven_platser'))).toBeNull();
+  // det andra trycket: en ny hjälte på en egen plats, och den gamla sparningen är orörd
+  await Promise.all([page.waitForEvent('load'), page.click('.nytt-aventyr')]);
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning && window.__ORDSTAVEN.spel.scene.isActive('Rum'));
+  const platser = await page.evaluate(() => JSON.parse(localStorage.getItem('ordstaven_platser') || 'null'));
+  expect(platser).toMatchObject({ aktiv: 'p2', platser: ['1', 'p2'] });
+  expect(await utanTid()).toEqual(fore);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.tillstand().spelare.hjalte.namn)).toBe('');
+  await expect(page.locator('.start-knapp')).toHaveAttribute('aria-label', 'Starta');
+  await expect(page.locator('.spelarkort[data-plats="1"]')).toContainText('TURE');
+  await expect(page.locator('.nytt-aventyr')).toHaveCount(0);
+  await page.screenshot({ path: 'test-results/start-ny-hjalte.png' });
+  // tillbaka till den gamla hjälten
+  await Promise.all([page.waitForEvent('load'), page.click('.spelarkort[data-plats="1"]')]);
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning && window.__ORDSTAVEN.spel.scene.isActive('Rum'));
+  await expect(page.locator('.start-knapp.fortsatt-kort')).toBeVisible();
+  expect(await page.evaluate(() => window.__ORDSTAVEN.tillstand().spelare.hjalte.namn)).toBe('Ture');
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('ordstaven_platser') || 'null').aktiv)).toBe('1');
+  // menyn för vuxna: spelarna, och den som inte spelas kan tas bort med två klick (den hamnar i sin backup)
+  await page.click('.start-knapp');
+  await page.keyboard.press('Control+Shift+M');
+  const grupp = page.locator('.menygrupp.spelare');
+  await expect(grupp).toContainText('TURE');
+  await expect(grupp.locator('.spelare-rad')).toHaveCount(2);
+  await page.screenshot({ path: 'test-results/meny-spelare.png' });
+  await grupp.locator('.spelare-rad[data-plats="p2"] .spelare-bort').click();
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('ordstaven_platser') || 'null').platser)).toEqual(['1', 'p2']);
+  await grupp.locator('.spelare-rad[data-plats="p2"] .spelare-bort').click();
+  await expect(page.locator('.menygrupp.spelare .spelare-rad')).toHaveCount(1);
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('ordstaven_platser') || 'null').platser)).toEqual(['1']);
+  expect(await page.evaluate(() => localStorage.getItem('ordstaven_spar_p2_backup'))).not.toBeNull();
+});

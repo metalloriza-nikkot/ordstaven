@@ -432,6 +432,24 @@ export class Rum extends Phaser.Scene {
   }
 
   /**
+   * En hjälte i andra färger som bild (startskärmens spelarkort, F1), utan att rummets hjälte ändras.
+   * @param {Record<string, number>} val @param {string} [ram] @returns {string | null}
+   */
+  hjalteBildFor(val, ram = 'hjalte_ga_ner_01') {
+    if (!this.textures.exists('hjalte') || !this.textures.get('hjalte').has(ram)) return null;
+    const hud = HJALTE_FARGER.hudfarg[val.hudfarg ?? 0] ?? HJALTE_FARGER.hudfarg[0];
+    const drakt = HJALTE_FARGER.drakt[val.drakt ?? 0] ?? HJALTE_FARGER.drakt[0];
+    const nyckel = fargad(this, 'hjalte', hjaltensByten(hud, drakt));
+    try { return this.textures.getBase64(nyckel, ram) || null; } catch { return null; }
+  }
+
+  /** Ungen som bild (startskärmen). @param {string} [ram] @returns {string | null} */
+  ungeBildUrl(ram = 'unge1_glad_ner_01') {
+    if (!this.textures.exists('unge') || !this.textures.get('unge').has(ram)) return null;
+    try { return this.textures.getBase64('unge', ram) || null; } catch { return null; }
+  }
+
+  /**
    * Hjälten i spelarens färger som en bild (data-URL) för textlagret, t.ex. när han väljer hjälte i s00 (10f).
    * null när bilden inte finns. @param {string} [ram]
    */

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { geSak, bytLager, lagerFor } from '../../src/karna/hjalte.js';
 import { readFileSync, readdirSync } from 'node:fs';
-import { skapaSparning, nyttTillstand, migrera, FORMAT, NYCKEL, NYCKEL_TRASIG, aventyrFor } from '../../src/karna/sparning.js';
+import { skapaSparning, skapaPlatser, nyckelFor, nyttTillstand, migrera, FORMAT, NYCKEL, NYCKEL_TRASIG, NYCKEL_PLATSER, aventyrFor } from '../../src/karna/sparning.js';
 const AVENTYR = 'den-gomda-dalen';
 import { skapaLogg } from '../../src/karna/logg.js';
 
@@ -117,6 +117,88 @@ describe('sparning', () => {
       for (const a of Object.values(d.aventyr)) expect(a.ungen).toBeUndefined();
     });
   }
+});
+
+describe('spelarna på enheten (F1)', () => {
+  const spelad = (l, plats, namn) => {
+    const s = skapaSparning({ lagring: l, spelversion: '0.1.0', klocka: fast, plats });
+    const t = s.las(); t.spelare.hjalte.namn = namn; t.spelare.hjalte.utseende = { hudfarg: 2, drakt: 1 };
+    aventyrFor(t, AVENTYR).scenId = 's03'; t.installningar = { rost: false, oppnadeKapitel: ['kap-01'] };
+    s.spara(t); return t;
+  };
+
+  it('en sparning från före platserna är plats 1 och ligger kvar i samma nyckel', () => {
+    const l = minne(); spelad(l, '1', 'Ture');
+    const p = skapaPlatser({ lagring: l });
+    expect(nyckelFor('1')).toBe(NYCKEL);
+    expect(p.aktiv()).toBe('1');
+    expect(p.lista()).toEqual(['1']);
+    expect(p.info('1')).toMatchObject({ namn: 'Ture', borjat: true, utseende: { hudfarg: 2, drakt: 1 } });
+  });
+
+  it('första gången finns en plats, och ingen har börjat', () => {
+    const p = skapaPlatser({ lagring: minne() });
+    expect(p.aktiv()).toBe('1');
+    expect(p.info('1').borjat).toBe(false);
+  });
+
+  it('ett nytt äventyr raderar ingenting: den nya hjälten får en egen plats, med enhetens inställningar', () => {
+    const l = minne(); const gammal = spelad(l, '1', 'Ture');
+    const fore = l.getItem(NYCKEL);
+    const p = skapaPlatser({ lagring: l });
+    const ny = p.ny(gammal, '0.31.0');
+    expect(ny).toBe('p2');
+    expect(p.aktiv()).toBe('p2');
+    expect(p.lista()).toEqual(['1', 'p2']);
+    expect(l.getItem(NYCKEL)).toBe(fore);
+    const t = skapaSparning({ lagring: l, spelversion: '0.31.0', plats: 'p2' }).las();
+    expect(t.spelare.hjalte.namn).toBe('');
+    expect(t.aventyr).toEqual({});
+    expect(t.installningar).toEqual({ rost: false, oppnadeKapitel: ['kap-01'] });
+    expect(t.spelare.hjalte.id).not.toBe(gammal.spelare.hjalte.id);
+  });
+
+  it('platserna sparar var för sig, och man kan byta tillbaka', () => {
+    const l = minne(); spelad(l, '1', 'Ture');
+    const p = skapaPlatser({ lagring: l });
+    p.ny(null); spelad(l, 'p2', 'Vilma');
+    expect(p.info('1').namn).toBe('Ture');
+    expect(p.info('p2').namn).toBe('Vilma');
+    expect(p.valj('1')).toBe(true);
+    expect(p.aktiv()).toBe('1');
+    expect(p.valj('p9')).toBe(false);
+    expect(JSON.parse(l.getItem(NYCKEL_PLATSER))).toMatchObject({ format: 1, aktiv: '1', platser: ['1', 'p2'] });
+  });
+
+  it('ett nytt äventyr som aldrig spelades används igen, så att platserna inte blir fler', () => {
+    const l = minne(); spelad(l, '1', 'Ture');
+    const p = skapaPlatser({ lagring: l });
+    expect(p.ny(null)).toBe('p2');
+    p.valj('1');
+    expect(p.ny(null)).toBe('p2');
+    expect(p.lista()).toEqual(['1', 'p2']);
+  });
+
+  it('den som spelas kan inte tas bort, och en borttagen hamnar i sin backup', () => {
+    const l = minne(); spelad(l, '1', 'Ture');
+    const p = skapaPlatser({ lagring: l });
+    p.ny(null); spelad(l, 'p2', 'Vilma');
+    expect(p.taBort('p2')).toBe(false);
+    p.valj('1');
+    expect(p.taBort('p2')).toBe(true);
+    expect(p.lista()).toEqual(['1']);
+    expect(l.getItem(nyckelFor('p2'))).toBeNull();
+    expect(JSON.parse(l.getItem(nyckelFor('p2') + '_backup')).tillstand.spelare.hjalte.namn).toBe('Vilma');
+    // numret används inte igen så länge backupen finns
+    expect(p.ny(null)).toBe('p3');
+  });
+
+  it('ett trasigt platsregister börjar om från sparningarna', () => {
+    const l = minne(); spelad(l, '1', 'Ture'); l.setItem(NYCKEL_PLATSER, '{trasig');
+    const p = skapaPlatser({ lagring: l });
+    expect(p.lista()).toEqual(['1']);
+    expect(p.aktiv()).toBe('1');
+  });
 });
 
 describe('logg', () => {

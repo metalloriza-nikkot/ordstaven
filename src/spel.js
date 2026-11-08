@@ -38,6 +38,7 @@ const vanta = (/** @type {number} */ ms) => new Promise((r) => setTimeout(r, ms)
 
 /**
  * @param {{ aventyr: any, kartor?: Record<string, import('./karna/karta.js').Karta>, kapitel: any[], ordlistor: any, tillstand: any, sparning: any, logg: any, rost: any, ljud: any,
+ *           platser?: ReturnType<typeof import('./karna/sparning.js').skapaPlatser>,
  *           ui: ReturnType<typeof import('./grans/ui.js').skapaUi>, rum: import('./scener/Rum.js').Rum, layout: any,
  *           inmatning: any, tangentbord: ReturnType<typeof import('./grans/tangentbord.js').skapaTangentbord>,
  *           bilder: ReturnType<typeof import('./grans/bilder.js').skapaBilder>, snabb: boolean, pek: () => boolean,
@@ -2919,13 +2920,66 @@ export function skapaSpel(d) {
   window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !ui.$('#pausmeny').hidden) { e.preventDefault(); stangPaus(); } });
 
   // ------------------------------------------------------------------ start, slut, meny
+  /**
+   * Startskärmen (F1, brief 9a och 10e): en stor FORTSÄTT med hjälten och ungen där de är, spelarna som kort med
+   * hjältens bild och namnet han skrev, och ett mindre NYTT ÄVENTYR som kräver två tryck och aldrig raderar något
+   * (en ny hjälte får en egen sparplats). Ingenting kräver läsning: ▶ och + räcker, orden står under när
+   * äventyret har dem (gransnitt.fortsatt och gransnitt.nytt_aventyr). Första gången finns bara ▶.
+   * Gråbox: bilden av rummet kommer med Stils skiss (F4).
+   */
   async function startskarm() {
-    const s = ui.visaSkarm(`<div class="start"><div class="stav-glimt" aria-hidden="true"></div><button type="button" class="knapp start-knapp" aria-label="Starta">▶</button></div>`);
-    await new Promise((klar) => s.querySelector('.start-knapp')?.addEventListener('click', () => klar(undefined), { once: true }));
+    const platser = d.platser;
+    const aktiv = platser?.aktiv() ?? '1';
+    const lista = platser ? platser.lista() : [aktiv];
+    const borjat = !!tillstand.spelare.hjalte.namn || !!av.startad || !!av.scenId || !!av.kapitelId || (av.scen ?? 0) > 0;
+    const bild = (/** @type {string | null} */ src, klass = '') => (src ? `<img class="figur-px ${klass}" src="${src}" alt="" aria-hidden="true" draggable="false">` : '');
+    const ord = (/** @type {string} */ nyckel) => { const o = gransnittsOrd(nyckel); return o ? `<span class="start-ord">${ui.rader(o, {}, 'kort-ord')}</span>` : ''; };
+    const andra = lista.filter((p) => p !== aktiv).map((p) => platser?.info(p)).filter((x) => x && x.borjat);
+    const kort = (/** @type {any} */ x, vald = false) => `<button type="button" class="spelarkort ${vald ? 'vald' : ''}" data-plats="${ui.esc(x.plats)}" aria-label="${ui.esc(x.namn || 'spelare')}">${bild(rum.hjalteBildFor?.(x.utseende) ?? null, 'liten')}${x.namn ? `<span class="spelarnamn">${ui.rader(x.namn, {}, 'kort-ord')}</span>` : ''}</button>`;
+    const jag = { plats: aktiv, namn: tillstand.spelare.hjalte.namn || '', utseende: tillstand.spelare.hjalte.utseende || {} };
+    const spelare = (andra.length || borjat)
+      // en ny hjälte som inte har börjat har redan ett nytt äventyr: då finns bara de andra hjältarna att byta till
+      ? `<div class="spelarrad">${borjat ? kort(jag, true) : ''}${andra.map((x) => kort(x)).join('')}${borjat ? `<button type="button" class="spelarkort nytt-aventyr" aria-label="Nytt äventyr"><span class="plus" aria-hidden="true">+</span>${ord('nytt_aventyr')}</button>` : ''}</div>`
+      : '';
+    const fortsatt = borjat
+      ? `<button type="button" class="knapp start-knapp fortsatt-kort" aria-label="Fortsätt"><span class="fortsatt-figurer">${bild(rum.hjalteBild?.() ?? null)}${tillstand.spelare.unge?.namn ? bild(rum.ungeBildUrl?.(`unge${tillstand.spelare.unge.steg || 1}_glad_ner_01`) ?? rum.ungeBildUrl?.() ?? null, 'unge') : ''}</span><span class="fortsatt-pil">▶</span>${ord('fortsatt')}</button>`
+      : `<div class="stav-glimt" aria-hidden="true"></div><button type="button" class="knapp start-knapp" aria-label="Starta">▶</button>`;
+    const s = ui.visaSkarm(`<div class="start${borjat ? ' med-fortsatt' : ''}">${fortsatt}${spelare}</div>`);
+    logg.handelse('start', 'startskärmen', { plats: aktiv, spelare: lista.length, borjat });
+    /** @type {ReturnType<typeof setTimeout> | undefined} */
+    let bekrafta;
+    await new Promise((klar) => {
+      s.querySelector('.start-knapp')?.addEventListener('click', () => klar(undefined), { once: true });
+      // en annan spelare: hans plats väljs, och spelet startar om på den
+      s.querySelectorAll('.spelarkort[data-plats]').forEach((el) => el.addEventListener('click', () => {
+        const p = /** @type {HTMLElement} */ (el).dataset.plats || '';
+        if (p === aktiv) { klar(undefined); return; }
+        ljud.spela('klick');
+        if (platser?.valj(p)) { logg.handelse('spelare', 'byter till plats ' + p); logg.spara?.(true); laddaOm(); }
+      }));
+      // NYTT ÄVENTYR: första trycket gör knappen redo (den lyser och växer), det andra inom 4 s startar en ny hjälte
+      const ny = /** @type {HTMLElement | null} */ (s.querySelector('.nytt-aventyr'));
+      ny?.addEventListener('click', () => {
+        ljud.spela('klick');
+        if (!ny.classList.contains('redo')) {
+          ny.classList.add('redo'); clearTimeout(bekrafta);
+          bekrafta = setTimeout(() => ny.classList.remove('redo'), 4000);
+          return;
+        }
+        clearTimeout(bekrafta);
+        spara();
+        const p = platser?.ny(tillstand, String(d.version ?? ''));
+        logg.handelse('spelare', 'nytt äventyr på plats ' + p);
+        logg.spara?.(true); laddaOm();
+      });
+    });
+    clearTimeout(bekrafta);
     ljud.starta(); rost.lasUpp();
     d.uppdatering.tillampa();
     ui.doljSkarm();
   }
+  /** Starta om sidan på den valda platsen (utan ?ny, som annars nollställer sparningen). */
+  function laddaOm() { const u = new URL(location.href); u.searchParams.delete('ny'); location.href = u.toString(); }
 
   async function spela() {
     rum.lager = { ...lagerFor(tillstand.spelare.hjalte) };
@@ -3104,6 +3158,22 @@ export function skapaSpel(d) {
    * Den minimala föräldravyn: per pusseltyp nivån, hur många uppgifter, andelen rätt på första försöket utan hjälp,
    * hur ofta hjälpen användes, och för läsvalen vad slumpen hade gett. Ur lärandehistoriken.
    */
+  /**
+   * Spelarna på enheten (F1): vem som spelas, byt till en annan, och ta bort en som inte spelas (två klick; sparningen
+   * läggs i platsens backup). En ny spelare görs på startskärmen (NYTT ÄVENTYR).
+   */
+  function spelargrupp() {
+    const platser = d.platser;
+    if (!platser) return '';
+    const aktiv = platser.aktiv();
+    const rad = (/** @type {string} */ p) => {
+      const x = platser.info(p);
+      const namn = x.namn ? ui.esc(versaler(x.namn)) : (x.borjat ? '(utan namn)' : '(inte börjat)');
+      return `<span class="spelare-rad" data-plats="${ui.esc(p)}"><b>${namn}</b>${p === aktiv ? ' <small>spelas nu</small>' : ` <button type="button" class="menyval spelare-valj">Spela</button><button type="button" class="menyval spelare-bort">Ta bort</button>`}</span>`;
+    };
+    return `<div class="menygrupp spelare"><b>Spelare:</b> ${platser.lista().map(rad).join('')}</div>`;
+  }
+
   function foraldravy() {
     const rader = sammanfatta(tillstand.spelare.larande?.historik || [], d.kapitel.flatMap((k) => k.pussel));
     if (!rader.length) return '<div class="menygrupp foraldravy"><b>Hur det går:</b> inga uppgifter än.</div>';
@@ -3133,6 +3203,7 @@ export function skapaSpel(d) {
       <label><input type="checkbox" class="rostval" ${inst.rost ? 'checked' : ''}> Datorrösten läser upp (av: rullningen piper i ordtakt)</label>
       <label><input type="checkbox" class="markeraval" ${inst.markera ? 'checked' : ''}> Markera ordet som läses (stäng av om markeringen hamnar fel på den här datorn)</label></div>
       ${foraldravy()}
+      ${spelargrupp()}
       <div class="menygrupp scenlista"><b>Hoppa till scen:</b>${scener}</div>
       <div class="menygrupp sparfil"><b>Sparfilen:</b> <button type="button" class="menyval spara-fil">Spara sparfilen</button><button type="button" class="menyval las-fil">Läs in en sparfil</button><input type="file" class="las-fil-val" accept=".json,application/json" hidden>
       <small>Sparfilen har allt spelaren har gjort, också namnen. Lägg den bara på ett privat ställe.</small><span class="sparfil-svar" role="status"></span></div>
@@ -3142,6 +3213,18 @@ export function skapaSpel(d) {
     s.querySelector('.rostval')?.addEventListener('change', (e) => { inst.rost = /** @type {HTMLInputElement} */ (e.target).checked; logg.handelse('inställning', `rösten ${inst.rost ? 'på' : 'av'}`); spara(); });
     s.querySelector('.markeraval')?.addEventListener('change', (e) => { inst.markera = /** @type {HTMLInputElement} */ (e.target).checked; logg.handelse('inställning', `markeringen ${inst.markera ? 'på' : 'av'}`); spara(); });
     s.querySelector('.etiketter')?.addEventListener('change', (e) => { inst.vuxenEtiketter = /** @type {HTMLInputElement} */ (e.target).checked; spara(); visaEtiketter(); });
+    s.querySelectorAll('.spelare-valj').forEach((el) => el.addEventListener('click', () => {
+      const p = /** @type {HTMLElement} */ (el.closest('.spelare-rad')).dataset.plats || '';
+      spara();
+      if (d.platser?.valj(p)) { logg.handelse('meny', 'byter till plats ' + p); logg.spara?.(true); laddaOm(); }
+    }));
+    s.querySelectorAll('.spelare-bort').forEach((el) => el.addEventListener('click', () => {
+      const knapp = /** @type {HTMLElement} */ (el);
+      if (!knapp.classList.contains('redo')) { knapp.classList.add('redo'); knapp.textContent = 'Säker? Ta bort'; return; }
+      const p = /** @type {HTMLElement} */ (el.closest('.spelare-rad')).dataset.plats || '';
+      if (d.platser?.taBort(p)) logg.handelse('meny', 'plats borttagen ' + p);
+      oppnaMeny();
+    }));
     s.querySelectorAll('.kapitel-oppet').forEach((el) => el.addEventListener('change', (e) => {
       const id = /** @type {string} */ (/** @type {HTMLElement} */ (el).dataset.kapitel);
       if (/** @type {HTMLInputElement} */ (e.target).checked) oppnaKapitel(id); else inst.oppnadeKapitel = (inst.oppnadeKapitel || []).filter((/** @type {string} */ x) => x !== id);

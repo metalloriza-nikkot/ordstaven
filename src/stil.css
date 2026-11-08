@@ -337,11 +337,31 @@ html, body {
 .stav-glimt::after { content: ''; position: absolute; inset: -14px; border-radius: 24px; border: 8px solid rgba(242, 193, 78, .6); box-shadow: 0 0 0 10px rgba(242, 193, 78, .25); animation: glod 2s ease-in-out infinite; will-change: opacity; }
 @keyframes glod { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
 .start-knapp { width: 140px; height: 140px; border-radius: 70px; font-size: 64px; background: var(--guld); }
+/* F1: FORTSÄTT med hjälten och ungen, spelarna som kort med hjältens bild, och ett mindre NYTT ÄVENTYR (två tryck).
+   Figurerna är 24 bildpixlar höga och skalas i hela steg (--ipx-figur i layout.js). */
+.start.med-fortsatt { gap: 28px; }
+.figur-px { display: block; height: calc(24 * var(--ipx-figur, 7px)); width: auto; image-rendering: pixelated; image-rendering: crisp-edges; pointer-events: none; }
+.figur-px.liten { height: calc(24 * var(--ipx-figur-liten, 3px)); }
+.start-knapp.fortsatt-kort { width: auto; height: auto; min-width: 280px; padding: 20px 36px 16px; border-radius: 28px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.fortsatt-figurer { display: flex; align-items: flex-end; gap: calc(4 * var(--ipx-figur, 7px)); }
+.fortsatt-pil { font-size: 56px; line-height: 1; }
+.start-ord { display: block; font-size: calc(28px * var(--t)); letter-spacing: .04em; line-height: 1.1; }
+.spelarrad { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; max-width: 92vw; }
+.spelarkort { min-width: 104px; min-height: 120px; padding: 10px 12px 8px; border-radius: 18px; background: var(--papper); color: var(--black); box-shadow: 0 4px 0 #b7a98a; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; font-size: calc(22px * var(--t)); }
+.spelarkort:active { transform: translateY(3px); box-shadow: 0 1px 0 #b7a98a; }
+.spelarkort.vald { box-shadow: 0 4px 0 #b7a98a, 0 0 0 5px var(--guld); }
+.spelarnamn { display: block; max-width: 9em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nytt-aventyr { background: #d8ccb4; opacity: .85; justify-content: center; }
+.nytt-aventyr .plus { font-size: 56px; line-height: 1; font-weight: 700; }
+/* första trycket: knappen lyser och växer, och det andra trycket startar en ny hjälte (inget raderas) */
+.nytt-aventyr.redo { opacity: 1; background: var(--guld); transform: scale(1.12); box-shadow: 0 4px 0 #b08a2a, 0 0 0 6px rgba(242, 193, 78, .45); }
 .stor-ikon { font-size: 140px; }
 .pass-slut .knappar { display: flex; gap: 32px; }
 .vuxen { color: #d8ccb4; font-size: 18px; font-style: italic; }
 .meny { max-height: 90vh; overflow: auto; touch-action: pan-y; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; width: min(92vw, 720px); padding: 20px 24px; border-radius: 16px; background: var(--papper); color: var(--black); font-style: normal; font-size: 18px; }
 .meny h2 { margin: 0 0 10px; font-size: 24px; }
+.spelare-rad { display: inline-flex; align-items: center; gap: 6px; margin-right: 18px; }
+.spelare-bort.redo { background: #e9a08a; }
 .menygrupp { margin: 12px 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .menygrupp label { display: block; width: 100%; }
 .menyval { padding: 8px 12px; border-radius: 8px; background: #e9dfc8; font-size: 16px; }

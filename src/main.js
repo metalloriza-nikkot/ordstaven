@@ -18,7 +18,7 @@ const platshallarfiler = import.meta.glob('../kartor/*/platshallare.json', { imp
 const mappAv = (/** @type {string} */ fil) => fil.split('/').at(-2);
 
 import { skapaLogg } from './karna/logg.js';
-import { skapaSparning } from './karna/sparning.js';
+import { skapaSparning, skapaPlatser } from './karna/sparning.js';
 import { skapaInmatning } from './karna/inmatning.js';
 import { RUM, varldTillSkarm } from './karna/skalning.js';
 import { lasKarta } from './karna/karta.js';
@@ -75,9 +75,13 @@ const logg = skapaLogg({ lagring, version: VERSION });
 kopplaLogg(logg);
 logg.handelse('start', `ORDSTAVEN ${VERSION}`, { lagring: lagring.typ, snabb });
 
-const sparning = skapaSparning({ lagring, spelversion: VERSION, logg });
+// sparplatserna (F1): en sparning per spelare. Startskärmen väljer spelare och startar om spelet på hans plats.
+const platser = skapaPlatser({ lagring, logg });
+const plats = platser.aktiv();
+const sparning = skapaSparning({ lagring, spelversion: VERSION, logg, plats });
 if (parametrar.has('ny')) sparning.nollstall();
 const tillstand = sparning.las();
+if (plats !== '1') logg.handelse('spelare', 'plats ' + plats);
 
 const varld = /** @type {HTMLElement} */ (document.getElementById('varld'));
 const textlager = /** @type {HTMLElement} */ (document.getElementById('textlager'));
@@ -194,7 +198,7 @@ const kartor = Object.fromEntries(Object.entries(kartfiler).filter(([fil]) => ma
 for (const [id, tmj] of Object.entries(testkartor)) kartor[id] = lasKarta(tmj);
 
 const spelet = skapaSpel({
-  aventyr, kartor, kapitel, ordlistor, tillstand, sparning, logg, rost, ljud, ui, rum, layout, inmatning, tangentbord, bilder,
+  aventyr, kartor, kapitel, ordlistor, tillstand, sparning, platser, logg, rost, ljud, ui, rum, layout, inmatning, tangentbord, bilder,
   snabb, pek: () => pek.matches, version: VERSION, exporteraLogg: () => exportera(logg),
   // sparfilen i menyn för vuxna: hela sparningen som en fil, och tillbaka
   filer: { laddaNed, tidsstampel, meddelande },
