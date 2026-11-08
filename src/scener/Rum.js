@@ -1915,13 +1915,15 @@ export class Rum extends Phaser.Scene {
   /**
    * En dörr öppnas när hjälten går igenom den (31.7, 10f): `<bild>_oppnas_01–03`, ca 80 ms var, i rummet han lämnar.
    * Den ritas stängd igen nästa gång rummet visas. En fel dörr öppnas aldrig. @param {string} id @param {number} [ms]
+   * @param {() => void} [paBorjan] när dörren börjar öppnas (ljudet), bara om den har en öppning
    */
-  async oppnaDorr(id, ms = 80) {
+  async oppnaDorr(id, ms = 80, paBorjan = undefined) {
     const r = /** @type {any} */ (this.ritade.get(id));
     const namn = r?.frame?.name;
     if (!namn || !r.setTexture) return false;
     const serie = [1, 2, 3].map((i) => foremalsbild(this, `${namn}_oppnas_0${i}`));
     if (!serie.every(Boolean)) return false;
+    paBorjan?.();
     for (const fb of /** @type {{ nyckel: string, ram: string }[]} */ (serie)) {
       if (!r.active) return false;
       r.setTexture(fb.nyckel, fb.ram); this.smutsig = true;

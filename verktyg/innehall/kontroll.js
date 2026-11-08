@@ -5,10 +5,14 @@ import Ajv from 'ajv/dist/2020.js';
 import { readFileSync } from 'node:fs';
 import { rader, versaler, ord, PLATSHALLARE } from '../../src/karna/text.js';
 import { kompileraUppdrag, hittaSteg } from '../../src/karna/uppdrag.js';
+import { SLINGOR } from '../../src/karna/musik.js';
+import { kandaLjud, ljudLista } from '../../src/karna/ljudid.js';
 
 const schema = (namn) => JSON.parse(readFileSync(new URL(`../../content/schema/${namn}.schema.json`, import.meta.url), 'utf8'));
 // teckenbredderna för typsnittet i textlagret (Lexend, beslut 13)
 const BREDDER = JSON.parse(readFileSync(new URL('../lexend-bredder.json', import.meta.url), 'utf8')).tecken;
+/** Ljuden innehållet får använda (64.6): Stils effekter och de inspelade lätena. */
+export const KANDA_LJUD = kandaLjud(Object.keys(JSON.parse(readFileSync(new URL('../../assets/ljud/effekter/ljud.json', import.meta.url), 'utf8'))));
 
 /** Läsplattans radbredd i em (16 em = 768 punkter vid 48 punkters text). Stilspåret kan justera. */
 export const RADBREDD_EM = 16;
@@ -234,6 +238,23 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
       }
     };
     ljudordKontroll(k.scener, 'scener');
+    // Musiken och ljuden (27, beslut 64.5–64.6): en slinga som finns (eller null), och ljud som finns
+    const slingaKontroll = (x, plats) => { if (x !== undefined && x !== null && !SLINGOR.includes(x)) fel.push(var_(`${plats}: okänd slinga ${x} (finns: ${SLINGOR.join(', ')})`)); };
+    slingaKontroll(k.musik, 'musik');
+    for (const r of k.rum || []) slingaKontroll(r.musik, `rum ${r.id} musik`);
+    const ljudKontroll = (x, plats) => {
+      if (Array.isArray(x)) { x.forEach((y, i) => ljudKontroll(y, `${plats}[${i}]`)); return; }
+      if (!x || typeof x !== 'object') return;
+      if (x.typ === 'musik') slingaKontroll(x.slinga, `${plats} musik`);
+      if (x.typ === 'ljud' && typeof x.id === 'string' && !KANDA_LJUD.has(x.id)) fel.push(var_(`${plats}: okänt ljud ${x.id}`));
+      for (const [nyckel, v] of Object.entries(x)) {
+        if (nyckel === 'ljud') { for (const id of ljudLista(v)) if (!KANDA_LJUD.has(id)) fel.push(var_(`${plats}: okänt ljud ${id}`)); continue; }
+        ljudKontroll(v, `${plats}.${nyckel}`);
+      }
+    };
+    for (const sc of k.scener || []) { slingaKontroll(sc.musik, `${sc.id} musik`); ljudKontroll(sc.steg, sc.id); }
+    ljudKontroll(k.pussel, 'pussel');
+    ljudKontroll(k.rum, 'rum');
     ljudordKontroll(k.pussel, 'pussel');
     const replikKontroll = (r, plats) => {
       if (!r) return;
@@ -256,6 +277,7 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
         if (st.paminnelse) { replikKontroll(st.paminnelse.replik, `${sp} paminnelse`); if (!st.vantar_pa) fel.push(var_(`${sp}: paminnelse gäller bara en replik med vantar_pa`)); }
         break;
         case 'mellanscen': pp.sek += 4; break;
+        case 'musik': break; // tar ingen tid
         case 'ljud':
           pp.sek += 1;
           if (st.foremal && (!s.rum || !rum.get(s.rum)?.innehall.map(objId).includes(st.foremal))) fel.push(var_(`${sp}: ${st.foremal} finns inte i rummet ${s.rum}`));

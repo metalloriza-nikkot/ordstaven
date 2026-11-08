@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ordstaven/schema/kapitel.schema.json",
   "title": "ORDSTAVEN – ett kapitel (rum, scener, pussel)",
-  "description": "Format 2. Beskrivs i docs/innehallsschema.md (version 2.20). All text lagras i vanlig skrift; spelet visar versaler tills nivån säger annat.",
+  "description": "Format 2. Beskrivs i docs/innehallsschema.md (version 2.29). All text lagras i vanlig skrift; spelet visar versaler tills nivån säger annat.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -75,6 +75,10 @@
           }
         }
       }
+    },
+    "musik": {
+      "$ref": "#/$defs/slinga",
+      "description": "Kapitlets slinga där ett rum eller en scen inte säger något annat (annars spel)."
     },
     "alias": {
       "type": "object",
@@ -241,6 +245,10 @@
         },
         "ljudord": {
           "$ref": "#/$defs/ljudord"
+        },
+        "ljud": {
+          "$ref": "#/$defs/ljudlista",
+          "description": "Reaktionens ljud (tutet, kastrullen), samtidigt som reaktionen börjar. Har en felreaktion ett ljud spelas inte bloinget."
         }
       }
     },
@@ -396,6 +404,10 @@
               }
             }
           }
+        },
+        "musik": {
+          "$ref": "#/$defs/slinga",
+          "description": "Rummets (områdets) slinga. Gäller före kapitlets."
         }
       }
     },
@@ -464,6 +476,10 @@
             "sover"
           ],
           "description": "Hur hjälten syns när scenen börjar (2.14). sover = i sängen (kartans föremål med sovplats) tills han ska röra sig."
+        },
+        "musik": {
+          "$ref": "#/$defs/slinga",
+          "description": "Ett undantag för hela scenen. Gäller före rummets. null = tyst."
         }
       }
     },
@@ -501,6 +517,10 @@
             },
             "bild": {
               "$ref": "#/$defs/id"
+            },
+            "ljud": {
+              "$ref": "#/$defs/ljudlista",
+              "description": "Det som låter i mellanscenen, samtidigt som den börjar (berättelsen väntar inte på ljudet)."
             }
           }
         },
@@ -524,6 +544,23 @@
             },
             "ljudord": {
               "$ref": "#/$defs/ljudord"
+            }
+          }
+        },
+        {
+          "description": "Byt slinga mitt i en scen, från det här steget till scenens slut (också när spelet startas om senare i scenen).",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "typ",
+            "slinga"
+          ],
+          "properties": {
+            "typ": {
+              "const": "musik"
+            },
+            "slinga": {
+              "$ref": "#/$defs/slinga"
             }
           }
         },
@@ -2075,6 +2112,33 @@
           "$ref": "#/$defs/anteckning"
         }
       }
+    },
+    "slinga": {
+      "description": "En av Stils musikslingor (src/karna/musik.js, SLINGOR), eller null för tystnad. Innehållskontrollen prövar id:t.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ljudlista": {
+      "description": "Ett ljud-id (Stils id i assets/ljud/effekter/ljud.json, eller ett av de inspelade), eller upp till tre som spelas efter varandra.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/id"
+        },
+        {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        }
+      ]
     }
   }
 }

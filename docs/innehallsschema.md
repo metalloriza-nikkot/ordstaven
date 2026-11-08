@@ -1,6 +1,7 @@
 # Innehållsschema – kapitel i format 2
 
-Version 2.28 (2026-11-08). Ägs av teknikspåret.
+Version 2.29 (2026-11-08). Ägs av teknikspåret.
+2.29: **musiken och ljuden** (27, beslut 64.5–64.6). **`musik`** på kapitlet, ett rum och en scen, och steget **`musik`** (avsnittet *3d* nedan). **`ljud`** på en reaktion (`vid_ratt`, `vid_fel`, `vid_valj`, `efter_3_fel`) och på en mellanscen. Allt är tillägg, filer i 2.28 gäller fortfarande.
 2.28: **räddningens knuff** (P15, beslut 58.2) följer Innehålls regel i 04 v0.10 (avsnittet om P15 nedan). Inga nya fält.
 2.27: **startskärmen och Farfars "Var var vi?"** (F1 och F2, beslut 61). Kapitlet får fältet **`var_var_vi`** (avsnittet *3c* nedan), och `aventyr.json` får orden **`gransnitt.fortsatt`** och **`gransnitt.nytt_aventyr`** under startskärmens knappar. Allt är tillägg, filer i 2.26 gäller fortfarande.
 2.26: **rättelserna efter den sista genomspelningen** (Teknik 13). Kartans objekt får **`klattrar_fran`** (figuren klättrar ned för stegen med det id:t när den visas i rummet han redan är i: apan när den är räddad). **Ridåns rutor** (rutlagret `over`) ligger under figurerna och är hinder för fötterna, och kartkontrollen prövar alla kartor (beslut 56.3 och 56.7). Allt är tillägg, filer i 2.25 gäller fortfarande.
@@ -95,7 +96,8 @@ Kapitelfilerna börjar med `"format": 2`, äventyret och ordlistorna med `"forma
 | `typ` | Fält | Vad som händer |
 |---|---|---|
 | `replik` | `talare`, `text`, `upplast`, `vantar_pa`, `via`, `vid`, `paminnelse` | Någon säger något. Visas på läsplattan. **`vantar_pa`** (`"mata_ungen"`: ungen har ätit, `"nosen"`: spelaren har tänt nosen, `"radion"`: spelaren har tryckt på radion, och radion har sagt Farfars senaste replik genom den igen, 2.15): en instruktion som ber om en handling väntar tills den är gjord. Den står i molnet nere till vänster (med en bild av handlingen och en högtalare) medan världen går, upprepas med en styrbild efter ca 8 s, och nästa steg kommer först efter handlingen. **`via: "radio"`**: repliken hörs genom radion. **`vid: "ungen"`**: texten står i en bubbla ovanför ungen i stället för på läsplattan och läses upp (namnet i s08). **`paminnelse`** (`efter_sek`, `replik`), bara med `vantar_pa`: efter så många sekunder kommer en annan replik i stället för samma instruktion igen ("{unge} är rädd.", sedan "Ge {unge} ett bär."). **`kapitelrubrik: true`** (2.15): repliken är nästa kapitels rubrik i slutet av kapitlet ("Kapitel 1. Skogen."). Den visas inte när nästa kapitel är låst (`kapitel_last`), eftersom slutrutan kommer i stället. Fälten finns bara på repliker som är egna steg. |
-| `mellanscen` | `beskrivning`, `bild` | Något händer i bild. Gråboxen visar beskrivningen för den vuxne. **`bild`** (förtydligat 2026-11-02, pass 3): det som händer i rummet med Stils bilder, och då visas inte beskrivningen. `hjalte_sang_morgon` (morgonen i sängen, ungen på täcket), `luftskepp_<läge>` (luftskeppet med baronen och Herr Skata: `glider`, `skata_landar`, `ser_hjalten`, `ser_kartan`, `skata_putsar`, `trasslar`) en sidovy (`in_i_skogen` och `vid_bron`, `assets/sidovyer/<bild>_bakgrund.png`: i `vid_bron` läser baronen sin lapp upp och ned, och Herr Skata landar på hjälmen) och `kartbit_unge` (2.21: ungen sätter nosen på mammas skugga i kartbiten i närbilden, i ca 2,6 s). Ägget (2.23, 36.7): `agg_frost` (det frostiga ägget i halmen), `agg_filt` (filten läggs om, frosten smälter), `agg_lyser` (ägget lyser i stavens färger tills kläckningen) och `agg_klackning` (knack, kras, ungen tittar ut, ramlar ut och hoppar). Efter `unge_folj` ligger skalet kvar. Baronen talar från luftskeppet när han har sett hjälten, och porträttets min följer läget. En bild som inte finns ger beskrivningen som förut, och ett test kontrollerar att varje bild finns. |
+| `mellanscen` | `beskrivning`, `bild`, `ljud` | Något händer i bild. **`ljud`** (2.29): det som låter i mellanscenen spelas när den börjar, och berättelsen väntar inte på det (se *3d*). Gråboxen visar beskrivningen för den vuxne. **`bild`** (förtydligat 2026-11-02, pass 3): det som händer i rummet med Stils bilder, och då visas inte beskrivningen. `hjalte_sang_morgon` (morgonen i sängen, ungen på täcket), `luftskepp_<läge>` (luftskeppet med baronen och Herr Skata: `glider`, `skata_landar`, `ser_hjalten`, `ser_kartan`, `skata_putsar`, `trasslar`) en sidovy (`in_i_skogen` och `vid_bron`, `assets/sidovyer/<bild>_bakgrund.png`: i `vid_bron` läser baronen sin lapp upp och ned, och Herr Skata landar på hjälmen) och `kartbit_unge` (2.21: ungen sätter nosen på mammas skugga i kartbiten i närbilden, i ca 2,6 s). Ägget (2.23, 36.7): `agg_frost` (det frostiga ägget i halmen), `agg_filt` (filten läggs om, frosten smälter), `agg_lyser` (ägget lyser i stavens färger tills kläckningen) och `agg_klackning` (knack, kras, ungen tittar ut, ramlar ut och hoppar). Efter `unge_folj` ligger skalet kvar. Baronen talar från luftskeppet när han har sett hjälten, och porträttets min följer läget. En bild som inte finns ger beskrivningen som förut, och ett test kontrollerar att varje bild finns. |
+| `musik` | `slinga` | (2.29) Byt slinga mitt i en scen, från steget till scenens slut. `null` = tyst. Se *3d*. |
 | `ljud` | `id`, `foremal`, `ljudord` | Ett ljud spelas. Med `foremal` hoppar föremålet till i bild (ägglådan som dunkar). Samma `id` ger alltid samma ljud. **`ljudord`** (2.12, beslut 21.5): ordet syns i världen vid det som låter (ovanför `foremal`, annars överst mitt på skärmen), i versaler, i Lexends tyngsta vikt med kontur, och står kvar ca 2 s (granskningen A 24). Nästa steg väntar inte på det. Vanlig skrift, ett eller två korta ord (`dunk`, `tok tok`). Kontrollen säger fel om ordet står i versaler eller har ett spärrat ljud, och varnar för dubbelteckning. Samma fält finns på reaktioner (`vid_ratt`, `vid_fel`, `vid_valj`), t.ex. KLONK, PIP och HO-HO: ordet syns då vid föremålet han valde. Ljudord behövs aldrig för att lösa en uppgift. |
 | `unge_folj` | `folj` | Ungen börjar (`true`) eller slutar (`false`) följa hjälten. |
 | `ga_till` | `mal`, `bild`, `visa_styrhjalp`, `knuff`, `vid_annan_utgang`, `fri_vag` | Spelaren ska gå till ett objekt i rummet. Efter en uppläst replik står målet i molnet med instruktionen och målets bild. **`bild`** (2.19) = ett bildkort som står i molnet i stället för målets egen bild, när målet inte har någon (krönet: `uppdrag_kullen`). Ett test kontrollerar att bildkortet finns. **`visa_styrhjalp`**: styrbilden för att gå. Den visas också vid första målet i varje pass (granskningen A 23). **`fri_vag: true`** (fritt vägval): de andra utgångarna går också att gå igenom, och rummet bakom visas (med en frivillig scen första gången). Steget är klart när han går genom målet. **`vid_annan_utgang`** (`ljud`, `handling`, `replik`): de andra utgångarna är låsta under steget. Går hjälten till en av dem öppnas den inte, ljudet spelas, hjälten tittar upp och målet lyser (hallen före kläckningen: `{ "ljud": "dunk" }`). |
@@ -128,7 +130,7 @@ En **replik inuti något annat** (`knuff`, `vid_fel`, `instruktion`, `vid_omstar
 **Fråga igen** (dialogregeln): en figur med `talare` i kartan upprepar sin senaste upplästa replik i scenen när spelaren trycker på den. Farfar i läsrummet och i köket har `talare: farfar`.
 
 **Knuffar som pekar på svaret** får `"pekar": true` (till exempel "ungen lutar sig mot rätt dörr"). De kommer tidigast efter första felet, eller efter 4 sekunder per alternativ och minst 12 sekunder, så att det aldrig lönar sig att vänta i stället för att läsa. Knuffar som upprepar frågan (tankebubblan blinkar, Farfar ropar igen) har inget `pekar` och kommer efter 9 sekunder som förut. Kontrollen varnar när en knuff i ett läsval nämner "rätt" eller "mot" utan `pekar`.
-`vid_ratt`, `vid_fel`, `efter_3_fel` och `vid_valj` har `handling` eller `reaktion` (vad som händer i bild, fri text i gråboxen), `replik` och `fest` (`liten`, `mellan`, `mellan_dampad`, `stor`).
+`vid_ratt`, `vid_fel`, `efter_3_fel` och `vid_valj` har `handling` eller `reaktion` (vad som händer i bild, fri text i gråboxen), `replik`, `fest` (`liten`, `mellan`, `mellan_dampad`, `stor`) och **`ljud`** (2.29, avsnittet *3d*).
 
 ### P1_las_och_valj
 
@@ -267,6 +269,35 @@ Farfars påminnelse när spelet startar igen (F2, brief 9a, Innehålls dokument 
 - Tiden är när sparningen skrevs senast. Gränsen (3 dygn, `LANG_TID_DAGAR` i `src/karna/varvarvi.js`) ändrar Teknik om ledningen vill.
 - Kontrollen säger fel om passet inte finns, om ett pass har två poster, om ordet är mer än ett ord och om en replik har `upplast: false`.
 
+## 3d. Musiken och ljuden (2.29)
+Musiken följer platsen och stämningen, inte kapitlet (beslut 64.5). Det billigaste: **kapitlet har en slinga, ett rum kan ha en egen, och en scen kan ha ett undantag.** Inget behöver skrivas där det inte ändras.
+```json
+{ "format": 2, "id": "kap-01", "musik": "skogen",
+  "rum": [ { "id": "glantan", "namn": "Gläntan", "musik": "skogen", "innehall": [ … ] } ],
+  "scener": [ { "id": "k1s13_slutet", "rum": "glantan", "musik": "lagerelden", "steg": [ … ] } ] }
+```
+- **Slingorna:** `meny`, `spel`, `natten`, `skogen`, `raddning` och `lagerelden` (Stils filer, `SLINGOR` i `src/karna/musik.js`). Byns slinga läggs till när Stil har gjort den. `null` = tyst.
+- **Vilken som spelar** (`musikFor` i `src/karna/musik.js`), den första som finns:
+  1. en räddning (P15) som pågår: alltid **`raddning`**, i hela pusslet. Den tonar tillbaka till platsens slinga när pusslet är klart, och behöver ingen data;
+  2. det sista steget **`{ "typ": "musik", "slinga": "spel" }`** i scenen, till och med steget som pågår (bytet mitt i en scen, t.ex. efter kläckningen). Det gäller till scenens slut, också när spelet startas om senare i scenen;
+  3. scenens **`musik`**;
+  4. rummets **`musik`** (i kapitlets `rum`), också när han går mellan rummen;
+  5. kapitlets **`musik`**;
+  6. annars **`spel`**.
+- Menyerna (introt, startskärmen, pausmenyn och INSTÄLLNINGAR) spelar alltid `meny`, och tillbaka i spelet spelar platsens slinga.
+- **Byten tonas på ca 1 s.** Samma slinga i nästa scen eller rum spelar vidare utan avbrott.
+- **Pausen** (64.5): efter två varv tonas slingan ut och vilar 20–40 s, sedan börjar den om. Inte för `raddning`.
+- **Ljud** (beslut 64.6): **`ljud`** är ett ljud-id, eller upp till tre som spelas efter varandra med ett litet glapp:
+  ```json
+  "vid_valj": { "reaktion": "dörren förblir stängd, en badanka piper ut genom springan och det spolar", "ljud": ["badanka", "spolning"], "replik": { … } }
+  ```
+  - **På en reaktion** (`vid_ratt`, `vid_fel`, `vid_valj`, `efter_3_fel`): ljudet spelas när reaktionen börjar. **Har en felreaktion ett ljud spelas inte bloinget** (`fel`): det roliga ljudet säger redan att det blev fel. En fel låda knarrar först (`lock`), sedan reaktionens ljud.
+  - **På en mellanscen:** ljudet spelas när mellanscenen börjar (luftskeppet, fåglarna på morgonen). Steget `ljud` finns kvar för ett ljud som berättelsen ska vänta på (dunket, ungens läten).
+  - **Id:n:** Stils id i `assets/ljud/effekter/ljud.json` (10c v0.5), de inspelade (`unge`, `unge_forsta_late`, `unge_langtan`, `unge_svarar`, `fagel_late`, `skata`, `mammas_rop`) och gråboxens gamla namn (`apa_gnaller`, `mage_kurrar`, `ekorre_not`, `klaffen_tick` …, `src/karna/ljudid.js`).
+  - **`mammas_rop`** är ungens längtande läte, spelat med `playbackRate` 0,7 och 6 dB svagare (beslut 64.6).
+- **Motorn spelar själv**, utan data: papperet (läsplattan öppnas, en lapp eller boken stängs), papperssuset (uppdragslappen fälls ihop), penndraget (en ny bock på uppdragslappen), en sida i sagan, dörren (en dörr med öppningsbilder öppnas), locket (en låda eller kista väljs), bonket (förenklingen spikar igen en dörr), stegen (ett knack per steg), suset (det han bär läggs på målet), hmm (bärpåsen är tom) och fanfaren med kapitelrubriken. **Baronens motiv** (`baron`) spelas där han dyker upp: skriv det som `ljud` på mellanscenen (luftskeppet, sidovyerna).
+- Kontrollen säger fel om en slinga eller ett ljud-id inte finns, och schemat om `ljud` har fler än tre id.
+
 ## 3b. Rummens kartor (Tiled)
 
 Innehållet säger **vad** som finns i ett rum, kartan säger **var** det står. Kartorna ägs av teknik (i gråboxen) och stil (när grafiken kommer) och ligger i `kartor/<äventyr>/<rum>.tmj`. Öppna dem i Tiled.
@@ -345,6 +376,7 @@ Små bokstäver utom formler (`"LJUS"`). Flaggor: `aao`, `helord`, `sparrad`, `b
 - Skyltar, frivilliga föremål, `las_skylt`, `visa_foremal`, `skylt` och `foremal` som pekar på föremål som inte finns i rummet. En frivillig scen utan `startar_i_rum`, och `paminnelse` utan `vantar_pa`.
 - Räddningens brickor som inte räcker till ordet, och `sak_i_sista` som inte finns i `innehall`.
 - `alias` som pekar på ett id som inte finns, eller ett gammalt id som finns kvar. `nivaer` där golvet ligger över taket. `ljud` med ett `foremal` som inte finns i rummet.
+- En slinga (`musik`) som inte finns, och ett ljud-id (`ljud`, steget `ljud`) som inte finns (2.29).
 - Läs och välj utan exakt ett rätt svar.
 - Förbjudna par på samma skärm (lås–läs, hår–här, bår–bär), och rätt svar och distraktor som bara skiljer sig på Å/Ä i L1–L3.
 - Spärrade ord (mjukt G/K, NG, SJ …) i text spelaren läser själv, även böjda former (berget, köket).

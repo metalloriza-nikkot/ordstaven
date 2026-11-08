@@ -11,6 +11,8 @@ import { rumTillSkarm, varldTillSkarm, RUM, textskala } from './karna/skalning.j
 import { framfor, lasplats, vidObjekt, genom, stigStart } from './karna/rumslayout.js';
 import { aventyrFor, spelareAttVisa } from './karna/sparning.js';
 import { varVarVi, senastSpelad } from './karna/varvarvi.js';
+import { musikFor } from './karna/musik.js';
+import { ljudLista } from './karna/ljudid.js';
 import { sparaPassbild, aterstallLarande, forstaIPasset } from './karna/larandebild.js';
 import { pekningOmMs, skapaHjalpSpar, knufftidMs } from './karna/hjalp.js';
 import { HJALTE_FARGER, HJALTE_FAST } from './scener/Rum.js';
@@ -107,10 +109,27 @@ export function skapaSpel(d) {
   document.addEventListener('visibilitychange', () => { if (document.hidden) pausa('dold'); else fortsatt('dold'); });
   /** Bokstavsbrickan nr n i ordet: tonen stiger för varje bokstav (bricka_1–8, 10c). @param {number} n */
   const brickljud = (n) => ljud.spela(`bricka_${Math.max(1, Math.min(8, n))}`);
-  /** Musiken (F5): meny eller spel, eller tyst (null). Bytet står i loggen. @param {string | null} namn */
+  /** Musiken (F5): en av slingorna, eller tyst (null). Bytet står i loggen. @param {string | null} namn */
   function spelaMusik(namn) {
     if (ljud.musikLage?.onskad !== namn) logg.handelse('musik', namn ?? 'tyst');
     ljud.musik?.(namn);
+  }
+  /** Spelet har börjat (efter startskärmen): då väljer platsen musiken. */
+  let iSpelet = false;
+  /** En räddning (P15) pågår: den spelar `raddning` och tonar tillbaka när den är klar (64.5). */
+  let raddningPagar = false;
+  /**
+   * Platsens slinga (27, beslut 64.5): räddningen, scenens steg `musik`, scenen, rummet, kapitlet, annars `spel`
+   * (src/karna/musik.js). Bara berättelsens scen räknar sina steg (en frivillig scen har sin egen `musik`).
+   */
+  function platsensMusik() {
+    const scen = visadScen ?? b?.scen;
+    return musikFor({ kapitel: b?.kapitel, scen, rumId: aktuelltRum ?? scen?.rum ?? null, stegIndex: scen && scen === b?.scen ? b.stegIndex : undefined, raddning: raddningPagar });
+  }
+  /** Spela platsens slinga, om spelet har börjat och ingen meny är öppen (menyn spelar sin egen och byter tillbaka). */
+  function spelaPlatsensMusik() {
+    if (!iSpelet || !b || pausorsaker.has('pausmeny') || pausorsaker.has('meny')) return; // utan kapitel: rummet väljer när det visas
+    spelaMusik(platsensMusik());
   }
   // musiken sänks ca 12 dB när något läses (62.10): rösten talar, eller läsplattan eller pratrutan är öppen
   setInterval(() => ljud.sank?.(!!rost.talar || !ui.plattan.hidden || !ui.$('#remsa').hidden), 200);
@@ -174,15 +193,25 @@ export function skapaSpel(d) {
     if (vantaPa) {
       lappVantar = true;
       try { await Promise.all([las, vanta(tid(3000))]); } finally { lappVantar = false; }
-      lappen.fallIhop();
+      lappIhop();
       await vanta(tid(LAPP_IHOP_MS));
-    } else lappTimer = setTimeout(() => { lappTimer = null; lappen.fallIhop(); }, 4000);
+    } else lappTimer = setTimeout(() => { lappTimer = null; lappIhop(); }, 4000);
   }
+  /** Lappen fälls ihop och flyger till sin knapp: ett papperssus (10c `pappersus`). */
+  function lappIhop() { if (lappen.framme) ljud.spela('pappersus'); lappen.fallIhop(); }
+  // läsplattan, boken och lapparna prasslar när de öppnas (och lapparna och boken när de stängs)
+  ui.vidPapper?.(() => ljud.spela('papper'));
   // remsan kommer och går med fönstret: lappen likaså
   layout.vidAndring(() => { if (b) { if (!lappAktiv()) lappen.visa(null); sattLappknapp(); } });
   lappen.vidTryck(() => { const l = lappNu(); if (!l || pausad) return; logg.handelse('lappen', 'läs igen'); lasLappen(l); });
-  /** Lappens innehåll efter var berättelsen är. @param {any} l */
-  const lappInnehall = (l) => lappen.visa(l ? { id: l.k.u.id, rubrik: l.k.u.rubrik, bild: l.k.u.bild, gjorda: l.gjorda.length, kvar: l.kvar } : null);
+  /** @type {{ id: string, gjorda: number } | null} lappens bockar senast (en ny bock låter som ett penndrag) */
+  let lappBockar = null;
+  /** Lappens innehåll efter var berättelsen är. En ny bock i samma uppdrag: ett kort penndrag (10c). @param {any} l */
+  const lappInnehall = (l) => {
+    if (l && lappBockar?.id === l.k.u.id && l.gjorda.length > lappBockar.gjorda) ljud.spela('penndrag');
+    lappBockar = l ? { id: l.k.u.id, gjorda: l.gjorda.length } : null;
+    lappen.visa(l ? { id: l.k.u.id, rubrik: l.k.u.rubrik, bild: l.k.u.bild, gjorda: l.gjorda.length, kvar: l.kvar } : null);
+  };
   /** Lappen har fällts ut i passet (ett nytt pass visar lappen en gång, brief 9a). */
   let lappIPasset = false;
   /**
@@ -512,8 +541,8 @@ export function skapaSpel(d) {
     const o = objekt ? rum.ruta(objekt) : null;
     // en rätt dörr öppnas (31.7) i stället för att hoppa till, som om den vore låst (50.5). En öppning i främre
     // väggen har ingen dörr: den lyser bara
-    if (o?.sort === 'utgang') { rum.markera(o.id, true); if (await Promise.race([rum.oppnaDorr?.(o.id, tid(80)), vanta(1000).then(() => false)])) logg.handelse('dörr', 'öppnas: ' + o.id); }
-    else if (o) { rum.hoppa(o.id); rum.markera(o.id, true); }
+    if (o?.sort === 'utgang') { rum.markera(o.id, true); if (await Promise.race([rum.oppnaDorr?.(o.id, tid(80), () => ljud.spela('dorr')), vanta(1000).then(() => false)])) logg.handelse('dörr', 'öppnas: ' + o.id); }
+    else if (o) { rum.hoppa(o.id); rum.markera(o.id, true); if (harLock(o)) ljud.spela('lock'); }
     rum.ungeReagerar(true); ljud.spela('unge');
     logg.handelse('rätt', objekt ?? 'kort');
     await vanta(tid(1100));
@@ -544,8 +573,29 @@ export function skapaSpel(d) {
     logg.handelse('ljudord', ord);
   }
 
-  async function reaktion(h, foremal = /** @type {string | null} */ (null)) {
+  /**
+   * Felets ljud: reaktionens eget (`ljud`, 64.6: tutet, kastrullen) när den har ett, annars Stils bloing. Båda på en
+   * gång blir grötigt, och det roliga ljudet säger redan att det blev fel. @param {any} reakt felreaktionen (eller null)
+   */
+  const felljud = (reakt) => { if (!ljudLista(reakt?.ljud).length) ljud.spela('fel'); };
+  /** Lådor och kistor har lock (10c `lock`): lådorna på vinden, kistan, skattlådan och den låsta lådan. @param {any} o */
+  const harLock = (o) => !!o && o.sort !== 'utgang' && /^(lada|kista|skattlada|last_lada)/.test(String(o.bild || o.id || ''));
+  /** Ett knack i trä per steg på stegen (10c `stege`), jämnt fördelade över klättringen. @param {number} ms */
+  const stegljud = (ms) => {
+    const n = Math.max(2, Math.round(ms / 220));
+    for (let i = 0; i < n; i++) window.setTimeout(() => ljud.spela('stege', { fart: i % 2 ? 1.06 : 1 }), (i * ms) / n);
+  };
+
+  /**
+   * En reaktion: ljud, ljudord, regi och replik. @param {any} h @param {string | null} [foremal] det som låter
+   * @param {string | null} [forst] ett ljud före reaktionens (locket på en fel låda): sedan reaktionens, eller bloinget
+   */
+  async function reaktion(h, foremal = /** @type {string | null} */ (null), forst = /** @type {string | null} */ (null)) {
     if (!h) return;
+    // reaktionens ljud (64.6), ett eller flera efter varandra
+    const egna = ljudLista(h.ljud);
+    const rad = forst ? [forst, ...(egna.length ? egna : ['fel'])] : egna;
+    if (rad.length) ljud.spelaRad?.(rad);
     if (h.ljudord) visaLjudord(h.ljudord, '', foremal);
     const regi = h.handling || h.reaktion;
     if (regi) ui.visaRegi(regi, 0);
@@ -798,6 +848,7 @@ export function skapaSpel(d) {
     const nytt = scen.rum !== aktuelltRum;
     const franRum = aktuelltRum ?? null;
     aktuelltRum = scen.rum;
+    spelaPlatsensMusik(); // platsens slinga tonas in medan rummet byts (27)
     const r = scen.rum ? b.rum(scen.rum) : null;
     // varianten för läsvalen i världen bestäms när han kommer in i rummet
     if (nytt) { rumsNiva.clear(); for (const p of b.kapitel.pussel) if (p.i_rummet && p.varianter) rumsNiva.set(p.id, lasniva(p.typ)); }
@@ -832,7 +883,7 @@ export function skapaSpel(d) {
     if (nytt && rum.inkom) {
       // hjälten kommer in vid motsvarande utgång: på stegen klättrar han själv de sista pinnarna, annars står han
       // ett ögonblick på tröskeln så att det syns var han kom ifrån
-      if (rum.inkom.klattra && klattrade) await rum.klattra(rum.inkom.id, klattrade, 'av', tid(600));
+      if (rum.inkom.klattra && klattrade) { stegljud(tid(600)); await rum.klattra(rum.inkom.id, klattrade, 'av', tid(600)); }
       else { await vanta(tid(200)); await rum.ga(lasplats(rum.inkom), tid(250)); } // sedan ett steg in i rummet
     }
     klattrade = null;
@@ -1055,6 +1106,7 @@ export function skapaSpel(d) {
   /** @param {any} st */
   async function utfor(st) {
     aktuelltSteg = st;
+    spelaPlatsensMusik(); // steget `musik` byter slinga, också när spelet startas om efter det
     if (st.typ !== 'ga_till') molnKedja = null;
     // han vaknar och kliver ur sängen när något ska göras i rummet (repliker och mellanscener hör han i sängen)
     // vid passets slut (sparpunkten) sover han kvar: han har just lagt sig (51.4)
@@ -1065,8 +1117,10 @@ export function skapaSpel(d) {
       case 'replik':
         // kapitlets rubrik visas inte när nästa kapitel är låst: slutrutan kommer i stället (granskningen A 21)
         if (st.kapitelrubrik && nastaKapitelLast(b.kapitel.id)) { logg.handelse('berättelse', 'kapitelrubriken hoppas över (kapitlet är låst)'); return; }
+        if (st.kapitelrubrik) ljud.spela('kapitel'); // kapitelrubriken: en kort fanfar (10c)
         return st.vantar_pa ? replikVantar(st) : st.vid === 'ungen' ? replikVidUngen(st) : replik(st);
       case 'mellanscen': {
+        if (st.ljud) ljud.spelaRad?.(st.ljud); // det som låter i mellanscenen (64.6), samtidigt som den börjar
         // med bild händer det i rummet (Stils bilder), och beskrivningen behövs inte. Annars som i gråboxen.
         // ungen på kartbiten (k1s11): i närbildens HTML, med nosen på mammas skugga
         if (st.bild === 'kartbit_unge') {
@@ -1084,6 +1138,7 @@ export function skapaSpel(d) {
         const figur = FLYGER_VID_LJUD[st.id]; if (figur) rum.flygForbi(figur, 2200); // väntar inte: berättelsen går vidare
         await vanta(tid(Math.max(600, Math.min(ms, 1600)))); return;
       }
+      case 'musik': return; // slingan byttes när steget började (spelaPlatsensMusik)
       case 'unge_folj': if (st.folj) rum.ungenUrAgget?.(); return; // effekten (ungen syns och följer) görs i berättelsemotorn; skalet ligger kvar i lådan
       case 'ga_till': return gaTill(st);
       case 'pussel': return pussel(b.pussel(st.pussel_id));
@@ -1429,14 +1484,14 @@ export function skapaSpel(d) {
     if (dorr?.sort === 'utgang' && !dorr.klattra && !dorr.golv) {
       const scener = b.kapitel.scener, sista = b.stegIndex === (b.scen?.steg?.length ?? 0) - 1;
       const nasta = sista ? scener[b.scenIndex + 1] : null;
-      if (nasta?.rum && nasta.rum === tillFor(dorr) && (await rum.oppnaDorr?.(dorr.id, tid(80)))) logg.handelse('dörr', 'öppnas: ' + dorr.id);
+      if (nasta?.rum && nasta.rum === tillFor(dorr) && (await rum.oppnaDorr?.(dorr.id, tid(80), () => ljud.spela('dorr')))) logg.handelse('dörr', 'öppnas: ' + dorr.id);
     }
     // stegen: hjälten klättrar själv upp eller ned tills huvudet når luckan, sedan glider nästa rum in
     const o = rum.ruta(st.mal);
     if (o?.klattra) {
       // nära nog räcker: hjälten ställer sig själv mitt för stegen och klättrar
       await rum.ga(framfor(o), tid(300));
-      klattrade = o.klattra; await rum.klattra(o.id, o.klattra, 'pa', tid(700));
+      klattrade = o.klattra; stegljud(tid(700)); await rum.klattra(o.id, o.klattra, 'pa', tid(700));
     }
   }
 
@@ -1630,7 +1685,11 @@ export function skapaSpel(d) {
       case 'P11_formel': res = await formel(p); break;
       case 'P12_dop': res = await dop(p); break;
       case 'P26_krukorna': res = await krukor(p); break;
-      case 'P15_raddning': res = await raddning(p); break;
+      case 'P15_raddning':
+        // räddningen har sin egen slinga, som tonar tillbaka till platsens när den är klar (64.5)
+        raddningPagar = true; spelaPlatsensMusik();
+        try { res = await raddning(p); } finally { raddningPagar = false; spelaPlatsensMusik(); }
+        break;
       case 'P9_kodlas': res = await kodlas(p); break;
       default:
         // P15, P9 och andra typer byggs i fas 3. Gråboxen hoppar över dem.
@@ -1738,7 +1797,7 @@ export function skapaSpel(d) {
         upptagen = true;
         const kort = /** @type {HTMLElement | null} */ (plattan().querySelector(`.kort[data-id="${CSS.escape(id)}"]`));
         if (r.resultat === 'fel') {
-          ljud.spela('fel'); kort?.classList.add('sjunker');
+          felljud(r.reaktion); kort?.classList.add('sjunker');
           await reaktion(r.reaktion);
           rita();
         } else if (r.resultat === 'ratt') {
@@ -1786,6 +1845,8 @@ export function skapaSpel(d) {
     // instruktionen står i molnet och läses upp där (T4c), medan världen går
     /** @type {Set<string>} alternativ som är använda (fel) eller borttagna */
     const borta = new Set();
+    /** @type {Set<string>} utgångar som förenklingen har spikat igen (bonket hörs en gång per dörr) */
+    const spikade = new Set();
     const altFor = (/** @type {string} */ objekt) => v.s.alternativ.find((a) => a.objekt === objekt && !borta.has(a.id));
     const kvarAlt = () => v.s.alternativ.filter((a) => !borta.has(a.id));
     const arUtgang = (/** @type {string} */ id) => rum.ruta(id)?.sort === 'utgang';
@@ -1951,22 +2012,28 @@ export function skapaSpel(d) {
         upptagen = true; visaLappen(null);
         if (r.resultat === 'fel') {
           rum.frys(true);
-          ljud.spela('fel');
+          // en fel låda: locket knarrar först, sedan reaktionens ljud (eller bloinget)
+          const lock = harLock(o);
+          if (!lock) felljud(r.reaktion);
           borta.add(altId); aktuellVariant = v.s.variantNyckel;
           if (utgang && o?.golv) await bakomKurvan(o, r.reaktion); // en fel stig leder aldrig vidare
           else {
             // dörren öppnas aldrig: hjälten tar ett steg tillbaka in i rummet
             if (utgang && o) await rum.ga(lasplats(o), tid(250));
             else if (alt?.objekt) rum.tomt(alt.objekt);
-            await reaktion(r.reaktion, alt?.objekt ?? null);
+            await reaktion(r.reaktion, alt?.objekt ?? null, lock ? 'lock' : null);
             // efter tre fel gungar ägget mot den rätta lådan (FILT, 10f)
             if (p.efter_3_fel && v.s.fel >= 3) { const ratt = kvarAlt().find((a) => a.ratt); if (ratt?.objekt && rum.aggGungar?.(ratt.objekt)) logg.handelse('ägget', 'gungar mot ' + ratt.objekt); }
           }
           // förenklingen kan ha tagit bort alternativ: lådor blir tomma, dörrar och stigar spikas igen
+          let nySpikad = false;
           for (const a of /** @type {any[]} */ (Object.values(p.varianter).flatMap((x) => /** @type {any} */ (x).alternativ))) {
             // bara föremål som inget kvarvarande alternativ använder (samma stig kan stå i flera varianter med olika id)
-            if (!v.s.alternativ.some((x) => x.id === a.id) && a.objekt && !v.s.alternativ.some((x) => x.objekt === a.objekt)) { if (arUtgang(a.objekt)) rum.spika(a.objekt); else rum.tomt(a.objekt); }
+            if (!v.s.alternativ.some((x) => x.id === a.id) && a.objekt && !v.s.alternativ.some((x) => x.objekt === a.objekt)) {
+              if (arUtgang(a.objekt)) { if (!spikade.has(a.objekt) && !rum.ruta(a.objekt)?.golv) nySpikad = true; spikade.add(a.objekt); rum.spika(a.objekt); } else rum.tomt(a.objekt);
+            }
           }
+          if (nySpikad) ljud.spela('bonk'); // en fel dörr spikas igen: två komiska bonk (10c)
           // varianten kan ha bytts (förenkling): lådorna visar de nya alternativens färg och storlek
           for (const a of v.s.alternativ) { const e = egenskaper(a.bild || a.id); if (a.objekt && (e.farg || e.storlek)) rum.visaDelar(a.objekt, delarAv([a])); }
           rum.sattInteraktiva(kvarSaker());
@@ -2121,7 +2188,7 @@ export function skapaSpel(d) {
         if (r.resultat === 'lagd') { tack(); brickljud(f.s.platser.filter((x) => x !== null).length); rita(); upptagen = false; return; }
         rita();
         if (r.resultat === 'fel') {
-          tandForebild('fel'); ljud.spela('fel'); ui.plattan.querySelector('.platser')?.classList.add('gra'); await vanta(tid(400));
+          tandForebild('fel'); felljud(/** @type {any} */ (r).samma ? null : r.reaktion); ui.plattan.querySelector('.platser')?.classList.add('gra'); await vanta(tid(400));
           // samma fel ord igen: bara ljudet och ungens blick
           if (/** @type {any} */ (r).samma) { logg.handelse('formel', `${p.id}: samma fel igen (kort)`); await kortReaktion(); } else await reaktion(r.reaktion);
           rita(); upptagen = false; return;
@@ -2230,7 +2297,7 @@ export function skapaSpel(d) {
         upptagen = true;
         if (res.resultat === 'fel') {
           tryckFel();
-          ljud.spela('fel'); nyaPinnar = 0; blundar = medStege; rita();
+          felljud(p.vid_fel); nyaPinnar = 0; blundar = medStege; rita();
           await reaktion(p.vid_fel);
           blundar = false; upptagen = false; rita();
           startaKnuffEfterFel();
@@ -2458,7 +2525,7 @@ export function skapaSpel(d) {
   // Vid 0 bär rycker ungen på axlarna, utan straff. Bara när världen går (inte med läsplattan öppen).
   ui.$('#hud-bar').addEventListener('click', () => {
     if (!b || !ui.plattan.hidden || rum.fryst || !rum.harRum || !rum.unge.visible || pausad) return;
-    if (av.bar <= 0) { rum.ungeReagerar(false); ljud.spela('klick'); logg.handelse('bär', 'tom påse'); return; }
+    if (av.bar <= 0) { rum.ungeReagerar(false); ljud.spela('hmm'); logg.handelse('bär', 'tom påse'); return; }
     av.bar--; ui.uppdateraHud(av); spara();
     logg.handelse('bär', 'ungen äter', { kvar: av.bar });
     handlingGjord('mata_ungen');
@@ -2478,7 +2545,7 @@ export function skapaSpel(d) {
     // vid skyltarna (s22) står svaret på Farfars lista. Utanför pusslen öppnar den uppdragslappen
     if (id && b.pussel(id) && (lappPussel === id || aktuelltSteg?.typ === 'pussel')) { logg.handelse('lappen', 'Farfars lapp: ' + id); visaLapp(b.pussel(id), false); return; }
     const l = lappNu();
-    if (l) { ljud.spela('klick'); if (lappen.framme) lappen.fallIhop(); else fallUtLappen(l, false); return; }
+    if (l) { ljud.spela('klick'); if (lappen.framme) lappIhop(); else fallUtLappen(l, false); return; }
     if (id && b.pussel(id)) visaLapp(b.pussel(id), false);
   });
 
@@ -2564,8 +2631,8 @@ export function skapaSpel(d) {
         const glimta = (/** @type {number} */ ms) => { clearTimeout(knuff); knuff = window.setTimeout(() => { if (!pausad) fram?.classList.add('glimtar'); }, ms); };
         plat.querySelector('.las')?.addEventListener('click', las);
         plat.querySelector('.bok-bild')?.addEventListener('click', las);
-        plat.querySelector('.bak')?.addEventListener('click', () => { if (i > 0) { rost.tyst(); i--; rita(); } });
-        fram?.addEventListener('click', () => { rost.tyst(); clearTimeout(knuff); if (sist) { sluta(); klar(undefined); } else { i++; ljud.spela('klick'); rita(); } });
+        plat.querySelector('.bak')?.addEventListener('click', () => { if (i > 0) { rost.tyst(); i--; ljud.spela('sida'); rita(); } });
+        fram?.addEventListener('click', () => { rost.tyst(); clearTimeout(knuff); if (sist) { sluta(); klar(undefined); } else { i++; ljud.spela('sida'); rita(); } });
         // uppslag 1 läses alltid av sig själv; de följande läses efter spelarens tryck (han har just bläddrat)
         las().then(() => glimta(i === 0 ? 0 : tid(6000)), () => glimta(0));
       };
@@ -2680,7 +2747,7 @@ export function skapaSpel(d) {
     try { await rum.vantaPa([st.till]); } finally { window.clearInterval(omplacera); malNu = null; if (instr) visaMoln(null); }
     rum.markera(st.till, false);
     rum.lagg(st.till);
-    ljud.spela('klick');
+    ljud.spela('sus'); // saken som svävade läggs på målet: ett mjukt sus (10c)
     await vanta(tid(400));
   }
 
@@ -2831,7 +2898,7 @@ export function skapaSpel(d) {
     await new Promise((klar) => p.querySelector('.fortsatt')?.addEventListener('click', () => klar(undefined), { once: true }));
     ui.doljSkarm();
     logg.handelse('sluta för idag', 'fortsätter');
-    ljud.starta(); spelaMusik('spel');
+    ljud.starta(); spelaPlatsensMusik();
     rum.frys(varFryst);
   }
 
@@ -2976,7 +3043,7 @@ export function skapaSpel(d) {
       ritaPaus('garderoben');
     }));
   }
-  function stangPaus() { rost.tyst(); ui.doljPausmeny(); fortsatt('pausmeny'); spelaMusik('spel'); }
+  function stangPaus() { rost.tyst(); ui.doljPausmeny(); fortsatt('pausmeny'); spelaPlatsensMusik(); }
   ui.$('#hud-paus').addEventListener('click', () => { if (pausad || !ui.plattan.hidden) return; ljud.spela('klick'); oppnaPaus(); });
   window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !ui.$('#pausmeny').hidden) { e.preventDefault(); stangPaus(); } });
 
@@ -3034,7 +3101,8 @@ export function skapaSpel(d) {
       return startskarm();
     }
     ljud.starta(); rost.lasUpp();
-    spelaMusik('spel');
+    iSpelet = true;
+    spelaPlatsensMusik();
     d.uppdatering.tillampa();
     // irisen (62.5) stängs över skrivbordet och öppnas runt hjälten när rummet syns (oppnaIris)
     if (d.iris) {
@@ -3270,7 +3338,7 @@ export function skapaSpel(d) {
   window.addEventListener('keydown', (e) => { if (e.ctrlKey && e.shiftKey && e.code === 'KeyM') { e.preventDefault(); oppnaMeny(); } });
   /** @type {string | null} slingan som spelade när INSTÄLLNINGAR öppnades */
   let musikForeMeny = null;
-  function stangMeny() { ui.doljMeny(); fortsatt('meny'); spelaMusik(musikForeMeny); }
+  function stangMeny() { ui.doljMeny(); fortsatt('meny'); if (iSpelet) spelaPlatsensMusik(); else spelaMusik(musikForeMeny); }
   // Escape stänger menyn (en väg ut, även med tangentbord)
   window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !ui.$('#vuxenmeny').hidden) { e.preventDefault(); stangMeny(); } });
   /** Pusseltyperna i föräldravyn (för den vuxne, inte speltext). */

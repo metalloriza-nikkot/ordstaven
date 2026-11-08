@@ -2023,3 +2023,43 @@ test('en knuff före valet räknas som hjälp för nivån (beslut 62.2): tredje 
   expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).not.toContain('[nivå] P1_las_och_valj L2 → L3');
 });
 
+
+test('musiken följer platsen (27, beslut 64.5): rummet före kapitlet, steget musik, scenens tystnad, och räddningen in och ut', async ({ page }) => {
+  test.setTimeout(60000);
+  const musik = async () => (await page.evaluate(() => window.__ORDSTAVEN.musik())).onskad;
+  const replikText = page.locator('#plattan .replik-ruta .text');
+  await provscen(page, { id: 't_musik', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [R('Ett.'), { typ: 'musik', slinga: 'lagerelden' }, R('Två.')] }, null, {
+    musik: 'skogen',
+    rum: { vinden: { musik: 'natten' } },
+    efter: [
+      { id: 't_musik2', pass: 1, rum: 'hallen', tillstand: 'morgon', steg: [R('Tre.')] },
+      { id: 't_musik3', pass: 1, rum: 'hallen', tillstand: 'morgon', musik: null, steg: [R('Fyra.')] },
+      { id: 't_musik4', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'pussel', pussel_id: 'k1_apan' }, R('Räddad.')] },
+    ],
+    pussel: [P1('k1_apan')],
+  });
+  // vinden har en egen slinga, som gäller före kapitlets
+  await expect(replikText).toHaveText('ETT.', { timeout: 8000 });
+  expect(await musik()).toBe('natten');
+  // steget musik byter mitt i scenen
+  await page.locator('#plattan .replik-ruta').click();
+  await expect(replikText).toHaveText('TVÅ.', { timeout: 8000 });
+  expect(await musik()).toBe('lagerelden');
+  // nästa scen i hallen: hallen har ingen egen, så kapitlets slinga
+  await page.locator('#plattan .replik-ruta').click();
+  await expect(replikText).toHaveText('TRE.', { timeout: 10000 });
+  expect(await musik()).toBe('skogen');
+  // en scen med musik: null är tyst
+  await page.locator('#plattan .replik-ruta').click();
+  await expect(replikText).toHaveText('FYRA.', { timeout: 10000 });
+  expect(await musik()).toBeNull();
+  // räddningen spelar sin egen slinga och tonar tillbaka till platsens när den är klar
+  await page.locator('#plattan .replik-ruta').click();
+  await expect(page.locator('#plattan .raddning-ruta .lapp')).toHaveText('MAN KLÄTTRAR UPP MED DEN.', { timeout: 10000 });
+  expect(await musik()).toBe('raddning');
+  for (const b of 'STEG') { await bricka(page, b).click(); await page.waitForTimeout(450); }
+  await expect(replikText).toHaveText('RÄDDAD.', { timeout: 10000 });
+  expect(await musik()).toBe('natten');
+  const logg = await page.evaluate(() => window.__ORDSTAVEN.logg());
+  for (const m of ['natten', 'lagerelden', 'skogen', 'tyst', 'raddning']) expect(logg).toContain(`[musik] ${m}`);
+});

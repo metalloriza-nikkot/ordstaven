@@ -34,6 +34,11 @@ namnkontrollen. Repot är publikt, så inga riktiga namn står i skripten eller 
     (kör efter de andra i `fas4`). `musik.py loop <fil>` gör en loop till `ljud/musik/` som .m4a och .ogg,
     med en halv sekund av loopen före och efter, och skriver ut looppunkterna (`KLANG=spel` för spelets loop).
     `musik.py` gör musikprovet (numpy och ffmpeg). `KLANG=spel` ger den mjukare klangen för spelet.
+    `ljud.py` (beslut 62.7) gör ljudeffekterna efter ljudlistan i 10c: 80 egna ljud ur syntes (numpy och scipy),
+    inga hämtade, till `ut/ljud/effekter/<id>.wav` med `ljud.json` (grupp, händelse, signatur, nivå och längd).
+    `slingor.py <namn>` gör fler musikslingor i samma familj och klang som spelets (`skogen`, `natten`, `raddning`
+    och `lagerelden`), som prov
+    eller med `loop <fil>` som loop till `ljud/musik/`, precis som `musik.py`.
 - **Körning:** bilderna i `ut/`-mapparna görs genom att köra skripten i ordningen figurer → `efx` → `prov` → `rutor`
   → `kort` → `hus` → `pass3` → resten, eftersom de senare läser de tidigares bilder och inkorgens bilder. Skripten
   räknar med att mapparna ligger direkt i `/home/claude/` (kopiera dit), med inkorgen i `/home/claude/inkorg/`, och

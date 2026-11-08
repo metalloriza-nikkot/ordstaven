@@ -24,5 +24,5 @@ Varje grafik-, ljud- eller typsnittsfil och varje bibliotek som följer med spel
 | Herr Skatas skratt | Eget, inspelat för spelet och bearbetat (tonhöjd och filter) så att rösten inte går att känna igen | Egna | Ja | `assets/ljud/herr_skata_skratt.wav` |
 | Ungens tre läten | Egna, inspelade för spelet och bearbetade (tonhöjd och filter) så att rösten inte går att känna igen | Egna | Ja | `assets/ljud/unge_late_01.wav`, `assets/ljud/unge_late_02.wav`, `assets/ljud/unge_late_03.wav` |
 | Ljudeffekterna (80 ljud, till exempel stämpeln, ordkraften, brickorna, festerna, dörrarna och djuren) | Egna, gjorda för spelet av stilspåret med egna skript (`fas4/ljud.py`), inga hämtade ljud | Egna | Ja | `assets/ljud/effekter/` |
-| Musiken: menyns och spelets slinga (mjuk chiptune utan sångtext, gjord helt i skript) | Egen, gjord för spelet av stilspåret med `verktyg/stil/fas4/musik.py` (numpy och ffmpeg), ingen förlaga | Egen | Ja | `assets/ljud/musik/` |
+| Musiken: sex slingor, menyns, spelets, nattens, skogens, räddningens och lägereldens (mjuk chiptune utan sångtext, gjord helt i skript) | Egen, gjord för spelet av stilspåret med `verktyg/stil/fas4/musik.py` och `fas4/slingor.py` (numpy och ffmpeg), ingen förlaga | Egen | Ja | `assets/ljud/musik/` |
 | Färgerna i grafiken (förteckning) | Samlade av `verktyg/grafik/inkorg.py` | Egna | Ja | `assets/palett.json` |

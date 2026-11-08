@@ -244,12 +244,23 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     }
     return rot;
   }
+  /** Papperet prasslar (10c `papper`) när läsplattan öppnas och när en lapp eller boken stängs. @type {(vad: 'oppnas' | 'stangs') => void} */
+  let papper = () => {};
+  /** Är plattan papper? Repliken (pratrutan) och ordet i luften är det inte. @param {string} klass */
+  const arPapper = (klass) => !/^(replik|formel-luft)\b/.test(klass);
   function visaPlatta(html, klass = '') {
+    const oppnas = plattan.hidden;
     plattan.className = klass; plattan.innerHTML = html; plattan.hidden = false; ikonKnappar(plattan);
     ui.classList.add('platta-oppen');
+    if (oppnas && arPapper(klass)) papper('oppnas');
     return plattan;
   }
-  function doljPlatta() { plattan.hidden = true; plattan.innerHTML = ''; ui.classList.remove('platta-oppen'); sattNos(false); }
+  function doljPlatta() {
+    if (!plattan.hidden && /\b(lapp-vy|bok)\b/.test(plattan.className)) papper('stangs');
+    plattan.hidden = true; plattan.innerHTML = ''; ui.classList.remove('platta-oppen'); sattNos(false);
+  }
+  /** @param {(vad: 'oppnas' | 'stangs') => void} fn */
+  const vidPapper = (fn) => { papper = fn; };
 
   /**
    * Vänta på ett tryck på ett element, eller Mellanslag/Enter. @param {HTMLElement} el
@@ -766,7 +777,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     flygBar,
     handknapp,
     ljudord, visaTanke, placeraTanke, pulseraTanke, ordskylt, skyltar, rumsskyltar, skyltHjalte, sattDorrRutor, ordnaSkyltar, skyltStor, pulseraSkylt, skyltNara, ropa,
-    ui, $, plattan, rader, esc, visaPlatta, doljPlatta, vantaFortsatt, visaRegi, doljRegi, visaFest,
+    ui, $, plattan, rader, esc, visaPlatta, doljPlatta, vidPapper, vantaFortsatt, visaRegi, doljRegi, visaFest,
     uppdateraHud, sattLappknapp, glimta, pulsera, ikonKnappar, visaSkarm, doljSkarm, iris, visaMeny, doljMeny, visaPausmeny, doljPausmeny, etiketter, sattNos, vaxlaNos, ljuda, arHelord,
     fanga, tandNos, markeraOrd,
     /** @param {(vad: 'tand' | 'ord', ord?: string) => void} f @returns {() => void} */

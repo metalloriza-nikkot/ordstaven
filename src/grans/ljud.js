@@ -11,19 +11,45 @@ import menyM4a from '../../assets/ljud/musik/meny.m4a?url';
 import menyOgg from '../../assets/ljud/musik/meny.ogg?url';
 import spelM4a from '../../assets/ljud/musik/spel.m4a?url';
 import spelOgg from '../../assets/ljud/musik/spel.ogg?url';
+import nattenM4a from '../../assets/ljud/musik/natten.m4a?url';
+import nattenOgg from '../../assets/ljud/musik/natten.ogg?url';
+import skogenM4a from '../../assets/ljud/musik/skogen.m4a?url';
+import skogenOgg from '../../assets/ljud/musik/skogen.ogg?url';
+import raddningM4a from '../../assets/ljud/musik/raddning.m4a?url';
+import raddningOgg from '../../assets/ljud/musik/raddning.ogg?url';
+import lagereldenM4a from '../../assets/ljud/musik/lagerelden.m4a?url';
+import lagereldenOgg from '../../assets/ljud/musik/lagerelden.ogg?url';
+import { pausPlan } from '../karna/musik.js';
+import { EFFEKT_FOR, INSPELAT_FOR, INSPELAT_SPELAS, ljudLista } from '../karna/ljudid.js';
+
+export { EFFEKT_FOR };
 
 /**
- * Musiken (F5, Stils två slingor, 10c och rapporten 8/11 12:40): varje fil har en halv sekund av slingans slut före
- * och en halv sekund av början efter, och spelas med WebAudio mellan looppunkterna, så att skarven inte hörs
- * (ett <audio loop> ger en skarv). Lägger avkodaren till tystnad i början flyttas båda punkterna lika mycket.
- * Slutpunkten räknas exakt ur takten (16 takter à 8 åttondelar), inte ur tabellens avrundade tal.
- * meny: introt, startskärmen, pausmenyn och INSTÄLLNINGAR. spel: inne i spelet, den mjukare klangen.
+ * Musiken (F5 och 27, Stils sex slingor, 10c v0.5): varje fil har en halv sekund av slingans slut före och en halv
+ * sekund av början efter, och spelas med WebAudio mellan looppunkterna, så att skarven inte hörs (ett <audio loop>
+ * ger en skarv). Lägger avkodaren till tystnad i början flyttas båda punkterna lika mycket.
+ * Slutpunkten räknas exakt ur takten (takter × åttondelar per takt × åttondelens längd i Stils skript), inte ur
+ * tabellens avrundade tal: tabellen ligger 6–16 prover fel, och det ger ett klick.
+ * meny: introt, startskärmen, pausmenyn och INSTÄLLNINGAR. Var de andra spelas står i datan (src/karna/musik.js).
  */
 export const MUSIK = /** @type {Record<string, { m4a: string, ogg: string, loopStart: number, loopEnd: number }>} */ ({
-  // menyns slinga är 16 takter i 92 BPM, 41,73913 s: tabellens 42,239 är avrundat, och 6 prover fel ger ett klick
+  // 16 takter à 8 åttondelar i 92 BPM: 41,73913 s
   meny: { m4a: menyM4a, ogg: menyOgg, loopStart: 0.5, loopEnd: 0.5 + (16 * 8 * 30) / 92 },
   spel: { m4a: spelM4a, ogg: spelOgg, loopStart: 0.5, loopEnd: 48.5 },
+  // fas4/slingor.py: natten 16 takter i 3/4 (6 åttondelar) i 63 BPM, 45,71429 s
+  natten: { m4a: nattenM4a, ogg: nattenOgg, loopStart: 0.5, loopEnd: 0.5 + (16 * 6 * 60) / (63 * 2) },
+  // skogen 24 takter i 6/8 med åttondelen 60/66/3 s, 43,63636 s
+  skogen: { m4a: skogenM4a, ogg: skogenOgg, loopStart: 0.5, loopEnd: 0.5 + (24 * 6 * 60) / (66 * 3) },
+  // raddning 16 takter à 8 åttondelar i 112 BPM, 34,28571 s
+  raddning: { m4a: raddningM4a, ogg: raddningOgg, loopStart: 0.5, loopEnd: 0.5 + (16 * 8 * 60) / (112 * 2) },
+  // lagerelden 16 takter à 8 åttondelar i 72 BPM, 53,33333 s
+  lagerelden: { m4a: lagereldenM4a, ogg: lagereldenOgg, loopStart: 0.5, loopEnd: 0.5 + (16 * 8 * 60) / (72 * 2) },
 });
+/** Byte mellan slingor: den gamla tonas ut och den nya in på ca 1 s (Stil, 10c). Efter pausen tonas den in mjukare. */
+export const MUSIK_BYTE_S = 1;
+export const MUSIK_EFTER_PAUS_S = 2;
+/** Högst så många avkodade slingor i minnet (en slinga är ca 16–19 MB avkodad). Menyns stannar alltid. */
+export const MUSIK_I_MINNET = 3;
 /** Musikens nivå, och hur mycket den sänks när något läses (ca 12 dB, 62.10). */
 export const MUSIK_NIVA = 0.5;
 export const MUSIK_SANKT_DB = -12;
@@ -35,11 +61,6 @@ export const MUSIK_SANKT_DB = -12;
 const EFFEKTER = /** @type {Record<string, string>} */ (Object.fromEntries(Object.entries(
   /** @type {Record<string, string>} */ (import.meta.glob('../../assets/ljud/effekter/*.wav', { query: '?url', import: 'default', eager: true })),
 ).map(([fil, url]) => [/** @type {string} */ (fil.split('/').pop()).replace(/\.wav$/, ''), url])));
-/** Gråboxens namn och innehållets ljud-id → Stils id (10c v0.5, *Gråboxens namn byts så här*). */
-export const EFFEKT_FOR = /** @type {Record<string, string>} */ ({
-  allmant: 'kruka', fagel: 'vingflax', fest: 'fest_mellan', bricka: 'bricka_1',
-  apa_gnaller: 'apa_gnall', ekorre_not: 'kras', mage_kurrar: 'mage', klaffen_tick: 'klick',
-});
 /** Signaturljuden spelas alltid likadant (samma fil, samma fart och förstärkning). */
 const SIGNATUR = new Set(['stampel', 'ordkraft', 'dunk', 'baron']);
 /** Ljudeffekternas förstärkning. Musiken ligger ca 8 dB under (MUSIK_NIVA). Avvägt utan öron, ska provlyssnas. */
@@ -49,12 +70,6 @@ export const effektFinns = (/** @type {string} */ id) => !!EFFEKTER[EFFEKT_FOR[i
 
 /** De inspelade ljuden. */
 const INSPELADE = { herr_skata_skratt: skrattUrl, unge_late_01: unge1Url, unge_late_02: unge2Url, unge_late_03: unge3Url };
-/** Ljud-id i innehållet och effekter → inspelat ljud. 'unge' (ungen reagerar) tar ett av de tre lätena. */
-const INSPELAT_FOR = /** @type {Record<string, string | string[]>} */ ({
-  fagel_late: 'herr_skata_skratt', skata: 'herr_skata_skratt',
-  unge_forsta_late: 'unge_late_01', unge_langtan: 'unge_late_02', unge_svarar: 'unge_late_03',
-  unge: ['unge_late_01', 'unge_late_02', 'unge_late_03'],
-});
 
 /** @param {{ tyst?: () => boolean }} [opt] */
 export function skapaLjud({ tyst = () => false } = {}) {
@@ -77,15 +92,17 @@ export function skapaLjud({ tyst = () => false } = {}) {
     if (document.hidden) ac.suspend().catch(() => {}); else ac.resume().catch(() => {});
   });
 
-  // ---------------------------------------------------------------- musiken (F5)
+  // ---------------------------------------------------------------- musiken (F5 och 27)
   /** @type {string | null} slingan som ska spela (också innan ljudet har startats) */
   let onskad = null;
   /** @type {{ namn: string, kalla: AudioBufferSourceNode, g: GainNode } | null} */
   let spelar = null;
+  /** @type {{ namn: string, timer: number } | null} slingan vilar (pausen efter två varv, 64.5) */
+  let vilar = null;
   /** @type {GainNode | null} */
   let musikUt = null;
   let sankt = false;
-  /** @type {Map<string, Promise<AudioBuffer | null>>} */
+  /** @type {Map<string, Promise<AudioBuffer | null>>} de avkodade slingorna, senast använd sist */
   const musikBuf = new Map();
   /** AAC (m4a) där webbläsaren kan det (Safari och Chrome på Mac och iPad), annars Ogg Vorbis. */
   const format = () => {
@@ -95,45 +112,80 @@ export function skapaLjud({ tyst = () => false } = {}) {
   const avkodaData = (data) => new Promise((klar, fel) => { const p = ac?.decodeAudioData(data, klar, fel); if (p && p.catch) p.catch(fel); });
   /** @param {string} namn @returns {Promise<AudioBuffer | null>} */
   function laddaMusik(namn) {
-    if (!musikBuf.has(namn)) {
-      const m = MUSIK[namn];
-      const prova = async (/** @type {string[]} */ f) => {
-        for (const x of f) {
-          try { const r = await fetch(/** @type {any} */ (m)[x]); return await avkodaData(await r.arrayBuffer()); } catch (e) { /* nästa format */ }
-        }
-        return null;
-      };
-      musikBuf.set(namn, m ? prova(format()) : Promise.resolve(null));
+    const finns = musikBuf.get(namn);
+    if (finns) { musikBuf.delete(namn); musikBuf.set(namn, finns); return finns; }
+    const m = MUSIK[namn];
+    const prova = async (/** @type {string[]} */ f) => {
+      for (const x of f) {
+        try { const r = await fetch(/** @type {any} */ (m)[x]); return await avkodaData(await r.arrayBuffer()); } catch (e) { /* nästa format */ }
+      }
+      return null;
+    };
+    const p = m ? prova(format()) : Promise.resolve(null);
+    musikBuf.set(namn, p);
+    // minnet (iPad): de äldsta slingorna släpps, utom menyns och den som spelar (den laddas igen när den behövs)
+    for (const n of [...musikBuf.keys()]) {
+      if (musikBuf.size <= MUSIK_I_MINNET) break;
+      if (n !== 'meny' && n !== namn && n !== spelar?.namn) musikBuf.delete(n);
     }
-    return /** @type {Promise<AudioBuffer | null>} */ (musikBuf.get(namn));
+    return p;
   }
   const nivaNu = () => MUSIK_NIVA * (sankt ? 10 ** (MUSIK_SANKT_DB / 20) : 1);
+  /** Tona ut en slinga och stoppa den. @param {{ kalla: AudioBufferSourceNode, g: GainNode }} x @param {number} s */
+  function tonaUt(x, s) {
+    if (!ac) return;
+    const t = ac.currentTime, { kalla, g } = x;
+    g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(Math.max(0.0001, g.gain.value), t); g.gain.linearRampToValueAtTime(0.0001, t + s);
+    try { kalla.stop(t + s + 0.05); } catch (e) { /* redan stoppad */ }
+  }
   /**
-   * Spela en slinga (meny eller spel), eller tystna (null). Samma slinga igen gör ingenting. Byten tonas (0,4 s ut
-   * och 0,6 s in). Före första trycket kommer ihåg den vilken slinga som ska spela. @param {string | null} namn
+   * Starta en slinga från början (loopStart, där motivet börjar), tonad in, och tona ut den som spelar. Efter två
+   * varv tonas den ut och vilar 20–40 s (pausPlan), sedan börjar den om. Räddningen vilar aldrig.
+   * @param {string} namn @param {AudioBuffer} buf @param {number} inS sekunder att tona in
+   */
+  function startaSlinga(namn, buf, inS) {
+    if (!ac || !musikUt) return;
+    if (spelar) { tonaUt(spelar, MUSIK_BYTE_S); spelar = null; }
+    const m = MUSIK[namn];
+    const kalla = ac.createBufferSource(), g = ac.createGain();
+    kalla.buffer = buf; kalla.loop = true; kalla.loopStart = m.loopStart; kalla.loopEnd = Math.min(m.loopEnd, buf.duration);
+    const t0 = ac.currentTime;
+    g.gain.setValueAtTime(0.0001, t0); g.gain.linearRampToValueAtTime(1, t0 + inS);
+    kalla.connect(g); g.connect(musikUt); kalla.start(t0, m.loopStart);
+    const x = { namn, kalla, g };
+    spelar = x;
+    const plan = pausPlan(namn, kalla.loopEnd - kalla.loopStart);
+    if (!plan) return;
+    const slut = t0 + plan.spelaS;
+    g.gain.setValueAtTime(1, slut - plan.tonaUtS); g.gain.linearRampToValueAtTime(0.0001, slut);
+    kalla.stop(slut + 0.05);
+    kalla.onended = () => {
+      if (spelar !== x) return; // bytt eller tystad före pausen
+      spelar = null;
+      const timer = window.setTimeout(() => {
+        if (vilar?.timer !== timer) return;
+        vilar = null;
+        if (onskad !== namn || tyst()) return;
+        laddaMusik(namn).then((b) => { if (b && onskad === namn && !spelar && !vilar) startaSlinga(namn, b, MUSIK_EFTER_PAUS_S); }).catch(() => {});
+      }, plan.vilaS * 1000);
+      vilar = { namn, timer };
+    };
+  }
+  /**
+   * Spela en slinga (MUSIK), eller tystna (null). Samma slinga igen gör ingenting, inte heller medan den vilar.
+   * Ett byte tonas på ca 1 s när den nya är avkodad, så att det aldrig blir tyst emellan. Före första trycket
+   * kommer den ihåg vilken slinga som ska spela. @param {string | null} namn
    */
   function musik(namn) {
     onskad = namn;
     if (!ac || tyst()) return;
-    if (spelar?.namn === namn) return;
-    const t = ac.currentTime;
-    if (spelar) {
-      const { kalla, g } = spelar;
-      g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(0.0001, t + 0.4);
-      try { kalla.stop(t + 0.45); } catch (e) { /* redan stoppad */ }
-      spelar = null;
-    }
-    if (!namn) return;
+    if (spelar?.namn === namn || vilar?.namn === namn) return;
+    if (vilar) { clearTimeout(vilar.timer); vilar = null; }
+    if (!namn || !MUSIK[namn]) { if (spelar) { tonaUt(spelar, MUSIK_BYTE_S); spelar = null; } return; }
     if (!musikUt) { musikUt = ac.createGain(); musikUt.gain.value = nivaNu(); musikUt.connect(ac.destination); }
     laddaMusik(namn).then((buf) => {
-      if (!buf || !ac || !musikUt || onskad !== namn || spelar?.namn === namn) return;
-      const m = MUSIK[namn];
-      const kalla = ac.createBufferSource(), g = ac.createGain();
-      kalla.buffer = buf; kalla.loop = true; kalla.loopStart = m.loopStart; kalla.loopEnd = Math.min(m.loopEnd, buf.duration);
-      const t0 = ac.currentTime;
-      g.gain.setValueAtTime(0.0001, t0); g.gain.linearRampToValueAtTime(1, t0 + 0.6);
-      kalla.connect(g); g.connect(musikUt); kalla.start(t0, 0);
-      spelar = { namn, kalla, g };
+      if (!buf || onskad !== namn || spelar?.namn === namn || vilar?.namn === namn) return;
+      startaSlinga(namn, buf, MUSIK_BYTE_S);
     }).catch(() => { /* ingen musik, spelet går ändå */ });
   }
   /** Sänk musiken ca 12 dB medan något läses, och höj den igen efteråt. @param {boolean} pa */
@@ -172,16 +224,31 @@ export function skapaLjud({ tyst = () => false } = {}) {
     }
   }
 
-  /** Spela ett inspelat ljud, om det finns. @param {string} namn @returns {number} längden i ms, 0 om det saknas */
+  /**
+   * Spela ett inspelat ljud, om det finns. Mammas rop (INSPELAT_SPELAS) är ungens läte, långsammare och svagare.
+   * @param {string} namn @returns {number} längden i ms, 0 om det saknas
+   */
   function inspelat(namn) {
     let n = INSPELAT_FOR[namn];
     if (Array.isArray(n)) n = n[Math.floor(Math.random() * n.length)];
     const buf = n ? buffrar.get(n) : null;
     if (!ac || !ut || !buf) return 0;
+    const satt = INSPELAT_SPELAS[namn];
     const k = ac.createBufferSource(), g = ac.createGain();
-    g.gain.value = 1; // inspelningarna är normaliserade (topp 0,89), genom ut (0,35) som syntesen
-    k.buffer = buf; k.connect(g); g.connect(ut); k.start();
-    return Math.round(buf.duration * 1000);
+    // inspelningarna är normaliserade (topp 0,89), genom ut (0,35) som syntesen
+    g.gain.value = satt ? 10 ** (satt.db / 20) : 1;
+    k.buffer = buf; k.playbackRate.value = satt?.fart ?? 1;
+    k.connect(g); g.connect(ut); k.start();
+    return Math.round((buf.duration / k.playbackRate.value) * 1000);
+  }
+  /** Hur länge ett ljud låter (ms), om det är avkodat, utan att spela det. @param {string} namn */
+  function langd(namn) {
+    let n = INSPELAT_FOR[namn];
+    if (Array.isArray(n)) n = n[0];
+    const ins = n ? buffrar.get(n) : null;
+    if (ins) return Math.round((ins.duration / (INSPELAT_SPELAS[namn]?.fart ?? 1)) * 1000);
+    const ef = effektBuf.get(EFFEKT_FOR[namn] ?? namn);
+    return ef ? Math.round(ef.duration * 1000) : 0;
   }
 
   /**
@@ -255,6 +322,22 @@ export function skapaLjud({ tyst = () => false } = {}) {
     dunk: 'dunk', klaffen_tick: 'tick', fagel_late: 'skata', unge_forsta_late: 'unge', unge_langtan: 'unge', unge_svarar: 'unge', mage_kurrar: 'mage', hackspett: 'klick', ekorre_not: 'kras',
   });
 
+  /**
+   * Ett ljud: det inspelade lätet, annars Stils ljudeffekt (10c v0.5), annars syntesen.
+   * @param {string} namn @param {{ fart?: number, om?: number }} [opt] fart: playbackRate, om: sekunder till start
+   * @returns {number} hur länge ljudet låter i ms (0 = kort syntes eller tyst)
+   */
+  function spela(namn, opt = {}) {
+    if (tyst()) return 0;
+    starta();
+    try {
+      const ms = inspelat(namn) || inspelat(LJUD_ID[namn] || '') || effekt(EFFEKT_FOR[namn] ?? namn, opt.fart, opt.om);
+      if (ms) return ms;
+      (fx[namn] || fx[LJUD_ID[namn]] || fx.allmant)();
+    } catch (e) { /* ljud får aldrig krascha spelet */ }
+    return 0;
+  }
+
   /** Stilguiden v0.26 §3. Ett nytt ljudord får sin färg av Stil innan Innehåll lägger in det. */
   const LJUDORD_FARG = /** @type {Record<string, string>} */ ({
     dunk: '#f5d9a8', brum: '#f4a6b8', buhu: '#8fcbf2', 'tok tok': '#c8e36a', 'ho ho': '#ffd95a', klonk: '#b9c6d3', pip: '#a6e3cf', kras: '#d9ccf5',
@@ -284,21 +367,21 @@ export function skapaLjud({ tyst = () => false } = {}) {
     musik,
     sank,
     /** För testerna och loggen: vilken slinga som ska spela, vilken som spelar och om den är sänkt. */
-    get musikLage() { return { onskad, spelar: spelar?.namn ?? null, sankt }; },
+    get musikLage() { return { onskad, spelar: spelar?.namn ?? null, vilar: vilar?.namn ?? null, sankt }; },
+    spela,
     /**
-     * Ett ljud: det inspelade lätet, annars Stils ljudeffekt (10c v0.5), annars syntesen.
-     * @param {string} namn @param {{ fart?: number, om?: number }} [opt] fart: playbackRate, om: sekunder till start
-     * @returns {number} hur länge ljudet låter i ms (0 = kort syntes eller tyst)
+     * En reaktions ljud (64.6): ett id eller upp till tre, efter varandra med ett litet glapp (`["badanka", "spolning"]`).
+     * @param {unknown} lista @returns {number} hur länge de låter tillsammans i ms (0 = tyst eller okänt)
      */
-    spela(namn, opt = {}) {
-      if (tyst()) return 0;
-      starta();
-      try {
-        const ms = inspelat(namn) || inspelat(LJUD_ID[namn] || '') || effekt(EFFEKT_FOR[namn] ?? namn, opt.fart, opt.om);
-        if (ms) return ms;
-        (fx[namn] || fx[LJUD_ID[namn]] || fx.allmant)();
-      } catch (e) { /* ljud får aldrig krascha spelet */ }
-      return 0;
+    spelaRad(lista) {
+      const ids = ljudLista(lista);
+      if (tyst() || !ids.length) return 0;
+      let om = 0;
+      ids.forEach((id, i) => {
+        if (i === 0) spela(id); else window.setTimeout(() => spela(id), om);
+        om += Math.max(350, langd(id)) + 120;
+      });
+      return om - 120;
     },
   };
 }
