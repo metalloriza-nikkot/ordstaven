@@ -151,10 +151,19 @@ export function skapaLjud({ tyst = () => false } = {}) {
   let effektUt = null;
   /** Hämta och avkoda de inspelade ljuden och ljudeffekterna en gång (callback-formen fungerar också i äldre Safari). */
   function avkoda() {
-    for (const [id, url] of Object.entries(EFFEKTER)) {
-      fetch(url).then((r) => r.arrayBuffer()).then((data) => new Promise((klar, fel) => {
-        const p = ac?.decodeAudioData(data, klar, fel); if (p && p.catch) p.catch(fel);
-      })).then((b) => { effektBuf.set(id, /** @type {AudioBuffer} */ (b)); }).catch(() => { /* syntesen får spela i stället */ });
+    // ljudeffekterna fyra åt gången, så att avkodningen inte tar hela datorn när spelet startar (golvdatorn, iPad).
+    // I snabbläget (testerna) hörs inget, och då avkodas de inte alls.
+    if (!tyst()) {
+      const ko = Object.entries(EFFEKTER);
+      const nasta = () => {
+        const x = ko.shift();
+        if (!x) return;
+        const [id, url] = x;
+        fetch(url).then((r) => r.arrayBuffer()).then((data) => new Promise((klar, fel) => {
+          const p = ac?.decodeAudioData(data, klar, fel); if (p && p.catch) p.catch(fel);
+        })).then((b) => { effektBuf.set(id, /** @type {AudioBuffer} */ (b)); }).catch(() => { /* syntesen får spela i stället */ }).finally(nasta);
+      };
+      for (let i = 0; i < 4; i++) nasta();
     }
     for (const [namn, url] of Object.entries(INSPELADE)) {
       fetch(url).then((r) => r.arrayBuffer()).then((data) => new Promise((klar, fel) => {

@@ -3060,7 +3060,7 @@ export function skapaSpel(d) {
    */
   async function taFoto(orsak, tvinga = false) {
     const p = d.platser;
-    if (!p || !rum.foto || (!tvinga && Date.now() - fotoTid < 20000)) return;
+    if (!p || !rum.foto || d.foto === false || (!tvinga && Date.now() - fotoTid < 20000)) return;
     fotoTid = Date.now();
     const url = await rum.foto();
     if (url && p.sparaFoto(p.aktiv(), url)) logg.handelse('foto', orsak, { kb: Math.round(url.length / 1024) });

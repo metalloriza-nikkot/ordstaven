@@ -869,14 +869,14 @@ test('startskärmen (F1, F4): fotot är FORTSÄTT, NYTT ÄVENTYR är en bok med 
 test('startskärmens foto (F4): rummet där han är, 160 × 96 runt hjälten, och det är FORTSÄTT nästa gång', async ({ page }, info) => {
   test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
   test.setTimeout(60000);
-  await starta(page, '?snabb&ny');
+  await starta(page, '?snabb&ny&foto'); // fotot tas inte i snabbläget utan ?foto
   await page.evaluate(() => {
     const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
     t.spelare.hjalte.namn = 'Ture'; t.spelare.unge.namn = 'KNOPP';
     av.scen = 5; delete av.scenId; av.startad = false;
     localStorage.setItem('ordstaven_spar', JSON.stringify(t));
   });
-  await starta(page);
+  await starta(page, '?snabb&foto');
   await page.click('.start-knapp');
   await page.waitForFunction(() => !!localStorage.getItem('ordstaven_spar_foto'), null, { timeout: 15000 });
   const matt = await page.evaluate(() => new Promise((klar) => { const i = new Image(); i.onload = () => klar([i.naturalWidth, i.naturalHeight]); i.src = localStorage.getItem('ordstaven_spar_foto'); }));

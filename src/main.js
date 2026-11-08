@@ -220,6 +220,8 @@ const spelet = skapaSpel({
   intro: utanIntro() ? false : (parametrar.has('intro') || (!snabb && !parametrar.has('test'))),
   // testläget (62.6): Hoppa till scen och objektens namn i INSTÄLLNINGAR, bara med ?test (och ?snabb, testernas läge)
   testlage: parametrar.has('test') || snabb,
+  // startskärmens foto (F4), inte i snabbläget (?foto tar det ändå): på en långsam testmaskin kostar bilden tid
+  foto: !snabb || parametrar.has('foto'),
   // irisen från startskärmen in i spelet (62.5), inte i snabbläget eller testläget (?iris visar den ändå)
   iris: (!snabb && !parametrar.has('test')) || parametrar.has('iris'),
   uppdatering: { tillampa: () => { uppdatering.tillampa(); startlage = false; } },
