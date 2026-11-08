@@ -7,7 +7,7 @@ import { rader, versaler, ord, PLATSHALLARE } from '../../src/karna/text.js';
 import { kompileraUppdrag, hittaSteg } from '../../src/karna/uppdrag.js';
 import { SLINGOR } from '../../src/karna/musik.js';
 import { kandaLjud, ljudLista } from '../../src/karna/ljudid.js';
-import { beskrivningarSomVisas, aventyretsBeskrivningar } from '../../src/karna/mellanscen.js';
+import { beskrivningarSomVisas, aventyretsBeskrivningar, reaktionerSomVisas } from '../../src/karna/mellanscen.js';
 
 const schema = (namn) => JSON.parse(readFileSync(new URL(`../../content/schema/${namn}.schema.json`, import.meta.url), 'utf8'));
 // teckenbredderna för typsnittet i textlagret (Lexend, beslut 13)
@@ -106,7 +106,7 @@ function kontrolleraKartor(k, kartor, fel, varningar) {
 
 /**
  * @param {{ aventyr: any, kapitel: any[], ordlistor: any, kartor?: Record<string, any> }} innehall
- * @returns {{ fel: string[], varningar: string[], pass: { kapitel: string, pass: number, minuter: number, lasuppgifter: number }[], beskrivningar: { kapitel: string, klart: boolean, platser: { plats: string, beskrivning: string }[] }[] }}
+ * @returns {{ fel: string[], varningar: string[], pass: { kapitel: string, pass: number, minuter: number, lasuppgifter: number }[], beskrivningar: { kapitel: string, klart: boolean, platser: { plats: string, beskrivning: string }[], reaktioner: { plats: string, text: string, sort: string }[] }[] }}
  */
 export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
   const fel = [], varningar = [], passInfo = [], beskrivningar = [];
@@ -287,7 +287,11 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
         replikKontroll(st, sp); pp.sek += 1.5 + ord(rader(st.text).join(' ')).length * 0.45;
         if (st.paminnelse) { replikKontroll(st.paminnelse.replik, `${sp} paminnelse`); if (!st.vantar_pa) fel.push(var_(`${sp}: paminnelse gäller bara en replik med vantar_pa`)); }
         break;
-        case 'mellanscen': pp.sek += 4; break;
+        case 'mellanscen':
+          pp.sek += 4;
+          // ungen springer till något i rummet (67.2)
+          if (st.unge_till && (!s.rum || !rum.get(s.rum)?.innehall.map(objId).includes(st.unge_till))) fel.push(var_(`${sp}: ungen springer till ${st.unge_till}, men det finns inte i rummet ${s.rum}`));
+          break;
         case 'musik': break; // tar ingen tid
         case 'ljud':
           pp.sek += 1;
@@ -576,13 +580,16 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
     // Varje mellanscen har en bild (Stils animation) eller syns_redan. Kontrollen skriver ut hur många som är kvar.
     const kvar = beskrivningarSomVisas(k);
     const klart = k.meta?.klart === true;
-    beskrivningar.push({ kapitel: k.id, klart, platser: kvar });
+    // Reaktionerna och knuffarna (beslut 67.3): samma regel. Varje text i rutan har syns_redan, eller en bild som visar det.
+    const reaktioner = reaktionerSomVisas(k);
+    beskrivningar.push({ kapitel: k.id, klart, platser: kvar, reaktioner });
     if (klart) for (const b of kvar) fel.push(var_(`${b.plats}: kapitlet är klart, men mellanscenen visar texten för den vuxne ("${b.beskrivning}"). Ge den en bild, eller syns_redan om det redan syns.`));
+    if (klart) for (const r of reaktioner) fel.push(var_(`${r.plats}: kapitlet är klart, men ${r.sort === 'knuff' ? 'knuffen' : 'reaktionen'} visar texten för den vuxne ("${r.text}"). Ge den syns_redan om det redan syns.`));
   }
   // äventyrets egna mellanscener (SLUTA FÖR IDAG och slutrutan) hör till äventyret: klart när aventyr.json säger det
   const aKvar = aventyretsBeskrivningar(aventyr);
   const aKlart = aventyr.meta?.klart === true;
-  beskrivningar.push({ kapitel: 'aventyr', klart: aKlart, platser: aKvar });
+  beskrivningar.push({ kapitel: 'aventyr', klart: aKlart, platser: aKvar, reaktioner: [] });
   if (aKlart) for (const b of aKvar) fel.push(`aventyr.json ${b.plats}: äventyret är klart, men mellanscenen visar texten för den vuxne ("${b.beskrivning}"). Ge den syns_redan, eller stryk den.`);
   return { fel, varningar, pass: passInfo, beskrivningar };
 }

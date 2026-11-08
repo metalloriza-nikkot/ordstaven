@@ -187,6 +187,13 @@ describe('mellanscenernas bilder och bildkorten', () => {
     agg_frost: ['agg_01'], agg_filt: ['agg_filt_frost', 'agg_filt'], agg_lyser: ['agg_lyser_01', 'agg_lyser_02', 'agg_lyser_03'],
     agg_klackning: ['agg_knack_01', 'agg_knack_02', 'agg_kras_01', 'agg_nos_01', 'agg_ute_01', 'agg_ute_02', 'agg_hopp_01', 'agg_skal', 'agg_frys_01', 'agg_frys_02', 'agg_gungar_hoger', 'agg_gungar_vanster'],
   };
+  /** Har rummets karta punkten regi_<namn>? */
+  const regiPunkt = (rumId, namn) => existsSync(new URL(`kartor/den-gomda-dalen/${rumId}.tmj`, rot))
+    && JSON.parse(las(`kartor/den-gomda-dalen/${rumId}.tmj`).toString()).layers.some((l) => (l.objects || []).some((o) => o.name === `regi_${namn}`));
+  it('Farfar i dörren (67.2): sovrummet har punkten där han står, och hans bilder finns på natten och på morgonen', () => {
+    expect(regiPunkt('sovrummet', 'farfar')).toBe(true);
+    for (const b of ['natt', 'morgon']) for (const h of ['ner', 'upp']) expect(ramar.has(`farfar_${b}_${h}_01`), `${b} ${h}`).toBe(true);
+  });
   it('varje mellanscen med bild har grafik (morgonen i sängen, luftskeppets lägen, sidovyerna, ungen på kartbiten, ägget)', () => {
     const saknas = [];
     for (const k of kapitel) for (const sc of k.scener) for (const st of sc.steg) {
@@ -195,6 +202,8 @@ describe('mellanscenernas bilder och bildkorten', () => {
         : st.bild.startsWith('luftskepp_') ? ramar.has(st.bild) || ramar.has(st.bild + '_01')
           : st.bild === 'kartbit_unge' ? existsSync(new URL('assets/sidovyer/kartbit_unge_01.png', rot)) && existsSync(new URL('assets/sidovyer/kartbit_unge_02.png', rot))
           : AGGET[st.bild] ? AGGET[st.bild].every((r) => ramar.has(r))
+          // Farfar i dörren (67.2): hans bilder, och punkten regi_farfar i rummets karta
+          : /^farfar_(i_dorren|gar_ut)$/.test(st.bild) ? ['natt', 'morgon'].every((b) => ramar.has(`farfar_${b}_ner_01`) && ramar.has(`farfar_${b}_upp_01`)) && regiPunkt(sc.rum, 'farfar')
           : existsSync(new URL(`assets/sidovyer/${st.bild}_bakgrund.png`, rot));
       if (!finns) saknas.push(`${k.id} ${sc.id}: ${st.bild}`);
     }

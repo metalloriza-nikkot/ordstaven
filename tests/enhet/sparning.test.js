@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { geSak, bytLager, lagerFor } from '../../src/karna/hjalte.js';
+import { geSak, bytLager, lagerFor, ristasNu } from '../../src/karna/hjalte.js';
 import { readFileSync, readdirSync } from 'node:fs';
 import { skapaSparning, skapaPlatser, nyckelFor, fotoNyckel, spelareAttVisa, nyttTillstand, migrera, FORMAT, NYCKEL, NYCKEL_TRASIG, NYCKEL_PLATSER, aventyrFor } from '../../src/karna/sparning.js';
 const AVENTYR = 'den-gomda-dalen';
@@ -117,6 +117,16 @@ describe('sparning', () => {
       for (const a of Object.values(d.aventyr)) expect(a.ungen).toBeUndefined();
     });
   }
+});
+
+describe('formeln ristas in på staven (beslut 67.6)', () => {
+  const svard = { typ: 'P11_formel', svar: 'SVÄRD', formler: [{ ord: 'SVÄRD' }] };
+  it('bara en ny formel ristas, och inte ett ord med ristas: false', () => {
+    expect(ristasNu(svard, ['LJUS'])).toBe(true);
+    expect(ristasNu(svard, ['LJUS', 'SVÄRD'])).toBe(false); // SVÄRD igen (k1_svard_igen)
+    expect(ristasNu({ ...svard, formler: [{ ord: 'SVÄRD', ristas: false }] }, [])).toBe(false);
+    expect(ristasNu({ typ: 'P15_raddning', svar: 'STEGE' }, [])).toBe(false);
+  });
 });
 
 describe('spelarna på enheten (F1)', () => {

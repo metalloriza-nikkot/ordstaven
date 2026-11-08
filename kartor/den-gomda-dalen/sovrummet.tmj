@@ -11,7 +11,7 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 10,
+ "nextobjectid": 11,
  "properties": [
   {
    "name": "rum",
@@ -126,6 +126,18 @@
      "type": "",
      "x": 200,
      "y": 150,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 10,
+     "name": "regi_farfar",
+     "type": "",
+     "x": 159,
+     "y": 54,
      "width": 0,
      "height": 0,
      "rotation": 0,

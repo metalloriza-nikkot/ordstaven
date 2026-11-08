@@ -33,10 +33,11 @@ import { STORSTA } from './kamera.js';
  *             storlek: { bredd: number, hojd: number }, massiv: { x: number, y: number, b: number, h: number }[],
  *             bild?: string | null, mark?: string | null, rutlager?: { namn: string, data: number[], visasMed: string | null }[],
  *             omgivning?: { vad: string, x: number, y: number, b: number, h: number }[],
- *             overHinder?: { x: number, y: number, b: number, h: number }[] }} Karta
+ *             overHinder?: { x: number, y: number, b: number, h: number }[], regi?: Record<string, { x: number, y: number }> }} Karta
  * bild = rummets bild (assets/rum), mark = rutsetet för marken utomhus (assets/tiles).
  * inomhus = rummet har väggram (bakvägg, sidoväggar, främre kant). in = var hjälten kommer in från ett rum
  * som inte har någon utgång hit (punkter som heter in_<rum>, t.ex. trädgården från köket). lampor = där det lyser i mörkret.
+ * regi = punkter för regin (regi_<namn>): regi_farfar är där Farfar står i dörren (67.2).
  * storlek = områdets storlek i pixlar (kartans bredd och höjd): en skärm (320×192) eller större, högst 640×384.
  * massiv = väggar inne i rummet (typen vagg), som ger rummet en annan form än en rektangel.
  * overHinder = ridåns rutor (rutlagret over) som hinder, en ruta per rad av rutor bredvid varandra (56.3): ridån
@@ -101,6 +102,8 @@ export function lasKarta(tmj) {
   const inpunkter = {};
   /** @type {{ x: number, y: number }[]} */
   const lampor = [];
+  /** @type {Record<string, { x: number, y: number }>} */
+  const regi = {};
   /** @type {{ x: number, y: number, b: number, h: number }[]} */
   const massiv = [];
   /** @type {{ vad: string, x: number, y: number, b: number, h: number }[]} */
@@ -122,10 +125,11 @@ export function lasKarta(tmj) {
     if (lager.type !== 'objectgroup') continue;
     for (const o of lager.objects || []) {
       const egen = Object.fromEntries((o.properties || []).map((/** @type {any} */ p) => [p.name, p.value]));
-      if (o.point || o.name === 'start' || /^in_/.test(o.name) || /^lampa(_|$)/.test(o.name)) {
+      if (o.point || o.name === 'start' || /^in_/.test(o.name) || /^lampa(_|$)/.test(o.name) || /^regi_/.test(o.name)) {
         const p = { x: Math.round(o.x), y: Math.round(o.y) };
         if (o.name === 'start') start = p; else if (/^in_/.test(o.name)) inpunkter[o.name.slice(3)] = p;
         else if (/^lampa(_|$)/.test(o.name)) lampor.push(p);
+        else if (/^regi_/.test(o.name)) regi[o.name.slice(5)] = p;
         continue;
       }
       const typ = o.type || o.class || '';
@@ -199,5 +203,5 @@ export function lasKarta(tmj) {
   const morker = kartegen.morker !== undefined && Number.isFinite(m) ? Math.max(0, Math.min(1, m)) : null;
   // vinka_fran (51.4): kommer han in från det rummet vinkar han mot huset (trädgården, när han har sagt hejdå)
   const vinkaFran = kartegen.vinka_fran ? String(kartegen.vinka_fran) : null;
-  return { vinkaFran, objekt, start, overHinder: overSomHinder(rutlager, tmj.width, tmj.tilewidth, tmj.tileheight), inomhus: !!kartegen.inomhus, in: inpunkter, lampor, vagg, morker, storlek: { bredd, hojd }, massiv, bild: kartegen.bild ? String(kartegen.bild) : null, mark: kartegen.mark ? String(kartegen.mark) : null, rutlager, omgivning };
+  return { vinkaFran, regi, objekt, start, overHinder: overSomHinder(rutlager, tmj.width, tmj.tilewidth, tmj.tileheight), inomhus: !!kartegen.inomhus, in: inpunkter, lampor, vagg, morker, storlek: { bredd, hojd }, massiv, bild: kartegen.bild ? String(kartegen.bild) : null, mark: kartegen.mark ? String(kartegen.mark) : null, rutlager, omgivning };
 }

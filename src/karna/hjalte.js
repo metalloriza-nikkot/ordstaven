@@ -40,3 +40,13 @@ export function bytLager(hjalte, sort, id) {
 
 /** Det han har på sig. @param {any} hjalte @returns {{ hjalmdekor: string | null, ryggsack: string | null }} */
 export const lagerFor = (hjalte) => sakra(hjalte).lager;
+
+/**
+ * Ristas formeln in på staven nu (beslut 67.6)? När han klarar en formel han inte har, och ordet inte är markerat
+ * `ristas: false` (det räcker en gång, 2.31). Då spelar motorn `formel_ristas`, som en signatur.
+ * @param {any} pussel ett P11 @param {string[]} formler hjältens formler före pusslet
+ */
+export function ristasNu(pussel, formler) {
+  if (!pussel || pussel.typ !== 'P11_formel' || (formler || []).includes(pussel.svar)) return false;
+  return (pussel.formler || []).find((/** @type {any} */ f) => f.ord === pussel.svar)?.ristas !== false;
+}

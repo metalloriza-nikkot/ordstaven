@@ -235,6 +235,19 @@ describe('kapitel 1: rummens text, frivilligt och nya steg (schema 2.8)', () => 
   });
 });
 
+/** Varje reaktion och knuff i ett kapitel (objekt med handling eller reaktion), utom efter_3_fel och förenklingen. */
+function allaReaktioner(k) {
+  const ut = [];
+  const ga = (x, nyckel) => {
+    if (Array.isArray(x)) { x.forEach((y) => ga(y, nyckel)); return; }
+    if (!x || typeof x !== 'object' || nyckel === 'efter_3_fel' || nyckel === 'forenkla') return;
+    if (typeof x.handling === 'string' || typeof x.reaktion === 'string') ut.push(x);
+    for (const [n, v] of Object.entries(x)) if (n !== 'replik') ga(v, Array.isArray(v) ? nyckel : n);
+  };
+  ga(k.pussel, ''); ga(k.scener, ''); ga(k.rum, '');
+  return ut;
+}
+
 describe('mellanscenernas text för den vuxne (beslut 65)', () => {
   const scen = (k, id) => k.scener.find((s) => s.id === id);
   it('regeln: en beskrivning visas bara utan bild och utan syns_redan', async () => {
@@ -243,6 +256,15 @@ describe('mellanscenernas text för den vuxne (beslut 65)', () => {
     expect(visarBeskrivning({ typ: 'mellanscen', beskrivning: 'Ungen gäspar.', bild: 'agg_frost' })).toBe(false);
     expect(visarBeskrivning({ typ: 'mellanscen', beskrivning: 'Ungen gäspar.', syns_redan: true })).toBe(false);
     expect(visarBeskrivning({ typ: 'replik', text: 'Hej.' })).toBe(false);
+    expect(visarBeskrivning({ typ: 'mellanscen', beskrivning: 'Ungen springer till grinden.', unge_till: 'grind' })).toBe(false); // 67.2
+  });
+  it('ungen springer till något i rummet (unge_till, 67.2): det ska finnas där', () => {
+    const d = riktigt();
+    const st = scen(d.kapitel[0], 's22_tradgarden').steg[1];
+    st.unge_till = 'grind';
+    expect(kontrollera(d).fel).toEqual([]);
+    st.unge_till = 'brevlada';
+    expect(kontrollera(d).fel.join('\n')).toMatch(/s22_tradgarden.*ungen springer till brevlada, men det finns inte i rummet tradgarden/);
   });
   it('kontrollen räknar dem i varje kapitel och i aventyr.json, men säger inget fel förrän kapitlet är klart', () => {
     const r = kontrollera(riktigt());
@@ -262,6 +284,9 @@ describe('mellanscenernas text för den vuxne (beslut 65)', () => {
     // varje mellanscen får syns_redan: inget fel kvar
     const allaSteg = [...k.scener.flatMap((s) => s.steg), ...k.rum.flatMap((r) => (r.frivilligt || []).flatMap((f) => f.steg))];
     for (const st of allaSteg) if (st.typ === 'mellanscen' && !st.bild) st.syns_redan = true;
+    expect(kontrollera(d).fel.join('\n')).not.toMatch(/mellanscenen visar/);
+    // reaktionerna och knuffarna har samma regel (67.3)
+    allaReaktioner(k).forEach((h) => { h.syns_redan = true; });
     expect(kontrollera(d).fel).toEqual([]);
     // en bild räcker också
     const st = scen(k, 'k1s06_present').steg[9];
@@ -273,6 +298,34 @@ describe('mellanscenernas text för den vuxne (beslut 65)', () => {
     d.aventyr.meta = { ...(d.aventyr.meta || {}), klart: true };
     expect(kontrollera(d).fel.join('\n')).toMatch(/aventyr\.json sluta_for_idag\.med_ungen steg 0: äventyret är klart/);
     for (const st of [...d.aventyr.sluta_for_idag.fore_ungen, ...d.aventyr.sluta_for_idag.med_ungen, ...d.aventyr.kapitel_last.steg]) if (st.typ === 'mellanscen') st.syns_redan = true;
+    expect(kontrollera(d).fel).toEqual([]);
+  });
+});
+
+describe('reaktionernas och knuffarnas text för den vuxne (beslut 67.3)', () => {
+  it('regeln: en reaktion eller knuff visar sin text bara utan syns_redan, och krukornas knuff aldrig', async () => {
+    const { visarRegi, reaktionerSomVisas } = await import('../../src/karna/mellanscen.js');
+    expect(visarRegi({ reaktion: 'en kotte trillar ner på hjälmen' })).toBe(true);
+    expect(visarRegi({ handling: 'skylten glimtar', syns_redan: true })).toBe(false);
+    expect(visarRegi({ replik: { talare: 'berattare', text: 'Hoppsan!' } })).toBe(false);
+    const k = riktigt().kapitel[0];
+    const platser = reaktionerSomVisas(k).map((r) => r.plats);
+    expect(platser).toContain('pussel p0_dorrar varianter L1 alternativ mat vid_valj');
+    expect(platser).toContain('s02_glimten steg 2 knuff');
+    expect(platser.filter((p) => p.startsWith('pussel p0_krukor'))).toEqual([]); // krukornas knuff pekar i världen
+    expect(platser.some((p) => / efter_3_fel/.test(p))).toBe(false);
+  });
+  it('kontrollen räknar dem, och ett klart kapitel med en reaktion som visar texten är fel', () => {
+    const d = riktigt();
+    const r = kontrollera(d);
+    expect(Object.fromEntries(r.beskrivningar.map((b) => [b.kapitel, b.reaktioner.length]))).toMatchObject({ 'kap-00': 34, 'kap-01': 38 });
+    const k = d.kapitel[1];
+    k.meta.klart = true;
+    for (const st of [...k.scener.flatMap((s) => s.steg), ...k.rum.flatMap((x) => (x.frivilligt || []).flatMap((f) => f.steg))]) if (st.typ === 'mellanscen' && !st.bild) st.syns_redan = true;
+    const fel = kontrollera(d).fel.join('\n');
+    expect(fel).toMatch(/kap-01 pussel k1_tradet varianter L2 alternativ ungt_trad vid_valj: kapitlet är klart, men reaktionen visar texten för den vuxne \("en kotte trillar ner på hjälmen"\)/);
+    expect(fel).toMatch(/kap-01 pussel k1_stenen knuff: kapitlet är klart, men knuffen visar texten för den vuxne \("skylten glimtar"\)/);
+    allaReaktioner(k).forEach((h) => { h.syns_redan = true; });
     expect(kontrollera(d).fel).toEqual([]);
   });
 });

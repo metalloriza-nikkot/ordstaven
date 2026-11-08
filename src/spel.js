@@ -13,11 +13,11 @@ import { aventyrFor, spelareAttVisa } from './karna/sparning.js';
 import { varVarVi, senastSpelad } from './karna/varvarvi.js';
 import { musikFor } from './karna/musik.js';
 import { ljudLista } from './karna/ljudid.js';
-import { SYNS_REDAN_MS } from './karna/mellanscen.js';
+import { SYNS_REDAN_MS, UNGE_TILL_MS, visarRegi } from './karna/mellanscen.js';
 import { sparaPassbild, aterstallLarande, forstaIPasset } from './karna/larandebild.js';
 import { pekningOmMs, skapaHjalpSpar, knufftidMs } from './karna/hjalp.js';
 import { HJALTE_FARGER, HJALTE_FAST } from './scener/Rum.js';
-import { lagerFor, bytLager } from './karna/hjalte.js';
+import { lagerFor, bytLager, ristasNu } from './karna/hjalte.js';
 import { TANGENTBORD_HOJD } from './grans/tangentbord.js';
 import { skapaRullning } from './grans/rullning.js';
 import { laggUngenPaKartan, kartbitarHtml } from './grans/kartbitar.js';
@@ -598,7 +598,8 @@ export function skapaSpel(d) {
     const rad = forst ? [forst, ...(egna.length ? egna : ['fel'])] : egna;
     if (rad.length) ljud.spelaRad?.(rad);
     if (h.ljudord) visaLjudord(h.ljudord, '', foremal);
-    const regi = h.handling || h.reaktion;
+    // texten för den vuxne, om det som händer inte redan syns (syns_redan, 67.3)
+    const regi = visarRegi(h) ? h.handling || h.reaktion : null;
     if (regi) ui.visaRegi(regi, 0);
     if (h.fest) { ljud.spela('fest_mellan'); ui.visaFest('✨', tid(900)); }
     const ruta = ui.plattan.hidden ? null : ui.plattan.querySelector('.pussel-ruta, .formel-ruta');
@@ -627,7 +628,7 @@ export function skapaSpel(d) {
       const visad = !!knuff.pekar && !!vakt?.peka?.();
       logg.handelse('knuff', knuff.handling, { pekar: !!knuff.pekar, ungenPekar: visad });
       vakt?.spar.knuff(!!knuff.pekar);
-      if (knuff.handling && !visad) ui.visaRegi(knuff.handling, 0);
+      if (visarRegi(knuff) && !visad) ui.visaRegi(knuff.handling, 0);
       if (knuff.replik) await sag(knuff.replik); else await vanta(2500);
       ui.doljRegi();
     };
@@ -1132,8 +1133,12 @@ export function skapaSpel(d) {
           const el = /** @type {HTMLElement | null} */ (ui.$('#narbild .karta-bitar'));
           if (el && !ui.$('#narbild').hidden && laggUngenPaKartan(el)) { logg.handelse('narbild', 'ungen på kartbiten'); await vanta(tid(2600)); return; }
         }
+        // ungen springer till ett föremål och väntar där (67.2): den nosar mot det tills nästa mål är nått
+        const ungen = st.unge_till ? rum.ungePekar(st.unge_till) : false;
+        if (ungen) logg.handelse('mellanscen', `ungen springer till ${st.unge_till}`);
         const regiMs = st.bild ? rum.regi(st.bild) : 0;
         if (regiMs) { logg.handelse('mellanscen', st.bild); await vanta(tid(regiMs)); return; }
+        if (ungen) { await vanta(tid(UNGE_TILL_MS)); return; }
         // det som händer syns redan (rummet, en animation eller nästa steg, beslut 65): ingen ruta, bara en stund
         if (st.syns_redan) { logg.handelse('mellanscen', 'syns redan'); await vanta(tid(SYNS_REDAN_MS)); return; }
         const ms = tid(Math.min(6000, 1800 + st.beskrivning.split(' ').length * 140));
@@ -1362,7 +1367,7 @@ export function skapaSpel(d) {
         if (last?.ljud) ljud.spela(last.ljud);
         rum.tittaUpp(tid(900));
         for (const m of ids) rum.markera(m, true);
-        if (last?.handling) ui.visaRegi(last.handling, 0);
+        if (visarRegi(last)) ui.visaRegi(last.handling, 0);
         if (last?.replik) await sag(last.replik); else await vanta(tid(900));
         if (o) await rum.ga(lasplats(o), tid(250));
         ui.doljRegi();
@@ -2201,7 +2206,9 @@ export function skapaSpel(d) {
           rita(); upptagen = false; return;
         }
         k.stopp(); sluta();
-        ljud.spela('ratt');
+        // en ny formel ristas in på staven: Stils signatur i stället för det vanliga rätt-ljudet (67.6)
+        if (ristasNu(p, tillstand.spelare.hjalte.formler)) { ljud.spela('formel_ristas'); logg.handelse('formel', `${p.id}: ${p.svar} ristas in på staven`); }
+        else ljud.spela('ratt');
         // kolla: förebilden lyser en sekund ovanför hans ord (titta–täck)
         // utifrån bilden lyser ordet ovanför bilden
         const kolla = tt ? `<div class="forebild kolla">${[...p.forebild.text].map((c) => `<span class="bokstav">${ui.esc(c)}</span>`).join('')}</div>${p.bild ? `<div class="formel-bild" aria-hidden="true">${bilder.html(p.bild)}</div>` : ''}` : '';
@@ -3458,10 +3465,10 @@ export function skapaSpel(d) {
     const nar = t.toLocaleString('sv-SE', { dateStyle: 'medium', timeStyle: 'short' });
     return `Sparfilen hämtades senast ${nar}${dagar >= 1 ? ` (för ${dagar} ${dagar === 1 ? 'dag' : 'dagar'} sedan)` : ''}.`;
   }
-  /** OM SPELET (62.6): versionen, de medverkande, licenserna och att inget skickas någonstans. */
+  /** OM SPELET (62.6): versionen, de medverkande (67.7: utan namn, repot är publikt), licenserna och att inget skickas någonstans. */
   function omSpelet() {
     return `<div class="menygrupp om-spelet"><b>Ordstaven ${ui.esc(String(d.version))}</b><small>${ui.esc(aventyr.meta?.namn ?? aventyr.id)}</small>
-      <p><b>Medverkande.</b> Idén, berättelsen, bilderna, ljudet och koden är gjorda av familjen bakom spelet tillsammans med Claude (Anthropic).</p>
+      <p><b>Medverkande.</b> Far &amp; son produktion tillsammans med Claude (Anthropic).</p>
       <p><b>Licenser.</b> All grafik, alla ljudeffekter och musiken är egna, gjorda för spelet. Typsnittet Lexend: SIL Open Font License 1.1. Spelmotorn Phaser och Workbox: MIT.</p>
       <p><b>Inget skickas någonstans.</b> Allt sparas bara i den här webbläsaren. Loggen och sparfilen lämnar enheten bara om du själv hämtar dem.</p></div>`;
   }

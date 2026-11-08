@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ordstaven/schema/kapitel.schema.json",
   "title": "ORDSTAVEN – ett kapitel (rum, scener, pussel)",
-  "description": "Format 2. Beskrivs i docs/innehallsschema.md (version 2.31). All text lagras i vanlig skrift; spelet visar versaler tills nivån säger annat.",
+  "description": "Format 2. Beskrivs i docs/innehallsschema.md (version 2.32). All text lagras i vanlig skrift; spelet visar versaler tills nivån säger annat.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -249,6 +249,10 @@
         "ljud": {
           "$ref": "#/$defs/ljudlista",
           "description": "Reaktionens ljud (tutet, kastrullen), samtidigt som reaktionen börjar. Har en felreaktion ett ljud spelas inte bloinget."
+        },
+        "syns_redan": {
+          "type": "boolean",
+          "description": "Det som händer syns redan (2.32, beslut 67.3): texten visas inte i rutan för den vuxne. Den står kvar som anteckning."
         }
       }
     },
@@ -274,6 +278,10 @@
         "pekar": {
           "type": "boolean",
           "description": "Knuffen pekar på svaret (ungen lutar sig mot rätt dörr). Kommer tidigast efter första felet, eller efter 4 s per alternativ och minst 12 s."
+        },
+        "syns_redan": {
+          "type": "boolean",
+          "description": "Det som händer syns redan (2.32, beslut 67.3): texten visas inte i rutan för den vuxne. Den står kvar som anteckning."
         }
       }
     },
@@ -542,7 +550,8 @@
               "type": "string"
             },
             "bild": {
-              "$ref": "#/$defs/id"
+              "$ref": "#/$defs/id",
+              "description": "Det som händer i rummet med Stils bilder eller regin, och då visas inte beskrivningen (avsnittet om mellanscen i docs/innehallsschema.md). Farfar i dörren: farfar_i_dorren och farfar_gar_ut (2.32, kartans punkt regi_farfar)."
             },
             "ljud": {
               "$ref": "#/$defs/ljudlista",
@@ -551,6 +560,10 @@
             "syns_redan": {
               "type": "boolean",
               "description": "Det som händer syns redan (rummet, en animation eller nästa steg visar det): beskrivningen visas inte, och berättelsen väntar en kort stund (beslut 65). Beskrivningen står kvar som anteckning."
+            },
+            "unge_till": {
+              "$ref": "#/$defs/id",
+              "description": "Ungen springer till föremålet (eller utgången) och väntar där, nosande mot det, tills nästa mål är nått (2.32, 67.2). Då visas inte beskrivningen."
             }
           }
         },
@@ -680,6 +693,10 @@
                 },
                 "replik": {
                   "$ref": "#/$defs/replik"
+                },
+                "syns_redan": {
+                  "type": "boolean",
+                  "description": "Det som händer syns redan (2.32, beslut 67.3): texten visas inte i rutan för den vuxne. Den står kvar som anteckning."
                 }
               }
             },
@@ -1599,6 +1616,10 @@
               },
               "ljudord": {
                 "$ref": "#/$defs/ljudord"
+              },
+              "syns_redan": {
+                "type": "boolean",
+                "description": "Det som händer syns redan (2.32, beslut 67.3): texten visas inte i rutan för den vuxne. Den står kvar som anteckning."
               }
             }
           }

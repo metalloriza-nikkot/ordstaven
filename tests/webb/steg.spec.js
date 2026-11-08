@@ -2083,6 +2083,57 @@ test('en mellanscen som redan syns (syns_redan, beslut 65) visar ingen ruta, och
   await expect(replikText).toHaveText('TVÅ.', { timeout: 10000 });
 });
 
+test('en reaktion och en knuff som redan syns (syns_redan, beslut 67.3) visar ingen ruta, och en utan gör det som förut', async ({ page }) => {
+  test.setTimeout(60000);
+  const pussel = {
+    id: 't_regi', typ: 'P1_las_och_valj', knuff: { handling: 'frågan blinkar', syns_redan: true, efter_sek: 3 },
+    varianter: { L1: { text: 'Välj bil.', alternativ: [
+      { id: 'bil', ord: 'bil', ratt: true },
+      { id: 'sol', ord: 'sol', vid_valj: { reaktion: 'en sol rullar ut', syns_redan: true, replik: R('Ett.') } },
+      { id: 'ost', ord: 'ost', vid_valj: { reaktion: 'ost ploppar ut', replik: R('Två.') } },
+    ] } },
+  };
+  await provscen(page, { id: 't_regi_scen', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'pussel', pussel_id: 't_regi' }, R('Klart.')] }, null, { pussel: [pussel] });
+  await expect(page.locator('#plattan .kort[data-id="sol"]')).toBeVisible({ timeout: 10000 });
+  // knuffen kommer (loggen), men rutan får aldrig texten
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 8000 }).toContain('frågan blinkar');
+  expect(await page.locator('#regi').textContent()).not.toContain('frågan blinkar');
+  await page.click('#plattan .kort[data-id="sol"]');
+  await expect(page.locator('#plattan .svar-rad .text').first()).toHaveText('ETT.', { timeout: 8000 });
+  expect(await page.locator('#regi').textContent()).not.toContain('en sol');
+  await page.waitForTimeout(1500);
+  await page.click('#plattan .kort[data-id="ost"]');
+  await expect(page.locator('#regi')).toHaveText('ost ploppar ut', { timeout: 8000 });
+});
+
+test('Farfar i dörren och ungen som springer före (67.2), med figurerna som finns: ingen ruta', async ({ page }) => {
+  test.setTimeout(60000);
+  const replikText = page.locator('#plattan .replik-ruta .text');
+  await provscen(page, { id: 't_farfar', pass: 1, rum: 'sovrummet', tillstand: 'natt', steg: [
+    { typ: 'mellanscen', beskrivning: 'Farfar står i dörren i morgonrock.', bild: 'farfar_i_dorren' }, { typ: 'replik', talare: 'farfar', text: 'Hörde du?', upplast: true },
+    { typ: 'mellanscen', beskrivning: 'Farfar går ut i hallen.', bild: 'farfar_gar_ut' }, R('Gå ut i hallen!'),
+  ] });
+  await expect(replikText).toHaveText('HÖRDE DU?', { timeout: 8000 });
+  // han står i dörröppningen i morgonrocken, och rutan har aldrig haft texten
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.farfarIDorren()), { timeout: 3000 }).toMatchObject({ x: 159, y: 54, bild: 'farfar_natt_ner_01' });
+  expect(await page.locator('#regi').textContent()).not.toContain('Farfar');
+  await page.screenshot({ path: 'test-results/farfar-i-dorren.png' });
+  await page.locator('#plattan .replik-ruta').click();
+  await expect(replikText).toHaveText('GÅ UT I HALLEN!', { timeout: 8000 });
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.farfarIDorren()), { timeout: 3000 }).toBe(null);
+  expect(await page.locator('#regi').textContent()).not.toContain('Farfar');
+  // ungen springer till grinden och väntar där
+  await provscen(page, { id: 't_grinden', pass: 1, rum: 'tradgarden', steg: [
+    { typ: 'mellanscen', beskrivning: 'Ungen springer till grinden och väntar.', unge_till: 'grind' }, R('Där är grinden.'),
+  ] });
+  await expect(replikText).toHaveText('DÄR ÄR GRINDEN.', { timeout: 8000 });
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('ungen springer till grind');
+  const grind = await page.evaluate(() => window.__ORDSTAVEN.ruta('grind'));
+  const mal = await page.evaluate(() => window.__ORDSTAVEN.ungeMal());
+  expect(Math.hypot(mal.x - (grind.x + grind.b / 2), mal.y - (grind.y + grind.h / 2))).toBeLessThan(40);
+  expect(await page.locator('#regi').textContent()).not.toContain('grinden');
+});
+
 test('skogsbrynet efter hugget (beslut 66.1): från liangången norrut och österut till buskarna, och tillbaka, med piltangenterna', async ({ page }) => {
   test.setTimeout(120000);
   await page.goto('./?snabb&ny&kapitel=kap-01');

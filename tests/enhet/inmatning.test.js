@@ -318,6 +318,17 @@ describe('lampor', () => {
   });
 });
 
+describe('regins punkter (67.2)', () => {
+  it('regi_farfar i sovrummet står i dörröppningen, under dörren, och är inget föremål', async () => {
+    const { readFileSync } = await import('node:fs');
+    const k = lasKarta(JSON.parse(readFileSync(new URL('../../kartor/den-gomda-dalen/sovrummet.tmj', import.meta.url), 'utf8')));
+    const p = k.regi.farfar, dorr = k.objekt.find((o) => o.id === 'dorr_hallen');
+    expect(p.x).toBeGreaterThan(dorr.x); expect(p.x).toBeLessThan(dorr.x + dorr.b);
+    expect(p.y).toBeGreaterThan(dorr.y + dorr.h); expect(p.y).toBeLessThan(dorr.y + dorr.h + 12);
+    expect(k.objekt.some((o) => o.id === 'regi_farfar')).toBe(false);
+  });
+});
+
 describe('vilken sak används (grind A)', () => {
   const sak = (id, x, y) => ({ id, x, y, b: 30, h: 18, sort: 'sak' });
   it('bara den närmaste saken inom räckvidden är aktiv', () => {

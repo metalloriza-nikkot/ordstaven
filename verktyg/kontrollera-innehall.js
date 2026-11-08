@@ -25,7 +25,12 @@ for (const mapp of readdirSync(rot, { withFileTypes: true }).filter((d) => d.isD
   console.log(`\n== ${mapp.name}: ${kapitel.length} kapitel ==`);
   for (const p of r.pass) console.log(`   ${p.kapitel} pass ${p.pass}: ca ${p.minuter} min, ${p.lasuppgifter} läsuppgifter`);
   // mellanscener som fortfarande visar texten för den vuxne (beslut 65): fel först när kapitlet är klart
-  for (const b of r.beskrivningar || []) if (b.platser.length) console.log(`   ${b.kapitel === 'aventyr' ? 'aventyr.json' : b.kapitel}: ${b.platser.length} mellanscener visar texten för den vuxne${b.klart ? '' : b.kapitel === 'aventyr' ? ' (äventyret är inte klart)' : ' (kapitlet är inte klart)'}`);
+  for (const b of r.beskrivningar || []) {
+    const n = b.platser.length, m = (b.reaktioner || []).length;
+    if (!n && !m) continue;
+    const delar = [n ? `${n} mellanscener` : '', m ? `${m} reaktioner och knuffar` : ''].filter(Boolean).join(' och ');
+    console.log(`   ${b.kapitel === 'aventyr' ? 'aventyr.json' : b.kapitel}: ${delar} visar texten för den vuxne${b.klart ? '' : b.kapitel === 'aventyr' ? ' (äventyret är inte klart)' : ' (kapitlet är inte klart)'}`);
+  }
   for (const f of r.fel) console.log('FEL      ' + f);
   for (const v of r.varningar) console.log('varning  ' + v);
   fel += r.fel.length; varningar += r.varningar.length;

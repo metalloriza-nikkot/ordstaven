@@ -116,6 +116,10 @@ export class Rum extends Phaser.Scene {
     this.lagda = [];
     /** @type {any} luftskeppet i rummet (regi, s22): bilden, läget och dess timrar */
     this.luft = null;
+    /** @type {any} Farfar i dörren (regi, 67.2), tills han går ut eller rummet byts */
+    this.farfarRegi = null;
+    /** @type {Record<string, { x: number, y: number }>} kartans punkter för regin (regi_farfar) */
+    this.regiPunkter = {};
     /** @type {string | null} den senaste sidovyn som visades (för testerna) */
     this.senasteSidovy = null;
     /** @type {{ id: string, img: any, tex: string, ram: string } | null} föremålet han sitter i (34.4) */
@@ -399,7 +403,7 @@ export class Rum extends Phaser.Scene {
 
   /** Höga bilder (trädkronor) och figurerna i ordning efter fötterna: den som står längre ned ritas framför. */
   sorteraFigurer() {
-    if (!this.hogaBilder.size) return;
+    if (!this.hogaBilder.size && !this.farfarRegi?.active) return;
     const fot = (/** @type {any} */ g) => (g === this.hjalte ? this.pos.y : g === this.unge ? this.ungePos.y : g.fot ?? g.y + (g.height || 0));
     const lista = /** @type {any[]} */ (this.lagerFigurer.list);
     const fore = lista.slice();
@@ -827,6 +831,7 @@ export class Rum extends Phaser.Scene {
     }
     const agg = AGGET[bild];
     if (agg) return this.aggRegi(agg) ? agg.ms : 0;
+    if (bild === 'farfar_i_dorren' || bild === 'farfar_gar_ut') return this.farfarIDorren(bild === 'farfar_i_dorren' ? 'in' : 'ut');
     if (this.textures.exists(`sidovy_${bild}_bakgrund`)) {
       // luftskeppet flyger först iväg åt fel håll, mot SKOLAN (Stil 21:20), sedan kommer sidovyn
       const ms = this.luft && this.flygFel() ? 1600 : 0;
@@ -836,8 +841,41 @@ export class Rum extends Phaser.Scene {
     return 0;
   }
 
+  /**
+   * Farfar i dörren (67.2, med Farfars bilder som finns): `in` ställer honom i rummets dörr (kartans punkt
+   * `regi_farfar`), och han tar två steg in och står vänd mot hjälten. `ut` vänder honom, och han går ut genom dörren
+   * och försvinner. På natten har han morgonrocken (`farfar_natt_`), annars `farfar_morgon_`. Han står kvar tills han
+   * går ut eller rummet byts. @param {'in' | 'ut'} vad @returns {number} hur länge berättelsen väntar (ms), 0 = går inte
+   */
+  farfarIDorren(vad) {
+    const p = this.regiPunkter?.farfar;
+    const bas = this.tillstand === 'natt' || this.tillstand === 'natt_upplyst' ? 'farfar_natt' : 'farfar_morgon';
+    const bild = (/** @type {string} */ h) => foremalsbild(this, `${bas}_${h}_01`);
+    if (!p || !bild('ner') || !bild('upp')) return 0;
+    const satt = (/** @type {any} */ img, /** @type {string} */ h) => { const fb = bild(h); if (fb) img.setTexture(fb.nyckel, fb.ram); };
+    if (vad === 'in') {
+      this.farfarRegi?.destroy();
+      const img = /** @type {any} */ (this.add.image(p.x, p.y - 8, bild('ner')?.nyckel ?? 'farfar', bild('ner')?.ram).setOrigin(0.5, 1).setAlpha(0));
+      img.fot = p.y; this.farfarRegi = img;
+      this.lagerFigurer.add(img); this.sorteraFigurer();
+      // ut ur dörröppningen: han tonas fram och tar två steg in (ett litet gung, han har bara en bild åt varje håll)
+      this.tweens.add({ targets: img, alpha: 1, duration: 200, onUpdate: () => { this.smutsig = true; } });
+      this.tweens.add({ targets: img, y: p.y, duration: 500, ease: 'Linear', onUpdate: () => { this.smutsig = true; } });
+      this.tweens.add({ targets: img, scaleY: 0.94, duration: 125, yoyo: true, repeat: 1, onUpdate: () => { this.smutsig = true; } });
+      return 900;
+    }
+    const img = this.farfarRegi;
+    if (!img?.active) return 0;
+    satt(img, 'upp');
+    this.tweens.add({ targets: img, y: p.y - 12, duration: 600, ease: 'Linear', onUpdate: () => { this.smutsig = true; } });
+    this.tweens.add({ targets: img, scaleY: 0.94, duration: 150, yoyo: true, repeat: 1, onUpdate: () => { this.smutsig = true; } });
+    this.tweens.add({ targets: img, alpha: 0, delay: 350, duration: 350, onUpdate: () => { this.smutsig = true; }, onComplete: () => { img.destroy(); if (this.farfarRegi === img) this.farfarRegi = null; this.smutsig = true; } });
+    return 800;
+  }
+
   /** Luftskeppet, hjälmen och sidovyn tas bort (nytt rum). */
   rensaRegi() {
+    this.farfarRegi?.destroy(); this.farfarRegi = null;
     if (this.luft) { for (const t of this.luft.tider) t.remove(); this.luft.gung.remove(); this.tweens.killTweensOf(this.luft.img); this.luft = null; }
     this.sattPose(null);
     this.lagerLuft?.each((/** @type {any} */ x) => this.tweens.killTweensOf(x));
@@ -1276,6 +1314,7 @@ export class Rum extends Phaser.Scene {
     this.visaUnge = v.unge;
     if (v.nyttRum) { for (const id of [...this.ramSlinga.keys(), ...this.ramTimrar.keys()]) this.stoppaRamar(id); this.ramFor.clear(); this.dolda.clear(); this.ungeMal = null; this.ungeTittarPa = null; this.ungeKlattrar = null; this.stegeNu = null; this.ungeSang = null; this.ungeLyft = 0; for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas?.remove(); this.sover = null; } this.vaknar = null; this.rensaRegi(); }
     this.tillstand = v.tillstand;
+    if (v.nyttRum || !this.harRum) this.regiPunkter = (this.harRum && v.karta?.regi) || {};
     if (v.nyttRum || !this.harRum) this.inomhus = !!v.karta?.inomhus;
     this.lampor = v.karta?.lampor || [];
     this.morkerNatt = v.karta?.morker ?? null;

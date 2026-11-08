@@ -13,7 +13,7 @@ describe('ljudeffekterna (F5, 10c v0.5)', () => {
   });
   it('gråboxens namn och innehållets ljud-id pekar på en fil', () => {
     for (const id of Object.values(EFFEKT_FOR)) expect(FILER).toContain(id);
-    for (const id of ['stampel', 'ordkraft', 'dunk', 'baron', 'radio', 'fest_mellan', 'fest_stor', 'pinne', 'start', 'titel_bokstav',
+    for (const id of ['stampel', 'ordkraft', 'dunk', 'baron', 'formel_ristas', 'radio', 'fest_mellan', 'fest_stor', 'pinne', 'start', 'titel_bokstav',
       'kruka', 'apa_gnaller', 'hackspett', 'uggla', 'ekorre_not', 'mage_kurrar', 'klonk', 'klick_las', 'hugg', 'prassel', 'sla', 'pff', 'bar', 'pling', 'klick', 'ratt', 'fel',
       ...Array.from({ length: 8 }, (_, i) => `bricka_${i + 1}`)]) expect(effektFinns(id), id).toBe(true);
   });

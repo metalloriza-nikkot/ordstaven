@@ -62,7 +62,7 @@ const EFFEKTER = /** @type {Record<string, string>} */ (Object.fromEntries(Objec
   /** @type {Record<string, string>} */ (import.meta.glob('../../assets/ljud/effekter/*.wav', { query: '?url', import: 'default', eager: true })),
 ).map(([fil, url]) => [/** @type {string} */ (fil.split('/').pop()).replace(/\.wav$/, ''), url])));
 /** Signaturljuden spelas alltid likadant (samma fil, samma fart och förstärkning). */
-const SIGNATUR = new Set(['stampel', 'ordkraft', 'dunk', 'baron']);
+const SIGNATUR = new Set(['stampel', 'ordkraft', 'dunk', 'baron', 'formel_ristas']);
 /** Ljudeffekternas förstärkning. Musiken ligger ca 8 dB under (MUSIK_NIVA). Avvägt utan öron, ska provlyssnas. */
 export const EFFEKT_NIVA = 0.5;
 /** Vilka ljud-id som har en fil (för testerna och loggen). */

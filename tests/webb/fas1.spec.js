@@ -997,6 +997,7 @@ test('INSTÄLLNINGAR (25, beslut 62.6): röstens tempo och volym, helskärm, nä
   await page.click('#vuxenmeny .del[data-del="om"]');
   await expect(page.locator('#vuxenmeny .om-spelet')).toContainText('Inget skickas någonstans');
   await expect(page.locator('#vuxenmeny .om-spelet')).toContainText('Lexend');
+  await expect(page.locator('#vuxenmeny .om-spelet')).toContainText('Far & son produktion tillsammans med Claude (Anthropic)'); // 67.7
   await page.screenshot({ path: 'test-results/installningar-om.png' });
   // testläget finns i snabbläget (testerna), men inte i det vanliga spelet
   await expect(page.locator('#vuxenmeny .del[data-del="test"]')).toHaveCount(1);
