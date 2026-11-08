@@ -982,7 +982,7 @@ async function hoppaKapitel1(page, i) {
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.keyboard.press('Control+Shift+KeyM');
   await page.click('#vuxenmeny .del[data-del="test"]');
-  await page.click(`#vuxenmeny .scen[data-kapitel="kap-01"][data-i="${i}"]`);
+  await page.click(`#vuxenmeny .scenlista .scen[data-kapitel="kap-01"][data-i="${i}"]`);
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.click('.start-knapp');
   for (const namn of ['TESTA', 'KNOPP']) {
@@ -1068,7 +1068,7 @@ test('SVÄRD gör staven till ett svärd, och spelaren hugger sig igenom liangå
   expect(await page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').harSvard)).toBe(true);
   // de står efter varandra i gången (delas: djup, 50.2) och fyller den, så att vägen norrut är stängd tills han har huggit
   const delar = await page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').objekt.filter((o) => /^lianer_/.test(o.id)).map((o) => [o.y, o.h, o.b]));
-  expect(delar.reduce((s, [, h]) => s + h, 0)).toBe(48);
+  expect(delar.reduce((s, [, h]) => s + h, 0)).toBe(40); // gången börjar 8 px längre ned sedan 0.42.0 (18, y 48, h 40)
   expect(delar.every(([, , b]) => b === 32)).toBe(true);
   await page.screenshot({ path: 'test-results/lianerna-hugga.png' });
   // den södra står närmast: han hugger sig norrut genom gången
@@ -1179,7 +1179,7 @@ test('menyn för vuxna hoppar till en scen i ett senare kapitel: det som kommer 
   await page.click('#vuxenmeny .del[data-del="test"]');
   await expect(page.locator('#vuxenmeny .kapitelrad')).toHaveCount(2);
   await page.screenshot({ path: 'test-results/meny-alla-kapitel.png' });
-  await page.click('#vuxenmeny .scen[data-kapitel="kap-01"][data-i="5"]'); // k1s07_stigarna, pass 2
+  await page.click('#vuxenmeny .scenlista .scen[data-kapitel="kap-01"][data-i="5"]'); // k1s07_stigarna, pass 2
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.click('.start-knapp');
   for (const namn of ['TESTA', 'KNOPP']) {

@@ -153,7 +153,7 @@ test('menyn för vuxna: ett kort tryck visar "håll inne", att hålla öppnar me
   await page.click('.start-knapp');
   await page.keyboard.press('Control+Shift+KeyM');
   await page.click('#vuxenmeny .del[data-del="test"]');
-  await page.click('#vuxenmeny .scen[data-i="9"]');
+  await page.click('#vuxenmeny .scenlista .scen[data-i="9"]');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.click('.start-knapp');
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('s08_farfar');
