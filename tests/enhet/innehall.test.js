@@ -234,3 +234,45 @@ describe('kapitel 1: rummens text, frivilligt och nya steg (schema 2.8)', () => 
     expect(medFel((k) => { k.pussel.find((p) => p.id === 'k1_loven').foremal.pop(); })).toMatch(/3 föremål men 4 poster/);
   });
 });
+
+describe('mellanscenernas text för den vuxne (beslut 65)', () => {
+  const scen = (k, id) => k.scener.find((s) => s.id === id);
+  it('regeln: en beskrivning visas bara utan bild och utan syns_redan', async () => {
+    const { visarBeskrivning } = await import('../../src/karna/mellanscen.js');
+    expect(visarBeskrivning({ typ: 'mellanscen', beskrivning: 'Ungen gäspar.' })).toBe(true);
+    expect(visarBeskrivning({ typ: 'mellanscen', beskrivning: 'Ungen gäspar.', bild: 'agg_frost' })).toBe(false);
+    expect(visarBeskrivning({ typ: 'mellanscen', beskrivning: 'Ungen gäspar.', syns_redan: true })).toBe(false);
+    expect(visarBeskrivning({ typ: 'replik', text: 'Hej.' })).toBe(false);
+  });
+  it('kontrollen räknar dem i varje kapitel och i aventyr.json, men säger inget fel förrän kapitlet är klart', () => {
+    const r = kontrollera(riktigt());
+    expect(r.fel).toEqual([]);
+    const antal = Object.fromEntries(r.beskrivningar.map((b) => [b.kapitel, b.platser.length]));
+    expect(antal['kap-00']).toBeGreaterThan(0);
+    expect(antal['kap-01']).toBeGreaterThan(0);
+    expect(r.beskrivningar.find((b) => b.kapitel === 'kap-01').platser.map((p) => p.plats)).toContain('rum glantan frivilligt ugglor steg 1');
+  });
+  it('ett klart kapitel som visar en beskrivning är fel, och syns_redan eller en bild gör det rätt', () => {
+    const d = riktigt();
+    const k = d.kapitel[1];
+    k.meta.klart = true;
+    const fel = kontrollera(d).fel.join('\n');
+    expect(fel).toMatch(/kap-01 k1s06_present steg 9: kapitlet är klart, men mellanscenen visar texten för den vuxne \("Ungen gäspar\."\)/);
+    expect(fel).not.toMatch(/^kap-00/m);
+    // varje mellanscen får syns_redan: inget fel kvar
+    const allaSteg = [...k.scener.flatMap((s) => s.steg), ...k.rum.flatMap((r) => (r.frivilligt || []).flatMap((f) => f.steg))];
+    for (const st of allaSteg) if (st.typ === 'mellanscen' && !st.bild) st.syns_redan = true;
+    expect(kontrollera(d).fel).toEqual([]);
+    // en bild räcker också
+    const st = scen(k, 'k1s06_present').steg[9];
+    delete st.syns_redan; st.bild = 'vid_bron';
+    expect(kontrollera(d).fel).toEqual([]);
+  });
+  it('aventyr.json: SLUTA FÖR IDAG och slutrutan prövas när äventyret är klart', () => {
+    const d = riktigt();
+    d.aventyr.meta = { ...(d.aventyr.meta || {}), klart: true };
+    expect(kontrollera(d).fel.join('\n')).toMatch(/aventyr\.json sluta_for_idag\.med_ungen steg 0: äventyret är klart/);
+    for (const st of [...d.aventyr.sluta_for_idag.fore_ungen, ...d.aventyr.sluta_for_idag.med_ungen, ...d.aventyr.kapitel_last.steg]) if (st.typ === 'mellanscen') st.syns_redan = true;
+    expect(kontrollera(d).fel).toEqual([]);
+  });
+});

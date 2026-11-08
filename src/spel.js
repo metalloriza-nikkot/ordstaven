@@ -13,6 +13,7 @@ import { aventyrFor, spelareAttVisa } from './karna/sparning.js';
 import { varVarVi, senastSpelad } from './karna/varvarvi.js';
 import { musikFor } from './karna/musik.js';
 import { ljudLista } from './karna/ljudid.js';
+import { SYNS_REDAN_MS } from './karna/mellanscen.js';
 import { sparaPassbild, aterstallLarande, forstaIPasset } from './karna/larandebild.js';
 import { pekningOmMs, skapaHjalpSpar, knufftidMs } from './karna/hjalp.js';
 import { HJALTE_FARGER, HJALTE_FAST } from './scener/Rum.js';
@@ -1129,6 +1130,8 @@ export function skapaSpel(d) {
         }
         const regiMs = st.bild ? rum.regi(st.bild) : 0;
         if (regiMs) { logg.handelse('mellanscen', st.bild); await vanta(tid(regiMs)); return; }
+        // det som händer syns redan (rummet, en animation eller nästa steg, beslut 65): ingen ruta, bara en stund
+        if (st.syns_redan) { logg.handelse('mellanscen', 'syns redan'); await vanta(tid(SYNS_REDAN_MS)); return; }
         const ms = tid(Math.min(6000, 1800 + st.beskrivning.split(' ').length * 140));
         await ui.visaRegi(st.beskrivning, ms); ui.doljRegi(); return;
       }
@@ -2868,6 +2871,7 @@ export function skapaSpel(d) {
       rum.frys(true);
       for (const st of aventyr.kapitel_last?.steg || []) {
         if (st.typ === 'replik') await replik(st);
+        else if (st.typ === 'mellanscen' && st.syns_redan) await vanta(tid(SYNS_REDAN_MS));
         else if (st.typ === 'mellanscen' && st.beskrivning) { ui.visaRegi(st.beskrivning, 0); await vanta(tid(1500)); ui.doljRegi(); }
       }
       const p = ui.visaSkarm(`<div class="pass-slut kapitel-last"><div class="stor-ikon">${SOVER}<span class="stjarna" aria-hidden="true">${ikon('stjarna', 'stor')}</span></div><button type="button" class="knapp stor igen" aria-label="Igen">▶</button></div>`);
@@ -2891,6 +2895,7 @@ export function skapaSpel(d) {
     rum.frys(true);
     for (const st of (s && (medUngen ? s.med_ungen : s.fore_ungen)) || []) {
       if (st.typ === 'replik') await replik(st);
+      else if (st.typ === 'mellanscen' && st.syns_redan) await vanta(tid(SYNS_REDAN_MS));
       else if (st.typ === 'mellanscen' && st.beskrivning) { ui.visaRegi(st.beskrivning, 0); await vanta(tid(1500)); ui.doljRegi(); }
     }
     rum.frys(true);

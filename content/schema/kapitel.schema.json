@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ordstaven/schema/kapitel.schema.json",
   "title": "ORDSTAVEN – ett kapitel (rum, scener, pussel)",
-  "description": "Format 2. Beskrivs i docs/innehallsschema.md (version 2.29). All text lagras i vanlig skrift; spelet visar versaler tills nivån säger annat.",
+  "description": "Format 2. Beskrivs i docs/innehallsschema.md (version 2.30). All text lagras i vanlig skrift; spelet visar versaler tills nivån säger annat.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -521,6 +521,10 @@
             "ljud": {
               "$ref": "#/$defs/ljudlista",
               "description": "Det som låter i mellanscenen, samtidigt som den börjar (berättelsen väntar inte på ljudet)."
+            },
+            "syns_redan": {
+              "type": "boolean",
+              "description": "Det som händer syns redan (rummet, en animation eller nästa steg visar det): beskrivningen visas inte, och berättelsen väntar en kort stund (beslut 65). Beskrivningen står kvar som anteckning."
             }
           }
         },

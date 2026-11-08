@@ -7,6 +7,7 @@ import { rader, versaler, ord, PLATSHALLARE } from '../../src/karna/text.js';
 import { kompileraUppdrag, hittaSteg } from '../../src/karna/uppdrag.js';
 import { SLINGOR } from '../../src/karna/musik.js';
 import { kandaLjud, ljudLista } from '../../src/karna/ljudid.js';
+import { beskrivningarSomVisas, aventyretsBeskrivningar } from '../../src/karna/mellanscen.js';
 
 const schema = (namn) => JSON.parse(readFileSync(new URL(`../../content/schema/${namn}.schema.json`, import.meta.url), 'utf8'));
 // teckenbredderna för typsnittet i textlagret (Lexend, beslut 13)
@@ -105,10 +106,10 @@ function kontrolleraKartor(k, kartor, fel, varningar) {
 
 /**
  * @param {{ aventyr: any, kapitel: any[], ordlistor: any, kartor?: Record<string, any> }} innehall
- * @returns {{ fel: string[], varningar: string[], pass: { kapitel: string, pass: number, minuter: number, lasuppgifter: number }[] }}
+ * @returns {{ fel: string[], varningar: string[], pass: { kapitel: string, pass: number, minuter: number, lasuppgifter: number }[], beskrivningar: { kapitel: string, klart: boolean, platser: { plats: string, beskrivning: string }[] }[] }}
  */
 export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
-  const fel = [], varningar = [], passInfo = [];
+  const fel = [], varningar = [], passInfo = [], beskrivningar = [];
   const v = validerare();
 
   // 1. Schemat
@@ -122,7 +123,7 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
   for (const k of kapitel) for (const s of k.scener || []) {
     if (s.hjalte === 'sover' && kartor?.[s.rum] && !(kartor[s.rum].objekt || []).some((/** @type {any} */ o) => o.sovplats)) fel.push(`${k.id} scen ${s.id}: hjälten sover, men kartan för ${s.rum} har ingen säng (sovplats)`);
   }
-  if (fel.length) return { fel, varningar, pass: passInfo };
+  if (fel.length) return { fel, varningar, pass: passInfo, beskrivningar };
 
   // Ordlistorna
   const ordmap = new Map();
@@ -529,6 +530,17 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
       const mer = platser.length === 2 ? ' och ett ställe till' : platser.length > 2 ? ` och ${platser.length - 1} ställen till` : '';
       varningar.push(var_(`ordet ${n.toLocaleLowerCase('sv-SE')} i en lästext finns inte i ordlistorna (${platser[0]}${mer})`));
     }
+    // Mellanscenernas text för den vuxne (beslut 65): ett klart kapitel (meta.klart) visar ingen beskrivning.
+    // Varje mellanscen har en bild (Stils animation) eller syns_redan. Kontrollen skriver ut hur många som är kvar.
+    const kvar = beskrivningarSomVisas(k);
+    const klart = k.meta?.klart === true;
+    beskrivningar.push({ kapitel: k.id, klart, platser: kvar });
+    if (klart) for (const b of kvar) fel.push(var_(`${b.plats}: kapitlet är klart, men mellanscenen visar texten för den vuxne ("${b.beskrivning}"). Ge den en bild, eller syns_redan om det redan syns.`));
   }
-  return { fel, varningar, pass: passInfo };
+  // äventyrets egna mellanscener (SLUTA FÖR IDAG och slutrutan) hör till äventyret: klart när aventyr.json säger det
+  const aKvar = aventyretsBeskrivningar(aventyr);
+  const aKlart = aventyr.meta?.klart === true;
+  beskrivningar.push({ kapitel: 'aventyr', klart: aKlart, platser: aKvar });
+  if (aKlart) for (const b of aKvar) fel.push(`aventyr.json ${b.plats}: äventyret är klart, men mellanscenen visar texten för den vuxne ("${b.beskrivning}"). Ge den syns_redan, eller stryk den.`);
+  return { fel, varningar, pass: passInfo, beskrivningar };
 }

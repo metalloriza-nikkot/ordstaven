@@ -2063,3 +2063,19 @@ test('musiken följer platsen (27, beslut 64.5): rummet före kapitlet, steget m
   const logg = await page.evaluate(() => window.__ORDSTAVEN.logg());
   for (const m of ['natten', 'lagerelden', 'skogen', 'tyst', 'raddning']) expect(logg).toContain(`[musik] ${m}`);
 });
+
+test('en mellanscen som redan syns (syns_redan, beslut 65) visar ingen ruta, och en utan bild gör det som förut', async ({ page }) => {
+  test.setTimeout(60000);
+  const replikText = page.locator('#plattan .replik-ruta .text');
+  await provscen(page, { id: 't_syns', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [
+    { typ: 'mellanscen', beskrivning: 'Det här syns redan i rummet.', syns_redan: true }, R('Ett.'),
+    { typ: 'mellanscen', beskrivning: 'Det här syns inte än.' }, R('Två.'),
+  ] });
+  await expect(replikText).toHaveText('ETT.', { timeout: 8000 });
+  // rutan har aldrig haft texten (den står kvar i elementet när rutan döljs)
+  expect(await page.locator('#regi').textContent()).not.toContain('syns redan');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('[mellanscen] syns redan');
+  await page.locator('#plattan .replik-ruta').click();
+  await expect(page.locator('#regi')).toHaveText('Det här syns inte än.', { timeout: 8000 });
+  await expect(replikText).toHaveText('TVÅ.', { timeout: 10000 });
+});
