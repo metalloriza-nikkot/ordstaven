@@ -105,6 +105,13 @@ export function skapaSpel(d) {
     logg.handelse('paus', 'slut');
   }
   document.addEventListener('visibilitychange', () => { if (document.hidden) pausa('dold'); else fortsatt('dold'); });
+  /** Musiken (F5): meny eller spel, eller tyst (null). Bytet står i loggen. @param {string | null} namn */
+  function spelaMusik(namn) {
+    if (ljud.musikLage?.onskad !== namn) logg.handelse('musik', namn ?? 'tyst');
+    ljud.musik?.(namn);
+  }
+  // musiken sänks ca 12 dB när något läses (62.10): rösten talar, eller läsplattan eller pratrutan är öppen
+  setInterval(() => ljud.sank?.(!!rost.talar || !ui.plattan.hidden || !ui.$('#remsa').hidden), 200);
   /** Läsnivån för en pusseltyp, inom kapitlets golv och tak (nivaer). @param {string} typ */
   const lasniva = (typ) => {
     const n = lasmotor.niva('L', typ);
@@ -2806,6 +2813,7 @@ export function skapaSpel(d) {
     const medUngen = !!tillstand.spelare.unge?.folj && !!tillstand.spelare.unge?.namn;
     logg.handelse('sluta för idag', medUngen ? 'med ungen' : 'före ungen');
     await taFoto('sluta för idag', true);
+    spelaMusik(null);
     spara();
     const varFryst = rum.fryst;
     rum.frys(true);
@@ -2818,6 +2826,7 @@ export function skapaSpel(d) {
     await new Promise((klar) => p.querySelector('.fortsatt')?.addEventListener('click', () => klar(undefined), { once: true }));
     ui.doljSkarm();
     logg.handelse('sluta för idag', 'fortsätter');
+    ljud.starta(); spelaMusik('spel');
     rum.frys(varFryst);
   }
 
@@ -2886,6 +2895,7 @@ export function skapaSpel(d) {
     if (!b) return;
     klartUppslagNu = null; // fliken KLART öppnas på det senaste uppslaget
     taFoto('paus', true);
+    spelaMusik('meny');
     pausa('pausmeny');
     ritaPaus(vy);
   }
@@ -2961,7 +2971,7 @@ export function skapaSpel(d) {
       ritaPaus('garderoben');
     }));
   }
-  function stangPaus() { rost.tyst(); ui.doljPausmeny(); fortsatt('pausmeny'); }
+  function stangPaus() { rost.tyst(); ui.doljPausmeny(); fortsatt('pausmeny'); spelaMusik('spel'); }
   ui.$('#hud-paus').addEventListener('click', () => { if (pausad || !ui.plattan.hidden) return; ljud.spela('klick'); oppnaPaus(); });
   window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !ui.$('#pausmeny').hidden) { e.preventDefault(); stangPaus(); } });
 
@@ -2978,13 +2988,14 @@ export function skapaSpel(d) {
       introVisat = true;
       await spelaIntro({
         skarm: ui.$('#skarm'), tid, logg,
-        forstaTrycket: () => { ljud.starta(); rost.lasUpp(); },
+        forstaTrycket: () => { ljud.starta(); spelaMusik('meny'); rost.lasUpp(); },
         klang: (i) => ljud.klang?.(i),
         lasNamnet: () => (inst.rost && rost.harRost ? rost.saga('Ordstaven', 'berattare') : Promise.resolve()),
         tyst: () => rost.tyst(),
         ordkraft: rum.figurUrl?.('effekter', 'efx_ordkraft_03') ?? null,
       });
     }
+    spelaMusik('meny');
     const platser = d.platser;
     const aktiv = platser?.aktiv() ?? '1';
     const lista = platser ? platser.lista() : [aktiv];
@@ -3017,6 +3028,7 @@ export function skapaSpel(d) {
       return startskarm();
     }
     ljud.starta(); rost.lasUpp();
+    spelaMusik('spel');
     d.uppdatering.tillampa();
     // irisen (62.5) stängs över skrivbordet och öppnas runt hjälten när rummet syns (oppnaIris)
     if (d.iris) {
@@ -3250,7 +3262,9 @@ export function skapaSpel(d) {
   meny.addEventListener('pointercancel', slapp);
   meny.addEventListener('contextmenu', (e) => e.preventDefault());
   window.addEventListener('keydown', (e) => { if (e.ctrlKey && e.shiftKey && e.code === 'KeyM') { e.preventDefault(); oppnaMeny(); } });
-  function stangMeny() { ui.doljMeny(); fortsatt('meny'); }
+  /** @type {string | null} slingan som spelade när INSTÄLLNINGAR öppnades */
+  let musikForeMeny = null;
+  function stangMeny() { ui.doljMeny(); fortsatt('meny'); spelaMusik(musikForeMeny); }
   // Escape stänger menyn (en väg ut, även med tangentbord)
   window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !ui.$('#vuxenmeny').hidden) { e.preventDefault(); stangMeny(); } });
   /** Pusseltyperna i föräldravyn (för den vuxne, inte speltext). */
@@ -3342,6 +3356,7 @@ export function skapaSpel(d) {
   /** Delen i INSTÄLLNINGAR som visas (den står kvar när menyn ritas om). */
   let menyDel = 'spelare';
   function oppnaMeny() {
+    if (ui.$('#vuxenmeny').hidden) { musikForeMeny = ljud.musikLage?.onskad ?? null; spelaMusik('meny'); }
     pausa('meny');
     const niva = lasmotor.niva('L', 'P1_las_och_valj');
     // alla kapitlens scener: ett hopp till ett senare kapitel eller en senare scen spolar fram det som kommer före

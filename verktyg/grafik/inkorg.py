@@ -16,6 +16,8 @@ Läser en kopia av inkorgsmappen och skriver till repot:
   (fas 4, 10e), och ui/intro/intro.json med introts tider och lägen.
 - figurer/*/*_portratt_*.png → också assets/portratt/<namn>.png (ansiktena i pratrutan, i textlagret).
 - ljud/*.wav             → assets/ljud/<namn>.wav, döpta utan mellanslag ("unge_late 2" → unge_late_02).
+- ljud/musik/*.m4a, *.ogg → assets/ljud/musik/<namn>.m4a och .ogg (Stils slingor, F5), omskrivna med ffmpeg utan
+  metadata (ljudet kopieras som det är).
 
 Arken (*_ark.png) hoppas över, de är bara till för att titta på.
 
@@ -152,11 +154,29 @@ def ljud(inkorg, repo, prova, fel):
             w.writeframes(data)
 
 
+def musik(inkorg, repo, prova, fel):
+    """Stils musik: samma ljud, bara utan metadata (ffmpeg -c copy)."""
+    import subprocess
+    for f in sorted(list((inkorg / 'ljud' / 'musik').glob('*.m4a')) + list((inkorg / 'ljud' / 'musik').glob('*.ogg'))):
+        if not NAMN.match(f.stem):
+            fel.append(f'{f}: namnet har tecken utanför a–z, 0–9 och _')
+            continue
+        print(f'{f.name} → assets/ljud/musik/{f.name}')
+        if prova:
+            continue
+        ut = repo / 'assets' / 'ljud' / 'musik'
+        ut.mkdir(parents=True, exist_ok=True)
+        r = subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', str(f), '-map', '0:a', '-map_metadata', '-1', '-fflags', '+bitexact',
+                            '-flags:a', '+bitexact', '-c', 'copy', str(ut / f.name)], capture_output=True, text=True)
+        if r.returncode:
+            fel.append(f'{f.name}: ffmpeg: {r.stderr.strip()[:200]}')
+
+
 def licenser(repo, fel):
     """Varje fil i assets/ (utom licenstexterna) ska stå i assets/LICENSER.md. Ett atlas räknas med sin mapp."""
     text = (repo / 'assets' / 'LICENSER.md').read_text()
     for f in sorted((repo / 'assets').rglob('*')):
-        if f.is_dir() or f.suffix not in ('.png', '.wav') or 'licenser' in f.parts:
+        if f.is_dir() or f.suffix not in ('.png', '.wav', '.m4a', '.ogg') or 'licenser' in f.parts:
             continue
         rel = f.relative_to(repo).as_posix()
         mappar = [p.relative_to(repo).as_posix() + '/' for p in f.parents if p != repo and repo in p.parents]
@@ -229,6 +249,8 @@ def main():
                 (repo / 'assets' / 'tiles' / mapp.name / f'{tsj.stem}.json').write_text(json.dumps(data, indent=1, ensure_ascii=False) + '\n')
     if med('ljud'):
         ljud(ink, repo, arg.prova, fel)
+    if med('ljud/musik') and (ink / 'ljud' / 'musik').is_dir():
+        musik(ink, repo, arg.prova, fel)
     # paletten är sluten: en färg som inte står i Stils masterpalett stoppar (Stil ritar om eller lägger in den)
     master = json.loads((repo / PALETT).read_text())
     tillatna = {f['hex'].lower() for f in master['farger'] + [t for t in master.get('tillagg', []) if isinstance(t, dict) and 'hex' in t]}

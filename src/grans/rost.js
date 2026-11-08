@@ -156,5 +156,7 @@ export function skapaRost({ logg, tyst = () => false }) {
     /** iPad Safari: rösten måste startas av ett tryck. */
     lasUpp() { try { if (synt && !tyst()) { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; synt.speak(u); } } catch (e) { /* ok */ } },
     get harRost() { return !!rost; },
+    /** Talar rösten nu (musiken sänks då, F5)? */
+    get talar() { try { return !!synt && !tyst() && (synt.speaking || synt.pending); } catch (e) { return false; } },
   };
 }

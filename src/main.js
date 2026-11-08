@@ -29,7 +29,7 @@ import { kopplaInmatning } from './grans/inmatningDom.js';
 import { kopplaLogg, exportera, laddaNed, tidsstampel, meddelande } from './grans/loggDom.js';
 import { startaUppdatering } from './grans/uppdatering.js';
 import { skapaRost } from './grans/rost.js';
-import { skapaLjud } from './grans/ljud.js';
+import { skapaLjud, MUSIK } from './grans/ljud.js';
 import { skapaUi } from './grans/ui.js';
 import { skapaBilder } from './grans/bilder.js';
 import { skapaTangentbord } from './grans/tangentbord.js';
@@ -297,4 +297,7 @@ redo.then(() => { startKlar = true; window.clearTimeout(startVakt); window.remov
   spel,
   /** 'webgl' eller 'canvas': hur världen ritas just nu */
   ritning: () => (spel.renderer && spel.renderer.type === Phaser.CANVAS ? 'canvas' : 'webgl'),
+  /** Musiken (F5): vilken slinga som ska spela och om den är sänkt (i snabbläget spelas inget, men läget följs). */
+  musik: () => ljud.musikLage,
+  musikfiler: () => MUSIK,
 };

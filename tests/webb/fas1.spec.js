@@ -923,3 +923,44 @@ test('introt (F4): natten väntar på första trycket, sedan morgonen, namnet, k
   await expect(page.locator('#iris')).toBeHidden();
   expect(fel).toEqual([]);
 });
+
+test('musiken (F5): menyns slinga i introt, på startskärmen, i pausmenyn och i INSTÄLLNINGAR, spelets inne i spelet, sänkt när något läses, och looppunkterna ger ingen skarv', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(60000);
+  const musik = () => page.evaluate(() => window.__ORDSTAVEN.musik());
+  await starta(page, '?snabb&ny&intro');
+  expect((await musik()).onskad).toBeNull(); // inget ljud före första trycket
+  await page.click('.intro');
+  expect((await musik()).onskad).toBe('meny');
+  await page.click('.intro');
+  await expect(page.locator('.startbord')).toBeVisible();
+  expect((await musik()).onskad).toBe('meny');
+  await page.click('.start-knapp');
+  await expect.poll(async () => (await musik()).onskad).toBe('spel');
+  // en replik i pratrutan eller läsplattan: musiken är sänkt, och höjs när den är borta
+  await expect(page.locator('#remsa:not([hidden]), #plattan:not([hidden])').first()).toBeVisible({ timeout: 10000 });
+  await expect.poll(async () => (await musik()).sankt).toBe(true);
+  // INSTÄLLNINGAR: menyns slinga, och tillbaka till spelets
+  await page.keyboard.press('Control+Shift+KeyM');
+  expect((await musik()).onskad).toBe('meny');
+  await page.keyboard.press('Escape');
+  expect((await musik()).onskad).toBe('spel');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('[musik] spel');
+  // Stils looppunkter: filerna räcker till slutpunkten, slingan är så lång som i tabellen, och ljudet efter
+  // slutpunkten är samma som efter startpunkten (en halv sekund av början efter), så att skarven inte hörs
+  const filer = await page.evaluate(async () => {
+    const ut = {};
+    for (const [namn, m] of Object.entries(window.__ORDSTAVEN.musikfiler())) {
+      const ac = new OfflineAudioContext(1, 44100, 44100);
+      const b = await ac.decodeAudioData(await (await fetch(m.ogg)).arrayBuffer());
+      const d = b.getChannelData(0), sr = b.sampleRate, a0 = Math.round(m.loopStart * sr), a1 = Math.round(m.loopEnd * sr);
+      let skillnad = 0, signal = 0;
+      for (let i = 0; i < sr * 0.3; i++) { skillnad += (d[a0 + i] - d[a1 + i]) ** 2; signal += d[a0 + i] ** 2; }
+      ut[namn] = { langd: b.duration, slinga: m.loopEnd - m.loopStart, skarv: Math.sqrt(skillnad / Math.max(signal, 1e-9)) };
+    }
+    return ut;
+  });
+  expect(filer.meny.slinga).toBeCloseTo(41.739, 3);
+  expect(filer.spel.slinga).toBeCloseTo(48.0, 3);
+  for (const f of Object.values(filer)) { expect(f.langd).toBeGreaterThanOrEqual(f.slinga + 0.5); expect(f.skarv).toBeLessThan(0.2); }
+});
