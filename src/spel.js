@@ -105,6 +105,8 @@ export function skapaSpel(d) {
     logg.handelse('paus', 'slut');
   }
   document.addEventListener('visibilitychange', () => { if (document.hidden) pausa('dold'); else fortsatt('dold'); });
+  /** Bokstavsbrickan nr n i ordet: tonen stiger för varje bokstav (bricka_1–8, 10c). @param {number} n */
+  const brickljud = (n) => ljud.spela(`bricka_${Math.max(1, Math.min(8, n))}`);
   /** Musiken (F5): meny eller spel, eller tyst (null). Bytet står i loggen. @param {string | null} namn */
   function spelaMusik(namn) {
     if (ljud.musikLage?.onskad !== namn) logg.handelse('musik', namn ?? 'tyst');
@@ -216,7 +218,7 @@ export function skapaSpel(d) {
     const p = stampelPlats(rum.pos, u, { x: k.x, y: k.y, b: RUM.bredd, h: RUM.hojd });
     const a = skarm(p.x, p.y), c = skarm(p.x + 64, p.y + 64);
     const st = visaStampel({ rot: /** @type {HTMLElement} */ (ui.$('#varldslager')), x: a.x, y: a.y, storlek: c.x - a.x, ms: tid(1500) });
-    ljud.spela('klick');
+    ljud.spela('stampel');
     const ord = gransnittsOrd('klart');
     if (ord) sag({ talare: 'berattare', text: ord, upplast: true });
     st.nedslag.then(() => { rum.ungeReagerar(true); ljud.spela('unge'); });
@@ -312,7 +314,7 @@ export function skapaSpel(d) {
     rum.frys(true);
     if (r.upplast && r.talare && aventyr.talare[r.talare]) senaste.set(r.talare, r);
     if (r.via === 'radio' && r.upplast) senaste.set(RADIO, r);
-    if (r.via === 'radio') ui.pulsera('#hud-radio');
+    if (r.via === 'radio') { ui.pulsera('#hud-radio'); ljud.spela('radio'); }
     const el = ui.visaPlatta(replikHtml(r), 'replik');
     placeraReplik(el);
     // nosen fungerar på repliker också, gratis (de läses ändå upp), så att "tryck på nosen" alltid ger svar
@@ -547,7 +549,7 @@ export function skapaSpel(d) {
     if (h.ljudord) visaLjudord(h.ljudord, '', foremal);
     const regi = h.handling || h.reaktion;
     if (regi) ui.visaRegi(regi, 0);
-    if (h.fest) { ljud.spela('fest'); ui.visaFest('✨', tid(900)); }
+    if (h.fest) { ljud.spela('fest_mellan'); ui.visaFest('✨', tid(900)); }
     const ruta = ui.plattan.hidden ? null : ui.plattan.querySelector('.pussel-ruta, .formel-ruta');
     if (h.replik && ruta) { const rad = document.createElement('div'); rad.className = 'svar-rad'; rad.innerHTML = portratt(h.replik.talare) + `<div class="text">${ui.rader(h.replik.text, varden())}</div>`; ruta.prepend(rad); }
     if (h.replik && !ruta) { await replik(h.replik); if (regi) ui.doljRegi(); return; }
@@ -1096,8 +1098,8 @@ export function skapaSpel(d) {
       }
       case 'nos_demo': return nosDemo(st);
       case 'ge_bar': ljud.spela('bar'); ui.uppdateraHud(av); ui.pulsera('#hud-bar'); await ui.visaFest('🫐', tid(900)); return;
-      case 'ge_kartbit': ljud.spela('fest'); await ui.visaFest(kartbitFest(st.nummer), tid(1200), true); return;
-      case 'ge_grad': ljud.spela('fest'); await ui.visaFest('⭐', tid(1500)); return;
+      case 'ge_kartbit': ljud.spela('fest_stor'); await ui.visaFest(kartbitFest(st.nummer), tid(1200), true); return;
+      case 'ge_grad': ljud.spela('fest_mellan'); await ui.visaFest('⭐', tid(1500)); return;
       case 'bok': return bok(st);
       case 'skapa_hjalte': return skapaHjalte(st);
       case 'sparpunkt': {
@@ -1148,13 +1150,13 @@ export function skapaSpel(d) {
    */
   async function geSakSteg(st) {
     rum.sattLager(lagerFor(tillstand.spelare.hjalte));
-    ljud.spela('fest');
+    ljud.spela('fest_mellan');
     nyttIHjalteboken();
     await ui.visaFest(st.sort === 'ryggsack' ? '🎒' : '👑', tid(1100));
   }
   /** Dinoboken får en sida (stubbe i gråboxen: sidan finns i hjälteboken, och pausknappen glimtar). @param {any} st */
   async function dinobok(st) {
-    ljud.spela('fest'); nyttIHjalteboken();
+    ljud.spela('fest_mellan'); nyttIHjalteboken();
     await ui.visaFest(bilder.html(st.sida.bild), tid(1100), true);
   }
   /** Ungen lär sig något nytt (stubbe i gråboxen: ungen hoppar och låter glad). @param {any} st */
@@ -2006,6 +2008,7 @@ export function skapaSpel(d) {
    */
   function ordkraft(ord) {
     const visad = !!rum.ordkraft?.();
+    ljud.spela('ordkraft');
     logg.handelse('ordkraft', `${String(ord).toUpperCase()}${visad ? '' : ' (utan bild)'}`);
   }
 
@@ -2115,7 +2118,7 @@ export function skapaSpel(d) {
         if (upptagen || r.resultat === 'ingen') return;
         k.nollstall();
         upptagen = true;
-        if (r.resultat === 'lagd') { tack(); ljud.spela('bricka'); rita(); upptagen = false; return; }
+        if (r.resultat === 'lagd') { tack(); brickljud(f.s.platser.filter((x) => x !== null).length); rita(); upptagen = false; return; }
         rita();
         if (r.resultat === 'fel') {
           tandForebild('fel'); ljud.spela('fel'); ui.plattan.querySelector('.platser')?.classList.add('gra'); await vanta(tid(400));
@@ -2215,7 +2218,9 @@ export function skapaSpel(d) {
           // en bricka som studsar är ett fel för knuffen (ingen reaktion att vänta på)
           if (res.resultat === 'studs') { tryckFel(); startaKnuffEfterFel(); ljud.spela('pff'); rita(); studsa(id); return; }
           tryckRatt();
-          ljud.spela('bricka'); rita();
+          // ett pinnsteg fälls ut per rätt bokstav, och tonen stiger lite för varje (10c)
+          { const nu = r.s.falt.filter(Boolean).length; ljud.spela('pinne', { fart: 1 + (0.25 * Math.max(0, nu - 1)) / Math.max(1, r.s.falt.length - 1) }); }
+          rita();
           if (res.resultat === 'klar') await fardig();
           return;
         }
@@ -2304,7 +2309,7 @@ export function skapaSpel(d) {
       const svar = async (/** @type {{ resultat: string, reaktion: any }} */ r) => {
         if (upptagen || r.resultat === 'ingen') return;
         k.nollstall(); upptagen = true;
-        if (r.resultat === 'lagd') { visar = -1; ljud.spela('bricka'); rita(); upptagen = false; return; }
+        if (r.resultat === 'lagd') { visar = -1; brickljud(f.s.platser.filter((x) => x !== null).length); rita(); upptagen = false; return; }
         if (r.resultat === 'fel') {
           logg.handelse('val', `${p.id}: fel ord`, { ratt: f.s.senastRatt });
           ljud.spela('klonk'); rita(); ui.plattan.querySelector('.kod-las')?.classList.add('rasslar');
@@ -2345,7 +2350,7 @@ export function skapaSpel(d) {
         ui.plattan.querySelector('.klar')?.addEventListener('click', () => fardig());
         ui.plattan.querySelector('.visa-tb')?.addEventListener('click', () => visaTangentbord());
       };
-      const skriv = (/** @type {string} */ bokstav) => { k.nollstall(); if (n.skriv(bokstav)) { ljud.spela('bricka'); rita(); } };
+      const skriv = (/** @type {string} */ bokstav) => { k.nollstall(); if (n.skriv(bokstav)) { brickljud(n.s.namn.length); rita(); } };
       const visaTangentbord = () => { tangentbord.visa(); layout.sattReserv(TANGENTBORD_HOJD); };
       let fardigt = false;
       const fardig = async () => {
@@ -2425,7 +2430,7 @@ export function skapaSpel(d) {
       else { ljud.spela(p.foremal ? 'prassel' : 'sla'); rum.slagen(id); }
       logg.handelse(hugga ? 'hugga' : 'svinga', `${id}: ${fynd}`);
       if (fynd === 'bar') { av.bar++; ui.uppdateraHud(av); ljud.spela('bar'); await ui.visaFest('🫐', tid(600)); }
-      else if (fynd && fynd === k.sista) { ljud.spela('fest'); await ui.visaFest(fynd.startsWith('kartbit') ? kartbitFest(Number(fynd.split('_')[1])) : bilder.emoji(fynd) || '✨', tid(900), true); }
+      else if (fynd && fynd === k.sista) { ljud.spela(fynd.startsWith('kartbit') ? 'fest_stor' : 'fest_mellan'); await ui.visaFest(fynd.startsWith('kartbit') ? kartbitFest(Number(fynd.split('_')[1])) : bilder.emoji(fynd) || '✨', tid(900), true); }
       else if (fynd && fynd !== 'tom') { ljud.spela('allmant'); await ui.visaFest(bilder.emoji(fynd) || '✨', tid(700)); }
       else await vanta(tid(300));
     }
@@ -2756,7 +2761,7 @@ export function skapaSpel(d) {
   async function passSlut(st) {
     rum.frys(true);
     tonaNasta = true; // nästa pass börjar en ny stund (ny dag): tona in
-    ljud.spela('fest');
+    ljud.spela('fest_mellan');
     const sover = '<span class="unge-sover" aria-hidden="true"><span class="kropp"></span><span class="zz">z z</span></span>';
     // frågan: sparpunktens egen, annars äventyrets (sparpunkt_fraga i aventyr.json)
     const fr = st?.fraga ?? aventyr.sparpunkt_fraga?.text ?? null;
@@ -2988,8 +2993,9 @@ export function skapaSpel(d) {
       introVisat = true;
       await spelaIntro({
         skarm: ui.$('#skarm'), tid, logg,
-        forstaTrycket: () => { ljud.starta(); spelaMusik('meny'); rost.lasUpp(); },
-        klang: (i) => ljud.klang?.(i),
+        forstaTrycket: () => { ljud.starta(); ljud.spela('start'); spelaMusik('meny'); rost.lasUpp(); },
+        // en klang per bokstav i ORDSTAVEN, som stiger lite (titel_bokstav med fart 1,0–1,4, 10c)
+        klang: (i) => ljud.spela('titel_bokstav', { fart: 1 + (0.4 * i) / 8 }),
         lasNamnet: () => (inst.rost && rost.harRost ? rost.saga('Ordstaven', 'berattare') : Promise.resolve()),
         tyst: () => rost.tyst(),
         ordkraft: rum.figurUrl?.('effekter', 'efx_ordkraft_03') ?? null,

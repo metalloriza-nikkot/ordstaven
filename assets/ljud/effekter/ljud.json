@@ -1,0 +1,562 @@
+{
+ "pling": {
+  "grupp": "Överallt",
+  "vad": "Uppdragslappen eller molnet kommer, ett nytt delsteg: mjukt pling",
+  "signatur": false,
+  "styrka_db": -10,
+  "sekunder": 0.75
+ },
+ "penndrag": {
+  "grupp": "Överallt",
+  "vad": "Bock på lappen: ett kort penndrag",
+  "signatur": false,
+  "styrka_db": -12,
+  "sekunder": 0.41
+ },
+ "stampel": {
+  "grupp": "Överallt",
+  "vad": "Stämpeln, uppdraget klart: en dov stämpel och ett litet pling",
+  "signatur": true,
+  "styrka_db": -5,
+  "sekunder": 0.95
+ },
+ "pappersus": {
+  "grupp": "Överallt",
+  "vad": "Lappen flyger till pausknappen: ett papperssus",
+  "signatur": false,
+  "styrka_db": -14,
+  "sekunder": 0.65
+ },
+ "papper": {
+  "grupp": "Överallt",
+  "vad": "Läsplattan, boken eller lappen öppnas och stängs: papper som prasslar",
+  "signatur": false,
+  "styrka_db": -14,
+  "sekunder": 0.47
+ },
+ "klick": {
+  "grupp": "Överallt",
+  "vad": "Knapp i menyerna: ett mjukt klick",
+  "signatur": false,
+  "styrka_db": -14,
+  "sekunder": 0.3
+ },
+ "bricka_1": {
+  "grupp": "Överallt",
+  "vad": "Bokstavsbricka eller tangent nr 1 i ordet: tonen stiger för varje bokstav (pentaton)",
+  "signatur": false,
+  "styrka_db": -10,
+  "sekunder": 0.41
+ },
+ "bricka_2": {
+  "grupp": "Överallt",
+  "vad": "Bokstavsbricka eller tangent nr 2 i ordet: tonen stiger för varje bokstav (pentaton)",
+  "signatur": false,
+  "styrka_db": -10,
+  "sekunder": 0.41
+ },
+ "bricka_3": {
+  "grupp": "Överallt",
+  "vad": "Bokstavsbricka eller tangent nr 3 i ordet: tonen stiger för varje bokstav (pentaton)",
+  "signatur": false,
+  "styrka_db": -10,
+  "sekunder": 0.41
+ },
+ "bricka_4": {
+  "grupp": "Överallt",
+  "vad": "Bokstavsbricka eller tangent nr 4 i ordet: tonen stiger för varje bokstav (pentaton)",
+  "signatur": false,
+  "styrka_db": -10,
+  "sekunder": 0.41
+ },
+ "bricka_5": {
+  "grupp": "Överallt",
+  "vad": "Bokstavsbricka eller tangent nr 5 i ordet: tonen stiger för varje bokstav (pentaton)",
+  "signatur": false,
+  "styrka_db": -10,
+  "sekunder": 0.41
+ },
+ "bricka_6": {
+  "grupp": "Överallt",
+  "vad": "Bokstavsbricka eller tangent nr 6 i ordet: tonen stiger för varje bokstav (pentaton)",
+  "signatur": false,
+  "styrka_db": -10,
+  "sekunder": 0.41
+ },
+ "bricka_7": {
+  "grupp": "Överallt",
+  "vad": "Bokstavsbricka eller tangent nr 7 i ordet: tonen stiger för varje bokstav (pentaton)",
+  "signatur": false,
+  "styrka_db": -10,
+  "sekunder": 0.41
+ },
+ "bricka_8": {
+  "grupp": "Överallt",
+  "vad": "Bokstavsbricka eller tangent nr 8 i ordet: tonen stiger för varje bokstav (pentaton)",
+  "signatur": false,
+  "styrka_db": -10,
+  "sekunder": 0.41
+ },
+ "pff": {
+  "grupp": "Överallt",
+  "vad": "Brickan studsar tillbaka: ett mjukt pff",
+  "signatur": false,
+  "styrka_db": -14,
+  "sekunder": 0.37
+ },
+ "ratt": {
+  "grupp": "Överallt",
+  "vad": "Rätt svar, litet: tre stigande toner",
+  "signatur": false,
+  "styrka_db": -7,
+  "sekunder": 0.85
+ },
+ "fel": {
+  "grupp": "Överallt",
+  "vad": "Fel: ett komiskt bloing, aldrig ett felsurr",
+  "signatur": false,
+  "styrka_db": -9,
+  "sekunder": 0.65
+ },
+ "fest_mellan": {
+  "grupp": "Överallt",
+  "vad": "Fest, mellan (räddning, duell, ny grad): fanfar",
+  "signatur": false,
+  "styrka_db": -5,
+  "sekunder": 1.35
+ },
+ "fest_stor": {
+  "grupp": "Överallt",
+  "vad": "Fest, stor (kartbit): längre fanfar i samma familj",
+  "signatur": false,
+  "styrka_db": -4,
+  "sekunder": 2.15
+ },
+ "ordkraft": {
+  "grupp": "Överallt",
+  "vad": "Ordkraftens ljus, varje gång ett ord blir något: stavens klang, ett glittrande ackord som stiger",
+  "signatur": true,
+  "styrka_db": -6,
+  "sekunder": 1.6
+ },
+ "formel_ristas": {
+  "grupp": "Överallt",
+  "vad": "En ny formel ristas in på staven: stavens klang och ett lågt surr som stiger",
+  "signatur": false,
+  "styrka_db": -5,
+  "sekunder": 2.55
+ },
+ "bar": {
+  "grupp": "Överallt",
+  "vad": "Ett bär till räknaren: ett plopp",
+  "signatur": false,
+  "styrka_db": -9,
+  "sekunder": 0.37
+ },
+ "hmm": {
+  "grupp": "Överallt",
+  "vad": "Mata ungen vid 0 bär: ett mjukt hmm",
+  "signatur": false,
+  "styrka_db": -12,
+  "sekunder": 0.75
+ },
+ "sla": {
+  "grupp": "Överallt",
+  "vad": "Vifta med staven (krukor, buskar, lövhögar): ett kort svisch",
+  "signatur": false,
+  "styrka_db": -10,
+  "sekunder": 0.43
+ },
+ "hugg": {
+  "grupp": "Kapitel 1",
+  "vad": "SVÄRD: ett svisch per hugg, ljusare än staven",
+  "signatur": false,
+  "styrka_db": -9,
+  "sekunder": 0.55
+ },
+ "kruka": {
+  "grupp": "Överallt",
+  "vad": "En kruka går sönder: lera som spricker och skärvor som klirrar",
+  "signatur": false,
+  "styrka_db": -7,
+  "sekunder": 0.75
+ },
+ "prassel": {
+  "grupp": "Överallt",
+  "vad": "En buske eller lövhög: prassel, sedan plopp",
+  "signatur": false,
+  "styrka_db": -9,
+  "sekunder": 0.75
+ },
+ "dorr": {
+  "grupp": "Överallt",
+  "vad": "En dörr öppnas (rätt): ett knarr och ett klick",
+  "signatur": false,
+  "styrka_db": -9,
+  "sekunder": 0.85
+ },
+ "bonk": {
+  "grupp": "Överallt",
+  "vad": "En fel dörr spikas igen (förenklingen): två komiska bonk",
+  "signatur": false,
+  "styrka_db": -8,
+  "sekunder": 0.75
+ },
+ "stege": {
+  "grupp": "Överallt",
+  "vad": "Klättra på en stege: ett knack i trä per steg",
+  "signatur": false,
+  "styrka_db": -10,
+  "sekunder": 0.33
+ },
+ "lock": {
+  "grupp": "Överallt",
+  "vad": "Ett lock öppnas (lådor, kistor): ett knarr",
+  "signatur": false,
+  "styrka_db": -10,
+  "sekunder": 0.6
+ },
+ "radio": {
+  "grupp": "Överallt",
+  "vad": "Radion: Farfar talar genom den, ett kort brus",
+  "signatur": false,
+  "styrka_db": -14,
+  "sekunder": 0.32
+ },
+ "kapitel": {
+  "grupp": "Överallt",
+  "vad": "Kapitelrubriken: kort fanfar",
+  "signatur": false,
+  "styrka_db": -6,
+  "sekunder": 0.95
+ },
+ "start": {
+  "grupp": "Introt",
+  "vad": "Första trycket: ett varmt startackord",
+  "signatur": false,
+  "styrka_db": -6,
+  "sekunder": 1.9
+ },
+ "titel_bokstav": {
+  "grupp": "Introt",
+  "vad": "En bokstav i ORDSTAVEN landar: en liten klang (stiger lite för varje bokstav, spela med playbackRate 1,0–1,4)",
+  "signatur": false,
+  "styrka_db": -12,
+  "sekunder": 0.6
+ },
+ "dunk": {
+  "grupp": "Prologen",
+  "vad": "DUNK, ägget på vinden: dovt och mjukt som en boll mot trä. Exakt samma varje gång",
+  "signatur": true,
+  "styrka_db": -5,
+  "sekunder": 0.75
+ },
+ "glitter": {
+  "grupp": "Prologen",
+  "vad": "Staven glimmar i mörkret: ett litet glitter",
+  "signatur": false,
+  "styrka_db": -14,
+  "sekunder": 0.85
+ },
+ "puff": {
+  "grupp": "Prologen",
+  "vad": "Ordet blir en sak (LJUS och andra): ett mjukt puff",
+  "signatur": false,
+  "styrka_db": -10,
+  "sekunder": 0.55
+ },
+ "fras": {
+  "grupp": "Prologen",
+  "vad": "Fel formel: staven fräser kort (ofarligt), sedan ett pff",
+  "signatur": false,
+  "styrka_db": -13,
+  "sekunder": 0.8
+ },
+ "tut": {
+  "grupp": "Prologen",
+  "vad": "Fel: en leksaksbil tutar",
+  "signatur": false,
+  "styrka_db": -10,
+  "sekunder": 0.7
+ },
+ "plopp": {
+  "grupp": "Prologen",
+  "vad": "Något ploppar ut (osten, hjälmen som trillar)",
+  "signatur": false,
+  "styrka_db": -9,
+  "sekunder": 0.4
+ },
+ "tander": {
+  "grupp": "Prologen",
+  "vad": "Knuffen: ägget hackar tänder (frusen)",
+  "signatur": false,
+  "styrka_db": -13,
+  "sekunder": 0.7
+ },
+ "sus": {
+  "grupp": "Prologen",
+  "vad": "Filten svävar och läggs om ägget (och repet som ringlar): ett mjukt sus",
+  "signatur": false,
+  "styrka_db": -14,
+  "sekunder": 1.05
+ },
+ "knack": {
+  "grupp": "Prologen",
+  "vad": "KNACK, KNACK: ägget knackar inifrån (spela två gånger)",
+  "signatur": false,
+  "styrka_db": -8,
+  "sekunder": 0.34
+ },
+ "kras": {
+  "grupp": "Prologen",
+  "vad": "KRAS: skal som spricker (och ekorrens nöt i kapitel 1)",
+  "signatur": false,
+  "styrka_db": -8,
+  "sekunder": 0.6
+ },
+ "kastrull": {
+  "grupp": "Prologen",
+  "vad": "Fel dörr: kastruller skramlar",
+  "signatur": false,
+  "styrka_db": -11,
+  "sekunder": 0.95
+ },
+ "badanka": {
+  "grupp": "Prologen",
+  "vad": "Fel dörr: en badanka piper",
+  "signatur": false,
+  "styrka_db": -10,
+  "sekunder": 0.75
+ },
+ "spolning": {
+  "grupp": "Prologen",
+  "vad": "Fel dörr: det spolar bakom toadörren",
+  "signatur": false,
+  "styrka_db": -12,
+  "sekunder": 1.25
+ },
+ "vackarklocka": {
+  "grupp": "Prologen",
+  "vad": "Fel dörr: en väckarklocka ringer kort",
+  "signatur": false,
+  "styrka_db": -13,
+  "sekunder": 0.85
+ },
+ "klirr": {
+  "grupp": "Prologen",
+  "vad": "Kakaokoppen trillar: ett klirr",
+  "signatur": false,
+  "styrka_db": -11,
+  "sekunder": 0.75
+ },
+ "mage": {
+  "grupp": "Prologen",
+  "vad": "BRUM, magen kurrar",
+  "signatur": false,
+  "styrka_db": -8,
+  "sekunder": 0.85
+ },
+ "plums": {
+  "grupp": "Prologen",
+  "vad": "Ungen dyker ned i dinomaten: plums",
+  "signatur": false,
+  "styrka_db": -9,
+  "sekunder": 0.5
+ },
+ "nys": {
+  "grupp": "Prologen",
+  "vad": "Dammoln och nysningar, ATJO bakom busken (kapitel 1): en liten nysning utan röst",
+  "signatur": false,
+  "styrka_db": -11,
+  "sekunder": 0.75
+ },
+ "kvack": {
+  "grupp": "Prologen",
+  "vad": "Fel låda: en leksaksgroda, KVACK",
+  "signatur": false,
+  "styrka_db": -10,
+  "sekunder": 0.45
+ },
+ "rull": {
+  "grupp": "Prologen",
+  "vad": "Bären rullar ut (och SOL rullar ut)",
+  "signatur": false,
+  "styrka_db": -12,
+  "sekunder": 0.85
+ },
+ "sida": {
+  "grupp": "Prologen",
+  "vad": "Sagan: en sida bläddras",
+  "signatur": false,
+  "styrka_db": -13,
+  "sekunder": 0.55
+ },
+ "boing": {
+  "grupp": "Prologen",
+  "vad": "Ungen studsar i sängen, saken studsar ur ryggsäcken: boing",
+  "signatur": false,
+  "styrka_db": -10,
+  "sekunder": 0.55
+ },
+ "kvitter": {
+  "grupp": "Prologen",
+  "vad": "Morgon: fåglar kvittrar utanför",
+  "signatur": false,
+  "styrka_db": -16,
+  "sekunder": 1.05
+ },
+ "slurp": {
+  "grupp": "Prologen",
+  "vad": "Ungen slickar hjälten på näsan",
+  "signatur": false,
+  "styrka_db": -12,
+  "sekunder": 0.5
+ },
+ "vissling": {
+  "grupp": "Prologen",
+  "vad": "Farfar visslar i köket (en kort slinga)",
+  "signatur": false,
+  "styrka_db": -14,
+  "sekunder": 1.45
+ },
+ "luftskepp": {
+  "grupp": "Prologen",
+  "vad": "Luftskeppet: lågt propellersurr som växer när det närmar sig (ca 3 s)",
+  "signatur": false,
+  "styrka_db": -10,
+  "sekunder": 3.25
+ },
+ "baron": {
+  "grupp": "Prologen",
+  "vad": "Baronens motiv: fyra pompösa, lite fåniga toner i fagott och tuba. Spelas varje gång han dyker upp (förslag)",
+  "signatur": true,
+  "styrka_db": -6,
+  "sekunder": 1.85
+ },
+ "rassel": {
+  "grupp": "Prologen",
+  "vad": "Repstegen trasslar, låsets bygel rasslar (kapitel 1)",
+  "signatur": false,
+  "styrka_db": -12,
+  "sekunder": 0.75
+ },
+ "vingflax": {
+  "grupp": "Kapitel 1",
+  "vad": "Småfåglar som flyger upp: vingflax och ett litet kvitter",
+  "signatur": false,
+  "styrka_db": -14,
+  "sekunder": 0.75
+ },
+ "klonk": {
+  "grupp": "Kapitel 1",
+  "vad": "KLONK: nöten och kotten på hjälmen, kodlåset vid fel",
+  "signatur": false,
+  "styrka_db": -9,
+  "sekunder": 0.6
+ },
+ "apa_gnall": {
+  "grupp": "Kapitel 1",
+  "vad": "Apan gnäller långt borta (före BUHU)",
+  "signatur": false,
+  "styrka_db": -16,
+  "sekunder": 0.85
+ },
+ "apa_grat": {
+  "grupp": "Kapitel 1",
+  "vad": "BUHU: apan gråter (ofarligt och lite lustigt)",
+  "signatur": false,
+  "styrka_db": -10,
+  "sekunder": 1.25
+ },
+ "apa_suck": {
+  "grupp": "Kapitel 1",
+  "vad": "Apan suckar",
+  "signatur": false,
+  "styrka_db": -14,
+  "sekunder": 0.85
+ },
+ "knarr": {
+  "grupp": "Kapitel 1",
+  "vad": "Nätet gungar och knakar (vid fel): ett trä- och repknarr",
+  "signatur": false,
+  "styrka_db": -12,
+  "sekunder": 0.65
+ },
+ "pinne": {
+  "grupp": "Kapitel 1",
+  "vad": "Pinnstegen: ett pinnsteg fälls ut (per rätt bokstav), stiger lite för varje",
+  "signatur": false,
+  "styrka_db": -10,
+  "sekunder": 0.32
+ },
+ "duns": {
+  "grupp": "Kapitel 1",
+  "vad": "En lian faller, Herr Skata landar: ett mjukt duns",
+  "signatur": false,
+  "styrka_db": -9,
+  "sekunder": 0.5
+ },
+ "kittla": {
+  "grupp": "Kapitel 1",
+  "vad": "Fel SVÄRD: det lilla svärdet kittlar, ett kittlande pling",
+  "signatur": false,
+  "styrka_db": -12,
+  "sekunder": 0.75
+ },
+ "klapp": {
+  "grupp": "Kapitel 1",
+  "vad": "Taggkammen klappas fast på hjälmen",
+  "signatur": false,
+  "styrka_db": -10,
+  "sekunder": 0.31
+ },
+ "uggla": {
+  "grupp": "Kapitel 1",
+  "vad": "HO HO: ugglorna vid rätt träd. Två mjuka ho",
+  "signatur": false,
+  "styrka_db": -8,
+  "sekunder": 1.1
+ },
+ "lucka_pip": {
+  "grupp": "Kapitel 1",
+  "vad": "Fel lucka: luckan piper (PIP) och slår igen",
+  "signatur": false,
+  "styrka_db": -10,
+  "sekunder": 0.65
+ },
+ "klick_las": {
+  "grupp": "Kapitel 1",
+  "vad": "Kodlåset: HEM lyser och låset klickar upp",
+  "signatur": false,
+  "styrka_db": -9,
+  "sekunder": 0.55
+ },
+ "krasch": {
+  "grupp": "Kapitel 1",
+  "vad": "Herr Skata kraschar i trädet: prassel, duns och fjädrar",
+  "signatur": false,
+  "styrka_db": -8,
+  "sekunder": 1.05
+ },
+ "hackspett": {
+  "grupp": "Kapitel 1",
+  "vad": "TOK TOK: hackspetten. Knack i trä",
+  "signatur": false,
+  "styrka_db": -8,
+  "sekunder": 0.65
+ },
+ "porl": {
+  "grupp": "Kapitel 1",
+  "vad": "Bäcken porlar (kort, kan spelas vid bron, inte som bakgrund)",
+  "signatur": false,
+  "styrka_db": -16,
+  "sekunder": 1.75
+ },
+ "snurr": {
+  "grupp": "Kapitel 1",
+  "vad": "Ugglorna vrider huvudet, ungen blir yr: ett snurr",
+  "signatur": false,
+  "styrka_db": -12,
+  "sekunder": 0.85
+ }
+}

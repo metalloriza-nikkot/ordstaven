@@ -16,6 +16,8 @@ Läser en kopia av inkorgsmappen och skriver till repot:
   (fas 4, 10e), och ui/intro/intro.json med introts tider och lägen.
 - figurer/*/*_portratt_*.png → också assets/portratt/<namn>.png (ansiktena i pratrutan, i textlagret).
 - ljud/*.wav             → assets/ljud/<namn>.wav, döpta utan mellanslag ("unge_late 2" → unge_late_02).
+- ljud/effekter/*.wav och ljud.json → assets/ljud/effekter/<id>.wav (Stils ljudeffekter, F5, 10c v0.5), med samma
+  namn som Stils id, omskrivna med bara formatet och ljuddatan, och ljud.json med id, grupp, nivå och längd.
 - ljud/musik/*.m4a, *.ogg → assets/ljud/musik/<namn>.m4a och .ogg (Stils slingor, F5), omskrivna med ffmpeg utan
   metadata (ljudet kopieras som det är).
 
@@ -154,6 +156,37 @@ def ljud(inkorg, repo, prova, fel):
             w.writeframes(data)
 
 
+def effekter(inkorg, repo, prova, fel):
+    """Stils ljudeffekter: namnen är Stils id (10c), och varje fil skrivs om med bara formatet och ljuddatan."""
+    mapp = inkorg / 'ljud' / 'effekter'
+    ut = repo / 'assets' / 'ljud' / 'effekter'
+    for f in sorted(mapp.glob('*.wav')):
+        if not NAMN.match(f.stem):
+            fel.append(f'{f.name}: namnet har tecken utanför a–z, 0–9 och _')
+            continue
+        with wave.open(str(f)) as w:
+            par, data = w.getparams(), w.readframes(w.getnframes())
+        sek = par.nframes / par.framerate
+        if sek > 4:
+            fel.append(f'{f.name}: {sek:.1f} s, en ljudeffekt ska vara kort (högst 4 s)')
+        if prova:
+            continue
+        ut.mkdir(parents=True, exist_ok=True)
+        with wave.open(str(ut / f.name), 'wb') as w:
+            w.setparams(par)
+            w.writeframes(data)
+    if (mapp / 'ljud.json').is_file():
+        data = json.loads((mapp / 'ljud.json').read_text())
+        rena = {k: {f: v[f] for f in ('grupp', 'vad', 'signatur', 'styrka_db', 'sekunder') if f in v} for k, v in data.items() if NAMN.match(k)}
+        saknas = [k for k in rena if not (mapp / f'{k}.wav').is_file()]
+        for k in saknas:
+            fel.append(f'ljud.json: {k} saknar sin fil')
+        print(f'assets/ljud/effekter/: {len(rena)} ljud')
+        if not prova:
+            ut.mkdir(parents=True, exist_ok=True)
+            (ut / 'ljud.json').write_text(json.dumps(rena, indent=1, ensure_ascii=False) + '\n')
+
+
 def musik(inkorg, repo, prova, fel):
     """Stils musik: samma ljud, bara utan metadata (ffmpeg -c copy)."""
     import subprocess
@@ -249,6 +282,8 @@ def main():
                 (repo / 'assets' / 'tiles' / mapp.name / f'{tsj.stem}.json').write_text(json.dumps(data, indent=1, ensure_ascii=False) + '\n')
     if med('ljud'):
         ljud(ink, repo, arg.prova, fel)
+    if med('ljud/effekter') and (ink / 'ljud' / 'effekter').is_dir():
+        effekter(ink, repo, arg.prova, fel)
     if med('ljud/musik') and (ink / 'ljud' / 'musik').is_dir():
         musik(ink, repo, arg.prova, fel)
     # paletten är sluten: en färg som inte står i Stils masterpalett stoppar (Stil ritar om eller lägger in den)

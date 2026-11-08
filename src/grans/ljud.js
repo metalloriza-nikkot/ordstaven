@@ -28,6 +28,25 @@ export const MUSIK = /** @type {Record<string, { m4a: string, ogg: string, loopS
 export const MUSIK_NIVA = 0.5;
 export const MUSIK_SANKT_DB = -12;
 
+/**
+ * Stils ljudeffekter (F5, 10c v0.5): 80 egna ljud med Stils id, nivån inbakad i filerna. Varje fil avkodas en gång
+ * när ljudet startar. Det inspelade (ungen och Herr Skata) och rösternas pip stannar som förut.
+ */
+const EFFEKTER = /** @type {Record<string, string>} */ (Object.fromEntries(Object.entries(
+  /** @type {Record<string, string>} */ (import.meta.glob('../../assets/ljud/effekter/*.wav', { query: '?url', import: 'default', eager: true })),
+).map(([fil, url]) => [/** @type {string} */ (fil.split('/').pop()).replace(/\.wav$/, ''), url])));
+/** Gråboxens namn och innehållets ljud-id → Stils id (10c v0.5, *Gråboxens namn byts så här*). */
+export const EFFEKT_FOR = /** @type {Record<string, string>} */ ({
+  allmant: 'kruka', fagel: 'vingflax', fest: 'fest_mellan', bricka: 'bricka_1',
+  apa_gnaller: 'apa_gnall', ekorre_not: 'kras', mage_kurrar: 'mage', klaffen_tick: 'klick',
+});
+/** Signaturljuden spelas alltid likadant (samma fil, samma fart och förstärkning). */
+const SIGNATUR = new Set(['stampel', 'ordkraft', 'dunk', 'baron']);
+/** Ljudeffekternas förstärkning. Musiken ligger ca 8 dB under (MUSIK_NIVA). Avvägt utan öron, ska provlyssnas. */
+export const EFFEKT_NIVA = 0.5;
+/** Vilka ljud-id som har en fil (för testerna och loggen). */
+export const effektFinns = (/** @type {string} */ id) => !!EFFEKTER[EFFEKT_FOR[id] ?? id];
+
 /** De inspelade ljuden. */
 const INSPELADE = { herr_skata_skratt: skrattUrl, unge_late_01: unge1Url, unge_late_02: unge2Url, unge_late_03: unge3Url };
 /** Ljud-id i innehållet och effekter → inspelat ljud. 'unge' (ungen reagerar) tar ett av de tre lätena. */
@@ -126,8 +145,17 @@ export function skapaLjud({ tyst = () => false } = {}) {
 
   /** @type {Map<string, AudioBuffer>} */
   const buffrar = new Map();
-  /** Hämta och avkoda de inspelade ljuden en gång (callback-formen fungerar också i äldre Safari). */
+  /** @type {Map<string, AudioBuffer>} */
+  const effektBuf = new Map();
+  /** @type {GainNode | null} */
+  let effektUt = null;
+  /** Hämta och avkoda de inspelade ljuden och ljudeffekterna en gång (callback-formen fungerar också i äldre Safari). */
   function avkoda() {
+    for (const [id, url] of Object.entries(EFFEKTER)) {
+      fetch(url).then((r) => r.arrayBuffer()).then((data) => new Promise((klar, fel) => {
+        const p = ac?.decodeAudioData(data, klar, fel); if (p && p.catch) p.catch(fel);
+      })).then((b) => { effektBuf.set(id, /** @type {AudioBuffer} */ (b)); }).catch(() => { /* syntesen får spela i stället */ });
+    }
     for (const [namn, url] of Object.entries(INSPELADE)) {
       fetch(url).then((r) => r.arrayBuffer()).then((data) => new Promise((klar, fel) => {
         const p = ac?.decodeAudioData(data, klar, fel); if (p && p.catch) p.catch(fel);
@@ -145,6 +173,20 @@ export function skapaLjud({ tyst = () => false } = {}) {
     g.gain.value = 1; // inspelningarna är normaliserade (topp 0,89), genom ut (0,35) som syntesen
     k.buffer = buf; k.connect(g); g.connect(ut); k.start();
     return Math.round(buf.duration * 1000);
+  }
+
+  /**
+   * Spela en av Stils ljudeffekter, om den är avkodad. @param {string} id Stils id @param {number} [fart] playbackRate
+   * (inte för signaturljuden) @param {number} [om] sekunder till start @returns {number} längden i ms, 0 om den saknas
+   */
+  function effekt(id, fart = 1, om = 0) {
+    const buf = effektBuf.get(id);
+    if (!ac || !buf) return 0;
+    if (!effektUt) { effektUt = ac.createGain(); effektUt.gain.value = EFFEKT_NIVA; effektUt.connect(ac.destination); }
+    const k = ac.createBufferSource();
+    k.buffer = buf; k.playbackRate.value = SIGNATUR.has(id) ? 1 : fart;
+    k.connect(effektUt); k.start(ac.currentTime + om);
+    return Math.round((buf.duration / k.playbackRate.value) * 1000);
   }
 
   /** @param {{ f: number, f2?: number, t?: number, v?: number, typ?: OscillatorType, d?: number }} o */
@@ -234,21 +276,16 @@ export function skapaLjud({ tyst = () => false } = {}) {
     sank,
     /** För testerna och loggen: vilken slinga som ska spela, vilken som spelar och om den är sänkt. */
     get musikLage() { return { onskad, spelar: spelar?.namn ?? null, sankt }; },
-    /** Introts lilla klang för bokstav i i ORDSTAVEN: mjuk och stigande (pentatont). @param {number} i */
-    klang(i) {
-      if (tyst()) return;
-      starta();
-      try {
-        const f = 660 * 2 ** ([0, 2, 4, 7, 9, 12, 14, 16, 19][i % 9] / 12);
-        ton({ f, t: 0.2, v: 0.09, typ: 'sine' }); ton({ f: f * 2, t: 0.1, v: 0.025, typ: 'sine', d: 0.01 });
-      } catch (e) { /* ljud får aldrig krascha spelet */ }
-    },
-    /** @returns {number} hur länge ljudet låter i ms (0 = kort syntes eller tyst) */
-    spela(namn) {
+    /**
+     * Ett ljud: det inspelade lätet, annars Stils ljudeffekt (10c v0.5), annars syntesen.
+     * @param {string} namn @param {{ fart?: number, om?: number }} [opt] fart: playbackRate, om: sekunder till start
+     * @returns {number} hur länge ljudet låter i ms (0 = kort syntes eller tyst)
+     */
+    spela(namn, opt = {}) {
       if (tyst()) return 0;
       starta();
       try {
-        const ms = inspelat(namn) || inspelat(LJUD_ID[namn] || '');
+        const ms = inspelat(namn) || inspelat(LJUD_ID[namn] || '') || effekt(EFFEKT_FOR[namn] ?? namn, opt.fart, opt.om);
         if (ms) return ms;
         (fx[namn] || fx[LJUD_ID[namn]] || fx.allmant)();
       } catch (e) { /* ljud får aldrig krascha spelet */ }
