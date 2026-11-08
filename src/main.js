@@ -58,7 +58,8 @@ let testkartor = {};
         // provpussel, fler scener (frivilliga) och fält i rummen, så att kapitel 1:s steg kan provas i prologens rum
         for (const p of t.pussel || []) k.pussel.push(p);
         if (t.uppdrag) k.uppdrag = t.uppdrag; // provuppdrag i stället för kapitlets (uppdragslappen, 2d)
-        if (t.var_var_vi) k.var_var_vi = t.var_var_vi; // Farfars "Var var vi?" (F2)
+        // Farfars "Var var vi?" (F2): bara provscenens egen, så att kapitlets riktiga inte kommer före provscenen
+        k.var_var_vi = t.var_var_vi ?? [];
         if (t.musik !== undefined) k.musik = t.musik; // kapitlets slinga (27)
         for (const sc of t.scener || []) k.scener.push(sc);
         for (const [id, falt] of Object.entries(t.rum || {})) { const r = k.rum.find((x) => x.id === id); if (r) Object.assign(r, falt); else k.rum.push({ id, namn: id, innehall: [], ...falt }); }

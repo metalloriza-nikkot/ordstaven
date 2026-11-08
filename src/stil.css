@@ -176,6 +176,11 @@ html, body {
 .replik-ruta .vvv-ord { flex: none; align-self: center; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 14px; border-radius: 14px; background: #fff8e6; box-shadow: inset 0 0 0 3px var(--guld); }
 .replik-ruta .vvv-text { font-size: calc(64px * var(--t)); line-height: 1.1; font-weight: 600; letter-spacing: .04em; }
 .replik-ruta .vvv-bild .bild.bildkort { width: var(--kort, 96px); height: var(--kort, 96px); }
+/* I remsan under spelytan står bilden bredvid ordet, så att rutan ryms i remsan (0.45.0: med Innehålls riktiga ord
+   blev den högre än remsan på MacBooken i helskärm) */
+.text-under #plattan.replik .vvv-ord { flex-direction: row; gap: calc(10px * var(--t)); padding: calc(6px * var(--t)) calc(14px * var(--t)); }
+.text-under #plattan.replik .vvv-bild .bild.bildkort { width: calc(64px * var(--t)); height: calc(64px * var(--t)); }
+.text-under #plattan.replik .vvv-bild { font-size: calc(52px * var(--t)); line-height: 1; }
 .replik-ruta .vidare, .pussel-ruta > .vidare { position: static; flex: none; }
 .pussel-ruta > .vidare { align-self: flex-end; }
 .replik-ruta .text, .svar-rad .text, .lapp { font-size: calc(48px * var(--t)); line-height: 1.4; letter-spacing: 0; } /* Lexend har redan luftigt avstånd */

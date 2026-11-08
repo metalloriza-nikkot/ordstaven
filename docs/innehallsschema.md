@@ -1,8 +1,9 @@
 # Innehållsschema – kapitel i format 2
 
-Version 2.30 (2026-11-08). Ägs av teknikspåret.
+Version 2.31 (2026-11-08). Ägs av teknikspåret.
+2.31: **kapitel 2:s fält** (Teknik 20, rapporten 26 och beslut 64.2). Schemat och kontrollen känner dem, och motorn bygger dem i kapitel 2:s gråbox. Avsnittet *3e* nedan. Allt är tillägg, filer i 2.30 gäller fortfarande.
 2.30: **mellanscenernas text för den vuxne** (Teknik 28, beslut 65). Mellanscenen får **`syns_redan: true`**: det som händer syns redan, och beskrivningen visas inte. Kapitlets och äventyrets **`meta.klart: true`** gör en beskrivning som visas till ett fel. Allt är tillägg, filer i 2.29 gäller fortfarande.
-2.29: **musiken och ljuden** (27, beslut 64.5–64.6). **`musik`** på kapitlet, ett rum och en scen, och steget **`musik`** (avsnittet *3d* nedan). **`ljud`** på en reaktion (`vid_ratt`, `vid_fel`, `vid_valj`, `efter_3_fel`) och på en mellanscen. Allt är tillägg, filer i 2.28 gäller fortfarande.
+2.29: **musiken och ljuden** (27, beslut 64.5–64.6). **`musik`** på kapitlet, ett rum och en scen, och steget **`musik`** (avsnittet *3d* nedan). **`ljud`** på en reaktion (`vid_ratt`, `vid_fel`, `vid_valj`) och på en mellanscen. Allt är tillägg, filer i 2.28 gäller fortfarande.
 2.28: **räddningens knuff** (P15, beslut 58.2) följer Innehålls regel i 04 v0.10 (avsnittet om P15 nedan). Inga nya fält.
 2.27: **startskärmen och Farfars "Var var vi?"** (F1 och F2, beslut 61). Kapitlet får fältet **`var_var_vi`** (avsnittet *3c* nedan), och `aventyr.json` får orden **`gransnitt.fortsatt`** och **`gransnitt.nytt_aventyr`** under startskärmens knappar. Allt är tillägg, filer i 2.26 gäller fortfarande.
 2.26: **rättelserna efter den sista genomspelningen** (Teknik 13). Kartans objekt får **`klattrar_fran`** (figuren klättrar ned för stegen med det id:t när den visas i rummet han redan är i: apan när den är räddad). **Ridåns rutor** (rutlagret `over`) ligger under figurerna och är hinder för fötterna, och kartkontrollen prövar alla kartor (beslut 56.3 och 56.7). Allt är tillägg, filer i 2.25 gäller fortfarande.
@@ -292,12 +293,29 @@ Musiken följer platsen och stämningen, inte kapitlet (beslut 64.5). Det billig
   ```json
   "vid_valj": { "reaktion": "dörren förblir stängd, en badanka piper ut genom springan och det spolar", "ljud": ["badanka", "spolning"], "replik": { … } }
   ```
-  - **På en reaktion** (`vid_ratt`, `vid_fel`, `vid_valj`, `efter_3_fel`): ljudet spelas när reaktionen börjar. **Har en felreaktion ett ljud spelas inte bloinget** (`fel`): det roliga ljudet säger redan att det blev fel. En fel låda knarrar först (`lock`), sedan reaktionens ljud.
+  - **På en reaktion** (`vid_ratt`, `vid_fel`, `vid_valj`): ljudet spelas när reaktionen börjar (`efter_3_fel` spelar ingen reaktion, bara ägget som gungar). **Har en felreaktion ett ljud spelas inte bloinget** (`fel`): det roliga ljudet säger redan att det blev fel. En fel låda knarrar först (`lock`), sedan reaktionens ljud.
   - **På en mellanscen:** ljudet spelas när mellanscenen börjar (luftskeppet, fåglarna på morgonen). Steget `ljud` finns kvar för ett ljud som berättelsen ska vänta på (dunket, ungens läten).
   - **Id:n:** Stils id i `assets/ljud/effekter/ljud.json` (10c v0.5), de inspelade (`unge`, `unge_forsta_late`, `unge_langtan`, `unge_svarar`, `fagel_late`, `skata`, `mammas_rop`) och gråboxens gamla namn (`apa_gnaller`, `mage_kurrar`, `ekorre_not`, `klaffen_tick` …, `src/karna/ljudid.js`).
   - **`mammas_rop`** är ungens längtande läte, spelat med `playbackRate` 0,7 och 6 dB svagare (beslut 64.6).
 - **Motorn spelar själv**, utan data: papperet (läsplattan öppnas, en lapp eller boken stängs), papperssuset (uppdragslappen fälls ihop), penndraget (en ny bock på uppdragslappen), en sida i sagan, dörren (en dörr med öppningsbilder öppnas), locket (en låda eller kista väljs), bonket (förenklingen spikar igen en dörr), stegen (ett knack per steg), suset (det han bär läggs på målet), hmm (bärpåsen är tom) och fanfaren med kapitelrubriken. **Baronens motiv** (`baron`) spelas där han dyker upp: skriv det som `ljud` på mellanscenen (luftskeppet, sidovyerna).
 - Kontrollen säger fel om en slinga eller ett ljud-id inte finns, och schemat om `ljud` har fler än tre id.
+
+## 3e. Kapitel 2:s fält (2.31)
+Formen kommer från rapporten 12:30 (Teknik 26) och Innehålls tillägg i 64.2. **Motorn bygger dem i kapitel 2:s gråbox** (Teknik 20), och kapitlet spelas inte förrän alla rum har en karta.
+- **P11 med tangentbordet:** `"skriv": "tangentbord"`. Fälten visar formelns längd och växer när han skriver fler bokstäver.
+  - `formler[]` får **`godtas`** (andra former, staven ristar in `ord`) och **`ristas: false`** (ordet räcker en gång och ristas inte in);
+  - `nastan[]` får **`tand`** (`forsta` eller `forebild`) och **`replik`**;
+  - **`rimliga`**: ord som passar men inte hjälper, var och en med `reaktion`, `replik`, `ljud` och `ljudord`. De räknas aldrig som fel;
+  - **`vanligt_svar`**: repliken för andra riktiga ord. Bara det som inte är ett ord får "pff".
+- **Steget `nav`:** `grenar` (`scen`, `mal`, `bild`), `mellan_grenar` (steg) och `knuff`. Grenarna tas i valfri ordning, och en gren är klar när dess scen är spelad. Grenarnas scener står efter navet i `scener`, och de bryter inte passet: en sparpunkt i `mellan_grenar` slutar det.
+- **`{ord:<pussel>}`** i en text: ordet han skrev i det P11 (BRO, STEGE, REP eller FLOTTE). Kontrollen räknar radens längd med det längsta ordet.
+- **`kraver`** på en variant i ett läsval: `{ "pussel": "k2_grodan", "variant": "L4" }`. Annars får han närmaste lägre variant.
+- **`villkor`** på en replik i `var_var_vi`: `{ "gren_kvar": "k2s04_bryggan" }` (grenens scen är inte spelad). Repliker med villkor räknas som en, och högst tre hörs.
+- **`oppna_lasplatta`** med **`skylt`** i stället för `pussel_id` (skyltens text visas igen) och **`lys_ord`** (ordet lyser i guld i texten tills nästa steg).
+- **`redan_last`** på ett läsval: så många av lästextens första rader visas grå med en bock.
+- **`ga_till` till `unge`:** ungen är målet.
+- **`bara` till ett annat rum** i kapitlet: han bär saken dit. Medan den följer honom är rummets utgångar stängda utom vägen mot målet, och målet glimtar.
+- **`lockar`** på en frivillig scen: `vid` (en utgång i något rum), `beskrivning`, `bild`, `ljud` och `ljudord`. Det händer när han går förbi, igen varje gång tills han har varit där, aldrig under en replik eller ett läsval.
 
 ## 3b. Rummens kartor (Tiled)
 
@@ -377,7 +395,7 @@ Små bokstäver utom formler (`"LJUS"`). Flaggor: `aao`, `helord`, `sparrad`, `b
 - Skyltar, frivilliga föremål, `las_skylt`, `visa_foremal`, `skylt` och `foremal` som pekar på föremål som inte finns i rummet. En frivillig scen utan `startar_i_rum`, och `paminnelse` utan `vantar_pa`.
 - Räddningens brickor som inte räcker till ordet, och `sak_i_sista` som inte finns i `innehall`.
 - `alias` som pekar på ett id som inte finns, eller ett gammalt id som finns kvar. `nivaer` där golvet ligger över taket. `ljud` med ett `foremal` som inte finns i rummet.
-- En slinga (`musik`) som inte finns, och ett ljud-id (`ljud`, steget `ljud`) som inte finns (2.29).
+- Fälten i 2.31 som pekar fel: en gren, ett mål eller ett `{ord:…}` som inte finns, ett `lys_ord` som inte står i skylten, och fler än tre repliker som hörs i `var_var_vi`.
 - **En mellanscen som visar sin beskrivning i ett klart kapitel** (2.30, beslut 65): kapitlet har `"meta": { "klart": true }`, och mellanscenen har varken `bild` eller `syns_redan`. Mellanscenerna i `aventyr.json` prövas när `aventyr.json` har `meta.klart`. Kontrollen skriver alltid ut hur många som är kvar i varje kapitel.
 - Läs och välj utan exakt ett rätt svar.
 - Förbjudna par på samma skärm (lås–läs, hår–här, bår–bär), och rätt svar och distraktor som bara skiljer sig på Å/Ä i L1–L3.
@@ -387,6 +405,7 @@ Små bokstäver utom formler (`"LJUS"`). Flaggor: `aao`, `helord`, `sparrad`, `b
 - P28 där alla eller inga alternativ är rätt.
 
 **Varningar (stoppar inget):**
+- En slinga (`musik`) eller ett ljud-id (`ljud`, steget `ljud`) som inte finns än (2.29, varning från 2.31): det hörs inget, eller syntesen, tills Stil har gjort det.
 - **Repliker som blir mer än två rader** på läsplattan. Radbredden är 16 em (768 punkter vid 48 punkters text, i versaler), räknad med Lexends egna teckenbredder (`verktyg/lexend-bredder.json`, utan extra bokstavsavstånd).
 - Mer än 8 ord på en rad i text spelaren läser själv.
 - **Färre än två läsuppgifter som avgör något per pass.** Räknas: P1, P28, P15 (kategorin läses). Inte P9: kodlåset är avkodning med nyckel.

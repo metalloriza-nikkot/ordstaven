@@ -1177,7 +1177,7 @@ test('menyn för vuxna hoppar till en scen i ett senare kapitel: det som kommer 
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('s00_start');
   await page.keyboard.press('Control+Shift+KeyM');
   await page.click('#vuxenmeny .del[data-del="test"]');
-  await expect(page.locator('#vuxenmeny .kapitelrad')).toHaveCount(2);
+  await expect(page.locator('#vuxenmeny .kapitelrad')).toHaveCount(3); // prologen, kapitel 1 och kapitel 2 (0.45.0)
   await page.screenshot({ path: 'test-results/meny-alla-kapitel.png' });
   await page.click('#vuxenmeny .scenlista .scen[data-kapitel="kap-01"][data-i="5"]'); // k1s07_stigarna, pass 2
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
@@ -1300,7 +1300,7 @@ test('menyn för vuxna startar ett pass: pass 3 börjar med morgonen, namnen och
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.keyboard.press('Control+Shift+KeyM');
   await page.click('#vuxenmeny .del[data-del="pass"]');
-  await expect(page.locator('#vuxenmeny .pass-start')).toHaveCount(5); // prologens tre pass och kapitel 1:s två
+  await expect(page.locator('#vuxenmeny .pass-start')).toHaveCount(8); // prologens tre pass, kapitel 1:s två och kapitel 2:s tre
   await page.screenshot({ path: 'test-results/meny-pass.png' });
   await page.locator('#vuxenmeny .pass-start', { hasText: 'Prologen, pass 3' }).click();
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
@@ -1832,11 +1832,14 @@ test('s21b: Farfar står vid ytterdörren, vänder sig mot hjälten och säger h
 });
 
 test('Var var vi (F2): i början av ett pass den korta med ordet, i stället för vid_omstart', async ({ page }) => {
-  const vvv = [{ pass: 1, ord: { ord: 'apa', bild: 'apa' }, kort: [{ talare: 'farfar', text: 'Kort påminnelse.' }], lang: [{ talare: 'farfar', text: 'Lång ett.' }, { talare: 'farfar', text: 'Lång två.' }] }];
+  const vvv = [{ pass: 1, ord: { ord: 'apa', bild: 'apa' }, kort: [{ talare: 'farfar', text: 'Kort påminnelse som blir två rader.' }], lang: [{ talare: 'farfar', text: 'Lång ett.' }, { talare: 'farfar', text: 'Lång två.' }] }];
   await provscen(page, { id: 't_vvv', pass: 1, rum: 'koket', tillstand: 'natt', vid_omstart: R('Gammal.', 'farfar'), steg: [R('Klart.')] },
     (t) => { t.aventyr['den-gomda-dalen'].startad = true; }, { var_var_vi: vvv });
-  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('KORT PÅMINNELSE.', { timeout: 8000 });
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('KORT PÅMINNELSE SOM BLIR TVÅ RADER.', { timeout: 8000 });
   await expect(page.locator('#plattan .replik-ruta .vvv-ord .vvv-text')).toHaveText('APA');
+  // rutan med ordet ryms i fönstret, också i remsan under spelytan (0.45.0)
+  const ruta = await page.locator('#plattan').boundingBox();
+  expect(ruta && ruta.y + ruta.height).toBeLessThanOrEqual(await page.evaluate(() => innerHeight) + 1);
   await page.screenshot({ path: 'test-results/var-var-vi-kort.png' });
   await page.click('#plattan .replik-ruta');
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('KLART.', { timeout: 8000 });
@@ -1880,7 +1883,7 @@ test('menyn sätter tillbaka lärandet till passets början, utan spår av det s
   await page.keyboard.press('Control+Shift+KeyM');
   await page.click('#vuxenmeny .del[data-del="pass"]');
   // passen utan bild av lärandet är märkta
-  await expect(page.locator('#vuxenmeny .pass-start[data-bild="nej"]')).toHaveText(['Prologen, pass 2 *', 'Skogen, pass 2 *']);
+  await expect(page.locator('#vuxenmeny .pass-start[data-bild="nej"]')).toHaveText(['Prologen, pass 2 *', 'Skogen, pass 2 *', 'Träsket, pass 1 *', 'Träsket, pass 2 *', 'Träsket, pass 3 *']);
   await expect(page.locator('#vuxenmeny .utan-bild')).toBeVisible();
   await page.screenshot({ path: 'test-results/meny-larandet.png' });
   await Promise.all([page.waitForEvent('load'), page.locator('#vuxenmeny .pass-start', { hasText: 'Prologen, pass 3' }).click()]);

@@ -276,3 +276,48 @@ describe('mellanscenernas text för den vuxne (beslut 65)', () => {
     expect(kontrollera(d).fel).toEqual([]);
   });
 });
+
+describe('kapitel 2 i schema 2.31 (Teknik 20, beslut 64.2)', () => {
+  const med2 = () => { const d = riktigt(); d.kapitel.push(las('den-gomda-dalen/kap-02.json')); return d; };
+  const k2 = (d) => d.kapitel[2];
+  const scen = (k, id) => k.scener.find((s) => s.id === id);
+  it('Innehålls data för kapitel 2 går igenom utan fel', () => {
+    const r = kontrollera(med2());
+    expect(r.fel).toEqual([]);
+    expect(r.pass.filter((p) => p.kapitel === 'kap-02').map((p) => p.pass)).toEqual([1, 2, 3]);
+    // navets sparpunkt i mellan_grenar slutar pass 2
+    expect(r.varningar.join('\n')).not.toMatch(/kap-02 pass 2 slutar inte med en sparpunkt/);
+  });
+  it('ga_till unge, bära till ett annat rum och lockar vid en utgång i ett annat rum', () => {
+    const d = med2();
+    expect(kontrollera(d).fel).toEqual([]);
+    scen(k2(d), 'k2s04_bryggan').steg.find((s) => s.typ === 'bara').till = 'finns_inte';
+    scen(k2(d), 'k2s06_dammen').lockar.vid = 'ingenstans';
+    const f = kontrollera(d).fel.join('\n');
+    expect(f).toMatch(/finns_inte finns inte i något rum i kapitlet/);
+    expect(f).toMatch(/lockar vid ingenstans, som inte finns i något rum/);
+  });
+  it('navet: grenarnas scener och mål, och stegen mellan grenarna', () => {
+    const d = med2();
+    const nav = scen(k2(d), 'k2s03_torget').steg.find((s) => s.typ === 'nav');
+    nav.grenar[0].scen = 'k2s99_finns_inte';
+    nav.grenar[1].mal = 'stig_ingenstans';
+    nav.mellan_grenar.push({ typ: 'ga_till', mal: 'brunn_saknas' });
+    const f = kontrollera(d).fel.join('\n');
+    expect(f).toMatch(/grenens scen k2s99_finns_inte finns inte/);
+    expect(f).toMatch(/grenens mål stig_ingenstans finns inte i rummet byn/);
+    expect(f).toMatch(/mellan_grenar 4 \(ga_till\): brunn_saknas finns inte i rummet byn/);
+  });
+  it('{ord:<pussel>} pekar på ett P11, oppna_lasplatta med skylt och lys_ord, och villkoren i "Var var vi?"', () => {
+    const d = med2();
+    scen(k2(d), 'k2s10_elden').steg.find((s) => s.typ === 'replik' && s.text.includes('{ord:')).text = 'Du skrev {ord:k2_grodan}.';
+    scen(k2(d), 'k2s04_bryggan').steg.find((s) => s.typ === 'oppna_lasplatta').lys_ord = 'over';
+    k2(d).var_var_vi[2].lang[2].villkor.gren_kvar = 'k2s77';
+    delete k2(d).var_var_vi[2].lang[3].villkor; // tre utan villkor och en med: fyra hörs
+    const f = kontrollera(d).fel.join('\n');
+    expect(f).toMatch(/\{ord:k2_grodan\} pekar inte på ett P11/);
+    expect(f).toMatch(/ordet over står inte i skylten brev_halva_1/);
+    expect(f).toMatch(/villkoret gren_kvar pekar på k2s77/);
+    expect(f).toMatch(/lang har 4 repliker som hörs, högst tre/);
+  });
+});

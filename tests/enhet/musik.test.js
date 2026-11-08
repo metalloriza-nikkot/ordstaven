@@ -87,7 +87,7 @@ describe('ljuden i datan (64.6)', () => {
     expect(INSPELAT_FOR.mammas_rop).toBe('unge_late_02');
     expect(INSPELAT_SPELAS.mammas_rop).toEqual({ fart: 0.7, db: -6 });
   });
-  it('innehållskontrollen: en okänd slinga eller ett okänt ljud är fel', () => {
+  it('innehållskontrollen: en okänd slinga eller ett okänt ljud är en varning (det kan komma senare från Stil)', () => {
     const d = riktigt();
     const k = d.kapitel[0];
     k.musik = 'spel';
@@ -103,11 +103,13 @@ describe('ljuden i datan (64.6)', () => {
     k.scener[2].steg.push({ typ: 'musik', slinga: 'diskot' });
     fel.vid_valj.ljud = ['kastrull', 'trumpet'];
     k.scener[1].steg.find((s) => s.typ === 'ljud').id = 'oljud';
-    const f = kontrollera(d).fel.join('\n');
-    expect(f).toMatch(/okänd slinga byn_okand/);
-    expect(f).toMatch(/okänd slinga diskot/);
-    expect(f).toMatch(/okänt ljud trumpet/);
-    expect(f).toMatch(/okänt ljud oljud/);
+    const r = kontrollera(d);
+    expect(r.fel).toEqual([]);
+    const v = r.varningar.join('\n');
+    expect(v).toMatch(/slingan byn_okand finns inte/);
+    expect(v).toMatch(/slingan diskot finns inte/);
+    expect(v).toMatch(/ljudet trumpet finns inte/);
+    expect(v).toMatch(/ljudet oljud finns inte/);
     // ljud med fyra id stoppas av schemat
     fel.vid_valj.ljud = ['tut', 'tut', 'tut', 'tut'];
     expect(kontrollera(d).fel.join('\n')).toMatch(/ljud/);

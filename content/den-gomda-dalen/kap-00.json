@@ -26,6 +26,70 @@
   "innehall_v014": "Det korta passet (beslut 45.5, 46.4, 47 och 50.4): rubrikerna PÅ VINDEN (förut TITTA PÅ VINDEN) och UT UR HUSET (förut FÖLJ LISTAN, en order som pekade på en lista han inte såg; rubriken avslöjar inte SKOGEN), fältet ersatter borttaget ur uppdragen (47.1), \"Gå till lådan!\" i s02 (47.6), och bild på de fyra mellanscenerna med ägget (agg_frost, agg_filt, agg_lyser och agg_klackning, Tekniks fält från 0.28.0) är Innehålls.",
   "innehall_v015": "Det andra korta passet (beslut 52.5): rubrikerna HOS FARFAR (förut KOM TILL FARFAR, en order; KÖKET skulle peka mot dörren han ska läsa sig till) och KRUKORNA (förut LETA I KRUKORNA), högst ca 11 tecken. Mellanscenerna i s18 och s21b beskriver Tekniks nya animationer (51.4): hjälten sover med hjälmen på, ungen trampar på fotändan och somnar, och Farfar och hjälten vinkar i stället för kramen. Ingen lästext och ingen replik är ändrad."
  },
+ "var_var_vi": [
+  {
+   "pass": 2,
+   "ord": {
+    "ord": "mat",
+    "bild": "mat"
+   },
+   "kort": [
+    {
+     "talare": "farfar",
+     "text": "Var var vi? {unge} är hungrig.",
+     "upplast": true
+    }
+   ],
+   "lang": [
+    {
+     "talare": "farfar",
+     "text": "Var var vi? Staven vaknade i natt.",
+     "upplast": true
+    },
+    {
+     "talare": "farfar",
+     "text": "Du kläckte ett ägg. Det blev {unge}!",
+     "upplast": true
+    },
+    {
+     "talare": "farfar",
+     "text": "Nu är {unge} hungrig.",
+     "upplast": true
+    }
+   ]
+  },
+  {
+   "pass": 3,
+   "ord": {
+    "ord": "sol",
+    "bild": "sol"
+   },
+   "kort": [
+    {
+     "talare": "farfar",
+     "text": "Var var vi? Det är morgon!",
+     "upplast": true
+    }
+   ],
+   "lang": [
+    {
+     "talare": "farfar",
+     "text": "Var var vi? I går hittade du en kartbit.",
+     "upplast": true
+    },
+    {
+     "talare": "farfar",
+     "text": "Jag berättade om dalen där mamma bor.",
+     "upplast": true
+    },
+    {
+     "talare": "farfar",
+     "text": "Nu är det morgon!",
+     "upplast": true
+    }
+   ]
+  }
+ ],
  "rum": [
   {
    "id": "vinden",

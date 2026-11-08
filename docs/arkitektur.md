@@ -856,3 +856,11 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Regeln** står på ett ställe (`karna/mellanscen.js`, `visarBeskrivning`): en mellanscen visar sin beskrivning i rutan (`#regi`) bara när den inte har någon `bild` och inte är `syns_redan`. Motorn (`utfor` i `spel.js`, SLUTA FÖR IDAG och slutrutan) och innehållskontrollen följer den. En bild som inte går att visa ger beskrivningen som förut, och att varje `bild` finns prövar `tillgangar.test.js`.
 - **`syns_redan`:** ingen ruta, och berättelsen väntar `SYNS_REDAN_MS` (0,8 s), så att det föregående steget hinner synas. Loggen skriver `[mellanscen] syns redan`.
 - **Kontrollen** räknar beskrivningarna som visas i varje kapitel och i `aventyr.json` och skriver ut antalet. Med `meta.klart: true` är var och en ett fel. Från kapitel 2 är det en del av kedjan (65.4).
+
+## 77. Kapitel 2:s data och schema 2.31 (0.45.0, Teknik 20, del 1)
+- **Innehålls data för kapitel 2** (`kap-02.json` v0.1, `var_var_vi` i kap-00 och kap-01, ordlistorna v0.10 och talarna `tant_rosa` och `bo`) är inlagd med Innehålls skript. Kontrollsummorna stämde, och ingen text är ändrad.
+- **Schemat 2.31** känner kapitlets nya fält (`docs/innehallsschema.md` 3e), och kontrollen prövar dem: ga_till till ungen, bära till ett annat rum, navets grenar och steg, `{ord:…}`, `lys_ord`, villkoren i "Var var vi?" och `lockar`. Navets grenar bryter inte passet.
+- **En slinga eller ett ljud som inte finns än är en varning** (förut fel i 0.43.0), eftersom Innehåll kan skriva ett ljud som Stil gör senare. Syntesen spelar så länge.
+- **"Var var vi?" med riktig text:** i remsan under spelytan står ordets bild bredvid ordet, så att rutan ryms (med Innehålls ord blev den högre än remsan på MacBooken i helskärm). En provscen i testerna får bara sin egen `var_var_vi`, inte kapitlets.
+- **Kapitlet spelas inte än:** `stodsAvGrabox` släpper inte in ett kapitel vars rum saknar kartor, så efter kapitel 1 kommer slutrutan som förut. Motorn för fälten och kartorna kommer i nästa delar av 20.
+

@@ -39,6 +39,78 @@
   "innehall_v079": "Det korta passet (beslut 45.5, 46.4, 47 och 50), ingen ny scen, inget nytt moment, läsval eller replik: rubrikerna LIANERNA, RÄTT TRÄD, PÅ KULLEN och VEMS LAPP? (högst ca 11 tecken, 10d), fältet ersatter borttaget ur uppdragen (47.1), mellanscenen i k1s13 med baronen bakom busken vid bron (50.2), och bild på mellanscenerna i k1s01 (in_i_skogen), k1s11 (kartbit_unge) och k1s13 (vid_bron), Tekniks fält från 0.26.0, är Innehålls.",
   "innehall_v0710": "Det andra korta passet (beslut 52.3 och 52.5), ingen ny scen, inget nytt moment, läsval eller replik: k1_lianerna har sex delar (liangången, 52.2), ugglorna är dolda tills k1_tradet är löst och syns med visa_foremal i k1s07 före trappan, i L2 och L3 (52.3), vid_ratt i k1_tradet säger att ugglorna landar i kronan, och rummens anteckningar i skogsbrynet och gläntan följer Stils kartor och Tekniks karta i 0.29.0 (häcken från norr till söder, liangången mellan snåren, den lilla lianen och stubben söder om snåret, skylten BÄR, bäcken med bäckarmen och baronens strand, den hemliga stigen och sydost). Dekor-id:na står bara i kartan."
  },
+ "var_var_vi": [
+  {
+   "pass": 1,
+   "ord": {
+    "ord": "skogen",
+    "bild": "trad"
+   },
+   "kort": [
+    {
+     "talare": "farfar",
+     "text": "Var var vi? Ni sprang in i skogen!",
+     "upplast": true,
+     "via": "radio"
+    }
+   ],
+   "lang": [
+    {
+     "talare": "farfar",
+     "text": "Var var vi? {unge} ska hem till mamma.",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "talare": "farfar",
+     "text": "Kartan visar vägen. Bit två är i skogen.",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "talare": "farfar",
+     "text": "Nu är ni i skogen!",
+     "upplast": true,
+     "via": "radio"
+    }
+   ]
+  },
+  {
+   "pass": 2,
+   "ord": {
+    "ord": "apa",
+    "bild": "apa"
+   },
+   "kort": [
+    {
+     "talare": "farfar",
+     "text": "Var var vi? Apan är räddad. Nu kartbiten!",
+     "upplast": true,
+     "via": "radio"
+    }
+   ],
+   "lang": [
+    {
+     "talare": "farfar",
+     "text": "Var var vi? Du skrev SVÄRD och räddade apan.",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "talare": "farfar",
+     "text": "Apan gav dig min gamla kodnyckel.",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "talare": "farfar",
+     "text": "Nu letar vi efter kartbit två.",
+     "upplast": true,
+     "via": "radio"
+    }
+   ]
+  }
+ ],
  "rum": [
   {
    "id": "skogsbrynet",
