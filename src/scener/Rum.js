@@ -446,6 +446,12 @@ export class Rum extends Phaser.Scene {
   }
 
   /** Ungen som bild (startskärmen). @param {string} [ram] @returns {string | null} */
+  /** En bild ur en figurs atlas som data-URL (introts ordkraft), eller null. @param {string} nyckel @param {string} ram */
+  figurUrl(nyckel, ram) {
+    if (!this.textures.exists(nyckel) || !this.textures.get(nyckel).has(ram)) return null;
+    try { return this.textures.getBase64(nyckel, ram) || null; } catch { return null; }
+  }
+
   ungeBildUrl(ram = 'unge1_glad_ner_01') {
     if (!this.textures.exists('unge') || !this.textures.get('unge').has(ram)) return null;
     try { return this.textures.getBase64('unge', ram) || null; } catch { return null; }

@@ -877,3 +877,38 @@ test('startskärmens foto (F4): rummet där han är, 160 × 96 runt hjälten, oc
   await page.screenshot({ path: 'test-results/start-foto.png' });
 });
 
+
+test('introt (F4): natten väntar på första trycket, sedan morgonen, namnet, kameran och blicken ned till startskärmen, och ett tryck till hoppar över', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(60000);
+  const fel = await starta(page, '?snabb&ny&intro');
+  await expect(page.locator('.intro')).toBeVisible();
+  await expect(page.locator('.intro-pil')).toBeVisible();
+  // Stils bilder i hela steg över spelytan, och inget att läsa: namnet syns inte än
+  expect(await page.locator('.intro').boundingBox()).toEqual(await page.locator('#varld').boundingBox());
+  await expect(page.locator('.intro-bokstav.fram')).toHaveCount(0);
+  await page.screenshot({ path: 'test-results/intro-natt.png' });
+  // natten väntar: inget händer utan tryck
+  await page.waitForTimeout(600);
+  await expect(page.locator('.startbord')).toHaveCount(0);
+  await page.click('.intro');
+  await expect(page.locator('.intro.morgon')).toBeVisible();
+  await expect(page.locator('.intro-pil')).toBeHidden();
+  await expect(page.locator('.startbord')).toBeVisible({ timeout: 15000 });
+  const logg = await page.evaluate(() => window.__ORDSTAVEN.logg());
+  expect(logg).toContain('[intro] första trycket');
+  expect(logg).toContain('[intro] klart');
+  await expect(page.locator('.skylt-namn')).toHaveText('ORDSTAVEN');
+  // en gång till: ett tryck efter det första hoppar över resten, direkt till startskärmen
+  await starta(page, '?snabb&intro');
+  await page.click('.intro');
+  await page.click('.intro');
+  await expect(page.locator('.startbord')).toBeVisible();
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('[intro] hoppat över');
+  // irisen (62.5) stängs över skrivbordet och öppnas i rummet
+  await starta(page, '?snabb&iris');
+  await page.click('.start-knapp');
+  await expect.poll(async () => (await page.evaluate(() => window.__ORDSTAVEN.logg())).includes('[iris] öppnad'), { timeout: 8000 }).toBe(true);
+  await expect(page.locator('#iris')).toBeHidden();
+  expect(fel).toEqual([]);
+});

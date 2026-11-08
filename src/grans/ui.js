@@ -45,6 +45,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     <div id="remsa" hidden></div>
     <div id="fest" hidden></div>
     <div id="skarm" hidden></div>
+    <div id="iris" hidden></div>
     <div id="pausmeny" hidden></div>
     <div id="vuxenmeny" hidden></div>`;
   document.body.appendChild(ui);
@@ -725,6 +726,37 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     return new Promise((r) => setTimeout(r, ms));
   }
 
+  /**
+   * Irisen (F4, beslut 62.5): en svart cirkel som stängs över spelytan och öppnas igen, som i SNES-spelen. Den går i
+   * åtta steg (setTimeout, en klippbana per steg), så att golvdatorn bara ritar om spelytan åtta gånger. Mitten i
+   * världens pixlar (förvalt mitt på). @param {boolean} stang @param {number} ms
+   * @param {{ x: number, y: number }} [mitt] @returns {Promise<number>} hur lång tid det tog (loggen, golvdatorn)
+   */
+  function iris(stang, ms, mitt = { x: 160, y: 96 }) {
+    const e = $('#iris');
+    e.hidden = false;
+    const b = e.clientWidth || 320, h = e.clientHeight || 192, k = b / 320;
+    const cx = mitt.x * k, cy = mitt.y * k;
+    const R = Math.hypot(Math.max(cx, b - cx), Math.max(cy, h - cy)) + 2;
+    const N = 8, t0 = performance.now();
+    return new Promise((klar) => {
+      let i = 0;
+      const steg = () => {
+        const r = Math.max(0, R * (stang ? 1 - i / N : i / N));
+        e.style.clipPath = r > 0
+          ? `path(evenodd, 'M0 0H${b}V${h}H0Z M${(cx - r).toFixed(1)} ${cy.toFixed(1)} a${r.toFixed(1)} ${r.toFixed(1)} 0 1 0 ${(2 * r).toFixed(1)} 0 a${r.toFixed(1)} ${r.toFixed(1)} 0 1 0 ${(-2 * r).toFixed(1)} 0Z')`
+          : 'none';
+        if (i++ >= N) {
+          if (!stang) { e.hidden = true; e.style.clipPath = ''; }
+          klar(Math.round(performance.now() - t0));
+          return;
+        }
+        setTimeout(steg, ms / N);
+      };
+      steg();
+    });
+  }
+
   return {
     kamera,
     /** När kameran har flyttat sig. @param {() => void} f */
@@ -735,7 +767,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     handknapp,
     ljudord, visaTanke, placeraTanke, pulseraTanke, ordskylt, skyltar, rumsskyltar, skyltHjalte, sattDorrRutor, ordnaSkyltar, skyltStor, pulseraSkylt, skyltNara, ropa,
     ui, $, plattan, rader, esc, visaPlatta, doljPlatta, vantaFortsatt, visaRegi, doljRegi, visaFest,
-    uppdateraHud, sattLappknapp, glimta, pulsera, ikonKnappar, visaSkarm, doljSkarm, visaMeny, doljMeny, visaPausmeny, doljPausmeny, etiketter, sattNos, vaxlaNos, ljuda, arHelord,
+    uppdateraHud, sattLappknapp, glimta, pulsera, ikonKnappar, visaSkarm, doljSkarm, iris, visaMeny, doljMeny, visaPausmeny, doljPausmeny, etiketter, sattNos, vaxlaNos, ljuda, arHelord,
     fanga, tandNos, markeraOrd,
     /** @param {(vad: 'tand' | 'ord', ord?: string) => void} f @returns {() => void} */
     vidNos(f) { nosLyssnare.add(f); return () => nosLyssnare.delete(f); },

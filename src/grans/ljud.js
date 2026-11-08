@@ -138,6 +138,15 @@ export function skapaLjud({ tyst = () => false } = {}) {
       const f = /** @type {Record<string, number>} */ ({ berattare: 520, gammal: 330, fanig: 440, fagel: 880, metall: 700, unge: 760 })[roll] ?? 520;
       try { ton({ f, t: 0.05, v: 0.06, typ: 'sine' }); } catch (e) { /* ljud får aldrig krascha spelet */ }
     },
+    /** Introts lilla klang för bokstav i i ORDSTAVEN: mjuk och stigande (pentatont). @param {number} i */
+    klang(i) {
+      if (tyst()) return;
+      starta();
+      try {
+        const f = 660 * 2 ** ([0, 2, 4, 7, 9, 12, 14, 16, 19][i % 9] / 12);
+        ton({ f, t: 0.2, v: 0.09, typ: 'sine' }); ton({ f: f * 2, t: 0.1, v: 0.025, typ: 'sine', d: 0.01 });
+      } catch (e) { /* ljud får aldrig krascha spelet */ }
+    },
     /** @returns {number} hur länge ljudet låter i ms (0 = kort syntes eller tyst) */
     spela(namn) {
       if (tyst()) return 0;

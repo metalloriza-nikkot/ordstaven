@@ -200,6 +200,10 @@ const kartor = Object.fromEntries(Object.entries(kartfiler).filter(([fil]) => ma
   .map(([fil, text]) => [fil.replace(/^.*\/|\.tmj$/g, ''), lasKarta(JSON.parse(/** @type {string} */ (text)))]));
 for (const [id, tmj] of Object.entries(testkartor)) kartor[id] = lasKarta(tmj);
 
+/** Ett byte av spelare (laddaOm i spel.js) startar om sidan utan introt, en gång. */
+function utanIntro() {
+  try { const v = sessionStorage.getItem('ordstaven_utan_intro'); sessionStorage.removeItem('ordstaven_utan_intro'); return v === '1'; } catch (e) { return false; }
+}
 const spelet = skapaSpel({
   aventyr, kartor, kapitel, ordlistor, tillstand, sparning, platser, logg, rost, ljud, ui, rum, layout, inmatning, tangentbord, bilder,
   snabb, pek: () => pek.matches, version: VERSION, exporteraLogg: () => exportera(logg),
@@ -207,6 +211,10 @@ const spelet = skapaSpel({
   filer: { laddaNed, tidsstampel, meddelande },
   // ?kapitel=kap-01: börja i ett kapitel som ännu saknar kartor (gråbox för den vuxne)
   valtKapitel: parametrar.get('kapitel'),
+  // introt (F4): när spelet startar, inte i snabbläget (?intro visar det ändå) och inte efter ett byte av spelare
+  intro: utanIntro() ? false : (parametrar.has('intro') || !snabb),
+  // irisen från startskärmen in i spelet (62.5), inte i snabbläget (?iris visar den ändå)
+  iris: !snabb || parametrar.has('iris'),
   uppdatering: { tillampa: () => { uppdatering.tillampa(); startlage = false; } },
 });
 // Startvakten: kommer rummet inte igång med WebGL (Safari på golvdatorn kan få WebGL men inte rita med det, och

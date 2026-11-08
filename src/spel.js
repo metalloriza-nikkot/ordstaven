@@ -20,6 +20,7 @@ import { skapaRullning } from './grans/rullning.js';
 import { laggUngenPaKartan, kartbitarHtml } from './grans/kartbitar.js';
 import { ikon, uiBild } from './grans/ikoner.js';
 import { visaStartskarm } from './grans/startskarm.js';
+import { spelaIntro } from './grans/intro.js';
 import { kompileraUppdrag, lappenNu, klaraFore, jamfor } from './karna/uppdrag.js';
 import { skapaUppdragslapp, lappText, stampelPlats, visaStampel, LAPP_IHOP_MS } from './grans/uppdragslapp.js';
 
@@ -2954,6 +2955,18 @@ export function skapaSpel(d) {
    * gången finns bara den stora boken. Bilderna och trycken står i grans/startskarm.js.
    */
   async function startskarm() {
+    // introt (F4): bara när spelet startar, aldrig efter ett byte av spelare (laddaOm) och aldrig i snabbläget
+    if (d.intro && !introVisat) {
+      introVisat = true;
+      await spelaIntro({
+        skarm: ui.$('#skarm'), tid, logg,
+        forstaTrycket: () => { ljud.starta(); rost.lasUpp(); },
+        klang: (i) => ljud.klang?.(i),
+        lasNamnet: () => (inst.rost && rost.harRost ? rost.saga('Ordstaven', 'berattare') : Promise.resolve()),
+        tyst: () => rost.tyst(),
+        ordkraft: rum.figurUrl?.('effekter', 'efx_ordkraft_03') ?? null,
+      });
+    }
     const platser = d.platser;
     const aktiv = platser?.aktiv() ?? '1';
     const lista = platser ? platser.lista() : [aktiv];
@@ -2987,7 +3000,21 @@ export function skapaSpel(d) {
     }
     ljud.starta(); rost.lasUpp();
     d.uppdatering.tillampa();
+    // irisen (62.5) stängs över skrivbordet och öppnas runt hjälten när rummet syns (oppnaIris)
+    if (d.iris) {
+      const ms = await ui.iris(true, tid(420), { x: 161, y: 103 });
+      irisStangd = true; logg.handelse('iris', `stängd på ${ms} ms`);
+      setTimeout(oppnaIris, tid(2500)); // om något annat än ett rum kommer först
+    }
     ui.doljSkarm();
+  }
+  let irisStangd = false;
+  /** Irisen öppnas runt hjälten (eller mitt på), en gång efter startskärmen. */
+  function oppnaIris() {
+    if (!irisStangd) return;
+    irisStangd = false;
+    const mitt = rum.harRum ? { x: rum.pos.x - rum.kamera.x, y: rum.pos.y - rum.kamera.y - 10 } : undefined;
+    ui.iris(false, tid(420), mitt).then((ms) => logg.handelse('iris', `öppnad på ${ms} ms`));
   }
   let fotoTid = 0;
   /**
@@ -3002,8 +3029,15 @@ export function skapaSpel(d) {
     const url = await rum.foto();
     if (url && p.sparaFoto(p.aktiv(), url)) logg.handelse('foto', orsak, { kb: Math.round(url.length / 1024) });
   }
-  /** Starta om sidan på den valda platsen (utan ?ny, som annars nollställer sparningen). */
-  function laddaOm() { const u = new URL(location.href); u.searchParams.delete('ny'); location.href = u.toString(); }
+  let introVisat = false;
+  /**
+   * Starta om sidan på den valda platsen (utan ?ny, som annars nollställer sparningen). Introt visas inte efter
+   * omstarten: han har redan sett det (F4).
+   */
+  function laddaOm() {
+    try { sessionStorage.setItem('ordstaven_utan_intro', '1'); } catch (e) { /* ok */ }
+    const u = new URL(location.href); u.searchParams.delete('ny'); u.searchParams.delete('intro'); location.href = u.toString();
+  }
 
   async function spela() {
     rum.lager = { ...lagerFor(tillstand.spelare.hjalte) };
@@ -3048,7 +3082,7 @@ export function skapaSpel(d) {
       rum.sattStav((tillstand.spelare.hjalte.formler || []).length > 0);
       if (av.aterstalld) { for (const f of FLIKAR) sett()[f] = antalI(f); delete av.aterstalld; spara(); }
       // namnen som saknas frågas efter först, med de hoppade kapitlens egna dop-pussel, med rummet bakom
-      if (dopAttFraga.length) await visaScen();
+      if (dopAttFraga.length) { await visaScen(); oppnaIris(); }
       for (const p of dopAttFraga) {
         const r = await pussel(p);
         if (r?.namn && p.sparas_som === 'hjalte.namn') tillstand.spelare.hjalte.namn = r.namn;
@@ -3067,6 +3101,7 @@ export function skapaSpel(d) {
       forstaKapitlet = false;
       while (!b.slut) {
         await visaScen();
+        oppnaIris();
         // startskärmens foto: rummet en stund efter att det syns (högst var 20:e sekund)
         setTimeout(() => { if (!pausad) taFoto('rummet'); }, tid(1500));
         let st0 = b.aktuellt();

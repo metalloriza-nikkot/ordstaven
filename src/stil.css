@@ -349,6 +349,26 @@ html, body {
 /* NYTT ÄVENTYR, första trycket: boken lyfts fram och resten tonas ned till 45 % */
 .startbord.lyft .fortsatt, .startbord.lyft .spelarkort, .startbord.lyft .ny-spelare, .startbord.lyft .unge { opacity: .45; }
 .startbord.lyft .nytt-aventyr { visibility: hidden; }
+/* irisen (62.5): en svart yta över spelytan med ett runt hål, i åtta steg (ui.js) */
+#iris { position: absolute; left: var(--rum-vanster); top: var(--rum-topp); width: var(--rum-bredd); height: var(--rum-hojd); background: #000; z-index: 5; pointer-events: none; }
+/* F4: introt (10e v0.4) i världens pixlar. Bara bildbyten, läge och opacitet (golvdatorn): solarna glider mellan
+   stegens lägen, bokstäverna tonas fram och namnet faller med ned till mässingsskylten (x 94–226, y 6–28). */
+.intro { position: absolute; left: var(--rum-vanster); top: var(--rum-topp); width: var(--rum-bredd); height: var(--rum-hojd); overflow: hidden; padding: 0; margin: 0; border: 0; outline: none; background: #0b0f1e; cursor: pointer; font: inherit; }
+.intro .sb, .intro-pil { position: absolute; }
+.intro img.sb { display: block; image-rendering: pixelated; image-rendering: crisp-edges; pointer-events: none; }
+.intro.morgon .intro-sol { transition: transform var(--steg-ms, 340ms) linear; }
+.intro-pil .puls { animation: pil-puls 1.6s ease-in-out infinite alternate; will-change: opacity; }
+@keyframes pil-puls { from { opacity: 0; } to { opacity: 1; } }
+.intro-titel { position: absolute; left: 50%; transform: translateX(-50%); transform-origin: 50% 0; font-weight: 700; line-height: 1; letter-spacing: .14em; padding-left: .14em; white-space: nowrap; color: #FFFBEA; text-shadow: 0 var(--vpx) 0 #1A1410, var(--vpx) 0 0 #1A1410, calc(-1 * var(--vpx)) 0 0 #1A1410, 0 calc(-1 * var(--vpx)) 0 #1A1410; pointer-events: none; z-index: 1; }
+.intro-bokstav { display: inline-block; opacity: 0; transform: translateY(calc(3 * var(--vpx))); transition: opacity .17s linear, transform .17s ease-out; }
+.intro-bokstav.fram { opacity: 1; transform: none; }
+/* C: namnet faller ned mot skylten och följer den bild för bild (intro.js, namnetIC), och lägger sig där startskärmens
+   .skylt-namn står (y 9,4 och 14,5 pixlar), i skyltens mässing */
+.intro.ned .intro-titel { transition: transform var(--c-ms, 90ms) linear; }
+.intro.landat .intro-titel { color: #3A2A0A; text-shadow: 0 var(--vpx) 0 #FFF0B0; transition: none; }
+.intro-ordkraft { opacity: 0; }
+.intro.landat .intro-ordkraft { opacity: 1; transition: opacity .2s linear; }
+.snabb .intro *, .snabb .intro { transition-duration: 0s !important; animation-duration: 0s !important; }
 .stor-ikon { font-size: 140px; }
 .pass-slut .knappar { display: flex; gap: 32px; }
 .vuxen { color: #d8ccb4; font-size: 18px; font-style: italic; }
