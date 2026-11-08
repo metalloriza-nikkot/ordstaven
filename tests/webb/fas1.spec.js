@@ -132,16 +132,27 @@ test('menyn för vuxna: ett kort tryck visar "håll inne", att hålla öppnar me
   // på iPad skrollar menyn med fingret (sidan skrollar aldrig, men menyn gör det), och sista knappen går att nå
   const drag = await page.evaluate(() => {
     const prov = (el) => { const e = new Event('touchmove', { bubbles: true, cancelable: true }); el.dispatchEvent(e); return e.defaultPrevented; };
-    const m = document.querySelector('#vuxenmeny .meny');
+    // INSTÄLLNINGAR (F4): delens fönster skrollar
+    const m = document.querySelector('#vuxenmeny .innehall');
     return { meny: prov(m.querySelector('*') || m), varld: prov(document.getElementById('varld')), skrollar: getComputedStyle(m).overflowY, touch: getComputedStyle(m).touchAction };
   });
   expect(drag).toEqual({ meny: false, varld: true, skrollar: 'auto', touch: 'pan-y' });
+  // INSTÄLLNINGAR i SNES-stil (F4): rubriken, delarna i en kolumn med markören och den valda delen till höger
+  await expect(page.locator('#vuxenmeny h2')).toHaveText('INSTÄLLNINGAR');
+  await expect(page.locator('#vuxenmeny .del')).toHaveText(['SPELARE', 'PASS OCH KAPITEL', 'LÄSNING', 'LJUD OCH RÖST', 'SKÄRM', 'SPARFIL', 'FRAMSTEG', 'OM SPELET']);
+  await page.click('#vuxenmeny .del[data-del="ljud"]');
+  await expect(page.locator('#vuxenmeny .del.vald')).toHaveText('LJUD OCH RÖST');
+  await expect(page.locator('#vuxenmeny .menydel[data-del="ljud"]')).toBeVisible();
+  await expect(page.locator('#vuxenmeny .menydel[data-del="spelare"]')).toBeHidden();
+  expect(await page.locator('#vuxenmeny .installningar').boundingBox()).toEqual(await page.locator('#varld').boundingBox());
+  await page.screenshot({ path: 'test-results/installningar.png' });
   await page.click('#vuxenmeny .stang');
   await expect(page.locator('#vuxenmeny')).toBeHidden();
   await expect(page.locator('.start-knapp')).toBeVisible();
   // i spelet: hoppa till köket
   await page.click('.start-knapp');
   await page.keyboard.press('Control+Shift+KeyM');
+  await page.click('#vuxenmeny .del[data-del="pass"]');
   await page.click('#vuxenmeny .scen[data-i="9"]');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.click('.start-knapp');

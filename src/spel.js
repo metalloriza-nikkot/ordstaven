@@ -19,7 +19,8 @@ import { TANGENTBORD_HOJD } from './grans/tangentbord.js';
 import { skapaRullning } from './grans/rullning.js';
 import { laggUngenPaKartan, kartbitarHtml } from './grans/kartbitar.js';
 import { ikon, uiBild } from './grans/ikoner.js';
-import { visaStartskarm } from './grans/startskarm.js';
+import { visaStartskarm, startBild } from './grans/startskarm.js';
+import { menyBild, vlage, satt9slice } from './grans/menybilder.js';
 import { spelaIntro } from './grans/intro.js';
 import { kompileraUppdrag, lappenNu, klaraFore, jamfor } from './karna/uppdrag.js';
 import { skapaUppdragslapp, lappText, stampelPlats, visaStampel, LAPP_IHOP_MS } from './grans/uppdragslapp.js';
@@ -64,6 +65,8 @@ const SPOLA_HELA = '*';
 export function skapaSpel(d) {
   const { aventyr, kartor = {}, tillstand, sparning, logg, rost, ljud, ui, rum, layout, inmatning, tangentbord, bilder, snabb } = d;
   const AVENTYR = aventyr.id;
+  // Stils bilder i 9-slice för pausmenyns kort och INSTÄLLNINGAR (F4) som CSS-variabler
+  satt9slice(document.documentElement);
   // när han spelade senast (F2): läses innan något sparas, eftersom varje sparning skriver en ny tid
   const senast = senastSpelad(tillstand);
   const av = aventyrFor(tillstand, AVENTYR);
@@ -2889,12 +2892,27 @@ export function skapaSpel(d) {
   /** En vy i pausmenyn (menyn är redan öppen). @param {'start' | 'kartan' | typeof FLIKAR[number]} vy */
   function ritaPaus(vy) {
     logg.handelse('pausmeny', vy);
-    const stang = '<button type="button" class="knapp stor paus-stang" aria-label="Fortsätt">▶</button>';
-    const tillbaka = '<button type="button" class="knapp paus-tillbaka" aria-label="Tillbaka">◀</button>';
+    // Stils pilar (F4, 10e *Pausmenyn*): den stora pilen tillbaka till spelet, och pilen bakåt
+    const pilBild = (/** @type {string} */ n) => { const u = startBild(n); return u ? `<img class="sb" src="${u}" alt="" draggable="false">` : ''; };
+    const stang = `<button type="button" class="knapp stor paus-stang bildpil" aria-label="Fortsätt">${pilBild('pil') || '▶'}</button>`;
+    const tillbaka = `<button type="button" class="knapp paus-tillbaka bildpil" aria-label="Tillbaka">${pilBild('bak') || '◀'}</button>`;
     let html = '';
     if (vy === 'start') {
+      // tre papperskort på läder (10e v0.4): panelen vid (36, 40), korten vid x 48, 124 och 200, och pilen vid (264, 118)
       const ny = FLIKAR.some(nyFlik);
-      html = `<div class="paus-start">${bildknapp('kartan', BILD.kartan)}${bildknapp('hjalteboken', BILD.hjalteboken, ny ? 'ny' : '')}${aventyr.sluta_for_idag ? bildknapp('sluta_for_idag', SOVER, 'sluta') : ''}</div>${stang}`;
+      const steg = tillstand.spelare.unge?.steg || 1;
+      const sover = rum.ungeBildUrl?.(`unge${steg}_sover_ner_01`) ?? rum.ungeBildUrl?.('unge1_sover_ner_01') ?? null;
+      const kort = [['kartan', uiBild('ikon_karta'), 48, ''], ['hjalteboken', uiBild('ikon_bok'), 48, ny ? 'ny' : ''],
+        ...(aventyr.sluta_for_idag ? [['sluta_for_idag', sover, 48, 'sluta']] : [])];
+      html = `<img class="sb" src="${menyBild('paus_panel') || ''}" alt="" draggable="false" style="${vlage(36, 40, 251, 103)}">`
+        + kort.map(([nyckel, url, px, klass], i) => {
+          const ord = gransnittsOrd(/** @type {string} */ (nyckel));
+          return `<button type="button" class="paus-val paus-kort ${klass}" data-val="${nyckel}" aria-label="${ui.esc(ord ?? /** @type {string} */ (nyckel))}" style="${vlage(48 + 76 * i, 50, 66, 74)}">`
+            + `<img class="sb" src="${menyBild('paus_kort') || ''}" alt="" draggable="false" style="${vlage(0, 0, 66, 74)}">`
+            + (url ? `<img class="sb paus-bild" src="${url}" alt="" draggable="false" style="${vlage(8, 4, /** @type {number} */ (px), /** @type {number} */ (px))}">` : `<span class="paus-bild">${nyckel === 'sluta_for_idag' ? SOVER : ''}</span>`)
+            + (ord ? `<span class="paus-ord">${ui.rader(ord, varden(), 'kort-ord')}</span>` : '') + '</button>';
+        }).join('')
+        + `<button type="button" class="paus-stang bildpil" aria-label="Fortsätt" style="${vlage(264, 118, 32, 32)}">${pilBild('pil') || '▶'}</button>`;
     } else if (vy === 'kartan') {
       const bitar = (av.kartbitar || []).slice().sort((x, y) => x - y);
       // de ritade bitarna ihop som en karta; en bit utan bild (bit 3–7 är skisser) som en emoji med sitt nummer
@@ -2916,7 +2934,7 @@ export function skapaSpel(d) {
       if (vy === 'klart') sida = klartUppslag(settFore);
       html = `${tillbaka}<div class="paus-flikar">${flikar}</div><div class="paus-sida">${sida}</div>${stang}`;
     }
-    const m = ui.visaPausmeny(`<div class="pausmeny vy-${vy}${FLIKAR.includes(/** @type {any} */ (vy)) ? ' bok' : ''}">${html}</div>`);
+    const m = ui.visaPausmeny(`<div class="pausmeny vy-${vy}${FLIKAR.includes(/** @type {any} */ (vy)) ? ' bok' : ''}${vy === 'start' ? ' paus-bord' : ''}">${html}</div>`);
     m.querySelector('.paus-stang')?.addEventListener('click', stangPaus);
     m.querySelector('.paus-tillbaka')?.addEventListener('click', () => { rost.tyst(); ljud.spela('klick'); ritaPaus('start'); });
     m.querySelectorAll('.paus-val').forEach((el) => el.addEventListener('click', () => {
@@ -3321,6 +3339,8 @@ export function skapaSpel(d) {
     laddaOm();
   }
 
+  /** Delen i INSTÄLLNINGAR som visas (den står kvar när menyn ritas om). */
+  let menyDel = 'spelare';
   function oppnaMeny() {
     pausa('meny');
     const niva = lasmotor.niva('L', 'P1_las_och_valj');
@@ -3339,19 +3359,34 @@ export function skapaSpel(d) {
     const utanBild = passStart.includes('data-bild="nej"');
     const lasbara = (aventyr.kapitel_last?.last || []).filter((/** @type {string} */ id) => aventyr.kapitel.includes(id));
     const las = lasbara.map((/** @type {string} */ id) => `<label><input type="checkbox" class="kapitel-oppet" data-kapitel="${ui.esc(id)}" ${(inst.oppnadeKapitel || []).includes(id) ? 'checked' : ''}> Kapitlet ${ui.esc(d.kapitel.find((k) => k.id === id)?.meta?.namn ?? id)} är öppet på den här enheten (annars är det låst efter kapitlet före, och har han kommit dit sätts sparningen tillbaka till slutet av kapitlet före)</label>`).join('');
-    const s = ui.visaMeny(`<div class="meny vuxen"><h2>INSTÄLLNINGAR <small>${ui.esc(String(d.version))}</small></h2>
-      <div class="menygrupp passlista"><b>Börja ett pass</b> <small>(namnen och det som kommer före finns kvar, och lärandet blir som när passet började):</small> ${passStart}${utanBild ? '<small class="utan-bild">* Där står lärandet kvar som det är nu, eftersom det inte finns någon bild av det från passets början.</small>' : ''}${las ? `<div class="kapitel-las">${las}</div>` : ''}</div>
-      <div class="menygrupp lasniva"><b>Läsnivå (läs och välj):</b> ${Array.from({ length: Math.max(4, niva) }, (_, i) => i + 1).map((n) => `<button type="button" class="menyval niva ${n === niva ? 'nu' : ''}" data-n="${n}">L${n}</button>`).join('')} <small class="niva-i-kapitlet">${nivaIKapitlet()}</small></div>
-      <div class="menygrupp"><label><input type="checkbox" class="foralder" ${inst.foralderLaser ? 'checked' : ''}> Föräldern läser ${ui.esc(Object.values(aventyr.talare).filter((/** @type {any} */ t) => t.rost === 'foraldern_eller_datorrost').map((/** @type {any} */ t) => t.namn).join(' och ') || 'rollernas')} repliker</label>
-      <label><input type="checkbox" class="etiketter" ${inst.vuxenEtiketter ? 'checked' : ''}> Visa objektens namn (inte under pussel)</label>
-      <label><input type="checkbox" class="rostval" ${inst.rost ? 'checked' : ''}> Datorrösten läser upp (av: rullningen piper i ordtakt)</label>
-      <label><input type="checkbox" class="markeraval" ${inst.markera ? 'checked' : ''}> Markera ordet som läses (stäng av om markeringen hamnar fel på den här datorn)</label></div>
-      ${foraldravy()}
-      ${spelargrupp()}
-      <div class="menygrupp scenlista"><b>Hoppa till scen:</b>${scener}</div>
-      <div class="menygrupp sparfil"><b>Sparfilen:</b> <button type="button" class="menyval spara-fil">Spara sparfilen</button><button type="button" class="menyval las-fil">Läs in en sparfil</button><input type="file" class="las-fil-val" accept=".json,application/json" hidden>
-      <small>Sparfilen har allt spelaren har gjort, också namnen. Lägg den bara på ett privat ställe.</small><span class="sparfil-svar" role="status"></span></div>
-      <div class="menygrupp"><button type="button" class="menyval logg">Spara loggen</button><button type="button" class="menyval nollstall">Börja om från början</button><button type="button" class="menyval stang">Stäng</button></div></div>`);
+    // INSTÄLLNINGAR i SNES-stil (10e v0.4): rubriken överst, delarna i en kolumn till vänster med markören, och
+    // den valda delen i fönstret till höger. Allt i världens pixlar över spelytan, texten i Lexend.
+    const delar = [
+      ['spelare', 'SPELARE', spelargrupp() || '<div class="menygrupp"><small>En spelare på den här enheten.</small></div>'],
+      ['pass', 'PASS OCH KAPITEL', `<div class="menygrupp passlista"><b>Börja ett pass</b> <small>(namnen och det som kommer före finns kvar, och lärandet blir som när passet började):</small> ${passStart}${utanBild ? '<small class="utan-bild">* Där står lärandet kvar som det är nu, eftersom det inte finns någon bild av det från passets början.</small>' : ''}${las ? `<div class="kapitel-las">${las}</div>` : ''}</div>
+        <div class="menygrupp scenlista"><b>Hoppa till scen:</b>${scener}</div>`],
+      ['lasning', 'LÄSNING', `<div class="menygrupp lasniva"><b>Läsnivå (läs och välj):</b> ${Array.from({ length: Math.max(4, niva) }, (_, i) => i + 1).map((n) => `<button type="button" class="menyval niva ${n === niva ? 'nu' : ''}" data-n="${n}">L${n}</button>`).join('')} <small class="niva-i-kapitlet">${nivaIKapitlet()}</small></div>`],
+      ['ljud', 'LJUD OCH RÖST', `<div class="menygrupp"><label><input type="checkbox" class="foralder" ${inst.foralderLaser ? 'checked' : ''}> Föräldern läser ${ui.esc(Object.values(aventyr.talare).filter((/** @type {any} */ t) => t.rost === 'foraldern_eller_datorrost').map((/** @type {any} */ t) => t.namn).join(' och ') || 'rollernas')} repliker</label>
+        <label><input type="checkbox" class="rostval" ${inst.rost ? 'checked' : ''}> Datorrösten läser upp (av: rullningen piper i ordtakt)</label>
+        <label><input type="checkbox" class="markeraval" ${inst.markera ? 'checked' : ''}> Markera ordet som läses (stäng av om markeringen hamnar fel på den här datorn)</label></div>`],
+      ['skarm', 'SKÄRM', `<div class="menygrupp"><label><input type="checkbox" class="etiketter" ${inst.vuxenEtiketter ? 'checked' : ''}> Visa objektens namn (inte under pussel)</label></div>`],
+      ['sparfil', 'SPARFIL', `<div class="menygrupp sparfil"><b>Sparfilen:</b> <button type="button" class="menyval spara-fil">Spara sparfilen</button><button type="button" class="menyval las-fil">Läs in en sparfil</button><input type="file" class="las-fil-val" accept=".json,application/json" hidden>
+        <small>Sparfilen har allt spelaren har gjort, också namnen. Lägg den bara på ett privat ställe.</small><span class="sparfil-svar" role="status"></span></div>
+        <div class="menygrupp"><button type="button" class="menyval logg">Spara loggen</button><button type="button" class="menyval nollstall">Börja om från början</button></div>`],
+      ['framsteg', 'FRAMSTEG', foraldravy()],
+      ['om', 'OM SPELET', `<div class="menygrupp om-spelet"><b>Ordstaven ${ui.esc(String(d.version))}</b><small>${ui.esc(aventyr.meta?.namn ?? aventyr.id)}</small></div>`],
+    ];
+    if (!delar.some(([id]) => id === menyDel)) menyDel = 'spelare';
+    const s = ui.visaMeny(`<div class="meny vuxen installningar" data-del="${menyDel}">
+      <div class="fonster rubrik" style="${vlage(4, 3, 312, 22)}"><h2>INSTÄLLNINGAR</h2><small class="menyversion">Ordstaven ${ui.esc(String(d.version))}</small><button type="button" class="menyval stang">◀ TILLBAKA</button></div>
+      <div class="fonster delar" style="${vlage(4, 28, 98, 160)}">${delar.map(([id, namn], i) => `<button type="button" class="del ${id === menyDel ? 'vald' : ''}" data-del="${id}" style="top:calc(${i * 18 - 1} * var(--vpx))"><img class="markor" src="${menyBild('markor') || ''}" alt="" draggable="false">${namn}</button>`).join('')}</div>
+      <div class="fonster innehall" style="${vlage(106, 28, 208, 160)}">${delar.map(([id, , html]) => `<section class="menydel" data-del="${id}"${id === menyDel ? '' : ' hidden'}>${html}</section>`).join('')}</div></div>`);
+    s.querySelectorAll('.del').forEach((el) => el.addEventListener('click', () => {
+      menyDel = /** @type {HTMLElement} */ (el).dataset.del || 'spelare';
+      s.querySelector('.installningar')?.setAttribute('data-del', menyDel);
+      s.querySelectorAll('.del').forEach((x) => x.classList.toggle('vald', x === el));
+      s.querySelectorAll('.menydel').forEach((x) => { /** @type {HTMLElement} */ (x).hidden = /** @type {HTMLElement} */ (x).dataset.del !== menyDel; });
+    }));
     s.querySelectorAll('.niva').forEach((el) => el.addEventListener('click', () => {
       // den vuxne sätter nivån för hand: det syns i loggen (14: utan raden gick det inte att se varför nivån ändrades)
       const n = Number(/** @type {HTMLElement} */ (el).dataset.n);

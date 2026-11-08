@@ -584,6 +584,7 @@ test('föräldravyn i menyn för vuxna visar hur det går per pusseltyp, med slu
     (t) => { t.spelare.larande.historik = [{ pussel_id: 'p0_filt', typ: 'P1_las_och_valj', niva: 'L2', ratt: true, tid: 5000 }, { pussel_id: 'p0_ljus', typ: 'P11_formel', niva: 'S1', ratt: false, tid: 20000 }]; },
     { rum: { provskogen: { innehall: ['sten'] } } });
   await page.keyboard.press('Control+Shift+KeyM');
+  await page.click('#vuxenmeny .del[data-del="framsteg"]');
   await expect(page.locator('#vuxenmeny .foraldravy tbody tr')).toHaveCount(2);
   await expect(page.locator('#vuxenmeny .foraldravy tbody tr').first()).toContainText('Läsa och välja');
   await page.screenshot({ path: 'test-results/foraldravy.png' });
@@ -980,6 +981,7 @@ async function hoppaKapitel1(page, i) {
   await page.goto('./?snabb&ny');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.keyboard.press('Control+Shift+KeyM');
+  await page.click('#vuxenmeny .del[data-del="pass"]');
   await page.click(`#vuxenmeny .scen[data-kapitel="kap-01"][data-i="${i}"]`);
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.click('.start-knapp');
@@ -1172,6 +1174,7 @@ test('menyn för vuxna hoppar till en scen i ett senare kapitel: det som kommer 
   await page.click('.start-knapp');
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('s00_start');
   await page.keyboard.press('Control+Shift+KeyM');
+  await page.click('#vuxenmeny .del[data-del="pass"]');
   await expect(page.locator('#vuxenmeny .kapitelrad')).toHaveCount(2);
   await page.screenshot({ path: 'test-results/meny-alla-kapitel.png' });
   await page.click('#vuxenmeny .scen[data-kapitel="kap-01"][data-i="5"]'); // k1s07_stigarna, pass 2
@@ -1280,6 +1283,7 @@ test('kapitel 1 är låst efter prologen: slutrutan kommer i stället, FORTSÄTT
   await page.screenshot({ path: 'test-results/kapitel-last.png' });
   // den vuxne öppnar kapitel 1 på enheten, och då fortsätter spelet där
   await page.keyboard.press('Control+Shift+KeyM');
+  await page.click('#vuxenmeny .del[data-del="pass"]');
   await page.locator('#vuxenmeny .kapitel-oppet[data-kapitel="kap-01"]').check();
   await page.goto('./?snabb');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
@@ -1293,6 +1297,7 @@ test('menyn för vuxna startar ett pass: pass 3 börjar med morgonen, namnen och
   await page.goto('./?snabb');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.keyboard.press('Control+Shift+KeyM');
+  await page.click('#vuxenmeny .del[data-del="pass"]');
   await expect(page.locator('#vuxenmeny .pass-start')).toHaveCount(5); // prologens tre pass och kapitel 1:s två
   await page.screenshot({ path: 'test-results/meny-pass.png' });
   await page.locator('#vuxenmeny .pass-start', { hasText: 'Prologen, pass 3' }).click();
@@ -1313,6 +1318,7 @@ test('sparfilen: den vuxne sparar hela sparningen som en fil och läser in den i
   await page.goto('./?snabb');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.keyboard.press('Control+Shift+KeyM');
+  await page.click('#vuxenmeny .del[data-del="sparfil"]');
   // spara: en fil i Hämtade filer med hela sparningen
   const [hamtad] = await Promise.all([page.waitForEvent('download'), page.click('#vuxenmeny .spara-fil')]);
   expect(hamtad.suggestedFilename()).toMatch(/^ordstaven-sparfil-\d{8}-\d{4}\.json$/);
@@ -1327,6 +1333,7 @@ test('sparfilen: den vuxne sparar hela sparningen som en fil och läser in den i
   expect(await page.evaluate(() => window.__ORDSTAVEN.tillstand().spelare.hjalte.namn ?? null)).toBeFalsy();
   // en fil som inte är en sparning: ett svar, och inget byts
   await page.keyboard.press('Control+Shift+KeyM');
+  await page.click('#vuxenmeny .del[data-del="sparfil"]');
   await page.setInputFiles('#vuxenmeny .las-fil-val', { name: 'fel.json', mimeType: 'application/json', buffer: Buffer.from('{"app":"NAGOT_ANNAT"}') });
   await expect(page.locator('#vuxenmeny .sparfil-svar')).toContainText('gick inte att läsa');
   // läs in: spelet startar om med sparningen från filen
@@ -1449,6 +1456,7 @@ test('Prologen, pass 3 i menyn: inget från kapitel 1 finns kvar, och kapitel 1 
   await page.goto('./?snabb');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.keyboard.press('Control+Shift+KeyM');
+  await page.click('#vuxenmeny .del[data-del="pass"]');
   await expect(page.locator('#vuxenmeny .kapitel-oppet')).toBeChecked();
   await page.locator('#vuxenmeny .pass-start', { hasText: 'Prologen, pass 3' }).click();
   await page.waitForURL((u) => true);
@@ -1867,6 +1875,7 @@ test('menyn sätter tillbaka lärandet till passets början, utan spår av det s
   await page.goto('./?snabb');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.keyboard.press('Control+Shift+KeyM');
+  await page.click('#vuxenmeny .del[data-del="pass"]');
   // passen utan bild av lärandet är märkta
   await expect(page.locator('#vuxenmeny .pass-start[data-bild="nej"]')).toHaveText(['Prologen, pass 2 *', 'Skogen, pass 2 *']);
   await expect(page.locator('#vuxenmeny .utan-bild')).toBeVisible();
@@ -1901,6 +1910,7 @@ test('menyn låser kapitel 1 igen: sparningen står i slutet av prologen, utan n
   await page.goto('./?snabb');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.keyboard.press('Control+Shift+KeyM');
+  await page.click('#vuxenmeny .del[data-del="pass"]');
   await Promise.all([page.waitForEvent('load'), page.locator('#vuxenmeny .kapitel-oppet[data-kapitel="kap-01"]').click()]);
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   const t = await page.evaluate(() => window.__ORDSTAVEN.tillstand());
@@ -1964,7 +1974,9 @@ test('läsnivån följer med mellan kapitlen (14): prologen slutar på L4, kapit
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   // den vuxne öppnar kapitel 1, och spelet fortsätter dit
   await page.keyboard.press('Control+Shift+KeyM');
+  await page.click('#vuxenmeny .del[data-del="lasning"]');
   await expect(page.locator('#vuxenmeny .lasniva .niva.nu')).toHaveText('L4');
+  await page.click('#vuxenmeny .del[data-del="pass"]');
   await page.locator('#vuxenmeny .kapitel-oppet[data-kapitel="kap-01"]').check();
   await page.goto('./?snabb');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
@@ -1976,14 +1988,17 @@ test('läsnivån följer med mellan kapitlen (14): prologen slutar på L4, kapit
   expect(t.spelare.larande.lasning.P1_las_och_valj).toMatchObject({ niva: 4, uppgifter: 6 });
   // menyn visar vad nivån betyder i kapitlet (taket L3), och ett hopp till kapitlets början flyttar den inte
   await page.keyboard.press('Control+Shift+KeyM');
+  await page.click('#vuxenmeny .del[data-del="lasning"]');
   await expect(page.locator('#vuxenmeny .niva-i-kapitlet')).toContainText('får han L3 (kapitlet har L2–L3)');
   await page.screenshot({ path: 'test-results/meny-lasniva.png' });
+  await page.click('#vuxenmeny .del[data-del="pass"]');
   await Promise.all([page.waitForEvent('load'), page.locator('#vuxenmeny .pass-start', { hasText: 'Skogen, pass 1' }).click()]);
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   t = await page.evaluate(() => window.__ORDSTAVEN.tillstand());
   expect(t.spelare.larande.lasning.P1_las_och_valj).toMatchObject({ niva: 4, uppgifter: 6 });
   // att sätta nivån för hand står i loggen, med nivån före
   await page.keyboard.press('Control+Shift+KeyM');
+  await page.click('#vuxenmeny .del[data-del="lasning"]');
   await page.locator('#vuxenmeny .lasniva .niva', { hasText: 'L2' }).click();
   expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toMatch(/\[inställning\] läsnivån satt för hand: L4 → L2 .*"P28_fore":"L2"/);
 });
