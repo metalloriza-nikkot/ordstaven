@@ -216,12 +216,12 @@ const spelet = skapaSpel({
   filer: { laddaNed, tidsstampel, meddelande },
   // ?kapitel=kap-01: börja i ett kapitel som ännu saknar kartor (gråbox för den vuxne)
   valtKapitel: parametrar.get('kapitel'),
-  // introt (F4): när spelet startar, inte i snabbläget (?intro visar det ändå) och inte efter ett byte av spelare
-  intro: utanIntro() ? false : (parametrar.has('intro') || !snabb),
+  // introt (F4): när spelet startar, inte i snabbläget eller testläget (?intro visar det ändå) och inte efter ett byte av spelare
+  intro: utanIntro() ? false : (parametrar.has('intro') || (!snabb && !parametrar.has('test'))),
   // testläget (62.6): Hoppa till scen och objektens namn i INSTÄLLNINGAR, bara med ?test (och ?snabb, testernas läge)
   testlage: parametrar.has('test') || snabb,
-  // irisen från startskärmen in i spelet (62.5), inte i snabbläget (?iris visar den ändå)
-  iris: !snabb || parametrar.has('iris'),
+  // irisen från startskärmen in i spelet (62.5), inte i snabbläget eller testläget (?iris visar den ändå)
+  iris: (!snabb && !parametrar.has('test')) || parametrar.has('iris'),
   uppdatering: { tillampa: () => { uppdatering.tillampa(); startlage = false; } },
 });
 // Startvakten: kommer rummet inte igång med WebGL (Safari på golvdatorn kan få WebGL men inte rita med det, och
