@@ -80,6 +80,8 @@ function malI(/** @type {any} */ kap, /** @type {any} */ st, /** @type {any[]} *
     return [...v.alternativ.map((/** @type {any} */ a) => a.objekt).filter(Boolean), ...(p.skylt ? [p.skylt] : [])];
   }
   if (p?.typ === 'P26_krukorna') return p.foremal || obj.filter((o) => o.visar === p.id).map((o) => o.id);
+  // navet (2.31): varje gren har sin utgång som mål
+  if (st.typ === 'nav') return (st.grenar || []).map((/** @type {any} */ g) => g.mal);
   return [st.mal, st.till, st.fran, st.figur, ...(st.typ === 'las_skylt' || st.typ === 'fritt' ? [st.foremal].flat() : [])].filter((x) => typeof x === 'string');
 }
 
@@ -242,7 +244,7 @@ function kontrollera(/** @type {string} */ kapId) {
           const o = obj.find((x) => x.id === id);
           if (!o) { if (k.objekt.some((/** @type {any} */ x) => x.id === id) || rum.innehall.map(idFor).includes(id)) fel.push(`${var_}: målet ${id} syns inte i rummet`); continue; }
           // under en väg (ga_till) går han ut genom en annan utgång han känner, i ett läsval bara genom den han väljer
-          const andra = st.typ === 'ga_till' ? obj.filter((x) => x.sort === 'utgang' && x.till && (kanda.has(x.till) || x.id === st.mal) && x !== o) : [];
+          const andra = st.typ === 'ga_till' || st.typ === 'nav' ? obj.filter((x) => x.sort === 'utgang' && x.till && (kanda.has(x.till) || x.id === st.mal || malI(kap, st, obj, niva).includes(x.id)) && x !== o) : [];
           const g = gaTill(h, k, pos, nivaNu, o, andra);
           if (g.fel) { fel.push(`${var_}: ${id} nås inte från ${Math.round(pos.x)},${Math.round(pos.y)} (${g.fel})`); continue; }
           // han går till målet han ska till; i ett läsval står han kvar och väljer
@@ -251,6 +253,9 @@ function kontrollera(/** @type {string} */ kapId) {
           if (st.typ !== 'pussel' || malI(kap, st, obj, niva).length === 1) { pos = g.slut; nivaNu = g.niva; }
         }
         if (st.typ === 'pussel') losta.add(st.pussel_id);
+        // rummets tillstånd när pusslet är löst (2.33): repen på torget faller
+        const pt = st.typ === 'pussel' ? kap.pussel.find((/** @type {any} */ x) => x.id === st.pussel_id) : null;
+        if (pt?.tillstand_efter) tillstand[rum.id] = pt.tillstand_efter;
         if (st.typ === 'visa_foremal') { (visade[rum.id] = visade[rum.id] || []).push(st.foremal); }
         if (st.typ === 'pussel' || st.typ === 'visa_foremal') {
           const fore = naas();
@@ -333,7 +338,7 @@ describe('kartkontrollen (54.5, 56.7)', () => {
   for (const kapId of KAPITEL) {
     it(`${kapId}: varje mål går att nå, inget står i vägen, ingen stig ligger över ett hinder och inget ovanför figurerna ligger där han kan gå`, () => {
       expect(kontrollera(kapId)).toEqual([]);
-    });
+    }, 60000); // kapitel 2 tar ca 4 s här och mer i CI (0.47.1 föll på 5 s)
     it(`${kapId}: varje läsval i rummet ryms på en skärm`, () => {
       const kap = las(`content/${AVENTYR}/${kapId}.json`);
       for (const p of kap.pussel.filter((/** @type {any} */ x) => x.i_rummet && x.varianter)) {

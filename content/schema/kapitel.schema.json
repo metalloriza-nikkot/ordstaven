@@ -1337,6 +1337,10 @@
           "type": "integer",
           "minimum": 0,
           "description": "Så många av lästextens första rader har han redan läst: de visas grå med en bock (2.31)."
+        },
+        "tillstand_efter": {
+          "type": "string",
+          "description": "Rummets tillstånd när pusslet är löst (2.33): repen på torget faller."
         }
       }
     },
@@ -1627,6 +1631,10 @@
         "vanligt_svar": {
           "$ref": "#/$defs/replik",
           "description": "Repliken för andra riktiga ord (i ordlistorna) som inte hjälper (2.31). Utan den gäller äventyrets standardreplik."
+        },
+        "tillstand_efter": {
+          "type": "string",
+          "description": "Rummets tillstånd när pusslet är löst (2.33): repen på torget faller."
         }
       }
     },
@@ -1676,6 +1684,10 @@
         },
         "anteckning": {
           "$ref": "#/$defs/anteckning"
+        },
+        "tillstand_efter": {
+          "type": "string",
+          "description": "Rummets tillstånd när pusslet är löst (2.33): repen på torget faller."
         }
       }
     },
@@ -1737,6 +1749,10 @@
             "hugga"
           ],
           "description": "svinga (förval): staven mot krukor, buskar och löv. hugga (beslut 39.3): staven är ett svärd, och varje hugg fäller en lian, som försvinner. Samma knapp, inga missar och ingen tid."
+        },
+        "tillstand_efter": {
+          "type": "string",
+          "description": "Rummets tillstånd när pusslet är löst (2.33): repen på torget faller."
         }
       }
     },
@@ -1850,6 +1866,10 @@
         },
         "anteckning": {
           "$ref": "#/$defs/anteckning"
+        },
+        "tillstand_efter": {
+          "type": "string",
+          "description": "Rummets tillstånd när pusslet är löst (2.33): repen på torget faller."
         }
       }
     },
@@ -1949,6 +1969,10 @@
               "$ref": "#/$defs/handling"
             }
           }
+        },
+        "tillstand_efter": {
+          "type": "string",
+          "description": "Rummets tillstånd när pusslet är löst (2.33): repen på torget faller."
         }
       }
     },
@@ -2071,6 +2095,10 @@
           "minimum": 0,
           "maximum": 5,
           "description": "Ordet lyser så länge innan låset öppnas och nästa replik kommer."
+        },
+        "tillstand_efter": {
+          "type": "string",
+          "description": "Rummets tillstånd när pusslet är löst (2.33): repen på torget faller."
         }
       }
     },

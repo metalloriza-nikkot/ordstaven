@@ -2327,3 +2327,75 @@ test('kapitel 2 går att gå in i (del 2): skylten, vattnet, BRO över vattnet o
   expect(t.spelare.hjalte.formler).not.toContain('BRO');
   await page.screenshot({ path: 'test-results/kap2-byn.png' });
 });
+
+test('navet i kapitel 2 (del 3): dammen lockar, bryggan först, halvan bärs till ramen i byn, passet slutar, och pass 3 börjar med halvan som är kvar', async ({ page }) => {
+  test.setTimeout(180000);
+  // en sparning i kapitel 2, framme vid navet på torget efter skyltarna (repen har fallit)
+  await page.goto('./?snabb&ny&kapitel=kap-02');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.evaluate(() => {
+    const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
+    // kapitlen före spolas fram när sidan laddas (namnen finns, så inget dop frågas efter)
+    Object.assign(av, { kapitelId: 'kap-02', scen: 2, scenId: 'k2s03_torget', steg: 5, pass: 2, startad: true, rumstillstand: { byn: 'fri' }, skrivet: { k2_over: 'BRO' } });
+    t.spelare.hjalte.namn = 'TESTA'; t.spelare.unge = { format: 1, steg: 1, formagor: [], ...t.spelare.unge, namn: 'KNOPP', folj: true };
+    delete av.nav; delete av.effekt;
+    localStorage.setItem('ordstaven_spar', JSON.stringify(t));
+  });
+  await page.goto('./?snabb&kapitel=kap-02');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  const vidare = async () => { for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta), .pass-slut .fortsatt').all()) await v.click({ timeout: 300 }).catch(() => {}); };
+  const scen = () => page.evaluate(() => window.__ORDSTAVEN.scen());
+  const steg = () => page.evaluate(() => window.__ORDSTAVEN.steg());
+  const logg = () => page.evaluate(() => window.__ORDSTAVEN.logg());
+  const av = () => page.evaluate(() => window.__ORDSTAVEN.tillstand().aventyr['den-gomda-dalen']);
+  /** Gå mot ett föremål som ett tryck på marken: mitt i en utgång, framför (under) en sak. */
+  const gaMot = (id, dy = 0) => page.evaluate(([id, dy]) => { const o = window.__ORDSTAVEN.ruta(id); if (!o) return false; window.__ORDSTAVEN.gaMot(o.x + o.b / 2, o.sort === 'utgang' ? o.y + o.h / 2 : o.y + o.h + 6 + dy); return true; }, [id, dy]);
+  const tills = async (villkor, gor, n = 80) => { for (let i = 0; i < n; i++) { if (await villkor()) return; await gor(); await page.waitForTimeout(200); } throw new Error('kom inte fram'); };
+
+  // pass 2 börjar i navet: Farfars påminnelse, sedan navet med båda grenarna
+  await tills(async () => (await steg())?.typ === 'nav', vidare);
+  expect(await logg()).toContain('[var var vi] kap-02 pass 2');
+  expect(await page.locator('#tanke').isVisible()).toBe(true);
+  // förbi dammens stig: grodorna lockar, och ungen springer dit (repen har fallit, så han kan gå dit)
+  await page.evaluate(() => { const o = window.__ORDSTAVEN.ruta('stig_dammen'); window.__ORDSTAVEN.gaMot(o.x + o.b / 2, o.y + o.h + 28); });
+  await expect.poll(logg, { timeout: 15000 }).toContain('[lockar] k2s06_dammen vid stig_dammen');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.ungeMal()?.x)).toBe(566); // mitt för stig_dammen
+  // bryggan först
+  await tills(async () => (await scen()) === 'k2s04_bryggan', () => gaMot('stig_bryggan'));
+  expect(await logg()).toContain('[vägval] gren k2s04_bryggan först');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.rumsobjekt())).toContain('brygga');
+  // scenen vid bryggan: halvan läses som en skylt, och sedan bär han den till ramen i byn
+  for (let i = 0; i < 200; i++) {
+    const st = await steg();
+    if ((await scen()) !== 'k2s04_bryggan') break;
+    if (await page.locator('#plattan').isVisible()) await vidare();
+    else if (st?.typ === 'las_skylt') await gaMot(st.foremal);
+    else if (st?.typ === 'bara') {
+      const har = await page.evaluate((m) => !!window.__ORDSTAVEN.ruta(m), st.till);
+      if (!har) await gaMot('stig_byn_bryggan');
+      else { await gaMot(st.till); await page.waitForTimeout(400); await page.keyboard.press('Space'); }
+    } else await vidare();
+    await page.waitForTimeout(200);
+  }
+  expect(await logg()).toContain('[bära] bryggan → byn');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.rumsobjekt())).toContain('brevram');
+  // tillbaka i navet: Tant Rosa, passets slut (▶ fortsätter), och navet med vassen kvar
+  await tills(async () => (await steg())?.typ === 'nav', vidare);
+  let a = await av();
+  expect(a.nav).toMatchObject({ scen: 'k2s03_torget', klara: ['k2s04_bryggan'], pass: 3 });
+  expect(a.pass).toBe(3);
+  expect(a.flyttad).toBeUndefined();
+  await page.screenshot({ path: 'test-results/kap2-navet.png' });
+  // FORTSÄTT: pass 3 börjar med halvan som är kvar (vassen), inte med skyltarna
+  await page.goto('./?snabb&kapitel=kap-02');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  await tills(async () => (await steg())?.typ === 'nav', vidare);
+  const l = await logg();
+  expect(l).toContain('[var var vi] kap-02 pass 3');
+  expect(l).not.toContain('Baronen satte upp skyltar');
+  a = await av();
+  expect(a.nav.klara).toEqual(['k2s04_bryggan']);
+  await tills(async () => (await scen()) === 'k2s05_vassen', () => gaMot('stig_vassen'));
+});

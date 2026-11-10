@@ -884,3 +884,12 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Formeln med tangentbordet** (P11 med `skriv: tangentbord`): `karna/skrivord.js` bedömer ordet han skrev. En formel eller en form som godtas löser pusslet, och ordet blir resultatet (`ord`, sparat i `av.skrivet` för `{ord:…}`). Nästan rätt tänder första bokstaven eller förebilden. Ett rimligt ord får sin reaktion och ett annat riktigt ord det vanliga svaret, och inget av dem räknas som fel. Bara det som inte är ett ord (varken i ordlistorna eller i kapitlens formler) får "pff" och tänder förebilden. Fälten visar formelns längd och växer till högst tio. Ett ord med `ristas: false` ristas inte in på staven, och `formel_ristas` spelas bara för en ny formel som ristas.
 - **Målet är ungen** (`ga_till` till `unge`): han är framme när han står bredvid ungen, där den är. Efter ca 15 s hoppar ungen till.
 - **Kartkontrollen** prövar kapitel 2 också. Navet, `bara` mellan rummen och grenarna kommer i del 3.
+
+## 81. Kapitel 2 i gråbox, del 3: navet, bära mellan rummen och det som lockar (0.49.0, Teknik 20)
+- **Navet i berättelsemotorn** (`karna/berattelse.js`): grenarnas scener hoppas över i tur och ordning (`grenarI`). Var han är i navet sparas i `av.nav` (`scen`, `klara`, `gren`, `mellan`, `pass`). `klar({ gren })` på navets steg startar grenens scen, slutet av grenen går tillbaka till navet via `mellan_grenar`, och när alla grenar är klara går berättelsen till scenen efter navet. `navLage()` och `pass` visar läget för gränssnittet.
+- **Passet efter navets sparpunkt** (`passEfterNavet`) är passet för scenen efter navet. `varVarVi` tar emot passet, om passet börjar och vilka grenar som är klara (villkoret `gren_kvar`).
+- **Scenens tillstånd sätts bara när scenen börjar från första steget.** Mitt i en scen (en omstart, tillbaka till navet) står rummets sparade tillstånd kvar, så att ett pussels `tillstand_efter` (2.33) inte tas tillbaka.
+- **Lappen** (`lappenNu`) får navets grenar: ett steg i en gren är gjort när grenen är klar.
+- **Gränssnittet** (`spel.js`): `nav()` är ett fritt mål med flera utgångar, avstickare och det frivilliga. `bara` till ett annat rum går rum för rum med `vagTillbaka`, och `av.flyttad` säger var resten av scenen spelas (`visaScen`). `lockar` vaktas av en klocka som bara gör något medan han går fritt.
+- **Testkroken** `gaMot(x, y)` är ett tryck på marken i rummet, så att webbtesterna kan gå i stora områden.
+

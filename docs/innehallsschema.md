@@ -1,6 +1,7 @@
 # Innehållsschema – kapitel i format 2
 
-Version 2.32 (2026-11-08). Ägs av teknikspåret.
+Version 2.33 (2026-11-10). Ägs av teknikspåret.
+2.33: **navet, `bara` mellan rummen och `lockar` i motorn** (Teknik 20 del 3). Ett pussel får **`tillstand_efter`**: rummets tillstånd när pusslet är löst (repen på torget faller när skyltarnas lögn är avslöjad). Hur motorn spelar navet står i *3e*. Allt är tillägg, filer i 2.32 gäller fortfarande.
 2.32: **reaktionernas och knuffarnas text för den vuxne** (Teknik 30, beslut 67.3). En reaktion (`vid_ratt`, `vid_fel`, `vid_valj`, ett rimligt ord, `vid_annan_utgang`) och en knuff får **`syns_redan: true`**, och i ett klart kapitel är en reaktion eller knuff som visar sin text ett fel, som för mellanscenerna. **Farfar i dörren och ungen som springer** (67.2): mellanscenens `bild` får `farfar_i_dorren` och `farfar_gar_ut` (kartans punkt `regi_farfar`), och mellanscenen får **`unge_till`**. Allt är tillägg, filer i 2.31 gäller fortfarande.
 2.31: **kapitel 2:s fält** (Teknik 20, rapporten 26 och beslut 64.2). Schemat och kontrollen känner dem, och motorn bygger dem i kapitel 2:s gråbox. Avsnittet *3e* nedan. Allt är tillägg, filer i 2.30 gäller fortfarande.
 2.30: **mellanscenernas text för den vuxne** (Teknik 28, beslut 65). Mellanscenen får **`syns_redan: true`**: det som händer syns redan, och beskrivningen visas inte. Kapitlets och äventyrets **`meta.klart: true`** gör en beskrivning som visas till ett fel. Allt är tillägg, filer i 2.29 gäller fortfarande.
@@ -129,6 +130,8 @@ En **replik inuti något annat** (`knuff`, `vid_fel`, `instruktion`, `vid_omstar
 ### Fält som alla pussel kan ha
 
 `id`, `typ`, `instruktion` (replik), `knuff` (`handling`, `replik`, `efter_sek`, standard 9 s), `forenkla` (`efter_fel`, `andring`), `efter_3_fel`, `vid_ratt`, `vid_fel`, `anteckning`.
+
+**`tillstand_efter`** (2.33): rummets tillstånd när pusslet är löst, ett av rummets `tillstand`. Med `"tillstand_efter": "fri"` på `k2_skyltarna` faller repen på torget (de har `syns_i: ["rep"]`), och stigarna är öppna när navet börjar. Tillståndet står kvar när han kommer tillbaka till navet och när spelet startas om mitt i scenen: scenens eget `tillstand` sätts bara när scenen börjar från första steget. Kontrollen säger fel om rummet inte har tillståndet.
 
 **Fråga igen** (dialogregeln): en figur med `talare` i kartan upprepar sin senaste upplästa replik i scenen när spelaren trycker på den. Farfar i läsrummet och i köket har `talare: farfar`.
 
@@ -319,6 +322,15 @@ Formen kommer från rapporten 12:30 (Teknik 26) och Innehålls tillägg i 64.2. 
 - **`ga_till` till `unge`:** ungen är målet.
 - **`bara` till ett annat rum** i kapitlet: han bär saken dit. Medan den följer honom är rummets utgångar stängda utom vägen mot målet, och målet glimtar.
 - **`lockar`** på en frivillig scen: `vid` (en utgång i något rum), `beskrivning`, `bild`, `ljud` och `ljudord`. Det händer när han går förbi, igen varje gång tills han har varit där, aldrig under en replik eller ett läsval.
+
+**Så spelar motorn navet** (2.33, Teknik 20 del 3):
+- **I navet** går han fritt i rummet. Varje gren som inte är klar har sin utgång (`mal`) som mål, och molnet visar grenarnas bilder (`bild`) med instruktionen före navet, efter en gren den sista upplästa repliken i `mellan_grenar`. Han kan också gå till rum han har varit i och till en frivillig scen, som under ett `ga_till` med fri väg. Knuffen efter ca 15 s: ungen springer mot närmaste gren som inte är klar och väntar där. Den visar aldrig sin text, eftersom ungen gör det den säger.
+- **En gren** spelas när han går ut genom dess utgång. När grenens scen är slut kommer `mellan_grenar` (om grenar är kvar) och sedan navet igen. När alla grenar är klara fortsätter berättelsen med scenen efter navet och grenarna.
+- **Passet:** efter en `sparpunkt` med `pass_slut` i `mellan_grenar` räknas allt till passet för scenen efter navet (pass 3 i kapitel 2), också den andra grenen. Börjar han spela igen i navet, kommer det passets "Var var vi?" i stället för scenens `vid_omstart`, och repliker med `villkor: { "gren_kvar": … }` hörs bara medan den grenen inte är klar. Mitt i en gren hörs grenens `vid_omstart`.
+- **Uppdragslappen:** ett steg i en gren är gjort när grenen är klar, i vilken ordning han än tar dem.
+- **Menyn för vuxna:** ett hopp till en gren spelar den grenen som om han valt den i navet, och de andra grenarna är inte spelade. Passen i menyn börjar vid passets första scen, så pass 3 i kapitel 2 börjar vid `k2s07` (efter båda halvorna).
+- **`bara` till ett annat rum:** saken följer honom, och i varje rum är utgångarna stängda utom vägen mot målet, som glimtar. Resten av scenen spelas i rummet där han lade saken, också efter en omstart.
+- **`lockar`:** när han kommer nära utgången (ca 3 rutor) medan han går fritt (ett mål, navet eller fri lek), och bara om han kan gå dit (inget rep i vägen). Ljudet och ljudordet kommer vid utgången, och ungen springer dit och väntar. Med `bild` spelas regin, annars visas beskrivningen en stund i gråboxen utan att världen stannar. Beskrivningen räknas som en mellanscen i kontrollen (`syns_redan` döljer den).
 
 ## 3b. Rummens kartor (Tiled)
 

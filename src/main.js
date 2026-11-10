@@ -258,6 +258,8 @@ redo.then(() => { startKlar = true; window.clearTimeout(startVakt); window.remov
   /** Skärmpunkt mitt på ett objekt i rummet (för att trycka på det). @param {string} id */
   objekt: (id) => { const o = rum.ruta(id); if (!o) return null; return varldTillSkarm(layout.skala, rum.kamera, o.x + o.b / 2, o.y + o.h / 2); },
   rumsobjekt: () => rum.objekt.map((o) => o.id),
+  /** Gå mot en punkt i rummet, som ett tryck på marken (vägen runt det som står i vägen). @param {number} x @param {number} y */
+  gaMot: (x, y) => inmatning.sattGaTill(x, y),
   pausad: () => spelet.pausad,
   /** Varianten (nivån) i pusslet som pågår, t.ex. "L2". */
   variant: () => spelet.variant,

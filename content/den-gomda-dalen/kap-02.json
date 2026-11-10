@@ -1366,6 +1366,7 @@
    "avsandare": "baronen",
    "hjalp": "ett_ord",
    "i_rummet": true,
+   "tillstand_efter": "fri",
    "instruktion": {
     "talare": "berattare",
     "text": "Vilken skylt ljuger?",

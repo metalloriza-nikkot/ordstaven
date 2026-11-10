@@ -7,11 +7,37 @@ import { geSak } from './hjalte.js';
 // unge_tillagg) utförs här och lämnas sedan till gränssnittet för att visas.
 // En frivillig scen (frivillig: true, t.ex. buskarna) spelas aldrig i tur och ordning: den startar när hjälten går
 // in i sitt rum (startar_i_rum) under en fri väg, och gränssnittet spelar den med frivilligScen().
+// Navet (steget `nav`, kapitel 2): grenarnas scener spelas inte heller i tur och ordning. Gränssnittet väljer en gren
+// med klar({ gren }), grenens scen spelas, och sedan kommer stegen i `mellan_grenar` och navet igen, tills alla grenar
+// är klara. Var han är i navet sparas i av.nav: { scen, klara, gren?, mellan?, pass }.
 
 /** Sparningens delar för äventyret som stegen ändrar. @param {any} av */
 function sakraAventyr(av) {
   av.ui = av.ui || {}; av.rumstillstand = av.rumstillstand || {}; av.lappar = av.lappar || []; av.kartbitar = av.kartbitar || [];
   av.bar = av.bar || 0; av.visade = av.visade || {}; av.frivilligt = av.frivilligt || []; av.skrivet = av.skrivet || {};
+}
+
+/**
+ * Kapitlets nav: varje grens scen → navets scen och stegets plats. @param {any} kapitel
+ * @returns {Map<string, { nav: string, steg: number }>}
+ */
+export function grenarI(kapitel) {
+  const m = new Map();
+  for (const s of kapitel?.scener || []) (s.steg || []).forEach((/** @type {any} */ st, /** @type {number} */ i) => {
+    if (st.typ === 'nav') for (const g of st.grenar || []) m.set(g.scen, { nav: s.id, steg: i });
+  });
+  return m;
+}
+
+/**
+ * Passet efter navets sparpunkt (`mellan_grenar` med `pass_slut`): passet för scenen som kommer efter navet och dess
+ * grenar, annars navets pass + 1 (2.31: "det som kommer efter den räknas som pass 3").
+ * @param {any} kapitel @param {number} navIndex navets scen
+ */
+export function passEfterNavet(kapitel, navIndex) {
+  const grenar = grenarI(kapitel);
+  const nasta = kapitel.scener.slice(navIndex + 1).find((/** @type {any} */ s) => !s.frivillig && !grenar.has(s.id));
+  return nasta?.pass ?? (kapitel.scener[navIndex]?.pass ?? 0) + 1;
 }
 
 /**
@@ -55,9 +81,11 @@ export function spolaFram({ kapitel, tillstand, aventyrId, tillScen }) {
   const pussel = new Map(kapitel.pussel.map((/** @type {any} */ p) => [p.id, p]));
   /** @type {any[]} */
   const dop = [];
+  // ett hopp till en gren i ett nav: de andra grenarna är inte spelade (de tas i valfri ordning)
+  const grenar = grenarI(kapitel), tillGren = !!tillScen && grenar.has(tillScen);
   for (const scen of kapitel.scener) {
     if (tillScen && scen.id === tillScen) break;
-    if (scen.frivillig) continue;
+    if (scen.frivillig || (tillGren && grenar.has(scen.id))) continue;
     for (const st of scen.steg) {
       // bären räknas inte: spolningen ska gå att göra på en sparning som redan har spelat kapitlet
       if (st.typ !== 'ge_bar') stegetsEffekt(st, { tillstand, av, unge, pussel, rumId: scen.rum ?? null });
@@ -125,27 +153,78 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
   // ungen hör till spelaren (sparformat 2)
   const unge = (tillstand.spelare.unge = tillstand.spelare.unge || { format: 1, namn: '', steg: 1, formagor: [] });
 
-  /** Första scenen från i som inte är frivillig. @param {number} i */
-  const inteFrivillig = (i) => { let j = i; while (kapitel.scener[j]?.frivillig) j++; return j; };
-  let scenIndex = inteFrivillig(Math.min(av.scen, kapitel.scener.length));
+  const grenar = grenarI(kapitel);
+  const scenNr = (/** @type {string} */ id) => kapitel.scener.findIndex((/** @type {any} */ s) => s.id === id);
+  /** Första scenen från i som spelas i tur och ordning: inte frivillig och inte en gren i ett nav. @param {number} i */
+  const inteFrivillig = (i) => { let j = i; while (kapitel.scener[j]?.frivillig || grenar.has(kapitel.scener[j]?.id)) j++; return j; };
+  // navet: sparningen står i navet eller i en gren. Står den i en gren utan navets läge (ett hopp i menyn för vuxna),
+  // börjar grenen som om han hade valt den i navet. Ett navläge som inte hör till sparningens scen är gammalt.
+  {
+    const id = kapitel.scener[av.scen]?.id;
+    const g = id ? grenar.get(id) : undefined;
+    if (g && av.nav?.gren !== id) av.nav = { scen: g.nav, klara: (av.nav?.scen === g.nav ? av.nav.klara : []).filter((/** @type {string} */ x) => x !== id), gren: id, pass: kapitel.scener[scenNr(g.nav)]?.pass };
+    else if (av.nav && av.nav.scen !== id && av.nav.gren !== id) delete av.nav;
+  }
+  let scenIndex = av.nav?.gren && av.nav.gren === kapitel.scener[av.scen]?.id ? av.scen : inteFrivillig(Math.min(av.scen, kapitel.scener.length));
   let stegIndex = -1; // -1 = vid_omstart (om sådan finns och vi startar om)
   let omstart = scenIndex > 0 || !!av.startad;
   av.startad = true;
 
   /** Steget att fortsätta på efter "Var var vi?" (vid_omstart). */
   let aterupptaSteg = 0;
+  /** Passet som scenen räknas till: i navet och dess grenar navets pass (pass 3 efter navets sparpunkt). @param {any} scen */
+  function passFor(scen) {
+    if (av.nav && (scen.id === av.nav.scen || scen.id === av.nav.gren)) return av.nav.pass ?? scen.pass;
+    return scen.pass;
+  }
+  /** Navets steg i scenen (eller -1). @param {any} scen */
+  const navPlats = (scen) => (scen?.steg || []).findIndex((/** @type {any} */ st) => st.typ === 'nav');
+  /** Står berättelsen i stegen mellan grenarna just nu? */
+  function iMellan() {
+    const scen = kapitel.scener[scenIndex];
+    return !!scen && !!av.nav && av.nav.scen === scen.id && stegIndex >= 0 && stegIndex === navPlats(scen) && Number.isInteger(av.nav.mellan);
+  }
+  /** Navet är klart eller ska fortsätta: tillbaka till navets steg, med stegen mellan grenarna om grenar är kvar. */
+  function tillbakaTillNavet() {
+    const nav = /** @type {any} */ (av.nav);
+    scenIndex = scenNr(nav.scen);
+    const scen = kapitel.scener[scenIndex];
+    const i = navPlats(scen), st = scen.steg[i];
+    const kvar = (st.grenar || []).filter((/** @type {any} */ g) => !nav.klara.includes(g.scen));
+    if (kvar.length) {
+      if ((st.mellan_grenar || []).length) nav.mellan = 0;
+      borjaScen(i);
+      stegIndex = i; // ingen vid_omstart: han kommer från grenen
+      return;
+    }
+    // alla grenar är klara: navet är slut, och berättelsen fortsätter efter det (scenen efter navet och grenarna)
+    delete av.nav;
+    if (i + 1 < scen.steg.length) { borjaScen(i + 1); stegIndex = i + 1; av.steg = stegIndex; return; }
+    scenIndex = inteFrivillig(scenIndex + 1);
+    borjaScen();
+    if (scenIndex >= kapitel.scener.length) av.scen = scenIndex;
+  }
   /** @param {number} [franSteg] steget att börja på (vid en omstart mitt i scenen) */
   function borjaScen(franSteg = 0) {
     const scen = kapitel.scener[scenIndex];
     if (!scen) return;
     aterupptaSteg = Math.max(0, Math.min(scen.steg.length - 1, franSteg));
-    av.scen = scenIndex; av.scenId = scen.id; av.pass = scen.pass; av.steg = aterupptaSteg;
-    if (scen.rum && scen.tillstand) av.rumstillstand[scen.rum] = scen.tillstand;
+    av.scen = scenIndex; av.scenId = scen.id; av.pass = passFor(scen); av.steg = aterupptaSteg;
+    // scenens tillstånd sätts när scenen börjar. Mitt i scenen står rummets sparade tillstånd kvar (repen har fallit,
+    // en formel har ändrat rummet), också när spelet startas om eller han kommer tillbaka till navet
+    if (scen.rum && scen.tillstand && aterupptaSteg === 0) av.rumstillstand[scen.rum] = scen.tillstand;
+    // rummet scenen fortsatte i efter att han bar något dit (bara till ett annat rum) hör bara till den scenen
+    if (av.flyttad && av.flyttad.scen !== scen.id) delete av.flyttad;
     stegIndex = omstart && scen.vid_omstart ? -1 : aterupptaSteg;
     omstart = false;
     L('scen', scen.id);
   }
   borjaScen(startSteg);
+  // står sparningen i navet utan navets läge (äldre sparning, eller ett hopp), börjar navet utan klara grenar
+  {
+    const sc = kapitel.scener[scenIndex], i = navPlats(sc);
+    if (sc && i >= 0 && aterupptaSteg === i && av.nav?.scen !== sc.id) av.nav = { scen: sc.id, klara: [], pass: sc.pass };
+  }
 
   const varden = () => ({ unge: unge.namn || '', hjalte: tillstand.spelare.hjalte.namn || '' });
 
@@ -182,10 +261,14 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
     aktuellt() {
       const scen = kapitel.scener[scenIndex];
       if (!scen) return null;
-      const st = stegIndex === -1 ? { typ: 'replik', ...scen.vid_omstart, omstart: true } : scen.steg[stegIndex];
+      const mellan = iMellan();
+      const st = stegIndex === -1 ? { typ: 'replik', ...scen.vid_omstart, omstart: true }
+        : mellan ? scen.steg[stegIndex].mellan_grenar[/** @type {any} */ (av.nav).mellan] : scen.steg[stegIndex];
+      // navet börjar: ingen gren är klar än
+      if (st?.typ === 'nav' && av.nav?.scen !== scen.id) av.nav = { scen: scen.id, klara: [], pass: scen.pass };
       if (!effektGjord) {
         // effekten görs en gång per steg, även om spelet startas om mitt i steget
-        const nyckel = `${scen.id}/${stegIndex}`;
+        const nyckel = `${scen.id}/${stegIndex}${mellan ? `/m${/** @type {any} */ (av.nav).mellan}` : ''}`;
         if (stegIndex >= 0 && av.effekt !== nyckel) { effekt(st); av.effekt = nyckel; }
         effektGjord = true;
       }
@@ -199,9 +282,11 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
     klar(resultat = {}) {
       const scen = kapitel.scener[scenIndex];
       if (!scen) return;
-      const st = stegIndex === -1 ? null : scen.steg[stegIndex];
+      const st = stegIndex === -1 ? null : iMellan() ? scen.steg[stegIndex].mellan_grenar[/** @type {any} */ (av.nav).mellan] : scen.steg[stegIndex];
+      /** @type {any} */
+      let p = null;
       if (st && st.typ === 'pussel') {
-        const p = pussel.get(st.pussel_id);
+        p = pussel.get(st.pussel_id);
         if (p && p.typ === 'P12_dop' && resultat.namn) {
           if (p.sparas_som === 'hjalte.namn') tillstand.spelare.hjalte.namn = resultat.namn;
           if (p.sparas_som === 'unge.namn') { unge.namn = resultat.namn; }
@@ -219,15 +304,52 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
         }
         if (p && (p.typ === 'P1_las_och_valj' || p.typ === 'P28_packa') && p.kan_oppnas_igen && !av.lappar.includes(p.id)) av.lappar.push(p.id);
       }
+      if (st && p && p.tillstand_efter && scen.rum && st.typ === 'pussel') av.rumstillstand[av.flyttad?.rum ?? scen.rum] = p.tillstand_efter;
       effektGjord = false;
-      stegIndex = stegIndex === -1 ? aterupptaSteg : stegIndex + 1;
+      if (stegIndex === -1) { stegIndex = aterupptaSteg; av.steg = stegIndex; return; }
+      // stegen mellan grenarna: nästa, och efter det sista navet igen. Efter navets sparpunkt börjar nästa pass.
+      if (iMellan()) {
+        const nav = /** @type {any} */ (av.nav), lista = scen.steg[stegIndex].mellan_grenar;
+        if (lista[nav.mellan]?.typ === 'sparpunkt' && lista[nav.mellan].pass_slut) { nav.pass = passEfterNavet(kapitel, scenIndex); av.pass = nav.pass; }
+        nav.mellan++;
+        if (nav.mellan >= lista.length) delete nav.mellan;
+        return;
+      }
+      // navet: han har valt en gren (resultat.gren, utgången han gick till). Grenens scen spelas nu.
+      if (st && st.typ === 'nav') {
+        const nav = av.nav && av.nav.scen === scen.id ? av.nav : (av.nav = { scen: scen.id, klara: [], pass: scen.pass });
+        const kvar = (st.grenar || []).filter((/** @type {any} */ g) => !nav.klara.includes(g.scen) && scenNr(g.scen) >= 0);
+        const g = kvar.find((/** @type {any} */ x) => x.scen === resultat.gren) ?? kvar[0];
+        if (!g) { tillbakaTillNavet(); return; }
+        nav.gren = g.scen; delete nav.mellan;
+        L('gren', g.scen);
+        scenIndex = scenNr(g.scen);
+        borjaScen();
+        return;
+      }
+      stegIndex = stegIndex + 1;
       av.steg = stegIndex;
       if (stegIndex >= scen.steg.length) {
+        // en gren är klar: tillbaka till navet
+        if (av.nav && av.nav.gren === scen.id) {
+          if (!av.nav.klara.includes(scen.id)) av.nav.klara.push(scen.id);
+          delete av.nav.gren;
+          L('gren klar', scen.id);
+          tillbakaTillNavet();
+          return;
+        }
         scenIndex = inteFrivillig(scenIndex + 1);
         borjaScen();
         if (scenIndex >= kapitel.scener.length) av.scen = scenIndex;
       }
     },
+    /** Navets läge: grenarna som är klara, grenen som pågår och passet, eller null utanför ett nav. */
+    navLage() {
+      const n = av.nav;
+      return n ? { scen: n.scen, klara: [...n.klara], gren: n.gren ?? null, mellan: Number.isInteger(n.mellan), pass: n.pass ?? null } : null;
+    },
+    /** Passet just nu: i navet och dess grenar navets pass (pass 3 efter navets sparpunkt). */
+    get pass() { const sc = kapitel.scener[scenIndex]; return sc ? passFor(sc) : null; },
 
     /** Dolda föremål som har visats i ett rum (visa_foremal). @param {string} rumId @returns {string[]} */
     visade(rumId) { return av.visade[rumId] || []; },
@@ -245,7 +367,14 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
     /** Det frivilliga är gjort, och görs inte igen. @param {string} id */
     frivilligtKlart(id) { if (!av.frivilligt.includes(id)) av.frivilligt.push(id); },
     /** Hoppa till en scen (gråboxens meny). @param {number} i */
-    hoppaTill(i) { scenIndex = Math.max(0, Math.min(kapitel.scener.length - 1, i)); effektGjord = false; omstart = false; borjaScen(); },
+    hoppaTill(i) {
+      scenIndex = Math.max(0, Math.min(kapitel.scener.length - 1, i)); effektGjord = false; omstart = false;
+      // ett hopp till en gren: som om han hade valt den i navet. Annars gäller inget navläge längre.
+      const g = grenar.get(kapitel.scener[scenIndex].id);
+      if (g) av.nav = { scen: g.nav, klara: [], gren: kapitel.scener[scenIndex].id, pass: kapitel.scener[scenNr(g.nav)]?.pass };
+      else delete av.nav;
+      borjaScen();
+    },
   };
 }
 
@@ -284,9 +413,10 @@ export function barFore({ kapitlen, tillKapitel, tillScen, perForemal }) {
   let n = 0;
   for (const k of kapitlen) {
     const pussel = new Map((k.pussel || []).map((/** @type {any} */ p) => [p.id, p]));
+    const grenar = grenarI(k), tillGren = k.id === tillKapitel && grenar.has(tillScen);
     for (const sc of k.scener) {
       if (k.id === tillKapitel && sc.id === tillScen) return n;
-      if (sc.frivillig) continue;
+      if (sc.frivillig || (tillGren && grenar.has(sc.id))) continue;
       for (const st of sc.steg) {
         if (st.typ === 'ge_bar') n += st.antal || 0;
         if (st.typ === 'fritt') n += (st.foremal || []).length * perForemal;

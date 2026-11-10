@@ -77,16 +77,19 @@ export function kompileraUppdrag(kapitel) {
  * avslöjar ringen att det finns något mer att göra.
  * @param {KompileratUppdrag[]} lista @param {Pos} pos var berättelsen är (steget som pågår eller kommer)
  * @param {Set<string>} [paminda] steg med `visas: med_paminnelse` vars påminnelse har kommit (`<uppdrag>/<steg>`)
+ * @param {{ alla: Set<number>, klara: Set<number> } | null} [grenar] navets grenar (scenernas index): grenarna tas i
+ *   valfri ordning, så ett steg i en annan gren är gjort när grenen är klar, inte när berättelsen står efter det
  * @returns {{ k: KompileratUppdrag, gjorda: UppdragsSteg[], nu: UppdragsSteg | null, nuIndex: number, kvar: number } | null}
  */
-export function lappenNu(lista, pos, paminda = new Set()) {
+export function lappenNu(lista, pos, paminda = new Set(), grenar = null) {
   const k = lista.find((x) => jamfor(x.start, pos) <= 0 && jamfor(pos, x.stampel) <= 0);
   if (!k) return null;
   const gjorda = [];
   let nu = null, nuIndex = -1, kvar = 0, forstaKvar = true;
   for (let i = 0; i < k.steg.length; i++) {
     const { s, pos: p } = k.steg[i];
-    if (jamfor(p, pos) < 0) { gjorda.push(s); continue; }
+    const gjort = grenar && grenar.alla.has(p[0]) && p[0] !== pos[0] ? grenar.klara.has(p[0]) : jamfor(p, pos) < 0;
+    if (gjort) { gjorda.push(s); continue; }
     const synligt = s.visas !== 'med_paminnelse' || paminda.has(`${k.u.id}/${i}`);
     if (synligt) kvar++;
     // steget han gör nu är det första som inte är gjort, om det syns

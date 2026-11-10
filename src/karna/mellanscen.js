@@ -16,14 +16,27 @@ export const visarBeskrivning = (st) => !!st && st.typ === 'mellanscen' && !!st.
 export const UNGE_TILL_MS = 1000;
 
 /**
- * Var mellanscenerna som visar sin beskrivning står: i scenerna och i rummens frivilliga föremål.
+ * Visar det som lockar till en frivillig scen (`lockar`, 2.31) sin beskrivning? Samma regel som en mellanscen.
+ * @param {any} l scenens `lockar`
+ */
+export const lockarVisarBeskrivning = (l) => !!l && visarBeskrivning({ ...l, typ: 'mellanscen' });
+
+/**
+ * Var mellanscenerna som visar sin beskrivning står: i scenerna (också stegen mellan navets grenar), i det som
+ * lockar till en frivillig scen och i rummens frivilliga föremål.
  * @param {any} kapitel @returns {{ plats: string, beskrivning: string }[]}
  */
 export function beskrivningarSomVisas(kapitel) {
   /** @type {{ plats: string, beskrivning: string }[]} */
   const ut = [];
-  const steg = (/** @type {any[]} */ lista, /** @type {string} */ plats) => (lista || []).forEach((st, i) => { if (visarBeskrivning(st)) ut.push({ plats: `${plats} steg ${i}`, beskrivning: st.beskrivning }); });
-  for (const s of kapitel?.scener || []) steg(s.steg, s.id);
+  const steg = (/** @type {any[]} */ lista, /** @type {string} */ plats) => (lista || []).forEach((st, i) => {
+    if (visarBeskrivning(st)) ut.push({ plats: `${plats} steg ${i}`, beskrivning: st.beskrivning });
+    if (st?.typ === 'nav') steg(st.mellan_grenar, `${plats} steg ${i} mellan_grenar`);
+  });
+  for (const s of kapitel?.scener || []) {
+    steg(s.steg, s.id);
+    if (lockarVisarBeskrivning(s.lockar)) ut.push({ plats: `${s.id} lockar`, beskrivning: s.lockar.beskrivning });
+  }
   for (const r of kapitel?.rum || []) for (const f of r.frivilligt || []) steg(f.steg, `rum ${r.id} frivilligt ${f.foremal}`);
   return ut;
 }
@@ -54,8 +67,11 @@ export const SYNS_REDAN_MS = 800;
  */
 export const visarRegi = (h) => !!h && !!(h.handling || h.reaktion) && !h.syns_redan;
 
-/** Pusseltyper vars knuff aldrig visar rutan: den pekar i världen (krukorna: ungen nosar mot närmaste föremål). */
-export const KNUFF_UTAN_RUTA = Object.freeze(new Set(['P26_krukorna']));
+/**
+ * Pusseltyper och steg vars knuff aldrig visar rutan: den pekar i världen (krukorna: ungen nosar mot närmaste
+ * föremål; navet: ungen springer mot närmaste gren som inte är klar).
+ */
+export const KNUFF_UTAN_RUTA = Object.freeze(new Set(['P26_krukorna', 'nav']));
 
 /** Fält som har en handling men aldrig visar den: efter tre fel (ägget gungar) och förenklingen. */
 const VISAS_INTE = new Set(['efter_3_fel', 'forenkla']);
@@ -79,7 +95,7 @@ export function reaktionerSomVisas(kapitel) {
   };
   for (const p of kapitel?.pussel || []) for (const [k, v] of Object.entries(p)) if (v && typeof v === 'object') ga(v, [`pussel ${p.id}`, k], p.typ);
   const steg = (/** @type {any[]} */ lista, /** @type {string} */ plats) => (lista || []).forEach((st, i) => {
-    for (const [k, v] of Object.entries(st || {})) if (v && typeof v === 'object' && k !== 'replik') ga(v, [`${plats} steg ${i}`, k], '');
+    for (const [k, v] of Object.entries(st || {})) if (v && typeof v === 'object' && k !== 'replik') ga(v, [`${plats} steg ${i}`, k], st?.typ === 'nav' ? 'nav' : '');
   });
   for (const s of kapitel?.scener || []) steg(s.steg, s.id);
   for (const r of kapitel?.rum || []) for (const f of r.frivilligt || []) steg(f.steg, `rum ${r.id} frivilligt ${f.foremal}`);

@@ -338,6 +338,8 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
           if (!p) { fel.push(var_(`${sp}: pusslet ${st.pussel_id} finns inte`)); break; }
           if (st.typ === 'pussel') {
             anvanda.add(p.id);
+            // rummets tillstånd när pusslet är löst (2.33): ett tillstånd som rummet har
+            if (p.tillstand_efter && !(rum.get(s.rum)?.tillstand || []).includes(p.tillstand_efter)) fel.push(var_(`${sp}: ${p.id} tillstand_efter ${p.tillstand_efter}, men rummet ${s.rum} har inte det tillståndet`));
             if (p.i_rummet) {
               const r = rum.get(s.rum);
               const ids = r ? r.innehall.map(objId) : [];

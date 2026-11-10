@@ -1,7 +1,7 @@
 // @ts-check
 // Spelet: kopplar berättelsemotorn (karna) till rummet (Phaser) och gränssnittet (DOM).
 // Varje stegtyp i innehållet har en hanterare här. Inget innehåll hårdkodas: allt kommer från content/.
-import { skapaBerattelse, spolaFram, aterstallFramsteg, barFore } from './karna/berattelse.js';
+import { skapaBerattelse, spolaFram, aterstallFramsteg, barFore, grenarI } from './karna/berattelse.js';
 import { sammanfatta } from './karna/foraldravy.js';
 import { skapaLasmotor, valjVariant } from './karna/lasmotor.js';
 import { egenskaper, egetForemal, synligaEgenskaper, PALETT } from './karna/egenskaper.js';
@@ -13,7 +13,7 @@ import { aventyrFor, spelareAttVisa } from './karna/sparning.js';
 import { varVarVi, senastSpelad } from './karna/varvarvi.js';
 import { musikFor } from './karna/musik.js';
 import { ljudLista } from './karna/ljudid.js';
-import { SYNS_REDAN_MS, UNGE_TILL_MS, visarRegi } from './karna/mellanscen.js';
+import { SYNS_REDAN_MS, UNGE_TILL_MS, visarRegi, lockarVisarBeskrivning } from './karna/mellanscen.js';
 import { sparaPassbild, aterstallLarande, forstaIPasset } from './karna/larandebild.js';
 import { pekningOmMs, skapaHjalpSpar, knufftidMs } from './karna/hjalp.js';
 import { HJALTE_FARGER, HJALTE_FAST } from './scener/Rum.js';
@@ -169,7 +169,14 @@ export function skapaSpel(d) {
   /** @returns {[number, number]} */
   const lappPos = () => [b.scenIndex, b.stegIndex < 0 ? (av.steg ?? 0) : b.stegIndex];
   const lappAktiv = () => !!b && !!uppdragKomp?.lista.length && layout.skala.remsa > 0;
-  const lappNu = () => (lappAktiv() ? lappenNu(/** @type {any} */ (uppdragKomp).lista, lappPos(), paminda) : null);
+  /** Navets grenar för lappen (kapitel 2): de tas i valfri ordning. */
+  const lappGrenar = () => {
+    const n = b?.navLage?.();
+    if (!n) return null;
+    const nr = (/** @type {string} */ id) => b.kapitel.scener.findIndex((/** @type {any} */ s) => s.id === id);
+    return { alla: new Set([...grenarI(b.kapitel).keys()].map(nr)), klara: new Set(n.klara.map(nr)) };
+  };
+  const lappNu = () => (lappAktiv() ? lappenNu(/** @type {any} */ (uppdragKomp).lista, lappPos(), paminda, lappGrenar()) : null);
   /** Lappens versaler som en mening för rösten ("GÅ UT I HALLEN" → "Gå ut i hallen"). @param {string} t */
   const lappTal = (t) => { const x = lappText(t).toLocaleLowerCase('sv-SE'); return x.charAt(0).toLocaleUpperCase('sv-SE') + x.slice(1); };
   /** Läs lappens rubrik. @param {any} l */
@@ -852,6 +859,8 @@ export function skapaSpel(d) {
     if (!scen) return;
     // spelet startade om mitt i en avstickare: rummet han var i visas, med scenens id (beslut 26.2)
     if (aterAvstickare && scen === b.scen && b.rum(aterAvstickare.rum) && (b.aktuellt()?.omstart || b.aktuellt()?.typ === 'ga_till')) scen = { id: scen.id, rum: aterAvstickare.rum, steg: [] };
+    // han bar något till ett annat rum (bara, 2.31): resten av scenen spelas där
+    else if (scen === b?.scen && av.flyttad?.scen === scen.id && av.flyttad.rum !== scen.rum && b.rum(av.flyttad.rum)) scen = { ...scen, rum: av.flyttad.rum };
     visadScen = scen;
     if (scen.id !== senasteScen) { senaste.clear(); senasteScen = scen.id; }
     const nytt = scen.rum !== aktuelltRum;
@@ -1156,8 +1165,13 @@ export function skapaSpel(d) {
       case 'musik': return; // slingan byttes när steget började (spelaPlatsensMusik)
       case 'unge_folj': if (st.folj) rum.ungenUrAgget?.(); return; // effekten (ungen syns och följer) görs i berättelsemotorn; skalet ligger kvar i lådan
       case 'ga_till': return gaTill(st);
+      case 'nav': return nav(st);
       case 'pussel': return pussel(b.pussel(st.pussel_id));
-      case 'oppna_lasplatta': return visaLapp(b.pussel(st.pussel_id), true);
+      case 'oppna_lasplatta': {
+        // en skylt i rummet visas igen (2.31: brevets halva). Ordet i guld (lys_ord) kommer i del 4.
+        if (st.skylt) { const sk = skyltarIRummet().find((x) => x.id === st.skylt); if (sk) return lasSkyltText(sk); logg.handelse('FEL', 'oppna_lasplatta: skylten finns inte i rummet: ' + st.skylt); return; }
+        return visaLapp(b.pussel(st.pussel_id), true);
+      }
       case 'visa_ui': {
         ui.uppdateraHud(av);
         visaPausknapp();
@@ -1313,7 +1327,7 @@ export function skapaSpel(d) {
     if (!av.ui?.[flagga]) { av.ui = { ...(av.ui || {}), [flagga]: true }; spara(); }
   }
   /** Passet styrbilderna räknas i: kapitlet och scenens pass. @param {string} vad */
-  const styrNyckel = (vad) => `${av.kapitelId ?? ''}:${b?.scen?.pass ?? ''}:${vad}`;
+  const styrNyckel = (vad) => `${av.kapitelId ?? ''}:${b?.pass ?? ''}:${vad}`;
   /** Styrbilderna som han har använt i passet som spelas nu (anvand, svinga, ga). @type {Set<string>} */
   const styrIPasset = new Set();
   let styrStilla = 0;
@@ -1536,6 +1550,63 @@ export function skapaSpel(d) {
   }
 
   /**
+   * Navet (2.31, kapitel 2): han går fritt i rummet, och varje gren som inte är klar har sin utgång som mål. Molnet
+   * visar grenarnas bilder och instruktionen (efter en gren den sista i `mellan_grenar`). Efter ca 15 s springer
+   * ungen en bit mot närmaste gren som inte är klar och tittar tillbaka. Under tiden kan han gå till rum han har varit
+   * i, till en frivillig scen (dammen) och göra det frivilliga i rummet, som under ett ga_till med fri väg.
+   * @param {any} st @returns {Promise<{ gren: string } | undefined>}
+   */
+  async function nav(st) {
+    rum.frys(false);
+    const lage = b.navLage();
+    const kvar = (st.grenar || []).filter((/** @type {any} */ g) => !lage?.klara.includes(g.scen) && rum.ruta(g.mal));
+    if (!kvar.length) { logg.handelse('FEL', 'navet: ingen gren kvar i rummet'); return undefined; }
+    const malen = kvar.map((/** @type {any} */ g) => /** @type {string} */ (g.mal));
+    // instruktionen: efter en gren den sista upplästa repliken mellan grenarna, annars den före navet
+    const mellan = lage?.klara.length ? [...(st.mellan_grenar || [])].reverse().find((/** @type {any} */ x) => x.typ === 'replik' && x.upplast) : null;
+    const instr = mellan ?? instruktionFore(st);
+    const visaMal = () => { if (!instr) return; visaMoln(kvar.map((/** @type {any} */ g) => bilder.html(g.bild || g.mal)).join(''), instr); placeraMoln([]); };
+    const omplacera = window.setInterval(() => { if (instr && !ui.$('#tanke').hidden && ui.plattan.hidden) placeraMoln([]); }, 250);
+    /** Närmaste gren som inte är klar (efter avståndet till dess utgång). */
+    const narmast = () => malen.map((id) => /** @type {any} */ (rum.ruta(id))).filter(Boolean).sort((a, c) => avstandTill(rum.pos, a) - avstandTill(rum.pos, c))[0]?.id ?? malen[0];
+    // knuffen: ungen springer mot närmaste gren och väntar där (den pekar, så rutan visas inte)
+    const k = knuffKlocka(st.knuff ? { ...st.knuff, syns_redan: true } : { handling: '' }, () => {
+      const m = narmast();
+      rum.markera(m, true);
+      logg.handelse('knuff', 'ungen springer mot grenen: ' + m, { ungenPekar: rum.ungePekar(m) });
+    }, undefined, MAL_KNUFF_MS);
+    malNu = malen[0];
+    if (instr) logg.handelse('mål', 'i molnet: ' + malen.join(', '));
+    const start = performance.now();
+    /** @type {string} */
+    let id;
+    try {
+      for (;;) {
+        const sidor = sidoUtgangar(null, true).filter((x) => !malen.includes(x));
+        const fri = frivilligaKvar();
+        const bortSkyltar = visaUtgangsSkyltar();
+        visaMal();
+        id = await anvand([...malen, ...sidor, ...fri], { tidig: instr ? malen[0] : null });
+        bortSkyltar();
+        if (malen.includes(id)) break;
+        k.stopp(); for (const m of malen) rum.markera(m, false);
+        rum.ungePekar(null);
+        if (instr) visaMoln(null);
+        if (fri.includes(id)) await korFrivilligt(id); else await avstickare(id, { ...st, mal: narmast() }, visaMal);
+        rum.frys(false); k.nollstall();
+      }
+    } finally {
+      window.clearInterval(omplacera); k.stopp(); malNu = null;
+      for (const m of malen) rum.markera(m, false);
+    }
+    rum.ungePekar(null);
+    if (instr) visaMoln(null);
+    const g = kvar.find((/** @type {any} */ x) => x.mal === id);
+    logg.handelse('vägval', `gren ${g.scen}${lage?.klara.length ? ` (efter ${lage.klara.join(', ')})` : ' först'}`, { sek: Math.round((performance.now() - start) / 100) / 10 });
+    return { gren: g.scen };
+  }
+
+  /**
    * Instruktionen i molnet vid förra målet och rummet där den stod: den gäller också nästa rums första mål
    * (sovrummet → hallen → köket), men bara när rummet har bytts, och den nollas av varje steg som inte är ett mål
    * (ett pussel, en replik, en mellanscen), beslut 36.5. @type {{ r: any, rum: string | null | undefined } | null}
@@ -1585,6 +1656,45 @@ export function skapaSpel(d) {
     try { for (const st of f.steg) { b.effektUtanfor(st, rumId); await utfor(st); } } finally { friviligtPagar.delete(nyckel); }
     aktuelltSteg = forra;
     ui.uppdateraHud(av); spara(); rum.frys(false);
+  }
+  /**
+   * Det som lockar till en frivillig scen (`lockar`, 2.31: grodorna vid dammens stig). Det händer när han går förbi
+   * utgången, igen varje gång han kommer nära den, tills han har varit där. Bara medan han går fritt (ett mål, navet
+   * eller fri lek), aldrig under en replik, ett läsval eller en avstickare, och bara när han kan gå dit (inget rep
+   * står i vägen). Ungen springer till utgången och väntar där, grodorna hoppar (ljudet och ljudordet), och i
+   * gråboxen visas beskrivningen en stund, utan att världen stannar.
+   */
+  {
+    /** @type {Set<string>} utgångar han står nära nu (det händer när han kommer nära, inte medan han står kvar) */
+    const nara = new Set();
+    /** @type {Map<string, number>} när det senast hände, per utgång */
+    const senast = new Map();
+    window.setInterval(() => {
+      if (!b || pausad || rum.fryst || !ui.plattan.hidden || !rum.harRum || !aktuelltRum) return;
+      if (!['ga_till', 'nav', 'fritt'].includes(aktuelltSteg?.typ) || aktuelltSteg?.mal === 'unge') return;
+      for (const sc of b.kapitel.scener) {
+        const l = sc.lockar;
+        if (!l || !sc.frivillig || b.frivilligtGjort(sc.id)) continue;
+        const o = rum.ruta(l.vid);
+        if (!o) continue;
+        const nu = avstandTill(rum.pos, o) <= RUM.ruta * 3;
+        if (!nu) { nara.delete(l.vid); continue; }
+        if (nara.has(l.vid)) continue;
+        nara.add(l.vid);
+        if (performance.now() - (senast.get(l.vid) ?? -1e9) < 4000) continue;
+        // står något i vägen (repen på torget) lockar det inte: han kan inte gå dit
+        const f = framfor(o);
+        if (Math.hypot(rum.pos.x - f.x, rum.pos.y - f.y) > 8 && !rum.vagTill(f).length) continue;
+        senast.set(l.vid, performance.now());
+        logg.handelse('lockar', `${sc.id} vid ${l.vid}`);
+        ljud.spelaRad?.(l.ljud);
+        visaLjudord(l.ljudord, Array.isArray(l.ljud) ? l.ljud[0] : l.ljud, l.vid);
+        rum.hoppa(l.vid);
+        rum.ungePekar(l.vid);
+        const ms = l.bild ? rum.regi(l.bild) : 0;
+        if (!ms && lockarVisarBeskrivning(l)) { ui.visaRegi(l.beskrivning, 0); window.setTimeout(() => ui.doljRegi(), tid(Math.min(5000, 1500 + l.beskrivning.split(' ').length * 120))); }
+      }
+    }, 200);
   }
   /**
    * Har kapitlet en sidogren (en frivillig scen som startar i ett rum)? Då är vägarna mellan kapitlets områden
@@ -2862,10 +2972,15 @@ export function skapaSpel(d) {
    */
   async function bara(st) {
     rum.frys(false);
-    const o = rum.ruta(st.till);
-    if (!o) { logg.handelse('FEL', 'bära: målet finns inte i rummet: ' + st.till); return; }
     const e = egenskaper(st.bild);
     const farg = e.farg && PALETT[e.farg] ? parseInt(PALETT[e.farg].slice(1), 16) : 0xc8553d;
+    // målet i ett annat rum i kapitlet (2.31): han bär saken dit, rum för rum
+    if (!rum.ruta(st.till) && aktuelltRum) {
+      const malRum = (b.kapitel.rum || []).map((/** @type {any} */ r) => r.id).find((/** @type {string} */ id) => (kartor[id]?.objekt || []).some((/** @type {any} */ x) => x.id === st.till));
+      if (malRum) await baraTillRum(st, malRum, farg);
+    }
+    const o = rum.ruta(st.till);
+    if (!o) { logg.handelse('FEL', 'bära: målet finns inte i rummet: ' + st.till); return; }
     rum.bara(farg, st.bild);
     // boken han hämtade är i hans händer nu, inte kvar i hyllan
     if (st.bild && rum.ruta(st.bild) && rum.ritade.get(st.bild)) rum.gomForemal?.(st.bild, true);
@@ -2880,6 +2995,32 @@ export function skapaSpel(d) {
     rum.lagg(st.till);
     ljud.spela('sus'); // saken som svävade läggs på målet: ett mjukt sus (10c)
     await vanta(tid(400));
+  }
+
+  /**
+   * Bära till ett annat rum (2.31): medan saken följer honom är rummets utgångar stängda utom vägen mot målet, och
+   * vägen glimtar. I nästa rum fortsätter scenen (av.flyttad), också när spelet startas om.
+   * @param {any} st @param {string} malRum @param {number} farg
+   */
+  async function baraTillRum(st, malRum, farg) {
+    const instr = instruktionFore(st);
+    for (let n = 0; n < 8 && aktuelltRum !== malRum; n++) {
+      const vag = vagTillbaka(/** @type {string} */ (aktuelltRum), malRum);
+      if (!vag) { logg.handelse('FEL', `bära: ingen väg från ${aktuelltRum} till ${malRum}`); return; }
+      rum.bara(farg, st.bild);
+      rum.markera(vag, true);
+      malNu = vag;
+      if (instr) { visaMoln(malBild(st.till), instr); placeraMoln([]); }
+      const omplacera = window.setInterval(() => { if (instr && !ui.$('#tanke').hidden && ui.plattan.hidden) placeraMoln([]); }, 250);
+      const k = knuffKlocka({ handling: '' }, () => logg.handelse('knuff', 'ungen nosar mot vägen: ' + vag, { ungenPekar: rum.ungePekar(vag) }), undefined, MAL_KNUFF_MS);
+      try { await anvand([vag]); } finally { window.clearInterval(omplacera); k.stopp(); malNu = null; rum.markera(vag, false); rum.ungePekar(null); if (instr) visaMoln(null); }
+      const nytt = tillFor(rum.ruta(vag));
+      if (!nytt) return;
+      logg.handelse('bära', `${aktuelltRum} → ${nytt}`);
+      av.flyttad = { scen: b.scen.id, rum: nytt }; spara();
+      await visaScen(b.scen, st);
+      rum.frys(false);
+    }
   }
 
   /** Avståndet från hjältens fötter till en ruta. @param {{ x: number, y: number }} p @param {any} o */
@@ -3334,7 +3475,10 @@ export function skapaSpel(d) {
       aterAvstickare = av.avstickare && b.rum(av.avstickare.rum) && b.aktuellt()?.omstart ? { ...av.avstickare } : null;
       if (av.avstickare && !aterAvstickare) { delete av.avstickare; spara(); }
       // Farfars "Var var vi?" (F2): när ett pass börjar efter FORTSÄTT, och mitt i ett pass när det har gått lång tid
-      let vvv = forstaKapitlet ? varVarVi({ kapitel, scenIndex: b.scenIndex, steg: av.steg ?? 0, senast, nu: Date.now() }) : null;
+      // i navet (kapitel 2): navets pass, och passet börjar när han står i navet (efter navets sparpunkt pass 3)
+      const navNu = b.navLage();
+      const iNavet = !!navNu && navNu.scen === b.scen?.id;
+      let vvv = forstaKapitlet ? varVarVi({ kapitel, scenIndex: b.scenIndex, steg: av.steg ?? 0, senast, nu: Date.now(), pass: navNu ? b.pass : null, borjar: navNu ? iNavet : null, klara: navNu?.klara ?? [] }) : null;
       forstaKapitlet = false;
       while (!b.slut) {
         await visaScen();
