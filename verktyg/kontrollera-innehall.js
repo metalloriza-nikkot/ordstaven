@@ -23,7 +23,7 @@ for (const mapp of readdirSync(rot, { withFileTypes: true }).filter((d) => d.isD
   }
   const r = kontrollera({ aventyr, kapitel, ordlistor, kartor });
   console.log(`\n== ${mapp.name}: ${kapitel.length} kapitel ==`);
-  for (const p of r.pass) console.log(`   ${p.kapitel} pass ${p.pass}: ca ${p.minuter} min, ${p.lasuppgifter} läsuppgifter`);
+  for (const p of r.pass) console.log(`   ${p.kapitel} pass ${p.pass}: ca ${p.minuter} min, ${p.lasuppgifter} läs- och skrivuppgifter som avgör`);
   // mellanscener som fortfarande visar texten för den vuxne (beslut 65): fel först när kapitlet är klart
   for (const b of r.beskrivningar || []) {
     const n = b.platser.length, m = (b.reaktioner || []).length;

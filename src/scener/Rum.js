@@ -839,6 +839,8 @@ export class Rum extends Phaser.Scene {
     const agg = AGGET[bild];
     if (agg) return this.aggRegi(agg) ? agg.ms : 0;
     if (bild === 'farfar_i_dorren' || bild === 'farfar_gar_ut') return this.farfarIDorren(bild === 'farfar_i_dorren' ? 'in' : 'ut');
+    const lage = this.stilsRegi(bild);
+    if (lage) return lage;
     if (this.textures.exists(`sidovy_${bild}_bakgrund`)) {
       // luftskeppet flyger först iväg åt fel håll, mot SKOLAN (Stil 21:20), sedan kommer sidovyn
       const ms = this.luft && this.flygFel() ? 1600 : 0;
@@ -878,6 +880,159 @@ export class Rum extends Phaser.Scene {
     this.tweens.add({ targets: img, scaleY: 0.94, duration: 150, yoyo: true, repeat: 1, onUpdate: () => { this.smutsig = true; } });
     this.tweens.add({ targets: img, alpha: 0, delay: 350, duration: 350, onUpdate: () => { this.smutsig = true; }, onComplete: () => { img.destroy(); if (this.farfarRegi === img) this.farfarRegi = null; this.smutsig = true; } });
     return 800;
+  }
+
+  /**
+   * Stils mellanscener (Teknik 31, beslut 68.5, Stils tabell 8/11): figurerna i rummet byter bild en stund och står
+   * sedan som förut. Ingen text. Saknas figuren eller bilderna händer ingenting (0), och då visar spelet beskrivningen.
+   * - `unge_gaspar`, `unge_fnissar`, `unge_fnissar_mun`, `unge_kryper_ihop`, `unge_lyssnar` (åt det håll ungen tittar)
+   *   och `unge_lyssnar_<upp|ner|hoger|vanster>`: ungens lägen (rad 27, 35, 43, 44, 46 och 47);
+   * - `unge_biter`: ungen biter i närmaste lian och drar (rad 24);
+   * - `farfar_skriver` och `farfar_gaspar` (med ungen): Farfar i fåtöljen (rad 12 och 18);
+   * - `buske_prasslar`: det prasslar i en av buskarna, och löv yr (rad 28);
+   * - `apa_suckar`: apan i nätet suckar (rad 31);
+   * - `ekorre_knacker`: ekorren på grenen skakar, skalet regnar ner på ungen, som nyser (rad 48);
+   * - `ugglor_vrider`: ugglorna vrider huvudet (rad 49);
+   * - `stav_ristas`: närbilden när SVÄRD ristas i staven (rad 25). Ordet visar textlagret ovanför.
+   * @param {string} bild @returns {number} hur länge berättelsen väntar (ms), 0 = finns inte
+   */
+  stilsRegi(bild) {
+    const m = /^unge_(gaspar|fnissar_mun|fnissar|kryper_ihop|lyssnar|biter)(?:_(upp|ner|hoger|vanster))?$/.exec(bild);
+    if (m) {
+      const [, lage, hall] = m;
+      const takt = /** @type {Record<string, [number, number]>} */ ({ gaspar: [450, 1], fnissar: [250, 3], fnissar_mun: [250, 3], kryper_ihop: [200, 4], lyssnar: [400, 2], biter: [250, 3] })[lage];
+      return this.ungeLage(lage, hall || this.ungeHallFor(lage), takt[0], takt[1]);
+    }
+    if (bild === 'farfar_skriver' || bild === 'farfar_gaspar') {
+      const o = this.objekt.find((x) => String(x.bild || '').startsWith('farfar_fatolj') && this.ritade.has(x.id));
+      if (!o || !foremalsbild(this, `${bild.replace('farfar_', 'farfar_fatolj_')}_01`)) return 0;
+      if (bild === 'farfar_skriver') return this.regiRamar(o.id, Array.from({ length: 10 }, (_, i) => `farfar_fatolj_skriver_0${1 + (i % 2)}`), 250);
+      const ms = this.regiRamar(o.id, ['farfar_fatolj_gaspar_01', 'farfar_fatolj_gaspar_02'], 900);
+      this.ungeLage('gaspar', 'ner', 450, 2);
+      return ms;
+    }
+    if (bild === 'buske_prasslar') {
+      const buskar = this.objekt.filter((x) => this.ritade.has(x.id) && foremalsbild(this, `${x.bild}_prassel_01`));
+      const o = buskar[Math.floor(Math.random() * buskar.length)];
+      if (!o) return 0;
+      this.lovYr(o.id);
+      return this.regiRamar(o.id, Array.from({ length: 6 }, (_, i) => `${o.bild}_prassel_0${1 + (i % 2)}`), 250);
+    }
+    if (bild === 'apa_suckar') {
+      const o = this.objekt.find((x) => String(x.bild || '').startsWith('apa_') && this.ritade.has(x.id) && !this.dolda.has(x.id));
+      if (!o || !foremalsbild(this, 'apa_sucka_01')) return 0;
+      return this.regiRamar(o.id, ['apa_sucka_01', 'apa_sucka_02', 'apa_sucka_01', 'apa_sucka_02'], 400);
+    }
+    if (bild === 'ekorre_knacker') {
+      const o = this.objekt.find((x) => String(x.bild || '').startsWith('ekorre_') && this.ritade.has(x.id));
+      if (!o) return 0;
+      const h = this.ungePos.x >= o.x + o.b / 2 ? 'hoger' : 'vanster';
+      if (!foremalsbild(this, `ekorre_skaka_${h}_01`)) return 0;
+      const ms = this.regiRamar(o.id, Array.from({ length: 6 }, (_, i) => `ekorre_skaka_${h}_0${1 + (i % 2)}`), 250);
+      // skalet regnar ner över ungen, och ungen nyser
+      if (this.unge.visible && this.textures.exists('effekter') && this.textures.get('effekter').has('efx_skal_01')) {
+        const skal = this.add.image(Math.round(this.ungePos.x), Math.round(this.ungePos.y - 34), 'effekter', 'efx_skal_01').setOrigin(0.5, 0.5);
+        this.lagerLjust.add(skal);
+        for (let i = 2; i <= 4; i++) this.time.delayedCall(140 * (i - 1), () => { if (!skal.active) return; if (i === 4) skal.destroy(); else { skal.setFrame(`efx_skal_0${i}`); skal.y += 8; } this.smutsig = true; });
+        this.time.delayedCall(560, () => this.ungeLage('nysa', 'ner', 300, 2));
+      }
+      return Math.max(ms, 1800);
+    }
+    if (bild === 'ugglor_vrider') {
+      const rad = /** @type {any} */ (this.ritade.get('ugglor'));
+      const ram = (/** @type {string} */ n) => { for (const x of rad?.list || []) if (x.setFrame && x.texture?.has(n)) x.setFrame(n); this.smutsig = true; };
+      if (!rad?.list?.length || !rad.list.some((/** @type {any} */ x) => x.texture?.has?.('uggla_vrid_01'))) return 0;
+      const forut = rad.list.map((/** @type {any} */ x) => x.frame?.name);
+      ram('uggla_01');
+      for (let i = 0; i < 6; i++) this.time.delayedCall(500 + 250 * i, () => ram(`uggla_vrid_0${1 + (i % 2)}`));
+      this.time.delayedCall(2000, () => { rad.list.forEach((/** @type {any} */ x, /** @type {number} */ i) => { if (x.active && forut[i]) x.setFrame(forut[i]); }); this.smutsig = true; });
+      return 2000;
+    }
+    if (bild === 'stav_ristas') return this.stavRistas();
+    return 0;
+  }
+
+  /** Åt vilket håll ungen gör sitt läge: biter mot närmaste lian, annars dit den tittar. @param {string} lage */
+  ungeHallFor(lage) {
+    if (lage === 'biter') {
+      const lian = this.objekt.filter((x) => /lian/.test(x.id) && this.ritade.has(x.id) && !this.dolda.has(x.id))
+        .sort((a, c) => Math.hypot(a.x + a.b / 2 - this.ungePos.x, a.y + a.h - this.ungePos.y) - Math.hypot(c.x + c.b / 2 - this.ungePos.x, c.y + c.h - this.ungePos.y))[0];
+      if (!lian) return 'upp';
+      const dx = lian.x + lian.b / 2 - this.ungePos.x, dy = lian.y + lian.h - this.ungePos.y;
+      return Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'hoger' : 'vanster') : 'upp';
+    }
+    if (lage === 'lyssnar') return riktningFor(this.ungeVand || { x: 0, y: 1 });
+    return 'ner';
+  }
+
+  /**
+   * Ungen gör ett läge (Stils bilder unge1_<läge>_<håll>_01–02 i en slinga). @param {string} lage @param {string} hall
+   * @param {number} ms per bild @param {number} varv gånger genom bilderna @returns {number} hur länge (ms), 0 = går inte
+   */
+  ungeLage(lage, hall, ms, varv) {
+    if (!this.unge.visible || !this.ungeBild || !this.textures.get('unge').has(`unge1_${lage}_${hall}_01`)) return 0;
+    const bilder = this.textures.get('unge').has(`unge1_${lage}_${hall}_02`) ? 2 : 1, nu = this.time.now, tid = ms * bilder * varv;
+    this.ungeReaktion = { namn: lage, hall, sida: false, start: nu, ms, bilder, slut: nu + tid };
+    // bilden byts också när världen står still (en replik står kvar medan ungen gäspar)
+    this.ritaUngen();
+    this.time.addEvent({ delay: ms, repeat: bilder * varv, callback: () => { if (this.unge.visible) this.ritaUngen(); } });
+    this.smutsig = true;
+    return tid;
+  }
+
+  /**
+   * Ett föremål byter bild i tur och ordning, steg ms var, och står sedan som förut (dess tomgång väntar under tiden).
+   * @param {string} id @param {string[]} ramar @param {number} steg @returns {number} hur länge (ms)
+   */
+  regiRamar(id, ramar, steg) {
+    const r = /** @type {any} */ (this.ritade.get(id));
+    if (!r?.setTexture) return 0;
+    const forut = { nyckel: r.texture.key, ram: r.frame.name, satt: this.ramFor.get(id) };
+    const anim = this.animerade.find((t) => t.img === r);
+    if (anim) this.animerade = this.animerade.filter((t) => t !== anim);
+    this.spelaRamar(id, ramar, steg);
+    const ms = steg * ramar.length;
+    this.ramTimrar.get(id)?.push(this.time.delayedCall(ms, () => {
+      if (forut.satt) this.ramFor.set(id, forut.satt); else this.ramFor.delete(id);
+      if (r.active) r.setTexture(forut.nyckel, forut.ram);
+      if (anim && r.active) this.animerade.push(anim);
+      this.smutsig = true;
+    }));
+    return ms;
+  }
+
+  /**
+   * Närbilden när SVÄRD ristas i staven (rad 25, Stils efx_stav_ristas): bild 1–6 en gång (120 ms), sedan 7–8 växelvis
+   * (300 ms) medan ordet står kvar. Bilden står i två gånger storleken, mitt på skärmen under ordet. @returns {number}
+   */
+  stavRistas() {
+    if (!this.textures.exists('effekter') || !this.textures.get('effekter').has('efx_stav_ristas_08')) return 0;
+    this.rensaSidovy();
+    const k = this.kamera, c = this.sidovy;
+    c.setPosition(k.x, k.y).setVisible(true).setAlpha(0);
+    c.add(this.add.rectangle(0, 0, RUM.bredd, RUM.hojd, 0x1b1712, 0.72).setOrigin(0, 0));
+    const img = this.add.image(Math.round(RUM.bredd / 2), Math.round(RUM.hojd * 0.62), 'effekter', 'efx_stav_ristas_01').setOrigin(0.5, 0.5).setScale(2);
+    c.add(img);
+    this.tweens.add({ targets: c, alpha: 1, duration: 200, onUpdate: () => { this.smutsig = true; } });
+    const ram = (/** @type {string} */ n) => { if (img.active) { img.setFrame(n); this.smutsig = true; } };
+    for (let i = 2; i <= 6; i++) this.time.delayedCall(120 * (i - 1), () => ram(`efx_stav_ristas_0${i}`));
+    for (let i = 0; i < 6; i++) this.time.delayedCall(720 + 300 * i, () => ram(`efx_stav_ristas_0${7 + (i % 2)}`));
+    const ms = 720 + 300 * 6;
+    this.time.delayedCall(ms, () => { this.tweens.add({ targets: c, alpha: 0, duration: 200, onUpdate: () => { this.smutsig = true; }, onComplete: () => { if (c.alpha === 0) this.rensaSidovy(); } }); });
+    return ms + 200;
+  }
+
+  /**
+   * En bild ur grafiken som en bild-URL, för textlagret (ekorren på kortet). @param {string} ram @returns {string | null}
+   */
+  ramUrl(ram) {
+    const fb = foremalsbild(this, ram);
+    const f = fb ? /** @type {any} */ (this.textures.getFrame(fb.nyckel, fb.ram)) : null;
+    if (!f?.source?.image) return null;
+    const c = document.createElement('canvas');
+    c.width = f.cutWidth; c.height = f.cutHeight;
+    c.getContext('2d')?.drawImage(f.source.image, f.cutX, f.cutY, f.cutWidth, f.cutHeight, 0, 0, f.cutWidth, f.cutHeight);
+    return c.toDataURL();
   }
 
   /** Luftskeppet, hjälmen och sidovyn tas bort (nytt rum). */
@@ -1299,6 +1454,7 @@ export class Rum extends Phaser.Scene {
     else if (us && us.fas === 'varv') namn = `unge1_tomgang_${['ner', 'hoger', 'upp', 'vanster'][Math.floor((ust - 450) / us.ms) % 4]}_01`;
     else if (us && us.fas === 'sover') namn = `unge1_sover_ner_0${1 + (Math.floor(nu / 900) % 2)}`;
     else if (this.ungeKlattrar) namn = `unge1_klattra_upp_0${1 + (Math.floor((nu - this.ungeKlattrar.start) / 180) % 2)}`;
+    else if (re && nu < re.slut && re.hall) namn = `unge1_${re.namn}_${re.hall}_0${1 + (Math.floor((nu - re.start) / re.ms) % re.bilder)}`; // ett läge (31): bilderna i en slinga
     else if (re && nu < re.slut) namn = `unge1_${re.namn}_${re.sida ? sida : 'ner'}_0${1 + Math.min(re.bilder - 1, Math.floor((nu - re.start) / re.ms))}`;
     else if (this.ungeMal && Math.hypot(this.ungeMal.x - this.ungePos.x, this.ungeMal.y - this.ungePos.y) < 3) namn = `unge1_nosar_${riktningFor({ x: Math.cos(this.ungeMal.mot), y: Math.sin(this.ungeMal.mot) })}_0${1 + (Math.floor(nu / 220) % 2)}`;
     else if (this.ungeGar) namn = `unge1_ga_${r}_0${1 + (Math.floor((this.ungeGang || 0) / GANG_STEG) % 4)}`;

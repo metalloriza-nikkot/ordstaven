@@ -2482,3 +2482,21 @@ test('byborna (kapitel 2, del 5): ett tryck ger en vinkning och ordet i en bubbl
   await tryckPaFiskaren();
   await expect(page.locator('#rop')).toHaveText('SUCK');
 });
+
+test('ekorren på kortet (Teknik 31, R67–R70): en felreaktion med bild visar ekorren bredvid kortet och ingen text för den vuxne', async ({ page }) => {
+  const fel = { reaktion: 'ekorren tittar ut och skakar på huvudet', bild: 'ekorre_skakar', replik: R('Inte där. Läs lappen igen.') };
+  await provscen(page, { id: 't_ekorre', pass: 1, rum: 'kontoret', steg: [{ typ: 'pussel', pussel_id: 't_lappen' }, R('Klart.')] }, null, {
+    pussel: [{ id: 't_lappen', typ: 'P1_las_och_valj', papper: 'lapp', instruktion: R('Var väntar baronen?'),
+      varianter: { L1: { text: 'Skata! Jag väntar vid bron.', alternativ: [{ id: 'bro', bild: 'bro', ratt: true }, { id: 'trad', bild: 'trad', vid_valj: fel }, { id: 'sten', bild: 'sten', vid_valj: fel }] } } }],
+  });
+  for (let i = 0; i < 20 && !(await page.locator('#plattan .kort[data-id="trad"]').isVisible()); i++) { await page.locator('#plattan .replik-ruta').click({ timeout: 300 }).catch(() => {}); await page.waitForTimeout(200); }
+  await page.locator('#plattan .kort[data-id="trad"]').click();
+  await expect(page.locator('.kort-figur')).toBeVisible({ timeout: 3000 });
+  await page.waitForTimeout(700);
+  const ruta = await page.locator('.kort-figur').boundingBox();
+  expect(ruta.width).toBeGreaterThan(20);
+  await page.screenshot({ path: 'test-results/ekorren-pa-kortet.png' });
+  expect(await page.locator('#regi').isVisible()).toBe(false);
+  await expect(page.locator('.kort-figur')).toHaveCount(0, { timeout: 5000 });
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('[reaktion] ekorre_skakar på kortet');
+});

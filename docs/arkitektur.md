@@ -904,3 +904,9 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Rollrösterna** `tant` och `barn` står i `src/grans/rost.js` (tonhöjd och tempo), och Tant Rosa och Bo har dem i `aventyr.json`.
 - **Gråboxen för kapitel 2 är klar** (del 1–5): kapitlet går att spela från träsket till elden.
 
+## 84. Stils mellanscener som regier (0.52.0, Teknik 31)
+- **`Rum.stilsRegi(bild)`** spelar Stils tabell (8/11): ungens lägen (`ungeLage`, bilderna unge1_<läge>_<håll>_01–02 i en slinga, också när världen står still), Farfar i fåtöljen, buskarna, apan, ekorren med skalet, ugglorna och närbilden när SVÄRD ristas (`stavRistas`, i sidovyns lager). `regiRamar` byter ett föremåls bild en stund och ställer tillbaka den och dess tomgång. En regi som saknar figur eller bild ger 0, och då visas beskrivningen som förut.
+- **Närbilden av staven** visar ordet i textlagret ovanför (`#plattan.formel-luft.ristas`): den senaste formeln på staven.
+- **En reaktion med `bild`** (`BILD_PA_KORTET` i `karna/mellanscen.js`): ekorren ritas ur atlasen till en bild (`Rum.ramUrl`) och står ovanpå sidan vid kortets hörn, så att den syns fast kortet sjunker och plattan ritas om.
+- **Testkrokarna** `regi(bild)` och `ungeRam()`.
+

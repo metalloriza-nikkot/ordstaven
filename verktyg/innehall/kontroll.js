@@ -20,8 +20,11 @@ export const RADBREDD_EM = 16;
 export const MAX_RADER_REPLIK = 2;
 export const MAX_ORD_PER_RAD = 8;
 export const MAX_MINUTER_PER_PASS = 10;
-/** Pusseltyper som räknas som läsuppgifter som avgör något. P9 (kodlåset) är avkodning med nyckel, inte läsförståelse. */
-export const LASUPPGIFTER = new Set(['P1_las_och_valj', 'P28_packa', 'P15_raddning']);
+/**
+ * Pusseltyper som räknas som läs- eller skrivuppgifter som avgör något. P9 (kodlåset) är avkodning med nyckel, inte
+ * läsförståelse. P11 (formeln) avgör också: han skriver ordet som löser det (beslut 68.3).
+ */
+export const LASUPPGIFTER = new Set(['P1_las_och_valj', 'P28_packa', 'P15_raddning', 'P11_formel']);
 
 let ajv;
 function validerare() {
@@ -469,7 +472,7 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
       passInfo.push({ kapitel: k.id, pass: nr, minuter, lasuppgifter: pp.lasuppgifter });
       if (!pp.sistaSparpunkt) varningar.push(var_(`pass ${nr} slutar inte med en sparpunkt (pass_slut)`));
       if (minuter > MAX_MINUTER_PER_PASS) varningar.push(var_(`pass ${nr}: uppskattat ${minuter} min, högst ${MAX_MINUTER_PER_PASS}`));
-      if (pp.lasuppgifter < 2) varningar.push(var_(`pass ${nr}: ${pp.lasuppgifter} läsuppgift(er) som avgör något, minst 2 (ledningens krav)`));
+      if (pp.lasuppgifter < 2) varningar.push(var_(`pass ${nr}: ${pp.lasuppgifter} läs- eller skrivuppgift(er) som avgör något, minst 2 (ledningens krav)`));
     }
 
     // Pussel

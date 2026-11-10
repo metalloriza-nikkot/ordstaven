@@ -65,7 +65,13 @@ export const SYNS_REDAN_MS = 800;
 /**
  * Visar reaktionen (eller knuffen) sin text i rutan? @param {any} h
  */
-export const visarRegi = (h) => !!h && !!(h.handling || h.reaktion) && !h.syns_redan;
+export const visarRegi = (h) => !!h && !!(h.handling || h.reaktion) && !h.syns_redan && !(h.bild && BILD_PA_KORTET.has(h.bild));
+
+/**
+ * Bilder en reaktion kan ha (`bild`, 2.35, Teknik 31): figuren som syns på kortet han valde (ekorren vid baronens
+ * lapp skakar på huvudet). Med en sådan bild visas inte texten.
+ */
+export const BILD_PA_KORTET = Object.freeze(new Set(['ekorre_skakar']));
 
 /**
  * Pusseltyper och steg vars knuff aldrig visar rutan: den pekar i världen (krukorna: ungen nosar mot närmaste

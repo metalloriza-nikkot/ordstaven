@@ -253,6 +253,13 @@
         "syns_redan": {
           "type": "boolean",
           "description": "Det som händer syns redan (2.32, beslut 67.3): texten visas inte i rutan för den vuxne. Den står kvar som anteckning."
+        },
+        "bild": {
+          "type": "string",
+          "enum": [
+            "ekorre_skakar"
+          ],
+          "description": "En figur på kortet han valde (2.35, Teknik 31): ekorre_skakar = ekorren tittar upp bakom kortet och skakar på huvudet. Med bild visas inte texten."
         }
       }
     },

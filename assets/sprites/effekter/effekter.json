@@ -480,10 +480,170 @@
     "h": 12
    }
   },
-  "efx_svard_01": {
+  "efx_stav_ristas_01": {
    "frame": {
     "x": 0,
     "y": 157,
+    "w": 108,
+    "h": 17
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 108,
+    "h": 17
+   },
+   "sourceSize": {
+    "w": 108,
+    "h": 17
+   }
+  },
+  "efx_stav_ristas_02": {
+   "frame": {
+    "x": 109,
+    "y": 157,
+    "w": 108,
+    "h": 17
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 108,
+    "h": 17
+   },
+   "sourceSize": {
+    "w": 108,
+    "h": 17
+   }
+  },
+  "efx_stav_ristas_03": {
+   "frame": {
+    "x": 218,
+    "y": 157,
+    "w": 108,
+    "h": 17
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 108,
+    "h": 17
+   },
+   "sourceSize": {
+    "w": 108,
+    "h": 17
+   }
+  },
+  "efx_stav_ristas_04": {
+   "frame": {
+    "x": 327,
+    "y": 157,
+    "w": 108,
+    "h": 17
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 108,
+    "h": 17
+   },
+   "sourceSize": {
+    "w": 108,
+    "h": 17
+   }
+  },
+  "efx_stav_ristas_05": {
+   "frame": {
+    "x": 0,
+    "y": 175,
+    "w": 108,
+    "h": 17
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 108,
+    "h": 17
+   },
+   "sourceSize": {
+    "w": 108,
+    "h": 17
+   }
+  },
+  "efx_stav_ristas_06": {
+   "frame": {
+    "x": 109,
+    "y": 175,
+    "w": 108,
+    "h": 17
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 108,
+    "h": 17
+   },
+   "sourceSize": {
+    "w": 108,
+    "h": 17
+   }
+  },
+  "efx_stav_ristas_07": {
+   "frame": {
+    "x": 218,
+    "y": 175,
+    "w": 108,
+    "h": 17
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 108,
+    "h": 17
+   },
+   "sourceSize": {
+    "w": 108,
+    "h": 17
+   }
+  },
+  "efx_stav_ristas_08": {
+   "frame": {
+    "x": 327,
+    "y": 175,
+    "w": 108,
+    "h": 17
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 108,
+    "h": 17
+   },
+   "sourceSize": {
+    "w": 108,
+    "h": 17
+   }
+  },
+  "efx_svard_01": {
+   "frame": {
+    "x": 0,
+    "y": 193,
     "w": 32,
     "h": 32
    },
@@ -503,7 +663,7 @@
   "efx_svard_02": {
    "frame": {
     "x": 33,
-    "y": 157,
+    "y": 193,
     "w": 32,
     "h": 32
    },
@@ -523,7 +683,7 @@
   "efx_svard_03": {
    "frame": {
     "x": 66,
-    "y": 157,
+    "y": 193,
     "w": 32,
     "h": 32
    },
@@ -543,7 +703,7 @@
   "efx_svard_04": {
    "frame": {
     "x": 99,
-    "y": 157,
+    "y": 193,
     "w": 32,
     "h": 32
    },
@@ -563,7 +723,7 @@
   "efx_svard_05": {
    "frame": {
     "x": 132,
-    "y": 157,
+    "y": 193,
     "w": 32,
     "h": 32
    },
@@ -583,7 +743,7 @@
   "efx_yr_stjarnor_01": {
    "frame": {
     "x": 0,
-    "y": 190,
+    "y": 226,
     "w": 16,
     "h": 6
    },
@@ -603,7 +763,7 @@
   "efx_yr_stjarnor_02": {
    "frame": {
     "x": 17,
-    "y": 190,
+    "y": 226,
     "w": 16,
     "h": 6
    },
@@ -625,8 +785,8 @@
   "image": "effekter.png",
   "format": "RGBA8888",
   "size": {
-   "w": 165,
-   "h": 197
+   "w": 436,
+   "h": 233
   },
   "scale": "1",
   "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."

@@ -260,7 +260,11 @@ redo.then(() => { startKlar = true; window.clearTimeout(startVakt); window.remov
   rumsobjekt: () => rum.objekt.map((o) => o.id),
   /** Gå mot en punkt i rummet, som ett tryck på marken (vägen runt det som står i vägen). @param {number} x @param {number} y */
   gaMot: (x, y) => inmatning.sattGaTill(x, y),
-  /** Var ungen står i rummet. */
+  /** Spela en regi i rummet (Stils mellanscener) och få hur länge den tar (ms, 0 = går inte). @param {string} bild */
+  regi: (bild) => rum.regi(bild),
+  /** Ungens bild just nu. */
+  ungeRam: () => rum.ungeBild?.frame?.name ?? null,
+    /** Var ungen står i rummet. */
   ungePos: () => ({ ...rum.ungePos }),
   pausad: () => spelet.pausad,
   /** Varianten (nivån) i pusslet som pågår, t.ex. "L2". */

@@ -616,6 +616,33 @@ export function skapaSpel(d) {
    * En reaktion: ljud, ljudord, regi och replik. @param {any} h @param {string | null} [foremal] det som låter
    * @param {string | null} [forst] ett ljud före reaktionens (locket på en fel låda): sedan reaktionens, eller bloinget
    */
+  /**
+   * En figur på kortet han valde (en reaktion med `bild`, 2.35): ekorren tittar upp bakom kortet och skakar på
+   * huvudet (`ekorre_skakar`, R67–R70), med ekorrens bilder ur grafiken. @param {HTMLElement} kort @param {string} bild
+   */
+  function figurPaKortet(kort, bild) {
+    if (bild !== 'ekorre_skakar') return;
+    const ramar = ['ekorre_titta_hoger_01', ...Array.from({ length: 6 }, (_, i) => `ekorre_skaka_hoger_0${1 + (i % 2)}`)].map((r) => rum.ramUrl(r));
+    if (ramar.some((u) => !u)) return;
+    // ovanpå sidan vid kortets hörn, inte i kortet: kortet sjunker och blir blekt, och plattan ritas om medan ekorren skakar
+    const ruta = kort.getBoundingClientRect();
+    const img = document.createElement('img');
+    img.className = 'kort-figur'; img.alt = '';
+    img.onload = () => {
+      if (img.dataset.satt) return;
+      img.dataset.satt = '1';
+      img.style.width = `calc(${img.naturalWidth * 2} * var(--ipx-text))`; // dubbel storlek, så att den syns bredvid kortet
+      const h = img.getBoundingClientRect().height;
+      img.style.left = `${ruta.right - h * 0.6}px`;
+      img.style.top = `${ruta.top - h * 0.75}px`;
+    };
+    img.src = /** @type {string} */ (ramar[0]);
+    document.body.append(img);
+    ramar.forEach((u, i) => window.setTimeout(() => { img.src = /** @type {string} */ (u); }, 250 * i));
+    window.setTimeout(() => img.remove(), 250 * ramar.length + 300);
+    logg.handelse('reaktion', `${bild} på kortet`);
+  }
+
   async function reaktion(h, foremal = /** @type {string | null} */ (null), forst = /** @type {string | null} */ (null)) {
     if (!h) return;
     // reaktionens ljud (64.6), ett eller flera efter varandra
@@ -1177,6 +1204,13 @@ export function skapaSpel(d) {
         const ungen = st.unge_till ? rum.ungePekar(st.unge_till) : false;
         if (ungen) logg.handelse('mellanscen', `ungen springer till ${st.unge_till}`);
         const regiMs = st.bild ? rum.regi(st.bild) : 0;
+        if (regiMs && st.bild === 'stav_ristas') {
+          // ordet som ristas står i textlagret ovanför närbilden (Stils tabell, rad 25): det senaste han fick på staven
+          const ord = (tillstand.spelare.hjalte.formler || []).at(-1) ?? '';
+          logg.handelse('mellanscen', `${st.bild} (${ord})`);
+          ui.visaPlatta(`<div class="formel-i-luften">${ui.esc(ord)}</div>`, 'formel-luft ristas');
+          await vanta(tid(regiMs)); ui.doljPlatta(); return;
+        }
         if (regiMs) { logg.handelse('mellanscen', st.bild); await vanta(tid(regiMs)); return; }
         if (ungen) { await vanta(tid(UNGE_TILL_MS)); return; }
         // det som händer syns redan (rummet, en animation eller nästa steg, beslut 65): ingen ruta, bara en stund
@@ -1976,6 +2010,7 @@ export function skapaSpel(d) {
         const kort = /** @type {HTMLElement | null} */ (plattan().querySelector(`.kort[data-id="${CSS.escape(id)}"]`));
         if (r.resultat === 'fel') {
           felljud(r.reaktion); kort?.classList.add('sjunker');
+          if (kort && r.reaktion?.bild) figurPaKortet(kort, r.reaktion.bild);
           await reaktion(r.reaktion);
           rita();
         } else if (r.resultat === 'ratt') {

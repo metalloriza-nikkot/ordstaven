@@ -169,6 +169,8 @@ html, body {
 #plattan { position: absolute; left: calc(var(--rum-vanster) + var(--rum-bredd) / 2); transform: translateX(-50%); max-width: min(92vw, var(--rum-bredd)); width: max-content; color: var(--black); }
 #plattan.replik { bottom: calc(100vh - var(--rum-topp) - var(--rum-hojd) + 12px); }
 #plattan.pussel, #plattan.bok, #plattan.formel-luft { top: calc(var(--rum-topp) + var(--rum-hojd) / 2); transform: translate(-50%, -50%); }
+/* ordet som ristas i staven (Stils närbild, Teknik 31): ovanför närbilden, som står under mitten */
+#plattan.formel-luft.ristas { top: calc(var(--rum-topp) + var(--rum-hojd) * .3); }
 .replik-ruta, .pussel-ruta, .formel-ruta, .dop-ruta, .bok-ruta, .hjalte-ruta { position: relative; background: var(--papper); border-radius: 18px; box-shadow: 0 8px 0 rgba(0, 0, 0, .35), inset 0 0 0 3px #d9c9a3; }
 .replik-ruta { display: flex; align-items: flex-end; gap: 16px; padding: 16px 16px 16px 20px; }
 .replik-ruta .text { align-self: center; }
@@ -231,6 +233,8 @@ html, body {
 .nos-pekar { position: absolute; top: -18px; right: -14px; font-size: 32px; animation: guppa 1s infinite; }
 /* fel skakar aldrig (stilguiden v0.26 §7, beslut 25.4): ett fel kort sjunker lite och blir grått, formelns platser
    blir grå en stund, och kodlåset rasslar bara med bygeln. Bara läge och opacitet rör sig. */
+/* ekorren som tittar upp bakom kortet och skakar på huvudet (en reaktion med bild, Teknik 31) */
+.kort-figur { position: fixed; height: auto; image-rendering: pixelated; pointer-events: none; z-index: 60; }
 .kort.sjunker { transform: translateY(10px); opacity: .6; background: #d9d4ca; box-shadow: 0 2px 0 #b3ac9e, 0 0 0 3px #cfc8b9; transition: transform .25s ease-in, opacity .25s; }
 .platser.gra .plats { background: #d9d4ca; color: #8f887c; border-color: #b3ac9e; }
 .kod-las { position: relative; margin-top: calc(30px * var(--t)); }

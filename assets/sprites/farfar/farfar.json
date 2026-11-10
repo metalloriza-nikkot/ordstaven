@@ -1,9 +1,49 @@
 {
  "frames": {
-  "farfar_fatolj_hoger": {
+  "farfar_fatolj_gaspar_01": {
    "frame": {
     "x": 0,
     "y": 0,
+    "w": 30,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 30,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 30,
+    "h": 28
+   }
+  },
+  "farfar_fatolj_gaspar_02": {
+   "frame": {
+    "x": 31,
+    "y": 0,
+    "w": 30,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 30,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 30,
+    "h": 28
+   }
+  },
+  "farfar_fatolj_hoger": {
+   "frame": {
+    "x": 0,
+    "y": 29,
     "w": 30,
     "h": 28
    },
@@ -23,7 +63,7 @@
   "farfar_fatolj_las_01": {
    "frame": {
     "x": 0,
-    "y": 29,
+    "y": 58,
     "w": 30,
     "h": 28
    },
@@ -43,7 +83,47 @@
   "farfar_fatolj_las_02": {
    "frame": {
     "x": 31,
-    "y": 29,
+    "y": 58,
+    "w": 30,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 30,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 30,
+    "h": 28
+   }
+  },
+  "farfar_fatolj_skriver_01": {
+   "frame": {
+    "x": 0,
+    "y": 87,
+    "w": 30,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 30,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 30,
+    "h": 28
+   }
+  },
+  "farfar_fatolj_skriver_02": {
+   "frame": {
+    "x": 31,
+    "y": 87,
     "w": 30,
     "h": 28
    },
@@ -63,7 +143,7 @@
   "farfar_fatolj_ta_emot_01": {
    "frame": {
     "x": 0,
-    "y": 58,
+    "y": 116,
     "w": 30,
     "h": 28
    },
@@ -83,7 +163,7 @@
   "farfar_fatolj_ta_emot_02": {
    "frame": {
     "x": 31,
-    "y": 58,
+    "y": 116,
     "w": 30,
     "h": 28
    },
@@ -103,7 +183,7 @@
   "farfar_morgon_hoger_01": {
    "frame": {
     "x": 0,
-    "y": 87,
+    "y": 145,
     "w": 16,
     "h": 24
    },
@@ -123,7 +203,7 @@
   "farfar_morgon_hoger_02": {
    "frame": {
     "x": 17,
-    "y": 87,
+    "y": 145,
     "w": 16,
     "h": 24
    },
@@ -143,7 +223,7 @@
   "farfar_morgon_hoger_03": {
    "frame": {
     "x": 34,
-    "y": 87,
+    "y": 145,
     "w": 16,
     "h": 24
    },
@@ -163,7 +243,7 @@
   "farfar_morgon_hoger_04": {
    "frame": {
     "x": 51,
-    "y": 87,
+    "y": 145,
     "w": 16,
     "h": 24
    },
@@ -183,7 +263,7 @@
   "farfar_morgon_ner_01": {
    "frame": {
     "x": 0,
-    "y": 112,
+    "y": 170,
     "w": 16,
     "h": 24
    },
@@ -203,7 +283,7 @@
   "farfar_morgon_ner_02": {
    "frame": {
     "x": 17,
-    "y": 112,
+    "y": 170,
     "w": 16,
     "h": 24
    },
@@ -223,7 +303,7 @@
   "farfar_morgon_ner_03": {
    "frame": {
     "x": 34,
-    "y": 112,
+    "y": 170,
     "w": 16,
     "h": 24
    },
@@ -243,7 +323,7 @@
   "farfar_morgon_ner_04": {
    "frame": {
     "x": 51,
-    "y": 112,
+    "y": 170,
     "w": 16,
     "h": 24
    },
@@ -263,7 +343,7 @@
   "farfar_morgon_upp_01": {
    "frame": {
     "x": 0,
-    "y": 137,
+    "y": 195,
     "w": 16,
     "h": 24
    },
@@ -283,7 +363,7 @@
   "farfar_morgon_upp_02": {
    "frame": {
     "x": 17,
-    "y": 137,
+    "y": 195,
     "w": 16,
     "h": 24
    },
@@ -303,7 +383,7 @@
   "farfar_morgon_upp_03": {
    "frame": {
     "x": 34,
-    "y": 137,
+    "y": 195,
     "w": 16,
     "h": 24
    },
@@ -323,7 +403,7 @@
   "farfar_morgon_upp_04": {
    "frame": {
     "x": 51,
-    "y": 137,
+    "y": 195,
     "w": 16,
     "h": 24
    },
@@ -343,7 +423,7 @@
   "farfar_morgon_vanster_01": {
    "frame": {
     "x": 0,
-    "y": 162,
+    "y": 220,
     "w": 16,
     "h": 24
    },
@@ -363,7 +443,7 @@
   "farfar_morgon_vanster_02": {
    "frame": {
     "x": 17,
-    "y": 162,
+    "y": 220,
     "w": 16,
     "h": 24
    },
@@ -383,7 +463,7 @@
   "farfar_morgon_vanster_03": {
    "frame": {
     "x": 34,
-    "y": 162,
+    "y": 220,
     "w": 16,
     "h": 24
    },
@@ -403,7 +483,7 @@
   "farfar_morgon_vanster_04": {
    "frame": {
     "x": 51,
-    "y": 162,
+    "y": 220,
     "w": 16,
     "h": 24
    },
@@ -423,7 +503,7 @@
   "farfar_morgon_vinka_hoger_01": {
    "frame": {
     "x": 0,
-    "y": 187,
+    "y": 245,
     "w": 16,
     "h": 24
    },
@@ -443,7 +523,7 @@
   "farfar_morgon_vinka_hoger_02": {
    "frame": {
     "x": 17,
-    "y": 187,
+    "y": 245,
     "w": 16,
     "h": 24
    },
@@ -463,7 +543,7 @@
   "farfar_morgon_vinka_ner_01": {
    "frame": {
     "x": 0,
-    "y": 212,
+    "y": 270,
     "w": 16,
     "h": 24
    },
@@ -483,7 +563,7 @@
   "farfar_morgon_vinka_ner_02": {
    "frame": {
     "x": 17,
-    "y": 212,
+    "y": 270,
     "w": 16,
     "h": 24
    },
@@ -503,7 +583,7 @@
   "farfar_morgon_vinka_vanster_01": {
    "frame": {
     "x": 0,
-    "y": 237,
+    "y": 295,
     "w": 16,
     "h": 24
    },
@@ -523,7 +603,7 @@
   "farfar_morgon_vinka_vanster_02": {
    "frame": {
     "x": 17,
-    "y": 237,
+    "y": 295,
     "w": 16,
     "h": 24
    },
@@ -543,7 +623,7 @@
   "farfar_natt_hoger_01": {
    "frame": {
     "x": 0,
-    "y": 262,
+    "y": 320,
     "w": 16,
     "h": 24
    },
@@ -563,7 +643,7 @@
   "farfar_natt_ner_01": {
    "frame": {
     "x": 0,
-    "y": 287,
+    "y": 345,
     "w": 16,
     "h": 24
    },
@@ -583,7 +663,7 @@
   "farfar_natt_upp_01": {
    "frame": {
     "x": 0,
-    "y": 312,
+    "y": 370,
     "w": 16,
     "h": 24
    },
@@ -603,7 +683,7 @@
   "farfar_natt_vanster_01": {
    "frame": {
     "x": 0,
-    "y": 337,
+    "y": 395,
     "w": 16,
     "h": 24
    },
@@ -623,7 +703,7 @@
   "farfar_portratt_fundersam": {
    "frame": {
     "x": 0,
-    "y": 362,
+    "y": 420,
     "w": 48,
     "h": 48
    },
@@ -643,7 +723,7 @@
   "farfar_portratt_fundersam_radio": {
    "frame": {
     "x": 0,
-    "y": 411,
+    "y": 469,
     "w": 48,
     "h": 48
    },
@@ -663,7 +743,7 @@
   "farfar_portratt_glad": {
    "frame": {
     "x": 0,
-    "y": 460,
+    "y": 518,
     "w": 48,
     "h": 48
    },
@@ -683,7 +763,7 @@
   "farfar_portratt_glad_radio": {
    "frame": {
     "x": 0,
-    "y": 509,
+    "y": 567,
     "w": 48,
     "h": 48
    },
@@ -706,7 +786,7 @@
   "format": "RGBA8888",
   "size": {
    "w": 68,
-   "h": 558
+   "h": 616
   },
   "scale": "1",
   "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."

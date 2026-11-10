@@ -97,12 +97,14 @@ describe('innehållskontrollen', () => {
   it('fångar dubbla id:n', () => {
     expect(medFel((k) => { k.pussel[1].id = 'p0_hjaltenamn'; })).toMatch(/används både/);
   });
-  it('räknar läsuppgifter per pass och varnar under två', () => {
+  it('räknar läs- och skrivuppgifter per pass och varnar under två, med formeln (P11) som avgörande (68.3)', () => {
     const d = riktigt();
-    expect(kontrollera(d).varningar.join('\n')).not.toMatch(/läsuppgift/);
-    const s07 = d.kapitel[0].scener.find((s) => s.id === 's07_dorrarna');
-    s07.steg = s07.steg.filter((st) => st.typ !== 'pussel');
-    expect(kontrollera(d).varningar.join('\n')).toMatch(/kap-00 pass 1: 1 läsuppgift/);
+    expect(kontrollera(d).varningar.join('\n')).not.toMatch(/kap-0[01] pass \d: \d läs- eller skrivuppgift/);
+    const pass1 = d.kapitel[0].scener.filter((s) => s.pass === 1);
+    const forut = kontrollera(d).pass.find((p) => p.kapitel === 'kap-00' && p.pass === 1).lasuppgifter;
+    const p11 = pass1.find((s) => s.steg.some((st) => st.typ === 'pussel' && d.kapitel[0].pussel.find((p) => p.id === st.pussel_id)?.typ === 'P11_formel'));
+    p11.steg = p11.steg.filter((st) => st.typ !== 'pussel' || d.kapitel[0].pussel.find((p) => p.id === st.pussel_id)?.typ !== 'P11_formel');
+    expect(kontrollera(d).pass.find((p) => p.kapitel === 'kap-00' && p.pass === 1).lasuppgifter).toBe(forut - 1);
   });
   it('kodlåset: tecknen måste ge svaret med nyckeln', () => {
     expect(medFel((k, d) => { d.kapitel[1].pussel.find((p) => p.id === 'k1_kodlas').svar = 'hej'; })).toMatch(/tecknen ger HEM/);

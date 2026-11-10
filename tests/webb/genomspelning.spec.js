@@ -227,7 +227,11 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
       // hallen före kläckningen (s01b): skyltarna syns redan, men en dörr är låst. Det dunkar, och han går till stegen.
       if (lage.scen === 's01b_hallen' && !oppnade.has('s01b')) {
         oppnade.add('s01b');
-        await expect(page.locator('#skyltar .skylt')).toHaveCount(5, { timeout: 5000 });
+        // instruktionen kan stå kvar i pratrutan när målet börjar (långsammare i Safari): ▶ som spelaren, sedan skyltarna
+        await expect.poll(async () => {
+          if (await page.locator('#plattan .replik-ruta').isVisible()) await page.locator('#plattan .replik-ruta').click({ timeout: 500 }).catch(() => {});
+          return page.locator('#skyltar .skylt').count();
+        }, { timeout: 10000 }).toBe(5);
         const dorr = await page.evaluate(() => window.__ORDSTAVEN.objekt('dorr_farfar'));
         await page.mouse.click(dorr.x, dorr.y);
         await expect.poll(async () => (await page.evaluate(() => window.__ORDSTAVEN.logg())).includes('[låst] dorr_farfar'), { timeout: 10000 }).toBe(true);
