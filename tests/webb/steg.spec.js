@@ -327,8 +327,10 @@ test('samma fel ord två gånger i en formel: andra gången bara ljudet och unge
   await page.click('#plattan .vidare');
   await expect(page.locator('#plattan .formel-bild')).toBeVisible({ timeout: 8000 });
   for (const b of 'DRSVÄ') await bricka(page, b).click(); // fel: ingen bokstav rätt, alla går tillbaka
-  await expect(page.locator('#plattan .svar-rad')).toHaveText(/NÄSTAN! HÄR STÅR ORDET\./, { timeout: 8000 });
+  // hela reaktionen första gången. Repliken kan hinna gå förbi i snabbläget (reaktionen har syns_redan), så loggen avgör
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 8000 }).toContain('förebilden tänds (fel)');
   await expect(page.locator('#plattan .platser.gra')).toHaveCount(0, { timeout: 8000 });
+  await expect(page.locator('#plattan .svar-rad')).toHaveCount(0, { timeout: 8000 });
   for (const b of 'DRSVÄ') await bricka(page, b).click(); // samma fel igen
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 8000 }).toContain('samma fel igen (kort)');
   expect(await page.locator('#plattan .svar-rad').count()).toBe(0);

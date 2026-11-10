@@ -19,6 +19,8 @@ import raddningM4a from '../../assets/ljud/musik/raddning.m4a?url';
 import raddningOgg from '../../assets/ljud/musik/raddning.ogg?url';
 import lagereldenM4a from '../../assets/ljud/musik/lagerelden.m4a?url';
 import lagereldenOgg from '../../assets/ljud/musik/lagerelden.ogg?url';
+import bynM4a from '../../assets/ljud/musik/byn.m4a?url';
+import bynOgg from '../../assets/ljud/musik/byn.ogg?url';
 import { pausPlan } from '../karna/musik.js';
 import { EFFEKT_FOR, INSPELAT_FOR, INSPELAT_SPELAS, ljudLista } from '../karna/ljudid.js';
 
@@ -44,6 +46,8 @@ export const MUSIK = /** @type {Record<string, { m4a: string, ogg: string, loopS
   raddning: { m4a: raddningM4a, ogg: raddningOgg, loopStart: 0.5, loopEnd: 0.5 + (16 * 8 * 60) / (112 * 2) },
   // lagerelden 16 takter à 8 åttondelar i 72 BPM, 53,33333 s
   lagerelden: { m4a: lagereldenM4a, ogg: lagereldenOgg, loopStart: 0.5, loopEnd: 0.5 + (16 * 8 * 60) / (72 * 2) },
+  // byn (Stil 12, 70.7) 16 takter à 8 åttondelar i 96 BPM, 40,000 s
+  byn: { m4a: bynM4a, ogg: bynOgg, loopStart: 0.5, loopEnd: 0.5 + (16 * 8 * 60) / (96 * 2) },
 });
 /** Byte mellan slingor: den gamla tonas ut och den nya in på ca 1 s (Stil, 10c). Efter pausen tonas den in mjukare. */
 export const MUSIK_BYTE_S = 1;

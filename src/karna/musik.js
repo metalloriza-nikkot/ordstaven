@@ -4,7 +4,7 @@
 // en scen. Räddningen spelar alltid `raddning`. Den här modulen väljer slingan och planerar pausen, utan ljud.
 
 /** Stils sex slingor (10c v0.5). Byns slinga läggs till när Stil har gjort den. */
-export const SLINGOR = /** @type {const} */ (['meny', 'spel', 'natten', 'skogen', 'raddning', 'lagerelden']);
+export const SLINGOR = /** @type {const} */ (['meny', 'spel', 'natten', 'skogen', 'raddning', 'lagerelden', 'byn']);
 /** Slingan när datan inte säger något: Farfars hus på dagen, och inne i spelet där inget annat är bestämt. */
 export const STANDARD = 'spel';
 /** Räddningen (P15) spelar alltid den här, och tonar tillbaka till platsens slinga när den är klar. */

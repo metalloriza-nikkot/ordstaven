@@ -23,6 +23,9 @@ describe('musiken (F5 och 27)', () => {
     expect(varv('lagerelden')).toBeCloseTo(160 / 3, 9);
     expect(MUSIK.natten.loopEnd).toBeCloseTo(46.214, 3);
     expect(MUSIK.lagerelden.loopEnd).toBeCloseTo(53.833, 3);
+    // byn (70.7): 16 takter à 2,5 s, och loopEnd 40,5 s som i Stils tabell
+    expect(varv('byn')).toBeCloseTo(40, 9);
+    expect(MUSIK.byn.loopEnd).toBeCloseTo(40.5, 9);
   });
   it('sänks ca 12 dB när något läses (62.10), och byten tonas på ca 1 s', () => {
     expect(MUSIK_SANKT_DB).toBe(-12);

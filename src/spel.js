@@ -3462,7 +3462,7 @@ export function skapaSpel(d) {
       spelare: visas.map((x) => ({ plats: x.plats, namn: x.namn, hjalte: rum.hjalteBildFor?.(x.utseende) ?? null, vald: x.plats === aktiv })),
       kanNySpelare: borjat, tid, klick: () => ljud.spela('klick'), logg,
     });
-    logg.handelse('start', 'startskärmen', { plats: aktiv, spelare: lista.length, visas: visas.length, borjat, foto: !!foto });
+    logg.handelse('start', 'startskärmen', { plats: aktiv, spelare: lista.length, visas: visas.length, borjat, foto: !!foto, rost: inst.rost ? 'på' : 'av', foralderLaser: inst.foralderLaser });
     const v = await sk.val;
     sk.stang();
     if (v.vad !== 'start') {

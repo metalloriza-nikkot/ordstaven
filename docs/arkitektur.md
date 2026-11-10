@@ -924,3 +924,8 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Kartorna** (`verktyg/kartor/kap2.py`): i vassen är det döda trädet och `bubbla_brev` borta, och `brev_halva_vatten` flyter ute i vattnet. Vid dammen står grodorna på fyra platser (`PLATS`: sten, vassen, under bladet och näckrosbladet, 69.8).
 - **`regiRamar`** startar om en slinga som gick före regin (Farfar som läser och sedan gäspar).
 - **Testkroken** `ungeSvavar()`.
+
+## 87. Byns slinga, surr och rösten i loggen (0.55.0, Teknik 33)
+- **`byn`** är den sjunde slingan (`SLINGOR` i `karna/musik.js`, `MUSIK` i `grans/ljud.js`): 16 takter à 8 åttondelar i 96 BPM, loopStart 0,5 s och loopEnd 40,5 s. Filerna har en halv sekund före och efter, som de andra (41,0 s).
+- **`surr`** är det 81:a ljudet i `assets/ljud/effekter/` (Stils `ljud.json`, grupp *Kapitel 2*). Kapitel 2:s trollslända har redan `ljud: surr`.
+- **Rösten i loggen** (70.4): `[röst] <namn>, på enheten` när en röst väljs, eller `ingen egen svensk röst, tyst`, med hur många svenska röster som finns och hur många av dem som är på nätet. Bara röstens namn, aldrig text. Startskärmens rad säger om rösten är på eller av.

@@ -6,8 +6,8 @@ const LJUD = JSON.parse(readFileSync(new URL('../../assets/ljud/effekter/ljud.js
 const FILER = readdirSync(new URL('../../assets/ljud/effekter/', import.meta.url)).filter((f) => f.endsWith('.wav')).map((f) => f.replace(/\.wav$/, ''));
 
 describe('ljudeffekterna (F5, 10c v0.5)', () => {
-  it('Stils 80 ljud: ett id per fil, och ljud.json säger nivå och längd', () => {
-    expect(FILER).toHaveLength(80);
+  it('Stils 81 ljud (surr i 70.7): ett id per fil, och ljud.json säger nivå och längd', () => {
+    expect(FILER).toHaveLength(81);
     expect(Object.keys(LJUD).sort()).toEqual([...FILER].sort());
     for (const v of Object.values(LJUD)) { expect(v.styrka_db).toBeLessThan(0); expect(v.sekunder).toBeGreaterThan(0); }
   });

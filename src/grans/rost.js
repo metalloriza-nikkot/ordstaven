@@ -63,8 +63,16 @@ export function skapaRost({ logg, tyst = () => false, tempo = () => 1, volym = (
     const sv = synt.getVoices().filter((v) => /^sv/i.test(v.lang));
     // bara enhetens egna röster (beslut 69.4): texten har namnen han har skrivit ({hjalte}, {unge}), och en röst
     // på nätet (Edge "Online (Natural)") skulle skicka dem från enheten. Finns ingen egen svensk röst är det tyst.
+    const forut = rost;
     rost = sv.find((v) => v.localService && /alva|klara|oskar/i.test(v.name)) || sv.find((v) => v.localService) || null;
+    // loggen säger vilken röst som läser, så att en tyst röst går att förstå (70.4). Bara röstens namn, aldrig text.
+    if (rost !== forut || !loggad) {
+      loggad = true;
+      if (rost) logg?.handelse('röst', `${rost.name}, på enheten`, { svenska: sv.length, pa_natet: sv.filter((v) => !v.localService).length });
+      else if (sv.length) logg?.handelse('röst', 'ingen egen svensk röst, tyst', { pa_natet: sv.length });
+    }
   }
+  let loggad = false;
   if (synt) { valj(); synt.addEventListener?.('voiceschanged', valj); }
 
   /** Uppskattad tid för en text när ingen röst finns. @param {string} t */

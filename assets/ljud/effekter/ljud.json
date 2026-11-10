@@ -428,7 +428,7 @@
  },
  "baron": {
   "grupp": "Prologen",
-  "vad": "Baronens motiv: fyra pompösa, lite fåniga toner i fagott och tuba. Spelas varje gång han dyker upp (förslag)",
+  "vad": "Baronens motiv: fyra pompösa, lite fåniga toner i fagott och tuba. Spelas varje gång han dyker upp",
   "signatur": true,
   "styrka_db": -6,
   "sekunder": 1.85
@@ -558,5 +558,12 @@
   "signatur": false,
   "styrka_db": -12,
   "sekunder": 0.85
+ },
+ "surr": {
+  "grupp": "Kapitel 2",
+  "vad": "Trollsländan surrar tre varv runt hjälmen: ett lätt vingsurr som kommer och går",
+  "signatur": false,
+  "styrka_db": -12,
+  "sekunder": 1.4
  }
 }

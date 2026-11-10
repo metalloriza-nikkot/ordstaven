@@ -155,7 +155,13 @@ describe('rullningens takt (beslut 21.2)', () => {
     await vi.advanceTimersByTimeAsync(3000);
     expect(sagt).toEqual([]);
     s.getVoices = () => [{ lang: 'sv-SE', name: 'Teströst Online', localService: false }, { lang: 'sv-SE', name: 'Alva', localService: true }];
-    const r2 = skapaRost({ logg: { handelse: vi.fn() } });
+    const h2 = vi.fn();
+    const r2 = skapaRost({ logg: { handelse: h2 } });
     expect(r2.harRost).toBe(true);
+    // loggen säger vilken röst som läser (70.4), och när den är tyst
+    expect(h2).toHaveBeenCalledWith('röst', 'Alva, på enheten', { svenska: 2, pa_natet: 1 });
+    s.getVoices = () => [{ lang: 'sv-SE', name: 'Teströst Online', localService: false }];
+    const h3 = vi.fn(); skapaRost({ logg: { handelse: h3 } });
+    expect(h3).toHaveBeenCalledWith('röst', 'ingen egen svensk röst, tyst', { pa_natet: 1 });
   });
 });
