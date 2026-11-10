@@ -1,0 +1,185 @@
+{
+ "type": "map",
+ "version": "1.10",
+ "tiledversion": "1.11.0",
+ "orientation": "orthogonal",
+ "renderorder": "right-down",
+ "width": 40,
+ "height": 12,
+ "tilewidth": 16,
+ "tileheight": 16,
+ "infinite": false,
+ "compressionlevel": -1,
+ "nextlayerid": 2,
+ "nextobjectid": 9,
+ "properties": [
+  {
+   "name": "rum",
+   "type": "string",
+   "value": "vassen"
+  }
+ ],
+ "tilesets": [],
+ "layers": [
+  {
+   "id": 1,
+   "name": "foremal",
+   "type": "objectgroup",
+   "draworder": "index",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 1,
+     "name": "stig_byn_vassen",
+     "type": "utgang",
+     "x": 40,
+     "y": 152,
+     "width": 28,
+     "height": 40,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "riktning",
+       "type": "string",
+       "value": "ned"
+      },
+      {
+       "name": "till",
+       "type": "string",
+       "value": "byn"
+      }
+     ]
+    },
+    {
+     "id": 2,
+     "name": "start",
+     "type": "",
+     "x": 54,
+     "y": 146,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 3,
+     "name": "bubbelblommor",
+     "type": "sak",
+     "x": 100,
+     "y": 56,
+     "width": 40,
+     "height": 20,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 4,
+     "name": "dott_trad",
+     "type": "sak",
+     "x": 440,
+     "y": 52,
+     "width": 28,
+     "height": 40,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 5,
+     "name": "bubbla_brev",
+     "type": "sak",
+     "x": 472,
+     "y": 30,
+     "width": 12,
+     "height": 12,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 6,
+     "name": "strand_vassen",
+     "type": "sak",
+     "x": 552,
+     "y": 72,
+     "width": 48,
+     "height": 48,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 7,
+     "name": "",
+     "type": "vagg",
+     "x": 600,
+     "y": 0,
+     "width": 40,
+     "height": 192,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vatten",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 8,
+     "name": "bubbla_unge",
+     "type": "sak",
+     "x": 608,
+     "y": 88,
+     "width": 14,
+     "height": 14,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

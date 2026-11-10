@@ -1,0 +1,262 @@
+{
+ "type": "map",
+ "version": "1.10",
+ "tiledversion": "1.11.0",
+ "orientation": "orthogonal",
+ "renderorder": "right-down",
+ "width": 20,
+ "height": 12,
+ "tilewidth": 16,
+ "tileheight": 16,
+ "infinite": false,
+ "compressionlevel": -1,
+ "nextlayerid": 2,
+ "nextobjectid": 13,
+ "properties": [
+  {
+   "name": "rum",
+   "type": "string",
+   "value": "dammen"
+  }
+ ],
+ "tilesets": [],
+ "layers": [
+  {
+   "id": 1,
+   "name": "foremal",
+   "type": "objectgroup",
+   "draworder": "index",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 1,
+     "name": "stig_byn_dammen",
+     "type": "utgang",
+     "x": 146,
+     "y": 152,
+     "width": 28,
+     "height": 40,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "riktning",
+       "type": "string",
+       "value": "ned"
+      },
+      {
+       "name": "till",
+       "type": "string",
+       "value": "byn"
+      }
+     ]
+    },
+    {
+     "id": 2,
+     "name": "start",
+     "type": "",
+     "x": 160,
+     "y": 146,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 3,
+     "name": "",
+     "type": "vagg",
+     "x": 96,
+     "y": 16,
+     "width": 208,
+     "height": 64,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vatten",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 4,
+     "name": "bo",
+     "type": "figur",
+     "x": 48,
+     "y": 80,
+     "width": 16,
+     "height": 24,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      },
+      {
+       "name": "talare",
+       "type": "string",
+       "value": "bo"
+      }
+     ]
+    },
+    {
+     "id": 5,
+     "name": "groda_liten_gul",
+     "type": "sak",
+     "x": 112,
+     "y": 76,
+     "width": 20,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 6,
+     "name": "groda_stor_gul",
+     "type": "sak",
+     "x": 160,
+     "y": 76,
+     "width": 20,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 7,
+     "name": "groda_liten_gron",
+     "type": "sak",
+     "x": 208,
+     "y": 76,
+     "width": 20,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 8,
+     "name": "groda_stor_gron",
+     "type": "sak",
+     "x": 256,
+     "y": 76,
+     "width": 20,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 9,
+     "name": "groda_gron_slat",
+     "type": "sak",
+     "x": 112,
+     "y": 76,
+     "width": 20,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 10,
+     "name": "groda_gron_prickig",
+     "type": "sak",
+     "x": 160,
+     "y": 76,
+     "width": 20,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 11,
+     "name": "groda_gul_slat",
+     "type": "sak",
+     "x": 208,
+     "y": 76,
+     "width": 20,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 12,
+     "name": "groda_gul_prickig",
+     "type": "sak",
+     "x": 256,
+     "y": 76,
+     "width": 20,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

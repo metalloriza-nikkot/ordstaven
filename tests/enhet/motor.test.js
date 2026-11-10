@@ -542,3 +542,30 @@ describe('tillbaka till början av ett pass (beslut 26.6)', () => {
     expect(aventyrFor(t, AVENTYR).bar).toBe(2);
   });
 });
+
+describe('formeln med tangentbordet i berättelsen (kapitel 2, Teknik 20 del 2)', () => {
+  const kap2 = las('den-gomda-dalen/kap-02.json');
+  const tillPusslet = (/** @type {string} */ id) => {
+    const t = nyttTillstand('t');
+    t.spelare.hjalte.formler = ['LJUS', 'SVÄRD'];
+    const av = aventyrFor(t, AVENTYR);
+    const si = kap2.scener.findIndex((/** @type {any} */ s) => s.steg.some((/** @type {any} */ st) => st.pussel_id === id));
+    Object.assign(av, { kapitelId: 'kap-02', scen: si, scenId: kap2.scener[si].id, steg: kap2.scener[si].steg.findIndex((/** @type {any} */ st) => st.pussel_id === id) });
+    const b = skapaBerattelse({ aventyr, kapitel: kap2, tillstand: t, aventyrId: AVENTYR });
+    if (b.aktuellt()?.text?.startsWith('Var var vi?')) b.klar(); // scenens vid_omstart
+    expect(b.aktuellt()).toMatchObject({ typ: 'pussel', pussel_id: id });
+    return { t, av, b };
+  };
+  it('ordet han skrev sparas för texten ({ord:k2_over}), men STEGE ristas inte in på staven (ristas: false)', () => {
+    const { t, av, b } = tillPusslet('k2_over');
+    b.klar({ ord: 'STEGE', ristas: false, forstaForsoket: true });
+    expect(av.skrivet).toEqual({ k2_over: 'STEGE' });
+    expect(t.spelare.hjalte.formler).toEqual(['LJUS', 'SVÄRD']);
+    expect(b.aktuellt()).toMatchObject({ typ: 'visa_foremal', foremal: 'overgang' });
+  });
+  it('FLYG ristas in på staven första gången', () => {
+    const { t, b } = tillPusslet('k2_flyg');
+    b.klar({ ord: 'FLYG' });
+    expect(t.spelare.hjalte.formler).toEqual(['LJUS', 'SVÄRD', 'FLYG']);
+  });
+});

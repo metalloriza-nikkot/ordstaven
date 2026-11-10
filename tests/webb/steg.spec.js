@@ -2237,3 +2237,93 @@ test('gläntans träd i L3 har Stils bilder (beslut 66.2): inget av de tre träd
   expect(await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt().filter((id) => /^(gammalt|ungt)_trad/.test(id)))).toEqual([]);
   await page.screenshot({ path: 'test-results/glantan-l3-traden.png' });
 });
+
+test('formeln med tangentbordet (kapitel 2, del 2): "pff" bara för det som inte är ett ord, och ordet han skrev blir det som händer', async ({ page }) => {
+  test.setTimeout(90000);
+  const kap2 = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-02.json', import.meta.url), 'utf8'));
+  const over = kap2.pussel.find((p) => p.id === 'k2_over');
+  await provscen(page, { id: 't_skriv', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'pussel', pussel_id: 'k2_over' }, R('Klart.')] }, (t) => { t.spelare.hjalte.formler = ['LJUS', 'SVÄRD']; }, { pussel: [over] });
+  // svaren i rutan (de står bara en kort stund i snabbläget)
+  await page.evaluate(() => {
+    window.__svar = [];
+    new MutationObserver(() => document.querySelectorAll('#plattan .svar-rad .text').forEach((e) => { if (!window.__svar.includes(e.textContent)) window.__svar.push(e.textContent); })).observe(document.querySelector('#plattan'), { childList: true, subtree: true });
+  });
+  const falt = page.locator('#plattan .formel-skriv .platser .plats');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('SKRIV ETT ORD MED STAVEN!', { timeout: 10000 });
+  await page.locator('#plattan .replik-ruta').click();
+  await expect(falt).toHaveCount(3, { timeout: 10000 }); // BRO: tre fält
+  const logg = () => page.evaluate(() => window.__ORDSTAVEN.logg());
+  // Å, Ä och Ö som från ett svenskt tangentbord (Playwrights type skickar dem som text, utan tangent)
+  const typ = async (ord) => { for (const c of ord) { if ('ÅÄÖ'.includes(c)) await page.evaluate((k) => window.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true })), c.toLowerCase()); else await page.keyboard.type(c); } };
+  const skriv = async (ord, sort) => {
+    await typ(ord); await page.keyboard.press('Enter');
+    await expect.poll(logg, { timeout: 8000 }).toContain(`k2_over: ${ord} (${sort})`);
+    await expect(falt.first()).toHaveText('', { timeout: 15000 }); // fälten är tomma igen efter svaret
+  };
+  const svar = () => page.evaluate(() => window.__svar);
+  // inget ord: "pff", och förebilden tänds
+  await skriv('XQZ', 'fel');
+  await expect.poll(svar).toContainEqual(expect.stringContaining('PFF'));
+  await expect(page.locator('#plattan .forebild')).toBeVisible();
+  // fälten växer när han skriver fler bokstäver
+  await page.keyboard.type('FLOT');
+  await expect(falt).toHaveCount(4);
+  for (let i = 0; i < 4; i++) await page.keyboard.press('Backspace');
+  await expect(falt).toHaveCount(3);
+  // ett ord som passar men inte hjälper: dess egen reaktion, aldrig "pff"
+  await skriv('BÅT', 'rimligt');
+  await expect.poll(svar).toContain('EN BÅT! MEN DEN ÄR FÖR LITEN.');
+  // ett annat riktigt ord: det vanliga svaret
+  await skriv('APA', 'ord');
+  await expect.poll(svar).toContain('BRA ORD! MEN DET HJÄLPER INTE HÄR.');
+  expect((await svar()).filter((t) => t.includes('PFF'))).toHaveLength(1);
+  // STEGE löser det, och ordet sparas för texten men ristas inte in på staven
+  await page.keyboard.type('STEGE'); await page.keyboard.press('Enter');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('KLART.', { timeout: 15000 });
+  const t = await page.evaluate(() => window.__ORDSTAVEN.tillstand());
+  expect(t.aventyr['den-gomda-dalen'].skrivet).toEqual({ k2_over: 'STEGE' });
+  expect(t.spelare.hjalte.formler).toEqual(['LJUS', 'SVÄRD']);
+  expect(await logg()).toContain('k2_over: STEGE (formel)');
+});
+
+test('kapitel 2 går att gå in i (del 2): skylten, vattnet, BRO över vattnet och in i byn, med piltangenterna', async ({ page }) => {
+  test.setTimeout(150000);
+  await page.goto('./?snabb&ny&kapitel=kap-02');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  for (const namn of ['TESTA', 'KNOPP']) {
+    for (let i = 0; i < 30 && !(await page.locator('#plattan .dop-ruta').isVisible()); i++) { await page.locator('#plattan .replik-ruta').click({ timeout: 300 }).catch(() => {}); await page.waitForTimeout(150); }
+    await page.waitForTimeout(200); await page.keyboard.type(namn); await page.keyboard.press('Enter');
+    await expect(page.locator('#plattan .dop-ruta')).toBeHidden({ timeout: 10000 });
+  }
+  const pos = () => page.evaluate(() => window.__ORDSTAVEN.position());
+  const tryck = async (t, ms) => { await page.keyboard.down(t); await page.waitForTimeout(ms); await page.keyboard.up(t); await page.waitForTimeout(60); };
+  const vidare = async () => { for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {}); };
+  /** Gå mot en punkt med piltangenterna, x-led först. */
+  const gaTill = async (x, y) => {
+    for (let i = 0; i < 40; i++) {
+      await vidare();
+      const p = await pos(), dx = x - p.x, dy = y - p.y;
+      if (Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
+      if (Math.abs(dx) >= 4) await tryck(dx > 0 ? 'ArrowRight' : 'ArrowLeft', Math.min(400, Math.abs(dx) * 12));
+      else await tryck(dy > 0 ? 'ArrowDown' : 'ArrowUp', Math.min(400, Math.abs(dy) * 12));
+    }
+  };
+  const gjort = new Set();
+  for (let i = 0; i < 120; i++) {
+    const [scen, st] = await page.evaluate(() => [window.__ORDSTAVEN.scen(), window.__ORDSTAVEN.steg()]);
+    if (scen !== 'k2s01_kanten') break;
+    const nyckel = `${st?.typ}:${st?.mal || st?.foremal || st?.pussel_id || ''}`;
+    if (st?.typ === 'las_skylt' && !gjort.has(nyckel)) { gjort.add(nyckel); await gaTill(107, 90); continue; }
+    if (st?.typ === 'ga_till' && st.mal === 'vattnet' && !gjort.has(nyckel)) { gjort.add(nyckel); await gaTill(300, 96); await gaTill(452, 96); await page.keyboard.press('Space'); continue; }
+    if (st?.typ === 'ga_till' && st.mal === 'stig_byn') { await gaTill(470, 96); await gaTill(636, 96); continue; }
+    if (await page.locator('#plattan .formel-skriv').isVisible()) { await page.keyboard.type('BRO'); await page.keyboard.press('Enter'); await page.waitForTimeout(800); continue; }
+    await vidare(); await page.waitForTimeout(150);
+  }
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 10000 }).toBe('k2s02_byn');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt())).toContain('stig_kanten');
+  const t = await page.evaluate(() => window.__ORDSTAVEN.tillstand());
+  expect(t.aventyr['den-gomda-dalen'].skrivet).toEqual({ k2_over: 'BRO' });
+  expect(t.spelare.hjalte.formler).not.toContain('BRO');
+  await page.screenshot({ path: 'test-results/kap2-byn.png' });
+});

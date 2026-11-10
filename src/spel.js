@@ -4,11 +4,11 @@
 import { skapaBerattelse, spolaFram, aterstallFramsteg, barFore } from './karna/berattelse.js';
 import { sammanfatta } from './karna/foraldravy.js';
 import { skapaLasmotor, valjVariant } from './karna/lasmotor.js';
-import { egenskaper, egetForemal, PALETT } from './karna/egenskaper.js';
+import { egenskaper, egetForemal, synligaEgenskaper, PALETT } from './karna/egenskaper.js';
 import { skapaValj, skapaFormel, skapaDop, skapaKrukor, skapaRaddning } from './karna/pussel.js';
 import { forSkarm, versaler } from './karna/text.js';
 import { rumTillSkarm, varldTillSkarm, RUM, textskala } from './karna/skalning.js';
-import { framfor, lasplats, vidObjekt, genom, stigStart } from './karna/rumslayout.js';
+import { framfor, lasplats, vidObjekt, genom, stigStart, RACKVIDD } from './karna/rumslayout.js';
 import { aventyrFor, spelareAttVisa } from './karna/sparning.js';
 import { varVarVi, senastSpelad } from './karna/varvarvi.js';
 import { musikFor } from './karna/musik.js';
@@ -19,6 +19,7 @@ import { pekningOmMs, skapaHjalpSpar, knufftidMs } from './karna/hjalp.js';
 import { HJALTE_FARGER, HJALTE_FAST } from './scener/Rum.js';
 import { lagerFor, bytLager, ristasNu } from './karna/hjalte.js';
 import { TANGENTBORD_HOJD } from './grans/tangentbord.js';
+import { kandaOrd, bedomOrd, antalFalt, MAX_BOKSTAVER } from './karna/skrivord.js';
 import { skapaRullning } from './grans/rullning.js';
 import { laggUngenPaKartan, kartbitarHtml } from './grans/kartbitar.js';
 import { ikon, uiBild } from './grans/ikoner.js';
@@ -110,6 +111,9 @@ export function skapaSpel(d) {
   document.addEventListener('visibilitychange', () => { if (document.hidden) pausa('dold'); else fortsatt('dold'); });
   /** Bokstavsbrickan nr n i ordet: tonen stiger för varje bokstav (bricka_1–8, 10c). @param {number} n */
   const brickljud = (n) => ljud.spela(`bricka_${Math.max(1, Math.min(8, n))}`);
+  /** Orden som räknas som riktiga ord när han skriver en formel (P11 med tangentbordet): räknas en gång. */
+  /** @type {Set<string> | null} */ let kanda = null;
+  const kandaOrdNu = () => (kanda ??= kandaOrd(d.ordlistor, d.kapitel));
   /** Musiken (F5): en av slingorna, eller tyst (null). Bytet står i loggen. @param {string | null} namn */
   function spelaMusik(namn) {
     if (ljud.musikLage?.onskad !== namn) logg.handelse('musik', namn ?? 'tyst');
@@ -679,7 +683,7 @@ export function skapaSpel(d) {
    */
   const delarAv = (alternativ, p) => alternativ.map((a) => {
     const e = egenskaper(a.bild || a.id);
-    return { farg: e.farg ? parseInt(PALETT[e.farg].slice(1), 16) : null, storlek: e.storlek, bild: a.bild ?? null, egen: !!(p && a.objekt && egetForemal(p, a.objekt)) };
+    return { farg: e.farg ? parseInt(PALETT[e.farg].slice(1), 16) : null, storlek: e.storlek, form: e.form, monster: e.monster, bild: a.bild ?? null, egen: !!(p && a.objekt && egetForemal(p, a.objekt)) };
   });
   /** Delar för alla föremål i ett rum som visar ett läs och välj-pussel, i den variant spelaren får. @param {any} karta */
   function delarIRummet(karta) {
@@ -697,8 +701,7 @@ export function skapaSpel(d) {
       if (!p.i_rummet || !p.varianter) continue;
       const [, v] = valjVariant(p.varianter, nivaFor(p));
       for (const a of v.alternativ) {
-        const e = egenskaper(a.bild || a.id);
-        if (a.objekt && iKartan.has(a.objekt) && (e.farg || e.storlek)) ut[a.objekt] = delarAv([a], p);
+        if (a.objekt && iKartan.has(a.objekt) && synligaEgenskaper(a.bild || a.id)) ut[a.objekt] = delarAv([a], p);
       }
     }
     return ut;
@@ -1401,6 +1404,7 @@ export function skapaSpel(d) {
 
   /** @param {any} st */
   async function gaTill(st) {
+    if (st.mal === 'unge') return gaTillUngen(st);
     rum.frys(false);
     // (står han kvar i en avstickare efter en omstart finns målet i scenens rum, inte här)
     if (!rum.ruta(st.mal) && !aterAvstickare) { logg.handelse('FEL', 'objektet finns inte i rummet: ' + st.mal); return; }
@@ -1505,6 +1509,30 @@ export function skapaSpel(d) {
       await rum.ga(framfor(o), tid(300));
       klattrade = o.klattra; stegljud(tid(700)); await rum.klattra(o.id, o.klattra, 'pa', tid(700));
     }
+  }
+
+  /**
+   * Målet är ungen (`ga_till` till `unge`, 2.31): han går fram till ungen där den är (i leran, k2s01). Han är
+   * framme när han står bredvid den, och efter ca 15 s hoppar ungen till. Sedan följer ungen honom igen.
+   * @param {any} st
+   */
+  async function gaTillUngen(st) {
+    rum.frys(false);
+    const instr = instruktionFore(st);
+    if (instr) { visaMoln(bilder.html('unge'), instr); placeraMoln([]); logg.handelse('mål', 'i molnet: unge'); }
+    const start = performance.now();
+    const k = knuffKlocka(st.knuff ?? { handling: '' }, () => { rum.ungeReagerar?.(true); if (instr) ui.pulseraTanke(); logg.handelse('knuff', 'ungen hoppar till'); }, undefined, MAL_KNUFF_MS);
+    const omplacera = window.setInterval(() => { if (instr && !ui.$('#tanke').hidden && ui.plattan.hidden) placeraMoln([]); }, 250);
+    await new Promise((klar) => {
+      const t = window.setInterval(() => {
+        const u = rum.ungePos, p = rum.pos;
+        if (!rum.fryst && Math.hypot(p.x - u.x, (p.y - u.y) * 1.5) <= RACKVIDD + 4) { window.clearInterval(t); klar(undefined); }
+      }, 60);
+    });
+    window.clearInterval(omplacera); k.stopp();
+    if (instr) visaMoln(null);
+    rum.ungePekar(null);
+    logg.handelse('framme', 'unge', { sek: Math.round((performance.now() - start) / 100) / 10, efter_dialog: !!instr });
   }
 
   /**
@@ -2047,7 +2075,7 @@ export function skapaSpel(d) {
           }
           if (nySpikad) ljud.spela('bonk'); // en fel dörr spikas igen: två komiska bonk (10c)
           // varianten kan ha bytts (förenkling): lådorna visar de nya alternativens färg och storlek
-          for (const a of v.s.alternativ) { const e = egenskaper(a.bild || a.id); if (a.objekt && (e.farg || e.storlek)) rum.visaDelar(a.objekt, delarAv([a], p)); }
+          for (const a of v.s.alternativ) { if (a.objekt && synligaEgenskaper(a.bild || a.id)) rum.visaDelar(a.objekt, delarAv([a], p)); }
           rum.sattInteraktiva(kvarSaker());
           ritaSkyltar();
           const pekar = v.s.pekar ? v.s.alternativ.find((a) => a.id === v.s.pekar) : null;
@@ -2098,6 +2126,7 @@ export function skapaSpel(d) {
    * @param {any} p
    */
   async function formel(p) {
+    if (p.skriv === 'tangentbord') return formelSkriv(p);
     const f = skapaFormel(p);
     const spar = { hjalp: false, forebild: false };
     if (p.instruktion) await replik(p.instruktion);
@@ -2224,6 +2253,94 @@ export function skapaSpel(d) {
         if (h.typ === 'bokstav' && fb.brickor) svar(f.skriv(h.tecken));
         if (h.typ === 'sudda' && !upptagen && f.sudda()) rita();
       });
+      rita();
+    });
+  }
+
+  /**
+   * Formeln med tangentbordet (P11 med "skriv": "tangentbord", kapitel 2, schema 2.31). Han skriver ett helt ord på
+   * tangentbordet (på iPad skärmens), och fälten visar formelns längd och växer när han skriver fler bokstäver. Ordet
+   * bedöms (karna/skrivord.js): en formel eller en form som godtas löser pusslet, och ordet han skrev blir det som
+   * händer (BRO, STEGE, REP eller FLOTTE). Nästan rätt tänder första bokstaven eller förebilden. Ett ord som passar
+   * men inte hjälper får sin reaktion, och ett annat riktigt ord Farfars vanliga svar. Inget av dem räknas som fel.
+   * Bara det som inte är ett ord får "pff" (vid_fel), och då tänds förebilden.
+   * @param {any} p
+   */
+  async function formelSkriv(p) {
+    const ord = kandaOrdNu();
+    const spar = { hjalp: false, forebild: false };
+    if (p.instruktion) await replik(p.instruktion);
+    rum.frys(true);
+    let skrivet = '', fel = 0, upptagen = false, fardigt = false;
+    /** förebilden (efter "pff" eller knuffen) och första bokstaven (nästan rätt) */
+    const fb = { visad: false, forsta: false };
+    return new Promise((klar) => {
+      const k = knuffKlocka(p.knuff, () => { if (p.forebild) { fb.visad = true; spar.forebild = true; } rita(); ui.plattan.querySelector('.forebild .bokstav')?.classList.add('blinkar'); });
+      const rita = () => {
+        const n = antalFalt(p, skrivet), tecken = [...skrivet];
+        const forsta = fb.forsta ? [...versaler(p.svar)][0] : '';
+        const platser = `<div class="platser skriv">${Array.from({ length: n }, (_, i) => `<span class="plats ${i < tecken.length ? 'fylld' : ''} ${!tecken.length && i === 0 && forsta ? 'tand' : ''}">${ui.esc(tecken[i] ?? (i === 0 && forsta ? forsta : ''))}</span>`).join('')}</div>`;
+        const forebild = p.forebild && fb.visad ? `<div class="forebild" aria-label="Förebild">${[...p.forebild.text].map((c) => `<span class="bokstav">${ui.esc(c)}</span>`).join('')}</div>` : '';
+        const bild = p.bild ? `<div class="formel-bild" aria-hidden="true">${bilder.html(p.bild)}</div>` : '';
+        const overst = bild ? `<div class="formel-overst">${bild}${forebild}</div>` : forebild;
+        const knappar = `<div class="dop-knappar">${d.pek() ? '' : '<button type="button" class="knapp visa-tb" aria-label="Visa tangentbordet">⌨</button>'}<button type="button" class="knapp sudda" aria-label="Sudda">⌫</button><button type="button" class="knapp klar ${tecken.length ? '' : 'av'}" aria-label="Klar">✓</button></div>`;
+        ui.visaPlatta(`<div class="formel-ruta formel-skriv">${overst}${platser}${knappar}</div>`, 'pussel P11_formel');
+        tangentbord.klarAktiv(tecken.length > 0);
+        tillatNos(p, spar);
+        ui.plattan.querySelector('.sudda')?.addEventListener('click', () => sudda());
+        ui.plattan.querySelector('.klar')?.addEventListener('click', () => bedom());
+        ui.plattan.querySelector('.visa-tb')?.addEventListener('click', () => visaTangentbord());
+      };
+      const visaTangentbord = () => { tangentbord.visa(); layout.sattReserv(TANGENTBORD_HOJD); };
+      const skriv = (/** @type {string} */ b) => {
+        if (upptagen || fardigt || [...skrivet].length >= MAX_BOKSTAVER) return;
+        k.nollstall(); skrivet += versaler(b); brickljud([...skrivet].length); rita();
+      };
+      const sudda = () => { if (upptagen || fardigt || !skrivet) return; skrivet = [...skrivet].slice(0, -1).join(''); ljud.spela('klick'); rita(); };
+      const tom = () => { skrivet = ''; rita(); };
+      const bedom = async () => {
+        if (upptagen || fardigt || !skrivet) return;
+        upptagen = true; k.nollstall();
+        const b = bedomOrd(p, skrivet, ord);
+        logg.handelse('formel', `${p.id}: ${b.ord} (${b.sort})`);
+        if (b.sort === 'formel') { await lyckad(b); return; }
+        if (b.sort === 'nastan') {
+          fel++;
+          if (b.nastan.tand === 'forebild' && p.forebild) { fb.visad = true; spar.forebild = true; } else fb.forsta = true;
+          ljud.spela('hmm');
+          if (b.nastan.effekt) ui.visaRegi(String(b.nastan.effekt).replace(/_/g, ' '), 0);
+          await reaktion({ replik: b.nastan.replik || { talare: 'berattare', text: 'Nästan!', upplast: true } });
+          ui.doljRegi();
+        } else if (b.sort === 'rimligt') {
+          await reaktion(b.rimligt);
+        } else if (b.sort === 'ord') {
+          if (p.vanligt_svar) await reaktion({ replik: p.vanligt_svar });
+        } else {
+          fel++;
+          if (p.forebild?.visas === 'vid_fel' || p.forebild) { fb.visad = true; spar.forebild = true; }
+          felljud(p.vid_fel); ui.plattan.querySelector('.platser')?.classList.add('gra'); await vanta(tid(400));
+          await reaktion(p.vid_fel);
+        }
+        upptagen = false; tom();
+      };
+      const lyckad = async (/** @type {{ ord: string, formel: any }} */ b) => {
+        fardigt = true; k.stopp(); sluta();
+        tangentbord.dolj(); layout.sattReserv(0);
+        // en ny formel ristas in på staven (67.6): inte BRO, som räcker en gång (ristas: false)
+        if (ristasNu(p, tillstand.spelare.hjalte.formler, b.ord)) { ljud.spela('formel_ristas'); logg.handelse('formel', `${p.id}: ${b.ord} ristas in på staven`); }
+        else ljud.spela('ratt');
+        ui.visaPlatta(`<div class="formel-luft-ruta"><div class="formel-i-luften">${ui.esc(b.ord)}</div></div>`, 'formel-luft');
+        await vanta(tid(1000)); ui.doljPlatta();
+        ordkraft(b.ord);
+        await reaktion(p.vid_ratt);
+        klar({ niva: p.niva, forstaForsoket: fel === 0, forsok: fel + 1, hjalp: spar.hjalp, ord: b.ord, ristas: b.formel.ristas !== false });
+      };
+      const sluta = lyssnaHandling((h) => {
+        if (h.typ === 'bokstav') skriv(h.tecken);
+        if (h.typ === 'sudda') sudda();
+        if (h.typ === 'interagera') bedom();
+      });
+      if (d.pek()) visaTangentbord();
       rita();
     });
   }

@@ -1,0 +1,213 @@
+{
+ "type": "map",
+ "version": "1.10",
+ "tiledversion": "1.11.0",
+ "orientation": "orthogonal",
+ "renderorder": "right-down",
+ "width": 20,
+ "height": 12,
+ "tilewidth": 16,
+ "tileheight": 16,
+ "infinite": false,
+ "compressionlevel": -1,
+ "nextlayerid": 2,
+ "nextobjectid": 10,
+ "properties": [
+  {
+   "name": "inomhus",
+   "type": "bool",
+   "value": true
+  },
+  {
+   "name": "rum",
+   "type": "string",
+   "value": "tant_rosas_hus"
+  }
+ ],
+ "tilesets": [],
+ "layers": [
+  {
+   "id": 1,
+   "name": "foremal",
+   "type": "objectgroup",
+   "draworder": "index",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 1,
+     "name": "dorr_ut",
+     "type": "utgang",
+     "x": 146,
+     "y": 176,
+     "width": 28,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "riktning",
+       "type": "string",
+       "value": "ned"
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "over"
+      },
+      {
+       "name": "till",
+       "type": "string",
+       "value": "byn"
+      }
+     ]
+    },
+    {
+     "id": 2,
+     "name": "start",
+     "type": "",
+     "x": 160,
+     "y": 150,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 3,
+     "name": "tant_rosa",
+     "type": "figur",
+     "x": 232,
+     "y": 96,
+     "width": 16,
+     "height": 24,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      },
+      {
+       "name": "talare",
+       "type": "string",
+       "value": "tant_rosa"
+      }
+     ]
+    },
+    {
+     "id": 4,
+     "name": "soffa",
+     "type": "sak",
+     "x": 48,
+     "y": 112,
+     "width": 56,
+     "height": 22,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 5,
+     "name": "tavla_stor_rund",
+     "type": "sak",
+     "x": 60,
+     "y": 14,
+     "width": 26,
+     "height": 26,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      }
+     ]
+    },
+    {
+     "id": 6,
+     "name": "tavla_liten_fyrkant",
+     "type": "sak",
+     "x": 112,
+     "y": 14,
+     "width": 26,
+     "height": 26,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      }
+     ]
+    },
+    {
+     "id": 7,
+     "name": "tavla_stor_fyrkant",
+     "type": "sak",
+     "x": 164,
+     "y": 14,
+     "width": 26,
+     "height": 26,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      }
+     ]
+    },
+    {
+     "id": 8,
+     "name": "tavla_liten_rund",
+     "type": "sak",
+     "x": 216,
+     "y": 14,
+     "width": 26,
+     "height": 26,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      }
+     ]
+    },
+    {
+     "id": 9,
+     "name": "kartbit_3",
+     "type": "sak",
+     "x": 144,
+     "y": 64,
+     "width": 14,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

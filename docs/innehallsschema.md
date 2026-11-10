@@ -344,6 +344,7 @@ Innehållet säger **vad** som finns i ett rum, kartan säger **var** det står.
   - `oppning` (på en stig med `golv`) = när stigen syns skär den igenom hindret den ligger över. Hålet i häcken (`stig_genom_hacken`, `dold`) ligger över häcken, och häcken är hel tills stenen har visat hålet.
 - **Varianterna i ett läsval i världen:** alla varianters föremål står i kartan, men bara den variant han får syns. Den rätta saken kan stå på samma plats i flera varianter (`hog_sten` och `hog_rund_sten`), så att bara en dold väg behövs.
 - **Alternativen i ett val** (lådorna i FILT och dinomaten) står minst 3 rutor isär, så att ingen plats når två av dem (testas).
+- **Hus och vatten ute** (kapitel 2:s gråbox): rutor med typen `vagg` står i vägen och ritas, vatten med egenskapen `vatten`. De är inga föremål och står inte i rummets innehåll.
 - **Regins punkter** (2.32): en punkt som heter `regi_<namn>` är en plats för regin, inget föremål. `regi_farfar` är där Farfar står i dörren (`farfar_i_dorren`).
 - **Kartans egenskap `morker`** (0–1) säger hur mörkt rummet är på natten (annars 0,72). Hallen har 0,55.
 - **Kartans egenskap `inomhus`** ger rummet en väggram: bakvägg 3 rutor, sidoväggar 2, främre kant 1. Dörrar sitter i väggarna och möbler står längs dem. Egenskaperna `vagg_bak`, `vagg_sida` och `vagg_fram` (pixlar) ger andra mått.

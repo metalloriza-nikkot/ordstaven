@@ -11,7 +11,7 @@ import { geSak } from './hjalte.js';
 /** Sparningens delar för äventyret som stegen ändrar. @param {any} av */
 function sakraAventyr(av) {
   av.ui = av.ui || {}; av.rumstillstand = av.rumstillstand || {}; av.lappar = av.lappar || []; av.kartbitar = av.kartbitar || [];
-  av.bar = av.bar || 0; av.visade = av.visade || {}; av.frivilligt = av.frivilligt || [];
+  av.bar = av.bar || 0; av.visade = av.visade || {}; av.frivilligt = av.frivilligt || []; av.skrivet = av.skrivet || {};
 }
 
 /**
@@ -112,6 +112,7 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
   av.visade = av.visade || {};
   /** @type {string[]} frivilliga scener och föremål som är gjorda (scenens id, eller rum/föremål) */
   av.frivilligt = av.frivilligt || [];
+  av.skrivet = av.skrivet || {};
   // rum som har gått upp i ett större område (kapitel 1: lianerna i skogsbrynet, gamla_tradet i gläntan, beslut 18.1):
   // det som har visats, rummets tillstånd och det frivilliga följer med till det nya rummet
   for (const [gammalt] of Object.entries(alias.rum || {})) {
@@ -206,10 +207,15 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
           if (p.sparas_som === 'unge.namn') { unge.namn = resultat.namn; }
         }
         if (p && p.typ === 'P11_formel') {
-          const f = p.formler.find((/** @type {any} */ x) => x.ord === p.svar);
+          // med tangentbordet (kapitel 2) är formeln det han skrev: BRO, STEGE, REP eller FLOTTE (resultat.ord)
+          const ord = resultat.ord || p.svar;
+          const f = (p.formler || []).find((/** @type {any} */ x) => x.ord === ord);
           if (f && f.tillstand_efter && scen.rum) av.rumstillstand[scen.rum] = f.tillstand_efter;
           const formler = tillstand.spelare.hjalte.formler;
-          if (!formler.includes(p.svar)) formler.push(p.svar);
+          // ett ord som räcker en gång ristas inte in på staven (ristas: false, 2.31)
+          if (f?.ristas !== false && !formler.includes(ord)) formler.push(ord);
+          // ordet han skrev, för {ord:<pussel>} i texten (64.2)
+          if (resultat.ord) av.skrivet[p.id] = ord;
         }
         if (p && (p.typ === 'P1_las_och_valj' || p.typ === 'P28_packa') && p.kan_oppnas_igen && !av.lappar.includes(p.id)) av.lappar.push(p.id);
       }

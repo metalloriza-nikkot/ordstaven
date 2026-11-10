@@ -30,7 +30,7 @@ import { STORSTA } from './kamera.js';
  * @typedef {{ objekt: Objekt[], start: { x: number, y: number } | null, inomhus: boolean,
  *             in: Record<string, { x: number, y: number }>, lampor: { x: number, y: number }[],
  *             vagg: { bak: number, sida: number, fram: number }, morker: number | null,
- *             storlek: { bredd: number, hojd: number }, massiv: { x: number, y: number, b: number, h: number }[],
+ *             storlek: { bredd: number, hojd: number }, massiv: { x: number, y: number, b: number, h: number, vatten?: boolean }[],
  *             bild?: string | null, mark?: string | null, rutlager?: { namn: string, data: number[], visasMed: string | null }[],
  *             omgivning?: { vad: string, x: number, y: number, b: number, h: number }[],
  *             overHinder?: { x: number, y: number, b: number, h: number }[], regi?: Record<string, { x: number, y: number }> }} Karta
@@ -39,7 +39,8 @@ import { STORSTA } from './kamera.js';
  * som inte har någon utgång hit (punkter som heter in_<rum>, t.ex. trädgården från köket). lampor = där det lyser i mörkret.
  * regi = punkter för regin (regi_<namn>): regi_farfar är där Farfar står i dörren (67.2).
  * storlek = områdets storlek i pixlar (kartans bredd och höjd): en skärm (320×192) eller större, högst 640×384.
- * massiv = väggar inne i rummet (typen vagg), som ger rummet en annan form än en rektangel.
+ * massiv = väggar inne i rummet (typen vagg), som ger rummet en annan form än en rektangel. Ute är de hus, eller vatten
+ * med egenskapen vatten (kapitel 2:s gråbox: träsket, dammen och stranden).
  * overHinder = ridåns rutor (rutlagret over) som hinder, en ruta per rad av rutor bredvid varandra (56.3): ridån
  * ligger under figurerna, och fötterna står aldrig i den.
  */
@@ -133,7 +134,8 @@ export function lasKarta(tmj) {
         continue;
       }
       const typ = o.type || o.class || '';
-      if (typ === 'vagg') { massiv.push({ x: Math.round(o.x), y: Math.round(o.y), b: Math.round(o.width), h: Math.round(o.height) }); continue; }
+      // massiv vägg, eller ute (kapitel 2:s gråbox) vatten (egenskapen vatten) och hus: ett hinder som ritas i gråboxen
+      if (typ === 'vagg') { massiv.push({ x: Math.round(o.x), y: Math.round(o.y), b: Math.round(o.width), h: Math.round(o.height), ...(egen.vatten ? { vatten: true } : {}) }); continue; }
       // liv i skogen (26.3, 10b): det som rör sig utan att man kan göra något med det. Inget föremål, inget hinder.
       if (typ === 'omgivning') { omgivning.push({ vad: String(egen.vad || ''), x: Math.round(o.x), y: Math.round(o.y), b: Math.round(o.width), h: Math.round(o.height) }); continue; }
       /** @type {Objekt} */

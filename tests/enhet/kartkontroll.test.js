@@ -23,7 +23,7 @@ import { FIGUR } from '../../src/karna/rorelse.js';
 
 const las = (/** @type {string} */ f) => JSON.parse(readFileSync(new URL(`../../${f}`, import.meta.url), 'utf8'));
 const AVENTYR = 'den-gomda-dalen';
-const KAPITEL = ['kap-00', 'kap-01'];
+const KAPITEL = ['kap-00', 'kap-01', 'kap-02'];
 /** @type {Map<string, any>} */
 const kartor = new Map();
 const karta = (/** @type {string} */ rum) => {

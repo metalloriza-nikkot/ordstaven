@@ -95,7 +95,7 @@ export class Rum extends Phaser.Scene {
     this.inomhus = false;
     /** väggarnas mått i rummet (kartan) */
     this.vagg = VAGG;
-    /** @type {{ x: number, y: number, b: number, h: number }[]} väggar inne i rummet (kartans vagg) */
+    /** @type {{ x: number, y: number, b: number, h: number, vatten?: boolean }[]} väggar inne i rummet, och ute vatten och hus (kartans vagg) */
     this.massiv = [];
     /** @type {{ x: number, y: number, b: number, h: number }[]} ridåns rutor som hinder (kartans overHinder) */
     this.overHinder = [];
@@ -146,7 +146,7 @@ export class Rum extends Phaser.Scene {
     /** @type {{ ids: string[], klar: (id: string) => void } | null} */
     this.vantar = null;
     this.markerade = new Set();
-    /** @type {Record<string, { farg: number | null, storlek: string | null, bild?: string | null, egen?: boolean }[]>} föremål som visar ett pussels alternativ */
+    /** @type {Record<string, { farg: number | null, storlek: string | null, bild?: string | null, egen?: boolean, form?: string | null, monster?: string | null }[]>} föremål som visar ett pussels alternativ */
     this.delar = {};
     /** @type {Map<string, any[]>} */
     this.ritadeDelar = new Map();
@@ -304,7 +304,14 @@ export class Rum extends Phaser.Scene {
     for (let x = RUM.ruta; x < B; x += RUM.ruta) g.fillRect(x, 0, 1, H);
     for (let y = RUM.ruta; y < H; y += RUM.ruta) g.fillRect(0, y, B, 1);
     g.fillStyle(FARG.kant).fillRect(0, 0, B, 2).fillRect(0, H - 2, B, 2).fillRect(0, 0, 2, H).fillRect(B - 2, 0, 2, H);
-    if (!this.inomhus) return;
+    if (!this.inomhus) {
+      // ute i gråboxen (kapitel 2): vatten blått med en ljus strandkant, och hus mörka med ett tak
+      for (const m of this.massiv) {
+        if (m.vatten) { g.fillStyle(0x3d6e9e).fillRect(m.x, m.y, m.b, m.h); g.fillStyle(0x8fb3cf).fillRect(m.x, m.y, m.b, 1).fillRect(m.x, m.y + m.h - 1, m.b, 1); continue; }
+        g.fillStyle(0x6a5544).fillRect(m.x, m.y, m.b, m.h); g.fillStyle(0x8a3b2e).fillRect(m.x, m.y, m.b, Math.min(8, m.h));
+      }
+      return;
+    }
     // väggramen: bakvägg 3 rutor, sidoväggar 2 med sneda hörn, främre kant 1, och en ljus list överst
     const { bak, sida, fram } = this.vagg;
     g.fillStyle(0x7a6a58).fillRect(sida, 0, B - 2 * sida, bak);
@@ -1490,13 +1497,19 @@ export class Rum extends Phaser.Scene {
     if (!delar) return;
     // föremålet visar ett pussels alternativ (lådorna): i samma färg och storlek som texten säger
     const n = delar.length, steg = o.b / n, bas = Math.min(steg - 3, o.h);
-    const ritade = delar.map((d, i) => {
+    const ritade = delar.flatMap((d, i) => {
       const k = d.storlek === 'stor' ? 1 : d.storlek === 'liten' ? 0.55 : 0.8;
       const b = Math.round(bas * k), h = Math.round(o.h * k);
       const x = Math.round(o.x + i * steg + (steg - b) / 2), y = o.y + o.h - h;
-      const ruta = this.add.rectangle(x, y, b, h, d.farg ?? FARG.sak).setOrigin(0, 0).setStrokeStyle(1, 0x2b2420);
+      // formen (en rund tavla är en ellips) och mönstret (en prickig groda har mörka prickar) syns också (63.4)
+      const ruta = d.form === 'rund'
+        ? this.add.ellipse(x + b / 2, y + h / 2, b, h, d.farg ?? FARG.sak).setStrokeStyle(1, 0x2b2420)
+        : this.add.rectangle(x, y, b, h, d.farg ?? FARG.sak).setOrigin(0, 0).setStrokeStyle(1, 0x2b2420);
       this.lagerObjekt.add(ruta);
-      return ruta;
+      if (d.monster !== 'prickig') return [ruta];
+      const prickar = [[0.3, 0.35], [0.68, 0.3], [0.5, 0.68], [0.22, 0.75], [0.8, 0.72]].map(([px, py]) => this.add.rectangle(Math.round(x + px * b) - 1, Math.round(y + py * h) - 1, 2, 2, 0x1d2b1c).setOrigin(0, 0));
+      for (const p of prickar) this.lagerObjekt.add(p);
+      return [ruta, ...prickar];
     });
     this.ritadeDelar.set(o.id, ritade);
   }
@@ -1550,7 +1563,7 @@ export class Rum extends Phaser.Scene {
 
   /**
    * Visa ett pussels alternativ i föremålet (t.ex. lådorna i den variant spelaren har). null = som vanligt.
-   * @param {string} id @param {{ farg: number | null, storlek: string | null, bild?: string | null, egen?: boolean }[] | null} delar
+   * @param {string} id @param {{ farg: number | null, storlek: string | null, bild?: string | null, egen?: boolean, form?: string | null, monster?: string | null }[] | null} delar
    */
   visaDelar(id, delar) {
     const o = this.ruta(id); if (!o) return;

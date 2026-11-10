@@ -9,19 +9,29 @@ export const PALETT = Object.freeze({ rod: '#d9443a', bla: '#1f3c88', gul: '#f4d
 /** Storlek som syns: stor, liten (annars vanlig). */
 export const STORLEK = Object.freeze({ stor: 1.35, liten: 0.7 });
 
+/** Form som syns (kapitel 2:s tavlor, 63.4): rund eller fyrkantig. */
+export const FORM = Object.freeze(['rund', 'fyrkant']);
+/** Mönster som syns (kapitel 2:s grodor): prickig eller slät. */
+export const MONSTER = Object.freeze(['prickig', 'slat']);
+
 /**
- * Egenskaperna i ett id eller bild-id, t.ex. "stor_rod", "lada_rod_stor", "filt_bla".
+ * Egenskaperna i ett id eller bild-id, t.ex. "stor_rod", "lada_rod_stor", "filt_bla", "tavla_liten_rund",
+ * "groda_gron_prickig".
  * @param {string} id
- * @returns {{ farg: keyof typeof PALETT | null, storlek: keyof typeof STORLEK | null }}
+ * @returns {{ farg: keyof typeof PALETT | null, storlek: keyof typeof STORLEK | null, form: string | null, monster: string | null }}
  */
 export function egenskaper(id) {
   const delar = String(id).split('_');
   const farg = /** @type {keyof typeof PALETT | undefined} */ (delar.find((d) => d in PALETT)) ?? null;
-  const BOJT = /** @type {Record<string, keyof typeof STORLEK>} */ ({ stort: 'stor', stora: 'stor', litet: 'liten', lilla: 'liten', sma: 'liten' });
-  const s = delar.map((d) => BOJT[d] || d).find((d) => d in STORLEK);
+  const BOJT = /** @type {Record<string, string>} */ ({ stort: 'stor', stora: 'stor', litet: 'liten', lilla: 'liten', sma: 'liten', runda: 'rund', runt: 'rund', fyrkantig: 'fyrkant', fyrkantiga: 'fyrkant', prickiga: 'prickig', prickigt: 'prickig', slata: 'slat', slatt: 'slat' });
+  const ord = delar.map((d) => BOJT[d] || d);
+  const s = ord.find((d) => d in STORLEK);
   const storlek = /** @type {keyof typeof STORLEK | undefined} */ (s) ?? null;
-  return { farg, storlek };
+  return { farg, storlek, form: ord.find((d) => FORM.includes(d)) ?? null, monster: ord.find((d) => MONSTER.includes(d)) ?? null };
 }
+
+/** Har id:t något som ska synas i gråboxen (färg, storlek, form eller mönster)? @param {string} id */
+export const synligaEgenskaper = (id) => { const e = egenskaper(id); return !!(e.farg || e.storlek || e.form || e.monster); };
 
 /** Ljusheten L* (CIELAB) för en färg, för testet att färgerna går att skilja åt. @param {string} hex */
 export function ljushet(hex) {

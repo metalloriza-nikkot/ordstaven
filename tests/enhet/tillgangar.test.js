@@ -2,7 +2,7 @@
 // och figurernas storlek. Filerna skrivs av verktyg/grafik/inkorg.py.
 import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
-import { egenskaper, egetForemal, foremaletsBild } from '../../src/karna/egenskaper.js';
+import { synligaEgenskaper, egetForemal, foremaletsBild } from '../../src/karna/egenskaper.js';
 import { valjVariant } from '../../src/karna/lasmotor.js';
 
 const rot = new URL('../../', import.meta.url);
@@ -128,8 +128,7 @@ describe('kartornas grafik', () => {
         for (const tal of [1, 2, 3, 4]) {
           const [vn, v] = valjVariant(p.varianter, tal);
           for (const a of v.alternativ.filter((x) => x.objekt && objektI.has(x.objekt))) {
-            const e = egenskaper(a.bild || a.id);
-            const delar = e.farg || e.storlek ? [{ bild: a.bild ?? null, egen: egetForemal(p, a.objekt) }] : null;
+            const delar = synligaEgenskaper(a.bild || a.id) ? [{ bild: a.bild ?? null, egen: egetForemal(p, a.objekt) }] : null;
             const kart = objektI.get(a.objekt);
             // det som inte ritas som bild i världen: stigar och dörrar i marken eller rummets bild, skyltar i textlagret
             if (!kart.bild && !delar) continue;

@@ -144,9 +144,14 @@ describe('bilden stämmer med texten', () => {
     for (const [a, x] of e) for (const [b, y] of e) if (a < b) expect(Math.abs(ljushet(x) - ljushet(y)), `${a}–${b}`).toBeGreaterThanOrEqual(10);
   });
   it('egenskaperna i ett bild-id läses ut', () => {
-    expect(egenskaper('lada_rod_stor')).toEqual({ farg: 'rod', storlek: 'stor' });
-    expect(egenskaper('liten_rod')).toEqual({ farg: 'rod', storlek: 'liten' });
-    expect(egenskaper('filt')).toEqual({ farg: null, storlek: null });
+    expect(egenskaper('lada_rod_stor')).toEqual({ farg: 'rod', storlek: 'stor', form: null, monster: null });
+    expect(egenskaper('liten_rod')).toEqual({ farg: 'rod', storlek: 'liten', form: null, monster: null });
+    expect(egenskaper('filt')).toEqual({ farg: null, storlek: null, form: null, monster: null });
+    // kapitel 2 (63.4): formen och mönstret syns också i gråboxen
+    expect(egenskaper('tavla_liten_rund')).toEqual({ farg: null, storlek: 'liten', form: 'rund', monster: null });
+    expect(egenskaper('tavla_stor_fyrkant')).toMatchObject({ storlek: 'stor', form: 'fyrkant' });
+    expect(egenskaper('groda_gron_prickig')).toEqual({ farg: 'gron', storlek: null, form: null, monster: 'prickig' });
+    expect(egenskaper('groda_gul_slat')).toMatchObject({ farg: 'gul', monster: 'slat' });
   });
   it('varje alternativ vars färg eller storlek läses i texten har den egenskapen i sitt id eller sin bild', () => {
     const ORD = { röd: ['farg', 'rod'], röda: ['farg', 'rod'], blå: ['farg', 'bla'], gul: ['farg', 'gul'], gula: ['farg', 'gul'], stor: ['storlek', 'stor'], stora: ['storlek', 'stor'], stort: ['storlek', 'stor'], litet: ['storlek', 'liten'], liten: ['storlek', 'liten'], lilla: ['storlek', 'liten'] };
