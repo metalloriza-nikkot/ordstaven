@@ -260,8 +260,12 @@ redo.then(() => { startKlar = true; window.clearTimeout(startVakt); window.remov
   rumsobjekt: () => rum.objekt.map((o) => o.id),
   /** Gå mot en punkt i rummet, som ett tryck på marken (vägen runt det som står i vägen). @param {number} x @param {number} y */
   gaMot: (x, y) => inmatning.sattGaTill(x, y),
-  /** Spela en regi i rummet (Stils mellanscener) och få hur länge den tar (ms, 0 = går inte). @param {string} bild */
-  regi: (bild) => rum.regi(bild),
+  /** Spela en regi i rummet (Stils mellanscener) och få hur länge den tar (ms, 0 = går inte). @param {string} bild @param {string} [mal] */
+  regi: (bild, mal) => rum.regi(bild, mal),
+  /** Hur djupt ungen har sjunkit i leran (69.1), 0 = inte fast */
+  ungeDjup: () => (rum.ungeFast ? Math.round(rum.ungeFast.djup) : 0),
+  /** Är ungen fast (i leran)? */
+  ungeFast: () => !!rum.ungeFast,
   /** Ungens bild just nu. */
   ungeRam: () => rum.ungeBild?.frame?.name ?? null,
     /** Var ungen står i rummet. */

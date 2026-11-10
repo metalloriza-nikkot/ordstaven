@@ -517,6 +517,9 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
           if (p.niva === 'S2' && (kvar.length < 2 || kvar.length > 3)) varningar.push(var_(`${plats}: S2 har 2–3 extra brickor, har ${kvar.length}`));
         }
         if (p.forebild && p.forebild.text !== p.svar) fel.push(var_(`${plats}: förebilden ${p.forebild.text} är inte svaret ${p.svar}`));
+        // hjälpens trappa (2.36, beslut 69.3) finns bara med tangentbordet
+        if (p.skriv !== 'tangentbord' && (p.forebild?.visas === 'andra_felet' || p.ledbild)) fel.push(var_(`${plats}: andra_felet och ledbild finns bara med skriv: tangentbord`));
+        if (p.skriv === 'tangentbord' && p.forebild && p.forebild.visas !== 'andra_felet') varningar.push(var_(`${plats}: förebilden tänds före två fel (69.3: forebild.visas andra_felet)`));
         for (const f of p.formler) for (const o of f.ord.split(' ')) if (!ordmap.has(o)) varningar.push(var_(`${plats}: formeln ${o} finns inte i ordlistorna`));
       }
       if (p.typ === 'P15_raddning') {

@@ -143,4 +143,19 @@ describe('rullningens takt (beslut 21.2)', () => {
     expect(teckenTid(0)).toBe(0);
     expect(teckenTid(40, true)).toBe(teckenTid(40)); // ett ord i taget går i samma takt
   });
+  it('väljer aldrig en röst på nätet: texten med namnen stannar på enheten (69.4)', async () => {
+    vi.useFakeTimers();
+    const s = falskSynt({ ms: 100 }); const sagt = [];
+    s.getVoices = () => [{ lang: 'sv-SE', name: 'Microsoft Teströst Online (Natural)', localService: false }];
+    s.speak = (u) => { sagt.push(u.text); u.onend?.(); };
+    installera(s);
+    const r = skapaRost({ logg: { handelse: vi.fn() } });
+    expect(r.harRost).toBe(false);
+    r.saga('Hej, Testa!');
+    await vi.advanceTimersByTimeAsync(3000);
+    expect(sagt).toEqual([]);
+    s.getVoices = () => [{ lang: 'sv-SE', name: 'Teströst Online', localService: false }, { lang: 'sv-SE', name: 'Alva', localService: true }];
+    const r2 = skapaRost({ logg: { handelse: vi.fn() } });
+    expect(r2.harRost).toBe(true);
+  });
 });

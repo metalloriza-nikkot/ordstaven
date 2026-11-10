@@ -1496,11 +1496,16 @@
             "visas": {
               "enum": [
                 "fran_start",
-                "vid_fel"
+                "vid_fel",
+                "andra_felet"
               ],
-              "description": "När förebilden syns. fran_start (förval): från början. vid_fel: först när han har lagt fel (ord som går att ljuda fram skrivs utifrån en bild, beslut 18.5). Den tonas bort vid nästa bricka (täck) och står kvar efter ett andra fel."
+              "description": "När förebilden syns. fran_start (förval): från början. vid_fel: först när han har lagt fel (ord som går att ljuda fram skrivs utifrån en bild, beslut 18.5). Den tonas bort vid nästa bricka (täck) och står kvar efter ett andra fel. andra_felet (2.36, bara med skriv: tangentbord, beslut 69.3): först efter två fel, och före det tänds ingen bokstav ur svaret (inte av nästan och inte av knuffen). Med tangentbordet täcks förebilden alltid när han skriver första bokstaven och syns igen när fälten är tomma."
             }
           }
+        },
+        "ledbild": {
+          "$ref": "#/$defs/id",
+          "description": "Hjälpens andra trappsteg (2.36, beslut 69.3, bara med skriv: tangentbord): en bild som tänds bredvid bilden efter första felet, till exempel tankebubbla_bro (en bro i ett moln). Den visar en väg att lösa problemet, aldrig ordet."
         },
         "brickor": {
           "type": "array",

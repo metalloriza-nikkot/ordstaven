@@ -61,7 +61,9 @@ export function skapaRost({ logg, tyst = () => false, tempo = () => 1, volym = (
   function valj() {
     if (!synt) return;
     const sv = synt.getVoices().filter((v) => /^sv/i.test(v.lang));
-    rost = sv.find((v) => v.localService && /alva|klara|oskar/i.test(v.name)) || sv.find((v) => v.localService) || sv[0] || null;
+    // bara enhetens egna röster (beslut 69.4): texten har namnen han har skrivit ({hjalte}, {unge}), och en röst
+    // på nätet (Edge "Online (Natural)") skulle skicka dem från enheten. Finns ingen egen svensk röst är det tyst.
+    rost = sv.find((v) => v.localService && /alva|klara|oskar/i.test(v.name)) || sv.find((v) => v.localService) || null;
   }
   if (synt) { valj(); synt.addEventListener?.('voiceschanged', valj); }
 

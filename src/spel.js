@@ -1203,7 +1203,7 @@ export function skapaSpel(d) {
         // ungen springer till ett föremål och väntar där (67.2): den nosar mot det tills nästa mål är nått
         const ungen = st.unge_till ? rum.ungePekar(st.unge_till) : false;
         if (ungen) logg.handelse('mellanscen', `ungen springer till ${st.unge_till}`);
-        const regiMs = st.bild ? rum.regi(st.bild) : 0;
+        const regiMs = st.bild ? rum.regi(st.bild, st.unge_till) : 0;
         if (regiMs && st.bild === 'stav_ristas') {
           // ordet som ristas står i textlagret ovanför närbilden (Stils tabell, rad 25): det senaste han fick på staven
           const ord = (tillstand.spelare.hjalte.formler || []).at(-1) ?? '';
@@ -2441,6 +2441,10 @@ export function skapaSpel(d) {
    * händer (BRO, STEGE, REP eller FLOTTE). Nästan rätt tänder första bokstaven eller förebilden. Ett ord som passar
    * men inte hjälper får sin reaktion, och ett annat riktigt ord Farfars vanliga svar. Inget av dem räknas som fel.
    * Bara det som inte är ett ord får "pff" (vid_fel), och då tänds förebilden.
+   * Hjälpen trappas (beslut 69.3): med `forebild.visas: "andra_felet"` syns först bara bilden (problemet), efter
+   * första felet `ledbild` (en bro i molnet), och förebilden först efter två fel. Före det tänds ingen bokstav ur
+   * svaret, inte heller av "nästan" eller knuffen (den får bilden att glimta). Förebilden täcks alltid när han börjar
+   * skriva och syns igen när fälten är tomma: titta, täck, skriv, kolla (08 §2). Vid rätt lyser den över hans ord.
    * @param {any} p
    */
   async function formelSkriv(p) {
@@ -2449,17 +2453,40 @@ export function skapaSpel(d) {
     if (p.instruktion) await replik(p.instruktion);
     rum.frys(true);
     let skrivet = '', fel = 0, upptagen = false, fardigt = false;
-    /** förebilden (efter "pff" eller knuffen) och första bokstaven (nästan rätt) */
-    const fb = { visad: false, forsta: false };
+    /** förebilden (efter "pff" eller knuffen), första bokstaven (nästan rätt) och ledbilden (efter första felet) */
+    const fb = { visad: false, forsta: false, ledbild: false, tackt: false };
+    const trappa = p.forebild?.visas === 'andra_felet';
+    /** får något ur svaret synas nu? Med trappan först efter två fel. */
+    const svaretFar = () => !trappa || fel >= 2;
+    /** får förebilden tändas nu? Efter två fel med trappan, efter ett med vid_fel, och annars direkt. */
+    const forebildFar = () => (trappa ? fel >= 2 : p.forebild?.visas === 'vid_fel' ? fel >= 1 : true);
+    const tandForebild = (/** @type {string} */ varfor) => {
+      if (!p.forebild || !forebildFar() || fb.visad) return !!p.forebild && fb.visad;
+      fb.visad = true; spar.forebild = true; logg.handelse('formel', `${p.id}: förebilden tänds (${varfor})`);
+      return true;
+    };
+    const tandLedbild = () => { if (p.ledbild && fel >= 1 && !fb.ledbild) { fb.ledbild = true; logg.handelse('formel', `${p.id}: ledbilden ${p.ledbild} tänds`); } };
     return new Promise((klar) => {
-      const k = knuffKlocka(p.knuff, () => { if (p.forebild) { fb.visad = true; spar.forebild = true; } rita(); ui.plattan.querySelector('.forebild .bokstav')?.classList.add('blinkar'); });
+      // knuffen: tänder förebilden när svaret får synas, annars glimtar bilden (och ledbilden)
+      const k = knuffKlocka(p.knuff, () => {
+        if (!fb.visad && (!p.forebild || !forebildFar())) {
+          for (const b of ui.plattan.querySelectorAll('.formel-bild')) { b.classList.remove('puls'); void (/** @type {HTMLElement} */ (b)).offsetWidth; b.classList.add('puls'); }
+          return;
+        }
+        tandForebild('knuff'); rita(); ui.plattan.querySelector('.forebild .bokstav')?.classList.add('blinkar');
+      });
       const rita = () => {
         const n = antalFalt(p, skrivet), tecken = [...skrivet];
         const forsta = fb.forsta ? [...versaler(p.svar)][0] : '';
+        // täck: förebilden tonas bort när första bokstaven skrivs, och syns igen när fälten är tomma
+        const tackt = fb.visad && tecken.length > 0;
+        if (tackt && !fb.tackt) logg.handelse('formel', `${p.id}: förebilden tonas bort (täck)`);
+        fb.tackt = tackt;
         const platser = `<div class="platser skriv">${Array.from({ length: n }, (_, i) => `<span class="plats ${i < tecken.length ? 'fylld' : ''} ${!tecken.length && i === 0 && forsta ? 'tand' : ''}">${ui.esc(tecken[i] ?? (i === 0 && forsta ? forsta : ''))}</span>`).join('')}</div>`;
-        const forebild = p.forebild && fb.visad ? `<div class="forebild" aria-label="Förebild">${[...p.forebild.text].map((c) => `<span class="bokstav">${ui.esc(c)}</span>`).join('')}</div>` : '';
+        const forebild = p.forebild && fb.visad ? `<div class="forebild ${tackt ? 'tonad' : ''}" aria-label="Förebild">${[...p.forebild.text].map((c) => `<span class="bokstav">${ui.esc(c)}</span>`).join('')}</div>` : '';
         const bild = p.bild ? `<div class="formel-bild" aria-hidden="true">${bilder.html(p.bild)}</div>` : '';
-        const overst = bild ? `<div class="formel-overst">${bild}${forebild}</div>` : forebild;
+        const ledbild = p.ledbild && fb.ledbild ? `<div class="formel-bild ledbild" aria-hidden="true">${bilder.html(p.ledbild)}</div>` : '';
+        const overst = bild || ledbild ? `<div class="formel-overst">${bild}${ledbild}${forebild}</div>` : forebild;
         const knappar = `<div class="dop-knappar">${d.pek() ? '' : '<button type="button" class="knapp visa-tb" aria-label="Visa tangentbordet">⌨</button>'}<button type="button" class="knapp sudda" aria-label="Sudda">⌫</button><button type="button" class="knapp klar ${tecken.length ? '' : 'av'}" aria-label="Klar">✓</button></div>`;
         ui.visaPlatta(`<div class="formel-ruta formel-skriv">${overst}${platser}${knappar}</div>`, 'pussel P11_formel');
         tangentbord.klarAktiv(tecken.length > 0);
@@ -2482,8 +2509,10 @@ export function skapaSpel(d) {
         logg.handelse('formel', `${p.id}: ${b.ord} (${b.sort})`);
         if (b.sort === 'formel') { await lyckad(b); return; }
         if (b.sort === 'nastan') {
-          fel++;
-          if (b.nastan.tand === 'forebild' && p.forebild) { fb.visad = true; spar.forebild = true; } else fb.forsta = true;
+          fel++; tandLedbild();
+          // nästan rätt tänder förebilden eller första bokstaven, men med trappan först efter två fel
+          if (svaretFar()) { if (b.nastan.tand === 'forebild' && p.forebild) tandForebild('nästan'); else fb.forsta = true; }
+          if (trappa) tandForebild('andra felet');
           ljud.spela('hmm');
           if (b.nastan.effekt) ui.visaRegi(String(b.nastan.effekt).replace(/_/g, ' '), 0);
           await reaktion({ replik: b.nastan.replik || { talare: 'berattare', text: 'Nästan!', upplast: true } });
@@ -2493,8 +2522,7 @@ export function skapaSpel(d) {
         } else if (b.sort === 'ord') {
           if (p.vanligt_svar) await reaktion({ replik: p.vanligt_svar });
         } else {
-          fel++;
-          if (p.forebild?.visas === 'vid_fel' || p.forebild) { fb.visad = true; spar.forebild = true; }
+          fel++; tandLedbild(); tandForebild('fel');
           felljud(p.vid_fel); ui.plattan.querySelector('.platser')?.classList.add('gra'); await vanta(tid(400));
           await reaktion(p.vid_fel);
         }
@@ -2506,10 +2534,13 @@ export function skapaSpel(d) {
         // en ny formel ristas in på staven (67.6): inte BRO, som räcker en gång (ristas: false)
         if (ristasNu(p, tillstand.spelare.hjalte.formler, b.ord)) { ljud.spela('formel_ristas'); logg.handelse('formel', `${p.id}: ${b.ord} ristas in på staven`); }
         else ljud.spela('ratt');
-        ui.visaPlatta(`<div class="formel-luft-ruta"><div class="formel-i-luften">${ui.esc(b.ord)}</div></div>`, 'formel-luft');
+        // kolla: förebilden lyser över hans ord när det är samma ord (titta, täck, skriv, kolla)
+        const kolla = fb.visad && p.forebild && versaler(p.forebild.text) === versaler(b.ord) ? `<div class="forebild kolla">${[...p.forebild.text].map((c) => `<span class="bokstav">${ui.esc(c)}</span>`).join('')}</div>` : '';
+        ui.visaPlatta(`<div class="formel-luft-ruta">${kolla}<div class="formel-i-luften">${ui.esc(b.ord)}</div></div>`, 'formel-luft');
         await vanta(tid(1000)); ui.doljPlatta();
         ordkraft(b.ord);
         await reaktion(p.vid_ratt);
+        logg.handelse('formel', `${p.id}: klar ${spar.forebild ? 'med' : 'utan'} förebild`);
         klar({ niva: p.niva, forstaForsoket: fel === 0, forsok: fel + 1, hjalp: spar.hjalp, ord: b.ord, ristas: b.formel.ristas !== false });
       };
       const sluta = lyssnaHandling((h) => {

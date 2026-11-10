@@ -826,12 +826,18 @@ export class Rum extends Phaser.Scene {
    * ingenting, och då visar spelet beskrivningen som i gråboxen.
    * - `hjalte_sang_morgon`: morgonen i sängen, ungen slickar honom på näsan (s19);
    * - `luftskepp_<läge>`: luftskeppet med baronen och Herr Skata (s22), se `luftskepp`;
-   * - en sidovy (`assets/sidovyer/<bild>_bakgrund.png`), se `visaSidovy`.
-   * @param {string} bild @returns {number} hur länge mellanscenen visas (ms), 0 = ingen bild
+   * - en sidovy (`assets/sidovyer/<bild>_bakgrund.png`), se `visaSidovy`;
+   * - kapitel 2:s gråbox (69.1): `unge_sjunker` (i mellanscenens `unge_till`), `unge_dras_upp` och
+   *   `luftskepp_river_brevet`.
+   * @param {string} bild @param {string} [mal] mellanscenens unge_till, om den har ett
+   * @returns {number} hur länge mellanscenen visas (ms), 0 = ingen bild
    */
-  regi(bild) {
+  regi(bild, mal) {
     if (!this.harRum || !bild) return 0;
     if (bild === 'hjalte_sang_morgon') return this.morgonISangen() ? 2400 : 0;
+    if (bild === 'unge_sjunker') return this.ungeSjunker(mal);
+    if (bild === 'unge_dras_upp') return this.ungeDrasUpp();
+    if (bild === 'luftskepp_river_brevet') return this.luftskeppRiverBrevet();
     if (bild.startsWith('luftskepp_')) {
       const lage = bild.slice('luftskepp_'.length);
       return this.luftskepp(lage) ? ({ glider: 2800, skata_putsar: 2200, trasslar: 2000 })[lage] ?? 1400 : 0;
@@ -984,6 +990,136 @@ export class Rum extends Phaser.Scene {
    * Ett föremål byter bild i tur och ordning, steg ms var, och står sedan som förut (dess tomgång väntar under tiden).
    * @param {string} id @param {string[]} ramar @param {number} steg @returns {number} hur länge (ms)
    */
+  // ------------------------------------------------------------------ kapitel 2:s mellanscener i gråboxen (69.1)
+
+  /**
+   * Ungen skuttar ut i ett föremål (leran) och sjunker ned till magen: ett hopp en bit in i föremålet från kanten
+   * närmast ungen, sedan sjunker bilden 12 px (den skärs av vid marken, och leran ringar sig runt den), och ungen
+   * tittar på hjälten. Den sitter fast tills `unge_dras_upp` eller rummet byts. @param {string | undefined} id
+   * @returns {number}
+   */
+  ungeSjunker(id) {
+    const o = id ? this.ruta(id) : null;
+    if (!o || !this.unge.visible || !this.ungeBild) return 0;
+    const fran = { ...this.ungePos };
+    // närmaste punkt i föremålet, och sedan 8 px in mot mitten
+    const nx = Math.max(o.x, Math.min(o.x + o.b, fran.x)), ny = Math.max(o.y, Math.min(o.y + o.h, fran.y));
+    const cx = o.x + o.b / 2, cy = o.y + o.h / 2, dl = Math.hypot(cx - nx, cy - ny) || 1, in8 = Math.min(8, dl);
+    const mal = { x: nx + ((cx - nx) / dl) * in8, y: ny + ((cy - ny) / dl) * in8 };
+    this.ungeMal = { x: mal.x, y: mal.y, mot: Math.atan2(this.pos.y - mal.y, this.pos.x - mal.x) };
+    const fast = { djup: 0, start: this.time.now };
+    this.ungeFast = fast;
+    const t = { p: 0 };
+    this.tweens.add({
+      targets: t, p: 1, duration: 550, ease: 'Sine.easeInOut',
+      onUpdate: () => { this.ungePos = { x: fran.x + (mal.x - fran.x) * t.p, y: fran.y + (mal.y - fran.y) * t.p }; this.ungeLyft = Math.round(Math.sin(t.p * Math.PI) * 14); this.placera(); this.smutsig = true; },
+      onComplete: () => {
+        this.ungeLyft = 0;
+        this.tweens.add({ targets: fast, djup: 12, duration: 900, ease: 'Sine.easeOut', onUpdate: () => { this.placera(); this.smutsig = true; } });
+      },
+    });
+    this.regiLogg.push(`ungen sjunker i ${o.id}`);
+    return 1900;
+  }
+
+  /** Ungens sjunkna läge i bilden: skuren vid marken, och leran som en ring runt den. Anropas av placera(). */
+  ritaUngeFast() {
+    const u = this.ungeBild; if (!u) return;
+    const f = this.ungeFast, d = f ? Math.round(f.djup) : 0;
+    this.ungeSkugga?.setVisible(!f);
+    if (d > 0) u.setCrop(0, 0, 24, 24 - d); else if (u.isCropped) u.setCrop();
+    if (!f) { this.ungeLera?.setVisible(false); return; }
+    if (!this.ungeLera || !this.ungeLera.active) { this.ungeLera = this.add.graphics(); this.unge.add(this.ungeLera); }
+    const g = this.ungeLera; g.clear().setVisible(true);
+    g.fillStyle(0x5b4630, 1).fillEllipse(12, 24 - d, 22, 6);
+    g.fillStyle(0x7a5f40, 1).fillEllipse(12, 23 - d, 16, 3);
+  }
+
+  /**
+   * Hjälten drar upp ungen: den flyger upp ur leran i en båge och landar bredvid honom, och leran stänker, en klick
+   * på hjälmen. Sedan följer den honom igen. @returns {number}
+   */
+  ungeDrasUpp() {
+    const f = this.ungeFast;
+    if (!f || !this.ungeBild) return 0;
+    this.tweens.killTweensOf(f);
+    const fran = { ...this.ungePos }, till = this.hinder.narmasteFria({ x: this.pos.x + (fran.x < this.pos.x ? -16 : 16), y: this.pos.y });
+    // leran stänker: små klickar ut åt sidorna, och en på hjälmen
+    for (let i = 0; i < 7; i++) {
+      const v = (i / 6) * Math.PI + Math.PI, r = 14 + (i % 3) * 5;
+      const klick = this.add.rectangle(Math.round(fran.x), Math.round(fran.y - 2), 2, 2, 0x5b4630).setOrigin(0.5, 0.5);
+      this.lagerLjust.add(klick);
+      this.tweens.add({ targets: klick, x: fran.x + Math.cos(v) * r, y: fran.y - 6 + Math.sin(v) * r * 0.6 + 10, duration: 500, ease: 'Quad.easeOut', onUpdate: () => { this.smutsig = true; }, onComplete: () => { this.tweens.add({ targets: klick, alpha: 0, duration: 400, delay: 300, onComplete: () => klick.destroy() }); } });
+    }
+    const hjalm = this.add.rectangle(Math.round(fran.x), Math.round(fran.y - 4), 3, 2, 0x5b4630).setOrigin(0.5, 0.5);
+    this.lagerLjust.add(hjalm);
+    this.tweens.add({ targets: hjalm, x: this.pos.x + 1, y: this.pos.y - FIGUR.hojd + 3, duration: 450, ease: 'Quad.easeOut', onUpdate: () => { this.smutsig = true; }, onComplete: () => { this.tweens.add({ targets: hjalm, alpha: 0, duration: 500, delay: 900, onComplete: () => hjalm.destroy() }); } });
+    // upp ur leran och i en båge till hjälten
+    this.tweens.add({ targets: f, djup: 0, duration: 180, onUpdate: () => { this.placera(); this.smutsig = true; } });
+    const t = { p: 0 };
+    this.tweens.add({
+      targets: t, p: 1, duration: 650, delay: 120, ease: 'Sine.easeInOut',
+      onUpdate: () => { this.ungePos = { x: fran.x + (till.x - fran.x) * t.p, y: fran.y + (till.y - fran.y) * t.p }; this.ungeLyft = Math.round(Math.sin(t.p * Math.PI) * 20); this.placera(); this.smutsig = true; },
+      onComplete: () => {
+        this.ungeLyft = 0; this.ungeFast = null; this.ungeMal = null;
+        this.ungeVand = { x: this.pos.x - this.ungePos.x, y: 0.01 };
+        this.placera(); this.ungeReagerar(true); this.smutsig = true;
+      },
+    });
+    this.regiLogg.push('ungen dras upp');
+    return 1500;
+  }
+
+  /**
+   * Luftskeppet river brevet (k2s02): det glider in högt uppe med brevet under gondolen, baronen och Herr Skata
+   * drar i var sin ände (brevet ryckar), och det går sönder. En halva far mot bryggan och en mot vassen, Herr Skatas
+   * fjäder dalar ned där den ska ligga (`fjader`), och luftskeppet sjunker mot bryggan och ut ur bild.
+   * @returns {number}
+   */
+  luftskeppRiverBrevet() {
+    if (!this.luftskepp('glider')) return 0;
+    const l = /** @type {any} */ (this.luft), img = l.img;
+    const under = () => ({ x: Math.round(img.x + img.width / 2), y: Math.round(img.y + img.height + 1) });
+    const papper = 0xf4ecd8, kant = 0x8a7a5a;
+    const brev = this.add.rectangle(under().x, under().y, 10, 7, papper).setStrokeStyle(1, kant).setOrigin(0.5, 0);
+    this.lagerLuft.add(brev);
+    const folj = this.time.addEvent({ delay: 40, loop: true, callback: () => { if (!brev.active) return; const u = under(); brev.setPosition(u.x + (l.rycker ? (Math.floor(this.time.now / 90) % 2 ? 1 : -1) : 0), u.y); this.smutsig = true; } });
+    l.tider.push(folj);
+    const mitt = (/** @type {string} */ id, /** @type {{ x: number, y: number }} */ annars) => { const o = this.ruta(id); return o ? { x: o.x + o.b / 2, y: o.y + o.h / 2 } : annars; };
+    this.time.delayedCall(2000, () => { l.rycker = true; });
+    this.time.delayedCall(2700, () => {
+      if (!brev.active) return;
+      l.rycker = false; folj.remove();
+      const p = { x: brev.x, y: brev.y };
+      brev.destroy();
+      // två halvor, åt var sitt håll, och de fladdrar
+      const flyg = (/** @type {number} */ dx, /** @type {{ x: number, y: number }} */ mot, /** @type {number} */ ms) => {
+        const h = this.add.rectangle(p.x + dx, p.y, 5, 7, papper).setStrokeStyle(1, kant).setOrigin(0.5, 0);
+        this.lagerLuft.add(h);
+        const d = Math.hypot(mot.x - p.x, mot.y - p.y) || 1, langd = Math.min(d, 220);
+        const till = { x: p.x + ((mot.x - p.x) / d) * langd, y: p.y + ((mot.y - p.y) / d) * langd };
+        const t = { p: 0 };
+        this.tweens.add({ targets: t, p: 1, duration: ms, ease: 'Sine.easeIn', onUpdate: () => { if (!h.active) return; h.setPosition(Math.round(p.x + dx + (till.x - p.x) * t.p + Math.sin(t.p * 14) * 3), Math.round(p.y + (till.y - p.y) * t.p)); h.setAngle(Math.sin(t.p * 18) * 25); this.smutsig = true; }, onComplete: () => h.destroy() });
+      };
+      flyg(-3, mitt('stig_vassen', { x: p.x, y: p.y - 200 }), 1700);
+      flyg(3, mitt('brygga_fran_torget', { x: p.x + 220, y: p.y }), 1500);
+      // Herr Skatas fjäder dalar ned där den ska ligga
+      const fj = mitt('fjader', { x: p.x, y: p.y + 80 });
+      const fjader = this.add.rectangle(p.x, p.y, 2, 6, 0x1e1e24).setOrigin(0.5, 0.5);
+      this.lagerLuft.add(fjader);
+      const t2 = { p: 0 };
+      this.tweens.add({ targets: t2, p: 1, duration: 1800, onUpdate: () => { if (!fjader.active) return; fjader.setPosition(Math.round(p.x + (fj.x - p.x) * t2.p + Math.sin(t2.p * 9) * 6), Math.round(p.y + (fj.y - p.y) * t2.p)); fjader.setAngle(Math.sin(t2.p * 9) * 40); this.smutsig = true; }, onComplete: () => { this.tweens.add({ targets: fjader, alpha: 0, duration: 300, onComplete: () => fjader.destroy() }); } });
+      // luftskeppet sjunker mot bryggan och ut ur bild
+      const bryggan = mitt('brygga_fran_torget', { x: img.x + 300, y: img.y + 60 });
+      const fran = { x: img.x + img.width / 2, y: img.y + img.height / 2 }, dd = Math.hypot(bryggan.x - fran.x, bryggan.y - fran.y) || 1;
+      if (this.textures.get('baronen').has('luftskepp_flyger_fel_01')) this.luftskepp('flyger_fel');
+      l.glider = true;
+      this.tweens.add({ targets: img, x: img.x + ((bryggan.x - fran.x) / dd) * 380, y: img.y + Math.max(20, ((bryggan.y - fran.y) / dd) * 380), duration: 1900, ease: 'Sine.easeIn', onUpdate: () => { img.x = Math.round(img.x); img.y = Math.round(img.y); this.smutsig = true; } });
+    });
+    this.regiLogg.push('luftskeppet river brevet');
+    return 4700;
+  }
+
   regiRamar(id, ramar, steg) {
     const r = /** @type {any} */ (this.ritade.get(id));
     if (!r?.setTexture) return 0;
@@ -1453,6 +1589,7 @@ export class Rum extends Phaser.Scene {
     if (us && ust >= 0 && us.fas === 'hopp') namn = `unge1_glad_ner_0${1 + Math.min(2, Math.floor(ust / 150))}`;
     else if (us && us.fas === 'varv') namn = `unge1_tomgang_${['ner', 'hoger', 'upp', 'vanster'][Math.floor((ust - 450) / us.ms) % 4]}_01`;
     else if (us && us.fas === 'sover') namn = `unge1_sover_ner_0${1 + (Math.floor(nu / 900) % 2)}`;
+    else if (this.ungeFast) namn = `unge1_radd_ner_0${1 + (Math.floor((nu - this.ungeFast.start) / 500) % 2)}`; // fast i leran: förvånad
     else if (this.ungeKlattrar) namn = `unge1_klattra_upp_0${1 + (Math.floor((nu - this.ungeKlattrar.start) / 180) % 2)}`;
     else if (re && nu < re.slut && re.hall) namn = `unge1_${re.namn}_${re.hall}_0${1 + (Math.floor((nu - re.start) / re.ms) % re.bilder)}`; // ett läge (31): bilderna i en slinga
     else if (re && nu < re.slut) namn = `unge1_${re.namn}_${re.sida ? sida : 'ner'}_0${1 + Math.min(re.bilder - 1, Math.floor((nu - re.start) / re.ms))}`;
@@ -1475,7 +1612,7 @@ export class Rum extends Phaser.Scene {
     this.harRum = !!v.rum;
     if (v.nyttRum || !this.harRum) { this.rumsbild = (this.harRum && v.karta?.bild) || null; this.mark = (this.harRum && v.karta?.mark) || null; this.rumId = v.rum; this.markObjekt = v.karta?.objekt || []; }
     this.visaUnge = v.unge;
-    if (v.nyttRum) { for (const id of [...this.ramSlinga.keys(), ...this.ramTimrar.keys()]) this.stoppaRamar(id); this.ramFor.clear(); this.dolda.clear(); this.ungeMal = null; this.ungeTittarPa = null; this.ungeKlattrar = null; this.stegeNu = null; this.ungeSang = null; this.ungeLyft = 0; for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas?.remove(); this.sover = null; } this.vaknar = null; this.rensaRegi(); }
+    if (v.nyttRum) { for (const id of [...this.ramSlinga.keys(), ...this.ramTimrar.keys()]) this.stoppaRamar(id); this.ramFor.clear(); this.dolda.clear(); this.ungeMal = null; this.ungeTittarPa = null; this.ungeKlattrar = null; this.stegeNu = null; this.ungeSang = null; this.ungeLyft = 0; this.ungeFast = null; for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas?.remove(); this.sover = null; } this.vaknar = null; this.rensaRegi(); }
     this.tillstand = v.tillstand;
     if (v.nyttRum || !this.harRum) this.regiPunkter = (this.harRum && v.karta?.regi) || {};
     if (v.nyttRum || !this.harRum) this.inomhus = !!v.karta?.inomhus;
@@ -1783,7 +1920,7 @@ export class Rum extends Phaser.Scene {
     // pekar ungen nosar den mot föremålet: små ryck åt dess håll
     const m = this.ungeMal;
     const nos = m && Math.hypot(m.x - this.ungePos.x, m.y - this.ungePos.y) < 3 ? Math.max(0, Math.sin(this.time.now / 110)) * 3 : 0;
-    if (this.ungeBild) { this.unge.setPosition(Math.round(this.ungePos.x - 12), Math.round(this.ungePos.y - 23 - (this.ungeLyft || 0))); this.ritaUngen(); }
+    if (this.ungeBild) { this.unge.setPosition(Math.round(this.ungePos.x - 12), Math.round(this.ungePos.y - 23 - (this.ungeLyft || 0) + (this.ungeFast ? Math.round(this.ungeFast.djup) : 0))); this.ritaUngen(); this.ritaUngeFast(); }
     else this.unge.setPosition(Math.round(this.ungePos.x - 6 + (m ? Math.cos(m.mot) * nos : 0)), Math.round(this.ungePos.y - 12 + (m ? Math.sin(m.mot) * nos : 0)));
     const l = this.ljusboll; l.clear();
     if (l.visible) {
@@ -2399,6 +2536,8 @@ export class Rum extends Phaser.Scene {
     // ungen klättrar inte med honom på stegen: den väntar nedanför, och klättrar efter när han är uppe
     if (this.paStege && !m) { if (flyttad) this.placera(); return this.vantaPaHandling(inm); }
     if ((this.ungeKlattrar || this.ungeSang) && !m) return this.vantaPaHandling(inm);
+    // fast i leran (69.1): ungen står kvar där den sjönk, också när målet är nått
+    if (this.ungeFast) { if (flyttad) this.placera(); else if (this.ungeBild && this.unge.visible) this.ritaUngen(); return this.vantaPaHandling(inm); }
     const ungenGar = l > narmare;
     if (ungenGar) { const v = Math.min(l - narmare, (dtMs / 1000) * (m ? 110 : 90)); this.ungePos = { x: this.ungePos.x + (dx / l) * v, y: this.ungePos.y + (dy / l) * v }; this.ungeVand = { x: dx / l, y: dy / l }; this.ungeGang = (this.ungeGang || 0) + v; }
     else if (!m && this.ungeGar) {

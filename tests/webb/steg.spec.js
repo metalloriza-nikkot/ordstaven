@@ -2246,7 +2246,9 @@ test('gläntans träd i L3 har Stils bilder (beslut 66.2): inget av de tre träd
 test('formeln med tangentbordet (kapitel 2, del 2): "pff" bara för det som inte är ett ord, och ordet han skrev blir det som händer', async ({ page }) => {
   test.setTimeout(90000);
   const kap2 = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-02.json', import.meta.url), 'utf8'));
-  const over = kap2.pussel.find((p) => p.id === 'k2_over');
+  // förebilden vid första felet (vid_fel), oberoende av vad datan säger nu: trappan har ett eget test
+  const over = { ...kap2.pussel.find((p) => p.id === 'k2_over'), ledbild: undefined };
+  over.forebild = { ...over.forebild, visas: 'vid_fel' };
   await provscen(page, { id: 't_skriv', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'pussel', pussel_id: 'k2_over' }, R('Klart.')] }, (t) => { t.spelare.hjalte.formler = ['LJUS', 'SVÄRD']; }, { pussel: [over] });
   // svaren i rutan (de står bara en kort stund i snabbläget)
   await page.evaluate(() => {
@@ -2270,11 +2272,13 @@ test('formeln med tangentbordet (kapitel 2, del 2): "pff" bara för det som inte
   await skriv('XQZ', 'fel');
   await expect.poll(svar).toContainEqual(expect.stringContaining('PFF'));
   await expect(page.locator('#plattan .forebild')).toBeVisible();
-  // fälten växer när han skriver fler bokstäver
+  // fälten växer när han skriver fler bokstäver, och förebilden täcks medan han skriver (69.3)
   await page.keyboard.type('FLOT');
   await expect(falt).toHaveCount(4);
+  await expect(page.locator('#plattan .forebild')).toHaveClass(/tonad/);
   for (let i = 0; i < 4; i++) await page.keyboard.press('Backspace');
   await expect(falt).toHaveCount(3);
+  await expect(page.locator('#plattan .forebild')).not.toHaveClass(/tonad/);
   // ett ord som passar men inte hjälper: dess egen reaktion, aldrig "pff"
   await skriv('BÅT', 'rimligt');
   await expect.poll(svar).toContain('EN BÅT! MEN DEN ÄR FÖR LITEN.');
@@ -2291,6 +2295,54 @@ test('formeln med tangentbordet (kapitel 2, del 2): "pff" bara för det som inte
   expect(await logg()).toContain('k2_over: STEGE (formel)');
 });
 
+
+test('hjälpens trappa i formeln med tangentbordet (Teknik 32, beslut 69.3): bilden, sedan ledbilden, och förebilden först efter två fel', async ({ page }) => {
+  test.setTimeout(90000);
+  const kap2 = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-02.json', import.meta.url), 'utf8'));
+  const over = { ...kap2.pussel.find((p) => p.id === 'k2_over'), ledbild: 'tankebubbla_bro', knuff: { handling: 'bilden glimtar', efter_sek: 1 } };
+  over.forebild = { text: 'BRO', upplast: false, visas: 'andra_felet' };
+  await provscen(page, { id: 't_trappa', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'pussel', pussel_id: 'k2_over' }, R('Klart.')] }, (t) => { t.spelare.hjalte.formler = ['LJUS', 'SVÄRD']; }, { pussel: [over] });
+  const falt = page.locator('#plattan .formel-skriv .platser .plats');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('SKRIV ETT ORD MED STAVEN!', { timeout: 10000 });
+  await page.locator('#plattan .replik-ruta').click();
+  await expect(falt).toHaveCount(3, { timeout: 10000 });
+  const logg = () => page.evaluate(() => window.__ORDSTAVEN.logg());
+  const forebild = page.locator('#plattan .forebild'), ledbild = page.locator('#plattan .formel-bild.ledbild');
+  // först bara bilden av problemet: knuffen får bilden att glimta, aldrig ordet
+  await expect(forebild).toHaveCount(0); await expect(ledbild).toHaveCount(0);
+  await expect.poll(logg, { timeout: 8000 }).toContain('[knuff] bilden glimtar');
+  await expect(forebild).toHaveCount(0);
+  const skriv = async (ord, sort) => {
+    await page.keyboard.type(ord); await page.keyboard.press('Enter');
+    await expect.poll(logg, { timeout: 8000 }).toContain(`k2_over: ${ord} (${sort})`);
+    await expect(page.locator('#plattan .platser .plats.fylld')).toHaveCount(0, { timeout: 15000 }); // tomt igen
+  };
+  // första felet: bron i molnet, men ingen bokstav ur svaret
+  await skriv('XQZ', 'fel');
+  await expect(ledbild).toBeVisible();
+  await expect(ledbild.locator('.bubbla')).toHaveCount(1);
+  await expect(forebild).toHaveCount(0);
+  await expect(page.locator('#plattan .plats.tand')).toHaveCount(0);
+  // andra felet, ett nästan (BOR): nu förebilden
+  await skriv('BOR', 'nastan');
+  await expect(forebild).toBeVisible();
+  await expect(page.locator('#plattan .plats.tand')).toHaveText('B'); // nästan tänder första bokstaven, nu när svaret får synas
+  await expect(forebild).not.toHaveClass(/tonad/);
+  // täck: den tonas bort när han skriver, och syns igen när fälten är tomma
+  await page.keyboard.type('B');
+  await expect(forebild).toHaveClass(/tonad/);
+  await page.keyboard.press('Backspace');
+  await expect(forebild).not.toHaveClass(/tonad/);
+  // kolla: förebilden lyser över hans ord
+  await page.keyboard.type('BRO'); await page.keyboard.press('Enter');
+  await expect(page.locator('#plattan .formel-luft-ruta .forebild.kolla')).toHaveCount(1, { timeout: 5000 });
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('KLART.', { timeout: 15000 });
+  const l = await logg();
+  expect(l).toContain('k2_over: ledbilden tankebubbla_bro tänds');
+  expect(l).toContain('k2_over: förebilden tänds (andra felet)');
+  expect(l).toContain('k2_over: förebilden tonas bort (täck)');
+  expect(l).toContain('k2_over: klar med förebild');
+});
 test('kapitel 2 går att gå in i (del 2): skylten, vattnet, BRO över vattnet och in i byn, med piltangenterna', async ({ page }) => {
   test.setTimeout(150000);
   await page.goto('./?snabb&ny&kapitel=kap-02');

@@ -910,3 +910,9 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **En reaktion med `bild`** (`BILD_PA_KORTET` i `karna/mellanscen.js`): ekorren ritas ur atlasen till en bild (`Rum.ramUrl`) och står ovanpå sidan vid kortets hörn, så att den syns fast kortet sjunker och plattan ritas om.
 - **Testkrokarna** `regi(bild)` och `ungeRam()`.
 
+
+## 85. Hjälpens trappa, rösten på enheten och kapitel 2:s mellanscener (0.53.0, Teknik 32)
+- **Förebilden i P11 med tangentbordet** (`formelSkriv` i `spel.js`, beslut 69.3): `forebildFar()` säger när förebilden får tändas (efter två fel med `visas: andra_felet`, efter ett med `vid_fel`, annars direkt). Med trappan tänds inget ur svaret före det, inte heller första bokstaven vid "nästan". Knuffen får bilden att glimta tills förebilden får synas. `ledbild` tänds efter första felet. Förebilden täcks (`tonad`) när fälten har bokstäver och syns igen när de är tomma, och vid rätt lyser den över hans ord (`kolla`).
+- **Rösten är alltid enhetens egen** (`grans/rost.js`, 69.4): bara röster med `localService`. En röst på nätet skulle skicka texten, med namnen han har skrivit, från enheten. Finns ingen egen svensk röst är det tyst, som när rösten är av.
+- **`Rum.regi(bild, mal)`** får mellanscenens `unge_till` som `mal`. `unge_sjunker` hoppar ungen in i föremålet och sänker den 12 px (`ungeFast.djup`; bilden skärs av med `setCrop`, och `ritaUngeFast` ritar leran runt den). Medan ungen är fast står den kvar i `update`, också när målet är nått. `unge_dras_upp` lyfter den i en båge till hjälten med lerklickar. `luftskepp_river_brevet` använder luftskeppet från s22 (`luftskepp('glider')`, `flyger_fel`) med brevet, halvorna och fjädern som gråboxens rutor.
+- **Testkrokarna** `regi(bild, mal)`, `ungeDjup()` och `ungeFast()`.

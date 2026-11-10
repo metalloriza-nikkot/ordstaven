@@ -912,3 +912,5 @@ html, body {
 #styrhjalp.pilar.ritad .vanster .nere { animation-delay: .3s; } #styrhjalp.pilar.ritad .ner .nere { animation-delay: .6s; } #styrhjalp.pilar.ritad .hoger .nere { animation-delay: .9s; }
 @keyframes tangentbild { 0% { opacity: 0; } 50% { opacity: 1; } }
 .snabb #styrhjalp .tangent-bild .nere { animation: none; }
+/* ledbilden i P11 med tangentbordet (69.3): efter första felet, bredvid bilden av problemet */
+.formel-bild.ledbild { background: transparent; box-shadow: none; animation: luft .4s ease; }
