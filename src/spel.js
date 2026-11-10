@@ -2511,7 +2511,8 @@ export function skapaSpel(d) {
         if (b.sort === 'nastan') {
           fel++; tandLedbild();
           // nästan rätt tänder förebilden eller första bokstaven, men med trappan först efter två fel
-          if (svaretFar()) { if (b.nastan.tand === 'forebild' && p.forebild) tandForebild('nästan'); else fb.forsta = true; }
+          // utan tand tänds ingenting (69.3: Innehåll har tagit bort tand ur kapitel 2)
+          if (svaretFar()) { if (b.nastan.tand === 'forebild' && p.forebild) tandForebild('nästan'); else if (b.nastan.tand === 'forsta') fb.forsta = true; }
           if (trappa) tandForebild('andra felet');
           ljud.spela('hmm');
           if (b.nastan.effekt) ui.visaRegi(String(b.nastan.effekt).replace(/_/g, ' '), 0);

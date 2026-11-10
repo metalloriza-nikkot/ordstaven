@@ -2326,7 +2326,7 @@ test('hjälpens trappa i formeln med tangentbordet (Teknik 32, beslut 69.3): bil
   // andra felet, ett nästan (BOR): nu förebilden
   await skriv('BOR', 'nastan');
   await expect(forebild).toBeVisible();
-  await expect(page.locator('#plattan .plats.tand')).toHaveText('B'); // nästan tänder första bokstaven, nu när svaret får synas
+  await expect(page.locator('#plattan .plats.tand')).toHaveCount(0); // nästan utan tand tänder ingen bokstav (69.3)
   await expect(forebild).not.toHaveClass(/tonad/);
   // täck: den tonas bort när han skriver, och syns igen när fälten är tomma
   await page.keyboard.type('B');
@@ -2372,6 +2372,8 @@ test('kapitel 2 går att gå in i (del 2): skylten, vattnet, BRO över vattnet o
     if (scen !== 'k2s01_kanten') break;
     const nyckel = `${st?.typ}:${st?.mal || st?.foremal || st?.pussel_id || ''}`;
     if (st?.typ === 'las_skylt' && !gjort.has(nyckel)) { gjort.add(nyckel); await gaTill(107, 90); continue; }
+    // ungen sitter fast i leran (69.1): han går dit, mot ungen, tills han når den
+    if (st?.typ === 'ga_till' && st.mal === 'unge') { const u = await page.evaluate(() => window.__ORDSTAVEN.ungePos()); await gaTill(u.x, u.y); continue; }
     if (st?.typ === 'ga_till' && st.mal === 'vattnet' && !gjort.has(nyckel)) { gjort.add(nyckel); await gaTill(300, 96); await gaTill(452, 96); await page.keyboard.press('Space'); continue; }
     if (st?.typ === 'ga_till' && st.mal === 'stig_byn') { await gaTill(470, 96); await gaTill(636, 96); continue; }
     if (await page.locator('#plattan .formel-skriv').isVisible()) { await page.keyboard.type('BRO'); await page.keyboard.press('Enter'); await page.waitForTimeout(800); continue; }
@@ -2393,7 +2395,7 @@ test('navet i kapitel 2 (del 3): dammen lockar, bryggan först, halvan bärs til
   await page.evaluate(() => {
     const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
     // kapitlen före spolas fram när sidan laddas (namnen finns, så inget dop frågas efter)
-    Object.assign(av, { kapitelId: 'kap-02', scen: 2, scenId: 'k2s03_torget', steg: 5, pass: 2, startad: true, rumstillstand: { byn: 'fri' }, skrivet: { k2_over: 'BRO' } });
+    Object.assign(av, { kapitelId: 'kap-02', scen: 2, scenId: 'k2s03_torget', steg: 6, pass: 2, startad: true, rumstillstand: { byn: 'fri' }, skrivet: { k2_over: 'BRO' } });
     t.spelare.hjalte.namn = 'TESTA'; t.spelare.unge = { format: 1, steg: 1, formagor: [], ...t.spelare.unge, namn: 'KNOPP', folj: true };
     delete av.nav; delete av.effekt;
     localStorage.setItem('ordstaven_spar', JSON.stringify(t));
@@ -2468,7 +2470,7 @@ test('brevet i Tant Rosas hus (kapitel 2, del 4): första meningen är redan lä
     await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
     await page.evaluate((grodan) => {
       const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
-      Object.assign(av, { kapitelId: 'kap-02', scen: 7, scenId: 'k2s08_huset', steg: 4, pass: 3, startad: true, rumstillstand: { byn: 'fri' }, skrivet: { k2_over: 'BRO' } });
+      Object.assign(av, { kapitelId: 'kap-02', scen: 7, scenId: 'k2s08_huset', steg: 3, pass: 3, startad: true, rumstillstand: { byn: 'fri' }, skrivet: { k2_over: 'BRO' } });
       t.spelare.hjalte.namn = 'TESTA'; t.spelare.unge = { format: 1, steg: 1, formagor: [], ...t.spelare.unge, namn: 'KNOPP', folj: true };
       const post = (niva) => ({ niva, streak: 0, miss: 0, uppgifter: 3, forstaForsok: 3, hjalp: 0, aa: 0 });
       t.spelare.larande.lasning = { P1_las_och_valj: post(4) };
@@ -2512,7 +2514,7 @@ test('byborna (kapitel 2, del 5): ett tryck ger en vinkning och ordet i en bubbl
     await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
     await page.evaluate((tillstand) => {
       const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
-      Object.assign(av, { kapitelId: 'kap-02', scen: 2, scenId: 'k2s03_torget', steg: 5, pass: 2, startad: true, rumstillstand: { byn: tillstand }, skrivet: { k2_over: 'BRO' } });
+      Object.assign(av, { kapitelId: 'kap-02', scen: 2, scenId: 'k2s03_torget', steg: 6, pass: 2, startad: true, rumstillstand: { byn: tillstand }, skrivet: { k2_over: 'BRO' } });
       t.spelare.hjalte.namn = 'TESTA'; t.spelare.unge = { format: 1, steg: 1, formagor: [], ...t.spelare.unge, namn: 'KNOPP', folj: true };
       localStorage.setItem('ordstaven_spar', JSON.stringify(t));
     }, tillstand);

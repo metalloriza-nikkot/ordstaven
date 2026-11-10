@@ -45,6 +45,10 @@ def punkt(namn, x, y):
 
 STIG = {'golv': True}
 
+# Grodornas platser vid dammen (69.8): x, y för en ruta på 20 × 16
+PLATS = {'sten': (68, 36), 'vassen': (286, 68), 'under_bladet': (140, 80), 'nackrosbladet': (236, 62)}
+
+
 RUMMEN = {
     # Västra skärmen: in från väster, skylten och leran. Östra: vattnet, och byn på andra sidan. Övergången skär
     # igenom vattnet när den syns (efter k2_over).
@@ -111,17 +115,16 @@ RUMMEN = {
             sak('fisk_hopp', 180, 124, 14, 10, sida='alla'),
         ],
     },
-    # 2 × 1 skärmar. Västra: vassen och bubbelblommorna längs stigen. Östra: det döda trädet med bubblan högt uppe,
-    # och stranden där en bubbla landar. Ungens bubbla svävar över vattnet utanför stranden.
+    # 2 × 1 skärmar. Västra: vassen och bubbelblommorna längs stigen. Östra: stranden, och ute i vattnet, utom räckhåll,
+    # brevets halva som flyter (69.5). Ungens bubbla svävar över vattnet utanför stranden.
     'vassen': {
         'storlek': (40, 12),
         'objekt': [
             utg('stig_byn_vassen', 40, 152, 28, 40, **STIG, riktning='ned', till='byn'),
             punkt('start', 54, 146),
             sak('bubbelblommor', 100, 56, 40, 20, sida='alla'),
-            sak('dott_trad', 440, 52, 28, 40, sida='alla'),
-            sak('bubbla_brev', 472, 30, 12, 12, sida='alla'),
             sak('strand_vassen', 552, 72, 48, 48, golv=True),
+            sak('brev_halva_vatten', 614, 52, 10, 8, sida='alla'),
             vagg(600, 0, 40, 192, vatten=True),
             sak('bubbla_unge', 608, 88, 14, 14, sida='alla'),
         ],
@@ -143,8 +146,9 @@ RUMMEN = {
             sak('kartbit_3', 144, 64, 14, 10, sida='alla'),
         ],
     },
-    # Sidogren, en skärm: dammen med fyra grodor på var sitt näckrosblad vid den södra kanten. L3 och L4 har var sina
-    # grodor på samma blad (bara varianten han får syns).
+    # Sidogren, en skärm: dammen med fyra grodor utspridda (69.8): på en sten i väster, i vassen i öster, under ett blad
+    # vid södra kanten och på ett näckrosblad. L3 och L4 har var sina grodor på samma platser (bara varianten han får
+    # syns), efter Innehålls anteckning i rummet.
     'dammen': {
         'storlek': (20, 12),
         'objekt': [
@@ -152,9 +156,9 @@ RUMMEN = {
             punkt('start', 160, 146),
             vagg(96, 16, 208, 64, vatten=True),
             figur('bo', 48, 80, sida='alla', talare='bo'),
-            *[sak(g, x, 76, 20, 16, sida='alla') for g, x in (
-                ('groda_liten_gul', 112), ('groda_stor_gul', 160), ('groda_liten_gron', 208), ('groda_stor_gron', 256),
-                ('groda_gron_slat', 112), ('groda_gron_prickig', 160), ('groda_gul_slat', 208), ('groda_gul_prickig', 256))],
+            *[sak(g, *PLATS[p], 20, 16, sida='alla') for g, p in (
+                ('groda_liten_gron', 'sten'), ('groda_liten_gul', 'vassen'), ('groda_stor_gron', 'under_bladet'), ('groda_stor_gul', 'nackrosbladet'),
+                ('groda_gron_slat', 'sten'), ('groda_gul_slat', 'vassen'), ('groda_gron_prickig', 'under_bladet'), ('groda_gul_prickig', 'nackrosbladet'))],
         ],
     },
 }

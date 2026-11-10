@@ -11,7 +11,7 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 9,
+ "nextobjectid": 8,
  "properties": [
   {
    "name": "rum",
@@ -91,42 +91,6 @@
     },
     {
      "id": 4,
-     "name": "dott_trad",
-     "type": "sak",
-     "x": 440,
-     "y": 52,
-     "width": 28,
-     "height": 40,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "sida",
-       "type": "string",
-       "value": "alla"
-      }
-     ]
-    },
-    {
-     "id": 5,
-     "name": "bubbla_brev",
-     "type": "sak",
-     "x": 472,
-     "y": 30,
-     "width": 12,
-     "height": 12,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "sida",
-       "type": "string",
-       "value": "alla"
-      }
-     ]
-    },
-    {
-     "id": 6,
      "name": "strand_vassen",
      "type": "sak",
      "x": 552,
@@ -144,7 +108,25 @@
      ]
     },
     {
-     "id": 7,
+     "id": 5,
+     "name": "brev_halva_vatten",
+     "type": "sak",
+     "x": 614,
+     "y": 52,
+     "width": 10,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 6,
      "name": "",
      "type": "vagg",
      "x": 600,
@@ -162,7 +144,7 @@
      ]
     },
     {
-     "id": 8,
+     "id": 7,
      "name": "bubbla_unge",
      "type": "sak",
      "x": 608,

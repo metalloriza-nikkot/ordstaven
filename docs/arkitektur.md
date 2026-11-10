@@ -916,3 +916,11 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Rösten är alltid enhetens egen** (`grans/rost.js`, 69.4): bara röster med `localService`. En röst på nätet skulle skicka texten, med namnen han har skrivit, från enheten. Finns ingen egen svensk röst är det tyst, som när rösten är av.
 - **`Rum.regi(bild, mal)`** får mellanscenens `unge_till` som `mal`. `unge_sjunker` hoppar ungen in i föremålet och sänker den 12 px (`ungeFast.djup`; bilden skärs av med `setCrop`, och `ritaUngeFast` ritar leran runt den). Medan ungen är fast står den kvar i `update`, också när målet är nått. `unge_dras_upp` lyfter den i en båge till hjälten med lerklickar. `luftskepp_river_brevet` använder luftskeppet från s22 (`luftskepp('glider')`, `flyger_fel`) med brevet, halvorna och fjädern som gråboxens rutor.
 - **Testkrokarna** `regi(bild, mal)`, `ungeDjup()` och `ungeFast()`.
+
+## 86. Vassen och Innehålls pass i 69 (0.54.0, Teknik 32)
+- **Innehålls skript** (`innehall-skript-pass69.py`) är kört på repots filer. Det skrev `forebild.efter_fel`, `forebild.tacks: nar_han_skriver` och `hjalp_bild`, och Teknik har skrivit dem i schemats form: `forebild.visas: andra_felet` och `ledbild: tankebubbla_bro` (`meta.teknik_v04` i kap-02). Ingen text är ändrad. Regierna står som `bild` på sju mellanscener.
+- **`nastan` utan `tand`** tänder ingenting. Förut tändes första bokstaven.
+- **Vassens regier** (`Rum`): `bubblorFranBlommorna` (en slinga som tas bort i `rensaRegi`), `halvanFlygerTillHanden` (göms med `gomForemal`), `ungeTasAvBubblan` och `bubblanSpricker`. **`ungeSvavar`** är ungen i bubblan: `styrd` medan regin flyttar den, och `foljer` när `bara` med `bubbla_unge` bär den efter hjälten. `lagg` lämnar den över målet. Kameran följer ungen medan den svävar själv eller ligger i vattnet (`ungeFast.farg === 'vatten'`). `bubbla_unge` är dold i datan, så regin tar platsen ur kartan (`markObjekt`).
+- **Kartorna** (`verktyg/kartor/kap2.py`): i vassen är det döda trädet och `bubbla_brev` borta, och `brev_halva_vatten` flyter ute i vattnet. Vid dammen står grodorna på fyra platser (`PLATS`: sten, vassen, under bladet och näckrosbladet, 69.8).
+- **`regiRamar`** startar om en slinga som gick före regin (Farfar som läser och sedan gäspar).
+- **Testkroken** `ungeSvavar()`.

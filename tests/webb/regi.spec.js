@@ -97,3 +97,26 @@ test('kapitel 2:s mellanscener i gråboxen (Teknik 32, 69.1): ungen sjunker i le
   await page.screenshot({ path: 'test-results/regi-luftskeppet-river-brevet.png' });
   expect(await O(() => window.__ORDSTAVEN.grafik().luftskepp)).toMatch(/^luftskepp_/);
 });
+
+test('vassen i gråboxen (Teknik 32, 69.5): blommorna blåser bubblor, halvan flyger till handen, ungen tas av en bubbla och plumsar', async ({ page }) => {
+  test.setTimeout(120000);
+  await sparadI(page, 'kap-02', 'k2s05_vassen');
+  const O = (f, a) => page.evaluate(f, a);
+  expect(await O(() => window.__ORDSTAVEN.regi('bubblor_fran_blommorna'))).toBeGreaterThan(0);
+  expect(await O(() => window.__ORDSTAVEN.regi('halvan_flyger_till_handen'))).toBeGreaterThan(0);
+  await page.waitForTimeout(2300);
+  expect(await O(() => window.__ORDSTAVEN.regi('unge_tas_av_bubblan'))).toBeGreaterThan(0);
+  await expect.poll(() => O(() => window.__ORDSTAVEN.ungeSvavar()), { timeout: 8000 }).toEqual({ foljer: false, r: 13 });
+  await page.waitForTimeout(2600);
+  const [u, m] = await O(() => [window.__ORDSTAVEN.ungePos(), window.__ORDSTAVEN.ruta('bubbla_unge') ?? { x: 608, y: 88, b: 14, h: 14 }]);
+  expect(Math.abs(u.x - (m.x + m.b / 2))).toBeLessThan(4);
+  await page.screenshot({ path: 'test-results/regi-unge-i-bubblan.png' });
+  expect(await O(() => window.__ORDSTAVEN.regi('bubblan_spricker_unge_plumsar'))).toBeGreaterThan(0);
+  await page.waitForTimeout(900);
+  expect(await O(() => window.__ORDSTAVEN.ungeFast())).toBe(true); // i vattnet
+  await page.screenshot({ path: 'test-results/regi-unge-plumsar.png' });
+  await expect.poll(() => O(() => window.__ORDSTAVEN.ungeFast()), { timeout: 8000 }).toBe(false);
+  expect(await O(() => window.__ORDSTAVEN.ungeSvavar())).toBeNull();
+  const regi = (await O(() => window.__ORDSTAVEN.grafik())).regi;
+  for (const r of ['blommorna blåser bubblor', 'halvan flyger till handen', 'ungen tas av bubblan', 'bubblan spricker och ungen plumsar']) expect(regi).toContain(r);
+});

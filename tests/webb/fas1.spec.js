@@ -439,14 +439,15 @@ test('formeln: en bokstavstangent lägger motsvarande bricka (LJUS på datorn)',
 
 test('mellanscenens text är en regianvisning: liten, i vanlig skrift, aldrig på läsplattan', async ({ page }, info) => {
   test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
-  await starta(page, '?snabb&ny');
+  // prologen och kapitel 1 har inga rutor kvar (68.9), så rutan prövas i kapitel 2:s gråbox: k2s01 börjar med en
+  await starta(page, '?snabb&ny&kapitel=kap-02');
   await page.evaluate(() => {
     const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
-    // s09: Farfar skriver på lappen (en mellanscen som fortfarande visar rutan, 67.2)
-    av.scen = 10; delete av.scenId; delete av.steg; av.startad = false; t.spelare.unge.namn = 'KNOPP';
+    Object.assign(av, { kapitelId: 'kap-02', scen: 0, scenId: 'k2s01_kanten', startad: false }); delete av.steg;
+    t.spelare.hjalte.namn = 'TESTA'; t.spelare.unge = { format: 1, steg: 1, formagor: [], ...t.spelare.unge, namn: 'KNOPP', folj: true };
     localStorage.setItem('ordstaven_spar', JSON.stringify(t));
   });
-  await starta(page);
+  await starta(page, '?snabb&kapitel=kap-02');
   // fånga regirutan när den visas (i snabbläget syns den bara ett ögonblick)
   await page.evaluate(() => {
     const e = document.querySelector('#regi');
@@ -745,7 +746,8 @@ test('boken: han bär boken och den hamnar hos Farfar, som tar emot den och läs
   expect(await page.evaluate(() => window.__ORDSTAVEN.burenBild())).toBeNull(); // Farfar har boken
   // Farfar tog emot boken och läser i den (51.4)
   expect([...farfar].some((b) => /^farfar_fatolj_(ta_emot|las)_0/.test(b || ''))).toBe(true);
-  expect(await page.evaluate(() => window.__ORDSTAVEN.bildFor('farfar_i_fatoljen'))).toMatch(/^farfar_fatolj_las_0[12]$/);
+  // han läser igen efter gäspningen (Stils regi, rad 18): spelets klocka går långsammare än snabblägets berättelse
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.bildFor('farfar_i_fatoljen')), { timeout: 6000 }).toMatch(/^farfar_fatolj_las_0[12]$/);
   // han reser sig när han ska gå: fåtöljen är tom, och han syns
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.bildFor('fatolj_vanster')), { timeout: 5000 }).toBe('fatolj_vanster');
   await page.screenshot({ path: 'test-results/fatoljen-tom.png' });

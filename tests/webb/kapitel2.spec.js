@@ -53,6 +53,7 @@ test('kapitel 2 går att spela från träsket till elden (gråbox, del 5)', asyn
     if (typSt === 'ga_till' && st.mal === 'unge') await gaTillUngen();
     else if (typSt === 'ga_till') { const o = await ev((m) => window.__ORDSTAVEN.ruta(m), st.mal); if (o?.sort === 'utgang') await gaUt(st.mal); else await anvand(st.mal); }
     else if (typSt === 'las_skylt' || typSt === 'prata') await gaMot(st.foremal || st.figur);
+    else if (typSt === 'ta_emot') await anvand(st.fran); // Tant Rosa räcker fram brevet (69.9)
     else if (typSt === 'nav') {
       const klara = (await ev(() => window.__ORDSTAVEN.tillstand().aventyr['den-gomda-dalen'].nav?.klara)) || [];
       const g = [...st.grenar].reverse().find((x) => !klara.includes(x.scen)); // vassen först
@@ -67,6 +68,9 @@ test('kapitel 2 går att spela från träsket till elden (gråbox, del 5)', asyn
     await page.waitForTimeout(250);
   }
   expect(scener).toEqual(['k2s01_kanten', 'k2s02_byn', 'k2s03_torget', 'k2s05_vassen', 'k2s03_torget', 'k2s04_bryggan', 'k2s07_hela_brevet', 'k2s08_huset', 'k2s09_kartbiten', 'k2s10_elden']);
+  // kapitel 2:s mellanscener rör sig i gråboxen (Teknik 32, 69.1 och 69.5)
+  const regi = (await ev(() => window.__ORDSTAVEN.grafik())).regi;
+  for (const r of ['ungen sjunker i leran', 'ungen dras upp', 'luftskeppet river brevet', 'blommorna blåser bubblor', 'halvan flyger till handen', 'ungen tas av bubblan', 'bubblan spricker och ungen plumsar']) expect(regi, r).toContain(r);
   const t = await ev(() => window.__ORDSTAVEN.tillstand());
   expect(t.spelare.hjalte.grad).toBe('Ordsmed');
   expect(t.spelare.hjalte.formler).toEqual(expect.arrayContaining(['FLYG']));

@@ -274,17 +274,26 @@ describe('mellanscenernas text för den vuxne (beslut 65)', () => {
     expect(kontrollera(d).fel.join('\n')).toMatch(/s22_tradgarden.*ungen springer till brevlada, men det finns inte i rummet tradgarden/);
   });
   it('kontrollen räknar dem i varje kapitel och i aventyr.json, men säger inget fel förrän kapitlet är klart', () => {
-    const r = kontrollera(riktigt());
+    // prologen och kapitel 1 har inga rutor kvar (Innehålls pass i 68.9)
+    const r0 = kontrollera(riktigt());
+    const antal0 = Object.fromEntries(r0.beskrivningar.map((b) => [b.kapitel, b.platser.length]));
+    expect([antal0['kap-00'] ?? 0, antal0['kap-01'] ?? 0]).toEqual([0, 0]);
+    // utan regin visar mellanscenen sin text igen, och kontrollen räknar den
+    const d = riktigt();
+    delete scen(d.kapitel[0], 's09_lappen').steg[2].bild;
+    delete d.kapitel[1].rum.find((x) => x.id === 'glantan').frivilligt.find((f) => f.foremal === 'ugglor').steg[1].bild;
+    const r = kontrollera(d);
     expect(r.fel).toEqual([]);
     const antal = Object.fromEntries(r.beskrivningar.map((b) => [b.kapitel, b.platser.length]));
-    expect(antal['kap-00']).toBeGreaterThan(0);
-    expect(antal['kap-01']).toBeGreaterThan(0);
+    expect(antal['kap-00']).toBe(1);
+    expect(antal['kap-01']).toBe(1);
     expect(r.beskrivningar.find((b) => b.kapitel === 'kap-01').platser.map((p) => p.plats)).toContain('rum glantan frivilligt ugglor steg 1');
   });
   it('ett klart kapitel som visar en beskrivning är fel, och syns_redan eller en bild gör det rätt', () => {
     const d = riktigt();
     const k = d.kapitel[1];
     k.meta.klart = true;
+    delete scen(k, 'k1s06_present').steg[9].bild; // utan regin visar den texten igen
     const fel = kontrollera(d).fel.join('\n');
     expect(fel).toMatch(/kap-01 k1s06_present steg 9: kapitlet är klart, men mellanscenen visar texten för den vuxne \("Ungen gäspar\."\)/);
     expect(fel).not.toMatch(/^kap-00/m);
@@ -303,7 +312,8 @@ describe('mellanscenernas text för den vuxne (beslut 65)', () => {
   it('aventyr.json: SLUTA FÖR IDAG och slutrutan prövas när äventyret är klart', () => {
     const d = riktigt();
     d.aventyr.meta = { ...(d.aventyr.meta || {}), klart: true };
-    // SLUTA FÖR IDAG har syns_redan (Innehåll, 67.9), och slutrutans mellanscen är kvar
+    expect(kontrollera(d).fel).toEqual([]); // slutrutan har regin unge_lyssnar (68.9)
+    delete d.aventyr.kapitel_last.steg[0].bild;
     expect(kontrollera(d).fel.join('\n')).toMatch(/aventyr\.json kapitel_last steg 0: äventyret är klart/);
     for (const st of [...d.aventyr.sluta_for_idag.fore_ungen, ...d.aventyr.sluta_for_idag.med_ungen, ...d.aventyr.kapitel_last.steg]) if (st.typ === 'mellanscen') st.syns_redan = true;
     expect(kontrollera(d).fel).toEqual([]);
@@ -317,6 +327,8 @@ describe('reaktionernas och knuffarnas text för den vuxne (beslut 67.3)', () =>
     expect(visarRegi({ handling: 'skylten glimtar', syns_redan: true })).toBe(false);
     expect(visarRegi({ replik: { talare: 'berattare', text: 'Hoppsan!' } })).toBe(false);
     const k = riktigt().kapitel[0];
+    expect(reaktionerSomVisas(k)).toEqual([]); // alla har syns_redan (68.9)
+    allaReaktioner(k).forEach((h) => { delete h.syns_redan; });
     const platser = reaktionerSomVisas(k).map((r) => r.plats);
     expect(platser).toContain('pussel p0_dorrar varianter L1 alternativ mat vid_valj');
     expect(platser).toContain('s02_glimten steg 2 knuff');
@@ -325,8 +337,11 @@ describe('reaktionernas och knuffarnas text för den vuxne (beslut 67.3)', () =>
   });
   it('kontrollen räknar dem, och ett klart kapitel med en reaktion som visar texten är fel', () => {
     const d = riktigt();
+    expect(Object.fromEntries(kontrollera(d).beskrivningar.map((b) => [b.kapitel, b.reaktioner.length]))).toMatchObject({ 'kap-00': 0, 'kap-01': 0 });
+    // utan syns_redan visar de texten igen, utom ekorren som står på kortet (bild, R67–R70)
+    for (const k of d.kapitel) allaReaktioner(k).forEach((h) => { delete h.syns_redan; });
     const r = kontrollera(d);
-    expect(Object.fromEntries(r.beskrivningar.map((b) => [b.kapitel, b.reaktioner.length]))).toMatchObject({ 'kap-00': 34, 'kap-01': 38 });
+    expect(Object.fromEntries(r.beskrivningar.map((b) => [b.kapitel, b.reaktioner.length]))).toMatchObject({ 'kap-00': 34, 'kap-01': 34 });
     const k = d.kapitel[1];
     k.meta.klart = true;
     for (const st of [...k.scener.flatMap((s) => s.steg), ...k.rum.flatMap((x) => (x.frivilligt || []).flatMap((f) => f.steg))]) if (st.typ === 'mellanscen' && !st.bild) st.syns_redan = true;

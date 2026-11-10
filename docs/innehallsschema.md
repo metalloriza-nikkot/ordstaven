@@ -313,7 +313,7 @@ Musiken följer platsen och stämningen, inte kapitlet (beslut 64.5). Det billig
 Formen kommer från rapporten 12:30 (Teknik 26) och Innehålls tillägg i 64.2. **Motorn bygger dem i kapitel 2:s gråbox** (Teknik 20), och kapitlet spelas inte förrän alla rum har en karta.
 - **P11 med tangentbordet:** `"skriv": "tangentbord"`. Fälten visar formelns längd och växer när han skriver fler bokstäver.
   - `formler[]` får **`godtas`** (andra former, staven ristar in `ord`) och **`ristas: false`** (ordet räcker en gång och ristas inte in);
-  - `nastan[]` får **`tand`** (`forsta` eller `forebild`) och **`replik`**;
+  - `nastan[]` får **`tand`** (`forsta` eller `forebild`, och utan `tand` tänds ingenting, 2.36) och **`replik`**;
   - **`rimliga`**: ord som passar men inte hjälper, var och en med `reaktion`, `replik`, `ljud` och `ljudord`. De räknas aldrig som fel;
   - **`vanligt_svar`**: repliken för andra riktiga ord. Bara det som inte är ett ord får "pff".
 - **Steget `nav`:** `grenar` (`scen`, `mal`, `bild`), `mellan_grenar` (steg) och `knuff`. Grenarna tas i valfri ordning, och en gren är klar när dess scen är spelad. Grenarnas scener står efter navet i `scener`, och de bryter inte passet: en sparpunkt i `mellan_grenar` slutar det.

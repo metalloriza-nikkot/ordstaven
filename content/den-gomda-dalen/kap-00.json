@@ -15,7 +15,7 @@
  },
  "meta": {
   "namn": "Prologen",
-  "version": "0.16",
+  "version": "0.17",
   "datum": "2026-11-07",
   "agare": "Innehåll",
   "kalla": "Manus 13-prolog-manus.md v1.10. Byggd på repots kap-00.json från 0.29.0.",
@@ -25,7 +25,8 @@
   "innehall_v013": "Beslut 39.1, genomgången av samspelen: sex instruktioner med verb och mål (s01, s01b, s06, s14, s15, s21) och \"Hej, {hjalte}!\" i s00. Hela genomgången står i 13 v1.8.",
   "innehall_v014": "Det korta passet (beslut 45.5, 46.4, 47 och 50.4): rubrikerna PÅ VINDEN (förut TITTA PÅ VINDEN) och UT UR HUSET (förut FÖLJ LISTAN, en order som pekade på en lista han inte såg; rubriken avslöjar inte SKOGEN), fältet ersatter borttaget ur uppdragen (47.1), \"Gå till lådan!\" i s02 (47.6), och bild på de fyra mellanscenerna med ägget (agg_frost, agg_filt, agg_lyser och agg_klackning, Tekniks fält från 0.28.0) är Innehålls.",
   "innehall_v015": "Det andra korta passet (beslut 52.5): rubrikerna HOS FARFAR (förut KOM TILL FARFAR, en order; KÖKET skulle peka mot dörren han ska läsa sig till) och KRUKORNA (förut LETA I KRUKORNA), högst ca 11 tecken. Mellanscenerna i s18 och s21b beskriver Tekniks nya animationer (51.4): hjälten sover med hjälmen på, ungen trampar på fotändan och somnar, och Farfar och hjälten vinkar i stället för kramen. Ingen lästext och ingen replik är ändrad.",
-  "andrat_v016": "2026-11-08 (beslut 67.9): musik (natten till kläckningen och vid sängdags, lagerelden i sagan), ljud på mellanscener och reaktioner, syns_redan på mellanscenerna som redan syns (67.2). Titelbildens mellanscen och Farfar vid fönstret (s21) är strukna. Ingen text som spelaren läser är ändrad."
+  "andrat_v016": "2026-11-08 (beslut 67.9): musik (natten till kläckningen och vid sängdags, lagerelden i sagan), ljud på mellanscener och reaktioner, syns_redan på mellanscenerna som redan syns (67.2). Titelbildens mellanscen och Farfar vid fönstret (s21) är strukna. Ingen text som spelaren läser är ändrad.",
+  "andrat_v017": "2026-11-10 (beslut 68.9): syns_redan på alla reaktioner och knuffar som visade sin text (68.4), Farfar i dörren och i hallen, ungen som springer till grinden, och Stils regier farfar_skriver och farfar_gaspar (Teknik 31). Ingen text är ändrad."
  },
  "var_var_vi": [
   {
@@ -292,7 +293,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Farfar står i dörren i morgonrock."
+     "beskrivning": "Farfar står i dörren i morgonrock.",
+     "bild": "farfar_i_dorren"
     },
     {
      "typ": "replik",
@@ -308,7 +310,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Farfar går ut i hallen, mot sitt läsrum."
+     "beskrivning": "Farfar går ut i hallen, mot sitt läsrum.",
+     "bild": "farfar_gar_ut"
     },
     {
      "typ": "replik",
@@ -401,7 +404,8 @@
        "talare": "berattare",
        "text": "Där är lådan!",
        "upplast": true
-      }
+      },
+      "syns_redan": true
      }
     }
    ],
@@ -762,7 +766,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Farfar skriver på ett gulnat papper med sin kompassros. Spelar en förälder Farfar kan lappen skrivas på riktigt papper."
+     "beskrivning": "Farfar skriver på ett gulnat papper med sin kompassros. Spelar en förälder Farfar kan lappen skrivas på riktigt papper.",
+     "bild": "farfar_skriver"
     },
     {
      "typ": "replik",
@@ -1145,7 +1150,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Farfar gäspar stort. Ungen gäspar också."
+     "beskrivning": "Farfar gäspar stort. Ungen gäspar också.",
+     "bild": "farfar_gaspar"
     },
     {
      "typ": "replik",
@@ -1462,7 +1468,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Ungen springer till grinden och väntar."
+     "beskrivning": "Ungen springer till grinden och väntar.",
+     "unge_till": "grind"
     },
     {
      "typ": "mellanscen",
@@ -1629,7 +1636,8 @@
      "upplast": true
     },
     "fest": "mellan",
-    "ljud": "puff"
+    "ljud": "puff",
+    "syns_redan": true
    },
    "vid_fel": {
     "reaktion": "staven fräser, pff och en rökring",
@@ -1639,10 +1647,12 @@
      "text": "Nästan! Titta på staven igen.",
      "upplast": true
     },
-    "ljud": "fras"
+    "ljud": "fras",
+    "syns_redan": true
    },
    "knuff": {
-    "handling": "första bokstaven i förebilden blinkar"
+    "handling": "första bokstaven i förebilden blinkar",
+    "syns_redan": true
    },
    "forenkla": {
     "efter_fel": 2,
@@ -1676,7 +1686,8 @@
          "text": "Hoppsan! Ägget fryser fortfarande.",
          "upplast": true
         },
-        "ljud": "tut"
+        "ljud": "tut",
+        "syns_redan": true
        },
        "objekt": "lada_hyllan"
       },
@@ -1691,7 +1702,8 @@
          "text": "Hoppsan! Ägget fryser fortfarande.",
          "upplast": true
         },
-        "ljud": "plopp"
+        "ljud": "plopp",
+        "syns_redan": true
        },
        "objekt": "lada_fonstret"
       }
@@ -1700,10 +1712,12 @@
    },
    "vid_ratt": {
     "handling": "filten svävar upp ur lådan och följer hjälten som ljusbollen",
-    "ljud": "sus"
+    "ljud": "sus",
+    "syns_redan": true
    },
    "knuff": {
-    "handling": "ägget hackar tänder, tankebubblan blinkar"
+    "handling": "ägget hackar tänder, tankebubblan blinkar",
+    "syns_redan": true
    },
    "forenkla": {
     "efter_fel": 2,
@@ -1727,7 +1741,8 @@
    "min_bokstaver": 1,
    "sparas_som": "unge.namn",
    "vid_ratt": {
-    "handling": "namnet lyser i luften ca 1 s, ungen snurrar av glädje"
+    "handling": "namnet lyser i luften ca 1 s, ungen snurrar av glädje",
+    "syns_redan": true
    },
    "knuff": {
     "handling": "översta raden på tangentbordet blinkar",
@@ -1736,7 +1751,8 @@
      "talare": "berattare",
      "text": "Tryck på en bokstav.",
      "upplast": true
-    }
+    },
+    "syns_redan": true
    }
   },
   {
@@ -1766,7 +1782,8 @@
          "text": "Hoppsan! Där lagar man mat.",
          "upplast": true
         },
-        "ljud": "kastrull"
+        "ljud": "kastrull",
+        "syns_redan": true
        }
       },
       {
@@ -1783,7 +1800,8 @@
         "ljud": [
          "badanka",
          "spolning"
-        ]
+        ],
+        "syns_redan": true
        },
        "objekt": "dorr_bad"
       },
@@ -1797,7 +1815,8 @@
          "talare": "berattare",
          "text": "Där sover du. Farfar är vaken!",
          "upplast": true
-        }
+        },
+        "syns_redan": true
        },
        "objekt": "dorr_sov"
       },
@@ -1813,7 +1832,8 @@
          "text": "Ring! Farfar är där böckerna är.",
          "upplast": true
         },
-        "ljud": "vackarklocka"
+        "ljud": "vackarklocka",
+        "syns_redan": true
        }
       }
      ]
@@ -1827,7 +1847,8 @@
      "text": "Där böckerna är!",
      "upplast": true
     },
-    "pekar": true
+    "pekar": true,
+    "syns_redan": true
    },
    "forenkla": {
     "efter_fel": 2,
@@ -1869,7 +1890,8 @@
          "text": "Hoppsan! Där var ingen mat.",
          "upplast": true
         },
-        "ljud": "nys"
+        "ljud": "nys",
+        "syns_redan": true
        },
        "bild": "lada_bla",
        "objekt": "lada_lang_nederst"
@@ -1883,7 +1905,8 @@
          "talare": "berattare",
          "text": "Hoppsan! Där var ingen mat.",
          "upplast": true
-        }
+        },
+        "syns_redan": true
        },
        "bild": "lada_gul",
        "objekt": "lada_lang_overst"
@@ -1912,7 +1935,8 @@
          "text": "Hoppsan! Där var ingen mat.",
          "upplast": true
         },
-        "ljud": "kvack"
+        "ljud": "kvack",
+        "syns_redan": true
        },
        "bild": "lada_rod_liten",
        "objekt": "lada_lang_overst"
@@ -1927,7 +1951,8 @@
          "text": "Hoppsan! Där var ingen mat.",
          "upplast": true
         },
-        "ljud": "nys"
+        "ljud": "nys",
+        "syns_redan": true
        },
        "bild": "lada_bla_stor",
        "objekt": "lada_lang_mitten"
@@ -1943,7 +1968,8 @@
      "text": "Mums! Det luktar dinomat!",
      "upplast": true
     },
-    "ljud": "plums"
+    "ljud": "plums",
+    "syns_redan": true
    },
    "forenkla": {
     "efter_fel": 2,
@@ -1954,7 +1980,8 @@
    },
    "anteckning": "Farfar skriver lappen i scen s09_lappen, på sitt papper med kompassros. Bilden stämmer med texten: färg och storlek syns tydligt (bild-id:t säger egenskapen), och färgerna skiljer sig även i ljushet (dokument 10). Varianten bestäms när han kommer in på vinden, och lådorna byts aldrig mitt i valet (granskningen av kapitel 1, punkt 18). Efter 2 fel stängs de prövade lådorna. Rätt svar har ett eget skämt (ungen dyker ner i lådan).",
    "knuff": {
-    "handling": "lappen 📜 lyser och glimtar"
+    "handling": "lappen 📜 lyser och glimtar",
+    "syns_redan": true
    }
   },
   {
@@ -1981,7 +2008,8 @@
          "text": "Hoppsan! {unge} är fortfarande hungrig.",
          "upplast": true
         },
-        "ljud": "sus"
+        "ljud": "sus",
+        "syns_redan": true
        }
       },
       {
@@ -1995,7 +2023,8 @@
          "text": "Hoppsan! {unge} är fortfarande hungrig.",
          "upplast": true
         },
-        "ljud": "rull"
+        "ljud": "rull",
+        "syns_redan": true
        }
       }
      ]
@@ -2003,7 +2032,8 @@
    },
    "vid_ratt": {
     "handling": "bär rullar ut, ungen äter och dansar",
-    "ljud": "rull"
+    "ljud": "rull",
+    "syns_redan": true
    },
    "forenkla": {
     "efter_fel": 2,
@@ -2056,7 +2086,8 @@
          "talare": "farfar",
          "text": "Det är jag! Din säng är inte här.",
          "upplast": true
-        }
+        },
+        "syns_redan": true
        }
       },
       {
@@ -2070,7 +2101,8 @@
          "text": "Hoppsan! Där sover man inte.",
          "upplast": true
         },
-        "ljud": "kastrull"
+        "ljud": "kastrull",
+        "syns_redan": true
        },
        "objekt": "dorr_mat"
       },
@@ -2085,7 +2117,8 @@
          "text": "Hoppsan! Där sover man inte.",
          "upplast": true
         },
-        "ljud": "badanka"
+        "ljud": "badanka",
+        "syns_redan": true
        },
        "objekt": "dorr_bad"
       },
@@ -2101,7 +2134,8 @@
          "text": "Ring! Det är Farfars säng.",
          "upplast": true
         },
-        "ljud": "vackarklocka"
+        "ljud": "vackarklocka",
+        "syns_redan": true
        }
       }
      ]
@@ -2109,7 +2143,8 @@
    },
    "knuff": {
     "handling": "ungen gäspar och lutar sig mot rätt dörr",
-    "pekar": true
+    "pekar": true,
+    "syns_redan": true
    },
    "forenkla": {
     "efter_fel": 2,
@@ -2127,7 +2162,8 @@
      "text": "Boing, boing! Här är din säng!",
      "upplast": true
     },
-    "ljud": "boing"
+    "ljud": "boing",
+    "syns_redan": true
    }
   },
   {
@@ -2221,7 +2257,8 @@
      "text": "Den står inte på listan.",
      "upplast": true
     },
-    "ljud": "boing"
+    "ljud": "boing",
+    "syns_redan": true
    },
    "vid_ratt": {
     "handling": "en bock per packad rad, sedan tonas resten av sakerna ut och sista raden lyser (teknik 2c.5)",
@@ -2230,7 +2267,8 @@
      "talare": "berattare",
      "text": "Allt är packat!",
      "upplast": true
-    }
+    },
+    "syns_redan": true
    },
    "forenkla": {
     "efter_fel": 3,
@@ -2272,7 +2310,8 @@
          "talare": "berattare",
          "text": "Fel väg! Tillbaka!",
          "upplast": true
-        }
+        },
+        "syns_redan": true
        },
        "objekt": "stig_byn"
       }
@@ -2280,7 +2319,8 @@
     }
    },
    "knuff": {
-    "handling": "listan i ryggsäcken lyser"
+    "handling": "listan i ryggsäcken lyser",
+    "syns_redan": true
    },
    "efter_3_fel": {
     "handling": "ungen drar hjälten mot skogsstigen"

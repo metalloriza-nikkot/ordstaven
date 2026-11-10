@@ -264,8 +264,10 @@ redo.then(() => { startKlar = true; window.clearTimeout(startVakt); window.remov
   regi: (bild, mal) => rum.regi(bild, mal),
   /** Hur djupt ungen har sjunkit i leran (69.1), 0 = inte fast */
   ungeDjup: () => (rum.ungeFast ? Math.round(rum.ungeFast.djup) : 0),
-  /** Är ungen fast (i leran)? */
+  /** Är ungen fast (i leran eller i vattnet)? */
   ungeFast: () => !!rum.ungeFast,
+  /** Svävar ungen i en bubbla (69.5), och följer den hjälten? null = nej */
+  ungeSvavar: () => (rum.ungeSvavar ? { foljer: rum.ungeSvavar.foljer, r: Math.round(rum.ungeSvavar.r) } : null),
   /** Ungens bild just nu. */
   ungeRam: () => rum.ungeBild?.frame?.name ?? null,
     /** Var ungen står i rummet. */

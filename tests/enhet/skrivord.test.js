@@ -16,10 +16,12 @@ describe('formeln med tangentbordet (kapitel 2)', () => {
     for (const w of ['BRO', 'stege', 'Rep', 'FLOTTE']) expect(bedomOrd(P('k2_over'), w, ord)).toMatchObject({ sort: 'formel', ord: w.toUpperCase() });
     expect(bedomOrd(P('k2_over'), 'BRO', ord).formel.ristas).toBe(false);
   });
-  it('en form som godtas ger formeln (FLYGER blir FLYG), och nästan rätt tänder något', () => {
+  it('en form som godtas ger formeln (FLYGER blir FLYG), och nästan rätt känns igen', () => {
     expect(bedomOrd(P('k2_flyg'), 'FLYGER', ord)).toMatchObject({ sort: 'formel', ord: 'FLYG' });
-    expect(bedomOrd(P('k2_flyg'), 'SVÄVA', ord)).toMatchObject({ sort: 'nastan', nastan: { tand: 'forebild' } });
-    expect(bedomOrd(P('k2_over'), 'BOR', ord)).toMatchObject({ sort: 'nastan', nastan: { tand: 'forsta' } });
+    // nästan rätt tänder ingen bokstav ur svaret längre (69.3): tand är borta ur kapitel 2
+    expect(bedomOrd(P('k2_flyg'), 'SVÄVA', ord)).toMatchObject({ sort: 'nastan', nastan: { ord: 'SVÄVA' } });
+    expect(bedomOrd(P('k2_over'), 'BOR', ord)).toMatchObject({ sort: 'nastan', nastan: { ord: 'BOR' } });
+    expect(P('k2_over').nastan.some((n) => n.tand)).toBe(false);
   });
   it('ett ord som passar men inte hjälper får sin reaktion, aldrig "pff" (beslut 63)', () => {
     const b = bedomOrd(P('k2_over'), 'BÅT', ord);

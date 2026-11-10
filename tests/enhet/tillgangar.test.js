@@ -193,16 +193,28 @@ describe('mellanscenernas bilder och bildkorten', () => {
     expect(regiPunkt('sovrummet', 'farfar')).toBe(true);
     for (const b of ['natt', 'morgon']) for (const h of ['ner', 'upp']) expect(ramar.has(`farfar_${b}_${h}_01`), `${b} ${h}`).toBe(true);
   });
+  const STILS_REGI = /** @type {Record<string, string[]>} */ ({
+    farfar_skriver: ['farfar_fatolj_skriver_01'], farfar_gaspar: ['farfar_fatolj_gaspar_01'], apa_suckar: ['apa_sucka_01'],
+    ekorre_knacker: ['ekorre_skaka_hoger_01', 'ekorre_skaka_vanster_01'], ugglor_vrider: ['uggla_vrid_01'], stav_ristas: ['efx_stav_ristas_08'],
+    buske_prasslar: [...ramar].filter((r) => r.endsWith('_prassel_01')).slice(0, 1),
+  });
+  const GRABOX_REGI = new Set(['unge_sjunker', 'unge_dras_upp', 'bubblor_fran_blommorna', 'halvan_flyger_till_handen', 'unge_tas_av_bubblan', 'bubblan_spricker_unge_plumsar']);
   it('varje mellanscen med bild har grafik (morgonen i sängen, luftskeppets lägen, sidovyerna, ungen på kartbiten, ägget)', () => {
     const saknas = [];
     for (const k of kapitel) for (const sc of k.scener) for (const st of sc.steg) {
       if (st.typ !== 'mellanscen' || !st.bild) continue;
       const finns = st.bild === 'hjalte_sang_morgon' ? ramar.has('hjalte_sang_morgon_01') && ramar.has('hjalte_sang_morgon_02')
+        : st.bild === 'luftskepp_river_brevet' ? ramar.has('luftskepp_glider_01')
         : st.bild.startsWith('luftskepp_') ? ramar.has(st.bild) || ramar.has(st.bild + '_01')
           : st.bild === 'kartbit_unge' ? existsSync(new URL('assets/sidovyer/kartbit_unge_01.png', rot)) && existsSync(new URL('assets/sidovyer/kartbit_unge_02.png', rot))
           : AGGET[st.bild] ? AGGET[st.bild].every((r) => ramar.has(r))
           // Farfar i dörren (67.2): hans bilder, och punkten regi_farfar i rummets karta
           : /^farfar_(i_dorren|gar_ut)$/.test(st.bild) ? ['natt', 'morgon'].every((b) => ramar.has(`farfar_${b}_ner_01`) && ramar.has(`farfar_${b}_upp_01`)) && regiPunkt(sc.rum, 'farfar')
+          // Stils regier (Teknik 31): ungens lägen och figurernas bilder
+          : /^unge_(gaspar|fnissar_mun|fnissar|kryper_ihop|lyssnar|biter)/.test(st.bild) ? [...ramar].some((r) => r.startsWith(`unge1_${st.bild.replace(/^unge_/, '').replace(/_(upp|ner|hoger|vanster)$/, '')}_`))
+          : STILS_REGI[st.bild] ? STILS_REGI[st.bild].every((r) => ramar.has(r))
+          // kapitel 2:s gråbox (69.1): ritas med figurerna som finns och gråboxens former
+          : GRABOX_REGI.has(st.bild) ? true
           : existsSync(new URL(`assets/sidovyer/${st.bild}_bakgrund.png`, rot));
       if (!finns) saknas.push(`${k.id} ${sc.id}: ${st.bild}`);
     }
