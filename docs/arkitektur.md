@@ -929,3 +929,12 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **`byn`** är den sjunde slingan (`SLINGOR` i `karna/musik.js`, `MUSIK` i `grans/ljud.js`): 16 takter à 8 åttondelar i 96 BPM, loopStart 0,5 s och loopEnd 40,5 s. Filerna har en halv sekund före och efter, som de andra (41,0 s).
 - **`surr`** är det 81:a ljudet i `assets/ljud/effekter/` (Stils `ljud.json`, grupp *Kapitel 2*). Kapitel 2:s trollslända har redan `ljud: surr`.
 - **Rösten i loggen** (70.4): `[röst] <namn>, på enheten` när en röst väljs, eller `ingen egen svensk röst, tyst`, med hur många svenska röster som finns och hur många av dem som är på nätet. Bara röstens namn, aldrig text. Startskärmens rad säger om rösten är på eller av.
+
+## 88. Kapitel 2 efter beslut 71: effekterna som regier, stocken, lyktorna och elden (0.56.0, Teknik 34)
+- **Innehålls skript** (`innehall-skript-pass71.py`) är kört på repots filer (kap-02 v0.5, ordlistorna). Teknik har satt `bild` på sex mellanscener och `unge_till: vass_tat` på den första, ingen text.
+- **Formelns `effekt` är en regi** när `Rum.regi(effekt)` har en (`k2`-tabellen i `regi`). Då väntar berättelsen in den och reaktionens text visas inte. Ett nästan-ords effekt med regi visar inte heller sin text. En effekt utan regi gör som förut.
+- **Kartans nya fält:** `nas_nara` på ett föremål gör ett `ga_till` klart när han är nära (som en skylt), och `rackvidd` (pixlar) ersätter `RACKVIDD` för det föremålet (halvan i vattnet, tavlorna högt upp). Punkten `regi_<id>_<tillstånd>` flyttar ett föremål i det tillståndet, med fötterna mitt på punktens underkant (byborna vid elden i `kvall`). `kap2.py` skriver rumsegenskapen `vagg_bak` (Tant Rosas höga bakvägg).
+- **Stocken** (71.3): `ungeSvavar` med `r = 0` är ungen på stocken, utan bubbla och med egen `lyft`. Ingenting följer hjälten: `bara`/`lagg` med `bubbla_unge` och `ungeTasAvBubblan`/`bubblanSpricker` är borta. Kameran följer inte ungen på stocken, eftersom hjälten står vid stranden.
+- **Lyktorna** (71.6): `lyktor_udden` är en lång ruta, och lyktorna står var 24:e pixel längs den. Medan ljuset hoppar följer kameran ljuset (`regiFokus`), och sedan hjälten igen. Lyktorna lyser tills rummet byts.
+- **Testkroken** `ungeSvavar()` säger också `styrd`. Ett enhetstest kontrollerar att varje P11:s `bild` och `ledbild` har en bild (ingen ❔), och platshållarna har fått `over_vattnet`, `tat_vass`, `unge_pa_stocken`, `lyktor_slackta` och `ljusboll`.
+

@@ -68,9 +68,11 @@ test('kapitel 2 går att spela från träsket till elden (gråbox, del 5)', asyn
     await page.waitForTimeout(250);
   }
   expect(scener).toEqual(['k2s01_kanten', 'k2s02_byn', 'k2s03_torget', 'k2s05_vassen', 'k2s03_torget', 'k2s04_bryggan', 'k2s07_hela_brevet', 'k2s08_huset', 'k2s09_kartbiten', 'k2s10_elden']);
-  // kapitel 2:s mellanscener rör sig i gråboxen (Teknik 32, 69.1 och 69.5)
+  // kapitel 2:s mellanscener och formler rör sig i gråboxen (Teknik 32 och 34, beslut 69 och 71)
   const regi = (await ev(() => window.__ORDSTAVEN.grafik())).regi;
-  for (const r of ['ungen sjunker i leran', 'ungen dras upp', 'luftskeppet river brevet', 'blommorna blåser bubblor', 'halvan flyger till handen', 'ungen tas av bubblan', 'bubblan spricker och ungen plumsar']) expect(regi, r).toContain(r);
+  for (const r of ['svärdet hugger genom vassen', 'ungen sjunker i leran', 'ungen dras upp', 'luftskeppet river brevet', 'blommorna blåser bubblor', 'halvan flyger till handen',
+    // beslut 71 (Teknik 34): stocken, Tant Rosa, lyktorna och elden
+    'ungen hoppar på stocken', 'ungen piper på stocken', 'stocken flyger till stranden', 'ungen hoppar i land', 'Tant Rosa når inte', 'ljuset hoppar mellan lyktorna', 'elden tänds']) expect(regi, r).toContain(r);
   const t = await ev(() => window.__ORDSTAVEN.tillstand());
   expect(t.spelare.hjalte.grad).toBe('Ordsmed');
   expect(t.spelare.hjalte.formler).toEqual(expect.arrayContaining(['FLYG']));

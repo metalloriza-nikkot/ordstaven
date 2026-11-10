@@ -2,8 +2,8 @@
  "$schema": "schema/ordlistor.schema.json",
  "format": 1,
  "meta": {
-  "version": "0.10",
-  "datum": "2026-11-08",
+  "version": "0.11",
+  "datum": "2026-11-10",
   "agare": "Innehåll",
   "textform": "Orden lagras med små bokstäver, formler i versaler. Böjda former (skogen, bron) står med när de används som alternativ.",
   "beskrivning": "Ordlistor 1-6 for ORDSTAVEN. Bilderna ar platshallare (emoji) for grabox. Ett ord ligger i den hogsta lista som nagot av dess drag kraver.",
@@ -13,7 +13,8 @@
   "andrat_v07": "80 ordformer från uppdragslappen (beslut 40.1), så att lappens text står i ordlistorna. Listan följer listornas regler: dubbelteckning ger lista 4, konsonantgrupp i början lista 3, korta ljudenliga ord lista 1 och längre lista 2. ATT, DIG, FÖR och UPP är småord som lärs som ordbilder (lista 6). KARTBITEN, LIANERNA och BARONENS är berättelseord.",
   "andrat_v08": "13 ordformer som står i lästexter men saknades (Tekniks kontroll i 0.22.0, beslut 43.5): stora, höga, runda, gamla, vita och gula (böjda egenskapsord), stenen, dalens, dinos, fötter och fossil, man och klättrar. Ingen lästext är omskriven, eftersom texterna är spelade och rummen frysta. Listan följer reglerna: dubbelteckning lista 4 (fossil, klättrar, fötter), konsonantgrupp i början lista 3 (stora, stenen), man lista 1 och resten lista 2.",
   "andrat_v09": "vems (rubriken VEMS LAPP? i kapitel 1, det korta passet). Konsonantgrupp i slutet, alltså lista 2.",
-  "andrat_v010": "Kapitel 2 (beslut 64): orden i lästexten, uppdragens rubriker, ord han troligen skriver på tangentbordet (tema skrivord, så att de aldrig får pff, 63.3) och bybornas bubblor."
+  "andrat_v010": "Kapitel 2 (beslut 64): orden i lästexten, uppdragens rubriker, ord han troligen skriver på tangentbordet (tema skrivord, så att de aldrig får pff, 63.3) och bybornas bubblor.",
+  "andrat_v011": "Kapitel 2 (beslut 71.6): sax, kniv, hugg och lys, ord han troligen skriver vid vassen och lyktorna (tema skrivord, så att de aldrig får pff). HUGG och LYS står också på uppdragslappen."
  },
  "listor": {
   "1": "Korta ljudenliga ord, 2-3 bokstaver, ingen konsonantgrupp, ingen dubbelteckning",
@@ -2518,6 +2519,30 @@
    "tema": "uppdragslappen",
    "flaggor": [],
    "varfor": "Kapitel 2 (beslut 64)"
+  },
+  {
+   "ord": "sax",
+   "lista": 2,
+   "bild": "✂️",
+   "tema": "skrivord",
+   "flaggor": [],
+   "varfor": "Kapitel 2 (beslut 71.6)"
+  },
+  {
+   "ord": "kniv",
+   "lista": 3,
+   "bild": "🔪",
+   "tema": "skrivord",
+   "flaggor": [],
+   "varfor": "Kapitel 2 (beslut 71.6)"
+  },
+  {
+   "ord": "lys",
+   "lista": 1,
+   "bild": "✨",
+   "tema": "skrivord",
+   "flaggor": [],
+   "varfor": "Kapitel 2 (beslut 71.6), och uppdragslappen"
   }
  ]
 }

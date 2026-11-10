@@ -197,6 +197,10 @@ export function lasKarta(tmj) {
       if (egen.bild_vinka) ut.bildVinka = String(egen.bild_vinka).split(',').map((t) => t.trim()).filter(Boolean);
       if (egen.bild_anim) { ut.bildAnim = String(egen.bild_anim).split(',').map((t) => t.trim()).filter(Boolean); ut.animMs = Math.max(250, tal(egen.anim_ms, 500)); }
       if (egen.rutor) ut.rutor = true;
+      // nas_nara (Teknik 34, 71.2) = han når den aldrig (halvan ute i vattnet): ett ga_till dit är klart när han är nära
+      if (egen.nas_nara) ut.nasNara = true;
+      // rackvidd (Teknik 34) = han når den på längre håll än vanligt: tavlorna högt på väggen (71.4), halvan i vattnet
+      if (egen.rackvidd) ut.rackvidd = Math.max(1, tal(egen.rackvidd, 0));
       objekt.push(ut);
     }
   }

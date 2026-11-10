@@ -57,6 +57,9 @@ RUMMEN = {
         'objekt': [
             utg('stig_skogen', 0, 84, 40, 24, **STIG, riktning='vanster'),
             punkt('start', 48, 100),
+            # 71.6: en vägg av tät vass tvärs över hela rummet strax efter skogen. Den syns i tillståndet vass och
+            # faller när SVÄRD har huggit (oppen)
+            sak('vass_tat', 84, 0, 20, 192, sida='vanster'),
             sak('skylt_lera', 100, 60, 14, 14, sida='alla'),
             sak('leran', 150, 104, 80, 40, sida='alla'),
             sak('stubbe_trask', 60, 148, 20, 14, sida='alla'),
@@ -86,6 +89,11 @@ RUMMEN = {
             sak('fjader', 140, 290, 10, 10, sida='alla'),
             sak('udden', 604, 362, 30, 14),  # uddens spets, bortom lägerelden
             sak('lagereld', 572, 326, 20, 16, sida='alla'),
+            # 71.5: i tillståndet kvall står byborna och Tant Rosa runt elden (fötterna, regi_<figur>_kvall)
+            punkt('regi_fiskaren_kvall', 556, 346), punkt('regi_tvatterskan_kvall', 582, 322),
+            punkt('regi_barnet_drake_kvall', 600, 346), punkt('regi_tant_rosa_kvall', 540, 322),
+            # 71.6: lyktor på pinnar längs stigen från torget ned till udden, släckta tills LJUS tänder dem
+            sak('lyktor_udden', 558, 136, 8, 172, golv=True),
             # torget
             utg('dorr_rosa', 404, 24, 24, 16, riktning='upp', sida='under', till='tant_rosas_hus'),
             sak('brevram', 436, 22, 14, 12, sida='under'),
@@ -115,8 +123,8 @@ RUMMEN = {
             sak('fisk_hopp', 180, 124, 14, 10, sida='alla'),
         ],
     },
-    # 2 × 1 skärmar. Västra: vassen och bubbelblommorna längs stigen. Östra: stranden, och ute i vattnet, utom räckhåll,
-    # brevets halva som flyter (69.5). Ungens bubbla svävar över vattnet utanför stranden.
+    # 2 × 1 skärmar. Västra: vassen och bubbelblommorna längs stigen. Östra: stranden med stocken, och ute i vattnet,
+    # utom räckhåll, brevets halva som flyter (69.5, 71.2–71.3).
     'vassen': {
         'storlek': (40, 12),
         'objekt': [
@@ -124,9 +132,11 @@ RUMMEN = {
             punkt('start', 54, 146),
             sak('bubbelblommor', 100, 56, 40, 20, sida='alla'),
             sak('strand_vassen', 552, 72, 48, 48, golv=True),
-            sak('brev_halva_vatten', 614, 52, 10, 8, sida='alla'),
+            # halvan ute i vattnet (71.2): han når den aldrig, så det räcker att gå nära (nas_nara)
+            sak('brev_halva_vatten', 614, 52, 10, 8, sida='alla', nas_nara=True, rackvidd=40),
             vagg(600, 0, 40, 192, vatten=True),
-            sak('bubbla_unge', 608, 88, 14, 14, sida='alla'),
+            # stocken i strandkanten som ungen hoppar upp på (71.3)
+            sak('stock_vassen', 600, 104, 28, 10, sida='alla'),
         ],
     },
     # Inomhus: fyra tavlor högt upp på bakväggen, i blandad ordning (lika stora rutor, gråboxen ritar storleken
@@ -134,15 +144,17 @@ RUMMEN = {
     'tant_rosas_hus': {
         'storlek': (20, 12),
         'inomhus': True,
+        'vagg_bak': 72,  # en hög bakvägg, så att tavlorna hänger högt med luft under (71.4)
         'objekt': [
             utg('dorr_ut', 146, 176, 28, 16, riktning='ned', sida='over', till='byn'),
             punkt('start', 160, 150),
             figur('tant_rosa', 232, 96, sida='alla', talare='tant_rosa'),
             sak('soffa', 48, 112, 56, 22, sida='alla'),
-            sak('tavla_stor_rund', 60, 14, 26, 26, sida='under'),
-            sak('tavla_liten_fyrkant', 112, 14, 26, 26, sida='under'),
-            sak('tavla_stor_fyrkant', 164, 14, 26, 26, sida='under'),
-            sak('tavla_liten_rund', 216, 14, 26, 26, sida='under'),
+            # högt på väggen med luft under (71.4): ingen når dem utan staven
+            sak('tavla_stor_rund', 60, 6, 24, 24, sida='under', rackvidd=56),
+            sak('tavla_liten_fyrkant', 112, 6, 24, 24, sida='under', rackvidd=56),
+            sak('tavla_stor_fyrkant', 164, 6, 24, 24, sida='under', rackvidd=56),
+            sak('tavla_liten_rund', 216, 6, 24, 24, sida='under', rackvidd=56),
             sak('kartbit_3', 144, 64, 14, 10, sida='alla'),
         ],
     },
@@ -187,6 +199,8 @@ def karta(rum, spec):
     props = {'rum': rum}
     if spec.get('inomhus'):
         props['inomhus'] = True
+    if spec.get('vagg_bak'):
+        props['vagg_bak'] = spec['vagg_bak']
     return {
         'type': 'map', 'version': '1.10', 'tiledversion': '1.11.0', 'orientation': 'orthogonal', 'renderorder': 'right-down',
         'width': bredd, 'height': hojd, 'tilewidth': R, 'tileheight': R, 'infinite': False, 'compressionlevel': -1,

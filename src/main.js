@@ -267,7 +267,7 @@ redo.then(() => { startKlar = true; window.clearTimeout(startVakt); window.remov
   /** Är ungen fast (i leran eller i vattnet)? */
   ungeFast: () => !!rum.ungeFast,
   /** Svävar ungen i en bubbla (69.5), och följer den hjälten? null = nej */
-  ungeSvavar: () => (rum.ungeSvavar ? { foljer: rum.ungeSvavar.foljer, r: Math.round(rum.ungeSvavar.r) } : null),
+  ungeSvavar: () => (rum.ungeSvavar ? { foljer: rum.ungeSvavar.foljer, r: Math.round(rum.ungeSvavar.r), styrd: !!rum.ungeSvavar.styrd } : null),
   /** Ungens bild just nu. */
   ungeRam: () => rum.ungeBild?.frame?.name ?? null,
     /** Var ungen står i rummet. */

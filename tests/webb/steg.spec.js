@@ -2375,16 +2375,21 @@ test('kapitel 2 går att gå in i (del 2): skylten, vattnet, BRO över vattnet o
     const nyckel = `${st?.typ}:${st?.mal || st?.foremal || st?.pussel_id || ''}`;
     if (st?.typ === 'las_skylt' && !gjort.has(nyckel)) { gjort.add(nyckel); await gaTill(107, 90); continue; }
     // ungen sitter fast i leran (69.1): han går dit, mot ungen, tills han når den
-    if (st?.typ === 'ga_till' && st.mal === 'unge') { const u = await page.evaluate(() => window.__ORDSTAVEN.ungePos()); await gaTill(u.x, u.y); continue; }
-    if (st?.typ === 'ga_till' && st.mal === 'vattnet' && !gjort.has(nyckel)) { gjort.add(nyckel); await gaTill(300, 96); await gaTill(452, 96); await page.keyboard.press('Space'); continue; }
+    if (st?.typ === 'ga_till' && st.mal === 'unge') { const u = await page.evaluate(() => window.__ORDSTAVEN.ungePos()); await gaTill(u.x - 16, u.y); continue; } // från vänster, utanför leran
+    if (st?.typ === 'ga_till' && st.mal === 'vattnet' && !gjort.has(nyckel)) { gjort.add(nyckel); await gaTill(140, 96); await gaTill(300, 96); await gaTill(452, 96); await page.keyboard.press('Space'); continue; }
     if (st?.typ === 'ga_till' && st.mal === 'stig_byn') { await gaTill(470, 96); await gaTill(636, 96); continue; }
-    if (await page.locator('#plattan .formel-skriv').isVisible()) { await page.keyboard.type('BRO'); await page.keyboard.press('Enter'); await page.waitForTimeout(800); continue; }
+    if (await page.locator('#plattan .formel-skriv').isVisible()) {
+      // vassen först (71.6): SVÄRD, med Ä som en tangent; sedan BRO över vattnet
+      if (st?.pussel_id === 'k2_svard') { await page.keyboard.type('SV'); await page.evaluate(() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ä', bubbles: true }))); await page.keyboard.type('RD'); }
+      else await page.keyboard.type('BRO');
+      await page.keyboard.press('Enter'); await page.waitForTimeout(800); continue;
+    }
     await vidare(); await page.waitForTimeout(150);
   }
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 10000 }).toBe('k2s02_byn');
   expect(await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt())).toContain('stig_kanten');
   const t = await page.evaluate(() => window.__ORDSTAVEN.tillstand());
-  expect(t.aventyr['den-gomda-dalen'].skrivet).toEqual({ k2_over: 'BRO' });
+  expect(t.aventyr['den-gomda-dalen'].skrivet).toMatchObject({ k2_over: 'BRO' });
   expect(t.spelare.hjalte.formler).not.toContain('BRO');
   await page.screenshot({ path: 'test-results/kap2-byn.png' });
 });

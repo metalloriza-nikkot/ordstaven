@@ -198,7 +198,9 @@ describe('mellanscenernas bilder och bildkorten', () => {
     ekorre_knacker: ['ekorre_skaka_hoger_01', 'ekorre_skaka_vanster_01'], ugglor_vrider: ['uggla_vrid_01'], stav_ristas: ['efx_stav_ristas_08'],
     buske_prasslar: [...ramar].filter((r) => r.endsWith('_prassel_01')).slice(0, 1),
   });
-  const GRABOX_REGI = new Set(['unge_sjunker', 'unge_dras_upp', 'bubblor_fran_blommorna', 'halvan_flyger_till_handen', 'unge_tas_av_bubblan', 'bubblan_spricker_unge_plumsar']);
+  const GRABOX_REGI = new Set(['unge_sjunker', 'unge_dras_upp', 'bubblor_fran_blommorna', 'halvan_flyger_till_handen',
+    // beslut 71 (Teknik 34): stocken, Tant Rosa, lyktorna och elden
+    'unge_hoppar_pa_stocken', 'unge_piper_pa_stocken', 'unge_hoppar_i_land', 'tant_rosa_nar_inte', 'byborna_jublar', 'elden_tands']);
   it('varje mellanscen med bild har grafik (morgonen i sängen, luftskeppets lägen, sidovyerna, ungen på kartbiten, ägget)', () => {
     const saknas = [];
     for (const k of kapitel) for (const sc of k.scener) for (const st of sc.steg) {

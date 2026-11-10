@@ -11,7 +11,7 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 12,
+ "nextobjectid": 13,
  "properties": [
   {
    "name": "rum",
@@ -68,6 +68,24 @@
     },
     {
      "id": 3,
+     "name": "vass_tat",
+     "type": "sak",
+     "x": 84,
+     "y": 0,
+     "width": 20,
+     "height": 192,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "vanster"
+      }
+     ]
+    },
+    {
+     "id": 4,
      "name": "skylt_lera",
      "type": "sak",
      "x": 100,
@@ -85,7 +103,7 @@
      ]
     },
     {
-     "id": 4,
+     "id": 5,
      "name": "leran",
      "type": "sak",
      "x": 150,
@@ -103,7 +121,7 @@
      ]
     },
     {
-     "id": 5,
+     "id": 6,
      "name": "stubbe_trask",
      "type": "sak",
      "x": 60,
@@ -121,7 +139,7 @@
      ]
     },
     {
-     "id": 6,
+     "id": 7,
      "name": "trollslanda",
      "type": "sak",
      "x": 276,
@@ -139,7 +157,7 @@
      ]
     },
     {
-     "id": 7,
+     "id": 8,
      "name": "",
      "type": "vagg",
      "x": 464,
@@ -157,7 +175,7 @@
      ]
     },
     {
-     "id": 8,
+     "id": 9,
      "name": "vattnet",
      "type": "sak",
      "x": 464,
@@ -175,7 +193,7 @@
      ]
     },
     {
-     "id": 9,
+     "id": 10,
      "name": "",
      "type": "vagg",
      "x": 464,
@@ -193,7 +211,7 @@
      ]
     },
     {
-     "id": 10,
+     "id": 11,
      "name": "overgang",
      "type": "sak",
      "x": 464,
@@ -216,7 +234,7 @@
      ]
     },
     {
-     "id": 11,
+     "id": 12,
      "name": "stig_byn",
      "type": "utgang",
      "x": 600,

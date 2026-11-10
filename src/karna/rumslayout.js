@@ -12,7 +12,7 @@ const FIGUR_HOJD = 24;
  *             till?: string, sida?: 'under' | 'over' | 'vanster' | 'hoger' | 'alla', golv?: boolean, visar?: string,
  *             riktning?: 'vanster' | 'hoger' | 'upp' | 'ned', klattra?: 'upp' | 'ned', ute?: boolean, lapp?: string,
  *             talare?: string, lastI?: string[], storlek?: { bredd: number, hojd: number }, forsvinnerEfter?: string, oppning?: boolean,
- *             bildSitter?: string, bildSedan?: string, sedan?: string, bildAnim?: string[], animMs?: number, rutor?: boolean,
+ *             bildSitter?: string, bildSedan?: string, sedan?: string, bildAnim?: string[], animMs?: number, rutor?: boolean, nasNara?: boolean, rackvidd?: number,
  *             bild?: string, bildNatt?: string, bildPa?: string, bildDel?: string, sovplats?: boolean, skataFonster?: boolean, lyser?: boolean, delasHela?: boolean, delasDjup?: boolean, dekor?: boolean, ovanpa?: boolean, delar?: number, bildTaEmot?: string[], bildLas?: string[], kommerFran?: string, klattrarFran?: string, bildVinka?: string[],
  *             bildRad?: string[], bildHugg?: string[], bildKvar?: string }} Objekt
  * till = rummet en utgång leder till, sida = var hjälten ställer sig, golv = man går på det (stig, grind).
@@ -104,7 +104,7 @@ export function avstandTill(pos, o) {
  * @param {{ x: number, y: number }} pos fötterna @param {Objekt} o
  */
 export function vidObjekt(pos, o) {
-  if (o.sort !== 'utgang' || o.klattra) return avstandTill(pos, o) <= RACKVIDD;
+  if (o.sort !== 'utgang' || o.klattra) return avstandTill(pos, o) <= (o.rackvidd ?? RACKVIDD);
   const f = framfor(o);
   return Math.abs(pos.x - f.x) <= 14 && Math.abs(pos.y - f.y) <= 14;
 }
@@ -244,7 +244,13 @@ export function rumsObjekt(innehall, tillstand, karta, visade = []) {
   // i ett område som är större än skärmen räknas föremålen mot områdets kanter
   const storlek = karta.storlek && (karta.storlek.bredd !== RUM.bredd || karta.storlek.hojd !== RUM.hojd) ? { storlek: karta.storlek } : {};
   // dekor (52.2) står bara i kartan: den ritas alltid och har inget samspel
-  const iKartan = karta.objekt.filter((o) => ids.includes(o.id) || o.dekor).map((o) => ({ ...o, ...storlek }));
+  // en figur eller sak kan stå på ett annat ställe i ett visst tillstånd (Teknik 34, byborna vid elden i kvall):
+  // kartans punkt regi_<id>_<tillstånd> är var den står med fötterna (mitt i nederkanten)
+  const flytt = (/** @type {any} */ o) => {
+    const p = tillstand ? karta.regi?.[`${o.id}_${tillstand}`] : null;
+    return p ? { ...o, x: Math.round(p.x - o.b / 2), y: Math.round(p.y - o.h) } : o;
+  };
+  const iKartan = karta.objekt.filter((o) => ids.includes(o.id) || o.dekor).map((o) => ({ ...flytt(o), ...storlek }));
   const saknas = ids.filter((id) => !iKartan.some((o) => o.id === id));
   return [...iKartan, ...placeraObjekt(saknas).map((o) => ({ ...o, ...storlek }))];
 }

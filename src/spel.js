@@ -1536,8 +1536,10 @@ export function skapaSpel(d) {
       return;
     }
     // en skylt med en mening räknas när han går dit (pusslet eller las_skylt öppnar den sedan)
-    const skyltMal = skyltarIRummet().some((x) => x.id === st.mal && x.mening);
-    if (skyltMal) skyltStyrs.add(st.mal);
+    // ...och så gör en sak han aldrig når (halvan ute i vattnet, kartans nas_nara, 71.2): det räcker att gå nära
+    const arSkylt = skyltarIRummet().some((x) => x.id === st.mal && x.mening);
+    const skyltMal = arSkylt || !!rum.ruta(st.mal)?.nasNara;
+    if (arSkylt) skyltStyrs.add(st.mal);
     // Medan han går dit kan han göra det frivilliga i rummet (rum.frivilligt), och med fri_vag gå in i en
     // sidogren (en frivillig scen, buskarna). Efteråt fortsätter steget som förut.
     /** @type {string[]} sidogrenar han tog under det fria vägvalet, i ordning (loggen, beslut 17.1) */
@@ -2515,7 +2517,8 @@ export function skapaSpel(d) {
           if (svaretFar()) { if (b.nastan.tand === 'forebild' && p.forebild) tandForebild('nästan'); else if (b.nastan.tand === 'forsta') fb.forsta = true; }
           if (trappa) tandForebild('andra felet');
           ljud.spela('hmm');
-          if (b.nastan.effekt) ui.visaRegi(String(b.nastan.effekt).replace(/_/g, ' '), 0);
+          // nästans effekt som regi i rummet om den finns, annars som ruta (gråboxen)
+          if (b.nastan.effekt && !rum.regi(b.nastan.effekt)) ui.visaRegi(String(b.nastan.effekt).replace(/_/g, ' '), 0);
           await reaktion({ replik: b.nastan.replik || { talare: 'berattare', text: 'Nästan!', upplast: true } });
           ui.doljRegi();
         } else if (b.sort === 'rimligt') {
@@ -2540,7 +2543,10 @@ export function skapaSpel(d) {
         ui.visaPlatta(`<div class="formel-luft-ruta">${kolla}<div class="formel-i-luften">${ui.esc(b.ord)}</div></div>`, 'formel-luft');
         await vanta(tid(1000)); ui.doljPlatta();
         ordkraft(b.ord);
-        await reaktion(p.vid_ratt);
+        // formelns effekt som regi i rummet (Teknik 34): då visar reaktionen inte sin text för den vuxne
+        const effektMs = b.formel.effekt ? rum.regi(b.formel.effekt) : 0;
+        if (effektMs) { logg.handelse('formel', `${p.id}: ${b.formel.effekt}`); await vanta(tid(effektMs)); }
+        await reaktion(effektMs && p.vid_ratt ? { ...p.vid_ratt, syns_redan: true } : p.vid_ratt);
         logg.handelse('formel', `${p.id}: klar ${spar.forebild ? 'med' : 'utan'} förebild`);
         klar({ niva: p.niva, forstaForsoket: fel === 0, forsok: fel + 1, hjalp: spar.hjalp, ord: b.ord, ristas: b.formel.ristas !== false });
       };

@@ -828,8 +828,9 @@ export class Rum extends Phaser.Scene {
    * - `luftskepp_<läge>`: luftskeppet med baronen och Herr Skata (s22), se `luftskepp`;
    * - en sidovy (`assets/sidovyer/<bild>_bakgrund.png`), se `visaSidovy`;
    * - kapitel 2:s gråbox (69.1): `unge_sjunker` (i mellanscenens `unge_till`), `unge_dras_upp`,
-   *   `luftskepp_river_brevet`, och i vassen (69.5) `bubblor_fran_blommorna`, `halvan_flyger_till_handen`,
-   *   `unge_tas_av_bubblan` och `bubblan_spricker_unge_plumsar`.
+   *   `luftskepp_river_brevet`, och i vassen `bubblor_fran_blommorna` och `halvan_flyger_till_handen` (69.5);
+   * - kapitel 2 efter beslut 71 (Teknik 34): formlernas effekter (svärdet i vassen, stocken, lyktorna) och
+   *   mellanscenerna med stocken, Tant Rosa och elden, se tabellen `k2` nedan.
    * @param {string} bild @param {string} [mal] mellanscenens unge_till, om den har ett
    * @returns {number} hur länge mellanscenen visas (ms), 0 = ingen bild
    */
@@ -841,8 +842,24 @@ export class Rum extends Phaser.Scene {
     if (bild === 'luftskepp_river_brevet') return this.luftskeppRiverBrevet();
     if (bild === 'bubblor_fran_blommorna') return this.bubblorFranBlommorna();
     if (bild === 'halvan_flyger_till_handen') return this.halvanFlygerTillHanden();
-    if (bild === 'unge_tas_av_bubblan') return this.ungeTasAvBubblan();
-    if (bild === 'bubblan_spricker_unge_plumsar') return this.bubblanSpricker();
+    // kapitel 2 efter beslut 71 (Teknik 34): formlernas effekter och mellanscenerna
+    const k2 = /** @type {Record<string, () => number>} */ ({
+      svard_hugger_genom_vassen: () => this.svardHuggerGenomVassen(),
+      litet_svard_kittlar_vassen: () => this.litetSvardKittlar(),
+      unge_hoppar_pa_stocken: () => this.ungeHopparPaStocken(),
+      unge_piper_pa_stocken: () => this.ungePiperPaStocken(),
+      stocken_flyger_till_stranden: () => this.stockenIland('flyg'),
+      rep_till_ungen: () => this.stockenIland('rep'),
+      bro_till_stocken: () => this.tillStocken('bro'),
+      stege_till_stocken: () => this.tillStocken('stege'),
+      unge_hoppar_i_land: () => this.ungeHopparILand(),
+      ljuset_hoppar_mellan_lyktorna: () => this.ljusetHopparMellanLyktorna(),
+      en_liten_ljusprick: () => this.litenLjusprick(),
+      tant_rosa_nar_inte: () => this.tantRosaNarInte(),
+      elden_tands: () => this.eldenTands(),
+      byborna_jublar: () => this.byborJublar(),
+    });
+    if (k2[bild]) return k2[bild]();
     if (bild.startsWith('luftskepp_')) {
       const lage = bild.slice('luftskepp_'.length);
       return this.luftskepp(lage) ? ({ glider: 2800, skata_putsar: 2200, trasslar: 2000 })[lage] ?? 1400 : 0;
@@ -1180,95 +1197,241 @@ export class Rum extends Phaser.Scene {
     return 2100;
   }
 
-  /**
-   * Ungen nosar på en gul blomma, en bubbla blåses runt den, och bubblan svävar ut över vattnet till `bubbla_unge`
-   * och stannar där (69.5). Ungen svävar i bubblan tills `bara` med `bubbla_unge` (då följer den hjälten) och
-   * `bubblan_spricker_unge_plumsar`. @returns {number}
-   */
-  ungeTasAvBubblan() {
-    // bubbla_unge är dold tills nästa steg visar den: platsen står i kartan
-    const o = this.ruta('bubbelblommor'), m = this.ruta('bubbla_unge') || (this.markObjekt || []).find((x) => x.id === 'bubbla_unge');
-    if (!o || !m || !this.unge.visible || !this.ungeBild) return 0;
-    const fran = { ...this.ungePos }, vid = this.hinder.narmasteFria({ x: o.x + o.b / 2, y: o.y + o.h + 6 });
-    const mal = { x: m.x + m.b / 2, y: m.y + m.h };
-    this.ungeMal = null;
-    // styrd: regin flyttar ungen, och update låter den vara (ingen bubbla förrän r växer)
-    const sv = { x: vid.x, y: vid.y, foljer: false, styrd: true, r: 0, g: this.add.graphics() };
-    this.lagerLjust.add(sv.g);
-    this.ungeSvavar = sv;
-    const t = { p: 0 };
-    // springer till blomman
-    this.tweens.add({ targets: t, p: 1, duration: 600, onUpdate: () => { this.ungePos = { x: fran.x + (vid.x - fran.x) * t.p, y: fran.y + (vid.y - fran.y) * t.p }; this.ungeVand = { x: 0, y: -1 }; this.ungeGar = true; this.placera(); this.smutsig = true; }, onComplete: () => { this.ungeGar = false; this.ungeLage('nosar', 'upp', 220, 3); } });
-    // bubblan blåses runt den, och den lyfter ut över vattnet
-    this.time.delayedCall(1300, () => {
-      if (this.ungeSvavar !== sv) return;
-      this.tweens.add({ targets: sv, r: 13, duration: 350, ease: 'Back.easeOut', onUpdate: () => { this.placera(); this.smutsig = true; } });
-      const t2 = { p: 0 };
-      this.tweens.add({ targets: t2, p: 1, delay: 400, duration: 2200, ease: 'Sine.easeInOut', onUpdate: () => { sv.x = vid.x + (mal.x - vid.x) * t2.p; sv.y = vid.y + (mal.y - vid.y) * t2.p + Math.sin(t2.p * 9) * 3; this.ungePos = { x: sv.x, y: sv.y }; this.ungeLyft = Math.round(14 * t2.p); this.placera(); this.smutsig = true; }, onComplete: () => { sv.styrd = false; } });
-    });
-    this.regiLogg.push('ungen tas av bubblan');
-    return 4000;
-  }
-
-  /** Ungen i bubblan: bubblan runt den, den gungar lite, och föremålet bubbla_unge syns inte. Anropas av placera(). */
+  /** Ungen i en bubbla (r > 0): bubblan runt den. På stocken (r = 0) ritas ingen bubbla. Anropas av placera(). */
   ritaUngeBubbla() {
     const sv = this.ungeSvavar;
     if (!sv) return;
-    this.ritade.get('bubbla_unge')?.setVisible(false);
+    if (!sv.r) { if (sv.g.active) sv.g.clear(); return; }
     if (!sv.g.active) { sv.g = this.add.graphics(); this.lagerLjust.add(sv.g); }
     this.ritaBubbla(sv.g, Math.round(this.ungePos.x), Math.round(this.ungePos.y - 11 - (this.ungeLyft || 0)), Math.round(sv.r));
   }
 
+  // ------------------------------------------------------------------ kapitel 2 efter beslut 71 (Teknik 34)
+
+  /** Föremålets bild och dess plats i kartan. @param {string} id */
+  foremalOchBild(id) {
+    const o = this.ruta(id) || (this.markObjekt || []).find((x) => x.id === id);
+    return { o, r: /** @type {any} */ (this.ritade.get(id)) };
+  }
+
+  /** Ungen hålls på en plats av regin (stocken): ungeSvavar utan bubbla. @param {number} x @param {number} y @param {number} [lyft] */
+  hallUngen(x, y, lyft = 3) {
+    if (this.ungeSvavar) this.ungeSvavar.g?.destroy();
+    const sv = { x, y, foljer: false, styrd: true, r: 0, lyft, g: this.add.graphics() };
+    this.lagerLjust.add(sv.g);
+    this.ungeSvavar = sv;
+    return sv;
+  }
+
+  /** Flytta ungen i en båge (styrd). @param {{x:number,y:number}} till @param {number} ms @param {number} hojd @param {() => void} [klar] */
+  ungeBage(till, ms, hojd, klar) {
+    const fran = { ...this.ungePos }, t = { p: 0 };
+    this.tweens.add({ targets: t, p: 1, duration: ms, ease: 'Sine.easeInOut', onUpdate: () => { this.ungePos = { x: fran.x + (till.x - fran.x) * t.p, y: fran.y + (till.y - fran.y) * t.p }; this.ungeLyft = Math.round(Math.sin(t.p * Math.PI) * hojd); this.placera(); this.smutsig = true; }, onComplete: () => { this.ungeLyft = 0; klar?.(); this.placera(); this.smutsig = true; } });
+  }
+
   /**
-   * Nära stranden spricker bubblan (69.5): PLOPP, ungen plumsar i vattnet och sjunker till halsen, sprattlar en
-   * sekund, simmar ett litet varv och kliver upp bredvid hjälten och skakar sig. @returns {number}
+   * SVÄRD hugger en väg genom den täta vassen (k2_svard): stavens ände blir ett svärd, tre hugg, löven yr, och vassen
+   * faller åt sidorna. Föremålet försvinner sedan med pusslets tillstand_efter. @returns {number}
    */
-  bubblanSpricker() {
-    const sv = this.ungeSvavar;
-    if (!sv || !this.ungeBild) return 0;
-    const c = { x: this.ungePos.x, y: this.ungePos.y - 11 - (this.ungeLyft || 0) };
-    for (let i = 0; i < 8; i++) {
-      const v = (i / 8) * Math.PI * 2, d = this.add.rectangle(Math.round(c.x), Math.round(c.y), 2, 2, 0xf2fbff); this.lagerLjust.add(d);
-      this.tweens.add({ targets: d, x: c.x + Math.cos(v) * 16, y: c.y + Math.sin(v) * 16, alpha: 0, duration: 350, onUpdate: () => { this.smutsig = true; }, onComplete: () => d.destroy() });
-    }
-    sv.g.destroy(); this.ungeSvavar = null;
-    // vattnet: närmaste punkt utanför stranden (där bubbla_unge stod), annars där ungen är
-    const m = this.ruta('bubbla_unge') || (this.markObjekt || []).find((x) => x.id === 'bubbla_unge'), vatten = m ? { x: m.x + m.b / 2, y: m.y + m.h } : { ...this.ungePos };
-    const fast = { djup: 0, start: this.time.now, farg: 'vatten' };
-    this.ungeFast = fast;
-    const fran = { ...this.ungePos }, lyft = this.ungeLyft || 0;
-    const t = { p: 0 };
-    this.tweens.add({ targets: t, p: 1, duration: 300, ease: 'Quad.easeIn', onUpdate: () => { this.ungePos = { x: fran.x + (vatten.x - fran.x) * t.p, y: fran.y + (vatten.y - fran.y) * t.p }; this.ungeLyft = Math.round(lyft * (1 - t.p)); this.placera(); this.smutsig = true; },
-      onComplete: () => {
-        this.ungeLyft = 0;
-        // plums: stänk, och den sjunker till halsen
-        for (let i = 0; i < 6; i++) { const v = Math.PI + (i / 5) * Math.PI, d = this.add.rectangle(vatten.x, vatten.y - 2, 2, 2, 0x8fc3e8); this.lagerLjust.add(d); this.tweens.add({ targets: d, x: vatten.x + Math.cos(v) * 12, y: vatten.y - 4 + Math.sin(v) * 10, alpha: 0, duration: 450, onUpdate: () => { this.smutsig = true; }, onComplete: () => d.destroy() }); }
-        this.tweens.add({ targets: fast, djup: 14, duration: 200, onUpdate: () => { this.placera(); this.smutsig = true; } });
-      } });
-    // sprattlar en sekund
-    const sprattel = this.time.addEvent({ delay: 80, repeat: 12, startAt: 0, callback: () => { if (!this.ungeFast) return; this.ungePos = { x: vatten.x + (Math.random() < 0.5 ? -2 : 2), y: vatten.y }; this.placera(); this.smutsig = true; } });
-    void sprattel;
-    // simmar ett litet varv, och kliver upp bredvid hjälten
-    this.time.delayedCall(1500, () => {
-      if (!this.ungeFast) return;
-      fast.djup = 10;
-      const t2 = { p: 0 };
-      this.tweens.add({ targets: t2, p: 1, duration: 1300, onUpdate: () => { const v = t2.p * Math.PI * 2; this.ungePos = { x: vatten.x + Math.sin(v) * 10, y: vatten.y - (1 - Math.cos(v)) * 8 }; this.ungeVand = { x: Math.cos(v), y: Math.sin(v) }; this.placera(); this.smutsig = true; },
-        onComplete: () => {
-          const upp = this.hinder.narmasteFria({ x: this.pos.x + (vatten.x < this.pos.x ? -16 : 16), y: this.pos.y });
-          const s0 = { ...this.ungePos }, t3 = { p: 0 };
-          this.tweens.add({ targets: fast, djup: 0, duration: 250, onUpdate: () => { this.placera(); this.smutsig = true; } });
-          this.tweens.add({ targets: t3, p: 1, duration: 500, ease: 'Sine.easeInOut', onUpdate: () => { this.ungePos = { x: s0.x + (upp.x - s0.x) * t3.p, y: s0.y + (upp.y - s0.y) * t3.p }; this.ungeLyft = Math.round(Math.sin(t3.p * Math.PI) * 8); this.placera(); this.smutsig = true; },
-            onComplete: () => {
-              this.ungeLyft = 0; this.ungeFast = null; this.ungeVand = { x: this.pos.x - this.ungePos.x, y: 0.01 };
-              // den skakar sig, och hjälten blir blöt: droppar åt sidorna
-              for (let i = 0; i < 6; i++) { const v = (i / 6) * Math.PI * 2, d = this.add.rectangle(this.ungePos.x, this.ungePos.y - 10, 1, 2, 0x8fc3e8); this.lagerLjust.add(d); this.tweens.add({ targets: d, x: this.ungePos.x + Math.cos(v) * 14, y: this.ungePos.y - 10 + Math.sin(v) * 8, alpha: 0, duration: 400, onUpdate: () => { this.smutsig = true; }, onComplete: () => d.destroy() }); }
-              this.ungeReagerar(true); this.placera(); this.smutsig = true;
-            } });
-        } });
+  svardHuggerGenomVassen() {
+    const { o, r } = this.foremalOchBild('vass_tat');
+    if (!o) return 0;
+    this.vand = { x: Math.sign(o.x + o.b / 2 - this.pos.x) || 1, y: 0 };
+    this.svard(true);
+    for (let i = 0; i < 3; i++) this.time.delayedCall(420 * i, () => { this.svinga(110, i === 2 ? 'snurr' : 'uppifran'); this.lovYr('vass_tat'); });
+    this.time.delayedCall(1300, () => {
+      if (r?.active) this.tweens.add({ targets: r, alpha: 0, scaleX: 0.2, duration: 350, onUpdate: () => { this.smutsig = true; } });
     });
-    this.regiLogg.push('bubblan spricker och ungen plumsar');
-    return 4000;
+    this.time.delayedCall(1700, () => this.svard(false));
+    this.regiLogg.push('svärdet hugger genom vassen');
+    return 1900;
+  }
+
+  /** Nästan rätt vid vassen: ett litet svärd kittlar den, och vassen darrar. @returns {number} */
+  litetSvardKittlar() {
+    const { r } = this.foremalOchBild('vass_tat');
+    if (!r) return 0;
+    const x0 = r.x;
+    this.svard(true);
+    this.tweens.add({ targets: r, x: x0 + 1, duration: 60, yoyo: true, repeat: 4, onUpdate: () => { this.smutsig = true; }, onComplete: () => { r.x = x0; this.svard(false); this.smutsig = true; } });
+    return 700;
+  }
+
+  /**
+   * Ungens jättehopp efter en stor bubbla, upp på stocken i strandkanten, och stocken glider ut (71.3). Ungen sitter
+   * kvar på stocken tills en formel tar den i land och unge_hoppar_i_land. @returns {number}
+   */
+  ungeHopparPaStocken() {
+    const { o, r } = this.foremalOchBild('stock_vassen');
+    if (!o || !this.unge.visible || !this.ungeBild) return 0;
+    const pa = { x: o.x + o.b / 2, y: o.y + o.h / 2 + 2 };
+    // den stora bubblan svävar ut över vattnet, framför ungen
+    const g = this.add.graphics(); this.lagerLjust.add(g);
+    const b0 = { x: this.ungePos.x, y: this.ungePos.y - 16 }, b1 = { x: pa.x + 4, y: pa.y - 22 }, tb = { p: 0 };
+    this.tweens.add({ targets: tb, p: 1, duration: 900, onUpdate: () => { if (g.active) this.ritaBubbla(g, Math.round(b0.x + (b1.x - b0.x) * tb.p), Math.round(b0.y + (b1.y - b0.y) * tb.p + Math.sin(tb.p * 8) * 2), 6); this.smutsig = true; } });
+    this.hallUngen(this.ungePos.x, this.ungePos.y);
+    this.time.delayedCall(500, () => this.ungeBage(pa, 650, 26, () => {
+      // bubblan spricker när ungen landar, och stocken glider ut med ungen
+      g.destroy();
+      for (let i = 0; i < 6; i++) { const v = (i / 6) * Math.PI * 2, d = this.add.rectangle(b1.x, b1.y, 2, 2, 0xf2fbff); this.lagerLjust.add(d); this.tweens.add({ targets: d, x: b1.x + Math.cos(v) * 10, y: b1.y + Math.sin(v) * 10, alpha: 0, duration: 300, onUpdate: () => { this.smutsig = true; }, onComplete: () => d.destroy() }); }
+      const ut = { dx: 8, dy: 14 }, t = { p: 0 }, rx = r?.x, ry = r?.y;
+      this.tweens.add({ targets: t, p: 1, duration: 1400, ease: 'Sine.easeOut', onUpdate: () => {
+        if (r?.active) { r.x = Math.round(rx + ut.dx * t.p); r.y = Math.round(ry + ut.dy * t.p); }
+        this.ungePos = { x: pa.x + ut.dx * t.p, y: pa.y + ut.dy * t.p }; this.placera(); this.smutsig = true;
+      }, onComplete: () => { const sv = this.ungeSvavar; if (sv) { sv.x = this.ungePos.x; sv.y = this.ungePos.y; sv.styrd = false; } } });
+    }));
+    this.regiLogg.push('ungen hoppar på stocken');
+    return 3000;
+  }
+
+  /** Ungen sitter på stocken och piper: små skutt, och den tittar på vattnet och på hjälten. @returns {number} */
+  ungePiperPaStocken() {
+    const sv = this.ungeSvavar;
+    if (!sv) return 0;
+    sv.styrd = true;
+    const y0 = this.ungePos.y;
+    this.ungeVand = { x: 0, y: 1 };
+    for (let i = 0; i < 3; i++) this.time.delayedCall(350 * i, () => this.ungeBage({ x: this.ungePos.x, y: y0 }, 200, 4));
+    this.time.delayedCall(1100, () => { this.ungeVand = { x: this.pos.x - this.ungePos.x, y: 0.01 }; sv.styrd = false; this.placera(); });
+    this.regiLogg.push('ungen piper på stocken');
+    return 1400;
+  }
+
+  /** Stocken med ungen tas till stranden (FLYG flyger, REP drar): tillbaka till sin plats i kartan. @param {'flyg' | 'rep'} hur */
+  stockenIland(hur) {
+    const { o, r } = this.foremalOchBild('stock_vassen');
+    const sv = this.ungeSvavar;
+    if (!o || !r?.active || !sv) return 0;
+    sv.styrd = true;
+    const fran = { x: r.x, y: r.y }, till = { x: o.x + (r.originX ?? 0) * o.b, y: o.y + (r.originY ?? 0) * o.h }, t = { p: 0 };
+    const rep = hur === 'rep' ? this.add.graphics() : null;
+    if (rep) this.lagerLjust.add(rep);
+    const dU = { x: this.ungePos.x - fran.x, y: this.ungePos.y - fran.y };
+    this.tweens.add({ targets: t, p: 1, delay: hur === 'rep' ? 400 : 0, duration: 1300, ease: 'Sine.easeInOut', onUpdate: () => {
+      r.x = Math.round(fran.x + (till.x - fran.x) * t.p); r.y = Math.round(fran.y + (till.y - fran.y) * t.p - (hur === 'flyg' ? Math.sin(t.p * Math.PI) * 18 : 0));
+      this.ungePos = { x: r.x + dU.x, y: r.y + dU.y + (hur === 'flyg' ? Math.sin(t.p * Math.PI) * 18 : 0) };
+      this.ungeLyft = hur === 'flyg' ? Math.round(Math.sin(t.p * Math.PI) * 18) : 3;
+      if (rep) rep.clear().lineStyle(1, 0xc9a66b, 1).lineBetween(this.pos.x + 6, this.pos.y - 14, this.ungePos.x, this.ungePos.y - 8);
+      this.placera(); this.smutsig = true;
+    }, onComplete: () => { rep?.destroy(); sv.x = this.ungePos.x; sv.y = this.ungePos.y; sv.styrd = false; this.ungeLyft = 3; this.placera(); } });
+    if (rep) rep.lineStyle(1, 0xc9a66b, 1).lineBetween(this.pos.x + 6, this.pos.y - 14, this.ungePos.x, this.ungePos.y - 8);
+    this.regiLogg.push(hur === 'flyg' ? 'stocken flyger till stranden' : 'repet drar in stocken');
+    return hur === 'rep' ? 1900 : 1500;
+  }
+
+  /** En bro eller en stege läggs ut till stocken, och ungen går i land på den. @param {'bro' | 'stege'} vad */
+  tillStocken(vad) {
+    const { r } = this.foremalOchBild('stock_vassen');
+    const sv = this.ungeSvavar;
+    if (!r?.active || !sv) return 0;
+    sv.styrd = true;
+    const fran = { x: this.pos.x + 8, y: this.pos.y - 4 }, till = { x: this.ungePos.x, y: this.ungePos.y - 2 };
+    const g = this.add.graphics(); this.lagerObjekt.add(g); this.lagda.push(g);
+    const n = 6;
+    for (let i = 0; i < n; i++) this.time.delayedCall(140 * i, () => {
+      if (!g.active) return;
+      const p = (i + 0.5) / n, x = fran.x + (till.x - fran.x) * p, y = fran.y + (till.y - fran.y) * p;
+      if (vad === 'bro') g.fillStyle(0x9a7a4e, 1).fillRect(Math.round(x - 3), Math.round(y - 5), 6, 10);
+      else { g.fillStyle(0xb08a58, 1).fillRect(Math.round(x - 1), Math.round(y - 5), 2, 10); g.lineStyle(1, 0xb08a58, 1).lineBetween(Math.round(x - 4), Math.round(y - 5), Math.round(x + 4), Math.round(y - 5)).lineBetween(Math.round(x - 4), Math.round(y + 5), Math.round(x + 4), Math.round(y + 5)); }
+      this.smutsig = true;
+    });
+    this.time.delayedCall(140 * n + 200, () => {
+      const iland = this.hinder.narmasteFria({ x: fran.x, y: fran.y + 4 });
+      this.ungeBage(iland, vad === 'stege' ? 1200 : 800, vad === 'stege' ? 2 : 0, () => { sv.x = this.ungePos.x; sv.y = this.ungePos.y; sv.lyft = 0; sv.styrd = false; });
+    });
+    this.regiLogg.push(vad === 'bro' ? 'en bro till stocken' : 'en stege till stocken');
+    return 140 * n + 200 + (vad === 'stege' ? 1300 : 900);
+  }
+
+  /** Ungen hoppar i land bredvid hjälten och skakar sig, så att hjälten blir blöt (71.3). @returns {number} */
+  ungeHopparILand() {
+    const sv = this.ungeSvavar;
+    if (!this.ungeBild || !this.unge.visible) return 0;
+    const till = this.hinder.narmasteFria({ x: this.pos.x + (this.ungePos.x < this.pos.x ? -16 : 16), y: this.pos.y });
+    const skaka = () => {
+      if (this.ungeSvavar) { this.ungeSvavar.g?.destroy(); this.ungeSvavar = null; }
+      this.ungeVand = { x: this.pos.x - this.ungePos.x, y: 0.01 };
+      for (let i = 0; i < 6; i++) { const v = (i / 6) * Math.PI * 2, d = this.add.rectangle(this.ungePos.x, this.ungePos.y - 10, 1, 2, 0x8fc3e8); this.lagerLjust.add(d); this.tweens.add({ targets: d, x: this.ungePos.x + Math.cos(v) * 14, y: this.ungePos.y - 10 + Math.sin(v) * 8, alpha: 0, duration: 400, onUpdate: () => { this.smutsig = true; }, onComplete: () => d.destroy() }); }
+      this.ungeReagerar(true); this.placera(); this.smutsig = true;
+    };
+    if (sv) { sv.styrd = true; this.ungeBage(till, 700, 18, skaka); } else skaka();
+    this.regiLogg.push('ungen hoppar i land');
+    return sv ? 1500 : 800;
+  }
+
+  /** Lyktornas platser längs lyktor_udden (en var 24:e pixel längs den långa sidan). */
+  lyktPunkter() {
+    const o = this.ruta('lyktor_udden');
+    if (!o) return [];
+    const lodrat = o.h >= o.b, n = Math.max(2, Math.floor((lodrat ? o.h : o.b) / 24) + 1);
+    return Array.from({ length: n }, (_, i) => (lodrat ? { x: o.x + o.b / 2, y: o.y + (i * (o.h - 1)) / (n - 1) } : { x: o.x + (i * (o.b - 1)) / (n - 1), y: o.y + o.h / 2 }));
+  }
+
+  /** LJUS: en ljusboll flyger från staven och tänder lyktorna en i taget (71.6). De lyser tills rummet byts. @returns {number} */
+  ljusetHopparMellanLyktorna() {
+    const p = this.lyktPunkter();
+    if (!p.length) return 0;
+    const boll = this.add.graphics(); this.lagerLjust.add(boll);
+    let fran = { x: this.pos.x + 6, y: this.pos.y - 26 };
+    const steg = 360, slut = steg * p.length + 900;
+    this.regiFokus = { x: this.pos.x, y: this.pos.y };
+    p.forEach((q, i) => this.time.delayedCall(steg * i, () => {
+      const a = { ...fran }, t = { p: 0 };
+      this.regiFokus = { x: q.x, y: q.y };
+      this.tweens.add({ targets: t, p: 1, duration: steg - 20, onUpdate: () => { if (!boll.active) return; boll.clear().fillStyle(0xfff2a8, 0.5).fillCircle(Math.round(a.x + (q.x - a.x) * t.p), Math.round(a.y + (q.y - 6 - a.y) * t.p - Math.sin(t.p * Math.PI) * 10), 4).fillStyle(0xffffff, 1).fillCircle(Math.round(a.x + (q.x - a.x) * t.p), Math.round(a.y + (q.y - 6 - a.y) * t.p - Math.sin(t.p * Math.PI) * 10), 2); this.smutsig = true; },
+        onComplete: () => { const l = this.add.graphics(); this.lagerLjust.add(l); this.lagda.push(l); l.fillStyle(0xffd34d, 0.35).fillCircle(Math.round(q.x), Math.round(q.y - 6), 5).fillStyle(0xffe680, 1).fillRect(Math.round(q.x - 1), Math.round(q.y - 8), 3, 4); this.smutsig = true; } });
+      fran = { x: q.x, y: q.y - 6 };
+    }));
+    this.time.delayedCall(steg * p.length + 100, () => boll.destroy());
+    this.time.delayedCall(slut, () => { this.regiFokus = null; });
+    this.regiLogg.push('ljuset hoppar mellan lyktorna');
+    return slut;
+  }
+
+  /** Nästan LJUS: en liten ljusprick vid stavens ände som slocknar. @returns {number} */
+  litenLjusprick() {
+    const d = this.add.circle(Math.round(this.pos.x + 6), Math.round(this.pos.y - 26), 2, 0xfff2a8); this.lagerLjust.add(d);
+    this.tweens.add({ targets: d, alpha: 0, duration: 500, delay: 200, onUpdate: () => { this.smutsig = true; }, onComplete: () => d.destroy() });
+    return 700;
+  }
+
+  /** Tant Rosa sträcker upp dammvippan mot tavlan, men den räcker inte (71.4). @returns {number} */
+  tantRosaNarInte() {
+    const { o } = this.foremalOchBild('tant_rosa');
+    if (!o) return 0;
+    const g = this.add.graphics(); this.lagerLjust.add(g);
+    const x = o.x + o.b / 2 + 4, y0 = o.y + 4, t = { p: 0 };
+    this.tweens.add({ targets: t, p: 1, duration: 1400, onUpdate: () => {
+      const upp = Math.min(1, t.p * 2.5) * 22, vick = Math.sin(t.p * 18) * 2;
+      g.clear().lineStyle(1, 0x8a6a48, 1).lineBetween(x, y0, x + vick, y0 - upp).fillStyle(0xd9c7a0, 1).fillCircle(Math.round(x + vick), Math.round(y0 - upp), 3);
+      this.smutsig = true;
+    }, onComplete: () => { g.destroy(); this.smutsig = true; } });
+    this.regiLogg.push('Tant Rosa når inte');
+    return 1600;
+  }
+
+  /** Elden tänds på udden, gnistor stiger, och byborna runt elden skuttar och jublar (71.5). @returns {number} */
+  eldenTands() {
+    const { o } = this.foremalOchBild('lagereld');
+    if (!o) return 0;
+    for (let i = 0; i < 12; i++) this.time.delayedCall(90 * i, () => {
+      const g = this.add.rectangle(Math.round(o.x + 4 + Math.random() * (o.b - 8)), o.y + 4, 2, 2, i % 2 ? 0xffb347 : 0xffe680); this.lagerLjust.add(g);
+      this.tweens.add({ targets: g, y: g.y - 18 - Math.random() * 10, alpha: 0, duration: 700, onUpdate: () => { this.smutsig = true; }, onComplete: () => g.destroy() });
+    });
+    this.byborJublar(400);
+    this.regiLogg.push('elden tänds');
+    return 2000;
+  }
+
+  /** Byborna (och Tant Rosa) skuttar och jublar där de står. @param {number} [fore] */
+  byborJublar(fore = 0) {
+    for (const id of ['fiskaren', 'tvatterskan', 'barnet_drake', 'tant_rosa']) {
+      const r = /** @type {any} */ (this.ritade.get(id));
+      if (!r?.active) continue;
+      const y0 = r.y;
+      this.tweens.add({ targets: r, y: y0 - 3, delay: fore + Math.random() * 200, duration: 150, yoyo: true, repeat: 3, onUpdate: () => { this.smutsig = true; }, onComplete: () => { r.y = y0; this.smutsig = true; } });
+    }
+    return 1400;
   }
 
   regiRamar(id, ramar, steg) {
@@ -1767,7 +1930,7 @@ export class Rum extends Phaser.Scene {
     this.harRum = !!v.rum;
     if (v.nyttRum || !this.harRum) { this.rumsbild = (this.harRum && v.karta?.bild) || null; this.mark = (this.harRum && v.karta?.mark) || null; this.rumId = v.rum; this.markObjekt = v.karta?.objekt || []; }
     this.visaUnge = v.unge;
-    if (v.nyttRum) { for (const id of [...this.ramSlinga.keys(), ...this.ramTimrar.keys()]) this.stoppaRamar(id); this.ramFor.clear(); this.dolda.clear(); this.ungeMal = null; this.ungeTittarPa = null; this.ungeKlattrar = null; this.stegeNu = null; this.ungeSang = null; this.ungeLyft = 0; this.ungeFast = null; if (this.ungeSvavar) { this.ungeSvavar.g.destroy(); this.ungeSvavar = null; } for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas?.remove(); this.sover = null; } this.vaknar = null; this.rensaRegi(); }
+    if (v.nyttRum) { for (const id of [...this.ramSlinga.keys(), ...this.ramTimrar.keys()]) this.stoppaRamar(id); this.ramFor.clear(); this.dolda.clear(); this.ungeMal = null; this.ungeTittarPa = null; this.ungeKlattrar = null; this.stegeNu = null; this.ungeSang = null; this.ungeLyft = 0; this.ungeFast = null; this.regiFokus = null; if (this.ungeSvavar) { this.ungeSvavar.g.destroy(); this.ungeSvavar = null; } for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas?.remove(); this.sover = null; } this.vaknar = null; this.rensaRegi(); }
     this.tillstand = v.tillstand;
     if (v.nyttRum || !this.harRum) this.regiPunkter = (this.harRum && v.karta?.regi) || {};
     if (v.nyttRum || !this.harRum) this.inomhus = !!v.karta?.inomhus;
@@ -2208,8 +2371,6 @@ export class Rum extends Phaser.Scene {
   bara(farg, bild = null) {
     this.buren?.destroy(); this.buren = null;
     if (farg === null) return;
-    // ungen i bubblan följer honom (69.5): ungen själv är det som bärs, så saken är tom
-    if (bild === 'bubbla_unge' && this.ungeSvavar) { this.ungeSvavar.foljer = true; this.buren = this.add.container(0, 0); return; }
     // sakens egen bild när Stil har ritat den (boken, 50.5), annars gråboxens filt
     const fb = bild ? foremalsbild(this, bild) : null;
     if (fb) {
@@ -2229,8 +2390,6 @@ export class Rum extends Phaser.Scene {
   lagg(id) {
     const o = this.ruta(id), g = this.buren; if (!o || !g) return;
     this.buren = null;
-    // ungen i bubblan stannar över målet (stranden), tills bubblan spricker
-    if (this.ungeSvavar?.foljer) { const sv = this.ungeSvavar; sv.foljer = false; sv.x = this.ungePos.x; sv.y = this.ungePos.y; g.destroy(); return; }
     if (o.sort === 'figur') {
       const b = g.getBounds();
       // Farfar tar emot boken och läser (51.4): handen ut, boken i handen, och sedan läser han tills rummet byts
@@ -2622,7 +2781,8 @@ export class Rum extends Phaser.Scene {
     const S = this.storlek;
     if (enSkarm(S)) { if (this.kamera.x || this.kamera.y) this.sattKamera({ x: 0, y: 0 }); return; }
     // ungen som svävar iväg i bubblan (69.5) ska synas: kameran följer den tills den följer hjälten
-    const fokus = (this.ungeSvavar && !this.ungeSvavar.foljer && this.ungeSvavar.r > 0) || this.ungeFast?.farg === 'vatten' ? this.ungePos : this.pos;
+    // ljuset som hoppar mellan lyktorna (71.6): kameran följer ljuset ned till udden, och sedan hjälten igen
+    const fokus = this.regiFokus ?? ((this.ungeSvavar && !this.ungeSvavar.foljer && this.ungeSvavar.r > 0) || this.ungeFast?.farg === 'vatten' ? this.ungePos : this.pos);
     const mal = this.omrade ? visaRuta(this.kamera, this.omrade, fokus, S).k : folj(this.kamera, fokus, S, { vand: this.vand, framat: this.kameraFramat });
     const k = narmare(this.kamera, mal, (Math.max(KAMERA.fart, FIGUR.fart * 1.5) * Math.min(dtMs, 100)) / 1000);
     if (k.x !== this.kamera.x || k.y !== this.kamera.y) this.sattKamera(k);
@@ -2699,14 +2859,15 @@ export class Rum extends Phaser.Scene {
     // ungen klättrar inte med honom på stegen: den väntar nedanför, och klättrar efter när han är uppe
     if (this.paStege && !m) { if (flyttad) this.placera(); return this.vantaPaHandling(inm); }
     if ((this.ungeKlattrar || this.ungeSang) && !m) return this.vantaPaHandling(inm);
-    // i bubblan (69.5): den svävar där den är, eller följer hjälten (bära), och gungar
+    // på stocken eller i en bubbla: ungen är där regin har satt den (inget följer hjälten, 71.3), och gungar
     if (this.ungeSvavar?.styrd) return this.vantaPaHandling(inm);
     if (this.ungeSvavar) {
       const sv = this.ungeSvavar;
       const tx = sv.foljer ? this.pos.x + 12 : sv.x, ty = sv.foljer ? this.pos.y - 2 : sv.y;
       const ddx = tx - this.ungePos.x, ddy = ty - this.ungePos.y, dl = Math.hypot(ddx, ddy);
       if (dl > 0.5) { const v = Math.min(dl, (dtMs / 1000) * 80); this.ungePos = { x: this.ungePos.x + (ddx / dl) * v, y: this.ungePos.y + (ddy / dl) * v }; }
-      this.ungeLyft = Math.round(14 + Math.sin(this.time.now / 400) * 2);
+      const lyft = sv.lyft ?? 14;
+      this.ungeLyft = Math.round(lyft + Math.sin(this.time.now / 400) * (lyft >= 8 ? 2 : 1));
       this.placera();
       return this.vantaPaHandling(inm);
     }
