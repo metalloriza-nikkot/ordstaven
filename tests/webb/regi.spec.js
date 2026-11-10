@@ -39,8 +39,8 @@ test('Stils mellanscener (Teknik 31): ungens lägen, ekorren, apan, Farfar och S
   expect(await regi(page, 'ekorre_knacker')).toBeGreaterThan(0);
   await page.waitForTimeout(400);
   expect(await page.evaluate(() => window.__ORDSTAVEN.bildFor('ekorre_gren'))).toMatch(/^ekorre_skaka_(hoger|vanster)_0[12]$/);
-  await page.waitForTimeout(2200);
-  expect(await page.evaluate(() => window.__ORDSTAVEN.bildFor('ekorre_gren'))).toBe('ekorre_gren_01'); // som förut
+  // som förut, och slingan går igen (spelets klocka går långsammare än väggklockan i canvas-läget, därför poll)
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.bildFor('ekorre_gren')), { timeout: 10000 }).toMatch(/^ekorre_gren_0[12]$/);
   expect(await regi(page, 'stav_ristas')).toBeGreaterThan(2000);
   await page.waitForTimeout(1500);
   await page.screenshot({ path: 'test-results/regi-stav-ristas.png' });

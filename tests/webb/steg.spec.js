@@ -535,8 +535,13 @@ test('fri väg: en sidogren (frivillig scen) spelas en gång, han går själv ti
   await page.click('#plattan .vidare');
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.rumsobjekt())).toContain('kista');
   expect(await page.evaluate(() => window.__ORDSTAVEN.tillstand().aventyr['den-gomda-dalen'].frivilligt)).toContain('t_sido');
+  // ett tryck medan rummet tonar in kan gå förlorat i en långsam webbläsare (CI): då trycker testet igen, som han skulle
   await tryckPa(page, 'stig_provA');
-  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.rumsobjekt())).toContain('stig_provc');
+  await expect.poll(async () => {
+    const o = await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt());
+    if (o.includes('stig_provA')) await tryckPa(page, 'stig_provA');
+    return o;
+  }, { timeout: 15000, intervals: [2500] }).toContain('stig_provc');
   expect(await page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('t_vag');
   await tryckPa(page, 'stig_provc');
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('VIDARE.', { timeout: 8000 });

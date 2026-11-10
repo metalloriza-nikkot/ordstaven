@@ -2,6 +2,7 @@
 
 | Version | Datum | Vad |
 |---|---|---|
+| 0.52.1 | 2026-11-10 | **Två webbtester väntar in spelet.** Inget ändras i spelet. 0.52.0 nådde aldrig ut, eftersom testet av regierna i iPadens Safari kollade ekorren innan spelets klocka hunnit klart. Det här är första publicerade versionen med byborna, rollrösterna och Stils mellanscener. |
 | 0.52.0 | 2026-11-10 | **Stils mellanscener rör sig.** Ungen gäspar, fnissar med foten för munnen, kryper ihop, lyssnar med borsten rest och biter i lianen. Farfar skriver lappen och gäspar, SVÄRD ristas i staven i en närbild, det prasslar i en buske, apan suckar, ekorren skakar skal över ungen som nyser, och ugglorna vrider huvudet. Ekorren tittar upp vid fel kort på baronens lapp. Bilderna kommer i spelet när Innehåll har satt dem i datan. |
 | 0.51.0 | 2026-11-10 | **Kapitel 2 i gråbox är klart (del 5).** Byborna vinkar när han trycker på dem och säger ett ord i en bubbla: fiskaren suckar medan repen spärrar bryggan och har fisk efteråt. Tant Rosa och Bo har egna röster. Hela kapitlet går att spela i gråbox, från träsket till elden. |
 | 0.50.0 | 2026-11-10 | **Kapitel 2 i gråbox, del 4.** Brevets halva visas igen med INTE i guld. Farfars brev i Tant Rosas hus läses på läsplattan, och den första meningen, som han redan har läst vid bryggan, står grå med en bock. Tavlorna kommer i den svårare varianten bara om han har klarat grodorna i den. Vid elden säger Farfar det ord han själv skrev vid vattnet. |
