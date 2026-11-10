@@ -206,7 +206,8 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
     // Kontroll av en text som visas
     const textKontroll = (text, plats, { lasesSjalv = false, replik = false } = {}) => {
       for (const r of rader(text)) {
-        for (const m of r.matchAll(PLATSHALLARE)) if (!platshallare.has(m[1])) fel.push(var_(`${plats}: okänd platshållare ${m[0]}`));
+        // {ord:<pussel>} prövas för sig (nedan): det ska peka på ett P11 i kapitlet
+        for (const m of r.matchAll(PLATSHALLARE)) if (!platshallare.has(m[1]) && !m[1].startsWith('ord:')) fel.push(var_(`${plats}: okänd platshållare ${m[0]}`));
         if (/\{[A-ZÅÄÖ]+\}/.test(r)) fel.push(var_(`${plats}: platshållare skrivs med små bokstäver, t.ex. {unge}`));
         const vo = versalord(r, formler);
         if (vo.length) fel.push(var_(`${plats}: skriv i vanlig skrift, inte versaler (${vo.slice(0, 3).join(', ')}): "${r}"`));

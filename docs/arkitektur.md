@@ -893,3 +893,9 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Gränssnittet** (`spel.js`): `nav()` är ett fritt mål med flera utgångar, avstickare och det frivilliga. `bara` till ett annat rum går rum för rum med `vagTillbaka`, och `av.flyttad` säger var resten av scenen spelas (`visaScen`). `lockar` vaktas av en klocka som bara gör något medan han går fritt.
 - **Testkroken** `gaMot(x, y)` är ett tryck på marken i rummet, så att webbtesterna kan gå i stora områden.
 
+## 82. Kapitel 2 i gråbox, del 4: ordet han skrev, kraven, guldet och brevet (0.50.0, Teknik 20)
+- **`{ord:<pussel>}`** är en platshållare som de andra (`karna/text.js`, `PLATSHALLARE`). Berättelsens `varden()` har `ord:<pussel>` för kapitlets P11 med tangentbordet, ur `av.skrivet` och annars pusslets svar.
+- **`nivaMedKrav`** (`karna/lasmotor.js`) sänker nivån till närmaste variant vars `kraver` är uppfyllt. Gränssnittet räknar det i `nivaFor`, så att rummets föremål, läsvalet och lappen visar samma variant.
+- **`lasText`** i `spel.js` ritar ett läsvals text med `redan_last`. Ett läsval i rummet med en text på flera rader visar den på läsplattan först, och lappknappen öppnar läsvalets egen lapp medan det pågår.
+- **`lys_ord`**: `lasSkyltText` sätter klassen `lyser` på ordet.
+

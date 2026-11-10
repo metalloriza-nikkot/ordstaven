@@ -160,3 +160,23 @@ describe('uppdragslappen med grenar', () => {
     expect(l3.kvar).toBe(2);
   });
 });
+
+describe('kapitel 2 del 4: ordet han skrev och variantens krav', () => {
+  it('{ord:<pussel>} är ordet han skrev, och annars pusslets svar', async () => {
+    const { forSkarm } = await import('../../src/karna/text.js');
+    const k = kapitel();
+    k.pussel.push({ id: 'k2_over', typ: 'P11_formel', skriv: 'tangentbord', svar: 'BRO' });
+    const { t, b } = ny(k);
+    expect(forSkarm('Du skrev {ord:k2_over} och FLYG.', { varden: b.varden() })).toEqual(['DU SKREV BRO OCH FLYG.']);
+    aventyrFor(t, AV).skrivet.k2_over = 'FLOTTE';
+    expect(forSkarm('Du skrev {ord:k2_over}.', { varden: b.varden(), skrift: 'vanlig' })).toEqual(['Du skrev Flotte.']);
+  });
+  it('en variant med kraver gäller bara när det pusslet är löst i varianten, annars närmaste lägre', async () => {
+    const { nivaMedKrav } = await import('../../src/karna/lasmotor.js');
+    const varianter = { L3: { text: 'a' }, L4: { text: 'b', kraver: { pussel: 'k2_grodan', variant: 'L4' } } };
+    expect(nivaMedKrav(varianter, 4, () => false)).toBe(3);
+    expect(nivaMedKrav(varianter, 4, (p, v) => p === 'k2_grodan' && v === 'L4')).toBe(4);
+    expect(nivaMedKrav(varianter, 3, () => false)).toBe(3);
+    expect(nivaMedKrav(varianter, 7, () => false)).toBe(3);
+  });
+});

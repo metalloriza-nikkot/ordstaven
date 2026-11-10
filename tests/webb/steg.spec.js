@@ -2366,9 +2366,12 @@ test('navet i kapitel 2 (del 3): dammen lockar, bryggan först, halvan bärs til
   expect(await logg()).toContain('[vägval] gren k2s04_bryggan först');
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.rumsobjekt())).toContain('brygga');
   // scenen vid bryggan: halvan läses som en skylt, och sedan bär han den till ramen i byn
+  let lyste = [];
   for (let i = 0; i < 200; i++) {
     const st = await steg();
     if ((await scen()) !== 'k2s04_bryggan') break;
+    // brevets halva igen, med INTE i guld (lys_ord, del 4)
+    if (st?.typ === 'oppna_lasplatta' && (await page.locator('#plattan .ord.lyser').count())) lyste = await page.locator('#plattan .ord.lyser').allTextContents();
     if (await page.locator('#plattan').isVisible()) await vidare();
     else if (st?.typ === 'las_skylt') await gaMot(st.foremal);
     else if (st?.typ === 'bara') {
@@ -2379,6 +2382,7 @@ test('navet i kapitel 2 (del 3): dammen lockar, bryggan först, halvan bärs til
     await page.waitForTimeout(200);
   }
   expect(await logg()).toContain('[bära] bryggan → byn');
+  expect(lyste).toEqual(['INTE']);
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.rumsobjekt())).toContain('brevram');
   // tillbaka i navet: Tant Rosa, passets slut (▶ fortsätter), och navet med vassen kvar
   await tills(async () => (await steg())?.typ === 'nav', vidare);
@@ -2398,4 +2402,48 @@ test('navet i kapitel 2 (del 3): dammen lockar, bryggan först, halvan bärs til
   a = await av();
   expect(a.nav.klara).toEqual(['k2s04_bryggan']);
   await tills(async () => (await scen()) === 'k2s05_vassen', () => gaMot('stig_vassen'));
+});
+
+test('brevet i Tant Rosas hus (kapitel 2, del 4): första meningen är redan läst, och L4 bara efter grodan i L4', async ({ page }) => {
+  test.setTimeout(90000);
+  const sparning = async (grodan) => {
+    await page.goto('./?snabb&ny&kapitel=kap-02');
+    await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+    await page.evaluate((grodan) => {
+      const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
+      Object.assign(av, { kapitelId: 'kap-02', scen: 7, scenId: 'k2s08_huset', steg: 4, pass: 3, startad: true, rumstillstand: { byn: 'fri' }, skrivet: { k2_over: 'BRO' } });
+      t.spelare.hjalte.namn = 'TESTA'; t.spelare.unge = { format: 1, steg: 1, formagor: [], ...t.spelare.unge, namn: 'KNOPP', folj: true };
+      const post = (niva) => ({ niva, streak: 0, miss: 0, uppgifter: 3, forstaForsok: 3, hjalp: 0, aa: 0 });
+      t.spelare.larande.lasning = { P1_las_och_valj: post(4) };
+      t.spelare.larande.historik = grodan ? [{ pussel_id: 'k2_grodan', typ: 'P1_las_och_valj', niva: 'L4', ratt: true, nar: 1000 }] : [];
+      localStorage.setItem('ordstaven_spar', JSON.stringify(t));
+    }, grodan);
+    await page.goto('./?snabb&kapitel=kap-02');
+    await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+    await page.click('.start-knapp');
+    // fram till läsvalet (det sätter varianten), utan att stänga brevet
+    for (let i = 0; i < 40 && !(await page.evaluate(() => window.__ORDSTAVEN.variant())); i++) {
+      for (const v of await page.locator('#plattan:not([hidden]) .replik-ruta').all()) await v.click({ timeout: 300 }).catch(() => {});
+      await page.waitForTimeout(200);
+    }
+  };
+  // nivån är L4, men grodan är inte löst i L4: tavlorna får L3. Brevet läses först på läsplattan (tre meningar ryms
+  // inte i bubblan), och den första meningen har han redan läst vid bryggan
+  await sparning(false);
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.variant())).toBe('L3');
+  const brev = page.locator('#plattan .lapp .rad');
+  await expect(brev).toHaveCount(3);
+  await expect(brev.first()).toHaveClass(/redan-last/);
+  await expect(brev.first()).toHaveText('BITEN ÄR INTE UNDER BRYGGAN.');
+  await expect(page.locator('#plattan .lapp .rad.redan-last')).toHaveCount(1);
+  await page.screenshot({ path: 'test-results/kap2-brevet.png' });
+  // sedan står papperet i bubblan, och ett tryck på det öppnar brevet igen
+  await page.locator('#plattan .vidare').click();
+  await expect(page.locator('#tanke .tanke-lapp')).toBeVisible({ timeout: 10000 });
+  await page.locator('#tanke .tanke-lapp').click();
+  await expect(page.locator('#plattan .lapp .rad')).toHaveCount(3);
+  await page.screenshot({ path: 'test-results/kap2-brevet-igen.png' });
+  // efter grodan i L4: L4
+  await sparning(true);
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.variant())).toBe('L4');
 });

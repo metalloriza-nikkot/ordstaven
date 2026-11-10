@@ -3,7 +3,7 @@
 // Varje stegtyp i innehållet har en hanterare här. Inget innehåll hårdkodas: allt kommer från content/.
 import { skapaBerattelse, spolaFram, aterstallFramsteg, barFore, grenarI } from './karna/berattelse.js';
 import { sammanfatta } from './karna/foraldravy.js';
-import { skapaLasmotor, valjVariant } from './karna/lasmotor.js';
+import { skapaLasmotor, valjVariant, nivaMedKrav } from './karna/lasmotor.js';
 import { egenskaper, egetForemal, synligaEgenskaper, PALETT } from './karna/egenskaper.js';
 import { skapaValj, skapaFormel, skapaDop, skapaKrukor, skapaRaddning } from './karna/pussel.js';
 import { forSkarm, versaler } from './karna/text.js';
@@ -151,7 +151,20 @@ export function skapaSpel(d) {
    */
   const rumsNiva = new Map();
   /** @param {any} p */
-  const nivaFor = (p) => rumsNiva.get(p.id) ?? lasniva(p.typ);
+  const nivaFor = (p) => rumsNiva.get(p.id) ?? medKrav(p, lasniva(p.typ));
+  /** Är pusslet löst i varianten (det finns i lärandets historik)? @param {string} pid @param {string} variant */
+  const lostI = (pid, variant) => (tillstand.spelare.larande?.historik || []).some((/** @type {any} */ h) => h.pussel_id === pid && h.niva === variant);
+  /** Nivån med variantens krav (`kraver`, 2.31). @param {any} p @param {number} tal */
+  const medKrav = (p, tal) => (p?.varianter ? nivaMedKrav(p.varianter, tal, lostI) : tal);
+  /**
+   * Läsvalets text som rader. De första `redan_last` raderna har han redan läst (brevets första mening, 2.31): de
+   * står grå med en bock. @param {any} p @param {string | string[]} text
+   */
+  const lasText = (p, text) => {
+    const n = p?.redan_last || 0;
+    if (!n || !Array.isArray(text)) return ui.rader(text, varden());
+    return text.map((r, i) => (i < n ? ui.rader([r], varden()).replace('class="rad"', 'class="rad bockad redan-last"') : ui.rader([r], varden()))).join('');
+  };
   const varden = () => b.varden();
 
   // ------------------------------------------------------------------ uppdragslappen (beslut 47 och 48, 2g)
@@ -699,7 +712,7 @@ export function skapaSpel(d) {
     for (const o of karta?.objekt || []) {
       const p = o.visar ? b.pussel(o.visar) : null;
       if (!p || !p.varianter || p.i_rummet) continue;
-      const [, v] = valjVariant(p.varianter, lasniva(p.typ));
+      const [, v] = valjVariant(p.varianter, nivaFor(p));
       ut[o.id] = delarAv(v.alternativ);
     }
     // läs i rummet: varje låda har sitt alternativs färg och storlek, i den variant spelaren får
@@ -869,7 +882,7 @@ export function skapaSpel(d) {
     spelaPlatsensMusik(); // platsens slinga tonas in medan rummet byts (27)
     const r = scen.rum ? b.rum(scen.rum) : null;
     // varianten för läsvalen i världen bestäms när han kommer in i rummet
-    if (nytt) { rumsNiva.clear(); for (const p of b.kapitel.pussel) if (p.i_rummet && p.varianter) rumsNiva.set(p.id, lasniva(p.typ)); }
+    if (nytt) { rumsNiva.clear(); for (const p of b.kapitel.pussel) if (p.i_rummet && p.varianter) rumsNiva.set(p.id, medKrav(p, lasniva(p.typ))); }
     // utgången i förra rummet som leder hit, och åt vilket håll den leder
     const ut = nytt && franRum && scen.rum ? rum.objekt.find((o) => tillFor(o) === scen.rum) : null;
     const glida = !!(ut && ut.riktning) && !tonaNasta;
@@ -1050,13 +1063,15 @@ export function skapaSpel(d) {
    * i rummet, som i pusslet på pusslets skylt. ▶ stänger.
    * @param {{ id: string, text: string, papper: string, pussel?: any }} sk
    */
-  async function lasSkyltText(sk) {
+  /** @param {any} sk @param {string} [lys] ett ord som lyser i guld i texten (`lys_ord`, 2.31: INTE i brevet) */
+  async function lasSkyltText(sk, lys) {
     if (skyltOppen) return;
     skyltOppen = sk.id;
     const varFryst = rum.fryst;
     rum.frys(true); inmatning.rensaGaTill();
-    logg.handelse('skylt', sk.id);
+    logg.handelse('skylt', sk.id + (lys ? ` (${lys} lyser)` : ''));
     const el = ui.visaPlatta(`<div class="pussel-ruta"><div class="lapp p-${ui.esc(sk.papper)}">${ui.rader(sk.text, varden())}</div><button type="button" class="vidare synlig" aria-label="Stäng">▶</button></div>`, 'pussel lapp-vy skylt-vy');
+    if (lys) for (const e of el.querySelectorAll('.ord')) if (versaler(/** @type {HTMLElement} */ (e).dataset.ord || '') === versaler(lys)) e.classList.add('lyser');
     if (sk.pussel) tillatNos(sk.pussel, skyltSpar ?? { hjalp: false }); else ui.sattNos(true, { betala: () => true });
     await ui.vantaFortsatt(/** @type {HTMLElement} */ (el.querySelector('.vidare')), lyssnaHandling);
     await vanta(0); // trycket på ▶ får inte nå nästa steg
@@ -1169,7 +1184,7 @@ export function skapaSpel(d) {
       case 'pussel': return pussel(b.pussel(st.pussel_id));
       case 'oppna_lasplatta': {
         // en skylt i rummet visas igen (2.31: brevets halva). Ordet i guld (lys_ord) kommer i del 4.
-        if (st.skylt) { const sk = skyltarIRummet().find((x) => x.id === st.skylt); if (sk) return lasSkyltText(sk); logg.handelse('FEL', 'oppna_lasplatta: skylten finns inte i rummet: ' + st.skylt); return; }
+        if (st.skylt) { const sk = skyltarIRummet().find((x) => x.id === st.skylt); if (sk) return lasSkyltText(sk, st.lys_ord); logg.handelse('FEL', 'oppna_lasplatta: skylten finns inte i rummet: ' + st.skylt); return; }
         return visaLapp(b.pussel(st.pussel_id), true);
       }
       case 'visa_ui': {
@@ -1884,7 +1899,7 @@ export function skapaSpel(d) {
   /** Läs och välj (P1) och packa (P28). @param {any} p */
   async function valj(p) {
     const flera = p.typ === 'P28_packa';
-    const niva = lasniva(p.typ);
+    const niva = nivaFor(p);
     const v = skapaValj(p, { niva });
     const spar = { hjalp: false };
     if (p.instruktion) await replik(p.instruktion);
@@ -1907,7 +1922,7 @@ export function skapaSpel(d) {
         return `<button type="button" class="${klasser}" data-id="${ui.esc(a.id)}">${luckor ? '<span class="lucka-ikon" aria-hidden="true"></span>' : ''}${bild}${etikett}${v.s.pekar === a.id ? `<span class="nos-pekar" aria-hidden="true">${ikon('nos', 'stor')}</span>` : ''}</button>`;
       };
       const rita = () => {
-        const papper = v.s.text ? `<div class="lapp p-${ui.esc(p.papper || 'lapp')}">${ui.rader(v.s.text, varden())}</div>` : '';
+        const papper = v.s.text ? `<div class="lapp p-${ui.esc(p.papper || 'lapp')}">${lasText(p, v.s.text)}</div>` : '';
         const bildHtml = v.s.bild ? bilder.html(v.s.bild) : '';
         // på luckorna står bilden till höger om frågan, annars under den
         const bild = bildHtml && !(luckor && fr) ? `<div class="fraga">${bildHtml}</div>` : '';
@@ -2004,15 +2019,19 @@ export function skapaSpel(d) {
     const kvarUtgangar = () => kvarAlt().map((a) => a.objekt).filter((id) => arUtgang(id));
     // Har spelaren fått pusslet som en lapp (dinomaten) står inte texten i tankebubblan: han läser lappen
     // eller minns den. Bubblan visar lappen, och ett tryck på den öppnar lappen igen.
-    const harLapp = (av.lappar || []).includes(p.id);
+    // Ett brev med tre meningar eller fler (Farfars brev i Tant Rosas hus) ryms inte i bubblan: han läser det på
+    // läsplattan först, och sedan visar bubblan papperet, som för en lapp han redan har. Två rader ryms (dinomaten).
+    const brev = !(av.lappar || []).includes(p.id) && Array.isArray(v.s.text) && v.s.text.length >= 3;
+    const harLapp = (av.lappar || []).includes(p.id) || brev;
     lappPussel = harLapp ? p.id : null; // lappknappen öppnar Farfars lapp medan pusslet pågår
+    if (brev) { logg.handelse('lappen', `${p.id}: brevet läses först`); await visaLapp(p, true); }
     // Står frågan på en skylt i rummet (p.skylt, Farfars skylt vid stenarna) läser han den där: bubblan visar ett
     // papper, och skylten öppnas när han går dit eller trycker på papperet. Den läses aldrig upp.
     const skylt = p.skylt ? skyltarIRummet().find((x) => x.id === p.skylt) ?? null : null;
     if (p.skylt && !skylt) logg.handelse('FEL', `${p.id}: skylten ${p.skylt} finns inte i rummet`);
     const fraga = () => visaMoln(skylt ? `<button type="button" class="tanke-lapp tanke-skylt" aria-label="Skylten">${ikon('lapp', 'stor')}</button>`
       : harLapp ? `<button type="button" class="tanke-lapp" aria-label="Lappen">${ikon('lapp', 'stor')}</button>`
-      : v.s.bild ? bilder.html(v.s.bild) : v.s.text ? `<span class="moln-text">${ui.rader(v.s.text, varden())}</span>` : null, p.instruktion ?? null);
+      : v.s.bild ? bilder.html(v.s.bild) : v.s.text ? `<span class="moln-text">${lasText(p, v.s.text)}</span>` : null, p.instruktion ?? null);
     if (skylt) {
       skyltStyrs.add(skylt.id); skyltSpar = spar; skyltPusselNu = skylt.id;
       // han har just gått fram till skylten: den öppnas direkt
@@ -2752,10 +2771,10 @@ export function skapaSpel(d) {
   /** Lappen (läsplattan utan pussel): visas, nosen tillåten, stängs med ▶. @param {any} p @param {boolean} forsta */
   async function visaLapp(p, forsta) {
     if (!p) return;
-    const niva = lasniva(p.typ);
+    const niva = nivaFor(p);
     const v = skapaValj(p, { niva });
     rum.frys(true);
-    const el = ui.visaPlatta(`<div class="pussel-ruta"><div class="lapp p-${ui.esc(p.papper || 'lapp')}">${ui.rader(v.s.text || '', varden())}</div><button type="button" class="vidare synlig" aria-label="Stäng">▶</button></div>`, 'pussel lapp-vy');
+    const el = ui.visaPlatta(`<div class="pussel-ruta"><div class="lapp p-${ui.esc(p.papper || 'lapp')}">${v.s.text ? lasText(p, v.s.text) : ''}</div><button type="button" class="vidare synlig" aria-label="Stäng">▶</button></div>`, 'pussel lapp-vy');
     tillatNos(p, { hjalp: false });
     const vidare = /** @type {HTMLElement} */ (el.querySelector('.vidare'));
     await ui.vantaFortsatt(vidare, lyssnaHandling);
@@ -2781,7 +2800,8 @@ export function skapaSpel(d) {
   // ut (47.2), och utan uppdrag Farfars senaste lapp om den hör till kapitlet
   ui.$('#hud-lapp').addEventListener('click', () => {
     if (!ui.plattan.hidden || pausad || !b) return;
-    const id = (av.lappar || [])[(av.lappar || []).length - 1];
+    // lappen i läsvalet som pågår (brevet i Tant Rosas hus), annars den senaste lappen han har
+    const id = lappPussel && b.pussel(lappPussel) ? lappPussel : (av.lappar || [])[(av.lappar || []).length - 1];
     // medan ett läsval pågår och han har en lapp i kapitlet öppnar knappen den senaste lappen, som före 2g (51.2):
     // vid skyltarna (s22) står svaret på Farfars lista. Utanför pusslen öppnar den uppdragslappen
     if (id && b.pussel(id) && (lappPussel === id || aktuelltSteg?.typ === 'pussel')) { logg.handelse('lappen', 'Farfars lapp: ' + id); visaLapp(b.pussel(id), false); return; }

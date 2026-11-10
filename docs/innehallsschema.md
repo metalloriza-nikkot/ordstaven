@@ -323,6 +323,14 @@ Formen kommer från rapporten 12:30 (Teknik 26) och Innehålls tillägg i 64.2. 
 - **`bara` till ett annat rum** i kapitlet: han bär saken dit. Medan den följer honom är rummets utgångar stängda utom vägen mot målet, och målet glimtar.
 - **`lockar`** på en frivillig scen: `vid` (en utgång i något rum), `beskrivning`, `bild`, `ljud` och `ljudord`. Det händer när han går förbi, igen varje gång tills han har varit där, aldrig under en replik eller ett läsval.
 
+**Så spelar motorn resten av fälten** (Teknik 20 del 4):
+- **`{ord:<pussel>}`** blir ordet han skrev i det P11 (sparat i sparningen), i texten och i rösten. Saknas det (ett hopp i menyn för vuxna) blir det pusslets `svar`.
+- **`kraver`:** en variant med `kraver: { pussel, variant }` gäller bara när det pusslet är löst i den varianten (det står i lärandets historik, med hur många försök som helst). Annars får han närmaste lägre variant, också på en högre nivå.
+- **`oppna_lasplatta` med `skylt`** visar skyltens text igen på läsplattan, och **`lys_ord`** lyser i guld där tills han stänger den.
+- **`redan_last`:** de första raderna står grå med en bock, på läsplattan och när lappen öppnas igen.
+- **Ett brev i ett läsval i rummet** (en text med flera rader, som Farfars brev i Tant Rosas hus) ryms inte i bubblan. Han läser det på läsplattan först, och sedan visar bubblan papperet, som ett tryck öppnar igen. Lappknappen öppnar det också.
+- **Tant Rosas dörr** går inte att gå in genom förrän berättelsen går dit (k2s07), eftersom han inte har varit i huset. Inget fält behövs.
+
 **Så spelar motorn navet** (2.33, Teknik 20 del 3):
 - **I navet** går han fritt i rummet. Varje gren som inte är klar har sin utgång (`mal`) som mål, och molnet visar grenarnas bilder (`bild`) med instruktionen före navet, efter en gren den sista upplästa repliken i `mellan_grenar`. Han kan också gå till rum han har varit i och till en frivillig scen, som under ett `ga_till` med fri väg. Knuffen efter ca 15 s: ungen springer mot närmaste gren som inte är klar och väntar där. Den visar aldrig sin text, eftersom ungen gör det den säger.
 - **En gren** spelas när han går ut genom dess utgång. När grenens scen är slut kommer `mellan_grenar` (om grenar är kvar) och sedan navet igen. När alla grenar är klara fortsätter berättelsen med scenen efter navet och grenarna.

@@ -4,8 +4,8 @@
 
 /** @typedef {'versaler' | 'vanlig'} Skrift */
 
-/** Platshållare i texten: {unge}, {hjalte}. */
-export const PLATSHALLARE = /\{([a-z]+)\}/g;
+/** Platshållare i texten: {unge}, {hjalte}, och {ord:<pussel>} (ordet han skrev i ett P11 med tangentbordet, 2.31). */
+export const PLATSHALLARE = /\{([a-z]+(?::[a-z0-9_]+)?)\}/g;
 
 /** Text som rader. @param {string | string[]} text @returns {string[]} */
 export function rader(text) {

@@ -209,6 +209,11 @@ html, body {
 /* packlistan: en bock per packad rad; när allt är packat lyser raden som inte är en sak, och sakerna tonas ut */
 .lapp .rad.bockad::after { content: ''; display: inline-block; width: calc(16 * var(--ipx-text)); height: calc(16 * var(--ipx-text)); margin-left: .25em; vertical-align: -.1em; background: url('../assets/ui/ikon_klar.png') 0 0 / 100% 100%; image-rendering: pixelated; }
 .lapp .rad.lyser { background: rgba(242, 193, 78, .5); border-radius: 6px; box-shadow: 0 0 0 4px rgba(242, 193, 78, .5); animation: puls .6s ease 3; }
+/* raderna han redan har läst (redan_last, 2.31): grå, med bocken efter */
+.rad.redan-last { color: #8a8170; }
+#tanke .moln-text .rad.redan-last::after { content: ''; display: inline-block; width: calc(16 * var(--ipx-text)); height: calc(16 * var(--ipx-text)); margin-left: .25em; vertical-align: -.1em; background: url('../assets/ui/ikon_klar.png') 0 0 / 100% 100%; image-rendering: pixelated; }
+/* ordet som lyser i guld (lys_ord, 2.31: INTE i brevet), med texten kvar i hög kontrast */
+.lapp .ord.lyser { background: rgba(242, 193, 78, .75); border-radius: 4px; box-shadow: 0 0 0 4px rgba(242, 193, 78, .75); animation: puls .6s ease 3; }
 .kortrad.packat .kort { opacity: .3; transition: opacity .4s; }
 /* baronens papper i hans orange (spelarens val), med de gamla id:na kvar */
 .lapp.p-lila_papper_blackplumpar, .lapp.p-baronens_papper_hatt, .lapp.p-baronens_papper_hjalm { background: #f6dcc3; box-shadow: 0 3px 0 rgba(0,0,0,.18), inset 0 0 0 4px #e8823a; }

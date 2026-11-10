@@ -226,7 +226,14 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
     if (sc && i >= 0 && aterupptaSteg === i && av.nav?.scen !== sc.id) av.nav = { scen: sc.id, klara: [], pass: sc.pass };
   }
 
-  const varden = () => ({ unge: unge.namn || '', hjalte: tillstand.spelare.hjalte.namn || '' });
+  // {ord:<pussel>} (2.31): ordet han skrev i ett P11 med tangentbordet, och annars pusslets svar (ett hopp i menyn)
+  const ordPussel = kapitel.pussel.filter((/** @type {any} */ p) => p.typ === 'P11_formel' && p.skriv === 'tangentbord');
+  const varden = () => {
+    /** @type {Record<string, string>} */
+    const v = { unge: unge.namn || '', hjalte: tillstand.spelare.hjalte.namn || '' };
+    for (const p of ordPussel) v[`ord:${p.id}`] = av.skrivet?.[p.id] || p.svar || '';
+    return v;
+  };
 
   /** Tillstånd för ett rum: senast satt, annars rummets första. @param {string | null} rumId */
   function rumsTillstand(rumId) {
