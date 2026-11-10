@@ -35,13 +35,13 @@
   "tant_rosa": {
    "namn": "Tant Rosa",
    "rost": "datorrost",
-   "rollrost": "gammal",
+   "rollrost": "tant",
    "portratt": "tant_rosa"
   },
   "bo": {
    "namn": "Bo",
    "rost": "datorrost",
-   "rollrost": "berattare",
+   "rollrost": "barn",
    "portratt": "bo"
   }
  },

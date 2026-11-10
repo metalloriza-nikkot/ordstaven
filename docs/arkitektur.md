@@ -899,3 +899,8 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **`lasText`** i `spel.js` ritar ett läsvals text med `redan_last`. Ett läsval i rummet med en text på flera rader visar den på läsplattan först, och lappknappen öppnar läsvalets egen lapp medan det pågår.
 - **`lys_ord`**: `lasSkyltText` sätter klassen `lyser` på ordet.
 
+## 83. Kapitel 2 i gråbox, del 5: byborna och rollrösterna (0.51.0, Teknik 20)
+- **Byborna:** `karna/bubblor.js` väljer ordet ur rummets `bubblor` efter rummets tillstånd (`*` gäller i alla). Ett tryck på en figur utan `talare` som har en bubbla går till `rum.fragaIgen` i `spel.js`: figuren vinkar, och ordet står i ropbubblan (`#rop`) i ca 2 s. Ingenting annat händer.
+- **Rollrösterna** `tant` och `barn` står i `src/grans/rost.js` (tonhöjd och tempo), och Tant Rosa och Bo har dem i `aventyr.json`.
+- **Gråboxen för kapitel 2 är klar** (del 1–5): kapitlet går att spela från träsket till elden.
+

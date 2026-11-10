@@ -260,6 +260,8 @@ redo.then(() => { startKlar = true; window.clearTimeout(startVakt); window.remov
   rumsobjekt: () => rum.objekt.map((o) => o.id),
   /** Gå mot en punkt i rummet, som ett tryck på marken (vägen runt det som står i vägen). @param {number} x @param {number} y */
   gaMot: (x, y) => inmatning.sattGaTill(x, y),
+  /** Var ungen står i rummet. */
+  ungePos: () => ({ ...rum.ungePos }),
   pausad: () => spelet.pausad,
   /** Varianten (nivån) i pusslet som pågår, t.ex. "L2". */
   variant: () => spelet.variant,

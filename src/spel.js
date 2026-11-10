@@ -14,6 +14,7 @@ import { varVarVi, senastSpelad } from './karna/varvarvi.js';
 import { musikFor } from './karna/musik.js';
 import { ljudLista } from './karna/ljudid.js';
 import { SYNS_REDAN_MS, UNGE_TILL_MS, visarRegi, lockarVisarBeskrivning } from './karna/mellanscen.js';
+import { bubblaFor, BUBBLA_MS } from './karna/bubblor.js';
 import { sparaPassbild, aterstallLarande, forstaIPasset } from './karna/larandebild.js';
 import { pekningOmMs, skapaHjalpSpar, knufftidMs } from './karna/hjalp.js';
 import { HJALTE_FARGER, HJALTE_FAST } from './scener/Rum.js';
@@ -934,7 +935,19 @@ export function skapaSpel(d) {
   }
   // dialogregeln: ett tryck på en figur (kartans "talare") upprepar dess senaste instruktion
   let fragar = false;
+  let bubblaTimer = 0;
   rum.fragaIgen = (/** @type {any} */ o) => {
+    // en bybo (kapitel 2) vinkar och visar sitt ord i en bubbla en stund. Det räknas inte som något.
+    const ord = !o.talare && aktuelltRum ? bubblaFor(b?.rum(aktuelltRum), o.id, b?.rumsTillstand(aktuelltRum) ?? null) : null;
+    if (ord) {
+      if (pausad || !ui.plattan.hidden) return true;
+      rum.vinka(o.id);
+      ui.ropa(ui.rader(ord, varden()), skarm(o.x + o.b / 2, o.y));
+      window.clearTimeout(bubblaTimer);
+      bubblaTimer = window.setTimeout(() => ui.ropa(null), BUBBLA_MS);
+      logg.handelse('bubbla', `${o.id}: ${ord}`);
+      return true;
+    }
     const r = o.talare ? senaste.get(o.talare) : null;
     if (!r || fragar || pausad || !ui.plattan.hidden) return false;
     // är figuren målet just nu (gå fram till Farfar, ta lappen, bär boken till honom) går trycket dit i stället

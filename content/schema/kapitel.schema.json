@@ -360,6 +360,18 @@
           },
           "description": "Objekt i rummet: ett id, eller { id, syns_i, dold }. Tiled-kartan använder samma id:n."
         },
+        "bubblor": {
+          "type": "object",
+          "description": "Bybornas bubblor (2.34, beslut 67.5): figurens id → rummets tillstånd (eller * för alla) → ordet i bubblan. Ett tryck på figuren ger en vinkning och bubblan i ca 2 s.",
+          "additionalProperties": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
         "anteckning": {
           "$ref": "#/$defs/anteckning"
         },

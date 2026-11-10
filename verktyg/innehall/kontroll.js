@@ -176,6 +176,12 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
     for (const r of k.rum) for (const t of r.tillstand || []) tillstand.add(t);
     for (const p of k.pussel) if (p.typ === 'P11_formel') for (const f of p.formler) if (f.tillstand_efter) tillstand.add(f.tillstand_efter);
 
+    // bybornas bubblor (2.34): figuren står i rummet, och nyckeln är ett av rummets tillstånd eller *
+    for (const r of k.rum) for (const [fig, per] of Object.entries(r.bubblor || {})) {
+      if (!r.innehall.map(objId).includes(fig)) fel.push(var_(`rum ${r.id}: bubblan hör till ${fig}, som inte står i rummet`));
+      for (const t of Object.keys(/** @type {any} */ (per))) if (t !== '*' && !(r.tillstand || []).includes(t)) fel.push(var_(`rum ${r.id}: bubblan för ${fig} gäller ${t}, men rummet har inte det tillståndet`));
+    }
+
     // Föremål i rummen: unika, och syns_i bara med tillstånd som rummet har
     for (const r of k.rum) {
       const ids = r.innehall.map(objId);

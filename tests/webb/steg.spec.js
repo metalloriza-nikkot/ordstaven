@@ -2447,3 +2447,38 @@ test('brevet i Tant Rosas hus (kapitel 2, del 4): första meningen är redan lä
   await sparning(true);
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.variant())).toBe('L4');
 });
+
+test('byborna (kapitel 2, del 5): ett tryck ger en vinkning och ordet i en bubbla en stund, efter byns tillstånd', async ({ page }) => {
+  test.setTimeout(90000);
+  const iByn = async (tillstand) => {
+    await page.goto('./?snabb&ny&kapitel=kap-02');
+    await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+    await page.evaluate((tillstand) => {
+      const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
+      Object.assign(av, { kapitelId: 'kap-02', scen: 2, scenId: 'k2s03_torget', steg: 5, pass: 2, startad: true, rumstillstand: { byn: tillstand }, skrivet: { k2_over: 'BRO' } });
+      t.spelare.hjalte.namn = 'TESTA'; t.spelare.unge = { format: 1, steg: 1, formagor: [], ...t.spelare.unge, namn: 'KNOPP', folj: true };
+      localStorage.setItem('ordstaven_spar', JSON.stringify(t));
+    }, tillstand);
+    await page.goto('./?snabb&kapitel=kap-02');
+    await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+    await page.click('.start-knapp');
+    for (let i = 0; i < 40 && (await page.evaluate(() => window.__ORDSTAVEN.steg()?.typ)) !== 'nav'; i++) {
+      for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+      await page.waitForTimeout(200);
+    }
+    await page.waitForFunction(() => !window.__ORDSTAVEN.fryst() && document.querySelector('#plattan').hidden);
+  };
+  const tryckPaFiskaren = async () => { const o = await page.evaluate(() => window.__ORDSTAVEN.objekt('fiskaren')); await page.mouse.click(o.x, o.y); };
+  await iByn('fri');
+  await tryckPaFiskaren();
+  await expect(page.locator('#rop')).toBeVisible();
+  await expect(page.locator('#rop')).toHaveText('FISK');
+  await page.screenshot({ path: 'test-results/kap2-bubblan.png' });
+  await expect(page.locator('#rop')).toBeHidden({ timeout: 5000 });
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('[bubbla] fiskaren: fisk');
+  // trycket räknas inte som något: navet står kvar
+  expect(await page.evaluate(() => window.__ORDSTAVEN.steg()?.typ)).toBe('nav');
+  await iByn('rep');
+  await tryckPaFiskaren();
+  await expect(page.locator('#rop')).toHaveText('SUCK');
+});

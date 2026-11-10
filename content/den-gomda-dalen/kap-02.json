@@ -258,6 +258,19 @@
     "tvatterskan",
     "barnet_drake"
    ],
+   "bubblor": {
+    "fiskaren": {
+     "rep": "suck",
+     "fri": "fisk"
+    },
+    "tvatterskan": {
+     "rep": "oj",
+     "fri": "hurra"
+    },
+    "barnet_drake": {
+     "*": "hej"
+    }
+   },
    "anteckning": "Navet, 2 × 2 skärmar (64.1). SV: in från bron (stig_kanten). Fiskarens nät och tvättstrecket på stranden. SO: ängen med barnet och draken, och udden med lägerelden. NV: pålhus. NO: TORGET, en skärm, med Tant Rosas hus (tant_rosa på trappan, dorr_rosa och brevram på dörren), brunnen mitt på torget och tre utgångar: stig_vassen och stig_dammen norrut (stig_dammen går förbi brunnen) och stig_bryggan österut. Bryggans början (brygga_fran_torget) syns från torget, gammal men hel. I tillståndet rep spärrar ett orange rep med en orange skylt var och en av de tre vägarna: rep_vassen över stig_vassen, rep_brunnen runt brunnen och över stig_dammen, och rep_bryggan över stig_bryggan. Repen ser likadana ut och spärrar lika mycket. Läsvalet ryms på torgets skärm. dorr_rosa är låst tills k2s07. Byborna (fiskaren, tvatterskan, barnet_drake) har sina områden i SV och SO, aldrig på torget (63.9). Se meta.teknik om byborna och tillstånden."
   },
   {

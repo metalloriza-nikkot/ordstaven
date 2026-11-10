@@ -62,7 +62,9 @@
               "fanig",
               "metall",
               "fagel",
-              "unge"
+              "unge",
+              "tant",
+              "barn"
             ],
             "description": "Tonhöjd och tempo för datorrösten."
           },

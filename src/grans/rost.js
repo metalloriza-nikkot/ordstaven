@@ -11,6 +11,9 @@
 const ROLLER = {
   berattare: { pitch: 1.05, rate: 0.95 },
   gammal: { pitch: 0.8, rate: 0.88 },
+  // Tant Rosa: ljusare än Farfar och lite långsam. Bo: ljus och snabb (beslut 67.5)
+  tant: { pitch: 1.15, rate: 0.9 },
+  barn: { pitch: 1.5, rate: 1.1 },
   fanig: { pitch: 1.35, rate: 1.05 },
   metall: { pitch: 1.6, rate: 1.15 },
   fagel: { pitch: 1.45, rate: 1.12, levande: 0.15 },
