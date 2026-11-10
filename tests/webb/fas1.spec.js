@@ -442,7 +442,8 @@ test('mellanscenens text är en regianvisning: liten, i vanlig skrift, aldrig p�
   await starta(page, '?snabb&ny');
   await page.evaluate(() => {
     const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
-    av.scen = 8; delete av.scenId; delete av.steg; av.startad = false; t.spelare.unge.namn = 'KNOPP';
+    // s09: Farfar skriver på lappen (en mellanscen som fortfarande visar rutan, 67.2)
+    av.scen = 10; delete av.scenId; delete av.steg; av.startad = false; t.spelare.unge.namn = 'KNOPP';
     localStorage.setItem('ordstaven_spar', JSON.stringify(t));
   });
   await starta(page);

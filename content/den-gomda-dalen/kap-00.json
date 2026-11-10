@@ -15,7 +15,7 @@
  },
  "meta": {
   "namn": "Prologen",
-  "version": "0.15",
+  "version": "0.16",
   "datum": "2026-11-07",
   "agare": "Innehåll",
   "kalla": "Manus 13-prolog-manus.md v1.10. Byggd på repots kap-00.json från 0.29.0.",
@@ -24,7 +24,8 @@
   "innehall_v012": "Nästa prologversion efter spelarens pass 3 (beslut 34.4–34.6, 36.7, 37.5, 38.2–38.4, granskningen C 26 och 28–30). Hela listan står i 13 v1.7.",
   "innehall_v013": "Beslut 39.1, genomgången av samspelen: sex instruktioner med verb och mål (s01, s01b, s06, s14, s15, s21) och \"Hej, {hjalte}!\" i s00. Hela genomgången står i 13 v1.8.",
   "innehall_v014": "Det korta passet (beslut 45.5, 46.4, 47 och 50.4): rubrikerna PÅ VINDEN (förut TITTA PÅ VINDEN) och UT UR HUSET (förut FÖLJ LISTAN, en order som pekade på en lista han inte såg; rubriken avslöjar inte SKOGEN), fältet ersatter borttaget ur uppdragen (47.1), \"Gå till lådan!\" i s02 (47.6), och bild på de fyra mellanscenerna med ägget (agg_frost, agg_filt, agg_lyser och agg_klackning, Tekniks fält från 0.28.0) är Innehålls.",
-  "innehall_v015": "Det andra korta passet (beslut 52.5): rubrikerna HOS FARFAR (förut KOM TILL FARFAR, en order; KÖKET skulle peka mot dörren han ska läsa sig till) och KRUKORNA (förut LETA I KRUKORNA), högst ca 11 tecken. Mellanscenerna i s18 och s21b beskriver Tekniks nya animationer (51.4): hjälten sover med hjälmen på, ungen trampar på fotändan och somnar, och Farfar och hjälten vinkar i stället för kramen. Ingen lästext och ingen replik är ändrad."
+  "innehall_v015": "Det andra korta passet (beslut 52.5): rubrikerna HOS FARFAR (förut KOM TILL FARFAR, en order; KÖKET skulle peka mot dörren han ska läsa sig till) och KRUKORNA (förut LETA I KRUKORNA), högst ca 11 tecken. Mellanscenerna i s18 och s21b beskriver Tekniks nya animationer (51.4): hjälten sover med hjälmen på, ungen trampar på fotändan och somnar, och Farfar och hjälten vinkar i stället för kramen. Ingen lästext och ingen replik är ändrad.",
+  "andrat_v016": "2026-11-08 (beslut 67.9): musik (natten till kläckningen och vid sängdags, lagerelden i sagan), ljud på mellanscener och reaktioner, syns_redan på mellanscenerna som redan syns (67.2). Titelbildens mellanscen och Farfar vid fönstret (s21) är strukna. Ingen text som spelaren läser är ändrad."
  },
  "var_var_vi": [
   {
@@ -222,10 +223,6 @@
    },
    "steg": [
     {
-     "typ": "mellanscen",
-     "beskrivning": "Titelbild: en stav som glimmar i mörker, en stor knapp utan text. Trycket startar ljudet."
-    },
-    {
      "typ": "replik",
      "talare": "berattare",
      "text": "Ordstaven. Den gömda dalen.",
@@ -262,6 +259,7 @@
    "id": "s01_natten",
    "pass": 1,
    "rum": "sovrummet",
+   "musik": "natten",
    "tillstand": "natt",
    "hjalte": "sover",
    "vid_omstart": {
@@ -272,7 +270,8 @@
    "steg": [
     {
      "typ": "mellanscen",
-     "beskrivning": "Sovrummet på natten. Ett nattljus lyser vid sängen. Hjälten sover."
+     "beskrivning": "Sovrummet på natten. Ett nattljus lyser vid sängen. Hjälten sover.",
+     "syns_redan": true
     },
     {
      "typ": "replik",
@@ -329,6 +328,7 @@
    "id": "s01b_hallen",
    "pass": 1,
    "rum": "hallen",
+   "musik": "natten",
    "tillstand": "natt",
    "vid_omstart": {
     "talare": "farfar",
@@ -338,7 +338,8 @@
    "steg": [
     {
      "typ": "mellanscen",
-     "beskrivning": "Hallen på natten, med en nattlampa. En bred entré med stegen upp, och en korridor med fem stängda dörrar med Farfars lappar."
+     "beskrivning": "Hallen på natten, med en nattlampa. En bred entré med stegen upp, och en korridor med fem stängda dörrar med Farfars lappar.",
+     "syns_redan": true
     },
     {
      "typ": "ljud",
@@ -347,7 +348,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Hjälten tittar upp. Stegen lyser."
+     "beskrivning": "Hjälten tittar upp. Stegen lyser.",
+     "syns_redan": true
     },
     {
      "typ": "replik",
@@ -369,6 +371,7 @@
    "id": "s02_glimten",
    "pass": 1,
    "rum": "vinden",
+   "musik": "natten",
    "tillstand": "natt",
    "vid_omstart": {
     "talare": "farfar",
@@ -408,6 +411,7 @@
    "id": "s03_staven",
    "pass": 1,
    "rum": "vinden",
+   "musik": "natten",
    "tillstand": "natt",
    "vid_omstart": {
     "talare": "farfar",
@@ -437,6 +441,7 @@
    "id": "s04_agget",
    "pass": 1,
    "rum": "vinden",
+   "musik": "natten",
    "tillstand": "natt_upplyst",
    "vid_omstart": {
     "talare": "farfar",
@@ -452,7 +457,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "I ljuset syns en låda längre bort, som inte syntes i mörkret."
+     "beskrivning": "I ljuset syns en låda längre bort, som inte syntes i mörkret.",
+     "syns_redan": true
     },
     {
      "typ": "replik",
@@ -514,6 +520,7 @@
    "id": "s05_klackningen",
    "pass": 1,
    "rum": "vinden",
+   "musik": "natten",
    "vid_omstart": {
     "talare": "farfar",
     "text": "Var var vi? Ägget håller på att kläckas!",
@@ -540,7 +547,8 @@
     {
      "typ": "mellanscen",
      "beskrivning": "Först ett öga, sedan nosen. Ungen ramlar ut, blinkar, ler med sin lilla mun och hoppar.",
-     "bild": "agg_klackning"
+     "bild": "agg_klackning",
+     "ljud": "kras"
     },
     {
      "typ": "ljud",
@@ -558,7 +566,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Utanför vindsfönstret fladdrar en svartvit fågel med blågrön stjärt. Den tittar in på ljuset med en blank glimt i ögat, skrattar och flyger iväg."
+     "beskrivning": "Utanför vindsfönstret fladdrar en svartvit fågel med blågrön stjärt. Den tittar in på ljuset med en blank glimt i ögat, skrattar och flyger iväg.",
+     "syns_redan": true
     },
     {
      "typ": "ljud",
@@ -625,7 +634,8 @@
    "steg": [
     {
      "typ": "mellanscen",
-     "beskrivning": "Hallen igen. Nu går dörrarna att öppna."
+     "beskrivning": "Hallen igen. Nu går dörrarna att öppna.",
+     "syns_redan": true
     },
     {
      "typ": "replik",
@@ -658,7 +668,9 @@
    "steg": [
     {
      "typ": "mellanscen",
-     "beskrivning": "Dörren öppnas. Farfar sitter i morgonrock i fåtöljen under läslampan och tappar kakaokoppen."
+     "beskrivning": "Dörren öppnas. Farfar sitter i morgonrock i fåtöljen under läslampan och tappar kakaokoppen.",
+     "syns_redan": true,
+     "ljud": "klirr"
     },
     {
      "typ": "prata",
@@ -689,7 +701,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Namnet som spelaren skrev syns ovanför ungen och läses upp."
+     "beskrivning": "Namnet som spelaren skrev syns ovanför ungen och läses upp.",
+     "syns_redan": true
     },
     {
      "typ": "replik",
@@ -759,7 +772,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Farfar håller upp lappen. Hjälten går fram och tar den med ett tryck."
+     "beskrivning": "Farfar håller upp lappen. Hjälten går fram och tar den med ett tryck.",
+     "syns_redan": true
     },
     {
      "typ": "ta_emot",
@@ -937,7 +951,8 @@
    "steg": [
     {
      "typ": "mellanscen",
-     "beskrivning": "Kartbit 1: berg, en dal full av moln, en stor skugga av en dinosaurie som liknar ungen. Ingen text."
+     "beskrivning": "Kartbit 1: berg, en dal full av moln, en stor skugga av en dinosaurie som liknar ungen. Ingen text.",
+     "syns_redan": true
     },
     {
      "typ": "ljud",
@@ -1000,6 +1015,7 @@
    "id": "s16_godnattsagan",
    "pass": 2,
    "rum": "kontoret",
+   "musik": "lagerelden",
    "tillstand": "natt",
    "vid_omstart": {
     "talare": "farfar",
@@ -1009,7 +1025,8 @@
    "steg": [
     {
      "typ": "mellanscen",
-     "beskrivning": "Farfar sitter i sin fåtölj under läslampan. Den andra fåtöljen är ledig."
+     "beskrivning": "Farfar sitter i sin fåtölj under läslampan. Den andra fåtöljen är ledig.",
+     "syns_redan": true
     },
     {
      "typ": "replik",
@@ -1050,7 +1067,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Farfar tar boken och slår upp den."
+     "beskrivning": "Farfar tar boken och slår upp den.",
+     "syns_redan": true
     },
     {
      "typ": "replik",
@@ -1064,7 +1082,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Hjälten sitter i fåtöljen. Ungen kryper upp i filten i hans knä."
+     "beskrivning": "Hjälten sitter i fåtöljen. Ungen kryper upp i filten i hans knä.",
+     "syns_redan": true
     },
     {
      "typ": "bok",
@@ -1145,6 +1164,7 @@
    "id": "s17_sovdags",
    "pass": 2,
    "rum": "hallen",
+   "musik": "natten",
    "tillstand": "natt",
    "vid_omstart": {
     "talare": "farfar",
@@ -1162,6 +1182,7 @@
    "id": "s18_sangen",
    "pass": 2,
    "rum": "sovrummet",
+   "musik": "natten",
    "tillstand": "natt",
    "vid_omstart": {
     "talare": "farfar",
@@ -1181,7 +1202,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Hjälten kryper ner i sängen med hjälmen på. Ungen hoppar upp på fotändan, trampar runt tre varv och somnar."
+     "beskrivning": "Hjälten kryper ner i sängen med hjälmen på. Ungen hoppar upp på fotändan, trampar runt tre varv och somnar.",
+     "syns_redan": true
     },
     {
      "typ": "replik",
@@ -1212,7 +1234,12 @@
     {
      "typ": "mellanscen",
      "beskrivning": "Solen i fönstret. Ungen slickar hjälten på näsan. Från köket hörs Farfar vissla.",
-     "bild": "hjalte_sang_morgon"
+     "bild": "hjalte_sang_morgon",
+     "ljud": [
+      "kvitter",
+      "slurp",
+      "vissling"
+     ]
     },
     {
      "typ": "replik",
@@ -1302,10 +1329,6 @@
      "pussel_id": "p0_packlista"
     },
     {
-     "typ": "mellanscen",
-     "beskrivning": "Farfar tittar ut genom fönstret och rynkar pannan."
-    },
-    {
      "typ": "replik",
      "talare": "farfar",
      "text": "Baronen vill också hitta dalen.",
@@ -1346,7 +1369,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Farfar talar genom radion fast han står i rummet. Ungen hoppar till."
+     "beskrivning": "Farfar talar genom radion fast han står i rummet. Ungen hoppar till.",
+     "syns_redan": true
     },
     {
      "typ": "replik",
@@ -1386,7 +1410,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Farfar går till ytterdörren och vinkar hej då. Hjälten vinkar tillbaka mot huset när han kommer ut."
+     "beskrivning": "Farfar går till ytterdörren och vinkar hej då. Hjälten vinkar tillbaka mot huset när han kommer ut.",
+     "syns_redan": true
     },
     {
      "typ": "replik",
@@ -1442,7 +1467,11 @@
     {
      "typ": "mellanscen",
      "beskrivning": "Ett orange luftskepp glider fram över trädgården. Baronen står i gondolen, kort och rund, med tropikhjälm och medaljer. Han tittar i en kikare, åt fel håll. Ungen tittar upp med stora ögon.",
-     "bild": "luftskepp_glider"
+     "bild": "luftskepp_glider",
+     "ljud": [
+      "luftskepp",
+      "baron"
+     ]
     },
     {
      "typ": "ljud",
@@ -1501,7 +1530,8 @@
     {
      "typ": "mellanscen",
      "beskrivning": "Baronen lutar sig ut för att se bättre och trasslar in sig i sin repstege. Tropikhjälmen trillar av. Ingen tidspress.",
-     "bild": "luftskepp_trasslar"
+     "bild": "luftskepp_trasslar",
+     "ljud": "rassel"
     },
     {
      "typ": "replik",
@@ -1528,7 +1558,8 @@
     {
      "typ": "mellanscen",
      "beskrivning": "Sidovy: hjälten och ungen springer in i skogen. Ovanför träden glider det orange luftskeppet åt fel håll, mot skolan, och baronen och Herr Skata pekar åt var sitt håll.",
-     "bild": "in_i_skogen"
+     "bild": "in_i_skogen",
+     "ljud": "luftskepp"
     },
     {
      "typ": "replik",
@@ -1597,7 +1628,8 @@
      "text": "Du skrev LJUS, och det blev ljust. Det är ordkraft!",
      "upplast": true
     },
-    "fest": "mellan"
+    "fest": "mellan",
+    "ljud": "puff"
    },
    "vid_fel": {
     "reaktion": "staven fräser, pff och en rökring",
@@ -1606,7 +1638,8 @@
      "talare": "berattare",
      "text": "Nästan! Titta på staven igen.",
      "upplast": true
-    }
+    },
+    "ljud": "fras"
    },
    "knuff": {
     "handling": "första bokstaven i förebilden blinkar"
@@ -1642,7 +1675,8 @@
          "talare": "berattare",
          "text": "Hoppsan! Ägget fryser fortfarande.",
          "upplast": true
-        }
+        },
+        "ljud": "tut"
        },
        "objekt": "lada_hyllan"
       },
@@ -1656,7 +1690,8 @@
          "talare": "berattare",
          "text": "Hoppsan! Ägget fryser fortfarande.",
          "upplast": true
-        }
+        },
+        "ljud": "plopp"
        },
        "objekt": "lada_fonstret"
       }
@@ -1664,7 +1699,8 @@
     }
    },
    "vid_ratt": {
-    "handling": "filten svävar upp ur lådan och följer hjälten som ljusbollen"
+    "handling": "filten svävar upp ur lådan och följer hjälten som ljusbollen",
+    "ljud": "sus"
    },
    "knuff": {
     "handling": "ägget hackar tänder, tankebubblan blinkar"
@@ -1729,7 +1765,8 @@
          "talare": "berattare",
          "text": "Hoppsan! Där lagar man mat.",
          "upplast": true
-        }
+        },
+        "ljud": "kastrull"
        }
       },
       {
@@ -1742,7 +1779,11 @@
          "talare": "berattare",
          "text": "Hoppsan! Där var bara en badanka.",
          "upplast": true
-        }
+        },
+        "ljud": [
+         "badanka",
+         "spolning"
+        ]
        },
        "objekt": "dorr_bad"
       },
@@ -1771,7 +1812,8 @@
          "talare": "berattare",
          "text": "Ring! Farfar är där böckerna är.",
          "upplast": true
-        }
+        },
+        "ljud": "vackarklocka"
        }
       }
      ]
@@ -1826,7 +1868,8 @@
          "talare": "berattare",
          "text": "Hoppsan! Där var ingen mat.",
          "upplast": true
-        }
+        },
+        "ljud": "nys"
        },
        "bild": "lada_bla",
        "objekt": "lada_lang_nederst"
@@ -1868,7 +1911,8 @@
          "talare": "berattare",
          "text": "Hoppsan! Där var ingen mat.",
          "upplast": true
-        }
+        },
+        "ljud": "kvack"
        },
        "bild": "lada_rod_liten",
        "objekt": "lada_lang_overst"
@@ -1882,7 +1926,8 @@
          "talare": "berattare",
          "text": "Hoppsan! Där var ingen mat.",
          "upplast": true
-        }
+        },
+        "ljud": "nys"
        },
        "bild": "lada_bla_stor",
        "objekt": "lada_lang_mitten"
@@ -1897,7 +1942,8 @@
      "talare": "berattare",
      "text": "Mums! Det luktar dinomat!",
      "upplast": true
-    }
+    },
+    "ljud": "plums"
    },
    "forenkla": {
     "efter_fel": 2,
@@ -1934,7 +1980,8 @@
          "talare": "berattare",
          "text": "Hoppsan! {unge} är fortfarande hungrig.",
          "upplast": true
-        }
+        },
+        "ljud": "sus"
        }
       },
       {
@@ -1947,14 +1994,16 @@
          "talare": "berattare",
          "text": "Hoppsan! {unge} är fortfarande hungrig.",
          "upplast": true
-        }
+        },
+        "ljud": "rull"
        }
       }
      ]
     }
    },
    "vid_ratt": {
-    "handling": "bär rullar ut, ungen äter och dansar"
+    "handling": "bär rullar ut, ungen äter och dansar",
+    "ljud": "rull"
    },
    "forenkla": {
     "efter_fel": 2,
@@ -2020,7 +2069,8 @@
          "talare": "berattare",
          "text": "Hoppsan! Där sover man inte.",
          "upplast": true
-        }
+        },
+        "ljud": "kastrull"
        },
        "objekt": "dorr_mat"
       },
@@ -2034,7 +2084,8 @@
          "talare": "berattare",
          "text": "Hoppsan! Där sover man inte.",
          "upplast": true
-        }
+        },
+        "ljud": "badanka"
        },
        "objekt": "dorr_bad"
       },
@@ -2049,7 +2100,8 @@
          "talare": "berattare",
          "text": "Ring! Det är Farfars säng.",
          "upplast": true
-        }
+        },
+        "ljud": "vackarklocka"
        }
       }
      ]
@@ -2074,7 +2126,8 @@
      "talare": "berattare",
      "text": "Boing, boing! Här är din säng!",
      "upplast": true
-    }
+    },
+    "ljud": "boing"
    }
   },
   {
@@ -2167,7 +2220,8 @@
      "talare": "berattare",
      "text": "Den står inte på listan.",
      "upplast": true
-    }
+    },
+    "ljud": "boing"
    },
    "vid_ratt": {
     "handling": "en bock per packad rad, sedan tonas resten av sakerna ut och sista raden lyser (teknik 2c.5)",

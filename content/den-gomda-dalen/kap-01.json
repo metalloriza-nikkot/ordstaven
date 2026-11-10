@@ -3,6 +3,7 @@
  "format": 2,
  "id": "kap-01",
  "kapitel": 1,
+ "musik": "skogen",
  "nivaer": {
   "lasning": [
    "L2",
@@ -21,7 +22,7 @@
  },
  "meta": {
   "namn": "Skogen",
-  "version": "0.7.10",
+  "version": "0.7.11",
   "datum": "2026-11-07",
   "agare": "Innehåll",
   "kalla": "Manus 15-kapitel1-manus.md v0.18. Byggd på repots kap-01.json från 0.29.0.",
@@ -37,7 +38,8 @@
   "innehall_v077": "Beslut 39.3: spelaren hugger lianerna själv (k1_lianerna, k1_liten_lian). Beslut 38.5: baronen läser sin lapp upp och ned i sidovyn. Genomgången av samspelen (39.1) gav inga fler rättelser i kapitel 1, se 15 v0.15.",
   "innehall_v078": "Rättelsepasset (beslut 43.5), ingen text i spelet ändrad: bild uppdrag_kullen på målet i k1s08 är Innehålls (Tekniks tillägg i 0.22.0), anteckningen i k1s07 utan namn, och lästextens ord i ordlistorna v0.8. Rummen är frysta (43.1).",
   "innehall_v079": "Det korta passet (beslut 45.5, 46.4, 47 och 50), ingen ny scen, inget nytt moment, läsval eller replik: rubrikerna LIANERNA, RÄTT TRÄD, PÅ KULLEN och VEMS LAPP? (högst ca 11 tecken, 10d), fältet ersatter borttaget ur uppdragen (47.1), mellanscenen i k1s13 med baronen bakom busken vid bron (50.2), och bild på mellanscenerna i k1s01 (in_i_skogen), k1s11 (kartbit_unge) och k1s13 (vid_bron), Tekniks fält från 0.26.0, är Innehålls.",
-  "innehall_v0710": "Det andra korta passet (beslut 52.3 och 52.5), ingen ny scen, inget nytt moment, läsval eller replik: k1_lianerna har sex delar (liangången, 52.2), ugglorna är dolda tills k1_tradet är löst och syns med visa_foremal i k1s07 före trappan, i L2 och L3 (52.3), vid_ratt i k1_tradet säger att ugglorna landar i kronan, och rummens anteckningar i skogsbrynet och gläntan följer Stils kartor och Tekniks karta i 0.29.0 (häcken från norr till söder, liangången mellan snåren, den lilla lianen och stubben söder om snåret, skylten BÄR, bäcken med bäckarmen och baronens strand, den hemliga stigen och sydost). Dekor-id:na står bara i kartan."
+  "innehall_v0710": "Det andra korta passet (beslut 52.3 och 52.5), ingen ny scen, inget nytt moment, läsval eller replik: k1_lianerna har sex delar (liangången, 52.2), ugglorna är dolda tills k1_tradet är löst och syns med visa_foremal i k1s07 före trappan, i L2 och L3 (52.3), vid_ratt i k1_tradet säger att ugglorna landar i kronan, och rummens anteckningar i skogsbrynet och gläntan följer Stils kartor och Tekniks karta i 0.29.0 (häcken från norr till söder, liangången mellan snåren, den lilla lianen och stubben söder om snåret, skylten BÄR, bäcken med bäckarmen och baronens strand, den hemliga stigen och sydost). Dekor-id:na står bara i kartan.",
+  "andrat_v0711": "2026-11-08 (beslut 67.9): musik skogen på kapitlet, ljud på mellanscener och reaktioner, och syns_redan på mellanscenerna som redan syns (67.2). Ingen text är ändrad."
  },
  "var_var_vi": [
   {
@@ -188,7 +190,8 @@
       },
       {
        "typ": "mellanscen",
-       "beskrivning": "Ekorren på grenen knäcker en nöt. Skalet regnar ner på ungen, som nyser."
+       "beskrivning": "Ekorren på grenen knäcker en nöt. Skalet regnar ner på ungen, som nyser.",
+       "ljud": "nys"
       }
      ],
      "anteckning": "Småfigur (beslut 26.3), frivillig. Samma ekorre som vid fel sten. Sitter på en gren på östra skärmen, inte vid stenarna eller formelträdet. Kan strykas utan att något annat ändras: ta bort posten och id:t i innehall."
@@ -323,7 +326,8 @@
       },
       {
        "typ": "mellanscen",
-       "beskrivning": "Ugglorna öppnar ögonen och vrider huvudet nästan ett helt varv. Ungen försöker göra likadant och blir yr."
+       "beskrivning": "Ugglorna öppnar ögonen och vrider huvudet nästan ett helt varv. Ungen försöker göra likadant och blir yr.",
+       "ljud": "snurr"
       }
      ],
      "anteckning": "Småfigur (beslut 26.3), frivillig. Samma tre ugglor som jublar HO HO vid rätt träd. De sitter i det gamla trädets krona över krönet och är dolda tills k1_tradet är löst (beslut 52.3). De syns och går att nå först när trappan har kommit fram, så de avslöjar aldrig läsvalet. Kan strykas utan att något annat ändras: ta bort posten, id:t i innehall och visa_foremal i k1s07."
@@ -345,7 +349,8 @@
     {
      "typ": "mellanscen",
      "beskrivning": "Hjälten och ungen springer in i skogen. Solljuset faller genom löven. Högt ovanför glider baronens orange luftskepp förbi, bort mot bergen. Radion sprakar.",
-     "bild": "in_i_skogen"
+     "bild": "in_i_skogen",
+     "ljud": "luftskepp"
     },
     {
      "typ": "replik",
@@ -470,7 +475,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Stavens ände blir ett svärd av guld. Ungen tittar på lianerna och sedan på hjälten."
+     "beskrivning": "Stavens ände blir ett svärd av guld. Ungen tittar på lianerna och sedan på hjälten.",
+     "syns_redan": true
     },
     {
      "typ": "pussel",
@@ -562,7 +568,9 @@
    "steg": [
     {
      "typ": "mellanscen",
-     "beskrivning": "En apa hänger högt uppe i ett orange nät. Nätet gungar. Ungen tittar upp med stora ögon."
+     "beskrivning": "En apa hänger högt uppe i ett orange nät. Nätet gungar. Ungen tittar upp med stora ögon.",
+     "syns_redan": true,
+     "ljud": "knarr"
     },
     {
      "typ": "replik",
@@ -572,7 +580,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "En fjäril fladdrar förbi nätet. Apan suckar."
+     "beskrivning": "En fjäril fladdrar förbi nätet. Apan suckar.",
+     "ljud": "apa_suck"
     },
     {
      "typ": "replik",
@@ -606,7 +615,8 @@
    "steg": [
     {
      "typ": "mellanscen",
-     "beskrivning": "Apan klättrar ner och kramar ungen."
+     "beskrivning": "Apan klättrar ner och kramar ungen.",
+     "syns_redan": true
     },
     {
      "typ": "replik",
@@ -616,7 +626,9 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Apan sätter en kam av taggar på hjälmen och klappar den på plats."
+     "beskrivning": "Apan sätter en kam av taggar på hjälmen och klappar den på plats.",
+     "syns_redan": true,
+     "ljud": "klapp"
     },
     {
      "typ": "ge_sak",
@@ -625,7 +637,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Apan klättrar upp i sitt bo och kommer tillbaka med ett gammalt kort som glänser: tecken, bokstäver och Farfars kompassros."
+     "beskrivning": "Apan klättrar upp i sitt bo och kommer tillbaka med ett gammalt kort som glänser: tecken, bokstäver och Farfars kompassros.",
+     "syns_redan": true
     },
     {
      "typ": "ta_emot",
@@ -678,7 +691,8 @@
    "steg": [
     {
      "typ": "mellanscen",
-     "beskrivning": "Stegen står kvar under apans bo. Norrut står några träd vid foten av en kulle, och Farfars skylt står framför dem."
+     "beskrivning": "Stegen står kvar under apans bo. Norrut står några träd vid foten av en kulle, och Farfars skylt står framför dem.",
+     "syns_redan": true
     },
     {
      "typ": "replik",
@@ -741,7 +755,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Uppe på kullen breder det gamla trädets krona ut sig, och under den ligger fyra lövhögar. Ungen kommer efter."
+     "beskrivning": "Uppe på kullen breder det gamla trädets krona ut sig, och under den ligger fyra lövhögar. Ungen kommer efter.",
+     "syns_redan": true
     },
     {
      "typ": "pussel",
@@ -753,7 +768,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Löven yr. En gammal låda med ett lås kommer fram."
+     "beskrivning": "Löven yr. En gammal låda med ett lås kommer fram.",
+     "syns_redan": true
     },
     {
      "typ": "replik",
@@ -787,7 +803,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Närbild: lådans lock har tre luckor med en mening var."
+     "beskrivning": "Närbild: lådans lock har tre luckor med en mening var.",
+     "syns_redan": true
     },
     {
      "typ": "replik",
@@ -798,7 +815,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Ungen sträcker fram sina blå fötter, utan att någon säger något."
+     "beskrivning": "Ungen sträcker fram sina blå fötter, utan att någon säger något.",
+     "syns_redan": true
     },
     {
      "typ": "pussel",
@@ -845,7 +863,8 @@
    "steg": [
     {
      "typ": "mellanscen",
-     "beskrivning": "I lådan ligger kartbit 2, och den passar ihop med bit 1. En väg går från skogen förbi en stor sten och en bro, och vidare mot ett träsk. Mammas skugga syns större."
+     "beskrivning": "I lådan ligger kartbit 2, och den passar ihop med bit 1. En väg går från skogen förbi en stor sten och en bro, och vidare mot ett träsk. Mammas skugga syns större.",
+     "syns_redan": true
     },
     {
      "typ": "ge_kartbit",
@@ -882,7 +901,9 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Herr Skata kommer flygande med en lapp i näbben, alldeles för fort, rakt in i trädet. Den studsar, ruskar på sig och tappar lappen på krönet. Lappen fladdrar ner."
+     "beskrivning": "Herr Skata kommer flygande med en lapp i näbben, alldeles för fort, rakt in i trädet. Den studsar, ruskar på sig och tappar lappen på krönet. Lappen fladdrar ner.",
+     "syns_redan": true,
+     "ljud": "krasch"
     },
     {
      "typ": "visa_foremal",
@@ -958,7 +979,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Ungen äter och trycker sig mot hjälten."
+     "beskrivning": "Ungen äter och trycker sig mot hjälten.",
+     "syns_redan": true
     },
     {
      "typ": "ljud",
@@ -996,7 +1018,8 @@
     {
      "typ": "mellanscen",
      "beskrivning": "Sidovy: hjälten och ungen smyger längs bäcken, förbi bron. Baronen sitter bakom busken vid bron och läser sin egen lapp upp och ned, och han ser dem inte. Herr Skata landar på tropikhjälmen, och hjälmen åker ner över ögonen.",
-     "bild": "vid_bron"
+     "bild": "vid_bron",
+     "ljud": "baron"
     },
     {
      "typ": "replik",
@@ -1075,7 +1098,8 @@
          "text": "Hoppsan! Läs skylten igen.",
          "upplast": true
         },
-        "ljudord": "klonk"
+        "ljudord": "klonk",
+        "ljud": "klonk"
        }
       },
       {
@@ -1089,7 +1113,8 @@
          "text": "Hoppsan! Läs skylten igen.",
          "upplast": true
         },
-        "ljudord": "klonk"
+        "ljudord": "klonk",
+        "ljud": "klonk"
        }
       }
      ]
@@ -1114,7 +1139,8 @@
          "text": "Hoppsan! Läs skylten igen.",
          "upplast": true
         },
-        "ljudord": "klonk"
+        "ljudord": "klonk",
+        "ljud": "klonk"
        }
       },
       {
@@ -1128,7 +1154,8 @@
          "text": "Hoppsan! Läs skylten igen.",
          "upplast": true
         },
-        "ljudord": "klonk"
+        "ljudord": "klonk",
+        "ljud": "klonk"
        }
       }
      ]
@@ -1190,7 +1217,8 @@
      "talare": "berattare",
      "text": "Nästan! Här står ordet.",
      "upplast": true
-    }
+    },
+    "ljud": "kittla"
    },
    "knuff": {
     "handling": "bilden i trädet glimtar"
@@ -1225,7 +1253,8 @@
    ],
    "vid_ratt": {
     "handling": "den sista lianen faller. Ungen hoppar över lianerna och viftar med svansklubban.",
-    "fest": "liten"
+    "fest": "liten",
+    "ljud": "duns"
    },
    "knuff": {
     "handling": "ungen nosar mot närmaste lian"
@@ -1271,7 +1300,8 @@
      "talare": "berattare",
      "text": "Nästan! Titta på staven.",
      "upplast": true
-    }
+    },
+    "ljud": "kittla"
    },
    "knuff": {
     "handling": "SVÄRD lyser på staven"
@@ -1295,7 +1325,8 @@
    ],
    "vid_ratt": {
     "handling": "lianen faller, och två bär ligger i stubben",
-    "fest": "liten"
+    "fest": "liten",
+    "ljud": "duns"
    },
    "anteckning": "Beslut 39.3: den lilla lianen huggs med ett hugg. Bären ges i rum.frivilligt efter pusslet.",
    "verb": "hugga"
@@ -1311,7 +1342,8 @@
    ],
    "vid_ratt": {
     "handling": "skattlådans lock flyger upp",
-    "fest": "liten"
+    "fest": "liten",
+    "ljud": "lock"
    },
    "anteckning": "Vila i sidogrenen: vifta med staven mot buske_1–buske_4, ingen text att läsa. Skattlådan ligger alltid i den sista.",
    "sak_i_sista": "skattlada",
@@ -1341,7 +1373,8 @@
    "tillatna_fel": 3,
    "hjalp": "ett_ord",
    "vid_fel": {
-    "reaktion": "nätet knakar och apan blundar. Brickan tonas ut."
+    "reaktion": "nätet knakar och apan blundar. Brickan tonas ut.",
+    "ljud": "knarr"
    },
    "vid_ratt": {
     "handling": "sista pinnsteget fälls ut, och stegen når hela vägen upp till nätet. STEGE skrivs i luften, och apan klättrar ner.",
@@ -1391,7 +1424,8 @@
          "text": "Klonk! Läs skylten igen.",
          "upplast": true
         },
-        "ljudord": "klonk"
+        "ljudord": "klonk",
+        "ljud": "klonk"
        }
       },
       {
@@ -1405,7 +1439,8 @@
          "text": "Klonk! Läs skylten igen.",
          "upplast": true
         },
-        "ljudord": "klonk"
+        "ljudord": "klonk",
+        "ljud": "klonk"
        }
       }
      ]
@@ -1430,7 +1465,8 @@
          "text": "Klonk! Läs skylten igen.",
          "upplast": true
         },
-        "ljudord": "klonk"
+        "ljudord": "klonk",
+        "ljud": "klonk"
        }
       },
       {
@@ -1444,7 +1480,8 @@
          "text": "Klonk! Läs skylten igen.",
          "upplast": true
         },
-        "ljudord": "klonk"
+        "ljudord": "klonk",
+        "ljud": "klonk"
        }
       }
      ]
@@ -1453,7 +1490,8 @@
    "vid_ratt": {
     "handling": "tre ugglor (samma figur tre gånger) landar i det gamla trädets krona och öppnar ögonen samtidigt: HO-HO! Bakom den tjocka stammen syns en stentrappa upp på kullen.",
     "fest": "liten",
-    "ljudord": "ho ho"
+    "ljudord": "ho ho",
+    "ljud": "uggla"
    },
    "knuff": {
     "handling": "skylten glimtar"
@@ -1529,7 +1567,8 @@
          "text": "Pip! Den passar inte.",
          "upplast": true
         },
-        "ljudord": "pip"
+        "ljudord": "pip",
+        "ljud": "lucka_pip"
        }
       },
       {
@@ -1543,7 +1582,8 @@
          "text": "Pip! Den passar inte.",
          "upplast": true
         },
-        "ljudord": "pip"
+        "ljudord": "pip",
+        "ljud": "lucka_pip"
        }
       }
      ]
@@ -1621,11 +1661,16 @@
    "hjalp": "ett_ord",
    "vid_ratt": {
     "handling": "HEM lyser i ca 2 sekunder. Sedan klickar låset, och locket flyger upp i ett moln av löv.",
-    "fest": "mellan"
+    "fest": "mellan",
+    "ljud": "klick_las"
    },
    "vid_fel": {
     "reaktion": "låset rasslar med bygeln, och de fel bokstäverna studsar tillbaka",
-    "ljudord": "klonk"
+    "ljudord": "klonk",
+    "ljud": [
+     "rassel",
+     "klonk"
+    ]
    },
    "knuff": {
     "handling": "nyckeln glimtar"
@@ -1733,7 +1778,8 @@
      "talare": "berattare",
      "text": "Där gömmer sig baronen!",
      "upplast": true
-    }
+    },
+    "ljud": "nys"
    },
    "knuff": {
     "handling": "lappen glimtar",

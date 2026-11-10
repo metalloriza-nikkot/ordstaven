@@ -296,7 +296,8 @@ describe('mellanscenernas text för den vuxne (beslut 65)', () => {
   it('aventyr.json: SLUTA FÖR IDAG och slutrutan prövas när äventyret är klart', () => {
     const d = riktigt();
     d.aventyr.meta = { ...(d.aventyr.meta || {}), klart: true };
-    expect(kontrollera(d).fel.join('\n')).toMatch(/aventyr\.json sluta_for_idag\.med_ungen steg 0: äventyret är klart/);
+    // SLUTA FÖR IDAG har syns_redan (Innehåll, 67.9), och slutrutans mellanscen är kvar
+    expect(kontrollera(d).fel.join('\n')).toMatch(/aventyr\.json kapitel_last steg 0: äventyret är klart/);
     for (const st of [...d.aventyr.sluta_for_idag.fore_ungen, ...d.aventyr.sluta_for_idag.med_ungen, ...d.aventyr.kapitel_last.steg]) if (st.typ === 'mellanscen') st.syns_redan = true;
     expect(kontrollera(d).fel).toEqual([]);
   });

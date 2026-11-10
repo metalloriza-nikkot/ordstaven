@@ -1278,7 +1278,7 @@ test('kapitel 1 är låst efter prologen: slutrutan kommer i stället, FORTSÄTT
     await page.waitForTimeout(150);
   }
   await expect(page.locator('.pass-slut.kapitel-last')).toBeVisible();
-  expect(sagt).toEqual(['VAD FINNS I SKOGEN?', 'FORTSÄTTNING FÖLJER!']);
+  expect(sagt).toEqual(['VART LEDER KARTAN NU?', 'FORTSÄTTNING FÖLJER!']); // slutrutan efter vilket kapitel som helst (67.4)
   expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('kapitlet är låst: kap-01');
   // ingen knapp som raderar eller börjar om
   await expect(page.locator('.pass-slut .om')).toHaveCount(0);
@@ -1459,7 +1459,7 @@ test('Prologen, pass 3 i menyn: inget från kapitel 1 finns kvar, och kapitel 1 
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.keyboard.press('Control+Shift+KeyM');
   await page.click('#vuxenmeny .del[data-del="pass"]');
-  await expect(page.locator('#vuxenmeny .kapitel-oppet')).toBeChecked();
+  await expect(page.locator('#vuxenmeny .kapitel-oppet[data-kapitel="kap-01"]')).toBeChecked();
   await page.locator('#vuxenmeny .pass-start', { hasText: 'Prologen, pass 3' }).click();
   await page.waitForURL((u) => true);
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
@@ -1573,14 +1573,14 @@ test('Pass 3 komplett: luftskeppet i trädgården, baronens porträtt, packlista
   expect((await grafik()).hjalm).toBe(true);
   expect((await grafik()).senasteSidovy).toBe('in_i_skogen');
   // kapitel 1 är låst: rubriken "Kapitel 1. Skogen." kommer inte, utan slutrutans krok (granskningen A 21)
-  for (let i = 0; i < 40 && !texter.some((t) => t.includes('VAD FINNS I SKOGEN')); i++) {
+  for (let i = 0; i < 40 && !texter.some((t) => t.includes('VART LEDER KARTAN NU')); i++) {
     const t = await page.evaluate(() => document.querySelector('#plattan')?.textContent || '');
     if (t) texter.push(t);
     await page.locator('#plattan .replik-ruta').click({ timeout: 300 }).catch(() => {});
     await page.waitForTimeout(150);
   }
   texter.push(...(await page.evaluate(() => /** @type {any} */ (window).__texter)));
-  expect(texter.some((t) => t.includes('VAD FINNS I SKOGEN'))).toBe(true);
+  expect(texter.some((t) => t.includes('VART LEDER KARTAN NU'))).toBe(true);
   expect(texter.some((t) => t.includes('KAPITEL 1'))).toBe(false);
 });
 

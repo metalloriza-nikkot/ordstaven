@@ -3,6 +3,7 @@
  "format": 2,
  "id": "kap-02",
  "kapitel": 2,
+ "musik": "skogen",
  "nivaer": {
   "lasning": [
    "L3",
@@ -15,11 +16,12 @@
  },
  "meta": {
   "namn": "Träsket",
-  "version": "0.1",
+  "version": "0.2",
   "datum": "2026-11-08",
   "agare": "Innehåll",
   "kalla": "Manus 17-kapitel2-manus.md v0.4 (beslut 60–64). Ny fil.",
-  "teknik": "Förslag från Innehåll (2026-11-08), byggt på Tekniks svar 26 och beslut 64.2. Fält som kontrollen inte känner än: P11 skriv, godtas, tand, rimliga, vanligt_svar och nastan.replik (Teknik 26). Steget nav med grenar (scen, mal, bild för ringen på lappen), mellan_grenar som steg (64.2) och knuff. Navets sparpunkt i mellan_grenar slutar pass 2, och det som kommer efter den räknas som pass 3 (var_var_vi pass 3 och passens tider). Grenarnas scener står som pass 2, eftersom ordningen är fri. {ord:k2_over} = ordet han skrev i k2_over (64.2), i k2s10 och i stämpeln för ELDEN. kraver på en variant (k2_tavlorna L4 bara om k2_grodan är löst i L4), och villkor gren_kvar på en replik i var_var_vi pass 3. Med villkoret har lang fyra repliker, men han hör bara tre. ristas: false på en formel som inte ska ristas in (BRO, STEGE, REP och FLOTTE i k2_over, REP i k2_bubblan). oppna_lasplatta med skylt i stället för pussel_id, och lys_ord (k2s04: brevets halva läses först med las_skylt, sedan visas den igen med INTE i guld). redan_last: 1 på k2_tavlorna (första raden grå med en bock, 63.6). ga_till unge: ungen i leran är målet (k2s01). bara över två rum: halvan bärs från bryggan och vassen till brevram i byn (k2s04 och k2s05). Medan bara pågår i vassen är rummets utgångar stängda, och målet glimtar (64.2). lockar på den frivilliga scenen k2s06 (58.5): draget vid stig_dammen, igen varje gång han går förbi tills han har varit där, aldrig under en replik eller ett läsval, och grodorna landar aldrig på torget under k2_skyltarna. Läsvalet med skyltarna: alternativen är skyltar med en mening (ord) i rummet, och varianten har bara bild (skylt_baronen) eftersom frågan är instruktionen. Byborna (17, Byborna, och 63.9) står bara i rummets anteckning och i 17 (Byborna): fiskaren, tvatterskan och barnet_drake är figurer i byns innehåll. Säg hur deras områden, sysslor, vinkningen vid ett tryck och bubblorna (SUCK, FISK, OJ, HURRA, HEJ) ska stå i datan, så skriver jag det. Tillstånden i byn: rep (k2s02–k2s03 till lögnen), fri (efter lögnen), kvall (k2s10). Repen och skyltarna syns bara i rep. dorr_rosa är låst tills k2s07. Effekterna i formler (bro_over_vattnet, bubblan_foljer_staven …) är namn för gråboxen, och vid_ratt beskriver dem. Mellanscenerna har ingen bild än, så att testet av bilderna går igenom. Stil ritar dem i kedjans steg 4–5 (65.4), och då får de bild: luftskepp_river_brevet, brevram_tom, brevram_halva (en eller två halvor), brevram_hel och under_bryggan. Uppdragens bildkort är lånade tills Stil har ritat kapitlets egna (TRÄSKET, TANT ROSA, BREVET, TAVLORNA och ELDEN, och ringarna med bryggan och vassen, som står som bild på navets grenar). musik och ljud på reaktionerna (64.5–64.6) kommer när Teknik har sagt hur de står i datan (27). k2_bubblan är räddningen."
+  "teknik": "Förslag från Innehåll (2026-11-08), byggt på Tekniks svar 26 och beslut 64.2. Fält som kontrollen inte känner än: P11 skriv, godtas, tand, rimliga, vanligt_svar och nastan.replik (Teknik 26). Steget nav med grenar (scen, mal, bild för ringen på lappen), mellan_grenar som steg (64.2) och knuff. Navets sparpunkt i mellan_grenar slutar pass 2, och det som kommer efter den räknas som pass 3 (var_var_vi pass 3 och passens tider). Grenarnas scener står som pass 2, eftersom ordningen är fri. {ord:k2_over} = ordet han skrev i k2_over (64.2), i k2s10 och i stämpeln för ELDEN. kraver på en variant (k2_tavlorna L4 bara om k2_grodan är löst i L4), och villkor gren_kvar på en replik i var_var_vi pass 3. Med villkoret har lang fyra repliker, men han hör bara tre. ristas: false på en formel som inte ska ristas in (BRO, STEGE, REP och FLOTTE i k2_over, REP i k2_bubblan). oppna_lasplatta med skylt i stället för pussel_id, och lys_ord (k2s04: brevets halva läses först med las_skylt, sedan visas den igen med INTE i guld). redan_last: 1 på k2_tavlorna (första raden grå med en bock, 63.6). ga_till unge: ungen i leran är målet (k2s01). bara över två rum: halvan bärs från bryggan och vassen till brevram i byn (k2s04 och k2s05). Medan bara pågår i vassen är rummets utgångar stängda, och målet glimtar (64.2). lockar på den frivilliga scenen k2s06 (58.5): draget vid stig_dammen, igen varje gång han går förbi tills han har varit där, aldrig under en replik eller ett läsval, och grodorna landar aldrig på torget under k2_skyltarna. Läsvalet med skyltarna: alternativen är skyltar med en mening (ord) i rummet, och varianten har bara bild (skylt_baronen) eftersom frågan är instruktionen. Byborna (17, Byborna, och 63.9) står bara i rummets anteckning och i 17 (Byborna): fiskaren, tvatterskan och barnet_drake är figurer i byns innehåll. Säg hur deras områden, sysslor, vinkningen vid ett tryck och bubblorna (SUCK, FISK, OJ, HURRA, HEJ) ska stå i datan, så skriver jag det. Tillstånden i byn: rep (k2s02–k2s03 till lögnen), fri (efter lögnen), kvall (k2s10). Repen och skyltarna syns bara i rep. dorr_rosa är låst tills k2s07. Effekterna i formler (bro_over_vattnet, bubblan_foljer_staven …) är namn för gråboxen, och vid_ratt beskriver dem. Mellanscenerna har ingen bild än, så att testet av bilderna går igenom. Stil ritar dem i kedjans steg 4–5 (65.4), och då får de bild: luftskepp_river_brevet, brevram_tom, brevram_halva (en eller två halvor), brevram_hel och under_bryggan. Uppdragens bildkort är lånade tills Stil har ritat kapitlets egna (TRÄSKET, TANT ROSA, BREVET, TAVLORNA och ELDEN, och ringarna med bryggan och vassen, som står som bild på navets grenar). musik och ljud på reaktionerna (64.5–64.6) kommer när Teknik har sagt hur de står i datan (27). k2_bubblan är räddningen.",
+  "andrat_v02": "2026-11-08 (beslut 67.9): musik (skogen på kapitlet, spel i Tant Rosas hus, raddning i k2s05 runt räddningen och lagerelden vid elden), ljud på mellanscener och reaktioner, och ljud-id:n som Stil har (slurp, plopp, plums, kvack). surr (trollsländan) är beställt av Stil. Byns slinga byter skogen i byn och på bryggan när Stil har gjort den."
  },
  "var_var_vi": [
   {
@@ -178,7 +180,7 @@
      "steg": [
       {
        "typ": "ljud",
-       "id": "trollslanda",
+       "id": "surr",
        "foremal": "trollslanda",
        "ljudord": "surr"
       },
@@ -282,7 +284,7 @@
      "steg": [
       {
        "typ": "ljud",
-       "id": "plask",
+       "id": "plums",
        "foremal": "fisk_hopp",
        "ljudord": "plask"
       },
@@ -315,6 +317,7 @@
   {
    "id": "tant_rosas_hus",
    "namn": "Tant Rosas hus",
+   "musik": "spel",
    "innehall": [
     "dorr_ut",
     "tant_rosa",
@@ -408,7 +411,7 @@
     },
     {
      "typ": "ljud",
-     "id": "lera",
+     "id": "slurp",
      "foremal": "leran",
      "ljudord": "slurp"
     },
@@ -509,7 +512,11 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Högt ovanför glider det orange luftskeppet. Herr Skata och baronen drar i var sin ände av ett brev. Brevet går sönder. Baronens halva stannar i hans hand, och luftskeppet sjunker mot bryggan. Den andra halvan fladdrar ner mot vassen, och en bubbla fångar den. Herr Skata tappar en svartvit fjäder, som seglar ner till hjältens fötter."
+     "beskrivning": "Högt ovanför glider det orange luftskeppet. Herr Skata och baronen drar i var sin ände av ett brev. Brevet går sönder. Baronens halva stannar i hans hand, och luftskeppet sjunker mot bryggan. Den andra halvan fladdrar ner mot vassen, och en bubbla fångar den. Herr Skata tappar en svartvit fjäder, som seglar ner till hjältens fötter.",
+     "ljud": [
+      "luftskepp",
+      "baron"
+     ]
     },
     {
      "typ": "ljud",
@@ -686,7 +693,8 @@
    "steg": [
     {
      "typ": "mellanscen",
-     "beskrivning": "Sidovy: under bryggan står baronen i lera till knäna och gräver och gräver med en liten spade. Herr Skata sitter på en påle. Upp kommer en gammal stövel. Sedan en fisk, som sprattlar och hoppar tillbaka."
+     "beskrivning": "Sidovy: under bryggan står baronen i lera till knäna och gräver och gräver med en liten spade. Herr Skata sitter på en påle. Upp kommer en gammal stövel. Sedan en fisk, som sprattlar och hoppar tillbaka.",
+     "ljud": "baron"
     },
     {
      "typ": "replik",
@@ -719,7 +727,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Ordet INTE lyser stort i guld över bryggan. Baronen tittar upp och tappar spaden."
+     "beskrivning": "Ordet INTE lyser stort i guld över bryggan. Baronen tittar upp och tappar spaden.",
+     "ljud": "glitter"
     },
     {
      "typ": "replik",
@@ -729,7 +738,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Herr Skata skrattar så att den ramlar av pålen."
+     "beskrivning": "Herr Skata skrattar så att den ramlar av pålen.",
+     "ljud": "skata"
     },
     {
      "typ": "replik",
@@ -746,7 +756,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Baronen håller upp en gammal kartbit med en kompassros i mässing. Sedan klättrar han upp i luftskeppet, lerig till knäna, och det lyfter."
+     "beskrivning": "Baronen håller upp en gammal kartbit med en kompassros i mässing. Sedan klättrar han upp i luftskeppet, lerig till knäna, och det lyfter.",
+     "ljud": "luftskepp"
     },
     {
      "typ": "replik",
@@ -840,7 +851,7 @@
     },
     {
      "typ": "ljud",
-     "id": "bubbla",
+     "id": "plopp",
      "ljudord": "plopp"
     },
     {
@@ -850,6 +861,10 @@
     {
      "typ": "mellanscen",
      "beskrivning": "Ungen nosar på en gul blomma. Blomman blåser en bubbla runt ungen, och bubblan lyfter! Den svävar ut över vattnet och stannar där. Ungen trummar på bubblan med tassarna."
+    },
+    {
+     "typ": "musik",
+     "slinga": "raddning"
     },
     {
      "typ": "visa_foremal",
@@ -878,7 +893,7 @@
     },
     {
      "typ": "ljud",
-     "id": "bubbla",
+     "id": "plopp",
      "ljudord": "plopp"
     },
     {
@@ -887,7 +902,7 @@
     },
     {
      "typ": "ljud",
-     "id": "plask",
+     "id": "plums",
      "ljudord": "plask"
     },
     {
@@ -895,6 +910,10 @@
      "talare": "berattare",
      "text": "{unge} kan simma!",
      "upplast": true
+    },
+    {
+     "typ": "musik",
+     "slinga": "skogen"
     },
     {
      "typ": "replik",
@@ -934,7 +953,7 @@
    "lockar": {
     "vid": "stig_dammen",
     "beskrivning": "Tre grodor hoppar ut på stigen. Ungen springer fram till dammens stig, stannar där och tittar på hjälten. Grodorna hoppar tillbaka in på stigen.",
-    "ljud": "groda",
+    "ljud": "kvack",
     "ljudord": "kvack"
    },
    "steg": [
@@ -1167,6 +1186,7 @@
    "pass": 3,
    "rum": "byn",
    "tillstand": "kvall",
+   "musik": "lagerelden",
    "vid_omstart": {
     "talare": "farfar",
     "text": "Var var vi? Ni skulle vila vid elden.",
@@ -1319,7 +1339,8 @@
    },
    "vid_ratt": {
     "handling": "ordet blir det han skrev: en bro av trä växer fram planka för planka (BRO), en lång stege lägger sig över vattnet och hjälten kryper över medan ungen vinglar på pinnarna (STEGE), ett rep spänns mellan två pålar och hjälten balanserar medan ungen hänger efter i svansen (REP), eller en flotte av stockar guppar fram och ungen paddlar med svansen (FLOTTE)",
-    "fest": "mellan"
+    "fest": "mellan",
+    "ljud": "puff"
    },
    "vid_fel": {
     "reaktion": "staven fräser, pff, och B i BRO lyser",
@@ -1327,7 +1348,8 @@
      "talare": "berattare",
      "text": "Pff! Skriv ett ord som hjälper.",
      "upplast": true
-    }
+    },
+    "ljud": "fras"
    },
    "knuff": {
     "handling": "bilden i molnet glimtar, och ungen tittar från ena stranden till den andra"
@@ -1377,7 +1399,8 @@
          "text": "Brunnen är rund och full. Den stämmer!",
          "upplast": true
         },
-        "ljudord": "kvack"
+        "ljudord": "kvack",
+        "ljud": "kvack"
        }
       },
       {
@@ -1396,7 +1419,8 @@
      "text": "Bryggan är hel! Baronen ljög.",
      "upplast": true
     },
-    "fest": "liten"
+    "fest": "liten",
+    "ljud": "duns"
    },
    "knuff": {
     "handling": "alla tre skyltarna glimtar en gång"
@@ -1520,7 +1544,8 @@
      "talare": "berattare",
      "text": "Pff! Titta på fjädern.",
      "upplast": true
-    }
+    },
+    "ljud": "fras"
    },
    "knuff": {
     "handling": "fjädern i molnet glimtar"
@@ -1590,7 +1615,8 @@
      "talare": "berattare",
      "text": "Pff! Titta på staven.",
      "upplast": true
-    }
+    },
+    "ljud": "fras"
    },
    "knuff": {
     "handling": "FLYG lyser på staven"
@@ -1634,7 +1660,8 @@
          "text": "Nej, den är stor!",
          "upplast": true
         },
-        "ljudord": "plask"
+        "ljudord": "plask",
+        "ljud": "plums"
        }
       },
       {
@@ -1648,7 +1675,8 @@
          "text": "Nej, den är grön!",
          "upplast": true
         },
-        "ljudord": "plask"
+        "ljudord": "plask",
+        "ljud": "plums"
        }
       },
       {
@@ -1662,7 +1690,8 @@
          "text": "Nej, den är stor och grön!",
          "upplast": true
         },
-        "ljudord": "plask"
+        "ljudord": "plask",
+        "ljud": "plums"
        }
       }
      ]
@@ -1691,7 +1720,8 @@
          "text": "Nej, den har prickar!",
          "upplast": true
         },
-        "ljudord": "plask"
+        "ljudord": "plask",
+        "ljud": "plums"
        }
       },
       {
@@ -1705,7 +1735,8 @@
          "text": "Nej, den är gul!",
          "upplast": true
         },
-        "ljudord": "plask"
+        "ljudord": "plask",
+        "ljud": "plums"
        }
       },
       {
@@ -1719,7 +1750,8 @@
          "text": "Nej, den är gul och har prickar!",
          "upplast": true
         },
-        "ljudord": "plask"
+        "ljudord": "plask",
+        "ljud": "plums"
        }
       }
      ]
@@ -1732,7 +1764,8 @@
      "text": "Där är du ju!",
      "upplast": true
     },
-    "fest": "liten"
+    "fest": "liten",
+    "ljud": "kvack"
    },
    "knuff": {
     "handling": "lappen glimtar"
@@ -1785,7 +1818,8 @@
          "text": "Den tavlan är inte rund!",
          "upplast": true
         },
-        "ljudord": "atjo"
+        "ljudord": "atjo",
+        "ljud": "nys"
        }
       },
       {
@@ -1799,7 +1833,8 @@
          "text": "Den tavlan är stor!",
          "upplast": true
         },
-        "ljudord": "atjo"
+        "ljudord": "atjo",
+        "ljud": "nys"
        }
       },
       {
@@ -1813,7 +1848,8 @@
          "text": "Den tavlan är stor!",
          "upplast": true
         },
-        "ljudord": "atjo"
+        "ljudord": "atjo",
+        "ljud": "nys"
        }
       }
      ]
@@ -1846,7 +1882,8 @@
          "text": "Den tavlan är rund!",
          "upplast": true
         },
-        "ljudord": "atjo"
+        "ljudord": "atjo",
+        "ljud": "nys"
        }
       },
       {
@@ -1860,7 +1897,8 @@
          "text": "Den tavlan är stor!",
          "upplast": true
         },
-        "ljudord": "atjo"
+        "ljudord": "atjo",
+        "ljud": "nys"
        }
       },
       {
@@ -1874,7 +1912,8 @@
          "text": "Den tavlan är stor!",
          "upplast": true
         },
-        "ljudord": "atjo"
+        "ljudord": "atjo",
+        "ljud": "nys"
        }
       }
      ]
@@ -1887,7 +1926,8 @@
      "text": "Något prasslar bakom tavlan!",
      "upplast": true
     },
-    "fest": "liten"
+    "fest": "liten",
+    "ljud": "prassel"
    },
    "knuff": {
     "handling": "brevet glimtar i ryggsäcken, och lappknappen öppnar det"
@@ -1982,7 +2022,8 @@
      "talare": "berattare",
      "text": "Pff! Titta på staven.",
      "upplast": true
-    }
+    },
+    "ljud": "fras"
    },
    "knuff": {
     "handling": "FLYG lyser på staven"

@@ -301,7 +301,9 @@ describe('berättelsemotorn', () => {
 
   it('en helt ny start spelar inte vid_omstart', () => {
     const b = skapaBerattelse({ aventyr, kapitel: prolog, tillstand: nyttTillstand('t'), aventyrId: AVENTYR });
-    expect(b.aktuellt().typ).toBe('mellanscen');
+    // det första steget i s00 (titelbildens mellanscen är struken, 67.2), inte Farfars "Var var vi?"
+    expect(b.aktuellt()).toMatchObject({ typ: prolog.scener[0].steg[0].typ, text: prolog.scener[0].steg[0].text });
+    expect(b.aktuellt().text).not.toMatch(/Var var vi/);
   });
 });
 
