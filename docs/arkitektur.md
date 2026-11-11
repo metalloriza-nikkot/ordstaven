@@ -944,3 +944,13 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - Loggen skriver `<pussel>: fel nr N` för varje fel med brickor.
 - **kap-01:** `k1_svard` och `k1_svard_igen` har `visas: andra_felet`. Ingen text är ändrad (`meta.teknik_72_2`).
 
+## 90. Kapitel 2 efter beslut 72: vassväggen, lerpölen, stocken långt ut, livet och dräkten (0.58.0, Teknik 35)
+- **Innehålls skript** (`innehall-skript-pass72.py`, kap-02 v0.6) är kört på repots fil. Ingen text är ändrad av Teknik.
+- **Vassväggen (72.3):** `vass_tat` i träskkanten är 50 pixlar bred med `delas: hela` och `visar: k2_vassvaggen`, så att P26 med `verb: hugga` delar den i fem lager från väster till öster, som lianväggen i kapitel 1. SVÄRD-formelns effekt gör bara staven till ett svärd. `unge_biter` med `unge_till` biter i det föremålet (ungen springer dit först).
+- **Zoner (2.40, 72.8):** `spel.js` frågar var 100:e ms om hjälten står i en zons ruta. Då fryses världen, stegen spelas, och `rum.zonUt` säger var han kom ifrån. Efteråt anropas `rum.undvikZon(id)`: vägen när han trycker går runt zonen (ett andra hinder, `hinderUndvik`, bara för vägen), tills rummet byts. Med piltangenterna kan han gå i den igen. `hjalteFast` skär av hjältens bilder vid marken, som ungen i leran.
+- **Stocken (72.5):** den driver till kartans punkt `regi_stock_ute` (annars 64 pixlar ut), och ungen skakar på huvudet mot land. Vattnet i vassen är 120 pixlar brett, och halvan nås inom 56 pixlar. Bron och stegen läggs med en planka var 10:e pixel.
+- **Bubbeljakten (72.5):** med `bubblor_fran_blommorna` skuttar ungen och nafsar i en bubbla var 2,2 s när den går fritt.
+- **Livet (26.3, 72.10):** kartans `omgivning` får `hager`, `groda` och `katt`, och `fagel` och `fjaril` ritas som former när Stils bilder saknas (`livet.js`, högst fyra steg per sekund). Hägern och fågeln flyger, och grodan plumsar, när han kommer nära. `kap2.py` har hjälparen `liv()`.
+- **Dräkten (72.11):** hjältens lager har `drakt`. En dräkt i `DRAKT_GAVOR` byter dräktens färg i palettbytet, och den rosa ryggsäcken tonas (`SACK_TON`) tills Stil har ritat den. En sparning utan `drakt` läses som förut (`lagerFor`).
+- **Gråboxen:** leran (föremål med `leran` eller `lerpol` i id:t) är brun.
+

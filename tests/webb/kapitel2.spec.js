@@ -61,6 +61,10 @@ test('kapitel 2 går att spela från träsket till elden (gråbox, del 5)', asyn
     } else if (typSt === 'bara') {
       if (await ev((m) => !!window.__ORDSTAVEN.ruta(m), st.till)) await anvand(st.till);
       else await gaUt(scen === 'k2s04_bryggan' ? 'stig_byn_bryggan' : 'stig_byn_vassen');
+    } else if (typSt === 'pussel' && pussel.get(st.pussel_id)?.verb === 'hugga') {
+      // vassväggen (72.3): det närmaste lagret, tills alla har fallit
+      const kvar = await ev(() => window.__ORDSTAVEN.rumsobjekt().filter((id) => id.startsWith('vass_tat_')).map((id) => window.__ORDSTAVEN.ruta(id)).sort((a, b) => a.x - b.x));
+      if (kvar.length) { await ev(([x, y]) => window.__ORDSTAVEN.gaMot(x, y), [kvar[0].x - 8, 100]); await page.waitForTimeout(500); await page.keyboard.press('Space'); }
     } else if (typSt === 'pussel' && pussel.get(st.pussel_id)?.i_rummet) {
       const m = await rattObjekt(pussel.get(st.pussel_id));
       if (m) await anvand(m);
@@ -70,10 +74,11 @@ test('kapitel 2 går att spela från träsket till elden (gråbox, del 5)', asyn
   expect(scener).toEqual(['k2s01_kanten', 'k2s02_byn', 'k2s03_torget', 'k2s05_vassen', 'k2s03_torget', 'k2s04_bryggan', 'k2s07_hela_brevet', 'k2s08_huset', 'k2s09_kartbiten', 'k2s10_elden']);
   // kapitel 2:s mellanscener och formler rör sig i gråboxen (Teknik 32 och 34, beslut 69 och 71)
   const regi = (await ev(() => window.__ORDSTAVEN.grafik())).regi;
-  for (const r of ['svärdet hugger genom vassen', 'ungen sjunker i leran', 'ungen dras upp', 'luftskeppet river brevet', 'blommorna blåser bubblor', 'halvan flyger till handen',
+  for (const r of ['ungen biter i vass_tat', 'staven blir ett svärd', 'ungen sjunker i leran', 'ungen dras upp', 'luftskeppet river brevet', 'blommorna blåser bubblor', 'ungen jagar bubblor', 'halvan flyger till handen',
     // beslut 71 (Teknik 34): stocken, Tant Rosa, lyktorna och elden
     'ungen hoppar på stocken', 'ungen piper på stocken', 'stocken flyger till stranden', 'ungen hoppar i land', 'Tant Rosa når inte', 'ljuset hoppar mellan lyktorna', 'elden tänds']) expect(regi, r).toContain(r);
   const t = await ev(() => window.__ORDSTAVEN.tillstand());
+  expect(t.spelare.hjalte.lager.ryggsack).toBe('ryggsack_rosa'); // Tant Rosas ryggsäck (72.11)
   expect(t.spelare.hjalte.grad).toBe('Ordsmed');
   expect(t.spelare.hjalte.formler).toEqual(expect.arrayContaining(['FLYG']));
   expect(t.aventyr['den-gomda-dalen'].kartbitar).toContain(3);

@@ -11,7 +11,7 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 39,
+ "nextobjectid": 40,
  "properties": [
   {
    "name": "rum",
@@ -95,6 +95,24 @@
     },
     {
      "id": 5,
+     "name": "fagel_48_52",
+     "type": "omgivning",
+     "x": 48,
+     "y": 52,
+     "width": 12,
+     "height": 12,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vad",
+       "type": "string",
+       "value": "fagel"
+      }
+     ]
+    },
+    {
+     "id": 6,
      "name": "",
      "type": "vagg",
      "x": 128,
@@ -105,7 +123,7 @@
      "visible": true
     },
     {
-     "id": 6,
+     "id": 7,
      "name": "",
      "type": "vagg",
      "x": 40,
@@ -116,7 +134,7 @@
      "visible": true
     },
     {
-     "id": 7,
+     "id": 8,
      "name": "",
      "type": "vagg",
      "x": 208,
@@ -127,7 +145,7 @@
      "visible": true
     },
     {
-     "id": 8,
+     "id": 9,
      "name": "",
      "type": "vagg",
      "x": 360,
@@ -138,7 +156,7 @@
      "visible": true
     },
     {
-     "id": 9,
+     "id": 10,
      "name": "",
      "type": "vagg",
      "x": 496,
@@ -149,7 +167,7 @@
      "visible": true
     },
     {
-     "id": 10,
+     "id": 11,
      "name": "",
      "type": "vagg",
      "x": 580,
@@ -160,7 +178,7 @@
      "visible": true
     },
     {
-     "id": 11,
+     "id": 12,
      "name": "",
      "type": "vagg",
      "x": 600,
@@ -171,7 +189,7 @@
      "visible": true
     },
     {
-     "id": 12,
+     "id": 13,
      "name": "",
      "type": "vagg",
      "x": 0,
@@ -189,7 +207,7 @@
      ]
     },
     {
-     "id": 13,
+     "id": 14,
      "name": "",
      "type": "vagg",
      "x": 604,
@@ -207,7 +225,7 @@
      ]
     },
     {
-     "id": 14,
+     "id": 15,
      "name": "fiskaren",
      "type": "figur",
      "x": 88,
@@ -225,7 +243,7 @@
      ]
     },
     {
-     "id": 15,
+     "id": 16,
      "name": "tvatterskan",
      "type": "figur",
      "x": 232,
@@ -243,7 +261,7 @@
      ]
     },
     {
-     "id": 16,
+     "id": 17,
      "name": "barnet_drake",
      "type": "figur",
      "x": 420,
@@ -261,7 +279,7 @@
      ]
     },
     {
-     "id": 17,
+     "id": 18,
      "name": "fjader",
      "type": "sak",
      "x": 140,
@@ -279,7 +297,7 @@
      ]
     },
     {
-     "id": 18,
+     "id": 19,
      "name": "udden",
      "type": "sak",
      "x": 604,
@@ -290,7 +308,7 @@
      "visible": true
     },
     {
-     "id": 19,
+     "id": 20,
      "name": "lagereld",
      "type": "sak",
      "x": 572,
@@ -308,7 +326,7 @@
      ]
     },
     {
-     "id": 20,
+     "id": 21,
      "name": "regi_fiskaren_kvall",
      "type": "",
      "x": 556,
@@ -320,7 +338,7 @@
      "point": true
     },
     {
-     "id": 21,
+     "id": 22,
      "name": "regi_tvatterskan_kvall",
      "type": "",
      "x": 582,
@@ -332,7 +350,7 @@
      "point": true
     },
     {
-     "id": 22,
+     "id": 23,
      "name": "regi_barnet_drake_kvall",
      "type": "",
      "x": 600,
@@ -344,7 +362,7 @@
      "point": true
     },
     {
-     "id": 23,
+     "id": 24,
      "name": "regi_tant_rosa_kvall",
      "type": "",
      "x": 540,
@@ -356,7 +374,7 @@
      "point": true
     },
     {
-     "id": 24,
+     "id": 25,
      "name": "lyktor_udden",
      "type": "sak",
      "x": 558,
@@ -374,7 +392,7 @@
      ]
     },
     {
-     "id": 25,
+     "id": 26,
      "name": "dorr_rosa",
      "type": "utgang",
      "x": 404,
@@ -402,7 +420,7 @@
      ]
     },
     {
-     "id": 26,
+     "id": 27,
      "name": "brevram",
      "type": "sak",
      "x": 436,
@@ -420,7 +438,7 @@
      ]
     },
     {
-     "id": 27,
+     "id": 28,
      "name": "tant_rosa",
      "type": "figur",
      "x": 464,
@@ -443,7 +461,7 @@
      ]
     },
     {
-     "id": 28,
+     "id": 29,
      "name": "brunnen",
      "type": "sak",
      "x": 488,
@@ -461,7 +479,7 @@
      ]
     },
     {
-     "id": 29,
+     "id": 30,
      "name": "stig_vassen",
      "type": "utgang",
      "x": 332,
@@ -489,7 +507,7 @@
      ]
     },
     {
-     "id": 30,
+     "id": 31,
      "name": "stig_dammen",
      "type": "utgang",
      "x": 552,
@@ -517,7 +535,7 @@
      ]
     },
     {
-     "id": 31,
+     "id": 32,
      "name": "stig_bryggan",
      "type": "utgang",
      "x": 600,
@@ -545,7 +563,7 @@
      ]
     },
     {
-     "id": 32,
+     "id": 33,
      "name": "brygga_fran_torget",
      "type": "sak",
      "x": 604,
@@ -556,7 +574,7 @@
      "visible": true
     },
     {
-     "id": 33,
+     "id": 34,
      "name": "rep_vassen",
      "type": "sak",
      "x": 326,
@@ -567,7 +585,7 @@
      "visible": true
     },
     {
-     "id": 34,
+     "id": 35,
      "name": "skylt_vassen",
      "type": "sak",
      "x": 368,
@@ -585,7 +603,7 @@
      ]
     },
     {
-     "id": 35,
+     "id": 36,
      "name": "rep_brunnen",
      "type": "sak",
      "x": 546,
@@ -596,7 +614,7 @@
      "visible": true
     },
     {
-     "id": 36,
+     "id": 37,
      "name": "skylt_brunnen",
      "type": "sak",
      "x": 528,
@@ -614,7 +632,7 @@
      ]
     },
     {
-     "id": 37,
+     "id": 38,
      "name": "rep_bryggan",
      "type": "sak",
      "x": 592,
@@ -625,7 +643,7 @@
      "visible": true
     },
     {
-     "id": 38,
+     "id": 39,
      "name": "skylt_bryggan",
      "type": "sak",
      "x": 574,

@@ -435,6 +435,33 @@
         "musik": {
           "$ref": "#/$defs/slinga",
           "description": "Rummets (områdets) slinga. Gäller före kapitlets."
+        },
+        "zoner": {
+          "type": "array",
+          "description": "Platser i rummet som spelar sina steg varje gång hjälten går in i dem (lerpölen i vassen, 72.8). Zonen är ett föremål i kartan med samma id. Stegen spelas bara när han går fritt, aldrig under en replik, ett läsval eller ett pussel, och igen först när han har gått ut ur zonen.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "steg"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/id"
+              },
+              "steg": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/$defs/steg"
+                }
+              },
+              "anteckning": {
+                "$ref": "#/$defs/anteckning"
+              }
+            }
+          }
         }
       }
     },
@@ -1115,7 +1142,8 @@
             "sort": {
               "enum": [
                 "hjalmdekor",
-                "ryggsack"
+                "ryggsack",
+                "drakt"
               ]
             },
             "id": {

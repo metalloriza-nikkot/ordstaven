@@ -11,7 +11,7 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 10,
+ "nextobjectid": 11,
  "properties": [
   {
    "name": "inomhus",
@@ -124,6 +124,24 @@
     },
     {
      "id": 5,
+     "name": "katt_52_100",
+     "type": "omgivning",
+     "x": 52,
+     "y": 100,
+     "width": 16,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vad",
+       "type": "string",
+       "value": "katt"
+      }
+     ]
+    },
+    {
+     "id": 6,
      "name": "tavla_stor_rund",
      "type": "sak",
      "x": 60,
@@ -146,7 +164,7 @@
      ]
     },
     {
-     "id": 6,
+     "id": 7,
      "name": "tavla_liten_fyrkant",
      "type": "sak",
      "x": 112,
@@ -169,7 +187,7 @@
      ]
     },
     {
-     "id": 7,
+     "id": 8,
      "name": "tavla_stor_fyrkant",
      "type": "sak",
      "x": 164,
@@ -192,7 +210,7 @@
      ]
     },
     {
-     "id": 8,
+     "id": 9,
      "name": "tavla_liten_rund",
      "type": "sak",
      "x": 216,
@@ -215,7 +233,7 @@
      ]
     },
     {
-     "id": 9,
+     "id": 10,
      "name": "kartbit_3",
      "type": "sak",
      "x": 144,

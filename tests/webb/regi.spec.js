@@ -23,6 +23,15 @@ async function sparadI(page, kap, scenId) {
   await page.waitForTimeout(1200);
 }
 const regi = (page, bild) => page.evaluate((b) => window.__ORDSTAVEN.regi(b), bild);
+/** Vänta på en regi medan repliker och rutor klickas bort (berättelsen går vidare som när han spelar). */
+async function vantaPaRegi(page, namn) {
+  for (let i = 0; i < 80; i++) {
+    if ((await page.evaluate(() => window.__ORDSTAVEN.grafik())).regi.includes(namn)) return;
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    await page.waitForTimeout(250);
+  }
+  throw new Error(`ingen regi ${namn}`);
+}
 /** Gå till en plats: repliker och rutor på vägen klickas bort (berättelsen går vidare som när han spelar). */
 async function gaTill(page, x, y, klar) {
   for (let i = 0; i < 80; i++) {
@@ -116,16 +125,16 @@ test('vassen i gråboxen (Teknik 32 och 34, 71.3): bubblorna, halvan till handen
   expect(await O(() => window.__ORDSTAVEN.regi('halvan_flyger_till_handen'))).toBeGreaterThan(0);
   await page.waitForTimeout(2300);
   // han har gått till stranden efter halvan (ga_till brev_halva_vatten)
-  await gaTill(page, 580, 110, (p) => p.x > 560);
-  // jättehoppet: ungen landar på stocken, och stocken glider ut med den. Inget följer hjälten.
+  await gaTill(page, 506, 96, (p) => p.x > 490);
+  // jättehoppet: ungen landar på stocken, och stocken glider långt ut med den (72.5). Inget följer hjälten.
   const s0 = await O(() => window.__ORDSTAVEN.ruta('stock_vassen'));
   expect(await O(() => window.__ORDSTAVEN.regi('unge_hoppar_pa_stocken'))).toBeGreaterThan(0);
   await expect.poll(() => O(() => window.__ORDSTAVEN.ungeSvavar()), { timeout: 10000 }).toEqual({ foljer: false, r: 0, styrd: false });
   const u = await O(() => window.__ORDSTAVEN.ungePos());
-  expect(u.x).toBeGreaterThan(s0.x + s0.b / 2 + 4); // ute på vattnet
+  expect(Math.hypot(u.x - (s0.x + s0.b / 2), u.y - (s0.y + s0.h / 2))).toBeGreaterThan(60); // långt ute, mycket längre än ett hopp
   await page.screenshot({ path: 'test-results/regi-unge-pa-stocken.png' });
   expect(await O(() => window.__ORDSTAVEN.regi('unge_piper_pa_stocken'))).toBeGreaterThan(0);
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(2600);
   expect(await O(() => window.__ORDSTAVEN.regi('stocken_flyger_till_stranden'))).toBeGreaterThan(0);
   await page.waitForTimeout(1800);
   const u2 = await O(() => window.__ORDSTAVEN.ungePos());
@@ -134,15 +143,15 @@ test('vassen i gråboxen (Teknik 32 och 34, 71.3): bubblorna, halvan till handen
   await expect.poll(() => O(() => window.__ORDSTAVEN.ungeSvavar()), { timeout: 8000 }).toBeNull();
   await page.screenshot({ path: 'test-results/regi-unge-i-land.png' });
   const regi = (await O(() => window.__ORDSTAVEN.grafik())).regi;
-  for (const r of ['blommorna blåser bubblor', 'halvan flyger till handen', 'ungen hoppar på stocken', 'ungen piper på stocken', 'stocken flyger till stranden', 'ungen hoppar i land']) expect(regi).toContain(r);
+  for (const r of ['blommorna blåser bubblor', 'ungen jagar bubblor', 'halvan flyger till handen', 'ungen hoppar på stocken', 'ungen piper på stocken', 'stocken flyger till stranden', 'ungen hoppar i land']) expect(regi).toContain(r);
 });
 
-test('REP, BRO och STEGE tar också ungen i land (71.3), och SVÄRD hugger genom vassen (71.6)', async ({ page }) => {
+test('REP, BRO och STEGE tar också ungen i land (71.3), och SVÄRD gör staven till ett svärd (72.3)', async ({ page }) => {
   test.setTimeout(120000);
   const O = (f, a) => page.evaluate(f, a);
   for (const [ord, namn] of [['rep_till_ungen', 'repet drar in stocken'], ['bro_till_stocken', 'en bro till stocken'], ['stege_till_stocken', 'en stege till stocken']]) {
     await sparadI(page, 'kap-02', 'k2s05_vassen');
-    await gaTill(page, 580, 110, (p) => p.x > 560);
+    await gaTill(page, 506, 96, (p) => p.x > 490);
     expect(await O(() => window.__ORDSTAVEN.regi('unge_hoppar_pa_stocken'))).toBeGreaterThan(0);
     await expect.poll(() => O(() => window.__ORDSTAVEN.ungeSvavar()?.styrd), { timeout: 10000 }).toBe(false);
     expect(await O((r) => window.__ORDSTAVEN.regi(r), ord)).toBeGreaterThan(0);
@@ -154,10 +163,8 @@ test('REP, BRO och STEGE tar också ungen i land (71.3), och SVÄRD hugger genom
   await sparadI(page, 'kap-02', 'k2s01_kanten');
   expect(await O(() => window.__ORDSTAVEN.regi('litet_svard_kittlar_vassen'))).toBeGreaterThan(0);
   expect(await O(() => window.__ORDSTAVEN.regi('svard_hugger_genom_vassen'))).toBeGreaterThan(0);
-  await page.waitForTimeout(800);
-  await page.screenshot({ path: 'test-results/regi-svard-i-vassen.png' });
-  await page.waitForTimeout(1400);
-  expect((await O(() => window.__ORDSTAVEN.grafik())).regi).toContain('svärdet hugger genom vassen');
+  await page.waitForTimeout(900);
+  expect((await O(() => window.__ORDSTAVEN.grafik())).regi).toContain('staven blir ett svärd');
 });
 
 test('kvällen i byn (71.5, 71.6): LJUS tänder lyktorna, elden tänds, byborna står vid elden; Tant Rosa når inte tavlan (71.4)', async ({ page }) => {
@@ -194,3 +201,66 @@ test('kvällen i byn (71.5, 71.6): LJUS tänder lyktorna, elden tänds, byborna 
   await page.waitForTimeout(900);
   await page.screenshot({ path: 'test-results/regi-tant-rosa-nar-inte.png' });
 });
+
+test('lerpölen i vassen (72.8): han sjunker, ungen drar upp honom, och sedan går vägen runt pölen', async ({ page }) => {
+  test.setTimeout(120000);
+  const O = (f, a) => page.evaluate(f, a);
+  await sparadI(page, 'kap-02', 'k2s05_vassen');
+  const pol = await O(() => window.__ORDSTAVEN.ruta('lerpol_vassen'));
+  expect(pol).toBeTruthy();
+  // ungen jagar bubblorna medan han letar (72.5)
+  await vantaPaRegi(page, 'ungen jagar bubblor');
+  // rakt in i pölen
+  for (let i = 0; i < 80 && !(await O(() => window.__ORDSTAVEN.logg())).includes('[zon]'); i++) {
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    await O(([x, y]) => window.__ORDSTAVEN.gaMot(x, y), [pol.x + pol.b / 2, pol.y + pol.h / 2]);
+    await page.waitForTimeout(200);
+  }
+  await expect.poll(() => O(() => window.__ORDSTAVEN.hjalteFast()), { timeout: 5000 }).toBeGreaterThan(4);
+  await page.screenshot({ path: 'test-results/regi-lerpolen.png' });
+  await expect.poll(() => O(() => window.__ORDSTAVEN.hjalteFast()), { timeout: 10000 }).toBe(0);
+  const ute = await O(() => window.__ORDSTAVEN.position());
+  const i = (p) => p.x >= pol.x && p.x <= pol.x + pol.b && p.y >= pol.y && p.y <= pol.y + pol.h;
+  expect(i(ute)).toBe(false);
+  const regi = (await O(() => window.__ORDSTAVEN.grafik())).regi;
+  for (const r of ['hjälten sjunker i leran', 'ungen drar upp hjälten']) expect(regi).toContain(r);
+  // nu går vägen runt pölen, också när målet ligger på andra sidan
+  await gaTill(page, pol.x + pol.b + 30, pol.y + pol.h / 2, (p) => p.x > pol.x + pol.b + 20);
+  const zoner = (await O(() => window.__ORDSTAVEN.logg())).split('\n').filter((r) => r.includes('[zon]'));
+  expect(zoner.length).toBe(1);
+});
+
+test('vassväggen (72.3): ungen biter i vassen, och efter SVÄRD hugger han sig igenom fem lager själv', async ({ page }) => {
+  test.setTimeout(120000);
+  const O = (f, a) => page.evaluate(f, a);
+  await sparadI(page, 'kap-02', 'k2s01_kanten');
+  await vantaPaRegi(page, 'ungen biter i vass_tat');
+  // SVÄRD med tangentbordet
+  for (let i = 0; i < 60 && !(await page.locator('#plattan .formel-skriv').isVisible()); i++) {
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    await page.waitForTimeout(250);
+  }
+  await page.keyboard.type('SV'); await O(() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ä', bubbles: true }))); await page.keyboard.type('RD');
+  await page.keyboard.press('Enter');
+  // hugget: väggen är delad i fem lager, och han hugger det närmaste tills alla har fallit
+  const lager = () => O(() => window.__ORDSTAVEN.rumsobjekt().filter((id) => id.startsWith('vass_tat_')).length);
+  for (let i = 0; i < 60 && (await lager()) === 0; i++) {
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    await page.waitForTimeout(250);
+  }
+  expect(await lager()).toBe(5);
+  for (let i = 0; i < 80; i++) {
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    const kvar = await O(() => window.__ORDSTAVEN.rumsobjekt().filter((id) => id.startsWith('vass_tat_')).map((id) => window.__ORDSTAVEN.ruta(id)).filter(Boolean).sort((a, b) => a.x - b.x));
+    if (!kvar.length) break;
+    if (i === 2) await page.screenshot({ path: 'test-results/regi-vassvaggen.png' });
+    await O(([x, y]) => window.__ORDSTAVEN.gaMot(x, y), [kvar[0].x - 8, 100]);
+    await page.waitForTimeout(400);
+    await page.keyboard.press('Space');
+    await page.waitForTimeout(300);
+  }
+  await expect.poll(() => O(() => window.__ORDSTAVEN.rumsobjekt().filter((id) => id.startsWith('vass_tat')).length), { timeout: 10000 }).toBe(0);
+  const logg = await O(() => window.__ORDSTAVEN.logg());
+  expect(logg.split('\n').filter((r) => r.includes('[hugga]')).length).toBe(5);
+});
+

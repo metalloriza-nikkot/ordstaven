@@ -446,6 +446,18 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
           kollaSteg(st, `rum ${r.id} frivilligt ${fv.foremal} steg ${i + 1} (${st.typ})`, { rum: r.id }, pp);
         });
       });
+      // zonerna (2.40, lerpölen i vassen, 72.8): ett föremål i rummet, och bara det som händer utan att han gör något
+      const zoner = new Set();
+      (r.zoner || []).forEach((z, j) => {
+        if (!ids.includes(z.id)) fel.push(var_(`rum ${r.id} zon ${j + 1}: ${z.id} finns inte i rummets innehall`));
+        if (zoner.has(z.id)) fel.push(var_(`rum ${r.id}: zonen ${z.id} står två gånger`));
+        zoner.add(z.id);
+        const pp = { sek: 0, lasuppgifter: 0, sistaSparpunkt: false };
+        z.steg.forEach((st, i) => {
+          if (!['mellanscen', 'ljud', 'replik'].includes(st.typ)) fel.push(var_(`rum ${r.id} zon ${z.id} steg ${i + 1}: ${st.typ} hör inte hemma i en zon (bara mellanscen, ljud och replik)`));
+          kollaSteg(st, `rum ${r.id} zon ${z.id} steg ${i + 1} (${st.typ})`, { rum: r.id }, pp);
+        });
+      });
     }
     // Farfars "Var var vi?" (2.27, F2): en post per pass som finns, och allt läses upp utom ordet
     const vvvPass = new Set();

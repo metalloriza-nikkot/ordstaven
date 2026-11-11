@@ -1,21 +1,22 @@
 // @ts-check
 // Hjältens lager (T2): formen är fast (spelarens figur). Huden och dräkten är palettbyten som väljs i början,
-// hjälmdekoren och ryggsäcken är saker han hittar. Allt han hittar tas på direkt (granskningen av kapitel 1),
+// hjälmdekoren och ryggsäcken är saker han hittar. En dräkt han får (Bos grodgröna, 72.11) är ett lager som byter
+// dräktens färg, och garderoben byter tillbaka. Allt han hittar tas på direkt (granskningen av kapitel 1),
 // och garderoben finns för att byta tillbaka. Ren logik på sparningens hjälte (spelare.hjalte).
 
 /** Sakerna han kan ha på sig, i den ordning garderoben visar dem. */
-export const LAGER = Object.freeze(['hjalmdekor', 'ryggsack']);
+export const LAGER = Object.freeze(['hjalmdekor', 'ryggsack', 'drakt']);
 
 /** @param {any} hjalte */
 function sakra(hjalte) {
-  hjalte.lager = { hjalmdekor: null, ryggsack: null, ...(hjalte.lager || {}) };
+  hjalte.lager = { hjalmdekor: null, ryggsack: null, drakt: null, ...(hjalte.lager || {}) };
   hjalte.garderob = hjalte.garderob || [];
   return hjalte;
 }
 
 /**
  * Hjälten får en sak. Den tas på direkt och läggs i garderoben (en gång).
- * @param {any} hjalte @param {'hjalmdekor' | 'ryggsack'} sort @param {string} id
+ * @param {any} hjalte @param {'hjalmdekor' | 'ryggsack' | 'drakt'} sort @param {string} id
  * @returns {boolean} om saken är ny (då glimtar pausknappen)
  */
 export function geSak(hjalte, sort, id) {
@@ -28,7 +29,7 @@ export function geSak(hjalte, sort, id) {
 
 /**
  * Byt i garderoben: ta på en sak han har, eller ta av (null).
- * @param {any} hjalte @param {'hjalmdekor' | 'ryggsack'} sort @param {string | null} id @returns {boolean} om något ändrades
+ * @param {any} hjalte @param {'hjalmdekor' | 'ryggsack' | 'drakt'} sort @param {string | null} id @returns {boolean} om något ändrades
  */
 export function bytLager(hjalte, sort, id) {
   const h = sakra(hjalte);
@@ -38,7 +39,7 @@ export function bytLager(hjalte, sort, id) {
   return true;
 }
 
-/** Det han har på sig. @param {any} hjalte @returns {{ hjalmdekor: string | null, ryggsack: string | null }} */
+/** Det han har på sig. @param {any} hjalte @returns {{ hjalmdekor: string | null, ryggsack: string | null, drakt: string | null }} */
 export const lagerFor = (hjalte) => sakra(hjalte).lager;
 
 /**

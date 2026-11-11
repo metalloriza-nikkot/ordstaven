@@ -439,12 +439,12 @@ test('formeln: en bokstavstangent lägger motsvarande bricka (LJUS på datorn)',
 
 test('mellanscenens text är en regianvisning: liten, i vanlig skrift, aldrig på läsplattan', async ({ page }, info) => {
   test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
-  // prologen och kapitel 1 har inga rutor kvar (68.9), så rutan prövas i kapitel 2:s gråbox: kvällen i byn (k2s10)
-  // börjar med en (k2s01 har en regi sedan beslut 71)
+  // prologen och kapitel 1 har inga rutor kvar (68.9), så rutan prövas i kapitel 2:s gråbox: Tant Rosas hus (k2s08)
+  // börjar med en (k2s01 har en regi sedan beslut 71, och kvällen har syns_redan sedan 72)
   await starta(page, '?snabb&ny&kapitel=kap-02');
   await page.evaluate(() => {
     const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
-    Object.assign(av, { kapitelId: 'kap-02', scen: 9, scenId: 'k2s10_elden', startad: false }); delete av.steg;
+    Object.assign(av, { kapitelId: 'kap-02', scen: 7, scenId: 'k2s08_huset', startad: false }); delete av.steg;
     t.spelare.hjalte.namn = 'TESTA'; t.spelare.unge = { format: 1, steg: 1, formagor: [], ...t.spelare.unge, namn: 'KNOPP', folj: true };
     localStorage.setItem('ordstaven_spar', JSON.stringify(t));
   });

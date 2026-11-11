@@ -1298,7 +1298,8 @@ export function skapaSpel(d) {
     rum.sattLager(lagerFor(tillstand.spelare.hjalte));
     ljud.spela('fest_mellan');
     nyttIHjalteboken();
-    await ui.visaFest(st.sort === 'ryggsack' ? '🎒' : '👑', tid(1100));
+    logg.handelse('gåva', `${st.sort}: ${st.id}`);
+    await ui.visaFest(st.sort === 'ryggsack' ? '🎒' : st.sort === 'drakt' ? '👕' : '👑', tid(1100));
   }
   /** Dinoboken får en sida (stubbe i gråboxen: sidan finns i hjälteboken, och pausknappen glimtar). @param {any} st */
   async function dinobok(st) {
@@ -1759,6 +1760,35 @@ export function skapaSpel(d) {
         if (!ms && lockarVisarBeskrivning(l)) { ui.visaRegi(l.beskrivning, 0); window.setTimeout(() => ui.doljRegi(), tid(Math.min(5000, 1500 + l.beskrivning.split(' ').length * 120))); }
       }
     }, 200);
+  }
+  /**
+   * Rummets zoner (`rum.zoner`, 2.40, lerpölen i vassen, 72.8): går hjälten in i zonens ruta i kartan spelas zonens
+   * steg, varje gång han går in. Bara medan han går fritt (ett mål, navet eller fri lek), aldrig under en replik, ett
+   * läsval eller ett pussel, och igen först när han har gått ut. Världen står still medan stegen spelas, och
+   * regin får veta var han kom ifrån (`rum.zonUt`), så att ungen drar upp honom åt det hållet.
+   */
+  {
+    /** @type {Set<string>} zonerna han står i nu */
+    const inne = new Set();
+    let utanfor = /** @type {{ x: number, y: number } | null} */ (null);
+    let pagar = false;
+    window.setInterval(async () => {
+      if (!b || pagar || !rum.harRum || !aktuelltRum) return;
+      const zoner = b.rum(aktuelltRum)?.zoner || [];
+      if (!zoner.length) { inne.clear(); return; }
+      const i = (/** @type {any} */ o) => rum.pos.x >= o.x && rum.pos.x <= o.x + o.b && rum.pos.y >= o.y && rum.pos.y <= o.y + o.h;
+      const traffad = zoner.find((/** @type {any} */ z) => { const o = rum.ruta(z.id); return o && i(o); });
+      for (const id of [...inne]) if (traffad?.id !== id) inne.delete(id);
+      if (!traffad) { utanfor = { ...rum.pos }; return; }
+      if (inne.has(traffad.id)) return;
+      inne.add(traffad.id);
+      if (pausad || rum.fryst || !ui.plattan.hidden || !['ga_till', 'nav', 'fritt'].includes(aktuelltSteg?.typ)) return;
+      pagar = true;
+      logg.handelse('zon', `${aktuelltRum}/${traffad.id}`);
+      rum.zonUt = utanfor; rum.frys(true);
+      const forra = aktuelltSteg;
+      try { for (const st of traffad.steg) await utfor(st); } finally { aktuelltSteg = forra; rum.zonUt = null; rum.undvikZon(traffad.id); rum.frys(false); pagar = false; }
+    }, 100);
   }
   /**
    * Har kapitlet en sidogren (en frivillig scen som startar i ett rum)? Då är vägarna mellan kapitlets områden
@@ -3405,7 +3435,7 @@ export function skapaSpel(d) {
       if (vy === 'staven') sida = `<div class="paus-formler">${(hjalte().formler || []).map((f) => `<button type="button" class="kort formel-ord" data-formel="${ui.esc(f)}"><span class="kort-etikett">${ui.rader(f, varden(), 'kort-ord')}</span></button>`).join('')}</div>`;
       if (vy === 'garderoben') {
         const pa = lagerFor(hjalte());
-        sida = `<div class="paus-garderob">${(hjalte().garderob || []).map((x) => `<button type="button" class="kort sak ${pa[/** @type {'hjalmdekor' | 'ryggsack'} */ (x.sort)] === x.id ? 'vald' : ''}" data-sort="${ui.esc(x.sort)}" data-id="${ui.esc(x.id)}">${bilder.html(x.id)}</button>`).join('')}</div>`;
+        sida = `<div class="paus-garderob">${(hjalte().garderob || []).map((x) => `<button type="button" class="kort sak ${pa[/** @type {'hjalmdekor' | 'ryggsack' | 'drakt'} */ (x.sort)] === x.id ? 'vald' : ''}" data-sort="${ui.esc(x.sort)}" data-id="${ui.esc(x.id)}">${bilder.html(x.id)}</button>`).join('')}</div>`;
       }
       if (vy === 'dinoboken') sida = `<div class="paus-dinobok">${(tillstand.spelare.dinobok || []).map((x) => `<button type="button" class="kort dinosida" data-text="${ui.esc(x.bildtext || '')}">${bilder.html(x.bild)}${x.bildtext ? `<span class="kort-etikett">${ui.rader(x.bildtext, varden(), 'kort-ord')}</span>` : ''}</button>`).join('')}</div>`;
       if (vy === 'klart') sida = klartUppslag(settFore);
@@ -3432,7 +3462,7 @@ export function skapaSpel(d) {
     }));
     m.querySelectorAll('.dinosida').forEach((el) => el.addEventListener('click', () => { const t = /** @type {HTMLElement} */ (el).dataset.text; if (t) sag({ talare: 'berattare', text: t, upplast: true }); }));
     m.querySelectorAll('.paus-garderob .sak').forEach((el) => el.addEventListener('click', () => {
-      const e = /** @type {HTMLElement} */ (el); const sort = /** @type {'hjalmdekor' | 'ryggsack'} */ (e.dataset.sort);
+      const e = /** @type {HTMLElement} */ (el); const sort = /** @type {'hjalmdekor' | 'ryggsack' | 'drakt'} */ (e.dataset.sort);
       const pa = lagerFor(hjalte())[sort] === e.dataset.id;
       if (bytLager(hjalte(), sort, pa ? null : (e.dataset.id || null))) { ljud.spela('klick'); rum.sattLager(lagerFor(hjalte())); spara(); logg.handelse('garderob', `${sort}: ${pa ? 'av' : e.dataset.id}`); }
       ritaPaus('garderoben');

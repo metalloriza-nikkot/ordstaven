@@ -100,11 +100,21 @@ describe('sparning', () => {
     const t = nyttTillstand('t'); const h = t.spelare.hjalte;
     expect(geSak(h, 'hjalmdekor', 'taggkam')).toBe(true);
     expect(geSak(h, 'hjalmdekor', 'taggkam')).toBe(false);
-    expect(lagerFor(h)).toEqual({ hjalmdekor: 'taggkam', ryggsack: null });
+    expect(lagerFor(h)).toEqual({ hjalmdekor: 'taggkam', ryggsack: null, drakt: null });
     expect(bytLager(h, 'hjalmdekor', null)).toBe(true);
     expect(bytLager(h, 'ryggsack', 'finns_inte')).toBe(false);
     expect(bytLager(h, 'hjalmdekor', 'taggkam')).toBe(true);
     expect(h.garderob).toEqual([{ sort: 'hjalmdekor', id: 'taggkam' }]);
+  });
+  it('en dräkt han får (72.11) tas på direkt, och garderoben tar av den igen', () => {
+    const t = nyttTillstand('t'); const h = t.spelare.hjalte;
+    expect(geSak(h, 'drakt', 'drakt_grodgron')).toBe(true);
+    expect(lagerFor(h).drakt).toBe('drakt_grodgron');
+    expect(bytLager(h, 'drakt', null)).toBe(true);
+    expect(lagerFor(h).drakt).toBe(null);
+    // en gammal sparning utan dräkt i lagret går att läsa
+    const gammal = { lager: { hjalmdekor: 'taggkam', ryggsack: null }, garderob: [] };
+    expect(lagerFor(gammal)).toEqual({ hjalmdekor: 'taggkam', ryggsack: null, drakt: null });
   });
 
   // Varje gammalt format har en fixturfil som alltid måste gå att läsa.

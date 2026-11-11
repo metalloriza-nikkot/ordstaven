@@ -710,6 +710,23 @@ test('höjdnivåer: han går upp för trappan själv, kanten går inte att gå �
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('LÖVEN.', { timeout: 8000 });
 });
 
+test('Bos grodgröna dräkt (72.11): dräktens färg byts direkt, och garderoben byter tillbaka', async ({ page }) => {
+  await provscen(page, { id: 't_drakt', pass: 1, rum: 'provskogen', steg: [
+    { typ: 'ge_sak', sort: 'drakt', id: 'drakt_grodgron' }, { typ: 'ga_till', mal: 'sten' }, R('Klart.'),
+  ] }, null, { rum: { provskogen: { innehall: ['sten'] } } });
+  const forut = 0x3a3e48, gron = 0x4f9a3a;
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.draktFarg()), { timeout: 8000 }).toBe(gron);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.lager().drakt)).toBe('drakt_grodgron');
+  await expect.poll(() => steg(page).then((s) => s?.typ), { timeout: 5000 }).toBe('ga_till');
+  await page.screenshot({ path: 'test-results/drakt-grodgron.png' });
+  await page.click('#hud-paus');
+  await page.click('#pausmeny .paus-val[data-val="hjalteboken"]');
+  await page.click('#pausmeny .paus-garderob .sak[data-sort="drakt"]');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.draktFarg())).toBe(forut);
+  await page.click('#pausmeny .paus-garderob .sak[data-sort="drakt"]');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.draktFarg())).toBe(gron);
+});
+
 test('gåvor tas på direkt, pausknappen glimtar, och hjälteboken har garderoben och Dinoboken med en stjärna på det nya', async ({ page }) => {
   await provscen(page, { id: 't_gava', pass: 1, rum: 'provskogen', steg: [
     { typ: 'ge_sak', sort: 'hjalmdekor', id: 'taggkam' }, { typ: 'dinobok', sida: { bild: 'fossil_och_ungen', bildtext: 'fossil' } }, { typ: 'ga_till', mal: 'sten' }, R('Klart.'),
@@ -1486,7 +1503,7 @@ test('Prologen, pass 3 i menyn: inget från kapitel 1 finns kvar, och kapitel 1 
   expect(t.spelare.hjalte.formler).toContain('LJUS');
   expect(av.kartbitar).toEqual([1]);
   expect(t.spelare.dinobok).toEqual([]);
-  expect(t.spelare.hjalte.lager).toEqual({ hjalmdekor: null, ryggsack: null });
+  expect(t.spelare.hjalte.lager).toEqual({ hjalmdekor: null, ryggsack: null, drakt: null });
   expect(t.spelare.hjalte.garderob).toEqual([]);
   expect(t.spelare.unge.tillagg).toEqual([]);
   expect(av.bar).toBe(6); // högst det prologen ger före pass 3
@@ -2353,7 +2370,7 @@ test('hjälpens trappa i formeln med tangentbordet (Teknik 32, beslut 69.3): bil
   expect(l).toContain('k2_over: förebilden tonas bort (täck)');
   expect(l).toContain('k2_over: klar med förebild');
 });
-test('kapitel 2 går att gå in i (del 2): skylten, vattnet, BRO över vattnet och in i byn, med piltangenterna', async ({ page }) => {
+test('kapitel 2 går att gå in i (del 2): SVÄRD och vassväggen, skylten, vattnet, BRO över vattnet och in i byn, med piltangenterna', async ({ page }) => {
   test.setTimeout(150000);
   await page.goto('./?snabb&ny&kapitel=kap-02');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
@@ -2381,7 +2398,13 @@ test('kapitel 2 går att gå in i (del 2): skylten, vattnet, BRO över vattnet o
     const [scen, st] = await page.evaluate(() => [window.__ORDSTAVEN.scen(), window.__ORDSTAVEN.steg()]);
     if (scen !== 'k2s01_kanten') break;
     const nyckel = `${st?.typ}:${st?.mal || st?.foremal || st?.pussel_id || ''}`;
-    if (st?.typ === 'las_skylt' && !gjort.has(nyckel)) { gjort.add(nyckel); await gaTill(107, 90); continue; }
+    if (st?.typ === 'las_skylt' && !gjort.has(nyckel)) { gjort.add(nyckel); await gaTill(139, 90); continue; }
+    // vassväggen (72.3): han hugger det närmaste lagret med Mellanslag, tills alla har fallit
+    if (st?.typ === 'pussel' && st.pussel_id === 'k2_vassvaggen' && !(await page.locator('#plattan').isVisible())) {
+      const kvar = await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt().filter((id) => id.startsWith('vass_tat_')).map((id) => window.__ORDSTAVEN.ruta(id)).sort((a, b) => a.x - b.x));
+      if (kvar.length) { await gaTill(kvar[0].x - 8, 100); await page.keyboard.press('Space'); await page.waitForTimeout(400); }
+      continue;
+    }
     // ungen sitter fast i leran (69.1): han går dit, mot ungen, tills han når den
     if (st?.typ === 'ga_till' && st.mal === 'unge') { const u = await page.evaluate(() => window.__ORDSTAVEN.ungePos()); await gaTill(u.x - 16, u.y); continue; } // från vänster, utanför leran
     if (st?.typ === 'ga_till' && st.mal === 'vattnet' && !gjort.has(nyckel)) { gjort.add(nyckel); await gaTill(140, 96); await gaTill(300, 96); await gaTill(452, 96); await page.keyboard.press('Space'); continue; }

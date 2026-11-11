@@ -11,7 +11,7 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 13,
+ "nextobjectid": 15,
  "properties": [
   {
    "name": "rum",
@@ -114,6 +114,42 @@
     },
     {
      "id": 5,
+     "name": "fjaril_170_14",
+     "type": "omgivning",
+     "x": 170,
+     "y": 14,
+     "width": 48,
+     "height": 30,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vad",
+       "type": "string",
+       "value": "fjaril"
+      }
+     ]
+    },
+    {
+     "id": 6,
+     "name": "fagel_300_96",
+     "type": "omgivning",
+     "x": 300,
+     "y": 96,
+     "width": 12,
+     "height": 12,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vad",
+       "type": "string",
+       "value": "fagel"
+      }
+     ]
+    },
+    {
+     "id": 7,
      "name": "groda_liten_gron",
      "type": "sak",
      "x": 68,
@@ -131,7 +167,7 @@
      ]
     },
     {
-     "id": 6,
+     "id": 8,
      "name": "groda_liten_gul",
      "type": "sak",
      "x": 286,
@@ -149,7 +185,7 @@
      ]
     },
     {
-     "id": 7,
+     "id": 9,
      "name": "groda_stor_gron",
      "type": "sak",
      "x": 140,
@@ -167,7 +203,7 @@
      ]
     },
     {
-     "id": 8,
+     "id": 10,
      "name": "groda_stor_gul",
      "type": "sak",
      "x": 236,
@@ -185,7 +221,7 @@
      ]
     },
     {
-     "id": 9,
+     "id": 11,
      "name": "groda_gron_slat",
      "type": "sak",
      "x": 68,
@@ -203,7 +239,7 @@
      ]
     },
     {
-     "id": 10,
+     "id": 12,
      "name": "groda_gul_slat",
      "type": "sak",
      "x": 286,
@@ -221,7 +257,7 @@
      ]
     },
     {
-     "id": 11,
+     "id": 13,
      "name": "groda_gron_prickig",
      "type": "sak",
      "x": 140,
@@ -239,7 +275,7 @@
      ]
     },
     {
-     "id": 12,
+     "id": 14,
      "name": "groda_gul_prickig",
      "type": "sak",
      "x": 236,

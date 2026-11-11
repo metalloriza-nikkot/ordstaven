@@ -43,6 +43,11 @@ def punkt(namn, x, y):
     return ('punkt', namn, x, y, 0, 0, {})
 
 
+def liv(vad, x, y, b, h):
+    """Något som lever i rummet (26.3, 72.10): fågel, häger, groda, katt eller fjäril. Det går inte att trycka på."""
+    return ('omgivning', f'{vad}_{x}_{y}', x, y, b, h, {'vad': vad})
+
+
 STIG = {'golv': True}
 
 # Grodornas platser vid dammen (69.8): x, y för en ruta på 20 × 16
@@ -57,13 +62,16 @@ RUMMEN = {
         'objekt': [
             utg('stig_skogen', 0, 84, 40, 24, **STIG, riktning='vanster'),
             punkt('start', 48, 100),
-            # 71.6: en vägg av tät vass tvärs över hela rummet strax efter skogen. Den syns i tillståndet vass och
-            # faller när SVÄRD har huggit (oppen)
-            sak('vass_tat', 84, 0, 20, 192, sida='vanster'),
-            sak('skylt_lera', 100, 60, 14, 14, sida='alla'),
+            # 71.6 och 72.3: en vägg av tät vass tvärs över hela rummet strax efter skogen. Efter SVÄRD hugger han sig
+            # igenom själv (k2_vassvaggen): väggen delas i lika många lager som pusslet har (fem), från väster till
+            # öster, och den västra står närmast honom. Den syns i tillståndet vass och är borta i oppen.
+            sak('vass_tat', 70, 0, 50, 192, sida='vanster', delas='hela', visar='k2_vassvaggen'),
+            sak('skylt_lera', 132, 60, 14, 14, sida='alla'),
             sak('leran', 150, 104, 80, 40, sida='alla'),
-            sak('stubbe_trask', 60, 148, 20, 14, sida='alla'),
+            sak('stubbe_trask', 36, 150, 20, 14, sida='alla'),
             sak('trollslanda', 276, 44, 12, 10, sida='alla'),
+            # 72.10: en fågel i vassen vid vattnet och en groda vid stranden
+            liv('fagel', 430, 48, 12, 12), liv('groda', 444, 126, 10, 8),
             vagg(464, 0, 96, 72, vatten=True),
             sak('vattnet', 464, 72, 96, 40, sida='vanster'),
             vagg(464, 112, 96, 80, vatten=True),
@@ -79,7 +87,7 @@ RUMMEN = {
             utg('stig_kanten', 0, 280, 40, 24, **STIG, riktning='vanster', till='trasket_kanten'),
             punkt('start', 48, 296),
             # pålhusen i NV, och raden av hus längs norra kanten som bara öppnar sig vid stigarna
-            vagg(0, 0, 330, 40), vagg(24, 64, 64, 40), vagg(128, 64, 72, 48), vagg(40, 136, 56, 40), vagg(208, 128, 64, 40),
+            vagg(0, 0, 330, 40), vagg(24, 64, 64, 40), liv('fagel', 48, 52, 12, 12), vagg(128, 64, 72, 48), vagg(40, 136, 56, 40), vagg(208, 128, 64, 40),
             vagg(360, 0, 136, 40), vagg(496, 0, 56, 40), vagg(580, 0, 60, 40), vagg(600, 40, 40, 60),
             # vattnet längs stranden i söder och öster
             vagg(0, 352, 520, 32, vatten=True), vagg(604, 124, 36, 176, vatten=True),
@@ -121,6 +129,10 @@ RUMMEN = {
             sak('brygga', 120, 84, 200, 28, golv=True),
             sak('brev_halva_1', 256, 92, 10, 10, sida='alla'),
             sak('fisk_hopp', 180, 124, 14, 10, sida='alla'),
+            # 72.7: leran vid bryggans landände, och Farfars skylt GÅ INTE I LERAN! (han läser den utan val)
+            sak('leran_brygga', 80, 116, 36, 24, sida='alla'),
+            sak('skylt_lera_brygga', 96, 62, 14, 14, sida='alla'),
+            liv('fagel', 214, 62, 12, 12),  # en mås på en påle
         ],
     },
     # 2 × 1 skärmar. Västra: vassen och bubbelblommorna längs stigen. Östra: stranden med stocken, och ute i vattnet,
@@ -131,12 +143,19 @@ RUMMEN = {
             utg('stig_byn_vassen', 40, 152, 28, 40, **STIG, riktning='ned', till='byn'),
             punkt('start', 54, 146),
             sak('bubbelblommor', 100, 56, 40, 20, sida='alla'),
-            sak('strand_vassen', 552, 72, 48, 48, golv=True),
+            # 72.8: lerpölen mitt på stigen, med Farfars skylt framför. Det går att gå runt den, och går han i den
+            # sjunker han (rummets zon med samma id)
+            sak('skylt_lera_vassen', 154, 96, 14, 12, sida='alla'),
+            sak('lerpol_vassen', 178, 100, 44, 40, golv=True),
+            sak('stubbe_vassen', 250, 36, 20, 14, sida='alla'),
+            liv('hager', 296, 112, 12, 24), liv('groda', 508, 70, 10, 8), liv('groda', 508, 132, 10, 8),
+            sak('strand_vassen', 480, 72, 40, 48, golv=True),
             # halvan ute i vattnet (71.2): han når den aldrig, så det räcker att gå nära (nas_nara)
-            sak('brev_halva_vatten', 614, 52, 10, 8, sida='alla', nas_nara=True, rackvidd=40),
-            vagg(600, 0, 40, 192, vatten=True),
-            # stocken i strandkanten som ungen hoppar upp på (71.3)
-            sak('stock_vassen', 600, 104, 28, 10, sida='alla'),
+            sak('brev_halva_vatten', 560, 52, 10, 8, sida='alla', nas_nara=True, rackvidd=56),
+            vagg(520, 0, 120, 192, vatten=True),
+            # stocken i strandkanten som ungen hoppar upp på (71.3), och där den stannar långt ute (72.5)
+            sak('stock_vassen', 520, 104, 28, 10, sida='alla'),
+            punkt('regi_stock_ute', 604, 150),
         ],
     },
     # Inomhus: fyra tavlor högt upp på bakväggen, i blandad ordning (lika stora rutor, gråboxen ritar storleken
@@ -150,6 +169,7 @@ RUMMEN = {
             punkt('start', 160, 150),
             figur('tant_rosa', 232, 96, sida='alla', talare='tant_rosa'),
             sak('soffa', 48, 112, 56, 22, sida='alla'),
+            liv('katt', 52, 100, 16, 10),  # 72.10: sover på soffan, aldrig nära tavlorna
             # högt på väggen med luft under (71.4): ingen når dem utan staven
             sak('tavla_stor_rund', 60, 6, 24, 24, sida='under', rackvidd=56),
             sak('tavla_liten_fyrkant', 112, 6, 24, 24, sida='under', rackvidd=56),
@@ -168,6 +188,7 @@ RUMMEN = {
             punkt('start', 160, 146),
             vagg(96, 16, 208, 64, vatten=True),
             figur('bo', 48, 80, sida='alla', talare='bo'),
+            liv('fjaril', 170, 14, 48, 30), liv('fagel', 300, 96, 12, 12),
             *[sak(g, *PLATS[p], 20, 16, sida='alla') for g, p in (
                 ('groda_liten_gron', 'sten'), ('groda_liten_gul', 'vassen'), ('groda_stor_gron', 'under_bladet'), ('groda_stor_gul', 'nackrosbladet'),
                 ('groda_gron_slat', 'sten'), ('groda_gul_slat', 'vassen'), ('groda_gron_prickig', 'under_bladet'), ('groda_gul_prickig', 'nackrosbladet'))],

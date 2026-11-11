@@ -272,5 +272,7 @@ export function objektFarg(o) {
   if (o.sort === 'utgang' && o.klattra) return 0x9a8f80;
   if (o.sort === 'utgang') return 0x6d5a45;
   if (o.sort === 'figur') return 0xc9a27a;
+  // gråboxen (72.8): leran (lerpölen, leran i träsket och vid bryggan) är brun, så att det syns var man sjunker
+  if (/(^|_)ler(an|pol)(_|$)/.test(o.id)) return 0x6b5436;
   return 0xb9b2a4;
 }

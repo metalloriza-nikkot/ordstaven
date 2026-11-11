@@ -266,6 +266,10 @@ redo.then(() => { startKlar = true; window.clearTimeout(startVakt); window.remov
   ungeDjup: () => (rum.ungeFast ? Math.round(rum.ungeFast.djup) : 0),
   /** Är ungen fast (i leran eller i vattnet)? */
   ungeFast: () => !!rum.ungeFast,
+  /** Dräktens färg just nu (72.11: Bos grodgröna dräkt). */
+  draktFarg: () => rum.draktFarg,
+  /** Hur djupt hjälten står i leran (72.8), 0 = inte alls. */
+  hjalteFast: () => (rum.hjalteFast ? Math.round(rum.hjalteFast.djup) : 0),
   /** Svävar ungen i en bubbla (69.5), och följer den hjälten? null = nej */
   ungeSvavar: () => (rum.ungeSvavar ? { foljer: rum.ungeSvavar.foljer, r: Math.round(rum.ungeSvavar.r), styrd: !!rum.ungeSvavar.styrd } : null),
   /** Ungens bild just nu. */

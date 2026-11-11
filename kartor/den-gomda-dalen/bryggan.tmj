@@ -11,7 +11,7 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 8,
+ "nextobjectid": 11,
  "properties": [
   {
    "name": "rum",
@@ -158,6 +158,60 @@
        "name": "sida",
        "type": "string",
        "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 8,
+     "name": "leran_brygga",
+     "type": "sak",
+     "x": 80,
+     "y": 116,
+     "width": 36,
+     "height": 24,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 9,
+     "name": "skylt_lera_brygga",
+     "type": "sak",
+     "x": 96,
+     "y": 62,
+     "width": 14,
+     "height": 14,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 10,
+     "name": "fagel_214_62",
+     "type": "omgivning",
+     "x": 214,
+     "y": 62,
+     "width": 12,
+     "height": 12,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vad",
+       "type": "string",
+       "value": "fagel"
       }
      ]
     }

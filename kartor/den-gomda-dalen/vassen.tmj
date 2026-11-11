@@ -11,7 +11,7 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 8,
+ "nextobjectid": 15,
  "properties": [
   {
    "name": "rum",
@@ -91,11 +91,119 @@
     },
     {
      "id": 4,
+     "name": "skylt_lera_vassen",
+     "type": "sak",
+     "x": 154,
+     "y": 96,
+     "width": 14,
+     "height": 12,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 5,
+     "name": "lerpol_vassen",
+     "type": "sak",
+     "x": 178,
+     "y": 100,
+     "width": 44,
+     "height": 40,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 6,
+     "name": "stubbe_vassen",
+     "type": "sak",
+     "x": 250,
+     "y": 36,
+     "width": 20,
+     "height": 14,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 7,
+     "name": "hager_296_112",
+     "type": "omgivning",
+     "x": 296,
+     "y": 112,
+     "width": 12,
+     "height": 24,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vad",
+       "type": "string",
+       "value": "hager"
+      }
+     ]
+    },
+    {
+     "id": 8,
+     "name": "groda_508_70",
+     "type": "omgivning",
+     "x": 508,
+     "y": 70,
+     "width": 10,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vad",
+       "type": "string",
+       "value": "groda"
+      }
+     ]
+    },
+    {
+     "id": 9,
+     "name": "groda_508_132",
+     "type": "omgivning",
+     "x": 508,
+     "y": 132,
+     "width": 10,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vad",
+       "type": "string",
+       "value": "groda"
+      }
+     ]
+    },
+    {
+     "id": 10,
      "name": "strand_vassen",
      "type": "sak",
-     "x": 552,
+     "x": 480,
      "y": 72,
-     "width": 48,
+     "width": 40,
      "height": 48,
      "rotation": 0,
      "visible": true,
@@ -108,10 +216,10 @@
      ]
     },
     {
-     "id": 5,
+     "id": 11,
      "name": "brev_halva_vatten",
      "type": "sak",
-     "x": 614,
+     "x": 560,
      "y": 52,
      "width": 10,
      "height": 8,
@@ -126,7 +234,7 @@
       {
        "name": "rackvidd",
        "type": "int",
-       "value": 40
+       "value": 56
       },
       {
        "name": "sida",
@@ -136,12 +244,12 @@
      ]
     },
     {
-     "id": 6,
+     "id": 12,
      "name": "",
      "type": "vagg",
-     "x": 600,
+     "x": 520,
      "y": 0,
-     "width": 40,
+     "width": 120,
      "height": 192,
      "rotation": 0,
      "visible": true,
@@ -154,10 +262,10 @@
      ]
     },
     {
-     "id": 7,
+     "id": 13,
      "name": "stock_vassen",
      "type": "sak",
-     "x": 600,
+     "x": 520,
      "y": 104,
      "width": 28,
      "height": 10,
@@ -170,6 +278,18 @@
        "value": "alla"
       }
      ]
+    },
+    {
+     "id": 14,
+     "name": "regi_stock_ute",
+     "type": "",
+     "x": 604,
+     "y": 150,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
     }
    ]
   }
