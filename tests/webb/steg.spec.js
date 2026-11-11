@@ -288,7 +288,7 @@ test('kodlåset: ungen visar första tecknet, låset kontrolleras när hela orde
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('ÖPPET.', { timeout: 10000 });
 });
 
-test('SVÄRD med brickor (72.2): bilden, ledbilden efter första felet, förebilden efter två fel, täcks vid nästa bricka och tänds igen vid fel', async ({ page }) => {
+test('SVÄRD med brickor (72.2 och 74.3): bilden, ledbilden efter första felet, förebilden efter två fel, täcks vid nästa bricka utan blinkande bricka och tänds igen vid fel', async ({ page }) => {
   test.setTimeout(60000);
   // en ledbild i provet (kapitel 1 har ingen än), för att se att den tänds med brickor också
   const svard = { ...P1('k1_svard'), ledbild: 'tankebubbla_svard' };
@@ -315,6 +315,10 @@ test('SVÄRD med brickor (72.2): bilden, ledbilden efter första felet, förebil
   await bricka(page, 'V').click();
   await expect(forebild).toHaveClass(/tonad/);
   await expect(page.locator('#plattan .unge-tacker')).toBeVisible();
+  // förebilden är det sista steget (74.3): förenklingen i k1_svard blinkar ingen bricka medan den är täckt
+  expect(svard.forenkla?.efter_fel).toBe(2);
+  await expect(page.locator('#plattan .bricka.tips')).toHaveCount(0);
+  await page.screenshot({ path: 'test-results/svard-tackt-utan-tips.png' });
   for (const b of 'DÄ') await bricka(page, b).click(); // SVDRÄ (R stannade): fel igen, och förebilden tänds igen
   await expect(forebild).not.toHaveClass(/tonad/, { timeout: 8000 });
   await expect(page.locator('#plattan .platser.gra')).toHaveCount(0, { timeout: 8000 });

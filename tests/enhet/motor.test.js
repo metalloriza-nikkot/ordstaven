@@ -131,6 +131,21 @@ describe('pusslen', () => {
     expect(f.skriv('j').resultat).toBe('lagd');
     expect(f.skriv('U').resultat).toBe('klar');
   });
+  it('formel med trappan: förenklingen blinkar ingen bricka, förebilden är sista steget (74.3)', () => {
+    // som k1_svard: forenkla efter 2 fel och forebild.visas andra_felet
+    const p = { ...P('p0_ljus'), forenkla: { efter_fel: 2, andring: 'nästa rätta bokstav blinkar' },
+      forebild: { text: 'LJUS', visas: 'andra_felet', tacks: 'forsta_brickan' } };
+    const f = skapaFormel(p, { slump: fast });
+    const id = (b) => f.s.brickor.find((x) => x.bokstav === b).id;
+    f.lagg(id('L')); f.lagg(id('U')); f.lagg(id('J'));
+    expect(f.lagg(id('S')).resultat).toBe('fel');
+    f.lagg(id('U')); expect(f.lagg(id('J')).resultat).toBe('fel');
+    expect(f.s.fel).toBe(2);
+    expect(f.s.tips).toBe(null);
+    expect(f.lagg(id('J')).resultat).toBe('lagd');
+    expect(f.s.tips).toBe(null);
+    expect(f.lagg(id('U')).resultat).toBe('klar');
+  });
   it('dop: versaler, max 10, bara bokstäver', () => {
     const d = skapaDop(P('p0_ungenamn'));
     expect(d.kanKlar).toBe(false);

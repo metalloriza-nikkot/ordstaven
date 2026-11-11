@@ -533,7 +533,9 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
         // som syns från början (LJUS i prologen, där han skriver av) är inget fel.
         if (p.skriv === 'tangentbord' && p.forebild && p.forebild.visas !== 'andra_felet') varningar.push(var_(`${plats}: förebilden tänds före två fel (69.3: forebild.visas andra_felet)`));
         if (p.skriv !== 'tangentbord' && p.forebild?.visas === 'vid_fel') varningar.push(var_(`${plats}: förebilden tänds efter ett fel (72.2: forebild.visas andra_felet)`));
-        if (p.forebild?.visas === 'andra_felet' && !p.ledbild) varningar.push(var_(`${plats}: ingen ledbild efter första felet (72.6)`));
+        // ledbilden gäller från kapitel 2 (08, beslut 73.2): prologen och kapitel 1 har ingen
+        const franKapitel2 = (aventyr?.kapitel || []).map((x) => (typeof x === 'string' ? x : x.id)).indexOf(k.id) >= 2;
+        if (franKapitel2 && p.forebild?.visas === 'andra_felet' && !p.ledbild) varningar.push(var_(`${plats}: ingen ledbild efter första felet (72.6)`));
         if (p.ledbild && p.forebild?.visas !== 'andra_felet') varningar.push(var_(`${plats}: ledbilden tänds bara med forebild.visas andra_felet`));
         for (const f of p.formler) for (const o of f.ord.split(' ')) if (!ordmap.has(o)) varningar.push(var_(`${plats}: formeln ${o} finns inte i ordlistorna`));
       }

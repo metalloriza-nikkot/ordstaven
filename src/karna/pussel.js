@@ -140,8 +140,11 @@ export function skapaFormel(pussel, { slump = Math.random } = {}) {
   };
   const ledigaBrickor = () => s.brickor.filter((b) => !s.platser.includes(b.id));
   const forstaTomma = () => s.platser.findIndex((p) => p === null);
+  // Med trappan (`forebild.visas: andra_felet`, beslut 74.3) är förebilden det sista steget: förenklingen blinkar
+  // ingen bricka, eftersom han då skulle skriva av bokstav för bokstav medan förebilden är täckt (titta, täck, skriv).
+  const trappa = pussel.forebild?.visas === 'andra_felet';
   const uppdateraTips = () => {
-    if (!(pussel.forenkla && s.fel >= pussel.forenkla.efter_fel)) { s.tips = null; return; }
+    if (trappa || !(pussel.forenkla && s.fel >= pussel.forenkla.efter_fel)) { s.tips = null; return; }
     const plats = forstaTomma();
     if (plats < 0) { s.tips = null; return; }
     s.tips = ledigaBrickor().find((b) => b.bokstav === svar[plats])?.id ?? null;

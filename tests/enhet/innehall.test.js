@@ -183,6 +183,15 @@ describe('kontrollen: enhet, alias, nivåer', () => {
     expect(medVarning((k) => { k.scener[3].steg[0].text = 'Klicka på lådan.'; })).toMatch(/nämner en enhet/);
     expect(medVarning((k) => { k.scener[3].steg[0].text = 'Tryck på lådan.'; })).not.toMatch(/nämner en enhet/);
   });
+  it('ledbilden saknas: varning från kapitel 2, inte i prologen och kapitel 1 (73.2)', () => {
+    // kapitel 1 har två formler med trappan och utan ledbild
+    expect(kontrollera(riktigt()).varningar.join('\n')).not.toMatch(/ingen ledbild/);
+    const d = riktigt();
+    const k2 = kopia(d.kapitel[1]); k2.id = 'kap-02';
+    d.aventyr = { ...d.aventyr, kapitel: ['kap-00', 'kap-01', 'kap-02'] };
+    d.kapitel = [d.kapitel[0], k2];
+    expect(kontrollera(d).varningar.join('\n')).toMatch(/kap-02 pussel k1_svard: ingen ledbild efter första felet/);
+  });
   it('alias pekar på id:n som finns, och golvet ligger under taket', () => {
     expect(medFel((k) => { k.alias = { scener: { s99_gammal: 's99_finnsinte' } }; })).toMatch(/pekar på s99_finnsinte/);
     expect(medFel((k) => { k.alias = { scener: { s02_glimten: 's03_staven' } }; })).toMatch(/finns fortfarande/);

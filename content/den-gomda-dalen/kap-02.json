@@ -16,7 +16,7 @@
  },
  "meta": {
   "namn": "Träsket",
-  "version": "0.6",
+  "version": "0.6.1",
   "datum": "2026-11-11",
   "agare": "Innehåll",
   "kalla": "Manus 17-kapitel2-manus.md v0.4 (beslut 60–64). Ny fil.",
@@ -25,7 +25,8 @@
   "andrat_v04": "2026-11-10 (beslut 68.9 och 69): unge_till i k2s01, byn struken ur första mellanscenen, Tant Rosa ute och frågar efter hjältens namn, repliken om var halvorna är, vassen omskriven (halvan i vattnet, bubblan bara för ungen, det döda trädet struket), Bos grodor utspridda, Tant Rosa räcker fram brevet, och hjälpen i alla P11 trappad (förebilden efter två fel, ingen bokstav före den, hjalp_bild i k2_over). Nya fält: hjalp_bild, forebild.efter_fel och forebild.tacks nar_han_skriver (Teknik 32).",
   "teknik_v04": "Teknik 32 (0.54.0): forebild.efter_fel 2 och tacks nar_han_skriver skrivna som forebild.visas andra_felet (täck gäller alltid med tangentbordet), och hjalp_bild { efter_fel 1, bild bro } som ledbild tankebubbla_bro (schema 2.36). Regier som bild på sju mellanscener (69.1). Ingen text är ändrad.",
   "andrat_v05": "2026-11-10 (beslut 71 och 70.7): Farfar minns inte var han gömde biten, och Herr Skata snor brevet för sigillets skull. Halvan i vassen hittar han själv. Ungen jagar en bubbla ut på en stock (k2_stocken i stället för k2_bubblan, med alias). Tavlorna hänger högt. Byn tänder elden för hjälten. SVÄRD vid träskkanten (k2_svard) och LJUS på stigen till udden (k2_lyktorna). musik byn i byn och på bryggan. Fältnamnen är schemats (forebild.visas andra_felet, ledbild).",
-  "andrat_v06": "2026-11-11 (beslut 72): ungen biter i vassen, och han hugger själv (k2_vassvaggen). VATTEN är rimligt vid vattnet. Stocken driver långt ut. Ledbild i alla skrivpussel. Baronen sitter i leran vid Farfars skylt under bryggan. En lerpöl i vassen (zoner, nytt fält), en häger, grodor och en stubbe med bär, och några få saker som lever i varje rum (26.3). Bos tack är en grodgrön dräkt (ge_sak sort drakt, nytt värde), och Tant Rosas ryggsäck är rosa."
+  "andrat_v06": "2026-11-11 (beslut 72): ungen biter i vassen, och han hugger själv (k2_vassvaggen). VATTEN är rimligt vid vattnet. Stocken driver långt ut. Ledbild i alla skrivpussel. Baronen sitter i leran vid Farfars skylt under bryggan. En lerpöl i vassen (zoner, nytt fält), en häger, grodor och en stubbe med bär, och några få saker som lever i varje rum (26.3). Bos tack är en grodgrön dräkt (ge_sak sort drakt, nytt värde), och Tant Rosas ryggsäck är rosa.",
+  "andrat_v061": "2026-11-11 (beslut 73.3): syns_redan på mellanscenen där dräkten blir grodgrön."
  },
  "var_var_vi": [
   {
@@ -1133,7 +1134,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Hjältens dräkt blir grodgrön. Ungen tittar och nickar."
+     "beskrivning": "Hjältens dräkt blir grodgrön. Ungen tittar och nickar.",
+     "syns_redan": true
     },
     {
      "typ": "replik",

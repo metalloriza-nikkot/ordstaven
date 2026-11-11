@@ -954,3 +954,10 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Dräkten (72.11):** hjältens lager har `drakt`. En dräkt i `DRAKT_GAVOR` byter dräktens färg i palettbytet, och den rosa ryggsäcken tonas (`SACK_TON`) tills Stil har ritat den. En sparning utan `drakt` läses som förut (`lagerFor`).
 - **Gråboxen:** leran (föremål med `leran` eller `lerpol` i id:t) är brun.
 - **Bilden vid vattnet (72.4, 0.58.1):** `over_vattnet` är en ritad bild i `bilder.js` (`RITADE`, före platshållarna): stränderna, vattnet, hjälten och ungen, byn och en prickad båge. Den visar ingen bro.
+
+## 91. Förebilden är trappans sista steg (0.59.0, Teknik 36, beslut 74.3)
+- **`skapaFormel()` (`karna/pussel.js`):** med `forebild.visas: andra_felet` sätter förenklingen (`forenkla`) aldrig `tips`, så ingen bricka blinkar. Förut blinkade nästa rätta bricka efter två fel, också medan förebilden var täckt, och då kunde han skriva av bokstav för bokstav i stället för titta, täck, skriv. Förebilden tänds igen vid varje nytt fel, så han kan aldrig köra fast. Utan trappan (LJUS i prologen, kodlåset) är förenklingen som förut.
+- Formeln med tangentbordet behövde ingen ändring: första bokstaven (`nastan.tand: forsta`) syns bara när fälten är tomma och bara efter två fel, och ingen P11 i kap-02 har `tand`.
+- **Kontrollen:** varningen för en P11 med trappan utan ledbild gäller från det tredje kapitlet i `aventyr.json` (kapitel 2). Prologen och kapitel 1 har ingen ledbild (08, beslut 73.2).
+- **Innehålls skript** (`innehall-skript-pass73.py`) är kört: kap-01 v0.7.13 (felrepliken i `k1_svard` och `k1_svard_igen` är "Nästan!") och kap-02 v0.6.1 (`syns_redan` på dräktens mellanscen). Ingen text är ändrad av Teknik.
+
