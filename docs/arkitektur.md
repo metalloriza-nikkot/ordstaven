@@ -961,3 +961,9 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Kontrollen:** varningen för en P11 med trappan utan ledbild gäller från det tredje kapitlet i `aventyr.json` (kapitel 2). Prologen och kapitel 1 har ingen ledbild (08, beslut 73.2).
 - **Innehålls skript** (`innehall-skript-pass73.py`) är kört: kap-01 v0.7.13 (felrepliken i `k1_svard` och `k1_svard_igen` är "Nästan!") och kap-02 v0.6.1 (`syns_redan` på dräktens mellanscen). Ingen text är ändrad av Teknik.
 
+## 92. Det som släpps landar nära hjälten, rullningen i ett nytt rum och kameran som visar figuren först (0.60.0, Teknik 37 och 39, beslut 75–76)
+- **`landningNara()` (`karna/rumslayout.js`):** det som dalar ned i en regi landar på mark han kan gå på, ett par steg från hjälten och inom skärmen (75.4, B13). Luftskeppet glider in över honom (`luftskepp(lage, overX)`), och fjädern landar vid hans fötter. Platsen sparas i `Rum.flyttade` (id → övre vänstra hörnet) och används när föremålet visas, tills han lämnar rummet. En regi som släpper något nytt ska använda samma funktion.
+- **Rullningen (`grans/rullning.js`, `arGlapp()` i `karna/framskrivning.js`):** glapp de första 2,5 s efter att ett rum har öppnats räknas inte (75.6). `rullning.rumOppnat()` anropas när ett nytt rum visas.
+- **`stavenBlirSvard()` och `litetSvardKittlar()`** vänder sig mot det närmaste han kan hugga (`narmastHuggbart()`: kartans `delas`, eller en del av ett delat föremål, `delAv`). Inget föremåls id står i koden (76.5).
+- **Kartans `visas_forst`** (bool, på ett föremål): när han kommer in i rummet glider kameran till föremålet och stannar där under scenens repliker och mellanscener. Den följer honom igen vid första steget där han ska göra något (`slappForst()`), eller efter högst 20 s. Används på apan i nätet i gläntan (76.5, D5), också i `verktyg/kartor/skog.py`.
+

@@ -2,6 +2,7 @@
 
 | Version | Datum | Vad |
 |---|---|---|
+| 0.60.0 | 2026-11-11 | **Det som händer syns där du tittar.** Luftskeppet glider in över hjälten, och Herr Skatas fjäder landar vid hans fötter. I gläntan visar kameran apan i nätet först. Texten rullar fram tecken för tecken också när rummet laddades långsamt. |
 | 0.59.0 | 2026-11-11 | **Ordet syns bara i förebilden.** I SVÄRD med brickor blinkar ingen bokstav efter två fel, så han tittar på ordet, täcker det och skriver det själv. Två repliker i kapitel 1 säger "Nästan!" efter första felet, och mellanscenen där dräkten blir grodgrön visar ingen ruta. |
 | 0.58.1 | 2026-11-11 | **Bilden vid vattnet visar problemet** (72.4): i gråboxen hjälten och ungen på ena stranden, byn på den andra och en prickad båge över vattnet, i stället för bara vatten. |
 | 0.58.0 | 2026-11-11 | **Kapitel 2 efter beslut 72.** Ungen biter i vassväggen, och efter SVÄRD hugger han sig igenom fem lager själv. I vassen jagar ungen bubblor, stocken driver långt ut, och ungen skakar på huvudet mot land. Går han i lerpölen vid Farfars skylt sjunker han, och ungen drar upp honom. Baronen sitter i leran vid bryggan. En häger, grodor, fåglar, en katt och en fjäril lever i rummen. Bos tack är en grodgrön dräkt, och Tant Rosas ryggsäck är rosa. |

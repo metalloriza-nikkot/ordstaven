@@ -363,6 +363,11 @@
        "name": "sida",
        "type": "string",
        "value": "hoger"
+      },
+      {
+       "name": "visas_forst",
+       "type": "bool",
+       "value": true
       }
      ]
     },

@@ -67,6 +67,10 @@ test('Stils mellanscener (Teknik 31): ungens lägen, ekorren, apan, Farfar och S
   for (const l of ['unge_fnissar', 'unge_fnissar_mun', 'unge_kryper_ihop', 'unge_gaspar', 'unge_lyssnar']) { expect(await regi(page, l), l).toBeGreaterThan(0); await page.waitForTimeout(1800); }
   // gläntan (k1s05): apan i nätet suckar
   await sparadI(page, 'kap-01', 'k1s05_glantan');
+  // kameran visar apan i nätet när gläntan börjar (kartans visas_forst, 76.5), inte bara hjälten vid ingången
+  await expect.poll(() => page.evaluate(() => { const k = window.__ORDSTAVEN.kamera(), a = window.__ORDSTAVEN.ruta('apan_i_nat');
+    return a.x >= k.x && a.x + a.b <= k.x + 320 && a.y >= k.y && a.y + a.h <= k.y + 192; }), { timeout: 8000 }).toBe(true);
+  await page.screenshot({ path: 'test-results/glantan-apan-forst.png' });
   expect(await regi(page, 'apa_suckar')).toBeGreaterThan(0);
   await page.waitForTimeout(200);
   expect(await page.evaluate(() => window.__ORDSTAVEN.bildFor('apan_i_nat'))).toMatch(/^apa_sucka_0[12]$/);
@@ -84,7 +88,7 @@ test('Stils mellanscener (Teknik 31): ungens lägen, ekorren, apan, Farfar och S
   expect(await regi(page, 'unge_finns_inte')).toBe(0);
 });
 
-test('kapitel 2:s mellanscener i gråboxen (Teknik 32, 69.1): ungen sjunker i leran och dras upp, och luftskeppet river brevet', async ({ page }) => {
+test('kapitel 2:s mellanscener i gråboxen (Teknik 32, 69.1 och 75.4): ungen sjunker i leran och dras upp, och luftskeppet river brevet och fjädern landar vid hjälten', async ({ page }) => {
   test.setTimeout(120000);
   // träskkanten: ungen skuttar ut i leran och sjunker, och sitter fast tills den dras upp
   await sparadI(page, 'kap-02', 'k2s01_kanten');
@@ -110,8 +114,15 @@ test('kapitel 2:s mellanscener i gråboxen (Teknik 32, 69.1): ungen sjunker i le
   expect(u3.x >= l3.x && u3.x <= l3.x + l3.b && u3.y >= l3.y && u3.y <= l3.y + l3.h).toBe(false); // ute ur leran
   // byn: luftskeppet glider in, brevet rivs, och luftskeppet far mot bryggan
   await sparadI(page, 'kap-02', 'k2s02_byn');
+  const hjalten = await O(() => window.__ORDSTAVEN.position());
+  const kartan = JSON.parse(readFileSync(new URL('../../kartor/den-gomda-dalen/byn.tmj', import.meta.url), 'utf8')).layers.flatMap((l) => l.objects || []).find((o) => o.name === 'fjader');
   expect(await O(() => window.__ORDSTAVEN.regi('luftskepp_river_brevet'))).toBeGreaterThan(4000);
   await page.waitForTimeout(3000);
+  // fjädern dalar ned nära hjälten där han står, inte där den står i kartan (75.4)
+  const fj = await O(() => window.__ORDSTAVEN.flyttad('fjader'));
+  expect(fj).not.toBeNull();
+  expect(Math.hypot(fj.x + kartan.width / 2 - hjalten.x, fj.y + kartan.height / 2 - hjalten.y)).toBeLessThan(40);
+  expect(Math.hypot(kartan.x - fj.x, kartan.y - fj.y)).toBeGreaterThan(20);
   expect((await O(() => window.__ORDSTAVEN.grafik())).regi).toContain('luftskeppet river brevet');
   await page.screenshot({ path: 'test-results/regi-luftskeppet-river-brevet.png' });
   expect(await O(() => window.__ORDSTAVEN.grafik().luftskepp)).toMatch(/^luftskepp_/);

@@ -4,7 +4,7 @@
 import Phaser from 'phaser';
 import { RUM } from '../karna/skalning.js';
 import { FIGUR, steg } from '../karna/rorelse.js';
-import { rumsObjekt, framfor, framforFran, vidObjekt, aktivSak, VAGG, objektFarg, lasplats, arSidodorr, stigStart } from '../karna/rumslayout.js';
+import { rumsObjekt, framfor, framforFran, vidObjekt, aktivSak, VAGG, objektFarg, lasplats, arSidodorr, stigStart, landningNara } from '../karna/rumslayout.js';
 import { synligaIds } from '../karna/karta.js';
 import { skapaHinder } from '../karna/vag.js';
 import { rumsHinder } from '../karna/rumshinder.js';
@@ -90,6 +90,11 @@ export class Rum extends Phaser.Scene {
     this.ungePos = { x: this.pos.x - 18, y: this.pos.y };
     /** @type {import('../karna/rumslayout.js').Objekt[]} */
     this.objekt = [];
+    /** föremål som en regi har flyttat i rummet (fjädern som landar vid hjälten, 75.4): id → övre vänstra hörnet */
+    /** @type {Map<string, { x: number, y: number }>} */
+    this.flyttade = new Map();
+    /** kameran visar kartans visas_forst tills han ska göra något (76.5) */
+    this.forstFokus = false;
     /** @type {Map<string, any>} */
     this.ritade = new Map();
     this.fryst = false;
@@ -1117,11 +1122,15 @@ export class Rum extends Phaser.Scene {
   /**
    * Luftskeppet river brevet (k2s02): det glider in högt uppe med brevet under gondolen, baronen och Herr Skata
    * drar i var sin ände (brevet ryckar), och det går sönder. En halva far mot bryggan och en mot vassen, Herr Skatas
-   * fjäder dalar ned där den ska ligga (`fjader`), och luftskeppet sjunker mot bryggan och ut ur bild.
+   * fjäder dalar ned vid hjältens fötter, och luftskeppet sjunker mot bryggan och ut ur bild. Skeppet glider in över
+   * hjälten där han står, och föremålet `fjader` flyttas dit fjädern landade (75.4).
    * @returns {number}
    */
   luftskeppRiverBrevet() {
-    if (!this.luftskepp('glider')) return 0;
+    // luftskeppet glider in över hjälten där han står, och fjädern landar vid hans fötter (75.4)
+    const k = this.kamera;
+    const landning = landningNara(this.pos, { x: k.x, y: k.y, b: RUM.bredd, h: RUM.hojd }, (q) => this.hinder.narmasteFria(q));
+    if (!this.luftskepp('glider', this.pos.x)) return 0;
     const l = /** @type {any} */ (this.luft), img = l.img;
     const under = () => ({ x: Math.round(img.x + img.width / 2), y: Math.round(img.y + img.height + 1) });
     const papper = 0xf4ecd8, kant = 0x8a7a5a;
@@ -1147,8 +1156,13 @@ export class Rum extends Phaser.Scene {
       };
       flyg(-3, mitt('stig_vassen', { x: p.x, y: p.y - 200 }), 1700);
       flyg(3, mitt('brygga_fran_torget', { x: p.x + 220, y: p.y }), 1500);
-      // Herr Skatas fjäder dalar ned där den ska ligga
-      const fj = mitt('fjader', { x: p.x, y: p.y + 80 });
+      // Herr Skatas fjäder dalar ned vid hjältens fötter
+      const fo = this.ruta('fjader') ?? { b: 10, h: 10 };
+      const flytt = { x: landning.x - Math.round(fo.b / 2), y: landning.y - Math.round(fo.h / 2) };
+      this.flyttade.set('fjader', flytt);
+      const syns = this.ruta('fjader');
+      if (syns) { syns.x = flytt.x; syns.y = flytt.y; }
+      const fj = landning;
       const fjader = this.add.rectangle(p.x, p.y, 2, 6, 0x1e1e24).setOrigin(0.5, 0.5);
       this.lagerLuft.add(fjader);
       const t2 = { p: 0 };
@@ -1322,12 +1336,24 @@ export class Rum extends Phaser.Scene {
   }
 
   /**
+   * Det närmaste han kan hugga i rummet: ett föremål som kartan delar (`delas: hela` eller `djup`), eller en del av ett
+   * sådant som redan är delat. @returns {import('../karna/rumslayout.js').Objekt | null}
+   */
+  narmastHuggbart() {
+    const huggbara = this.objekt.filter((x) => x.delasHela || x.delasDjup || /** @type {any} */ (x).delAv);
+    let basta = null, d = Infinity;
+    for (const x of huggbara) { const dd = Math.hypot(x.x + x.b / 2 - this.pos.x, x.y + x.h / 2 - this.pos.y); if (dd < d) { d = dd; basta = x; } }
+    return basta;
+  }
+
+  /**
    * SVÄRD vid vassväggen (k2_svard, 72.3): stavens ände blir ett svärd av guld, och han vänder sig mot vassen. Han
    * hugger sig igenom själv efteråt (k2_vassvaggen, P26 med verb hugga), så svärdet står kvar. Effekten heter fortfarande
-   * `svard_hugger_genom_vassen` i datan, och `staven_blir_svard` gör samma sak. @returns {number}
+   * `svard_hugger_genom_vassen` i datan, och `staven_blir_svard` gör samma sak. Han vänder sig mot det närmaste han
+   * kan hugga i rummet (kartans `delas`), så att inget föremåls id står i koden (76.5). @returns {number}
    */
   stavenBlirSvard() {
-    const o = this.ruta('vass_tat') ?? this.objekt.find((x) => x.id.startsWith('vass_tat_'));
+    const o = this.narmastHuggbart();
     if (o) this.vand = { x: Math.sign(o.x + o.b / 2 - this.pos.x) || 1, y: 0 };
     this.svard(true);
     this.svinga(120, 'uppifran');
@@ -1337,7 +1363,8 @@ export class Rum extends Phaser.Scene {
 
   /** Nästan rätt vid vassen: ett litet svärd kittlar den, och vassen darrar. @returns {number} */
   litetSvardKittlar() {
-    const { r } = this.foremalOchBild('vass_tat');
+    const o = this.narmastHuggbart();
+    const { r } = o ? this.foremalOchBild(o.id) : { r: null };
     if (!r) return 0;
     const x0 = r.x;
     this.svard(true);
@@ -1660,13 +1687,16 @@ export class Rum extends Phaser.Scene {
    * - trasslar: baronen trasslar in sig i repstegen, och hjälmen trillar ned på gräset;
    * - laser_skyltarna: utan hjälm läser han skyltarna med kikaren åt fel håll (munnen rör sig när han talar);
    * - flyger_fel: se `flygFel`.
-   * @param {string} lage @returns {boolean}
+   * @param {string} lage @param {number | null} [overX] glida in över den här punkten (hjälten, 75.4) i stället för till vänster i bild
+   * @returns {boolean}
    */
-  luftskepp(lage) {
+  luftskepp(lage, overX = null) {
     if (!this.textures.exists('baronen') || !this.textures.get('baronen').has('luftskepp_glider_01')) return false;
     const k = this.kamera, mal = { x: Math.round(k.x + 64), y: k.y + 2 };
     if (!this.luft) {
       const img = this.add.image(lage === 'glider' ? k.x - 112 : mal.x, mal.y, 'baronen', 'luftskepp_glider_01').setOrigin(0, 0);
+      // över en punkt (hjälten, 75.4): skeppets mitt där, men hela skeppet inom skärmen
+      if (overX !== null) mal.x = Math.round(Math.max(k.x, Math.min(k.x + RUM.bredd - img.width, overX - img.width / 2)));
       this.lagerLuft.add(img);
       // det svävar: upp och ned en pixel
       const gung = this.time.addEvent({ delay: 700, loop: true, callback: () => { if (this.luft && !this.luft.glider) { img.y = mal.y + (img.y === mal.y ? 1 : 0); this.smutsig = true; } } });
@@ -2033,7 +2063,7 @@ export class Rum extends Phaser.Scene {
     this.harRum = !!v.rum;
     if (v.nyttRum || !this.harRum) { this.rumsbild = (this.harRum && v.karta?.bild) || null; this.mark = (this.harRum && v.karta?.mark) || null; this.rumId = v.rum; this.markObjekt = v.karta?.objekt || []; }
     this.visaUnge = v.unge;
-    if (v.nyttRum) { for (const id of [...this.ramSlinga.keys(), ...this.ramTimrar.keys()]) this.stoppaRamar(id); this.ramFor.clear(); this.dolda.clear(); this.ungeMal = null; this.ungeTittarPa = null; this.ungeKlattrar = null; this.stegeNu = null; this.ungeSang = null; this.ungeLyft = 0; this.ungeFast = null; this.hjalteFast = null; this.lerig = 0; this.undvik = []; this.hinderUndvik = null; this.regiFokus = null; if (this.ungeSvavar) { this.ungeSvavar.g.destroy(); this.ungeSvavar = null; } for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas?.remove(); this.sover = null; } this.vaknar = null; this.rensaRegi(); }
+    if (v.nyttRum) { for (const id of [...this.ramSlinga.keys(), ...this.ramTimrar.keys()]) this.stoppaRamar(id); this.ramFor.clear(); this.dolda.clear(); this.ungeMal = null; this.ungeTittarPa = null; this.ungeKlattrar = null; this.stegeNu = null; this.ungeSang = null; this.ungeLyft = 0; this.ungeFast = null; this.hjalteFast = null; this.lerig = 0; this.undvik = []; this.hinderUndvik = null; this.regiFokus = null; this.forstFokus = false; if (this.ungeSvavar) { this.ungeSvavar.g.destroy(); this.ungeSvavar = null; } for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas?.remove(); this.sover = null; } this.vaknar = null; this.rensaRegi(); }
     this.tillstand = v.tillstand;
     if (v.nyttRum || !this.harRum) this.regiPunkter = (this.harRum && v.karta?.regi) || {};
     if (v.nyttRum || !this.harRum) this.inomhus = !!v.karta?.inomhus;
@@ -2054,7 +2084,9 @@ export class Rum extends Phaser.Scene {
     this.synliga = synliga;
     if (v.nyttRum || !this.harRum || andrat) {
       const fore = new Set((this.objekt || []).map((o) => o.id));
+      if (v.nyttRum) this.flyttade.clear();
       this.objekt = this.harRum ? rumsObjekt(v.innehall, v.tillstand, v.karta, v.visade) : [];
+      for (const o of this.objekt) { const f = this.flyttade.get(o.id); if (f) { o.x = f.x; o.y = f.y; } }
       // en figur som klättrar ned när den visas (apan när den är räddad, 56.4): bara i rummet han redan är i
       const klattrar = v.nyttRum ? [] : this.objekt.filter((o) => o.klattrarFran && !fore.has(o.id)).map((o) => o.id);
       for (const g of this.hogaBilder) g.destroy(); this.hogaBilder.clear(); this.animerade = [];
@@ -2085,6 +2117,13 @@ export class Rum extends Phaser.Scene {
         this.b.inmatning.rensaGaTill();
         // kameran hoppar till hjälten när han kommer in (rummet glider eller tonas in)
         this.sattKamera(enSkarm(this.storlek) ? { x: 0, y: 0 } : centrera(this.pos, this.storlek));
+        // kartans visas_forst (76.5, D5): kameran glider till figuren som scenen börjar med (apan i nätet), och
+        // tillbaka till hjälten när han ska göra något (slappForst) eller efter högst 20 s
+        const forst = this.objekt.find((o) => o.visasForst);
+        if (forst && !enSkarm(this.storlek)) {
+          this.regiFokus = { x: forst.x + forst.b / 2, y: forst.y + forst.h / 2 }; this.forstFokus = true;
+          this.time.delayedCall(20000, () => this.slappForst());
+        }
         // han kommer ut ur huset och vinkar mot det (kartans vinka_fran, 51.4)
         if (v.franRum && v.karta?.vinkaFran === v.franRum) { this.vand = { x: 0, y: -1 }; this.time.delayedCall(400, () => this.vinkaHjalte('upp')); }
       } else this.pos = this.hinder.narmasteFria(this.pos);
@@ -2401,7 +2440,7 @@ export class Rum extends Phaser.Scene {
       for (let i = 0; i < antal; i++) {
         const y0 = bas.y + Math.round((i * bas.h) / antal), y1 = bas.y + Math.round(((i + 1) * bas.h) / antal);
         const bild = bas.bildRad?.[i % bas.bildRad.length] ?? bas.bildDel;
-        const n = { id: `${id}_${i}`, x: bas.x, y: y0, b: bas.b, h: y1 - y0, sort: /** @type {'sak'} */ ('sak'), sida: /** @type {'under'} */ ('under'), ...(bild ? { bild } : {}),
+        const n = { id: `${id}_${i}`, delAv: id, x: bas.x, y: y0, b: bas.b, h: y1 - y0, sort: /** @type {'sak'} */ ('sak'), sida: /** @type {'under'} */ ('under'), ...(bild ? { bild } : {}),
           ...(bas.bildHugg ? { bildHugg: bas.bildHugg } : {}), ...(bas.bildKvar ? { bildKvar: bas.bildKvar } : {}) };
         this.objekt.push(n); this.ritaObjekt(n); nya.push(n.id);
       }
@@ -2413,7 +2452,7 @@ export class Rum extends Phaser.Scene {
     if (bas?.delasHela) {
       for (let i = 0; i < antal; i++) {
         const x0 = bas.x + Math.round((i * bas.b) / antal), x1 = bas.x + Math.round(((i + 1) * bas.b) / antal);
-        const n = { id: `${id}_${i}`, x: x0, y: bas.y, b: x1 - x0, h: bas.h, sort: /** @type {'sak'} */ ('sak'), ...(bas.sida ? { sida: bas.sida } : {}), ...(bas.bildDel ? { bild: bas.bildDel } : {}),
+        const n = { id: `${id}_${i}`, delAv: id, x: x0, y: bas.y, b: x1 - x0, h: bas.h, sort: /** @type {'sak'} */ ('sak'), ...(bas.sida ? { sida: bas.sida } : {}), ...(bas.bildDel ? { bild: bas.bildDel } : {}),
           ...(bas.bildRad ? { bildRad: bas.bildRad } : {}), ...(bas.bildHugg ? { bildHugg: bas.bildHugg } : {}), ...(bas.bildKvar ? { bildKvar: bas.bildKvar } : {}) };
         this.objekt.push(n); this.ritaObjekt(n); nya.push(n.id);
       }
@@ -2904,6 +2943,12 @@ export class Rum extends Phaser.Scene {
     const mal = this.omrade ? visaRuta(this.kamera, this.omrade, fokus, S).k : folj(this.kamera, fokus, S, { vand: this.vand, framat: this.kameraFramat });
     const k = narmare(this.kamera, mal, (Math.max(KAMERA.fart, FIGUR.fart * 1.5) * Math.min(dtMs, 100)) / 1000);
     if (k.x !== this.kamera.x || k.y !== this.kamera.y) this.sattKamera(k);
+  }
+
+  /** Kameran följer hjälten igen efter att ha visat kartans `visas_forst` (76.5). */
+  slappForst() {
+    if (!this.forstFokus) return;
+    this.forstFokus = false; this.regiFokus = null;
   }
 
   /** Flytta kameran (hela pixlar), och säg det till textlagret. @param {import('../karna/skalning.js').Kamera} k */

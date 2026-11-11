@@ -4,7 +4,17 @@
 // (grans/rullning.js), det han ska läsa rullas aldrig. Provsidan använder samma funktioner.
 
 /** Rullningens takt (beslut 21.2): en rad på ca 30 tecken står klar på under en sekund. */
-export const RULLNING = Object.freeze({ teckenPerSek: 40 });
+export const RULLNING = Object.freeze({ teckenPerSek: 40, glappMs: 80, vilaEfterRumMs: 2500 });
+
+/**
+ * Räknas en bildruta som ett glapp i rullningen (golvdatorn)? Ett glapp är en bildruta längre än `glappMs`, men inte
+ * de första sekunderna efter att ett rum har öppnats (75.6): då laddas rummet, och ett glapp säger inget om datorn.
+ * @param {number} g bildrutans längd i ms @param {number} t nu @param {number} vilaTill glapp räknas från den här tiden
+ * @returns {boolean}
+ */
+export function arGlapp(g, t, vilaTill) {
+  return g > RULLNING.glappMs && t >= vilaTill;
+}
 
 /** Hur lång tid det tar att rulla fram n tecken. @param {number} n @param {boolean} [ordVis] ett ord i taget (samma takt) @returns {number} ms */
 export function teckenTid(n, ordVis = false) {

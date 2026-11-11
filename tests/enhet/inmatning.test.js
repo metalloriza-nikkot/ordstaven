@@ -102,7 +102,26 @@ describe('nosen och bokstäverna', () => {
 });
 
 import { skapaHinder } from '../../src/karna/vag.js';
-import { framfor, framforFran, hinderFran, rumsObjekt, vidObjekt, vaggar, genom, lasplats, objektFarg, VAGG, RACKVIDD, aktivSak, glipa, avstandTill } from '../../src/karna/rumslayout.js';
+import { framfor, framforFran, hinderFran, rumsObjekt, vidObjekt, vaggar, genom, lasplats, objektFarg, VAGG, RACKVIDD, aktivSak, glipa, avstandTill, landningNara } from '../../src/karna/rumslayout.js';
+
+describe('det som dalar ned landar nära hjälten (75.4)', () => {
+  const vy = { x: 0, y: 0, b: 320, h: 192 };
+  const fri = (/** @type {{x:number,y:number}} */ p) => p;
+  it('ett par steg från honom, inte på honom, inom skärmen och på mark han kan gå på', () => {
+    const pos = { x: 100, y: 120 };
+    const p = landningNara(pos, vy, fri);
+    const d = Math.hypot(p.x - pos.x, p.y - pos.y);
+    expect(d).toBeGreaterThanOrEqual(12);
+    expect(d).toBeLessThanOrEqual(32);
+    // vid skärmens högra kant landar den på andra sidan om honom
+    const kant = landningNara({ x: 312, y: 120 }, vy, fri);
+    expect(kant.x).toBeLessThan(312);
+    expect(kant.x).toBeGreaterThanOrEqual(10);
+    // det han inte kan gå på flyttas till närmaste fria punkt
+    const vagg = (/** @type {{x:number,y:number}} */ q) => (q.y > 130 ? { x: q.x, y: 130 } : q);
+    expect(landningNara({ x: 100, y: 126 }, vy, vagg).y).toBeLessThanOrEqual(130);
+  });
+});
 
 describe('kollision och vägsökning', () => {
   const lada = { x: 140, y: 80, b: 40, h: 30 };

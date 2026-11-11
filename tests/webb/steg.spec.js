@@ -2267,6 +2267,9 @@ test('gläntans träd i L3 har Stils bilder (beslut 66.2): inget av de tre träd
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.click('.start-knapp');
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.rumsobjekt().includes('stort_gammalt_trad')), { timeout: 15000 }).toBe(true);
+  // träden som står på samma plats i kartan är nivåvarianter (D1): L2:s träd står inte där samtidigt
+  const ids = await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt());
+  for (const l2 of ['gammalt_trad', 'ungt_trad', 'ungt_trad_2']) expect(ids, l2).not.toContain(l2);
   const bilder = await page.evaluate(() => ['stort_gammalt_trad', 'stort_ungt_trad', 'litet_gammalt_trad'].map((id) => window.__ORDSTAVEN.bildFor(id)));
   expect(bilder).toEqual(['trad_stort_gammalt', 'trad_stort_ungt', 'trad_litet_gammalt']);
   // L2:s träd syns inte i L3

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ordStarter, ordVid, ordTider, uppskattadTid } from '../../src/karna/framskrivning.js';
+import { ordStarter, ordVid, ordTider, uppskattadTid, arGlapp, RULLNING } from '../../src/karna/framskrivning.js';
 import { hamta, falt } from '../../src/textprov/hamta.js';
 import { FORMER, GRUPPER } from '../../src/textprov/former.js';
 import aventyr from '../../content/den-gomda-dalen/aventyr.json';
@@ -27,6 +27,17 @@ describe('framskrivning ord för ord', () => {
     expect(tider[2]).toBeLessThan(3000 * 0.85);
     expect(ordTider('')).toEqual([]);
     expect(uppskattadTid('Ett två tre')).toBe(500 + 3 * 380);
+  });
+});
+
+describe('rullningens glapp (golvdatorn, 75.6)', () => {
+  it('en lång bildruta räknas, men inte de första sekunderna efter att ett rum har öppnats', () => {
+    const oppnat = 1000, vilaTill = oppnat + RULLNING.vilaEfterRumMs;
+    expect(arGlapp(300, oppnat + 500, vilaTill)).toBe(false);
+    expect(arGlapp(300, vilaTill - 1, vilaTill)).toBe(false);
+    expect(arGlapp(300, vilaTill, vilaTill)).toBe(true);
+    expect(arGlapp(RULLNING.glappMs, vilaTill + 10, vilaTill)).toBe(false);
+    expect(arGlapp(300, 50, 0)).toBe(true);
   });
 });
 

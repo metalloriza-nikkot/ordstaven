@@ -70,6 +70,8 @@ OVANPA = {'glantan': {'ugglor'}}
 SIDA = {'glantan': {'apan_i_nat': 'hoger'}}
 # apan klättrar ned för stegen när den är räddad (56.4)
 KLATTRAR = {'glantan': {'apan': 'stege'}}
+# visas_forst (76.5, D5): kameran visar figuren först när han kommer in, tills han ska göra något
+VISAS_FORST = {'glantan': {'apan_i_nat'}}
 # stegen står framför stammen (5d): den skär en öppning i trädets hinder, så att han når den
 OPPNING = {'glantan': {'stege'}}
 # det som ritas i rutlagret och inte som ett föremål
@@ -233,6 +235,8 @@ def kor(prova=False):
                 satt(o, 'sida', SIDA[rum][n])
             if n in KLATTRAR.get(rum, {}):
                 satt(o, 'klattrar_fran', KLATTRAR[rum][n])
+            if n in VISAS_FORST.get(rum, set()):
+                satt(o, 'visas_forst', True)
             if n in OPPNING.get(rum, set()):
                 satt(o, 'oppning', True)
         # liv i skogen: objekt med typen omgivning (tas bort och läggs till på nytt, så att skriptet kan köras om)

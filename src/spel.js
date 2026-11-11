@@ -920,6 +920,7 @@ export function skapaSpel(d) {
     if (tonas) { rum.frys(true); await ui.tona(true, tid(300)); }
     rum.visa({ rum: scen.rum, tillstand: b.rumsTillstand(scen.rum), innehall: r ? innehallNu(r) : [], kvar: r ? kvarNu(r) : [], bytta: r ? byttaNu(r) : [], unge: tillstand.spelare.unge?.folj ?? !!tillstand.spelare.unge?.namn, nyttRum: nytt,
       karta: scen.rum ? kartor[scen.rum] ?? null : null, franRum, delar: scen.rum ? delarIRummet(kartor[scen.rum]) : {}, visade: scen.rum ? b.visade(scen.rum) : [] });
+    if (nytt) rullning.rumOppnat(); // rummet laddas: glapp nu säger inget om datorn (75.6)
     visaRumsskyltar();
     // hjälten sover i sängen när scenen börjar så (scenens hjalte: "sover"), tills han ska röra sig
     if (scen.hjalte === 'sover' && scen === b?.scen && b.stegIndex <= 0 && sovitI !== scen.id) { sovitI = scen.id; rum.sov(); }
@@ -1186,6 +1187,8 @@ export function skapaSpel(d) {
     if (rum.sover && !['replik', 'mellanscen', 'ljud', 'visa_ui', 'sparpunkt'].includes(st.typ)) await rum.vakna(tid(500));
     // han reser sig ur fåtöljen när han ska röra sig (34.4); sagan läser han sittande
     if (rum.sitter && !['replik', 'mellanscen', 'ljud', 'visa_ui', 'bok', 'sparpunkt', 'ge_grad'].includes(st.typ)) rum.stigUpp();
+    // kameran har visat det scenen börjar med (kartans visas_forst, 76.5): när han ska göra något följer den honom igen
+    if (!['replik', 'mellanscen', 'ljud', 'musik'].includes(st.typ)) rum.slappForst?.();
     switch (st.typ) {
       case 'replik':
         // kapitlets rubrik visas inte när nästa kapitel är låst: slutrutan kommer i stället (granskningen A 21)

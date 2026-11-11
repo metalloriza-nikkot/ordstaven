@@ -13,7 +13,7 @@ const FIGUR_HOJD = 24;
  *             riktning?: 'vanster' | 'hoger' | 'upp' | 'ned', klattra?: 'upp' | 'ned', ute?: boolean, lapp?: string,
  *             talare?: string, lastI?: string[], storlek?: { bredd: number, hojd: number }, forsvinnerEfter?: string, oppning?: boolean,
  *             bildSitter?: string, bildSedan?: string, sedan?: string, bildAnim?: string[], animMs?: number, rutor?: boolean, nasNara?: boolean, rackvidd?: number,
- *             bild?: string, bildNatt?: string, bildPa?: string, bildDel?: string, sovplats?: boolean, skataFonster?: boolean, lyser?: boolean, delasHela?: boolean, delasDjup?: boolean, dekor?: boolean, ovanpa?: boolean, delar?: number, bildTaEmot?: string[], bildLas?: string[], kommerFran?: string, klattrarFran?: string, bildVinka?: string[],
+ *             bild?: string, bildNatt?: string, bildPa?: string, bildDel?: string, sovplats?: boolean, skataFonster?: boolean, lyser?: boolean, delasHela?: boolean, delasDjup?: boolean, dekor?: boolean, ovanpa?: boolean, delar?: number, bildTaEmot?: string[], bildLas?: string[], kommerFran?: string, klattrarFran?: string, visasForst?: boolean, bildVinka?: string[],
  *             bildRad?: string[], bildHugg?: string[], bildKvar?: string }} Objekt
  * till = rummet en utgång leder till, sida = var hjälten ställer sig, golv = man går på det (stig, grind).
  * sida 'alla' = föremålet har ingen framsida (krukor, buskar, en låda mitt på golvet): det går att använda från alla håll.
@@ -275,4 +275,24 @@ export function objektFarg(o) {
   // gråboxen (72.8): leran (lerpölen, leran i träsket och vid bryggan) är brun, så att det syns var man sjunker
   if (/(^|_)ler(an|pol)(_|$)/.test(o.id)) return 0x6b5436;
   return 0xb9b2a4;
+}
+
+/**
+ * Var något som dalar ned ur luften landar (75.4, fjädern under luftskeppet): på mark han kan gå på, ett par steg
+ * från hjälten där han står och inom skärmen, så att det berättelsen visar händer där spelaren tittar. Aldrig på
+ * honom. Platserna prövas i ordning: bredvid honom, snett framför, framför, och sist en bit längre bort.
+ * @param {{ x: number, y: number }} pos hjältens fötter
+ * @param {{ x: number, y: number, b: number, h: number }} vy det som syns (kameran)
+ * @param {(p: { x: number, y: number }) => { x: number, y: number }} fri närmaste punkt han kan gå på
+ * @returns {{ x: number, y: number }}
+ */
+export function landningNara(pos, vy, fri) {
+  const kant = 10, minst = 12;
+  const forsok = [[20, 4], [-20, 4], [16, 14], [-16, 14], [0, 18], [28, 0], [-28, 0], [0, -16]];
+  const inom = (/** @type {{ x: number, y: number }} */ p) => p.x >= vy.x + kant && p.x <= vy.x + vy.b - kant && p.y >= vy.y + kant && p.y <= vy.y + vy.h - kant;
+  for (const [dx, dy] of forsok) {
+    const p = fri({ x: pos.x + dx, y: pos.y + dy });
+    if (inom(p) && Math.hypot(p.x - pos.x, p.y - pos.y) >= minst) return { x: Math.round(p.x), y: Math.round(p.y) };
+  }
+  return { x: Math.round(pos.x), y: Math.round(pos.y) };
 }

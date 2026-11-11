@@ -287,6 +287,8 @@ redo.then(() => { startKlar = true; window.clearTimeout(startVakt); window.remov
   buren: () => !!rum.buren,
   lagda: () => rum.lagda.length,
   ruta: (id) => { const o = rum.ruta(id); return o ? { ...o } : null; },
+  /** var en regi har flyttat ett föremål (fjädern, 75.4): övre vänstra hörnet, eller null */
+  flyttad: (id) => { const f = rum.flyttade.get(id); return f ? { ...f } : null; },
   logg: () => logg.text(),
   /** Föremålen som går att använda just nu. */
   interaktiva: () => [...rum.interaktiva],

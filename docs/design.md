@@ -19,7 +19,7 @@ Första äventyret i en tänkt serie. Hjälten (utseende, namn, grad, formler) f
 9. **Barnsäkert:** inga annonser, ingen spårning, inga köp. All data stannar på enheten.
 
 ## Värld och vy
-- Pixelgrafik i SNES-anda, vy snett uppifrån. Världen består av **rum om en skärm**: 320×192 pixlar (20×12 rutor à 16×16). Kameran bläddrar vid kanten, ingen fri scrollning.
+- Pixelgrafik i SNES-anda, vy snett uppifrån. Skärmen visar 320×192 pixlar (20×12 rutor à 16×16). **Ett rum kan vara större än skärmen** (högst 2×2 skärmar), och kameran följer hjälten inom rummet och stannar vid kanterna. Ett läsval ryms alltid på en skärm, och när en fråga ställs visar kameran hela valet.
 - Heltalsskalning, nearest-neighbor. En ram (läderomslag) fyller resten av skärmen i alla format (16:10, 16:9, 4:3).
 - Kapitel = nav med grenar. Fordonsmoment och kartbitsscener visas från sidan.
 - Figurer har fyra gångriktningar. Hjälten ca 16×24.
@@ -45,9 +45,9 @@ Första äventyret i en tänkt serie. Hjälten (utseende, namn, grad, formler) f
 - Anpassning per pusseltyp: 3 rätt i rad → upp, 2 fel i rad → ned, inom kapitlets golv och tak.
 - Loggas per försök: `pussel_id`, `typ`, `nivå`, `rätt`, `antal_försök`, `hjälp_använd`, `tid`.
 
-## Valutor
-- **Bär** till ungen: 1 per löst uppgift, betalar hjälpknappen.
-- **Mynt** till hjälten: hittas i världen, köper utseende. Storyn kräver aldrig mynt.
+## Valuta
+- **Bär** är den enda valutan: ungen får bär för lösta uppgifter och hittar dem i världen (i stubbar och under vass). Nosen kostar ett bär (gratis vid 0), och han kan mata ungen med dem. Det finns inga mynt (beslut 76.5).
+- Hjälten blir starkare genom formler, inte genom saker han köper. Gåvor som tack (dräktens färg, ryggsäcken) byter utseende.
 
 ## Ljud
 Röst > ljudeffekter > musik. Musiken sänks när något läses. Ingen sång eller text i musiken. Mjuka chiptune-klanger.

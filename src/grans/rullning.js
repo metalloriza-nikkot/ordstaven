@@ -4,8 +4,9 @@
 // Orden tar sin plats från början (dolda tecken har sin bredd), så raden hoppar aldrig. Ett tryck visar allt.
 // Markeringen (guldlinjen under ordet) följer rösten från första ordet. Utan röst piper rullningen lågt i ordtakt,
 // och när föräldern läser Farfar är den tyst. Golvdatorn: hackar rullningen (långa glapp mellan bildrutorna)
-// rullar texten resten av passet fram ett ord i taget i samma takt, och loggen säger det.
-import { ordStarter, ordVid, ordTider, teckenTid, RULLNING } from '../karna/framskrivning.js';
+// rullar texten resten av passet fram ett ord i taget i samma takt, och loggen säger det. De första sekunderna efter
+// att ett rum har öppnats räknas inte (75.6): då laddas rummet, och ett glapp där säger inget om datorn.
+import { ordStarter, ordVid, ordTider, teckenTid, RULLNING, arGlapp } from '../karna/framskrivning.js';
 
 /**
  * @typedef {{ text: string, roll: string, tala: ((vidOrd: (i: number) => void) => Promise<any>) | null,
@@ -21,6 +22,8 @@ import { ordStarter, ordVid, ordTider, teckenTid, RULLNING } from '../karna/fram
 export function skapaRullning({ ljud, logg, nu = () => performance.now(), ram = (f) => requestAnimationFrame(f), slutaRam = (id) => cancelAnimationFrame(id) }) {
   /** 'tecken' eller 'ord' (golvdatorn, om rullningen hackar) */
   let lage = 'tecken';
+  /** glapp före den här tiden räknas inte (ett rum har just öppnats) */
+  let raknaFran = 0;
 
   /**
    * Dela upp textens bokstäver i egna spans (en gång per element). Orden (.ord) behåller sitt span, så att nosen
@@ -79,7 +82,7 @@ export function skapaRullning({ ljud, logg, nu = () => performance.now(), ram = 
         if (slut) return;
         const t = nu();
         const g = t - forra; forra = t;
-        langsta = Math.max(langsta, g); if (g > 80) glapp++;
+        langsta = Math.max(langsta, g); if (arGlapp(g, t, raknaFran)) glapp++;
         let till = Math.min(n, Math.floor(((t - t0) * RULLNING.teckenPerSek) / 1000) + 1);
         // ett ord i taget: ordet syns helt när dess första tecken är på tur
         if (lage === 'ord') { const w = ordFor[Math.max(0, till - 1)]; while (till < n && ordFor[till] === w) till++; }
@@ -118,5 +121,8 @@ export function skapaRullning({ ljud, logg, nu = () => performance.now(), ram = 
     return { klar, rullar: () => !slut, visaAllt, stopp: () => { visaAllt(); avmarkera(); } };
   }
 
-  return { starta, get lage() { return lage; } };
+  /** Ett rum har öppnats: glappen räknas inte de närmaste sekunderna (75.6). */
+  const rumOppnat = () => { raknaFran = nu() + RULLNING.vilaEfterRumMs; };
+
+  return { starta, rumOppnat, get lage() { return lage; } };
 }

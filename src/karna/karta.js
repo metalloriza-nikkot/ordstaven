@@ -194,6 +194,8 @@ export function lasKarta(tmj) {
       // klattrar_fran (56.4) = figuren klättrar ned för stegen när den visas i ett rum han redan är i (apan när den
       // är räddad), med bilderna <namn>_klattra_ned_01–02 (annars <namn>_klattra_01–02)
       if (egen.klattrar_fran) ut.klattrarFran = String(egen.klattrar_fran);
+      // visas_forst (76.5, D5) = kameran visar figuren först när han kommer in i rummet, tills han ska göra något
+      if (egen.visas_forst === true || egen.visas_forst === 'true') ut.visasForst = true;
       if (egen.bild_vinka) ut.bildVinka = String(egen.bild_vinka).split(',').map((t) => t.trim()).filter(Boolean);
       if (egen.bild_anim) { ut.bildAnim = String(egen.bild_anim).split(',').map((t) => t.trim()).filter(Boolean); ut.animMs = Math.max(250, tal(egen.anim_ms, 500)); }
       if (egen.rutor) ut.rutor = true;
