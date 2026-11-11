@@ -2801,6 +2801,25 @@ export class Rum extends Phaser.Scene {
     this.tweens.add({ targets: r, y: r.y + 6, alpha: 0, duration: 260, onUpdate: () => { this.smutsig = true; }, onComplete: () => { r.destroy(); this.smutsig = true; } });
   }
 
+  /** Han vänder sig mot ett föremål (hugget, 76.5): åt det håll föremålets mitt ligger mest. @param {string} id */
+  vandMot(id) {
+    const o = this.ruta(id);
+    if (!o) return;
+    const dx = o.x + o.b / 2 - this.pos.x, dy = o.y + o.h / 2 - this.pos.y;
+    this.vand = Math.abs(dx) >= Math.abs(dy) ? { x: Math.sign(dx) || 1, y: 0 } : { x: 0, y: Math.sign(dy) || 1 };
+    this.ritaHjalte();
+  }
+
+  /**
+   * Träffpausen (76.5, B12): världen står still ett ögonblick när svärdet träffar (klockan och tweens), och går sedan
+   * vidare. Väggklockan styr slutet, så att pausen aldrig blir längre. @param {number} ms
+   */
+  traffpaus(ms) {
+    if (!(ms > 0) || this.time.paused) return;
+    this.time.paused = true; this.tweens.pauseAll();
+    window.setTimeout(() => { this.time.paused = false; this.tweens.resumeAll(); this.smutsig = true; }, ms);
+  }
+
   /**
    * Ett sving med staven, eller ett hugg med svärdet (10b): hjältens tre svingbilder, med staven eller svärdet ovanpå
    * (under när han svingar uppåt). Gråboxen utan bilderna gör inget. @param {number} [ms] per bild

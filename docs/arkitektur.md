@@ -967,3 +967,10 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **`stavenBlirSvard()` och `litetSvardKittlar()`** vänder sig mot det närmaste han kan hugga (`narmastHuggbart()`: kartans `delas`, eller en del av ett delat föremål, `delAv`). Inget föremåls id står i koden (76.5).
 - **Kartans `visas_forst`** (bool, på ett föremål): när han kommer in i rummet glider kameran till föremålet och stannar där under scenens repliker och mellanscener. Den följer honom igen vid första steget där han ska göra något (`slappForst()`), eller efter högst 20 s. Används på apan i nätet i gläntan (76.5, D5), också i `verktyg/kartor/skog.py`.
 
+## 93. Skrivpusslen kör aldrig fast, hugget och budgeten (0.61.0, Teknik 39, beslut 76.2–76.5)
+- **`formelSkriv()` (`spel.js`):** `fel` (räknas för nivån: "nästan" och inget ord) och `steg` (varje försök som inte löste pusslet). Trappan följer `steg`: ledbilden efter ett, förebilden efter två med `andra_felet`. Knuffen startas om efter varje knuff och klättrar ett steg i taget. Skrivskärmen har frågeraden överst (`fragaRadHtml(r, bild, hogtalare)`), och förebilden är ett `.ord` som nosen läser.
+- **`naraStavning()` (`karna/skrivord.js`):** platsen i målordet där bokstaven skiljer, eller -1. `bedomOrd()` prövar den efter `nastan` och `rimliga` och före ordlistan, och ger `{ sort: 'nastan', mal, skiljer }`.
+- **Nosen i loggen (C3):** `tillatNos()` sparar orden han nosar på i pusslets hjälp (`nosade`), och `[val]` och `[formel] … klar` säger dem.
+- **Hugget (B12):** `anvand(…, { vidMiss })` svingar i luften med ljudet `sus` när han trycker utan att stå vid något, `Rum.vandMot(id)` vänder honom mot det han hugger, och `Rum.traffpaus(ms)` stoppar klockan och tweens ca 60 ms vid träffen. Tonhöjden växlar mellan tre hugg.
+- **Budgeten (76.3):** `verktyg/innehall/budget.js` (`budgetVarningar`, `rattArUdda`, `talareI`), anropad från kontrollen för kapitel från index 2 i `aventyr.json`.
+

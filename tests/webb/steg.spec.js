@@ -2330,39 +2330,49 @@ test('formeln med tangentbordet (kapitel 2, del 2): "pff" bara för det som inte
 });
 
 
-test('hjälpens trappa i formeln med tangentbordet (Teknik 32, beslut 69.3): bilden, sedan ledbilden, och förebilden först efter två fel', async ({ page }) => {
+test('hjälpens trappa i formeln med tangentbordet (69.3 och 76.2): varje försök tar ett steg, bilden, sedan ledbilden, och förebilden efter två försök', async ({ page }) => {
   test.setTimeout(90000);
   const kap2 = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-02.json', import.meta.url), 'utf8'));
-  const over = { ...kap2.pussel.find((p) => p.id === 'k2_over'), ledbild: 'tankebubbla_bro', knuff: { handling: 'bilden glimtar', efter_sek: 1 } };
+  // knuffen kommer inte under det här testet (den har ett eget test)
+  const over = { ...kap2.pussel.find((p) => p.id === 'k2_over'), ledbild: 'tankebubbla_bro', knuff: { handling: 'bilden glimtar', efter_sek: 600 } };
   over.forebild = { text: 'BRO', upplast: false, visas: 'andra_felet' };
   await provscen(page, { id: 't_trappa', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'pussel', pussel_id: 'k2_over' }, R('Klart.')] }, (t) => { t.spelare.hjalte.formler = ['LJUS', 'SVÄRD']; }, { pussel: [over] });
   const falt = page.locator('#plattan .formel-skriv .platser .plats');
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('SKRIV ETT ORD MED STAVEN!', { timeout: 10000 });
   await page.locator('#plattan .replik-ruta').click();
   await expect(falt).toHaveCount(3, { timeout: 10000 });
+  // instruktionen står överst med stjärnan och högtalaren (76.2, A5)
+  await expect(page.locator('#plattan .formel-skriv .fraga-rad .text')).toHaveText('SKRIV ETT ORD MED STAVEN!');
+  await expect(page.locator('#plattan .formel-skriv .fraga-rad .portratt.stjarna')).toHaveCount(1);
+  await expect(page.locator('#plattan .formel-skriv .fraga-rad .hogtalare')).toHaveCount(1);
   const logg = () => page.evaluate(() => window.__ORDSTAVEN.logg());
   const forebild = page.locator('#plattan .forebild'), ledbild = page.locator('#plattan .formel-bild.ledbild');
-  // först bara bilden av problemet: knuffen får bilden att glimta, aldrig ordet
   await expect(forebild).toHaveCount(0); await expect(ledbild).toHaveCount(0);
-  await expect.poll(logg, { timeout: 8000 }).toContain('[knuff] bilden glimtar');
-  await expect(forebild).toHaveCount(0);
   const skriv = async (ord, sort) => {
     await page.keyboard.type(ord); await page.keyboard.press('Enter');
     await expect.poll(logg, { timeout: 8000 }).toContain(`k2_over: ${ord} (${sort})`);
     await expect(page.locator('#plattan .platser .plats.fylld')).toHaveCount(0, { timeout: 15000 }); // tomt igen
   };
-  // första felet: bron i molnet, men ingen bokstav ur svaret
-  await skriv('XQZ', 'fel');
+  // första försöket, ett riktigt ord som inte hjälper: inget "pff", men trappan tar ett steg till bron i molnet
+  await skriv('APA', 'ord');
   await expect(ledbild).toBeVisible();
   await expect(ledbild.locator('.bubbla')).toHaveCount(1);
   await expect(forebild).toHaveCount(0);
   await expect(page.locator('#plattan .plats.tand')).toHaveCount(0);
-  // andra felet, ett nästan (BOR): nu förebilden
+  // andra försöket, ett nästan (BOR): nu förebilden
   await skriv('BOR', 'nastan');
   await expect(forebild).toBeVisible();
   await page.screenshot({ path: 'test-results/formel-over-vattnet.png' });
   await expect(page.locator('#plattan .plats.tand')).toHaveCount(0); // nästan utan tand tänder ingen bokstav (69.3)
   await expect(forebild).not.toHaveClass(/tonad/);
+  // förebilden är ett ord nosen kan läsa (76.2, A5)
+  await expect(forebild.locator('.ord[data-ord="BRO"]')).toHaveCount(1);
+  // nära stavning (BRÅ för BRO): "nästan", och förebilden markerar bokstaven som skiljer
+  await page.keyboard.type('BR'); await page.evaluate(() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'å', bubbles: true }))); await page.keyboard.press('Enter');
+  await expect.poll(logg, { timeout: 8000 }).toContain('k2_over: BRÅ (nastan)');
+  await expect(page.locator('#plattan .platser .plats.fylld')).toHaveCount(0, { timeout: 15000 });
+  await expect(forebild.locator('.bokstav.skiljer')).toHaveText('O');
+  await page.screenshot({ path: 'test-results/formel-nara-stavning.png' });
   // täck: den tonas bort när han skriver, och syns igen när fälten är tomma
   await page.keyboard.type('B');
   await expect(forebild).toHaveClass(/tonad/);
@@ -2377,6 +2387,25 @@ test('hjälpens trappa i formeln med tangentbordet (Teknik 32, beslut 69.3): bil
   expect(l).toContain('k2_over: förebilden tänds (andra felet)');
   expect(l).toContain('k2_over: förebilden tonas bort (täck)');
   expect(l).toContain('k2_over: klar med förebild');
+  expect(l).not.toContain('k2_over: BRÅ (fel)');
+});
+
+test('knuffen i formeln kommer igen och klättrar (76.2, A3): bilden glimtar, sedan ledbilden och sedan förebilden', async ({ page }) => {
+  test.setTimeout(60000);
+  const kap2 = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-02.json', import.meta.url), 'utf8'));
+  const over = { ...kap2.pussel.find((p) => p.id === 'k2_over'), ledbild: 'tankebubbla_bro', knuff: { handling: 'bilden glimtar', efter_sek: 1, syns_redan: true } };
+  over.forebild = { text: 'BRO', upplast: false, visas: 'andra_felet' };
+  await provscen(page, { id: 't_knuff', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'pussel', pussel_id: 'k2_over' }, R('Klart.')] }, (t) => { t.spelare.hjalte.formler = ['LJUS', 'SVÄRD']; }, { pussel: [over] });
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('SKRIV ETT ORD MED STAVEN!', { timeout: 10000 });
+  await page.locator('#plattan .replik-ruta').click();
+  const logg = () => page.evaluate(() => window.__ORDSTAVEN.logg());
+  await expect.poll(logg, { timeout: 10000 }).toContain('k2_over: ledbilden tankebubbla_bro tänds (knuff)');
+  await expect(page.locator('#plattan .formel-bild.ledbild')).toBeVisible();
+  await expect.poll(logg, { timeout: 10000 }).toContain('k2_over: förebilden tänds (knuff)');
+  await expect(page.locator('#plattan .forebild')).toBeVisible();
+  // han kan alltid skriva av ordet: det kör aldrig fast
+  await page.keyboard.type('BRO'); await page.keyboard.press('Enter');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('KLART.', { timeout: 15000 });
 });
 test('kapitel 2 går att gå in i (del 2): SVÄRD och vassväggen, skylten, vattnet, BRO över vattnet och in i byn, med piltangenterna', async ({ page }) => {
   test.setTimeout(150000);

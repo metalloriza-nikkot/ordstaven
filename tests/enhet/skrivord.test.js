@@ -2,7 +2,7 @@
 // Formeln med tangentbordet (P11 med skriv: tangentbord, kapitel 2): ordet han skriver bedöms (Teknik 20, del 2).
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { bedomOrd, kandaOrd, antalFalt, MAX_BOKSTAVER } from '../../src/karna/skrivord.js';
+import { bedomOrd, kandaOrd, antalFalt, MAX_BOKSTAVER, naraStavning } from '../../src/karna/skrivord.js';
 import { ristasNu } from '../../src/karna/hjalte.js';
 
 const las = (/** @type {string} */ f) => JSON.parse(readFileSync(new URL(`../../${f}`, import.meta.url), 'utf8'));
@@ -48,3 +48,26 @@ describe('formeln med tangentbordet (kapitel 2)', () => {
     expect(ristasNu(P('k2_bubblan'), ['FLYG'], 'REP')).toBe(false);
   });
 });
+
+describe('nära stavning (76.2, A4)', () => {
+  it('enkel eller dubbel konsonant, Å/Ä och stum bokstav före J ger platsen som skiljer', () => {
+    expect(naraStavning('SIMA', 'SIMMA')).toBe(3);
+    expect(naraStavning('FLOTE', 'FLOTTE')).toBe(4);
+    expect(naraStavning('FLYGG', 'FLYG')).toBe(3);
+    expect(naraStavning('SVÅRD', 'SVÄRD')).toBe(2);
+    expect(naraStavning('SÅV', 'SOV')).toBe(1);
+    expect(naraStavning('JUS', 'LJUS')).toBe(0);
+    expect(naraStavning('JÄLP', 'HJÄLP')).toBe(0);
+  });
+  it('annat räknas inte som nära', () => {
+    for (const [a, m] of [['BRO', 'BRO'], ['BOR', 'BRO'], ['FLYT', 'FLYG'], ['SVRD', 'SVÄRD'], ['US', 'LJUS'], ['SVAARD', 'SVÄRD'], ['', 'BRO']]) expect(naraStavning(a, m), `${a}/${m}`).toBe(-1);
+  });
+  it('en formel som är nära stavad blir "nästan" med bokstaven som skiljer, aldrig "pff"', () => {
+    const b = bedomOrd(P('k2_svard'), 'SVÅRD', ord);
+    expect(b.sort).toBe('nastan');
+    expect(b).toMatchObject({ mal: 'SVÄRD', skiljer: 2 });
+    // ett riktigt rimligt ord går före
+    expect(bedomOrd(P('k2_svard'), 'SAX', ord).sort).toBe('rimligt');
+  });
+});
+

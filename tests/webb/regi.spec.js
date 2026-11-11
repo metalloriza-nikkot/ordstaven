@@ -260,6 +260,12 @@ test('vassväggen (72.3): ungen biter i vassen, och efter SVÄRD hugger han sig 
     await page.waitForTimeout(250);
   }
   expect(await lager()).toBe(5);
+  // knappen svingar alltid (76.5, B12): långt från vassen blir det ett sving i luften, och inget lager faller
+  await O(() => window.__ORDSTAVEN.gaMot(30, 100));
+  await page.waitForTimeout(1200);
+  await page.keyboard.press('Space');
+  await expect.poll(() => O(() => window.__ORDSTAVEN.logg()), { timeout: 3000 }).toContain('[hugg] i luften');
+  expect(await lager()).toBe(5);
   for (let i = 0; i < 80; i++) {
     for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
     const kvar = await O(() => window.__ORDSTAVEN.rumsobjekt().filter((id) => id.startsWith('vass_tat_')).map((id) => window.__ORDSTAVEN.ruta(id)).filter(Boolean).sort((a, b) => a.x - b.x));

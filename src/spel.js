@@ -398,7 +398,7 @@ export function skapaSpel(d) {
   const vantarPaHandling = new Map();
   /** En handling är gjord (ungen har ätit, nosen är tänd). @param {string} namn */
   function handlingGjord(namn) { const f = vantarPaHandling.get(namn); if (f) { vantarPaHandling.delete(namn); f(); } }
-  ui.vidNos((vad, ord) => { if (vad === 'tand') handlingGjord('nosen'); else handlingGjord('nosa:' + versaler(ord || '')); });
+  ui.vidNos((vad, ord) => { if (vad === 'tand') handlingGjord('nosen'); else { handlingGjord('nosa:' + versaler(ord || '')); if (ord) nosSpar?.nosade?.push(versaler(ord)); } });
 
   /**
    * Molnet nere till vänster (stilguiden §3, T4c): uppgiften och frågan i samma moln, alltid med en bild av
@@ -701,12 +701,18 @@ export function skapaSpel(d) {
 
   /** Loggen: varje val, och om en knuff eller pekning kom före det. @param {any} p @param {string} altId @param {string} resultat @param {ReturnType<typeof skapaHjalpSpar>} spar */
   function loggaVal(p, altId, resultat, spar) {
-    logg.handelse('val', `${p.id}: ${altId}`, { resultat, sek: Math.round(spar.sedanStart() / 100) / 10, ...spar.fore() });
+    logg.handelse('val', `${p.id}: ${altId}`, { resultat, sek: Math.round(spar.sedanStart() / 100) / 10, ...spar.fore(), ...nosadeIPusslet(nosSpar) });
   }
 
+  /** pusslets hjälp just nu, för orden han nosar på (76.5, C3) @type {{ nosade?: string[] } | null} */
+  let nosSpar = null;
+  /** Orden han nosade på i pusslet, för loggen. @param {any} spar @returns {{ nosade?: string }} */
+  const nosadeIPusslet = (spar) => (spar?.nosade?.length ? { nosade: spar.nosade.join(' ') } : {});
   /** Nosen: tillåten i pussel med hjälp "ett_ord". Kostar ett bär, gratis vid 0 bär. @param {any} pussel @param {{ hjalp: boolean }} spar */
   function tillatNos(pussel, spar) {
     const tillaten = !!pussel && pussel.hjalp === 'ett_ord';
+    // orden han nosar på i pusslet loggas med valet (76.5, C3)
+    nosSpar = /** @type {any} */ (spar); nosSpar.nosade ??= [];
     ui.sattNos(tillaten, {
       betala: () => {
         if (av.bar > 0) {
@@ -1407,7 +1413,7 @@ export function skapaSpel(d) {
    * tidig = målet i molnet: handen syns redan på ca två rutors avstånd (beslut 34.3), också på en dörr, och ett tryck
    * på den räknas. Hjälten går själv sista biten.
    */
-  function anvand(ids, { verb = 'anvand', last, framme: narFramme = [], tidig = /** @type {string | null} */ (null) } = {}) {
+  function anvand(ids, { verb = 'anvand', last, framme: narFramme = [], tidig = /** @type {string | null} */ (null), vidMiss = /** @type {(() => void) | null} */ (null) } = {}) {
     let avbryt = () => {};
     const lova = /** @type {Promise<string> & { avbryt(): void }} */ (new Promise((klar) => {
       const utgangar = ids.filter((id) => rum.ruta(id)?.sort === 'utgang' || narFramme.includes(id));
@@ -1470,7 +1476,7 @@ export function skapaSpel(d) {
       }, 60);
       const sluta = lyssnaHandling((h) => {
         if (h.typ !== 'interagera' || rum.fryst) return;
-        if (nara) gor(nara); else { const ut = utgangar.find(framme); if (ut) gor(ut); }
+        if (nara) gor(nara); else { const ut = utgangar.find(framme); if (ut) gor(ut); else vidMiss?.(); }
       });
       rum.tryckPa = (id) => { if (id === nara || (utgangar.includes(id) && framme(id))) { gor(id); return true; } return false; };
       let gjort = false;
@@ -1976,7 +1982,7 @@ export function skapaSpel(d) {
     return null;
   };
   /** En rad med frågan och den som ställde den (ansikte eller stjärna). Ett tryck på ansiktet läser den igen. @param {any} r @param {string} [bild] */
-  const fragaRadHtml = (r, bild = '') => `<div class="fraga-rad">${portratt(r.talare, r.via === 'radio').replace('class="portratt', 'role="button" tabindex="0" aria-label="Läs frågan igen" class="portratt las-igen')}<div class="text">${ui.rader(r.text, varden())}</div>${bild ? `<span class="fraga-bild">${bild}</span>` : ''}</div>`;
+  const fragaRadHtml = (r, bild = '', hogtalare = false) => `<div class="fraga-rad">${portratt(r.talare, r.via === 'radio').replace('class="portratt', 'role="button" tabindex="0" aria-label="Läs frågan igen" class="portratt las-igen')}<div class="text">${ui.rader(r.text, varden())}</div>${bild ? `<span class="fraga-bild">${bild}</span>` : ''}${hogtalare ? `<button type="button" class="hogtalare" aria-label="Läs igen">${ikon('hogtalare')}</button>` : ''}</div>`;
 
   /** Läs och välj (P1) och packa (P28). @param {any} p */
   async function valj(p) {
@@ -2502,28 +2508,33 @@ export function skapaSpel(d) {
     const spar = { hjalp: false, forebild: false };
     if (p.instruktion) await replik(p.instruktion);
     rum.frys(true);
-    let skrivet = '', fel = 0, upptagen = false, fardigt = false;
-    /** förebilden (efter "pff" eller knuffen), första bokstaven (nästan rätt) och ledbilden (efter första felet) */
-    const fb = { visad: false, forsta: false, ledbild: false, tackt: false };
+    // fel = det som räknas för nivån ("nästan" och inget ord); steg = varje försök som inte löste pusslet, också ett
+    // riktigt ord som inte hjälper (76.2, A3): trappan tar ett steg per försök, så att han aldrig kör fast
+    let skrivet = '', fel = 0, steg = 0, upptagen = false, fardigt = false;
+    /** förebilden (efter "pff" eller knuffen), första bokstaven (nästan rätt), ledbilden (efter första försöket) och bokstaven som skiljer (nära stavning) */
+    const fb = { visad: false, forsta: false, ledbild: false, tackt: false, /** @type {number} */ skiljer: -1 };
     const trappa = p.forebild?.visas === 'andra_felet';
-    /** får något ur svaret synas nu? Med trappan först efter två fel. */
-    const svaretFar = () => !trappa || fel >= 2;
-    /** får förebilden tändas nu? Efter två fel med trappan, efter ett med vid_fel, och annars direkt. */
-    const forebildFar = () => (trappa ? fel >= 2 : p.forebild?.visas === 'vid_fel' ? fel >= 1 : true);
+    /** får något ur svaret synas nu? Med trappan först efter två försök. */
+    const svaretFar = () => !trappa || steg >= 2;
+    /** får förebilden tändas nu? Efter två försök med trappan, efter ett fel med vid_fel, och annars direkt. */
+    const forebildFar = () => (trappa ? steg >= 2 : p.forebild?.visas === 'vid_fel' ? fel >= 1 : true);
     const tandForebild = (/** @type {string} */ varfor) => {
       if (!p.forebild || !forebildFar() || fb.visad) return !!p.forebild && fb.visad;
       fb.visad = true; spar.forebild = true; logg.handelse('formel', `${p.id}: förebilden tänds (${varfor})`);
       return true;
     };
-    const tandLedbild = () => { if (p.ledbild && fel >= 1 && !fb.ledbild) { fb.ledbild = true; logg.handelse('formel', `${p.id}: ledbilden ${p.ledbild} tänds`); } };
+    const tandLedbild = (knuff = false) => { if (p.ledbild && (knuff || steg >= 1) && !fb.ledbild) { fb.ledbild = true; logg.handelse('formel', `${p.id}: ledbilden ${p.ledbild} tänds${knuff ? ' (knuff)' : ''}`); return true; } return false; };
     return new Promise((klar) => {
-      // knuffen: tänder förebilden när svaret får synas, annars glimtar bilden (och ledbilden)
+      // knuffen kommer igen och klättrar (76.2, A3): varje knuff är ett steg i trappan. Bilden glimtar, och först
+      // tänds ledbilden, sedan förebilden. När förebilden syns blinkar dess första bokstav.
+      const pulsBild = () => { for (const b of ui.plattan.querySelectorAll('.formel-bild')) { b.classList.remove('puls'); void (/** @type {HTMLElement} */ (b)).offsetWidth; b.classList.add('puls'); } };
       const k = knuffKlocka(p.knuff, () => {
-        if (!fb.visad && (!p.forebild || !forebildFar())) {
-          for (const b of ui.plattan.querySelectorAll('.formel-bild')) { b.classList.remove('puls'); void (/** @type {HTMLElement} */ (b)).offsetWidth; b.classList.add('puls'); }
-          return;
-        }
-        tandForebild('knuff'); rita(); ui.plattan.querySelector('.forebild .bokstav')?.classList.add('blinkar');
+        if (fardigt) return;
+        if (fb.visad) ui.plattan.querySelector('.forebild .bokstav')?.classList.add('blinkar');
+        else if (tandLedbild(true)) { rita(); pulsBild(); }
+        else if (p.forebild) { fb.visad = true; spar.forebild = true; logg.handelse('formel', `${p.id}: förebilden tänds (knuff)`); rita(); ui.plattan.querySelector('.forebild .bokstav')?.classList.add('blinkar'); }
+        else pulsBild();
+        k.nollstall();
       });
       const rita = () => {
         const n = antalFalt(p, skrivet), tecken = [...skrivet];
@@ -2533,12 +2544,16 @@ export function skapaSpel(d) {
         if (tackt && !fb.tackt) logg.handelse('formel', `${p.id}: förebilden tonas bort (täck)`);
         fb.tackt = tackt;
         const platser = `<div class="platser skriv">${Array.from({ length: n }, (_, i) => `<span class="plats ${i < tecken.length ? 'fylld' : ''} ${!tecken.length && i === 0 && forsta ? 'tand' : ''}">${ui.esc(tecken[i] ?? (i === 0 && forsta ? forsta : ''))}</span>`).join('')}</div>`;
-        const forebild = p.forebild && fb.visad ? `<div class="forebild ${tackt ? 'tonad' : ''}" aria-label="Förebild">${[...p.forebild.text].map((c) => `<span class="bokstav">${ui.esc(c)}</span>`).join('')}</div>` : '';
+        // förebilden är ett ord nosen kan läsa (76.2, A5), och vid nära stavning är bokstaven som skiljer markerad
+        const forebild = p.forebild && fb.visad ? `<div class="forebild ${tackt ? 'tonad' : ''}" aria-label="Förebild"><span class="ord" data-ord="${ui.esc(p.forebild.text)}">${[...p.forebild.text].map((c, i) => `<span class="bokstav${i === fb.skiljer ? ' skiljer' : ''}">${ui.esc(c)}</span>`).join('')}</span></div>` : '';
         const bild = p.bild ? `<div class="formel-bild" aria-hidden="true">${bilder.html(p.bild)}</div>` : '';
         const ledbild = p.ledbild && fb.ledbild ? `<div class="formel-bild ledbild" aria-hidden="true">${bilder.html(p.ledbild)}</div>` : '';
         const overst = bild || ledbild ? `<div class="formel-overst">${bild}${ledbild}${forebild}</div>` : forebild;
         const knappar = `<div class="dop-knappar">${d.pek() ? '' : '<button type="button" class="knapp visa-tb" aria-label="Visa tangentbordet">⌨</button>'}<button type="button" class="knapp sudda" aria-label="Sudda">⌫</button><button type="button" class="knapp klar ${tecken.length ? '' : 'av'}" aria-label="Klar">✓</button></div>`;
-        ui.visaPlatta(`<div class="formel-ruta formel-skriv">${overst}${platser}${knappar}</div>`, 'pussel P11_formel');
+        // instruktionen står överst med stjärnan och högtalaren, så att han kan höra den igen (76.2, A5)
+        const fraga = p.instruktion ? fragaRadHtml(p.instruktion, '', true) : '';
+        ui.visaPlatta(`<div class="formel-ruta formel-skriv">${fraga}${overst}${platser}${knappar}</div>`, 'pussel P11_formel');
+        if (p.instruktion) for (const el of ui.plattan.querySelectorAll('.fraga-rad .las-igen, .fraga-rad .hogtalare')) el.addEventListener('click', (e) => { e.stopPropagation(); sag(p.instruktion); });
         tangentbord.klarAktiv(tecken.length > 0);
         tillatNos(p, spar);
         ui.plattan.querySelector('.sudda')?.addEventListener('click', () => sudda());
@@ -2558,8 +2573,11 @@ export function skapaSpel(d) {
         const b = bedomOrd(p, skrivet, ord);
         logg.handelse('formel', `${p.id}: ${b.ord} (${b.sort})`);
         if (b.sort === 'formel') { await lyckad(b); return; }
+        if (b.sort !== 'formel') steg++;
         if (b.sort === 'nastan') {
           fel++; tandLedbild();
+          // nära stavning (76.2): förebilden markerar bokstaven som skiljer, när den är samma ord som målet
+          if (b.mal && p.forebild && versaler(p.forebild.text) === b.mal && typeof b.skiljer === 'number') fb.skiljer = b.skiljer;
           // nästan rätt tänder förebilden eller första bokstaven, men med trappan först efter två fel
           // utan tand tänds ingenting (69.3: Innehåll har tagit bort tand ur kapitel 2)
           if (svaretFar()) { if (b.nastan.tand === 'forebild' && p.forebild) tandForebild('nästan'); else if (b.nastan.tand === 'forsta') fb.forsta = true; }
@@ -2569,10 +2587,11 @@ export function skapaSpel(d) {
           if (b.nastan.effekt && !rum.regi(b.nastan.effekt)) ui.visaRegi(String(b.nastan.effekt).replace(/_/g, ' '), 0);
           await reaktion({ replik: b.nastan.replik || { talare: 'berattare', text: 'Nästan!', upplast: true } });
           ui.doljRegi();
-        } else if (b.sort === 'rimligt') {
-          await reaktion(b.rimligt);
-        } else if (b.sort === 'ord') {
-          if (p.vanligt_svar) await reaktion({ replik: p.vanligt_svar });
+        } else if (b.sort === 'rimligt' || b.sort === 'ord') {
+          // ett riktigt ord som inte hjälper räknas inte som fel, men trappan tar ett steg (76.2, A3)
+          tandLedbild(); if (trappa) tandForebild('försök');
+          if (b.sort === 'rimligt') await reaktion(b.rimligt);
+          else if (p.vanligt_svar) await reaktion({ replik: p.vanligt_svar });
         } else {
           fel++; tandLedbild(); tandForebild('fel');
           felljud(p.vid_fel); ui.plattan.querySelector('.platser')?.classList.add('gra'); await vanta(tid(400));
@@ -2595,7 +2614,7 @@ export function skapaSpel(d) {
         const effektMs = b.formel.effekt ? rum.regi(b.formel.effekt) : 0;
         if (effektMs) { logg.handelse('formel', `${p.id}: ${b.formel.effekt}`); await vanta(tid(effektMs)); }
         await reaktion(effektMs && p.vid_ratt ? { ...p.vid_ratt, syns_redan: true } : p.vid_ratt);
-        logg.handelse('formel', `${p.id}: klar ${spar.forebild ? 'med' : 'utan'} förebild`);
+        logg.handelse('formel', `${p.id}: klar ${spar.forebild ? 'med' : 'utan'} förebild`, { forsok: steg + 1, ...nosadeIPusslet(spar) });
         klar({ niva: p.niva, forstaForsoket: fel === 0, forsok: fel + 1, hjalp: spar.hjalp, ord: b.ord, ristas: b.formel.ristas !== false });
       };
       const sluta = lyssnaHandling((h) => {
@@ -2873,10 +2892,18 @@ export function skapaSpel(d) {
       logg.handelse('knuff', p.knuff?.handling || 'närmaste föremål glimtar', { foremal: id, ungenPekar: ungen });
     };
     const knuff = knuffKlocka(p.knuff ? { efter_sek: p.knuff.efter_sek } : null, pekaNarmaste);
+    // knappen svingar alltid (76.5, B12): står han inte vid något, blir det ett sving i luften med ett sus
+    let svingar = 0;
+    const miss = () => {
+      const nu = performance.now();
+      if (nu - svingar < tid(300)) return;
+      svingar = nu; rum.svinga(tid(80), 'sida'); ljud.spela('sus'); logg.handelse(hugga ? 'hugg' : 'svinga', 'i luften');
+    };
+    let antalHugg = 0;
     while (!k.s.klar && ids.length) {
       const kvar = ids.filter((_, i) => k.s.slagna[i] === null);
       if (!kvar.length) break;
-      const id = await anvand(kvar, { verb: 'svinga' });
+      const id = await anvand(kvar, { verb: 'svinga', vidMiss: miss });
       knuff.nollstall(); rum.markera(id, false);
       if (pekad) { rum.markera(pekad, false); rum.ungePekar(null); pekad = null; }
       const fynd = k.sla(ids.indexOf(id));
@@ -2884,10 +2911,13 @@ export function skapaSpel(d) {
       // (51.5): från sidan, uppifrån, och snurren på den sista lianen, som fäller den med flest löv
       const sista = hugga && kvar.length === 1 && ids.length > 1;
       const typ = !hugga ? 'sida' : sista ? 'snurr' : (ids.length - kvar.length) % 2 ? 'uppifran' : 'sida';
+      // han vänder sig mot det han hugger (76.5, B12), också när han kom dit med ett tryck
+      rum.vandMot?.(id);
       rum.svinga(tid(80), typ);
       if (hugga) logg.handelse('hugg', `${typ}: ${id}`);
       await vanta(tid(typ === 'snurr' ? 160 : 80));
-      if (hugga) { ljud.spela('hugg'); rum.lovYr?.(id, sista ? 3 : 1); rum.huggen(id); }
+      // träffen: en kort paus i världen och lite olika tonhöjd varje gång (B12)
+      if (hugga) { ljud.spela('hugg', { fart: [1, 0.92, 1.08][antalHugg++ % 3] }); rum.traffpaus?.(tid(60)); rum.lovYr?.(id, sista ? 3 : 1); rum.huggen(id); }
       else { ljud.spela(p.foremal ? 'prassel' : 'sla'); rum.slagen(id); }
       logg.handelse(hugga ? 'hugga' : 'svinga', `${id}: ${fynd}`);
       if (fynd === 'bar') { av.bar++; ui.uppdateraHud(av); ljud.spela('bar'); await ui.visaFest('🫐', tid(600)); }

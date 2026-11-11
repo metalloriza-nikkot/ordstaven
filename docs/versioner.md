@@ -2,6 +2,7 @@
 
 | Version | Datum | Vad |
 |---|---|---|
+| 0.61.0 | 2026-11-11 | **Skrivandet kör aldrig fast.** Varje försök hjälper ett steg till: först bilden i molnet, sedan ordet att skriva av, och ungens knuff kommer igen. SVÅRD eller FLOTE ger "nästan", och ordet visar bokstaven som skiljer. Frågan står överst med en högtalare. Svärdet svingar alltid, vänder sig mot vassen och stannar upp ett ögonblick när det träffar. |
 | 0.60.0 | 2026-11-11 | **Det som händer syns där du tittar.** Luftskeppet glider in över hjälten, och Herr Skatas fjäder landar vid hans fötter. I gläntan visar kameran apan i nätet först. Texten rullar fram tecken för tecken också när rummet laddades långsamt. |
 | 0.59.0 | 2026-11-11 | **Ordet syns bara i förebilden.** I SVÄRD med brickor blinkar ingen bokstav efter två fel, så han tittar på ordet, täcker det och skriver det själv. Två repliker i kapitel 1 säger "Nästan!" efter första felet, och mellanscenen där dräkten blir grodgrön visar ingen ruta. |
 | 0.58.1 | 2026-11-11 | **Bilden vid vattnet visar problemet** (72.4): i gråboxen hjälten och ungen på ena stranden, byn på den andra och en prickad båge över vattnet, i stället för bara vatten. |

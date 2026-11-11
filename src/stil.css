@@ -768,6 +768,11 @@ html, body {
 .fraga-rad .text { font-size: calc(40px * var(--t)); line-height: 1.3; }
 .fraga-rad .portratt { flex: none; cursor: pointer; }
 .fraga-rad .fraga-bild { margin-left: auto; font-size: calc(56px * var(--t)); line-height: 1; }
+/* skrivuppgiften (76.2, A5): instruktionen överst med stjärnan och en högtalare som läser den igen */
+.fraga-rad .hogtalare { margin-left: auto; flex: none; width: 48px; height: 48px; border-radius: 24px; border: 0; background: #efe6d2; display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; }
+.formel-skriv .fraga-rad .text { font-size: calc(36px * var(--t)); }
+/* nära stavning (76.2, A4): bokstaven som skiljer har ett guldstreck under sig i förebilden */
+.forebild .bokstav.skiljer { text-decoration: underline; text-decoration-thickness: 4px; text-underline-offset: 6px; text-decoration-color: #f2c14e; }
 /* Inga skuggor med oskärpa (10c, 27.10, 2c): golvdatorn målar om dem varje gång texten under dem ändras. Skuggor
    är hårda (förskjutning utan oskärpa), och glöd är en ring av pixlar. Ett test säger fel om oskärpan kommer tillbaka. */
 /* luckorna: läsplattan är en närbild av lådans lock. Tre rader i hela bredden, var och en en lucka med gångjärn */

@@ -8,6 +8,7 @@ import { kompileraUppdrag, hittaSteg } from '../../src/karna/uppdrag.js';
 import { SLINGOR } from '../../src/karna/musik.js';
 import { kandaLjud, ljudLista } from '../../src/karna/ljudid.js';
 import { beskrivningarSomVisas, aventyretsBeskrivningar, reaktionerSomVisas } from '../../src/karna/mellanscen.js';
+import { budgetVarningar, talareI } from './budget.js';
 
 const schema = (namn) => JSON.parse(readFileSync(new URL(`../../content/schema/${namn}.schema.json`, import.meta.url), 'utf8'));
 // teckenbredderna för typsnittet i textlagret (Lexend, beslut 13)
@@ -22,9 +23,10 @@ export const MAX_ORD_PER_RAD = 8;
 export const MAX_MINUTER_PER_PASS = 10;
 /**
  * Pusseltyper som räknas som läs- eller skrivuppgifter som avgör något. P9 (kodlåset) är avkodning med nyckel, inte
- * läsförståelse. P11 (formeln) avgör också: han skriver ordet som löser det (beslut 68.3).
+ * läsförståelse. P11 (formeln) avgör också: han skriver ordet som löser det (beslut 68.3). P15 (räddningen) avgör
+ * ingen läsning: alla brickor går att trycka, och stegen visar ordet (76.3, C4).
  */
-export const LASUPPGIFTER = new Set(['P1_las_och_valj', 'P28_packa', 'P15_raddning', 'P11_formel']);
+export const LASUPPGIFTER = new Set(['P1_las_och_valj', 'P28_packa', 'P11_formel']);
 
 let ajv;
 function validerare() {
@@ -147,6 +149,16 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
   const platshallare = new Set(Object.keys(aventyr.platshallare).map((p) => p.slice(1, -1)));
   const kapitelIds = new Set(kapitel.map((k) => k.id));
   for (const k of aventyr.kapitel) if (!kapitelIds.has(k)) varningar.push(`aventyr.json: kapitel ${k} saknas än`);
+  // budgeten per pass och kapitel (76.3), från kapitel 2: talarna i kapitlen före räknas inte som nya figurer
+  {
+    const ordning = (aventyr.kapitel || []).map((x) => (typeof x === 'string' ? x : x.id));
+    const sorterade = [...kapitel].sort((a, b) => ordning.indexOf(a.id) - ordning.indexOf(b.id));
+    const tidigare = new Set();
+    for (const k of sorterade) {
+      if (ordning.indexOf(k.id) >= 2) varningar.push(...budgetVarningar(k, { tidigareTalare: new Set(tidigare) }));
+      for (const t of talareI(k)) tidigare.add(t);
+    }
+  }
 
   for (const k of kapitel) {
     const var_ = (s) => `${k.id} ${s}`;
