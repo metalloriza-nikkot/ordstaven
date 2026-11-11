@@ -938,3 +938,9 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Lyktorna** (71.6): `lyktor_udden` är en lång ruta, och lyktorna står var 24:e pixel längs den. Medan ljuset hoppar följer kameran ljuset (`regiFokus`), och sedan hjälten igen. Lyktorna lyser tills rummet byts.
 - **Testkroken** `ungeSvavar()` säger också `styrd`. Ett enhetstest kontrollerar att varje P11:s `bild` och `ledbild` har en bild (ingen ❔), och platshållarna har fått `over_vattnet`, `tat_vass`, `unge_pa_stocken`, `lyktor_slackta` och `ljusboll`.
 
+## 89. Hjälpens trappa med brickor (0.57.0, Teknik 35, beslut 72.2)
+- **`formel()` (brickor) följer samma trappa som `formelSkriv()`** när `forebild.visas` är `andra_felet`: ingen förebild från början, ledbilden efter första felet, förebilden efter två fel (vilken sorts fel som helst). Den täcks vid varje ny bricka (ungen håller för ögonen) och tänds igen vid nästa fel eller knuff. Före två fel får knuffen bilden att glimta.
+- `vid_fel` (en förebild efter första felet som står kvar efter det andra) finns kvar i motorn men används inte i datan. Kontrollen varnar för det.
+- Loggen skriver `<pussel>: fel nr N` för varje fel med brickor.
+- **kap-01:** `k1_svard` och `k1_svard_igen` har `visas: andra_felet`. Ingen text är ändrad (`meta.teknik_72_2`).
+

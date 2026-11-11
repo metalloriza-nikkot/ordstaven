@@ -40,7 +40,8 @@
   "innehall_v079": "Det korta passet (beslut 45.5, 46.4, 47 och 50), ingen ny scen, inget nytt moment, läsval eller replik: rubrikerna LIANERNA, RÄTT TRÄD, PÅ KULLEN och VEMS LAPP? (högst ca 11 tecken, 10d), fältet ersatter borttaget ur uppdragen (47.1), mellanscenen i k1s13 med baronen bakom busken vid bron (50.2), och bild på mellanscenerna i k1s01 (in_i_skogen), k1s11 (kartbit_unge) och k1s13 (vid_bron), Tekniks fält från 0.26.0, är Innehålls.",
   "innehall_v0710": "Det andra korta passet (beslut 52.3 och 52.5), ingen ny scen, inget nytt moment, läsval eller replik: k1_lianerna har sex delar (liangången, 52.2), ugglorna är dolda tills k1_tradet är löst och syns med visa_foremal i k1s07 före trappan, i L2 och L3 (52.3), vid_ratt i k1_tradet säger att ugglorna landar i kronan, och rummens anteckningar i skogsbrynet och gläntan följer Stils kartor och Tekniks karta i 0.29.0 (häcken från norr till söder, liangången mellan snåren, den lilla lianen och stubben söder om snåret, skylten BÄR, bäcken med bäckarmen och baronens strand, den hemliga stigen och sydost). Dekor-id:na står bara i kartan.",
   "andrat_v0711": "2026-11-08 (beslut 67.9): musik skogen på kapitlet, ljud på mellanscener och reaktioner, och syns_redan på mellanscenerna som redan syns (67.2). Ingen text är ändrad.",
-  "andrat_v0712": "2026-11-10 (beslut 68.9): syns_redan på alla reaktioner och knuffar som visade sin text (68.4), ungen som springer mot stigen i k1s03, Stils regier på tolv mellanscener och ekorre_skakar på felen vid baronens lapp (Teknik 31). Ingen text är ändrad."
+  "andrat_v0712": "2026-11-10 (beslut 68.9): syns_redan på alla reaktioner och knuffar som visade sin text (68.4), ungen som springer mot stigen i k1s03, Stils regier på tolv mellanscener och ekorre_skakar på felen vid baronens lapp (Teknik 31). Ingen text är ändrad.",
+  "teknik_72_2": "Teknik 0.57.0 (beslut 72.2): forebild.visas är andra_felet på k1_svard och k1_svard_igen, som i kapitel 2 (69.3). Förebilden kommer efter två fel och täcks vid nästa bricka. Ingen text är ändrad."
  },
  "var_var_vi": [
   {
@@ -1208,7 +1209,7 @@
     "upplast": false,
     "placering": "trad_med_formel",
     "ligger_kvar": false,
-    "visas": "vid_fel",
+    "visas": "andra_felet",
     "tacks": "forsta_brickan"
    },
    "brickor": [
@@ -1295,7 +1296,7 @@
     "upplast": false,
     "placering": "staven",
     "ligger_kvar": false,
-    "visas": "vid_fel",
+    "visas": "andra_felet",
     "tacks": "forsta_brickan"
    },
    "brickor": [

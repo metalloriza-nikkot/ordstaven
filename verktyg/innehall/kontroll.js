@@ -517,9 +517,12 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
           if (p.niva === 'S2' && (kvar.length < 2 || kvar.length > 3)) varningar.push(var_(`${plats}: S2 har 2–3 extra brickor, har ${kvar.length}`));
         }
         if (p.forebild && p.forebild.text !== p.svar) fel.push(var_(`${plats}: förebilden ${p.forebild.text} är inte svaret ${p.svar}`));
-        // hjälpens trappa (2.36, beslut 69.3) finns bara med tangentbordet
-        if (p.skriv !== 'tangentbord' && (p.forebild?.visas === 'andra_felet' || p.ledbild)) fel.push(var_(`${plats}: andra_felet och ledbild finns bara med skriv: tangentbord`));
+        // hjälpens trappa (2.36 och 2.39, beslut 69.3, 72.2 och 72.6): med tangentbordet och med brickor. En förebild
+        // som syns från början (LJUS i prologen, där han skriver av) är inget fel.
         if (p.skriv === 'tangentbord' && p.forebild && p.forebild.visas !== 'andra_felet') varningar.push(var_(`${plats}: förebilden tänds före två fel (69.3: forebild.visas andra_felet)`));
+        if (p.skriv !== 'tangentbord' && p.forebild?.visas === 'vid_fel') varningar.push(var_(`${plats}: förebilden tänds efter ett fel (72.2: forebild.visas andra_felet)`));
+        if (p.forebild?.visas === 'andra_felet' && !p.ledbild) varningar.push(var_(`${plats}: ingen ledbild efter första felet (72.6)`));
+        if (p.ledbild && p.forebild?.visas !== 'andra_felet') varningar.push(var_(`${plats}: ledbilden tänds bara med forebild.visas andra_felet`));
         for (const f of p.formler) for (const o of f.ord.split(' ')) if (!ordmap.has(o)) varningar.push(var_(`${plats}: formeln ${o} finns inte i ordlistorna`));
       }
       if (p.typ === 'P15_raddning') {

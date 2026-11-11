@@ -2313,12 +2313,25 @@ export function skapaSpel(d) {
     const tt = p.forebild?.tacks === 'forsta_brickan';
     // utifrån bilden (forebild.visas vid_fel, beslut 18.5): ingen förebild från början och brickorna direkt.
     // Förebilden tänds först vid fel (titta), tonas bort vid nästa bricka (täck) och står kvar efter ett andra fel.
-    const vidFel = p.forebild?.visas === 'vid_fel';
+    // Hjälpen trappas också med brickor (69.3 och 72.2, `visas: andra_felet`): bilden först, ledbilden efter första
+    // felet och förebilden efter två fel. Förebilden täcks vid varje ny bricka och tänds igen vid nästa fel.
+    const trappa = p.forebild?.visas === 'andra_felet';
+    const vidFel = p.forebild?.visas === 'vid_fel' || trappa;
+    let fel = 0;
     /** titta–täck: syns förebilden, har den synts, och står den kvar (efter fel eller knuff)? */
-    const fb = { syns: !vidFel, visad: !vidFel, kvar: false, brickor: vidFel || !tt || !(p.forebild?.brickor_efter_sek > 0) };
+    const fb = { syns: !vidFel, visad: !vidFel, kvar: false, ledbild: false, brickor: vidFel || !tt || !(p.forebild?.brickor_efter_sek > 0) };
     return new Promise((klar) => {
       let upptagen = false;
       const tandForebild = (/** @type {string} */ varfor) => {
+        if (trappa) {
+          if (varfor === 'fel') fel++;
+          if (p.ledbild && fel >= 1 && !fb.ledbild) { fb.ledbild = true; logg.handelse('formel', `${p.id}: ledbilden ${p.ledbild} tänds`); }
+          if (fel < 2 || fb.syns) return;
+          fb.syns = true; spar.forebild = true;
+          logg.handelse('formel', `${p.id}: förebilden tänds (${fb.visad ? 'igen' : 'andra felet'})`);
+          fb.visad = true;
+          return;
+        }
         if (vidFel && !fb.visad) {
           // första felet: ordet tänds bredvid bilden, och han tittar. Vid nästa bricka tonas det bort.
           fb.syns = true; fb.visad = true; spar.forebild = true;
@@ -2331,7 +2344,7 @@ export function skapaSpel(d) {
       };
       // knuffen: utifrån bilden glimtar bilden (förebilden pekar på svaret och kommer först efter fel), annars förebilden
       const k = knuffKlocka(p.knuff, () => {
-        if (vidFel && !fb.visad) { const b = ui.plattan.querySelector('.formel-bild'); b?.classList.remove('puls'); void (/** @type {HTMLElement | null} */ (b))?.offsetWidth; b?.classList.add('puls'); return; }
+        if (vidFel && (trappa ? fel < 2 : !fb.visad)) { const b = ui.plattan.querySelector('.formel-bild'); b?.classList.remove('puls'); void (/** @type {HTMLElement | null} */ (b))?.offsetWidth; b?.classList.add('puls'); return; }
         tandForebild('knuff'); rita(); ui.plattan.querySelector('.forebild .bokstav')?.classList.add('blinkar');
       });
       if (!fb.brickor) window.setTimeout(() => { fb.brickor = true; if (!upptagen) rita(); }, tid(p.forebild.brickor_efter_sek * 1000));
@@ -2345,7 +2358,8 @@ export function skapaSpel(d) {
         const forebild = p.forebild && fb.visad ? `<div class="forebild ${fb.syns ? '' : 'tonad'}" aria-label="Förebild">${[...p.forebild.text].map((c) => `<span class="bokstav">${ui.esc(c)}</span>`).join('')}</div>` : '';
         // bilden som ställer frågan (Farfars ristade svärd), med förebilden bredvid när den har tänts
         const bild = p.bild ? `<div class="formel-bild" aria-hidden="true">${bilder.html(p.bild)}</div>` : '';
-        const overst = bild ? `<div class="formel-overst">${bild}${forebild}</div>` : forebild;
+        const ledbild = p.ledbild && fb.ledbild ? `<div class="formel-bild ledbild" aria-hidden="true">${bilder.html(p.ledbild)}</div>` : '';
+        const overst = bild || ledbild ? `<div class="formel-overst">${bild}${ledbild}${forebild}</div>` : forebild;
         // ungen håller tassarna för ögonen medan förebilden är borta (titta–täck), men bara när den har synts
         const tacker = tt && fb.visad && !fb.syns ? '<span class="unge-tacker" aria-hidden="true"><span class="kropp"></span><span class="tass"></span><span class="tass"></span></span>' : '';
         const platser = `<div class="platser">${f.s.platser.map((id, i) => `<span class="plats ${f.s.last[i] ? 'last' : ''} ${id !== null && !f.s.last[i] ? 'flyttbar' : ''}" data-plats="${i}" ${id !== null ? `data-id="${id}"` : ''}>${ui.esc(bokstav(id))}</span>`).join('')}</div>`;
@@ -2408,6 +2422,7 @@ export function skapaSpel(d) {
         if (r.resultat === 'lagd') { tack(); brickljud(f.s.platser.filter((x) => x !== null).length); rita(); upptagen = false; return; }
         rita();
         if (r.resultat === 'fel') {
+          logg.handelse('formel', `${p.id}: fel nr ${f.s.fel}`);
           tandForebild('fel'); felljud(/** @type {any} */ (r).samma ? null : r.reaktion); ui.plattan.querySelector('.platser')?.classList.add('gra'); await vanta(tid(400));
           // samma fel ord igen: bara ljudet och ungens blick
           if (/** @type {any} */ (r).samma) { logg.handelse('formel', `${p.id}: samma fel igen (kort)`); await kortReaktion(); } else await reaktion(r.reaktion);
