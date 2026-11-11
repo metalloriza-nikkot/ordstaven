@@ -2353,6 +2353,7 @@ test('hjälpens trappa i formeln med tangentbordet (Teknik 32, beslut 69.3): bil
   // andra felet, ett nästan (BOR): nu förebilden
   await skriv('BOR', 'nastan');
   await expect(forebild).toBeVisible();
+  await page.screenshot({ path: 'test-results/formel-over-vattnet.png' });
   await expect(page.locator('#plattan .plats.tand')).toHaveCount(0); // nästan utan tand tänder ingen bokstav (69.3)
   await expect(forebild).not.toHaveClass(/tonad/);
   // täck: den tonas bort när han skriver, och syns igen när fälten är tomma

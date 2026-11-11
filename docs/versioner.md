@@ -2,6 +2,7 @@
 
 | Version | Datum | Vad |
 |---|---|---|
+| 0.58.1 | 2026-11-11 | **Bilden vid vattnet visar problemet** (72.4): i gråboxen hjälten och ungen på ena stranden, byn på den andra och en prickad båge över vattnet, i stället för bara vatten. |
 | 0.58.0 | 2026-11-11 | **Kapitel 2 efter beslut 72.** Ungen biter i vassväggen, och efter SVÄRD hugger han sig igenom fem lager själv. I vassen jagar ungen bubblor, stocken driver långt ut, och ungen skakar på huvudet mot land. Går han i lerpölen vid Farfars skylt sjunker han, och ungen drar upp honom. Baronen sitter i leran vid bryggan. En häger, grodor, fåglar, en katt och en fjäril lever i rummen. Bos tack är en grodgrön dräkt, och Tant Rosas ryggsäck är rosa. |
 | 0.57.0 | 2026-11-11 | **SVÄRD i kapitel 1 följer samma hjälp som kapitel 2.** Ordet syns först efter två fel, inte efter ett, och täcks när han lägger nästa bricka. |
 | 0.56.0 | 2026-11-10 | **Kapitel 2 efter beslut 71.** Innehålls nya pass är inne. Vassen står tät vid träsket tills han skriver SVÄRD, och då hugger svärdet en väg. I vassen hittar han halvan själv, och ungen gör ett jättehopp efter en bubbla upp på en stock som driver ut: FLYG, REP, BRO eller STEGE tar den i land, och den skakar sig så att han blir blöt. Tavlorna hänger högt på Tant Rosas vägg, och hon når inte med dammvippan. På kvällen tänder LJUS lyktorna ned till udden, kameran följer ljuset, och byborna står runt elden när Fiskaren tänder den. |

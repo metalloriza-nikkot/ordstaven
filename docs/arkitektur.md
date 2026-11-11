@@ -953,4 +953,4 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Livet (26.3, 72.10):** kartans `omgivning` får `hager`, `groda` och `katt`, och `fagel` och `fjaril` ritas som former när Stils bilder saknas (`livet.js`, högst fyra steg per sekund). Hägern och fågeln flyger, och grodan plumsar, när han kommer nära. `kap2.py` har hjälparen `liv()`.
 - **Dräkten (72.11):** hjältens lager har `drakt`. En dräkt i `DRAKT_GAVOR` byter dräktens färg i palettbytet, och den rosa ryggsäcken tonas (`SACK_TON`) tills Stil har ritat den. En sparning utan `drakt` läses som förut (`lagerFor`).
 - **Gråboxen:** leran (föremål med `leran` eller `lerpol` i id:t) är brun.
-
+- **Bilden vid vattnet (72.4, 0.58.1):** `over_vattnet` är en ritad bild i `bilder.js` (`RITADE`, före platshållarna): stränderna, vattnet, hjälten och ungen, byn och en prickad båge. Den visar ingen bro.

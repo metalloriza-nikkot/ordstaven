@@ -33,6 +33,16 @@ const RITADE = /** @type {Record<string, (farg?: string) => string>} */ ({
     <path d="M42 48 l16 -16 l-4 18 z" fill="${farg}"/><path d="M42 48 l16 -16 l-4 18 z" fill="#fff" opacity=".22"/>
     <g stroke="${farg}" stroke-width="2" stroke-linecap="round"><path d="M9 48 v6 M14 48 v6 M19 48 v6 M24 48 v6 M29 48 v6 M34 48 v6 M39 48 v6"/></g>
   </svg>`,
+  // vid vattnet (72.4): hjälten och ungen på ena stranden, byn på den andra och en prickad båge över vattnet. Bilden
+  // ställer frågan (hur kommer de över?) och passar BRO, STEGE, REP och FLOTTE, men visar inget av dem
+  over_vattnet: () => `<svg class="ritad" viewBox="0 0 96 64" width="1.5em" height="1em" aria-hidden="true">
+    <rect x="0" y="40" width="96" height="24" fill="#3f6e9e"/><path d="M30 46 q6 -3 12 0 q6 3 12 0 q6 -3 12 0" stroke="#8fc3e8" stroke-width="2" fill="none"/>
+    <path d="M0 36 h26 l4 28 h-30 z" fill="#6f9a4a"/><path d="M96 36 h-26 l-4 28 h30 z" fill="#6f9a4a"/>
+    <rect x="8" y="22" width="6" height="14" rx="2" fill="#2e8bd8"/><circle cx="11" cy="19" r="4" fill="#c9ccd2"/>
+    <ellipse cx="20" cy="33" rx="5" ry="3.5" fill="#5fae6a"/>
+    <path d="M74 26 l6 -6 l6 6 v10 h-12 z" fill="#b08a58"/><path d="M84 30 l4 -4 l4 4 v6 h-8 z" fill="#9a7a4e"/>
+    <path d="M24 30 Q48 -2 72 30" stroke="#f2c14e" stroke-width="2.5" stroke-dasharray="3 4" fill="none" stroke-linecap="round"/>
+  </svg>`,
 });
 
 /** @param {any} ordlistor @param {Record<string, string>} [platshallare] äventyrets egna bild-id → emoji */
@@ -55,6 +65,7 @@ export function skapaBilder(ordlistor, platshallare = {}) {
       return `<span class="bild bubbla" data-bild="${id}"><span class="bubbla-ytter">${e}</span><span class="bubbla-prick"></span></span>`;
     }
     const k = kort(id); if (k) return k;
+    if (RITADE[id]) return `<span class="bild emoji" data-bild="${id}" style="font-size:calc(64px * var(--t))">${RITADE[id]()}</span>`;
     if (EXTRA[id]) return `<span class="bild emoji" data-bild="${id}">${somIkon(EXTRA[id])}</span>`;
     const farg = delar.map((d) => FARGER[/** @type {keyof FARGER} */ (d)]).find(Boolean);
     const storlek = egenskaper(id).storlek;
