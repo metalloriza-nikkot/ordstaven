@@ -5,13 +5,13 @@
  "name": "skog",
  "image": "skog.png",
  "imagewidth": 128,
- "imageheight": 160,
+ "imageheight": 176,
  "tilewidth": 16,
  "tileheight": 16,
  "margin": 0,
  "spacing": 0,
  "columns": 8,
- "tilecount": 80,
+ "tilecount": 88,
  "tiles": [
   {
    "id": 0,
@@ -756,6 +756,146 @@
      "value": "vatten_glitter_3"
     }
    ]
+  },
+  {
+   "id": 73,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "skugga_S"
+    }
+   ]
+  },
+  {
+   "id": 74,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "skugga_E"
+    }
+   ]
+  },
+  {
+   "id": 75,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "skugga_SE"
+    }
+   ]
+  },
+  {
+   "id": 76,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "skugga_NE"
+    }
+   ]
+  },
+  {
+   "id": 77,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "trappa_S_V"
+    }
+   ]
+  },
+  {
+   "id": 78,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "trappa_S_H"
+    }
+   ]
+  },
+  {
+   "id": 79,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "trappa_F_V"
+    }
+   ]
+  },
+  {
+   "id": 80,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "trappa_F_H"
+    }
+   ]
+  },
+  {
+   "id": 81,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "trappa_fot_V"
+    }
+   ]
+  },
+  {
+   "id": 82,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "trappa_fot_H"
+    }
+   ]
+  },
+  {
+   "id": 83,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "stege_S"
+    }
+   ]
+  },
+  {
+   "id": 84,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "stege_F"
+    }
+   ]
+  },
+  {
+   "id": 85,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "stig_0101_skugga_E"
+    }
+   ]
+  },
+  {
+   "id": 86,
+   "properties": [
+    {
+     "name": "namn",
+     "type": "string",
+     "value": "stig_0101_skugga_SE"
+    }
+   ]
   }
  ],
  "wangsets": [
@@ -1451,7 +1591,7 @@
   {
    "name": "beskrivning",
    "type": "string",
-   "value": "Skogens rutor (Stil). Kullen: kulle_* i 3 x 4, sista raden är klippans framsida. Vattnets helruta är animerad."
+   "value": "Skogens rutor (Stil). Kullen: kulle_* i 3 x 4, sista raden är klippans framsida. Höjdkitet: skugga_S, skugga_E, skugga_SE och skugga_NE på marken söder och öster om kullen, trappa_S/F/fot_V/H för trappan i framsidan (två rutor bred), och stege_S/F. Vattnets helruta är animerad."
   }
  ]
 }

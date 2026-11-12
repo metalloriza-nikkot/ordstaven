@@ -21,6 +21,7 @@ import { HJALTE_FARGER, HJALTE_FAST } from './scener/Rum.js';
 import { lagerFor, bytLager, ristasNu } from './karna/hjalte.js';
 import { TANGENTBORD_HOJD } from './grans/tangentbord.js';
 import { kandaOrd, bedomOrd, antalFalt, MAX_BOKSTAVER } from './karna/skrivord.js';
+import { laddaOrdlista } from './grans/ordlista.js';
 import { skapaRullning } from './grans/rullning.js';
 import { laggUngenPaKartan, kartbitarHtml } from './grans/kartbitar.js';
 import { ikon, uiBild } from './grans/ikoner.js';
@@ -814,6 +815,8 @@ export function skapaSpel(d) {
 
   /** Formelpussel som är lösta i det här passet (formeln läggs på staven när steget är klart). @type {Set<string>} */
   const losta = new Set();
+  /** Ett pussel i ett rums frivilliga (draken, 76.4): en formel han redan kan gör det inte gjort. @param {string} pid */
+  const iFrivilligt = (pid) => (b?.kapitel?.rum || []).some((/** @type {any} */ r) => (r.frivilligt || []).some((/** @type {any} */ f) => (f.steg || []).some((/** @type {any} */ st) => st.typ === 'pussel' && st.pussel_id === pid)));
   /**
    * Rummets föremål just nu (T5):
    * - av ett läsval i världen syns bara den variant han får, så att L2:s stenar inte står bredvid L3:s
@@ -837,7 +840,7 @@ export function skapaSpel(d) {
     for (const o of kartor[r.id]?.objekt || []) {
       if (!o.forsvinnerEfter) continue;
       const p = b.pussel(o.forsvinnerEfter);
-      if (losta.has(o.forsvinnerEfter) || (p?.typ === 'P11_formel' && formler.includes(p.svar)) || pusselForbi(o.forsvinnerEfter)) borta.add(o.id);
+      if (losta.has(o.forsvinnerEfter) || (p?.typ === 'P11_formel' && !iFrivilligt(p.id) && formler.includes(p.svar)) || pusselForbi(o.forsvinnerEfter)) borta.add(o.id);
     }
     return borta.size ? r.innehall.filter((/** @type {any} */ x) => !borta.has(typeof x === 'string' ? x : x.id)) : r.innehall;
   }
@@ -851,7 +854,7 @@ export function skapaSpel(d) {
     return (kartor[r.id]?.objekt || []).filter((/** @type {any} */ o) => {
       if (!o.sedan) return false;
       const p = b.pussel(o.sedan);
-      return visade.includes(o.sedan) || losta.has(o.sedan) || (p?.typ === 'P11_formel' && formler.includes(p.svar)) || pusselForbi(o.sedan);
+      return visade.includes(o.sedan) || losta.has(o.sedan) || (p?.typ === 'P11_formel' && !iFrivilligt(p.id) && formler.includes(p.svar)) || pusselForbi(o.sedan);
     }).map((/** @type {any} */ o) => o.id);
   }
   /** Det som står kvar efter hugget: kartans föremål som är borta (forsvinner_efter) och har bild_kvar. @param {any} r */
@@ -882,6 +885,26 @@ export function skapaSpel(d) {
       if ((f.steg || []).some((/** @type {any} */ st) => st.typ === 'pussel' && st.pussel_id === pid)) return b.frivilligtGjort(`${r.id}/${f.foremal}`) && !friviligtPagar.has(`${r.id}/${f.foremal}`);
     }
     return false;
+  }
+  /**
+   * `efter` på en zon eller ett frivilligt föremål (2.43): ett pussel som är gjort, eller ett steg i en scen som
+   * berättelsen har gått förbi (`scen` och t.ex. `ga_till: unge`, leran som blir en pöl när ungen är uppdragen).
+   * Utan `efter` gäller det alltid. @param {any} e
+   */
+  function efterUppfyllt(e) {
+    if (!e) return true;
+    if (e.pussel && !(losta.has(e.pussel) || pusselForbi(e.pussel))) return false;
+    if (e.scen) {
+      const sc = b?.kapitel?.scener || [];
+      const si = sc.findIndex((/** @type {any} */ x) => x.id === e.scen);
+      if (si < 0) return false;
+      if (b.scenIndex !== si) return b.scenIndex > si;
+      const nyckel = Object.keys(e).find((x) => x !== 'scen' && x !== 'pussel');
+      const ti = nyckel ? sc[si].steg.findIndex((/** @type {any} */ st) => st.typ === nyckel && (st.mal === e[nyckel] || st.id === e[nyckel] || st.foremal === e[nyckel])) : -1;
+      const nu = Math.max(b.stegIndex, av.scen === si ? (av.steg ?? -1) : -1);
+      return ti >= 0 && nu > ti;
+    }
+    return true;
   }
   /** Det frivilliga som spelas just nu (det räknas som gjort redan när det börjar). @type {Set<string>} */
   const friviligtPagar = new Set();
@@ -1712,7 +1735,7 @@ export function skapaSpel(d) {
       const p = st.typ === 'pussel' ? b.pussel(st.pussel_id) : null;
       return !p || p.typ !== 'P11_formel' || (tillstand.spelare.hjalte.formler || []).includes(p.svar);
     });
-    return (r?.frivilligt || []).filter((/** @type {any} */ f) => rum.ruta(f.foremal) && !b.frivilligtGjort(`${aktuelltRum}/${f.foremal}`) && kan(f)).map((/** @type {any} */ f) => /** @type {string} */ (f.foremal));
+    return (r?.frivilligt || []).filter((/** @type {any} */ f) => rum.ruta(f.foremal) && !b.frivilligtGjort(`${aktuelltRum}/${f.foremal}`) && kan(f) && efterUppfyllt(f.efter)).map((/** @type {any} */ f) => /** @type {string} */ (f.foremal));
   }
   /**
    * Gör det frivilliga vid ett föremål: stegen spelas utanför berättelsens ordning, och det räknas som gjort
@@ -1786,7 +1809,7 @@ export function skapaSpel(d) {
       const zoner = b.rum(aktuelltRum)?.zoner || [];
       if (!zoner.length) { inne.clear(); return; }
       const i = (/** @type {any} */ o) => rum.pos.x >= o.x && rum.pos.x <= o.x + o.b && rum.pos.y >= o.y && rum.pos.y <= o.y + o.h;
-      const traffad = zoner.find((/** @type {any} */ z) => { const o = rum.ruta(z.id); return o && i(o); });
+      const traffad = zoner.find((/** @type {any} */ z) => { const o = rum.ruta(z.id); return o && i(o) && efterUppfyllt(z.efter); });
       for (const id of [...inne]) if (traffad?.id !== id) inne.delete(id);
       if (!traffad) { utanfor = { ...rum.pos }; return; }
       if (inne.has(traffad.id)) return;
@@ -2069,9 +2092,21 @@ export function skapaSpel(d) {
         } else {
           ljud.spela('ratt'); kort?.classList.add('ratt');
           k.stopp();
+          // ett ord som lyser i guld när han har valt rätt (2.43, INTE vid bryggan): i texten och på kortet
+          if (p.lys_ord) {
+            for (const e of plattan().querySelectorAll('.ord')) if (versaler(/** @type {HTMLElement} */ (e).dataset.ord || '') === versaler(p.lys_ord)) e.classList.add('lyser');
+            logg.handelse('val', `${p.id}: ${versaler(p.lys_ord)} lyser`);
+            ljud.spela('glitter');
+            await vanta(tid(1400));
+          }
           await vanta(tid(500));
           ui.doljPlatta();
-          await Promise.all([rattHandelse(null), reaktion(r.reaktion)]);
+          // ett rätt alternativ med effekt (2.43, stocken: FLYG, REP eller BRO) gör det i rummet, och då visar
+          // reaktionen inte sin text för den vuxne
+          const valt = v.s.alternativ.find((a) => a.id === id);
+          const effektMs = valt?.effekt ? rum.regi(valt.effekt) : 0;
+          if (effektMs) { logg.handelse('val', `${p.id}: ${valt.effekt}`); await Promise.all([rattHandelse(null), vanta(tid(effektMs))]); await reaktion(r.reaktion ? { ...r.reaktion, syns_redan: true } : null); }
+          else await Promise.all([rattHandelse(null), reaktion(r.reaktion)]);
           klar({ niva: v.s.variantNyckel, forstaForsoket: v.forstaForsoket, forsok: v.s.forsok, hjalp: spar.hjalp, knuffFore: hjalpSpar.fore().knuff_fore });
           return;
         }
@@ -2505,6 +2540,8 @@ export function skapaSpel(d) {
    */
   async function formelSkriv(p) {
     const ord = kandaOrdNu();
+    // SALDO (77.2) hämtas när skrivpusslet öppnas: ett rätt stavat svenskt ord får aldrig "pff"
+    const saldo = laddaOrdlista();
     const spar = { hjalp: false, forebild: false };
     if (p.instruktion) await replik(p.instruktion);
     rum.frys(true);
@@ -2570,8 +2607,10 @@ export function skapaSpel(d) {
       const bedom = async () => {
         if (upptagen || fardigt || !skrivet) return;
         upptagen = true; k.nollstall();
-        const b = bedomOrd(p, skrivet, ord);
-        logg.handelse('formel', `${p.id}: ${b.ord} (${b.sort})`);
+        const lista = await Promise.race([saldo, vanta(2500).then(() => null)]);
+        const b = bedomOrd(p, skrivet, lista ? { has: (/** @type {string} */ w) => ord.has(w) || lista.ord.has(w) } : ord, lista?.sparr);
+        // ett grovt ord skrivs aldrig ut i loggen (77.2)
+        logg.handelse('formel', b.sort === 'sparrat' ? `${p.id}: ett ord som inte visas (spärrat)` : `${p.id}: ${b.ord} (${b.sort})`);
         if (b.sort === 'formel') { await lyckad(b); return; }
         if (b.sort !== 'formel') steg++;
         if (b.sort === 'nastan') {
@@ -2587,6 +2626,10 @@ export function skapaSpel(d) {
           if (b.nastan.effekt && !rum.regi(b.nastan.effekt)) ui.visaRegi(String(b.nastan.effekt).replace(/_/g, ' '), 0);
           await reaktion({ replik: b.nastan.replik || { talare: 'berattare', text: 'Nästan!', upplast: true } });
           ui.doljRegi();
+        } else if (b.sort === 'sparrat') {
+          // ett vanligt försök med en neutral reaktion (77.2): trappan tar ett steg, och ordet försvinner
+          tandLedbild(); if (trappa) tandForebild('försök');
+          ljud.spela('hmm'); await vanta(tid(500));
         } else if (b.sort === 'rimligt' || b.sort === 'ord') {
           // ett riktigt ord som inte hjälper räknas inte som fel, men trappan tar ett steg (76.2, A3)
           tandLedbild(); if (trappa) tandForebild('försök');
@@ -2877,13 +2920,21 @@ export function skapaSpel(d) {
       // kartan säger vilket föremål som är krukorna (visar: pusslets id)
       const bas = visarFor(p.id)?.id ?? rum.objekt.find((o) => o.sort === 'sak')?.id ?? '';
       if (!visarFor(p.id)) logg.handelse('FEL', `ingen karta visar ${p.id}, krukorna hamnar vid ${bas}`);
-      ids = rum.dela(bas, k.s.antal);
+      ids = p.falt ? rum.delaFalt(bas, p.falt.rader, p.falt.per_rad) : rum.dela(bas, k.s.antal);
     }
+    // fältet (75.3): när gången är huggen är pusslet löst så fort han går förbi fältet. Tills dess kan han hugga fler
+    const faltSlut = () => {
+      const delar = ids.map((id) => rum.ruta(id)).filter(Boolean);
+      const hoger = Math.max(...delar.map((o) => /** @type {any} */ (o).x + /** @type {any} */ (o).b), 0);
+      return rum.pos.x > hoger + 8;
+    };
     visaEtiketter();
     /** @type {string | null} */
     let pekad = null;
     const pekaNarmaste = () => {
-      const kvar = ids.filter((_, i) => k.s.slagna[i] === null);
+      // i fältet nosar ungen mot gången som inte är huggen än (75.3)
+      const gangKvar = /** @type {any} */ (k.s).mal ? ids.filter((_, i) => /** @type {any} */ (k.s).mal.includes(i) && k.s.slagna[i] === null) : [];
+      const kvar = gangKvar.length ? gangKvar : ids.filter((_, i) => k.s.slagna[i] === null);
       const avst = (/** @type {string} */ id) => { const o = rum.ruta(id); return o ? Math.hypot(o.x + o.b / 2 - rum.pos.x, o.y + o.h / 2 - rum.pos.y) : Infinity; };
       const id = kvar.sort((a, b) => avst(a) - avst(b))[0];
       if (!id) return;
@@ -2903,7 +2954,18 @@ export function skapaSpel(d) {
     while (!k.s.klar && ids.length) {
       const kvar = ids.filter((_, i) => k.s.slagna[i] === null);
       if (!kvar.length) break;
-      const id = await anvand(kvar, { verb: 'svinga', vidMiss: miss });
+      /** @type {string} */
+      let id;
+      if (p.falt && /** @type {any} */ (k.s).oppen) {
+        // gången är öppen: han kan hugga fler, eller gå vidare genom gången
+        const val = anvand(kvar, { verb: 'svinga', vidMiss: miss });
+        let tick = 0;
+        const forbi = new Promise((klar) => { tick = window.setInterval(() => { if (faltSlut()) klar(null); }, 150); });
+        const vad = await Promise.race([val, forbi]);
+        window.clearInterval(tick);
+        if (vad === null) { val.avbryt(); rum.sattInteraktiva([]); logg.handelse('hugga', `${p.id}: gick vidare, ${kvar.length} kvar`); break; }
+        id = /** @type {string} */ (vad);
+      } else id = await anvand(kvar, { verb: 'svinga', vidMiss: miss });
       knuff.nollstall(); rum.markera(id, false);
       if (pekad) { rum.markera(pekad, false); rum.ungePekar(null); pekad = null; }
       const fynd = k.sla(ids.indexOf(id));
@@ -2927,6 +2989,7 @@ export function skapaSpel(d) {
     }
     knuff.stopp();
     if (pekad) { rum.markera(pekad, false); rum.ungePekar(null); }
+    if (p.falt) rum.behallDelar?.(ids.filter((_, i) => k.s.slagna[i] === null));
     if (hugga) rum.svard(false);
     if (p.vid_ratt) await reaktion(p.vid_ratt);
     return {};
@@ -3914,7 +3977,7 @@ export function skapaSpel(d) {
   function omSpelet() {
     return `<div class="menygrupp om-spelet"><b>Ordstaven ${ui.esc(String(d.version))}</b><small>${ui.esc(aventyr.meta?.namn ?? aventyr.id)}</small>
       <p><b>Medverkande.</b> Far &amp; son produktion tillsammans med Claude (Anthropic).</p>
-      <p><b>Licenser.</b> All grafik, alla ljudeffekter och musiken är egna, gjorda för spelet. Typsnittet Lexend: SIL Open Font License 1.1. Spelmotorn Phaser och Workbox: MIT.</p>
+      <p><b>Licenser.</b> All grafik, alla ljudeffekter och musiken är egna, gjorda för spelet. Typsnittet Lexend: SIL Open Font License 1.1. Spelmotorn Phaser och Workbox: MIT. Ordlistan bygger på SALDO från Språkbanken Text, Göteborgs universitet: CC BY 4.0, omgjord för spelet.</p>
       <p><b>Inget skickas någonstans.</b> Allt sparas bara i den här webbläsaren. Loggen och sparfilen lämnar enheten bara om du själv hämtar dem.</p></div>`;
   }
   /** Delen i INSTÄLLNINGAR som visas (den står kvar när menyn ritas om). */

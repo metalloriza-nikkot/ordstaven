@@ -48,6 +48,13 @@ test('kapitel 2 går att spela från träsket till elden (gråbox, del 5)', asyn
       const p = pussel.get(st?.pussel_id);
       await typ(p.svar); await page.keyboard.press('Enter'); await page.waitForTimeout(800); continue;
     }
+    // ett läsval på läsplattan (stocken och bryggan, 76.2 och 76.4): det första rätta kortet
+    if (await page.locator('#plattan .kortrad .kort').first().isVisible().catch(() => false) && st?.typ === 'pussel' && pussel.get(st.pussel_id)?.typ === 'P1_las_och_valj') {
+      const v = await ev(() => window.__ORDSTAVEN.variant());
+      const p = pussel.get(st.pussel_id); const ratt = (p.varianter[v] || Object.values(p.varianter)[0]).alternativ.find((a) => a.ratt);
+      await page.locator(`#plattan .kort[data-id="${ratt.id}"]`).click({ timeout: 1000 }).catch(() => {});
+      await page.waitForTimeout(600); continue;
+    }
     if (await page.locator('#plattan').isVisible()) { await vidare(); await page.waitForTimeout(150); continue; }
     const typSt = st?.typ;
     if (typSt === 'ga_till' && st.mal === 'unge') await gaTillUngen();
@@ -62,9 +69,12 @@ test('kapitel 2 går att spela från träsket till elden (gråbox, del 5)', asyn
       if (await ev((m) => !!window.__ORDSTAVEN.ruta(m), st.till)) await anvand(st.till);
       else await gaUt(scen === 'k2s04_bryggan' ? 'stig_byn_bryggan' : 'stig_byn_vassen');
     } else if (typSt === 'pussel' && pussel.get(st.pussel_id)?.verb === 'hugga') {
-      // vassväggen (72.3): det närmaste lagret, tills alla har fallit
-      const kvar = await ev(() => window.__ORDSTAVEN.rumsobjekt().filter((id) => id.startsWith('vass_tat_')).map((id) => window.__ORDSTAVEN.ruta(id)).sort((a, b) => a.x - b.x));
-      if (kvar.length) { await ev(([x, y]) => window.__ORDSTAVEN.gaMot(x, y), [kvar[0].x - 8, 100]); await page.waitForTimeout(500); await page.keyboard.press('Space'); }
+      // vassväggen (75.3): tussarna i gången, från väster, tills gången är öppen, och sedan genom gången
+      const p = pussel.get(st.pussel_id);
+      const gang = p.innehall.map((x, i) => (x === p.falt.klar_nar ? `vass_tat_${i}` : null)).filter(Boolean);
+      const kvar = await ev((g) => g.map((id) => window.__ORDSTAVEN.ruta(id)).filter(Boolean).sort((a, b) => a.x - b.x || a.y - b.y), gang);
+      if (kvar.length) { await ev(([x, y]) => window.__ORDSTAVEN.gaMot(x, y), [kvar[0].x - 8, kvar[0].y + kvar[0].h / 2]); await page.waitForTimeout(500); await page.keyboard.press('Space'); }
+      else await ev(() => { const p = window.__ORDSTAVEN.position(); window.__ORDSTAVEN.gaMot(p.x + 60, p.y); });
     } else if (typSt === 'pussel' && pussel.get(st.pussel_id)?.i_rummet) {
       const m = await rattObjekt(pussel.get(st.pussel_id));
       if (m) await anvand(m);

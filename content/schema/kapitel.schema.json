@@ -428,6 +428,9 @@
               },
               "anteckning": {
                 "$ref": "#/$defs/anteckning"
+              },
+              "efter": {
+                "$ref": "#/$defs/efter"
               }
             }
           }
@@ -459,6 +462,9 @@
               },
               "anteckning": {
                 "$ref": "#/$defs/anteckning"
+              },
+              "efter": {
+                "$ref": "#/$defs/efter"
               }
             }
           }
@@ -1388,6 +1394,14 @@
         "tillstand_efter": {
           "type": "string",
           "description": "Rummets tillstånd när pusslet är löst (2.33): repen på torget faller."
+        },
+        "flera_ratta": {
+          "type": "boolean",
+          "description": "Flera alternativ är rätt (2.43, stocken 77.3). Det första rätta han väljer löser pusslet, med alternativets vid_valj. Utan fältet ska exakt ett vara rätt."
+        },
+        "lys_ord": {
+          "type": "string",
+          "description": "Ett ord som lyser i guld i texten och på kortet när han har valt rätt (2.43, INTE vid bryggan), som lys_ord på oppna_lasplatta (2.31)."
         }
       }
     },
@@ -1436,6 +1450,10 @@
               "objekt": {
                 "$ref": "#/$defs/id",
                 "description": "Föremålet i rummet där alternativet ligger (bara med i_rummet)."
+              },
+              "effekt": {
+                "$ref": "#/$defs/id",
+                "description": "Ett rätt alternativ som gör något i rummet (2.43): regins namn, som en formels effekt."
               }
             }
           }
@@ -1454,6 +1472,10 @@
             },
             "variant": {
               "$ref": "#/$defs/niva_l"
+            },
+            "eller_niva": {
+              "$ref": "#/$defs/niva_l",
+              "description": "Varianten gäller också när spelarens nivå är minst den här (2.43)."
             }
           }
         }
@@ -1805,6 +1827,29 @@
         "tillstand_efter": {
           "type": "string",
           "description": "Rummets tillstånd när pusslet är löst (2.33): repen på torget faller."
+        },
+        "falt": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "rader",
+            "per_rad",
+            "klar_nar"
+          ],
+          "description": "Ett fält av tussar (2.43, vassväggen 75.3): innehall är rad för rad, per_rad i varje. Pusslet är löst när alla tussar med posten klar_nar har fallit, och resten går att hugga efteråt.",
+          "properties": {
+            "rader": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "per_rad": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "klar_nar": {
+              "$ref": "#/$defs/id"
+            }
+          }
         }
       }
     },
@@ -2420,6 +2465,22 @@
           }
         }
       ]
+    },
+    "efter": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Gäller först efter något (2.43): ett löst pussel (pussel), eller ett steg i en scen (scen och ett steg, t.ex. ga_till: unge, som betyder att det steget i scenen är gjort). Före det gör zonen ingenting och föremålet går inte att använda.",
+      "properties": {
+        "pussel": {
+          "$ref": "#/$defs/id"
+        },
+        "scen": {
+          "$ref": "#/$defs/id"
+        },
+        "ga_till": {
+          "type": "string"
+        }
+      }
     }
   }
 }

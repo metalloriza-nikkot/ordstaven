@@ -2,7 +2,7 @@
 // Formeln med tangentbordet (P11 med skriv: tangentbord, kapitel 2): ordet han skriver bedöms (Teknik 20, del 2).
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { bedomOrd, kandaOrd, antalFalt, MAX_BOKSTAVER, naraStavning } from '../../src/karna/skrivord.js';
+import { bedomOrd, kandaOrd, antalFalt, MAX_BOKSTAVER, naraStavning, avkodaOrdlista } from '../../src/karna/skrivord.js';
 import { ristasNu } from '../../src/karna/hjalte.js';
 
 const las = (/** @type {string} */ f) => JSON.parse(readFileSync(new URL(`../../${f}`, import.meta.url), 'utf8'));
@@ -71,3 +71,31 @@ describe('nära stavning (76.2, A4)', () => {
   });
 });
 
+
+describe('SALDO och spärrlistan (beslut 76.2 och 77.2)', () => {
+  it('den prefixkodade listan packas upp till orden i versaler', () => {
+    expect([...avkodaOrdlista('0BRO\n3AR\n2Y\n0SPORRE\n')]).toEqual(['BRO', 'BROAR', 'BRY', 'SPORRE']);
+    expect(avkodaOrdlista('').size).toBe(0);
+  });
+  it('ett ord ur SALDO är ett riktigt ord, aldrig "pff"', () => {
+    const saldo = new Set(['KATTUNGE']);
+    expect(bedomOrd(P('k2_svard'), 'KATTUNGE', ord).sort).toBe('fel');
+    expect(bedomOrd(P('k2_svard'), 'KATTUNGE', { has: (w) => ord.has(w) || saldo.has(w) }).sort).toBe('ord');
+  });
+  it('ett grovt ord är "spärrat": aldrig "BRA ORD!", och ordet följer inte med', () => {
+    const sparr = new Set(['FANORD']);
+    const b = bedomOrd(P('k2_svard'), 'fanord', { has: () => true }, sparr);
+    expect(b).toEqual({ sort: 'sparrat', ord: '' });
+    // formeln går alltid före
+    expect(bedomOrd(P('k2_svard'), 'SVÄRD', ord, new Set(['SVÄRD'])).sort).toBe('formel');
+  });
+  it('spärrlistan i repot: varje grundord finns i den kodade listan, och listan har inga vanliga ord', () => {
+    const rader = readFileSync(new URL('../../verktyg/ordlista/sparrlista.txt', import.meta.url), 'utf8').split('\n').map((r) => r.split('#')[0].trim()).filter((r) => r && !r.startsWith('del:'));
+    const sparr = avkodaOrdlista(readFileSync(new URL('../../assets/ordlista/sparr.txt', import.meta.url), 'utf8'));
+    // längre ord än fälten rymmer går inte att skriva
+    for (const r of rader) if (r.length <= MAX_BOKSTAVER) expect(sparr.has(r.toLocaleUpperCase('sv-SE')), r).toBe(true);
+    // ord som spelet använder får aldrig vara spärrade
+    for (const w of ['BRO', 'FLYG', 'SVÄRD', 'LJUS', 'REP', 'STEGE', 'SPORRE', 'BAJS', 'PUNG', 'SJUTTON']) expect(sparr.has(w), w).toBe(false);
+    for (const w of ord) expect(sparr.has(w), w).toBe(false);
+  });
+});

@@ -12,6 +12,7 @@ export const MAX_BOKSTAVER = 10;
  *   | { sort: 'nastan', ord: string, nastan: any, mal?: string, skiljer?: number }
  *   | { sort: 'rimligt', ord: string, rimligt: any }
  *   | { sort: 'ord', ord: string }
+ *   | { sort: 'sparrat', ord: string }
  *   | { sort: 'fel', ord: string }} Bedomning
  */
 
@@ -76,10 +77,11 @@ export function naraStavning(skrivet, mal) {
 
 /**
  * Bedöm ordet han har skrivit.
- * @param {any} pussel ett P11 @param {string} skrivet @param {Set<string>} ord riktiga ord (kandaOrd)
+ * @param {any} pussel ett P11 @param {string} skrivet @param {{ has(w: string): boolean }} ord riktiga ord (kandaOrd och SALDO)
+ * @param {{ has(w: string): boolean } | null} [sparr] grova ord som aldrig får "BRA ORD!" (77.2)
  * @returns {Bedomning}
  */
-export function bedomOrd(pussel, skrivet, ord) {
+export function bedomOrd(pussel, skrivet, ord, sparr = null) {
   const w = versaler(String(skrivet || '').trim());
   const formler = pussel.formler?.length ? pussel.formler : [{ ord: pussel.svar }];
   for (const f of formler) if ([f.ord, ...(f.godtas || [])].some((x) => versaler(x) === w)) return { sort: 'formel', ord: versaler(f.ord), formel: f };
@@ -92,6 +94,28 @@ export function bedomOrd(pussel, skrivet, ord) {
     const i = naraStavning(w, mal);
     if (i >= 0) return { sort: 'nastan', ord: w, nastan: { auto: true }, mal: versaler(mal), skiljer: i };
   }
+  // ett grovt ord (spärrlistan, 77.2) får aldrig "BRA ORD!": det är ett vanligt försök, och ordet visas inte igen
+  if (sparr?.has(w)) return { sort: 'sparrat', ord: '' };
   if (ord.has(w)) return { sort: 'ord', ord: w };
   return { sort: 'fel', ord: w };
+}
+
+/** Siffrorna i den prefixkodade ordlistan (verktyg/ordlista/saldo.py): hur många tecken raden delar med raden före. */
+const PREFIX = '0123456789abcdefghijklmnopqrstuvwxyz';
+
+/**
+ * Packa upp den prefixkodade ordlistan (SALDO, 77.2): varje rad börjar med hur många tecken den delar med raden
+ * före, och sedan resten av ordet. @param {string} text @returns {Set<string>}
+ */
+export function avkodaOrdlista(text) {
+  const ut = new Set();
+  let forra = '';
+  for (const rad of text.split('\n')) {
+    if (!rad || rad.startsWith('#')) continue;
+    const n = PREFIX.indexOf(rad[0]);
+    if (n < 0) continue;
+    forra = forra.slice(0, n) + rad.slice(1);
+    ut.add(forra);
+  }
+  return ut;
 }

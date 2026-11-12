@@ -4,7 +4,7 @@
 // så att de går att skilja åt för den som ser färger svagt (stilguiden, avsnitt 4).
 
 /** Gråboxens färger. Ljusheten (L*) skiljer minst 10 mellan alla par. */
-export const PALETT = Object.freeze({ rod: '#d9443a', bla: '#1f3c88', gul: '#f4d03f', gron: '#6abf69', vit: '#f7f5ef' });
+export const PALETT = Object.freeze({ rod: '#d9443a', bla: '#1f3c88', gul: '#f4d03f', gron: '#6abf69', vit: '#f7f5ef', rosa: '#a8326e' });
 
 /** Storlek som syns: stor, liten (annars vanlig). */
 export const STORLEK = Object.freeze({ stor: 1.35, liten: 0.7 });

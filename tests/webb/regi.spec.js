@@ -1,21 +1,22 @@
 // Stils mellanscener som regier i rummet (Teknik 31, beslut 68.5): varje regi går i sitt rum, med Stils bilder.
 import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
+const kap2 = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-02.json', import.meta.url), 'utf8'));
 
 const las = (k) => JSON.parse(readFileSync(new URL(`../../content/den-gomda-dalen/${k}.json`, import.meta.url), 'utf8'));
 
 /** En sparning i en scen (namnen finns, kapitlen före spolas fram), och spelet startat där. */
-async function sparadI(page, kap, scenId) {
+async function sparadI(page, kap, scenId, steg = 0, extra = {}) {
   const k = las(kap);
   await page.goto(`./?snabb&ny&kapitel=${kap}`);
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
-  await page.evaluate(([kap, scenId, scen]) => {
+  await page.evaluate(([kap, scenId, scen, steg, extra]) => {
     const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
-    Object.assign(av, { kapitelId: kap, scen, scenId, steg: 0, startad: false });
+    Object.assign(av, { kapitelId: kap, scen, scenId, steg, startad: false }, extra);
     t.spelare.hjalte.namn = 'TESTA'; t.spelare.unge = { format: 1, steg: 1, formagor: [], ...t.spelare.unge, namn: 'KNOPP', folj: true };
     t.spelare.hjalte.formler = [...new Set([...(t.spelare.hjalte.formler || []), 'LJUS', 'SVÄRD'])];
     localStorage.setItem('ordstaven_spar', JSON.stringify(t));
-  }, [kap, scenId, k.scener.findIndex((s) => s.id === scenId)]);
+  }, [kap, scenId, k.scener.findIndex((s) => s.id === scenId), steg, extra]);
   await page.goto(`./?snabb&kapitel=${kap}`);
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.click('.start-knapp');
@@ -241,43 +242,145 @@ test('lerpölen i vassen (72.8): han sjunker, ungen drar upp honom, och sedan g�
   expect(zoner.length).toBe(1);
 });
 
-test('vassväggen (72.3): ungen biter i vassen, och efter SVÄRD hugger han sig igenom fem lager själv', async ({ page }) => {
+test('vassväggen (72.3, 75.3): ungen biter i vassen, och efter SVÄRD hugger han sig igenom ett fält av tussar, en gång igenom räcker', async ({ page }) => {
   test.setTimeout(120000);
   const O = (f, a) => page.evaluate(f, a);
+  const vidare = async () => { for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {}); };
   await sparadI(page, 'kap-02', 'k2s01_kanten');
   await vantaPaRegi(page, 'ungen biter i vass_tat');
   // SVÄRD med tangentbordet
-  for (let i = 0; i < 60 && !(await page.locator('#plattan .formel-skriv').isVisible()); i++) {
-    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
-    await page.waitForTimeout(250);
-  }
+  for (let i = 0; i < 60 && !(await page.locator('#plattan .formel-skriv').isVisible()); i++) { await vidare(); await page.waitForTimeout(250); }
   await page.keyboard.type('SV'); await O(() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ä', bubbles: true }))); await page.keyboard.type('RD');
   await page.keyboard.press('Enter');
-  // hugget: väggen är delad i fem lager, och han hugger det närmaste tills alla har fallit
-  const lager = () => O(() => window.__ORDSTAVEN.rumsobjekt().filter((id) => id.startsWith('vass_tat_')).length);
-  for (let i = 0; i < 60 && (await lager()) === 0; i++) {
-    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
-    await page.waitForTimeout(250);
-  }
-  expect(await lager()).toBe(5);
-  // knappen svingar alltid (76.5, B12): långt från vassen blir det ett sving i luften, och inget lager faller
+  // fältet: 15 tussar i tre rader från väster till öster, fem i varje (75.3)
+  const tussar = () => O(() => window.__ORDSTAVEN.rumsobjekt().filter((id) => id.startsWith('vass_tat_')));
+  for (let i = 0; i < 60 && (await tussar()).length === 0; i++) { await vidare(); await page.waitForTimeout(250); }
+  expect((await tussar()).length).toBe(15);
+  const p = kap2.pussel.find((x) => x.id === 'k2_vassvaggen');
+  const gang = p.innehall.map((x, i) => (x === 'gang' ? `vass_tat_${i}` : null)).filter(Boolean);
+  expect(gang.length).toBe(6);
+  // knappen svingar alltid (76.5, B12): långt från vassen blir det ett sving i luften, och ingen tuss faller
   await O(() => window.__ORDSTAVEN.gaMot(30, 100));
   await page.waitForTimeout(1200);
   await page.keyboard.press('Space');
   await expect.poll(() => O(() => window.__ORDSTAVEN.logg()), { timeout: 3000 }).toContain('[hugg] i luften');
-  expect(await lager()).toBe(5);
-  for (let i = 0; i < 80; i++) {
-    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
-    const kvar = await O(() => window.__ORDSTAVEN.rumsobjekt().filter((id) => id.startsWith('vass_tat_')).map((id) => window.__ORDSTAVEN.ruta(id)).filter(Boolean).sort((a, b) => a.x - b.x));
-    if (!kvar.length) break;
-    if (i === 2) await page.screenshot({ path: 'test-results/regi-vassvaggen.png' });
-    await O(([x, y]) => window.__ORDSTAVEN.gaMot(x, y), [kvar[0].x - 8, 100]);
-    await page.waitForTimeout(400);
+  expect((await tussar()).length).toBe(15);
+  const hugg = async (id) => {
+    const o = await O((id) => window.__ORDSTAVEN.ruta(id), id);
+    if (!o) return;
+    await O(([x, y]) => window.__ORDSTAVEN.gaMot(x, y), [o.x - 8, o.y + o.h / 2]);
+    // vänta tills han står still där (vägen tillbaka genom gången är längre)
+    let forra = null;
+    for (let i = 0; i < 20; i++) { await page.waitForTimeout(150); const p = await O(() => window.__ORDSTAVEN.position()); if (forra && Math.abs(p.x - forra.x) + Math.abs(p.y - forra.y) < 0.5) break; forra = p; }
     await page.keyboard.press('Space');
-    await page.waitForTimeout(300);
+    await page.waitForTimeout(400);
+  };
+  // gången, från väster
+  for (let i = 0; i < 30; i++) {
+    const kvar = await O((g) => g.map((id) => window.__ORDSTAVEN.ruta(id)).filter(Boolean).sort((a, b) => a.x - b.x || a.y - b.y), gang);
+    if (!kvar.length) break;
+    if (i === 3) await page.screenshot({ path: 'test-results/regi-vassvaggen.png' });
+    await hugg(kvar[0].id);
   }
-  await expect.poll(() => O(() => window.__ORDSTAVEN.rumsobjekt().filter((id) => id.startsWith('vass_tat')).length), { timeout: 10000 }).toBe(0);
+  expect((await tussar()).length).toBe(9);
+  // gången är öppen, men han kan hugga fler: en tuss med ett bär under (bar)
+  const bar0 = await O(() => window.__ORDSTAVEN.tillstand().aventyr['den-gomda-dalen'].bar ?? 0);
+  await hugg('vass_tat_1');
+  expect((await tussar()).length).toBe(8);
+  await expect.poll(() => O(() => window.__ORDSTAVEN.tillstand().aventyr['den-gomda-dalen'].bar ?? 0), { timeout: 3000 }).toBe(bar0 + 1);
+  // han går genom gången, och berättelsen går vidare. Tussarna som står kvar står kvar
+  // gången är de två mittersta raderna i söder (y ca 77–154), öster om fältet
+  await O(() => window.__ORDSTAVEN.gaMot(150, 115));
+  await expect.poll(() => O(() => window.__ORDSTAVEN.logg()), { timeout: 8000 }).toMatch(/gick vidare, 8 kvar/);
+  await page.waitForTimeout(800);
+  expect((await tussar()).length).toBe(8);
+  await page.screenshot({ path: 'test-results/regi-vassvaggen-gangen.png' });
   const logg = await O(() => window.__ORDSTAVEN.logg());
-  expect(logg.split('\n').filter((r) => r.includes('[hugga]')).length).toBe(5);
+  expect(logg.split('\n').filter((r) => r.includes('[hugga]') && r.includes('vass_tat_')).length).toBe(7);
 });
 
+test('leran i träskkanten (75.5): en pöl först när ungen är uppdragen, och ungen drar upp honom', async ({ page }) => {
+  test.setTimeout(120000);
+  const O = (f, a) => page.evaluate(f, a);
+  // steget efter ga_till unge (ungen är uppdragen)
+  const sc = kap2.scener.find((s) => s.id === 'k2s01_kanten');
+  const efter = sc.steg.findIndex((s) => s.typ === 'ga_till' && s.mal === 'unge') + 1;
+  await sparadI(page, 'kap-02', 'k2s01_kanten', efter, { rumstillstand: { trasket_kanten: 'oppen' } });
+  const l = await O(() => window.__ORDSTAVEN.ruta('leran'));
+  expect(l).toBeTruthy();
+  for (let i = 0; i < 80 && !(await O(() => window.__ORDSTAVEN.logg())).includes('[zon] trasket_kanten/leran'); i++) {
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    await O(([x, y]) => window.__ORDSTAVEN.gaMot(x, y), [l.x + l.b / 2, l.y + l.h / 2]);
+    await page.waitForTimeout(200);
+  }
+  await expect.poll(() => O(() => window.__ORDSTAVEN.hjalteFast()), { timeout: 5000 }).toBeGreaterThan(4);
+  await page.screenshot({ path: 'test-results/regi-leran-kanten.png' });
+  await expect.poll(() => O(() => window.__ORDSTAVEN.hjalteFast()), { timeout: 10000 }).toBe(0);
+});
+
+test('leran i träskkanten (75.5): före ungen är uppdragen är leran ingen pöl', async ({ page }) => {
+  test.setTimeout(90000);
+  const O = (f, a) => page.evaluate(f, a);
+  const sc = kap2.scener.find((s) => s.id === 'k2s01_kanten');
+  const gaTillUngen = sc.steg.findIndex((s) => s.typ === 'ga_till' && s.mal === 'unge');
+  await sparadI(page, 'kap-02', 'k2s01_kanten', gaTillUngen, { rumstillstand: { trasket_kanten: 'oppen' } });
+  const l = await O(() => window.__ORDSTAVEN.ruta('leran'));
+  for (let i = 0; i < 12; i++) { await O(([x, y]) => window.__ORDSTAVEN.gaMot(x, y), [l.x + l.b / 2, l.y + l.h / 2]); await page.waitForTimeout(250); }
+  expect(await O(() => window.__ORDSTAVEN.logg())).not.toContain('[zon] trasket_kanten/leran');
+});
+
+test('draken på taket (76.4): frivilligt efter FLYG, draken flyger ned till barnet, och vimpeln sitter på hjälmen', async ({ page }) => {
+  test.setTimeout(120000);
+  const O = (f, a) => page.evaluate(f, a);
+  await sparadI(page, 'kap-02', 'k2s07_hela_brevet');
+  await O(() => { const t = window.__ORDSTAVEN.tillstand(); t.spelare.hjalte.formler = [...new Set([...(t.spelare.hjalte.formler || []), 'FLYG'])]; });
+  const d = await O(() => window.__ORDSTAVEN.ruta('drake_tak'));
+  expect(d).toBeTruthy();
+  for (let i = 0; i < 80 && !(await page.locator('#plattan .formel-skriv').isVisible()); i++) {
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    await O(([x, y]) => window.__ORDSTAVEN.gaMot(x, y), [d.x + d.b / 2, d.y + d.h + 48]);
+    await page.waitForTimeout(300);
+    if (i % 3 === 2) await page.keyboard.press('Space');
+  }
+  await expect(page.locator('#plattan .formel-skriv')).toBeVisible();
+  await page.screenshot({ path: 'test-results/regi-draken-formel.png' });
+  await page.keyboard.type('FLYG'); await page.keyboard.press('Enter');
+  await vantaPaRegi(page, 'draken flyger ned till barnet');
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: 'test-results/regi-draken-nere.png' });
+  await expect.poll(() => O(() => window.__ORDSTAVEN.tillstand().spelare.hjalte.lager?.hjalmdekor), { timeout: 15000 }).toBe('drakvimpel');
+  await expect.poll(() => O(() => window.__ORDSTAVEN.rumsobjekt()), { timeout: 10000 }).not.toContain('drake_tak');
+});
+
+
+test('husen på torget (77.4): fyra dörrar, fel dörr öppnas aldrig, och vid den rosa dörren på det lilla huset kommer Tant Rosa ut', async ({ page }) => {
+  test.setTimeout(120000);
+  const O = (f, a) => page.evaluate(f, a);
+  const sc = kap2.scener.find((s) => s.id === 'k2s02_byn');
+  const steg = sc.steg.findIndex((s) => s.typ === 'pussel' && s.pussel_id === 'k2_husen');
+  await sparadI(page, 'kap-02', 'k2s02_byn', steg, { visade: { byn: ['fjader'] } });
+  for (let i = 0; i < 60 && !(await O(() => window.__ORDSTAVEN.variant())); i++) {
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    await page.waitForTimeout(250);
+  }
+  expect(await O(() => window.__ORDSTAVEN.variant())).toBe('L3');
+  for (let i = 0; i < 10; i++) { for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {}); await page.waitForTimeout(150); }
+  const ids = await O(() => window.__ORDSTAVEN.rumsobjekt());
+  for (const d of ['dorr_rosa', 'dorr_litet_bla', 'dorr_stort_rosa', 'dorr_stort_bla']) expect(ids).toContain(d);
+  expect(ids).not.toContain('tant_rosa'); // hon syns först när dörren går upp (63.6)
+  const genom = async (id) => {
+    for (let i = 0; i < 20; i++) {
+      for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+      await O((id) => { const o = window.__ORDSTAVEN.ruta(id); window.__ORDSTAVEN.gaMot(o.x + o.b / 2, o.y + o.h / 2); }, id);
+      await page.waitForTimeout(300);
+      if ((await O(() => window.__ORDSTAVEN.logg())).includes(`[val] k2_husen: ${id === 'dorr_rosa' ? 'litet_rosa' : id === 'dorr_stort_bla' ? 'stort_bla' : ''}`)) return;
+    }
+  };
+  await page.screenshot({ path: 'test-results/regi-husen.png' });
+  await genom('dorr_stort_bla');
+  await expect.poll(() => O(() => window.__ORDSTAVEN.logg()), { timeout: 10000 }).toMatch(/k2_husen: stort_bla/);
+  await genom('dorr_rosa');
+  await expect.poll(() => O(() => window.__ORDSTAVEN.rumsobjekt()), { timeout: 15000 }).toContain('tant_rosa');
+  await page.waitForTimeout(600);
+  await page.screenshot({ path: 'test-results/regi-husen-tant-rosa.png' });
+});

@@ -974,3 +974,12 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Hugget (B12):** `anvand(…, { vidMiss })` svingar i luften med ljudet `sus` när han trycker utan att stå vid något, `Rum.vandMot(id)` vänder honom mot det han hugger, och `Rum.traffpaus(ms)` stoppar klockan och tweens ca 60 ms vid träffen. Tonhöjden växlar mellan tre hugg.
 - **Budgeten (76.3):** `verktyg/innehall/budget.js` (`budgetVarningar`, `rattArUdda`, `talareI`), anropad från kontrollen för kapitel från index 2 i `aventyr.json`.
 
+## 94. Kapitel 2 efter beslut 75–77: tussarna, lerorna, läsvalen, draken, husen, gläntan och SALDO (0.62.0, Teknik 37 och 39)
+- **Fältet av tussar** (`falt` på ett P26, 75.3): `Rum.delaFalt` delar föremålet i ett rutnät, och `skapaKrukor` håller innehållet på sin plats. När gången (`klar_nar`) är huggen tävlar knappen med en vakt som ser om han har gått förbi fältet: då avbryts väntan, och tussarna som står kvar sparas i `Rum.kvarDelar` och ritas i stället för det hela föremålet tills rummet byts, också i ett annat tillstånd.
+- **`efter`** (zoner och frivilligt) prövas av `efterUppfyllt` i spel.js med samma regel som `pusselForbi`: ett pussel som är gjort, eller ett steg i en scen som berättelsen har gått förbi. Lerorna är `golv` i kartan, så att han kan gå i dem.
+- **Flera rätta svar** (`flera_ratta`): `skapaValj` ger det valda alternativets `vid_valj` som reaktion, och spel.js spelar alternativets `effekt` som regi. `lys_ord` på ett P1 tänder ordet i texten och på kortet innan läsplattan stängs.
+- **Ett frivilligt pussel med en formel han redan kan** (draken) gör inte föremålet borta eller bytt: `iFrivilligt` hindrar formelregeln i `innehallNu` och `byttaNu`, och `forsvinner_efter` gäller när det frivilliga är gjort.
+- **Husen på torget** är utgångar utan `till`. Läsvalet i världen (`i_rummet`) väljer dörren när han går in i den, som dörrarna i prologen.
+- **Gläntan** (77.8) har Stils höjdkit: rutsetet har skugga, trappa och stege, och trappan står i kullens framsida i rutlagret. Kartan är skriven med `skog.py` efter Stils ändring, men bara gläntans rutlager och trappan är bytta, så att föremålens id står kvar.
+- **SALDO** (77.2): `verktyg/ordlista/saldo.py` gör om `saldom.xml` till en prefixkodad lista (`assets/ordlista/ord.txt`) och spärrade former (`sparr.txt`). `src/grans/ordlista.js` hämtar dem när ett skrivpussel öppnas, och `skrivord.avkodaOrdlista` packar upp dem. Väntan på listan är högst 2,5 s, och utan den avgör spelets egna ordlistor. Service workern förcachar .txt.
+

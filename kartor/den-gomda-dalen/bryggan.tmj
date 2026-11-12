@@ -173,6 +173,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"

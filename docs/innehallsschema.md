@@ -1,6 +1,15 @@
 # Innehållsschema – kapitel i format 2
 
-Version 2.42 (2026-11-11). Ägs av teknikspåret.
+Version 2.43 (2026-11-12). Ägs av teknikspåret.
+2.43: **Kapitel 2 efter beslut 75–77** (Teknik 37 och 39). Nya fält, alla är tillägg:
+- **`falt`** på ett P26 (`{ rader, per_rad, klar_nar }`, vassväggen 75.3): föremålet som visar pusslet delas i ett fält av tussar, `rader` från väster till öster med `per_rad` i varje från norr till söder, i samma ordning som `innehall`. Innehållet ligger där det står (det blandas inte). Pusslet är löst när alla tussar med posten `klar_nar` har fallit och han går förbi fältet. Fram till dess kan han hugga fler, och en tuss med `bar` ger ett bär. Tussarna som står kvar står kvar tills han lämnar rummet;
+- **`efter`** på en zon och på ett frivilligt föremål (`{ pussel }` eller `{ scen, <stegtyp>: <mål> }`, t.ex. `{ scen: "k2s01_kanten", ga_till: "unge" }`): det gäller först när pusslet är gjort, eller när berättelsen har gått förbi det steget i scenen;
+- **`kraver.eller_niva`**: varianten gäller också när spelarens nivå redan är minst den;
+- **`flera_ratta`** på ett P1 (77.3, stocken): flera alternativ är rätt, och det första han väljer löser pusslet med alternativets `vid_valj`. Ett rätt alternativ kan ha **`effekt`** (en regi, som en formels). Utan fältet ska exakt ett alternativ vara rätt, och kontrollen säger fel annars;
+- **`lys_ord`** på ett P1 (k2_halvan): ordet lyser i guld i texten och på kortet när han har valt rätt;
+- rummets tillstånd kan heta vad som helst (`morgon` i byn, 76.4), och `ge_sak` med sorten `hjalmdekor` gäller också drakvimpeln.
+
+**SALDO** (77.2): i ett skrivpussel med tangentbord är ett ord ur SALDO (`assets/ordlista/ord.txt`, verktyg/ordlista/saldo.py) ett riktigt ord, aldrig "pff". Ett ord på spärrlistan (`verktyg/ordlista/sparrlista.txt`) är ett vanligt försök med en neutral reaktion, och det skrivs inte i loggen. Spelets ordlistor styr fortfarande bara det han läser.
 2.42: **Skrivpusslen kör aldrig fast** (Teknik 39, beslut 76.2). Formatet är oförändrat, men motorn gör så här med en P11 med tangentbord:
 - **varje försök som inte löser pusslet tar ett steg i trappan**, också ett rimligt eller vanligt ord (ledbilden efter första försöket, förebilden efter två med `andra_felet`). Bara "nästan" och det som inte är ett ord räknas som fel för nivån;
 - **knuffen kommer igen** efter samma tid och klättrar: ledbilden, sedan förebilden, och sedan blinkar förebildens första bokstav;

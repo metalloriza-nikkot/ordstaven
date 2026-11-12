@@ -62,12 +62,13 @@ RUMMEN = {
         'objekt': [
             utg('stig_skogen', 0, 84, 40, 24, **STIG, riktning='vanster'),
             punkt('start', 48, 100),
-            # 71.6 och 72.3: en vägg av tät vass tvärs över hela rummet strax efter skogen. Efter SVÄRD hugger han sig
-            # igenom själv (k2_vassvaggen): väggen delas i lika många lager som pusslet har (fem), från väster till
-            # öster, och den västra står närmast honom. Den syns i tillståndet vass och är borta i oppen.
-            sak('vass_tat', 70, 0, 50, 192, sida='vanster', delas='hela', visar='k2_vassvaggen'),
+            # 71.6, 72.3 och 75.3: en vägg av tät vass tvärs över hela rummet strax efter skogen. Efter SVÄRD hugger
+            # han sig igenom själv (k2_vassvaggen): väggen delas i ett fält av tussar efter pusslets falt (tre rader
+            # från väster till öster, fem tussar i varje). Den syns i tillståndet vass och är borta i oppen.
+            sak('vass_tat', 72, 0, 48, 192, sida='vanster', delas='hela', visar='k2_vassvaggen'),
             sak('skylt_lera', 132, 60, 14, 14, sida='alla'),
-            sak('leran', 150, 104, 80, 40, sida='alla'),
+            # 75.5: leran går att gå i, och när ungen är uppdragen är den en pöl (rummets zon)
+            sak('leran', 150, 104, 80, 40, sida='alla', golv=True),
             sak('stubbe_trask', 36, 150, 20, 14, sida='alla'),
             sak('trollslanda', 276, 44, 12, 10, sida='alla'),
             # 72.10: en fågel i vassen vid vattnet och en groda vid stranden
@@ -88,12 +89,17 @@ RUMMEN = {
             punkt('start', 48, 296),
             # pålhusen i NV, och raden av hus längs norra kanten som bara öppnar sig vid stigarna
             vagg(0, 0, 330, 40), vagg(24, 64, 64, 40), liv('fagel', 48, 52, 12, 12), vagg(128, 64, 72, 48), vagg(40, 136, 56, 40), vagg(208, 128, 64, 40),
-            vagg(360, 0, 136, 40), vagg(496, 0, 56, 40), vagg(580, 0, 60, 40), vagg(600, 40, 40, 60),
+            # 77.4: torgets fyra hus, korsade två och två: i norr Tant Rosas lilla hus med rosa dörr och ett stort
+            # med blå dörr, i söder ett stort med rosa dörr och ett litet med blå. Husets storlek är väggens storlek
+            vagg(360, 0, 56, 40), vagg(416, 0, 80, 56), vagg(496, 0, 56, 40), vagg(580, 0, 60, 40), vagg(600, 40, 40, 60),
+            vagg(368, 136, 72, 56), vagg(452, 152, 48, 40),
             # vattnet längs stranden i söder och öster
             vagg(0, 352, 520, 32, vatten=True), vagg(604, 124, 36, 176, vatten=True),
             figur('fiskaren', 88, 316, sida='alla'),
             figur('tvatterskan', 232, 236, sida='alla'),
             figur('barnet_drake', 420, 252, sida='alla'),
+            # 76.4: barnets drake sitter fast på taket ovanför det, och FLYG tar ned den (frivilligt)
+            vagg(392, 200, 64, 32), sak('drake_tak', 414, 192, 20, 16, sida='under', rackvidd=56, forsvinner_efter='k2_draken'),
             sak('fjader', 140, 290, 10, 10, sida='alla'),
             sak('udden', 604, 362, 30, 14),  # uddens spets, bortom lägerelden
             sak('lagereld', 572, 326, 20, 16, sida='alla'),
@@ -103,9 +109,12 @@ RUMMEN = {
             # 71.6: lyktor på pinnar längs stigen från torget ned till udden, släckta tills LJUS tänder dem
             sak('lyktor_udden', 558, 136, 8, 172, golv=True),
             # torget
-            utg('dorr_rosa', 404, 24, 24, 16, riktning='upp', sida='under', till='tant_rosas_hus'),
-            sak('brevram', 436, 22, 14, 12, sida='under'),
-            figur('tant_rosa', 464, 42, sida='alla', talare='tant_rosa'),
+            utg('dorr_rosa', 376, 24, 24, 16, riktning='upp', sida='under', till='tant_rosas_hus'),
+            sak('brevram', 401, 22, 14, 12, sida='under'),
+            utg('dorr_stort_bla', 444, 40, 24, 16, riktning='upp', sida='under'),
+            utg('dorr_stort_rosa', 392, 136, 24, 16, riktning='ned', sida='over'),
+            utg('dorr_litet_bla', 464, 152, 24, 16, riktning='ned', sida='over'),
+            figur('tant_rosa', 404, 42, sida='alla', talare='tant_rosa'),
             sak('brunnen', 488, 100, 28, 24, sida='alla'),
             utg('stig_vassen', 332, 0, 28, 40, **STIG, riktning='upp', till='vassen'),
             utg('stig_dammen', 552, 0, 28, 40, **STIG, riktning='upp', till='dammen'),
@@ -130,7 +139,7 @@ RUMMEN = {
             sak('brev_halva_1', 256, 92, 10, 10, sida='alla'),
             sak('fisk_hopp', 180, 124, 14, 10, sida='alla'),
             # 72.7: leran vid bryggans landände, och Farfars skylt GÅ INTE I LERAN! (han läser den utan val)
-            sak('leran_brygga', 80, 116, 36, 24, sida='alla'),
+            sak('leran_brygga', 80, 116, 36, 24, sida='alla', golv=True),  # 75.5: en pöl som i vassen
             sak('skylt_lera_brygga', 96, 62, 14, 14, sida='alla'),
             liv('fagel', 214, 62, 12, 12),  # en mås på en påle
         ],

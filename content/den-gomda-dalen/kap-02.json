@@ -16,8 +16,8 @@
  },
  "meta": {
   "namn": "Träsket",
-  "version": "0.6.1",
-  "datum": "2026-11-11",
+  "version": "0.7.1",
+  "datum": "2026-11-12",
   "agare": "Innehåll",
   "kalla": "Manus 17-kapitel2-manus.md v0.4 (beslut 60–64). Ny fil.",
   "teknik": "Förslag från Innehåll (2026-11-08), byggt på Tekniks svar 26 och beslut 64.2. Fält som kontrollen inte känner än: P11 skriv, godtas, tand, rimliga, vanligt_svar och nastan.replik (Teknik 26). Steget nav med grenar (scen, mal, bild för ringen på lappen), mellan_grenar som steg (64.2) och knuff. Navets sparpunkt i mellan_grenar slutar pass 2, och det som kommer efter den räknas som pass 3 (var_var_vi pass 3 och passens tider). Grenarnas scener står som pass 2, eftersom ordningen är fri. {ord:k2_over} = ordet han skrev i k2_over (64.2), i k2s10 och i stämpeln för ELDEN. kraver på en variant (k2_tavlorna L4 bara om k2_grodan är löst i L4), och villkor gren_kvar på en replik i var_var_vi pass 3. Med villkoret har lang fyra repliker, men han hör bara tre. ristas: false på en formel som inte ska ristas in (BRO, STEGE, REP och FLOTTE i k2_over, REP i k2_bubblan). oppna_lasplatta med skylt i stället för pussel_id, och lys_ord (k2s04: brevets halva läses först med las_skylt, sedan visas den igen med INTE i guld). redan_last: 1 på k2_tavlorna (första raden grå med en bock, 63.6). ga_till unge: ungen i leran är målet (k2s01). bara över två rum: halvan bärs från bryggan och vassen till brevram i byn (k2s04 och k2s05). Medan bara pågår i vassen är rummets utgångar stängda, och målet glimtar (64.2). lockar på den frivilliga scenen k2s06 (58.5): draget vid stig_dammen, igen varje gång han går förbi tills han har varit där, aldrig under en replik eller ett läsval, och grodorna landar aldrig på torget under k2_skyltarna. Läsvalet med skyltarna: alternativen är skyltar med en mening (ord) i rummet, och varianten har bara bild (skylt_baronen) eftersom frågan är instruktionen. Byborna (17, Byborna, och 63.9) står bara i rummets anteckning och i 17 (Byborna): fiskaren, tvatterskan och barnet_drake är figurer i byns innehåll. Säg hur deras områden, sysslor, vinkningen vid ett tryck och bubblorna (SUCK, FISK, OJ, HURRA, HEJ) ska stå i datan, så skriver jag det. Tillstånden i byn: rep (k2s02–k2s03 till lögnen), fri (efter lögnen), kvall (k2s10). Repen och skyltarna syns bara i rep. dorr_rosa är låst tills k2s07. Effekterna i formler (bro_over_vattnet, bubblan_foljer_staven …) är namn för gråboxen, och vid_ratt beskriver dem. Mellanscenerna har ingen bild än, så att testet av bilderna går igenom. Stil ritar dem i kedjans steg 4–5 (65.4), och då får de bild: luftskepp_river_brevet, brevram_tom, brevram_halva (en eller två halvor), brevram_hel och under_bryggan. Uppdragens bildkort är lånade tills Stil har ritat kapitlets egna (TRÄSKET, TANT ROSA, BREVET, TAVLORNA och ELDEN, och ringarna med bryggan och vassen, som står som bild på navets grenar). musik och ljud på reaktionerna (64.5–64.6) kommer när Teknik har sagt hur de står i datan (27). k2_bubblan är räddningen.",
@@ -26,7 +26,10 @@
   "teknik_v04": "Teknik 32 (0.54.0): forebild.efter_fel 2 och tacks nar_han_skriver skrivna som forebild.visas andra_felet (täck gäller alltid med tangentbordet), och hjalp_bild { efter_fel 1, bild bro } som ledbild tankebubbla_bro (schema 2.36). Regier som bild på sju mellanscener (69.1). Ingen text är ändrad.",
   "andrat_v05": "2026-11-10 (beslut 71 och 70.7): Farfar minns inte var han gömde biten, och Herr Skata snor brevet för sigillets skull. Halvan i vassen hittar han själv. Ungen jagar en bubbla ut på en stock (k2_stocken i stället för k2_bubblan, med alias). Tavlorna hänger högt. Byn tänder elden för hjälten. SVÄRD vid träskkanten (k2_svard) och LJUS på stigen till udden (k2_lyktorna). musik byn i byn och på bryggan. Fältnamnen är schemats (forebild.visas andra_felet, ledbild).",
   "andrat_v06": "2026-11-11 (beslut 72): ungen biter i vassen, och han hugger själv (k2_vassvaggen). VATTEN är rimligt vid vattnet. Stocken driver långt ut. Ledbild i alla skrivpussel. Baronen sitter i leran vid Farfars skylt under bryggan. En lerpöl i vassen (zoner, nytt fält), en häger, grodor och en stubbe med bär, och några få saker som lever i varje rum (26.3). Bos tack är en grodgrön dräkt (ge_sak sort drakt, nytt värde), och Tant Rosas ryggsäck är rosa.",
-  "andrat_v061": "2026-11-11 (beslut 73.3): syns_redan på mellanscenen där dräkten blir grodgrön."
+  "andrat_v061": "2026-11-11 (beslut 73.3): syns_redan på mellanscenen där dräkten blir grodgrön.",
+  "andrat_v07": "2026-11-11 (beslut 75 och 76): vassväggen som ett fält av tussar, lerorna i träskkanten och vid bryggan som pölen i vassen, LYFT godtas och fler rimliga ord, k2_stocken som läsval, bryggans läsval med INTE (k2_halvan), skyltarna i L4 och tavlorna i L4 också när nivån är L4, Farfars rader före vassen, brevet rivs i tre steg, byn i tillståndet morgon utan rep, pratet kortat, baronens kartbit, Farfars tidslinje, mamma vid elden och draken på taket (k2_draken, frivillig). Nya fält: falt i P26, efter på zoner och frivilligt, kraver.eller_niva, flera rätta alternativ med egen vid_valj i P1, och tillståndet morgon.",
+  "andrat_v071": "2026-11-12 (beslut 77.4): läsvalet k2_husen i pass 1. Fyra hus på torget (dorr_rosa, dorr_litet_bla, dorr_stort_rosa och dorr_stort_bla), Farfars mening på baksidan av hans lista, Tant Rosa ut genom rätt dörr, och tant_rosa och brevram dolda tills dess. HALLÅ!, ungen mot torget och KOM HIT! är strukna, och Herr Skata har redan brevet när luftskeppet kommer. Uppdraget TANT ROSA har steget HITTA HUSET.",
+  "teknik_77": "Teknik 2026-11-12 (beslut 77.3, schema 2.43): k2_stocken har flera_ratta, och de tre rätta alternativen har sin regi som effekt (samma som formlerna hade i 0.56.0). k2_halvan har lys_ord INTE, som oppna_lasplatta hade vid bryggan (vid_ratt: ordet INTE lyser i guld). Ingen text är ändrad."
  },
  "var_var_vi": [
   {
@@ -207,21 +210,64 @@
    "tillstand": [
     "vass",
     "oppen"
+   ],
+   "zoner": [
+    {
+     "id": "leran",
+     "efter": {
+      "scen": "k2s01_kanten",
+      "ga_till": "unge"
+     },
+     "steg": [
+      {
+       "typ": "mellanscen",
+       "beskrivning": "Hjälten kliver rakt ut i leran och sjunker ner till knäna.",
+       "bild": "hjalte_sjunker"
+      },
+      {
+       "typ": "ljud",
+       "id": "slurp",
+       "ljudord": "slurp"
+      },
+      {
+       "typ": "mellanscen",
+       "beskrivning": "Ungen biter tag i hjältens ärm och drar. Hjälten flyger upp, lerig till knäna, och ungen sträcker på sig och ser mycket stolt ut.",
+       "bild": "unge_drar_upp_hjalten"
+      },
+      {
+       "typ": "replik",
+       "talare": "berattare",
+       "text": "Nu var det {unge} som drog!",
+       "upplast": true
+      }
+     ],
+     "anteckning": "75.5: leran blir en pöl först när ungen är uppdragen (efter). Först räddar han ungen, och sedan räddar ungen honom om han inte lyssnade på skylten. Repliken spelar på \"Dra upp {unge}!\" och finns bara här. Vägen går runt pölen efter första gången (73.2)."
+    }
    ]
   },
   {
    "id": "byn",
    "namn": "Byn",
    "tillstand": [
+    "morgon",
     "rep",
     "fri",
     "kvall"
    ],
    "innehall": [
     "stig_kanten",
-    "tant_rosa",
+    {
+     "id": "tant_rosa",
+     "dold": true
+    },
     "dorr_rosa",
-    "brevram",
+    "dorr_litet_bla",
+    "dorr_stort_rosa",
+    "dorr_stort_bla",
+    {
+     "id": "brevram",
+     "dold": true
+    },
     "brunnen",
     {
      "id": "rep_vassen",
@@ -272,25 +318,56 @@
     "lagereld",
     "fiskaren",
     "tvatterskan",
-    "barnet_drake"
+    "barnet_drake",
+    "drake_tak"
    ],
    "bubblor": {
     "fiskaren": {
      "rep": "suck",
      "fri": "fisk",
-     "kvall": "hurra"
+     "kvall": "hurra",
+     "morgon": "suck"
     },
     "tvatterskan": {
      "rep": "oj",
      "fri": "hurra",
-     "kvall": "hurra"
+     "kvall": "hurra",
+     "morgon": "oj"
     },
     "barnet_drake": {
      "*": "hej"
     }
    },
-   "anteckning": "Navet, 2 × 2 skärmar (64.1). SV: in från bron (stig_kanten). Fiskarens nät och tvättstrecket på stranden. SO: ängen med barnet och draken, och udden med lägerelden. NV: pålhus. NO: TORGET, en skärm, med Tant Rosas hus (tant_rosa på trappan, dorr_rosa och brevram på dörren), brunnen mitt på torget och tre utgångar: stig_vassen och stig_dammen norrut (stig_dammen går förbi brunnen) och stig_bryggan österut. Bryggans början (brygga_fran_torget) syns från torget, gammal men hel. I tillståndet rep spärrar ett orange rep med en orange skylt var och en av de tre vägarna: rep_vassen över stig_vassen, rep_brunnen runt brunnen och över stig_dammen, och rep_bryggan över stig_bryggan. Repen ser likadana ut och spärrar lika mycket. Läsvalet ryms på torgets skärm. dorr_rosa är låst tills k2s07. Byborna (fiskaren, tvatterskan, barnet_drake) har sina områden i SV och SO, aldrig på torget (63.9). Se meta.teknik om byborna och tillstånden. 71.5: i tillståndet kvall står byborna på udden runt lagereld och jublar, och Tant Rosa sitter med. lyktor_udden är lyktor på pinnar längs stigen från torget till udden. De är släckta tills LJUS har tänt dem (71.6). Liv (26.3, 72.10): byborna räcker. Bara en fågel (fagel) på ett pålhustak i nordväst, långt från torget och byborna, så att högst två saker rör sig på samma skärm (golvet).",
-   "musik": "byn"
+   "anteckning": "Navet, 2 × 2 skärmar (64.1). SV: in från bron (stig_kanten). Fiskarens nät och tvättstrecket på stranden. SO: ängen med barnet och draken, och udden med lägerelden. NV: pålhus. NO: TORGET, en skärm, med fyra hus (77.4), korsade två och två: Tant Rosas lilla hus med rosa dörr (dorr_rosa, med brevram på dörren och tant_rosa på trappan), ett litet hus med blå dörr (dorr_litet_bla), ett stort hus med rosa dörr (dorr_stort_rosa) och ett stort hus med blå dörr (dorr_stort_bla). Alla fyra dörrar syns på torgets skärm, och husen är lika i allt utom storlek och dörrens färg. tant_rosa och brevram är dolda tills k2_husen är löst, så att inget visar vilket hus som är rätt. brunnen mitt på torget och tre utgångar: stig_vassen och stig_dammen norrut (stig_dammen går förbi brunnen) och stig_bryggan österut. Bryggans början (brygga_fran_torget) syns från torget, gammal men hel. I tillståndet rep spärrar ett orange rep med en orange skylt var och en av de tre vägarna: rep_vassen över stig_vassen, rep_brunnen runt brunnen och över stig_dammen, och rep_bryggan över stig_bryggan. Repen ser likadana ut och spärrar lika mycket. Läsvalet ryms på torgets skärm. dorr_rosa är låst tills k2s07. Byborna (fiskaren, tvatterskan, barnet_drake) har sina områden i SV och SO, aldrig på torget (63.9). Se meta.teknik om byborna och tillstånden. 71.5: i tillståndet kvall står byborna på udden runt lagereld och jublar, och Tant Rosa sitter med. lyktor_udden är lyktor på pinnar längs stigen från torget till udden. De är släckta tills LJUS har tänt dem (71.6). Liv (26.3, 72.10): byborna räcker. Bara en fågel (fagel) på ett pålhustak i nordväst, långt från torget och byborna, så att högst två saker rör sig på samma skärm (golvet). 76.4: tillståndet morgon är byn i pass 1, utan rep och baronens skyltar. Draken sitter fast på ett tak vid ängen (drake_tak) tills han har hjälpt barnet med FLYG.",
+   "musik": "byn",
+   "frivilligt": [
+    {
+     "foremal": "drake_tak",
+     "efter": {
+      "pussel": "k2_flyg"
+     },
+     "steg": [
+      {
+       "typ": "mellanscen",
+       "beskrivning": "Barnets drake sitter fast på ett tak. Barnet drar i snöret, men draken sitter kvar."
+      },
+      {
+       "typ": "pussel",
+       "pussel_id": "k2_draken"
+      },
+      {
+       "typ": "mellanscen",
+       "beskrivning": "Barnet springer med draken och jublar. Sedan knyter det en liten vimpel från draksvansen på hjältens hjälm."
+      },
+      {
+       "typ": "ge_sak",
+       "sort": "hjalmdekor",
+       "id": "drakvimpel"
+      }
+     ],
+     "anteckning": "76.4 (B10): kapitlets frivilliga formel. Draken syns hela tiden, men fungerar först när han kan FLYG (efter). Barnet står under taket och tittar upp tills draken är loss, och springer sedan med den igen. Gåvan är en hjälmdekor, ett annat slag än Bos dräkt och Tant Rosas ryggsäck (72.11)."
+    }
+   ]
   },
   {
    "id": "bryggan",
@@ -335,7 +412,30 @@
     }
    ],
    "anteckning": "1 skärm. En lång brygga på pålar ut i vattnet, luftskeppet förtöjt vid änden. Baronen står i leran under bryggan, och det syns i sidovyn (mellanscenen under_bryggan). brev_halva_1 landar på bryggan efter sidovyn och är Farfars halva av brevet. Den läses som en skylt (las_skylt), så att scenen väntar tills han har läst. 72.7: vid bryggans landände är det lera (leran_brygga), och där står Farfars skylt (skylt_lera_brygga). Baronen sitter i leran under bryggan. Liv (26.3): en mås på en påle (fagel) som flyger när han kommer nära, och fisken som hoppar.",
-   "musik": "byn"
+   "musik": "byn",
+   "zoner": [
+    {
+     "id": "leran_brygga",
+     "steg": [
+      {
+       "typ": "mellanscen",
+       "beskrivning": "Hjälten kliver rakt ut i leran och sjunker ner till knäna.",
+       "bild": "hjalte_sjunker"
+      },
+      {
+       "typ": "ljud",
+       "id": "slurp",
+       "ljudord": "slurp"
+      },
+      {
+       "typ": "mellanscen",
+       "beskrivning": "Ungen biter tag i hjältens ärm och drar upp honom. Sedan fnissar den så mycket att den måste hålla för munnen.",
+       "bild": "unge_drar_upp_hjalten"
+      }
+     ],
+     "anteckning": "75.5: sitter baronen kvar i leran, sjunker hjälten bredvid honom, och baronen sitter kvar. Ungen fnissar, som när baronen inte hade läst skylten. Vägen går runt pölen efter första gången."
+    }
+   ]
   },
   {
    "id": "vassen",
@@ -389,7 +489,7 @@
        "bild": "unge_drar_upp_hjalten"
       }
      ],
-     "anteckning": "72.8: varje gång han går in i lerpölen. Omsorgen åt andra hållet, ca 3 s och ofarligt. Ingen text: skylten har redan sagt det. Den som läser skylten går runt och sparar tid (princip 1)."
+     "anteckning": "72.8: varje gång han går in i lerpölen. Omsorgen åt andra hållet, ca 3 s och ofarligt. Ingen text: skylten har redan sagt det. Den som läser skylten går runt och sparar tid (princip 1). 75.5: i vassen viftar ungen med svansen. I träskkanten säger berättaren något, och vid bryggan fnissar ungen, så att samma räddning inte blir enformig."
     }
    ]
   },
@@ -443,7 +543,32 @@
    "steg": [
     {
      "typ": "mellanscen",
-     "beskrivning": "Morgon. Bäckstigen tar slut vid en vägg av hög, tät vass. Ungen biter i vassen och drar, som den bet i lianerna i skogen, men den kommer inte igenom.",
+     "beskrivning": "Morgon vid träsket. Radion sprakar."
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "God morgon! Nu är ni vid träsket.",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Kartbit tre visar vägen till mamma.",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Den finns hos min vän i byn.",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Men stigen tar slut vid en vägg av hög, tät vass. Ungen biter i vassen och drar, som den bet i lianerna i skogen, men den kommer inte igenom.",
      "unge_till": "vass_tat",
      "bild": "unge_biter"
     },
@@ -464,41 +589,13 @@
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "God morgon! Nu är ni vid träsket.",
-     "upplast": true,
-     "via": "radio"
-    },
-    {
-     "typ": "replik",
-     "talare": "farfar",
-     "text": "Kartan visar vägen hem till mamma.",
-     "upplast": true,
-     "via": "radio"
-    },
-    {
-     "typ": "replik",
-     "talare": "farfar",
-     "text": "Bit tre finns hos min vän i byn.",
-     "upplast": true,
-     "via": "radio"
-    },
-    {
-     "typ": "replik",
-     "talare": "farfar",
-     "text": "Men läs min skylt först!",
+     "text": "Läs min skylt!",
      "upplast": true,
      "via": "radio"
     },
     {
      "typ": "las_skylt",
      "foremal": "skylt_lera"
-    },
-    {
-     "typ": "replik",
-     "talare": "farfar",
-     "text": "Skylten sa: gå inte i leran!",
-     "upplast": true,
-     "via": "radio"
     },
     {
      "typ": "mellanscen",
@@ -592,14 +689,14 @@
      "mal": "stig_byn"
     }
    ],
-   "anteckning": "71.6: kapitlet börjar med en formel han kan (SVÄRD), så att första stunden är en seger, och pass 1 blir mindre tunt. Sedan läsning (skylten), vila (leran) och ett nytt ord (vattnet). 72.3: ungen biter i vassen före SVÄRD, och han hugger sig igenom själv efteråt (k2_vassvaggen). Mellanscenen där vassen faller är struken, eftersom han gör det själv.",
+   "anteckning": "71.6: kapitlet börjar med en formel han kan (SVÄRD), så att första stunden är en seger, och pass 1 blir mindre tunt. Sedan läsning (skylten), vila (leran) och ett nytt ord (vattnet). 72.3: ungen biter i vassen före SVÄRD, och han hugger sig igenom själv efteråt (k2_vassvaggen). Mellanscenen där vassen faller är struken, eftersom han gör det själv. 76.4: Farfars rader och kapitlets fråga (var är bit tre?) kommer före vassen (B5), så att kapitlet inte börjar som en repris av liangången. \"Kartan visar vägen hem till mamma\" är ihopslaget med frågan, och Farfar läser inte upp skylten efter att barnet har läst den (B4).",
    "tillstand": "vass"
   },
   {
    "id": "k2s02_byn",
    "pass": 1,
    "rum": "byn",
-   "tillstand": "rep",
+   "tillstand": "morgon",
    "vid_omstart": {
     "talare": "farfar",
     "text": "Var var vi? Ni kom till byn.",
@@ -608,21 +705,34 @@
    "steg": [
     {
      "typ": "mellanscen",
-     "beskrivning": "Byn står på pålar vid vattnet. Det är tidig morgon och tyst. En fiskare sitter vid sitt nät på stranden och suckar."
-    },
-    {
-     "typ": "mellanscen",
-     "beskrivning": "Högt ovanför glider det orange luftskeppet. Herr Skata har fått syn på något som blänker: ett brev med Farfars sigill i mässing, med kompassrosen. Skatan nafsar tag i brevet, och baronen tar tag i andra änden. Brevet går sönder. Baronens halva stannar i hans hand, och luftskeppet sjunker mot bryggan. Den andra halvan fladdrar ner mot vassen och landar i vattnet. Herr Skata tappar en svartvit fjäder, som seglar ner till hjältens fötter.",
-     "ljud": [
-      "luftskepp",
-      "baron"
-     ],
-     "bild": "luftskepp_river_brevet"
+     "beskrivning": "Tidig morgon i byn. Högt ovanför glider det orange luftskeppet. Herr Skata flyger förbi med ett brev i näbben, och Farfars sigill i mässing blänker. Baronen lutar sig ut och tar tag i andra änden. Båda drar.",
+     "bild": "luftskepp_river_brevet",
+     "ljud": "luftskepp"
     },
     {
      "typ": "ljud",
-     "id": "fagel_late",
+     "id": "pappersus",
      "ljudord": "rits"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Brevet går mitt itu. Baronens halva stannar i hans hand, och luftskeppet sjunker mot bryggan.",
+     "ljud": "baron"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Den andra halvan fladdrar ner mot vassen och landar i vattnet. En svartvit fjäder från Herr Skata dalar ner."
+    },
+    {
+     "typ": "ljud",
+     "id": "plums",
+     "ljudord": "plask"
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "En halva till bryggan och en i vassen!",
+     "upplast": true
     },
     {
      "typ": "visa_foremal",
@@ -644,71 +754,47 @@
     },
     {
      "typ": "replik",
-     "talare": "tant_rosa",
-     "text": "Hallå!",
-     "upplast": true
-    },
-    {
-     "typ": "mellanscen",
-     "beskrivning": "Ungen spetsar öronen och springer mot torget, där en tant med stor stråhatt dammar sin trappa.",
-     "unge_till": "tant_rosa"
-    },
-    {
-     "typ": "prata",
-     "figur": "tant_rosa",
-     "kalla": {
-      "talare": "tant_rosa",
-      "text": "Kom hit!",
-      "upplast": true
-     }
-    },
-    {
-     "typ": "replik",
-     "talare": "tant_rosa",
-     "text": "Är du {hjalte}? Farfar har berättat om dig.",
-     "upplast": true
-    },
-    {
-     "typ": "replik",
-     "talare": "tant_rosa",
-     "text": "Jag är Tant Rosa, Farfars gamla vän.",
-     "upplast": true
-    },
-    {
-     "typ": "replik",
      "talare": "farfar",
-     "text": "Hej, Rosa! Det är jag!",
+     "text": "Det var mitt brev! Min vän i byn hade det.",
      "upplast": true,
      "via": "radio"
     },
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Jag gömde biten här för länge sen.",
+     "text": "Var bor hon? Det står på baksidan av min lista.",
      "upplast": true,
      "via": "radio"
+    },
+    {
+     "typ": "pussel",
+     "pussel_id": "k2_husen"
+    },
+    {
+     "typ": "visa_foremal",
+     "foremal": "tant_rosa"
+    },
+    {
+     "typ": "visa_foremal",
+     "foremal": "brevram"
+    },
+    {
+     "typ": "replik",
+     "talare": "tant_rosa",
+     "text": "Är du {hjalte}? Jag är Rosa, Farfars vän.",
+     "upplast": true
     },
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Men jag minns inte var!",
+     "text": "Hej, Rosa! Jag minns inte var biten är!",
      "upplast": true,
      "via": "radio"
     },
     {
      "typ": "replik",
      "talare": "tant_rosa",
-     "text": "Han skrev ett brev. Herr Skata rev det!",
-     "upplast": true
-    },
-    {
-     "typ": "mellanscen",
-     "beskrivning": "Närbild: brevramen på dörren, med två tomma platser i form av rivna halvor."
-    },
-    {
-     "typ": "replik",
-     "talare": "tant_rosa",
-     "text": "Hämta halvorna, så läser vi det hos mig!",
+     "text": "Han skrev var, för länge sen. Hämta halvorna!",
      "upplast": true
     },
     {
@@ -717,7 +803,7 @@
      "valfri": false
     }
    ],
-   "anteckning": "Mellanscenen visar var halvorna är innan någon säger det: baronens halva åker till bryggan med luftskeppet, och den andra landar i vattnet vid vassen (69.5). Herr Skata snor det som blänker: brevet har Farfars sigill i mässing med kompassrosen, samma som på bit 7 (71.1). Fjädern blir bilden för FLYG (63.8). Ingen dörr (69.4): Tant Rosa står ute och dammar vid sin trappa. Hon ropar, ungen springer dit, och hon frågar efter hjältens namn ({hjalte}). 71.1: Farfar minns platsen men inte stället (16, seriens regel), och därför finns brevet. Hans replik säger INTE en gång till. Pass 1 slutar här."
+   "anteckning": "76.4 (B6): brevet rivs i tre steg. Herr Skata nafsar och baronen drar, RITS, baronens halva åker till bryggan, och den andra landar i vattnet vid vassen, PLASK. Berättaren pekar ut båda halvorna, och sedan landar fjädern (75.4: nära hjälten). Byn är i tillståndet morgon, utan rep: baronen spärrar vägarna efter landningen, och repen syns först i pass 2. Herr Skata har redan tagit brevet från Tant Rosas trappa, och Tant Rosa syns inte förrän hon öppnar sin dörr (77.4). Farfars tidslinje (B9, 06 §2): han gömde biten hos Rosa för länge sen och skrev var i ett brev, så att han inte skulle glömma. Rosa fick inte öppna det förrän hans barnbarn kom. Nu minns han inte var, och brevet behövs. Högst tre repliker i rad (76.3). 77.4: pass 1 har ett läsval i världen (k2_husen). Farfar säger på radion att brevet var hans och att det står på baksidan av hans lista var vännen bor. Spelaren läser listan och knackar på ett av fyra hus. Vid rätt dörr kommer Tant Rosa ut, och brevramen syns på dörren. HALLÅ!, ungen som springer mot torget och KOM HIT! är strukna, och närbilden av brevramen också, eftersom ramen syns på dörren när den går upp (vid_ratt). Efter läsvalet är det fem passiva steg i rad med Tekniks räkning (visa_foremal räknas) och tre repliker."
   },
   {
    "id": "k2s03_torget",
@@ -732,7 +818,7 @@
    "steg": [
     {
      "typ": "mellanscen",
-     "beskrivning": "Hjälten står på torget. Tre orange rep med baronens tropikhjälm spärrar vägarna: stigen till vassen, stigen förbi brunnen och bryggan. Vid varje rep står en orange skylt."
+     "beskrivning": "Hjälten står på torget. Baronen har landat vid bryggan och spärrat vägarna med tre orange rep med sin tropikhjälm: stigen till vassen, stigen förbi brunnen och bryggan. Vid varje rep står en orange skylt."
     },
     {
      "typ": "replik",
@@ -851,52 +937,23 @@
      "foremal": "brev_halva_1"
     },
     {
-     "typ": "replik",
-     "talare": "berattare",
-     "text": "Ta brevet!",
-     "upplast": true
-    },
-    {
-     "typ": "las_skylt",
-     "foremal": "brev_halva_1"
-    },
-    {
-     "typ": "oppna_lasplatta",
-     "skylt": "brev_halva_1",
-     "lys_ord": "inte"
+     "typ": "pussel",
+     "pussel_id": "k2_halvan"
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Ordet INTE lyser stort i guld över bryggan. Baronen tittar upp och tappar spaden.",
-     "ljud": "glitter"
-    },
-    {
-     "typ": "replik",
-     "talare": "baronen",
-     "text": "Va?! Inte under bryggan?!",
-     "upplast": true
-    },
-    {
-     "typ": "mellanscen",
-     "beskrivning": "Herr Skata skrattar så att den ramlar av pålen.",
+     "beskrivning": "Baronen tittar upp och tappar spaden. Herr Skata skrattar så att den ramlar av pålen.",
      "ljud": "skata"
     },
     {
      "typ": "replik",
-     "talare": "farfar",
-     "text": "Ha! Det var mitt knep!",
-     "upplast": true,
-     "via": "radio"
-    },
-    {
-     "typ": "replik",
      "talare": "baronen",
-     "text": "Hmpf! Ha! En bit har jag redan!",
+     "text": "Va?! Inte där? Hmpf! En bit har jag redan!",
      "upplast": true
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Baronen håller upp en gammal kartbit med en kompassros i mässing. Sedan vill han klättra upp i luftskeppet, men han sitter fast. Herr Skata nafsar tag i hans hjälm och drar."
+     "beskrivning": "Baronen håller upp en gammal kartbit med en kompassros i mässing. Sedan vill han upp i luftskeppet, men han sitter fast. Herr Skata nafsar tag i hans hjälm och drar."
     },
     {
      "typ": "ljud",
@@ -910,22 +967,10 @@
     },
     {
      "typ": "replik",
-     "talare": "berattare",
-     "text": "Baronen har också en kartbit!",
-     "upplast": true
-    },
-    {
-     "typ": "replik",
      "talare": "farfar",
-     "text": "Den som inte läser noga hittar aldrig dalen.",
+     "text": "Han har min gamla bit! Ta halvan till Rosa!",
      "upplast": true,
      "via": "radio"
-    },
-    {
-     "typ": "replik",
-     "talare": "berattare",
-     "text": "Gå till Tant Rosa med halvan!",
-     "upplast": true
     },
     {
      "typ": "bara",
@@ -943,7 +988,7 @@
      "upplast": true
     }
    ],
-   "anteckning": "Spelarens regel (38.5) i spelet: baronen läser inget högt (63.6), så barnet läser raden först (las_skylt väntar tills han har läst). Sedan visas samma rad igen med INTE i guld (oppna_lasplatta med skylt och lys_ord, se meta.teknik), och det är därför baronen förstår. Farfars knep svarar på oron för baronens kartbit. Bit 7 planteras (06 §2). Halvan bärs till ramen i byn och sätts dit direkt (63.7): bara går här från bryggan till byn. Bilden brevram_halva är ramen med en eller två halvor, efter hur många som sitter där. 72.7: baronen står i lera, inte i vatten, och det blir ett skämt med INTE. Farfars skylt GÅ INTE I LERAN! står vid bryggans landände, och spelaren läser den en gång till utan val. Baronen har inte läst den heller (spelarens regel, 38.5): han sitter fast, och Herr Skata drar upp honom i hjälmen."
+   "anteckning": "Spelarens regel (38.5) i spelet: baronen läser inget högt (63.6), så barnet läser raden först (las_skylt väntar tills han har läst). Sedan visas samma rad igen med INTE i guld (oppna_lasplatta med skylt och lys_ord, se meta.teknik), och det är därför baronen förstår. Farfars knep svarar på oron för baronens kartbit. Bit 7 planteras (06 §2). Halvan bärs till ramen i byn och sätts dit direkt (63.7): bara går här från bryggan till byn. Bilden brevram_halva är ramen med en eller två halvor, efter hur många som sitter där. 72.7: baronen står i lera, inte i vatten, och det blir ett skämt med INTE. Farfars skylt GÅ INTE I LERAN! står vid bryggans landände, och spelaren läser den en gång till utan val. Baronen har inte läst den heller (spelarens regel, 38.5): han sitter fast, och Herr Skata drar upp honom i hjälmen. 76.4 (B2, B3, B8): bryggan har ett läsval (k2_halvan), och spelaren väljer den mening som står på Farfars halva. Fem repliker är strukna (ta brevet, Farfars knep, baronen har också en kartbit, den som inte läser noga, och gå till Tant Rosa), och baronens två repliker är en. Farfar känner igen baronens bit på radion. Svaret på hur baronen fick den kommer i kapitel 3 (72.9). Högst fem passiva steg i rad (76.3)."
   },
   {
    "id": "k2s05_vassen",
@@ -992,8 +1037,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Ordet FLYG ristas in längs staven, under SVÄRD. Guldet glimmar.",
-     "bild": "stav_ristas"
+     "beskrivning": "Brevet lyfter ur vattnet och flyger lätt som en fjäder till hjältens hand. Det är blött, och bokstäverna är suddiga. Ordet FLYG ristas in längs staven, under SVÄRD. Guldet glimmar.",
+     "bild": "halvan_flyger_till_handen"
     },
     {
      "typ": "replik",
@@ -1003,12 +1048,7 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Brevet lyfter ur vattnet och flyger lätt som en fjäder till hjältens hand. Det är blött, och bokstäverna är suddiga.",
-     "bild": "halvan_flyger_till_handen"
-    },
-    {
-     "typ": "mellanscen",
-     "beskrivning": "Ungen nafsar efter bubblorna. En stor bubbla svävar ut över vattnet. Ungen tar sats och gör ett jättehopp efter den, längre än den någonsin har hoppat, rakt upp på en stock i strandkanten. Bubblan spricker, och stocken glider långt ut på vattnet, mycket längre än ungen kan hoppa.",
+     "beskrivning": "Ungen nafsar efter bubblorna. En stor bubbla svävar ut över vattnet. Ungen tar sats och gör ett jättehopp efter den, längre än den någonsin har hoppat, rakt upp på en stock i strandkanten.",
      "bild": "unge_hoppar_pa_stocken"
     },
     {
@@ -1018,17 +1058,13 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Ungen sitter på stocken och piper. Den tittar mot land, långt bort, och skakar på huvudet. Sedan tittar den på hjälten.",
+     "beskrivning": "Stocken glider långt ut, mycket längre än ungen kan hoppa, och stannar. Ungen sätter sig tryggt mitt på stocken. Den tittar mot land och skakar på huvudet. Sedan tittar den på hjälten.",
      "bild": "unge_piper_pa_stocken"
-    },
-    {
-     "typ": "musik",
-     "slinga": "raddning"
     },
     {
      "typ": "replik",
      "talare": "berattare",
-     "text": "Vilket hopp! Men nu driver {unge} ut!",
+     "text": "Vilket hopp! Hur kommer {unge} i land?",
      "upplast": true
     },
     {
@@ -1045,10 +1081,6 @@
      "talare": "berattare",
      "text": "{unge} är i land igen!",
      "upplast": true
-    },
-    {
-     "typ": "musik",
-     "slinga": "skogen"
     },
     {
      "typ": "replik",
@@ -1072,7 +1104,7 @@
      "upplast": true
     }
    ],
-   "anteckning": "71.2: han hittar halvan själv. Molnet säger bara HITTA BREVETS HALVA!, och ingen mellanscen visar den innan han har gått nära. Knuffen efter 15 s är som vanligt (ungen springer mot halvan). Att leta är vila. Sedan fjädern och FLYG (69.5). 71.3: ungen jagar bubblorna, som har synts sedan han kom in, och hoppar efter en stor bubbla upp på en stock, som glider ut. Staven verkar på stocken, aldrig på ungen (16). FLYG, REP, BRO eller STEGE tar den i land, och inget följer honom. Ungens nya förmåga i kapitel 2 är att hoppa, och den föds i jättehoppet efter bubblan (06 §6). Den lär sig simma i kapitel 3 vid floden: SIMMA här får \"INTE ÄN!\", och ungen gör simtag vid kartan (k2s09). 72.5: ungen hoppar efter bubblorna och nafsar i luften redan när han kommer in (regi). Stocken driver långt ut, så att det syns att ungen inte kan hoppa tillbaka. Jättehoppet står kvar, eftersom hoppa föds där."
+   "anteckning": "71.2: han hittar halvan själv. Molnet säger bara HITTA BREVETS HALVA!, och ingen mellanscen visar den innan han har gått nära. Knuffen efter 15 s är som vanligt (ungen springer mot halvan). Att leta är vila. Sedan fjädern och FLYG (69.5). 71.3: ungen jagar bubblorna, som har synts sedan han kom in, och hoppar efter en stor bubbla upp på en stock, som glider ut. Staven verkar på stocken, aldrig på ungen (16). FLYG, REP, BRO eller STEGE tar den i land, och inget följer honom. Ungens nya förmåga i kapitel 2 är att hoppa, och den föds i jättehoppet efter bubblan (06 §6). Den lär sig simma i kapitel 3 vid floden: SIMMA här får \"INTE ÄN!\", och ungen gör simtag vid kartan (k2s09). 72.5: ungen hoppar efter bubblorna och nafsar i luften redan när han kommer in (regi). Stocken driver långt ut, så att det syns att ungen inte kan hoppa tillbaka. Jättehoppet står kvar, eftersom hoppa föds där. 76.2 (A7, A9): räddningen är ett läsval, så vassen har ett läsval och ett skrivpussel. Stocken stannar, ungen sitter tryggt, och räddningsmusiken är borta, så att inget känns som tidspress. Brevet som flyger och ristningen är en mellanscen, så att det aldrig blir fler än fem passiva steg i rad (76.3)."
   },
   {
    "id": "k2s06_dammen",
@@ -1205,7 +1237,7 @@
     {
      "typ": "replik",
      "talare": "tant_rosa",
-     "text": "Här är brevet. Läs det!",
+     "text": "Jag har aldrig läst det. Läs du!",
      "upplast": true
     },
     {
@@ -1237,13 +1269,7 @@
     {
      "typ": "replik",
      "talare": "tant_rosa",
-     "text": "Den hänger för högt. Jag når inte!",
-     "upplast": true
-    },
-    {
-     "typ": "replik",
-     "talare": "berattare",
-     "text": "Lyft den med staven!",
+     "text": "Jag når inte ens med min långa vippa!",
      "upplast": true
     },
     {
@@ -1269,7 +1295,7 @@
      "mal": "kartbit_3"
     }
    ],
-   "anteckning": "69.9: Tant Rosa räcker fram brevet, hjälten tar det själv och läser det på läsplattan. Sedan ligger det i ryggsäcken, så att knuffen och lappknappen kan öppna det igen. \"Fyrtio år\" kommer efter rätt tavla, som poäng: hon har dammat den tavlan i fyrtio år utan att titta bakom den. INTE avgör här i L4, bara om han har löst grodan i L4 (63.6). FLYG en tredje gång, och tavlan svävar ner själv (63.8). 71.4: tavlorna hänger högt, med tydlig luft under, så att det syns att ingen når dem. Tant Rosa dammar med en lång vippa men kan inte lyfta den."
+   "anteckning": "69.9: Tant Rosa räcker fram brevet, hjälten tar det själv och läser det på läsplattan. Sedan ligger det i ryggsäcken, så att knuffen och lappknappen kan öppna det igen. \"Fyrtio år\" kommer efter rätt tavla, som poäng: hon har dammat den tavlan i fyrtio år utan att titta bakom den. INTE avgör här i L4, bara om han har löst grodan i L4 (63.6). FLYG en tredje gång, och tavlan svävar ner själv (63.8). 71.4: tavlorna hänger högt, med tydlig luft under, så att det syns att ingen når dem. Tant Rosa dammar med en lång vippa men kan inte lyfta den. 76.2 och 76.4: \"Lyft den med staven!\" är struken, och LYFT godtas. Tant Rosa har aldrig läst brevet, eftersom hon inte fick öppna det förrän hans barnbarn kom (B9). Hon når inte \"med min långa vippa\"."
   },
   {
    "id": "k2s09_kartbiten",
@@ -1301,12 +1327,6 @@
      "beskrivning": "Ungen sätter tassen på floden på kartan och gör simtag i luften."
     },
     {
-     "typ": "replik",
-     "talare": "tant_rosa",
-     "text": "Tack för att du kom. Ta den här!",
-     "upplast": true
-    },
-    {
      "typ": "ge_sak",
      "sort": "ryggsack",
      "id": "ryggsack_rosa"
@@ -1314,26 +1334,13 @@
     {
      "typ": "replik",
      "talare": "tant_rosa",
-     "text": "Jag flätade den av vass, med rosa band.",
-     "upplast": true
-    },
-    {
-     "typ": "replik",
-     "talare": "farfar",
-     "text": "Tack, Rosa. Du är en god vän.",
-     "upplast": true,
-     "via": "radio"
-    },
-    {
-     "typ": "replik",
-     "talare": "tant_rosa",
-     "text": "I kväll tänder byn elden för er!",
+     "text": "Tack! Jag flätade den av vass, med rosa band.",
      "upplast": true
     },
     {
      "typ": "replik",
      "talare": "tant_rosa",
-     "text": "Kom, vi går till udden!",
+     "text": "I kväll tänder byn elden. Kom till udden!",
      "upplast": true
     },
     {
@@ -1341,7 +1348,7 @@
      "mal": "dorr_ut"
     }
    ],
-   "anteckning": "71.5: elden är byns tack, inte en utkastning. Tant Rosa följer med ut, så hon säger inte hejdå här. Kartbit 3 visar vägen till floden (06 §2), och ungens simtag planterar att den lär sig simma i kapitel 3. 72.11: ryggsäcken är rosa, flätad av vass med rosa band. Det är Tant Rosas färg, och den syns på långt håll."
+   "anteckning": "71.5: elden är byns tack, inte en utkastning. Tant Rosa följer med ut, så hon säger inte hejdå här. Kartbit 3 visar vägen till floden (06 §2), och ungens simtag planterar att den lär sig simma i kapitel 3. 72.11: ryggsäcken är rosa, flätad av vass med rosa band. Det är Tant Rosas färg, och den syns på långt håll. 76.4 (B3): pratet kortas från sex repliker till tre. Tacket kommer med gåvan, och Farfars tack till Rosa är struket."
   },
   {
    "id": "k2s10_elden",
@@ -1394,14 +1401,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Fiskaren tänder elden, och byborna står runt den och jublar. Två månar speglar sig i träsket, en stor ljus och en liten blåaktig. Hjälten sätter sig, och ungen kryper intill.",
+     "beskrivning": "Fiskaren tänder elden, och byborna står runt den och jublar för hjälten. Två månar speglar sig i träsket, en stor ljus och en liten blåaktig. Hjälten sätter sig, och ungen kryper intill.",
      "bild": "elden_tands"
-    },
-    {
-     "typ": "replik",
-     "talare": "tant_rosa",
-     "text": "Du gav byn bryggan tillbaka. Tack!",
-     "upplast": true
     },
     {
      "typ": "replik",
@@ -1417,7 +1418,15 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Guldet i stavens inristningar lyser starkare. Ungen somnar mot hjälten."
+     "beskrivning": "Guldet i stavens inristningar lyser starkare. Ungen lyfter huvudet och tittar mot dalen bortom träsket. Långt borta hörs ett svagt rop."
+    },
+    {
+     "typ": "ljud",
+     "id": "mammas_rop"
+    },
+    {
+     "typ": "ljud",
+     "id": "unge_svarar"
     },
     {
      "typ": "replik",
@@ -1438,7 +1447,7 @@
      "valfri": false
     }
    ],
-   "anteckning": "71.5: byn tänder elden för hjälten, som avslöjade baronens lögn och gav byn bryggan tillbaka. Tant Rosa följer med, och byborna står runt elden och jublar. 71.6: LJUS tänder lyktorna längs stigen till udden. Det är en formel han har lärt sig i prologen, och berättelsen behöver den: det är mörkt. Lägerelden (35.6): hjälten sätter sig själv, och ungen somnar mot honom. ORDSMED ges i berättelsen (09 §3)."
+   "anteckning": "71.5: byn tänder elden för hjälten, som avslöjade baronens lögn och gav byn bryggan tillbaka. Tant Rosa följer med, och byborna står runt elden och jublar. 71.6: LJUS tänder lyktorna längs stigen till udden. Det är en formel han har lärt sig i prologen, och berättelsen behöver den: det är mörkt. Lägerelden (35.6): hjälten sätter sig själv, och ungen somnar mot honom. ORDSMED ges i berättelsen (09 §3). 76.4 (B7): mamma vid elden. Ungen tittar mot dalen och hör ett svagt rop, samma ljud som i slutet av kapitel 1, och svarar. Högst fem passiva steg i rad efter elden (76.3). Tant Rosas tack är struket (B3): byborna jublar för hjälten i mellanscenen."
   }
  ],
  "pussel": [
@@ -1490,6 +1499,15 @@
      "replik": {
       "talare": "berattare",
       "text": "Vassen lyser! Men den står kvar.",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "YXA",
+     "reaktion": "en yxa av guld dyker upp, men den är så tung att den dunsar i marken",
+     "replik": {
+      "talare": "berattare",
+      "text": "Bra ord! Men yxan är för tung.",
       "upplast": true
      }
     }
@@ -1556,7 +1574,7 @@
    "knuff": {
     "handling": "bilden i molnet glimtar, och ungen nafsar på vassen"
    },
-   "anteckning": "71.6: en formel han har lärt sig är ett verktyg resten av äventyret (brief §4, 08 §4). SVÄRD lärdes i kapitel 1 och kommer tillbaka här, där berättelsen behöver det: vassen stänger vägen ut ur skogen. Han skriver det själv på tangentbordet. Ledbilden efter första felet visar ett svärd i ett moln, aldrig ordet. Förebilden efter två fel (69.3). Felrepliken påminner om skogen och pekar inte på staven, eftersom ordet står där. SAX och KNIV är rimliga och för små, HUGG frågar med vad, och LJUS är en formel han kan som inte hjälper här (09 §5). 72.3: ungen biter i vassen och drar innan han skriver, som den bet i lianerna (en bild, inga ord). Sedan hugger han själv (k2_vassvaggen), och vassen faller först då."
+   "anteckning": "71.6: en formel han har lärt sig är ett verktyg resten av äventyret (brief §4, 08 §4). SVÄRD lärdes i kapitel 1 och kommer tillbaka här, där berättelsen behöver det: vassen stänger vägen ut ur skogen. Han skriver det själv på tangentbordet. Ledbilden efter första felet visar ett svärd i ett moln, aldrig ordet. Förebilden efter två fel (69.3). Felrepliken påminner om skogen och pekar inte på staven, eftersom ordet står där. SAX och KNIV är rimliga och för små, HUGG frågar med vad, och LJUS är en formel han kan som inte hjälper här (09 §5). 72.3: ungen biter i vassen och drar innan han skriver, som den bet i lianerna (en bild, inga ord). Sedan hugger han själv (k2_vassvaggen), och vassen faller först då. 76.2: YXA är rimligt, eftersom ett barn troligen skriver det här."
   },
   {
    "id": "k2_vassvaggen",
@@ -1569,22 +1587,37 @@
    },
    "innehall": [
     "tom",
+    "bar",
+    "gang",
+    "gang",
     "tom",
     "tom",
     "tom",
+    "gang",
+    "gang",
+    "bar",
+    "bar",
+    "tom",
+    "gang",
+    "gang",
     "tom"
    ],
    "vid_ratt": {
-    "handling": "den sista vassen faller, och träsket breder ut sig: vatten, vass och lite dimma. Ungen skuttar ut på stigen.",
+    "handling": "gången genom vassen är öppen, och träsket breder ut sig: vatten, vass och lite dimma. Ungen skuttar ut på stigen.",
     "fest": "liten",
     "ljud": "prassel",
     "syns_redan": true
    },
    "knuff": {
-    "handling": "ungen nosar mot vassen"
+    "handling": "ungen nosar mot vassen där stigen går"
    },
    "tillstand_efter": "oppen",
-   "anteckning": "72.3 (brief §4, formeln ger förmågan): efter SVÄRD hugger han sig själv igenom fem lager vass, med samma knapp som i liangången i kapitel 1. Varje hugg fäller ett lager. Inga missar och ingen tid. Rummet går till tillståndet oppen när det sista lagret har fallit."
+   "anteckning": "75.3: vassväggen är ett fält av 15 tussar, en ruta var, i tre rader tvärs över stigen (väster till öster, fem tussar i varje rad från norr till söder, i den ordningen i innehall). Varje hugg fäller den närmaste tussen inom handens räckvidd, åt det håll han står. Inga missar och ingen tid. Pusslet är löst, och rummet går till oppen, när alla tussar som heter gang har fallit: en gång genom fältet, sex hugg (falt.klar_nar). Resten är frivilligt, och tre tussar har ett bär under sig (bar), som gräset i Zelda. Huggen växlar som i liangången. Den som hugger allt är klar på ca 20 s. Varför inte hugg allt: den sista tussen är svår att hitta för ett barn, och då blir leken en syssla. Uppdragets steg HUGG VASSEN är klart när gången är öppen.",
+   "falt": {
+    "rader": 3,
+    "per_rad": 5,
+    "klar_nar": "gang"
+   }
   },
   {
    "id": "k2_over",
@@ -1704,6 +1737,101 @@
    "ledbild": "tankebubbla_bro"
   },
   {
+   "id": "k2_husen",
+   "typ": "P1_las_och_valj",
+   "avsandare": "farfar",
+   "papper": "anteckningspapper_kompassros",
+   "hjalp": "ett_ord",
+   "kan_oppnas_igen": true,
+   "i_rummet": true,
+   "varianter": {
+    "L3": {
+     "text": [
+      "Min vän bor i ett litet hus.",
+      "Dörren är rosa."
+     ],
+     "alternativ": [
+      {
+       "id": "litet_rosa",
+       "objekt": "dorr_rosa",
+       "bild": "hus_litet_rosa",
+       "ratt": true
+      },
+      {
+       "id": "litet_bla",
+       "objekt": "dorr_litet_bla",
+       "bild": "hus_litet_bla",
+       "vid_valj": {
+        "reaktion": "dörren förblir stängd, och någon knackar tillbaka från insidan. En hackspett tittar ut genom brevinkastet.",
+        "replik": {
+         "talare": "berattare",
+         "text": "Tock tock! Där bor en hackspett.",
+         "upplast": true
+        },
+        "ljud": [
+         "knack",
+         "hackspett"
+        ]
+       }
+      },
+      {
+       "id": "stort_rosa",
+       "objekt": "dorr_stort_rosa",
+       "bild": "hus_stort_rosa",
+       "vid_valj": {
+        "reaktion": "dörren förblir stängd, och någon nyser så att hela huset skakar och hjälmen hoppar på hjältens huvud",
+        "replik": {
+         "talare": "berattare",
+         "text": "Atjo! Där bor en jätte.",
+         "upplast": true
+        },
+        "ljud": [
+         "knack",
+         "nys"
+        ]
+       }
+      },
+      {
+       "id": "stort_bla",
+       "objekt": "dorr_stort_bla",
+       "bild": "hus_stort_bla",
+       "vid_valj": {
+        "reaktion": "dörren förblir stängd, och bakom den spelar någon trumpet, falskt. Ungen håller för öronen.",
+        "replik": {
+         "talare": "berattare",
+         "text": "Tut! Där övar någon trumpet.",
+         "upplast": true
+        },
+        "ljud": [
+         "knack",
+         "tut"
+        ]
+       }
+      }
+     ]
+    }
+   },
+   "vid_ratt": {
+    "handling": "han knackar på den rosa dörren, och den går upp. Ut på trappan kommer tanten med den stora stråhatten. På dörren sitter en tom brevram.",
+    "ljud": [
+     "knack",
+     "dorr"
+    ],
+    "fest": "liten"
+   },
+   "knuff": {
+    "handling": "Farfars lista glimtar"
+   },
+   "forenkla": {
+    "efter_fel": 2,
+    "andring": "en dörr han redan har knackat på får en blomkruka framför sig och går inte att knacka på igen"
+   },
+   "efter_3_fel": {
+    "handling": "ungen springer till den rosa dörren och skrapar på den"
+   },
+   "anteckning": "77.4: läsvalet i pass 1, i världen. Fyra hus på torget, korsade två och två (litet eller stort, rosa eller blå dörr), så att rätt hus aldrig är det enda udda (76.3). Lästexten står på baksidan av Farfars lista (samma papper som packlistan i prologen), på två rader så att ingen rad har fler än åtta ord, och listan kan öppnas igen. Han går till en dörr och knackar. Fel dörr öppnas aldrig, och skämtet hörs bakom dörren, som dörrarna i prologen. Den stora rosa dörren har en jätte: felet säger att huset var för stort. Bara L3, som gäller alla (närmaste lägre variant). INTE används inte här, eftersom INTE görs tryggt först vid bryggan. Tant Rosa och brevramen är dolda tills pusslet är löst, så att inget i rummet visar svaret (63.6)."
+  },
+  {
    "id": "k2_skyltarna",
    "typ": "P1_las_och_valj",
    "avsandare": "baronen",
@@ -1754,6 +1882,45 @@
        "ratt": true
       }
      ]
+    },
+    "L4": {
+     "bild": "skylt_baronen",
+     "alternativ": [
+      {
+       "id": "skylt_vassen",
+       "ord": "Vassen är inte låg.",
+       "objekt": "skylt_vassen",
+       "vid_valj": {
+        "reaktion": "vassen vajar i vinden bakom repet",
+        "replik": {
+         "talare": "berattare",
+         "text": "Vassen är hög. Den stämmer!",
+         "upplast": true
+        }
+       }
+      },
+      {
+       "id": "skylt_brunnen",
+       "ord": "Brunnen är inte torr.",
+       "objekt": "skylt_brunnen",
+       "vid_valj": {
+        "reaktion": "vattnet glittrar i brunnen, och en groda tittar upp",
+        "replik": {
+         "talare": "berattare",
+         "text": "Brunnen är full. Den stämmer!",
+         "upplast": true
+        },
+        "ljudord": "kvack",
+        "ljud": "kvack"
+       }
+      },
+      {
+       "id": "skylt_bryggan",
+       "ord": "Bryggan är inte hel.",
+       "objekt": "skylt_bryggan",
+       "ratt": true
+      }
+     ]
     }
    },
    "vid_ratt": {
@@ -1773,7 +1940,7 @@
     "efter_fel": 2,
     "andring": "ungen springer till bryggans skylt och nosar på den"
    },
-   "anteckning": "Hitta baronens lögn (08 P4) som ett vanligt läsval i rummet, där alternativen är skyltar med en mening var. Bara L3, två egenskaper per skylt, ingen negation (63.5). Lögnen står i den andra egenskapen: bryggan är gammal, som skylten säger, men inte sönder, så han måste läsa hela meningen. 64.1: läsvalet börjar när pass 2 börjar på torget, innan han har valt väg, och alla tre repen spärrar en väg han kan vilja ta (vassen, dammen förbi brunnen, bryggan). Felreaktionen säger det som är sant (63.5). En prövad skylt tonas ut och går inte att välja igen. Varianten L3 gäller också den som står på L4."
+   "anteckning": "Hitta baronens lögn (08 P4) som ett vanligt läsval i rummet, där alternativen är skyltar med en mening var. Bara L3, två egenskaper per skylt, ingen negation (63.5). Lögnen står i den andra egenskapen: bryggan är gammal, som skylten säger, men inte sönder, så han måste läsa hela meningen. 64.1: läsvalet börjar när pass 2 börjar på torget, innan han har valt väg, och alla tre repen spärrar en väg han kan vilja ta (vassen, dammen förbi brunnen, bryggan). Felreaktionen säger det som är sant (63.5). En prövad skylt tonas ut och går inte att välja igen. Varianten L3 gäller också den som står på L4. 76.4 (C2): L4 har en negation på varje skylt, och lögnen är att bryggan inte skulle vara hel. Felrepliken säger det som är sant om världen och läser inte upp skylten. Bryggan, brunnen och vassen syns från torget (granskning 5)."
   },
   {
    "id": "k2_flyg",
@@ -1847,6 +2014,24 @@
       "text": "Det är för långt att hoppa.",
       "upplast": true
      }
+    },
+    {
+     "ord": "HIT",
+     "reaktion": "brevet guppar närmare, men en våg tar det tillbaka",
+     "replik": {
+      "talare": "berattare",
+      "text": "Bra ord! Men brevet flyter kvar.",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "UPP",
+     "reaktion": "brevet hoppar upp ur vattnet och plaskar ner igen",
+     "replik": {
+      "talare": "berattare",
+      "text": "Bra ord! Men brevet flyter kvar.",
+      "upplast": true
+     }
     }
    ],
    "vanligt_svar": {
@@ -1881,114 +2066,85 @@
    "knuff": {
     "handling": "fjädern i molnet glimtar"
    },
-   "anteckning": "Ny formel utifrån en bild (08 §2, regel 1): Herr Skatas fjäder som svävar (63.8). Han har hittat halvan själv (71.2). Den flyter utom räckhåll (69.5), och FLYG får den att flyga till hans hand. FLYGER och FLYGA godtas, och staven ristar in FLYG (63.3). SVÄVA och SVÄVAR får nästan, men ingen bokstav (69.3). Förebilden kommer efter två fel och täcks när han skriver. Frågan är en uppmaning, så att svaret blir formeln. 72.6: ledbilden efter första felet är en fågel som flyger, aldrig ordet.",
+   "anteckning": "Ny formel utifrån en bild (08 §2, regel 1): Herr Skatas fjäder som svävar (63.8). Han har hittat halvan själv (71.2). Den flyter utom räckhåll (69.5), och FLYG får den att flyga till hans hand. FLYGER och FLYGA godtas, och staven ristar in FLYG (63.3). SVÄVA och SVÄVAR får nästan, men ingen bokstav (69.3). Förebilden kommer efter två fel och täcks när han skriver. Frågan är en uppmaning, så att svaret blir formeln. 72.6: ledbilden efter första felet är en fågel som flyger, aldrig ordet. 76.2: HIT och UPP är rimliga, eftersom ett barn troligen skriver det här.",
    "ledbild": "tankebubbla_fagel"
   },
   {
    "id": "k2_stocken",
-   "typ": "P11_formel",
-   "niva": "S3",
-   "skriv": "tangentbord",
-   "bild": "unge_pa_stocken",
-   "svar": "FLYG",
-   "formler": [
-    {
-     "ord": "FLYG",
-     "godtas": [
-      "FLYGER",
-      "FLYGA"
-     ],
-     "effekt": "stocken_flyger_till_stranden"
-    },
-    {
-     "ord": "REP",
-     "effekt": "rep_till_ungen",
-     "ristas": false
-    },
-    {
-     "ord": "BRO",
-     "effekt": "bro_till_stocken",
-     "ristas": false
-    },
-    {
-     "ord": "STEGE",
-     "effekt": "stege_till_stocken",
-     "ristas": false
-    }
-   ],
-   "rimliga": [
-    {
-     "ord": "SIMMA",
-     "reaktion": "ungen tittar på vattnet och skakar på huvudet",
-     "replik": {
-      "talare": "berattare",
-      "text": "{unge} kan inte simma. Inte än!",
-      "upplast": true
-     }
-    },
-    {
-     "ord": "HOPPA",
-     "reaktion": "ungen tittar mot stranden, långt bort, och skakar på huvudet",
-     "replik": {
-      "talare": "berattare",
-      "text": "Det är för långt att hoppa.",
-      "upplast": true
-     }
-    },
-    {
-     "ord": "BÅT",
-     "reaktion": "en pytteliten båt guppar fram, men ungen vågar inte kliva i",
-     "replik": {
-      "talare": "berattare",
-      "text": "En båt! Men den är för liten.",
-      "upplast": true
-     }
-    },
-    {
-     "ord": "FLOTTE",
-     "reaktion": "ungen klappar på stocken under sig",
-     "replik": {
-      "talare": "berattare",
-      "text": "Bra ord! Men {unge} sitter redan på en stock.",
-      "upplast": true
-     }
-    }
-   ],
-   "vanligt_svar": {
-    "talare": "berattare",
-    "text": "Bra ord! Men det hjälper inte här.",
-    "upplast": true
-   },
-   "nastan": [],
-   "forebild": {
-    "text": "FLYG",
-    "upplast": false,
-    "visas": "andra_felet"
-   },
+   "typ": "P1_las_och_valj",
+   "flera_ratta": true,
    "hjalp": "ett_ord",
    "instruktion": {
     "talare": "berattare",
-    "text": "Skriv ett ord som hjälper {unge}!",
+    "text": "Vilket ord hjälper {unge} i land?",
     "upplast": true
    },
+   "varianter": {
+    "L2": {
+     "bild": "unge_pa_stocken",
+     "alternativ": [
+      {
+       "id": "flyg",
+       "ord": "Flyg",
+       "ratt": true,
+       "vid_valj": {
+        "reaktion": "stocken lyfter ur vattnet och flyger lätt tillbaka till stranden med ungen på"
+       },
+       "effekt": "stocken_flyger_till_stranden"
+      },
+      {
+       "id": "rep",
+       "ord": "Rep",
+       "ratt": true,
+       "vid_valj": {
+        "reaktion": "ett rep susar ut från staven, ungen biter tag i det, och hjälten drar in stocken"
+       },
+       "effekt": "rep_till_ungen"
+      },
+      {
+       "id": "bro",
+       "ord": "Bro",
+       "ratt": true,
+       "vid_valj": {
+        "reaktion": "en bro av trä växer ut till stocken, och ungen springer i land"
+       },
+       "effekt": "bro_till_stocken"
+      },
+      {
+       "id": "ljus",
+       "ord": "Ljus",
+       "vid_valj": {
+        "reaktion": "stocken lyser en stund, men den ligger kvar ute på vattnet",
+        "replik": {
+         "talare": "berattare",
+         "text": "Stocken lyser! Men den ligger kvar.",
+         "upplast": true
+        }
+       }
+      },
+      {
+       "id": "svard",
+       "ord": "Svärd",
+       "vid_valj": {
+        "reaktion": "stavens ände blir ett svärd av guld en stund",
+        "replik": {
+         "talare": "berattare",
+         "text": "Svärdet skär bara växter.",
+         "upplast": true
+        }
+       }
+      }
+     ]
+    }
+   },
    "vid_ratt": {
-    "handling": "FLYG: stocken lyfter ur vattnet och flyger lätt tillbaka till stranden med ungen på. REP: ett rep susar ut från staven, ungen biter tag i det, och hjälten drar in stocken. BRO: en bro av trä växer ut till stocken, och ungen springer i land. STEGE: en lång stege lägger sig ut till stocken, och ungen balanserar i land.",
+    "handling": "ordet lyser på staven, och ungen kommer i land på det sätt han valde",
     "fest": "mellan"
    },
-   "vid_fel": {
-    "reaktion": "staven fräser, pff",
-    "replik": {
-     "talare": "berattare",
-     "text": "Pff! Vad gjorde du med brevet?",
-     "upplast": true
-    },
-    "ljud": "fras"
-   },
    "knuff": {
-    "handling": "bilden i molnet glimtar, och ungen piper"
+    "handling": "ungen piper och tittar på staven"
    },
-   "anteckning": "Räddningen (63.2, 71.3): ungen har jagat en bubbla upp på en stock, och han såg det hända. Han har just fått brevet att flyga med FLYG, och nu får stocken flyga. Staven verkar på stocken, aldrig på ungen (16). REP, BRO och STEGE fungerar också, eftersom de bar honom över vattnet vid träskkanten (verktygslådan, 08 §4). FLOTTE är rimligt: ungen sitter redan på en stock. Räddningen kan inte misslyckas, och stocken driver inte bort. Ingen bokstav ur svaret före förebilden (69.3): felrepliken påminner om brevet. SIMMA planterar kapitel 3. Hette k2_bubblan (alias). 72.5: stocken driver långt ut, mycket längre än ungens hopp, och ungen skakar på huvudet mot land. 72.6: ledbilden efter första felet är brevet som flög till hans hand, samma som felrepliken påminner om.",
-   "ledbild": "tankebubbla_brev_flyger"
+   "anteckning": "76.2 (A7): räddningen är ett läsval, inte ett skrivpussel. Han väljer bland stavens ord (LJUS, SVÄRD och FLYG) och REP och BRO, som bar honom över vattnet vid träskkanten. FLYG, REP och BRO räddar ungen, var och en på sitt sätt (vid_valj på det rätta alternativet). LJUS och SVÄRD får vänliga reaktioner. Staven verkar på stocken, aldrig på ungen (16). Nu har vassen ett läsval och ett skrivpussel, och FLYG skrivs två gånger i kapitlet. Ungen sitter tryggt på stocken, som har stannat, och ingen musik skyndar på (A9). Orden är enstaka, därför L2. Hette k2_bubblan (alias)."
   },
   {
    "id": "k2_grodan",
@@ -2224,7 +2380,8 @@
     "L4": {
      "kraver": {
       "pussel": "k2_grodan",
-      "variant": "L4"
+      "variant": "L4",
+      "eller_niva": "L4"
      },
      "text": [
       "Biten är inte under bryggan.",
@@ -2306,7 +2463,7 @@
    "efter_3_fel": {
     "handling": "ungen sätter sig under rätt tavla och viftar med svansen"
    },
-   "anteckning": "INTE avgör här (63.6). Brevet har tre korta meningar, och den första har han läst vid bryggan: redan_last 1 visar den grå med en bock. Fyra tavlor i två par (63.4). Samma form i L3 och L4, bara den sista meningen skiljer sig. L4 kommer bara om han har löst k2_grodan i L4 (kraver, 63.6, 64.2), annars L3 oavsett nivå. Felreaktionen säger det som är sant om tavlan han valde."
+   "anteckning": "INTE avgör här (63.6). Brevet har tre korta meningar, och den första har han läst vid bryggan: redan_last 1 visar den grå med en bock. Fyra tavlor i två par (63.4). Samma form i L3 och L4, bara den sista meningen skiljer sig. L4 kommer bara om han har löst k2_grodan i L4 (kraver, 63.6, 64.2), annars L3 oavsett nivå. Felreaktionen säger det som är sant om tavlan han valde. 76.4 (C2): L4 gäller också när nivån är L4 nu, inte bara efter grodan i L4."
   },
   {
    "id": "k2_lyft",
@@ -2323,21 +2480,25 @@
       "FLYGA"
      ],
      "effekt": "tavlan_svavar_ner"
+    },
+    {
+     "ord": "LYFT",
+     "godtas": [
+      "LYFTA"
+     ],
+     "effekt": "tavlan_svavar_ner",
+     "ristas": false
+    },
+    {
+     "ord": "NER",
+     "effekt": "tavlan_svavar_ner",
+     "ristas": false
     }
    ],
    "rimliga": [
     {
      "ord": "STEGE",
      "reaktion": "en stege ställer sig mot väggen, men tavlan sitter fast på sin spik",
-     "replik": {
-      "talare": "berattare",
-      "text": "Bra ord! Men tavlan sitter fast.",
-      "upplast": true
-     }
-    },
-    {
-     "ord": "NER",
-     "reaktion": "tavlan skakar lite",
      "replik": {
       "talare": "berattare",
       "text": "Bra ord! Men tavlan sitter fast.",
@@ -2361,6 +2522,15 @@
       "text": "Svärdet skär bara växter.",
       "upplast": true
      }
+    },
+    {
+     "ord": "UPP",
+     "reaktion": "tavlan gungar på sin spik",
+     "replik": {
+      "talare": "berattare",
+      "text": "Tavlan hänger redan uppe!",
+      "upplast": true
+     }
     }
    ],
    "vanligt_svar": {
@@ -2380,7 +2550,7 @@
     "upplast": true
    },
    "vid_ratt": {
-    "handling": "FLYG lyser på staven",
+    "handling": "ordet lyser på staven, och tavlan lyfter från väggen",
     "fest": "mellan"
    },
    "vid_fel": {
@@ -2395,7 +2565,7 @@
    "knuff": {
     "handling": "bilden i molnet glimtar"
    },
-   "anteckning": "FLYG en tredje gång (visa, gör tryggt, en gång till). Han kan formeln, och den står på staven. STEGE och NER är rimliga ord, och LJUS och SVÄRD (formler han kan) får vänliga reaktioner. Tavlan svävar ner själv (63.8). 72.6: ledbilden efter första felet är brevet som flög ur vattnet i vassen, samma som felrepliken påminner om.",
+   "anteckning": "FLYG en tredje gång (visa, gör tryggt, en gång till). Han kan formeln, och den står på staven. STEGE och NER är rimliga ord, och LJUS och SVÄRD (formler han kan) får vänliga reaktioner. Tavlan svävar ner själv (63.8). 72.6: ledbilden efter första felet är brevet som flög ur vattnet i vassen, samma som felrepliken påminner om. 76.2: LYFT, LYFTA och NER godtas, med samma effekt men utan att ristas in. Det berättelsen ber honom göra ska alltid fungera, och \"Lyft den med staven!\" är struken. FLYG är fortfarande formeln. UPP är rimligt.",
    "ledbild": "tankebubbla_brev_flyger"
   },
   {
@@ -2459,6 +2629,24 @@
      "replik": {
       "talare": "berattare",
       "text": "Svärdet skär bara växter.",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "TÄND",
+     "reaktion": "en gnista tänds i den första lyktan och slocknar",
+     "replik": {
+      "talare": "berattare",
+      "text": "Bra ord! Men vad ska du tända med?",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "LYKTA",
+     "reaktion": "lyktorna gungar på sina pinnar",
+     "replik": {
+      "talare": "berattare",
+      "text": "Bra ord! Men lyktorna är släckta.",
       "upplast": true
      }
     }
@@ -2525,7 +2713,183 @@
    "knuff": {
     "handling": "bilden i molnet glimtar, och ungen tittar upp mot lyktorna"
    },
-   "anteckning": "71.6: en formel han har lärt sig är ett verktyg resten av äventyret (brief §4, 08 §4). LJUS lärdes i prologen och kommer tillbaka när det blir kväll, där berättelsen behöver det. Han skriver det själv på tangentbordet. LYS och LYSA godtas. JUS, LJU och LUS ger en liten ljusprick (nästan, LJ låter som J). Ledbilden efter första felet visar en ljusboll i ett moln, aldrig ordet. Förebilden efter två fel (69.3). Felrepliken påminner om prologen och säger inte ordet. ELD får en replik som planterar byns eld."
+   "anteckning": "71.6: en formel han har lärt sig är ett verktyg resten av äventyret (brief §4, 08 §4). LJUS lärdes i prologen och kommer tillbaka när det blir kväll, där berättelsen behöver det. Han skriver det själv på tangentbordet. LYS och LYSA godtas. JUS, LJU och LUS ger en liten ljusprick (nästan, LJ låter som J). Ledbilden efter första felet visar en ljusboll i ett moln, aldrig ordet. Förebilden efter två fel (69.3). Felrepliken påminner om prologen och säger inte ordet. ELD får en replik som planterar byns eld. 76.2: TÄND och LYKTA är rimliga, eftersom ett barn troligen skriver det här."
+  },
+  {
+   "id": "k2_halvan",
+   "typ": "P1_las_och_valj",
+   "avsandare": "farfar",
+   "papper": "brev_farfar_halva",
+   "hjalp": "ett_ord",
+   "kan_oppnas_igen": true,
+   "skylt": "brev_halva_1",
+   "lys_ord": "INTE",
+   "instruktion": {
+    "talare": "berattare",
+    "text": "Vad står det på brevet?",
+    "upplast": true
+   },
+   "varianter": {
+    "L4": {
+     "text": "Biten är inte under bryggan.",
+     "alternativ": [
+      {
+       "id": "inte_under",
+       "ord": "Biten är inte under bryggan.",
+       "ratt": true
+      },
+      {
+       "id": "under",
+       "ord": "Biten är under bryggan.",
+       "vid_valj": {
+        "reaktion": "baronen nickar ivrigt och gräver fortare, och en gammal stövel flyger upp ur leran",
+        "replik": {
+         "talare": "baronen",
+         "text": "Precis! Det läste jag också!",
+         "upplast": true
+        },
+        "ljud": "baron"
+       }
+      }
+     ]
+    }
+   },
+   "vid_ratt": {
+    "handling": "ordet INTE lyser stort i guld över bryggan",
+    "ljud": "glitter",
+    "fest": "liten"
+   },
+   "knuff": {
+    "handling": "brevet glimtar"
+   },
+   "anteckning": "76.4 (B2): bryggans gren har en egen handling. Baronen hoppade över INTE. Spelaren läser Farfars halva och väljer den mening som står där, och felet är baronens: han nickar och gräver fortare. INTE lyser i guld när han har valt rätt (63.6). Bara L4, som gäller alla, så INTE avgör nu på huvudvägen (C2). Efter detta avgör INTE igen i grodan (frivillig) och i tavlorna."
+  },
+  {
+   "id": "k2_draken",
+   "typ": "P11_formel",
+   "niva": "S3",
+   "skriv": "tangentbord",
+   "bild": "drake_pa_taket",
+   "ledbild": "tankebubbla_fagel",
+   "svar": "FLYG",
+   "formler": [
+    {
+     "ord": "FLYG",
+     "godtas": [
+      "FLYGER",
+      "FLYGA"
+     ],
+     "effekt": "draken_flyger_ner_till_barnet"
+    }
+   ],
+   "rimliga": [
+    {
+     "ord": "STEGE",
+     "reaktion": "en stege ställer sig mot huset, men den är för kort",
+     "replik": {
+      "talare": "berattare",
+      "text": "Bra ord! Men taket är för högt.",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "NER",
+     "reaktion": "draken rycker i snöret, men den sitter fast",
+     "replik": {
+      "talare": "berattare",
+      "text": "Bra ord! Men draken sitter fast.",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "HIT",
+     "reaktion": "draken rycker i snöret, men den sitter fast",
+     "replik": {
+      "talare": "berattare",
+      "text": "Bra ord! Men draken sitter fast.",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "LOSS",
+     "reaktion": "draken rycker i snöret, men den sitter fast",
+     "replik": {
+      "talare": "berattare",
+      "text": "Bra ord! Men draken sitter fast.",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "VIND",
+     "reaktion": "en liten vind blåser, och draken fladdrar men sitter kvar",
+     "replik": {
+      "talare": "berattare",
+      "text": "Bra ord! Men vinden är för liten.",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "HOPPA",
+     "reaktion": "hjälten hoppar så högt han kan, men når inte",
+     "replik": {
+      "talare": "berattare",
+      "text": "Det är för högt att hoppa.",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "LJUS",
+     "reaktion": "draken lyser en stund på taket",
+     "replik": {
+      "talare": "berattare",
+      "text": "Draken lyser! Men den sitter kvar.",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "SVÄRD",
+     "reaktion": "stavens ände blir ett svärd av guld en stund",
+     "replik": {
+      "talare": "berattare",
+      "text": "Svärdet skär bara växter.",
+      "upplast": true
+     }
+    }
+   ],
+   "vanligt_svar": {
+    "talare": "berattare",
+    "text": "Bra ord! Men det hjälper inte här.",
+    "upplast": true
+   },
+   "nastan": [],
+   "forebild": {
+    "text": "FLYG",
+    "upplast": false,
+    "visas": "andra_felet"
+   },
+   "hjalp": "ett_ord",
+   "instruktion": {
+    "talare": "berattare",
+    "text": "Skriv ett ord som hjälper draken!",
+    "upplast": true
+   },
+   "vid_ratt": {
+    "handling": "FLYG lyser på staven. Draken lossnar från taket, flyger en sväng över byn och landar hos barnet",
+    "fest": "liten"
+   },
+   "vid_fel": {
+    "reaktion": "staven fräser, pff",
+    "replik": {
+     "talare": "berattare",
+     "text": "Pff! Minns du brevet i vassen?",
+     "upplast": true
+    },
+    "ljud": "fras"
+   },
+   "knuff": {
+    "handling": "bilden i molnet glimtar, och barnet drar i snöret"
+   },
+   "anteckning": "76.4 (B10): frivillig formel i byn, FLYG en gång till på ett nytt ställe. Hindret visar på sitt utseende vad som behövs: något högt uppe som ska flyga. Ledbilden är fågeln från vassen."
   }
  ],
  "uppdrag": [
@@ -2576,12 +2940,19 @@
       "scen": "k2s02_byn",
       "ga_till": "fjader"
      }
+    },
+    {
+     "text": "HITTA HUSET",
+     "klart": {
+      "scen": "k2s02_byn",
+      "pussel": "k2_husen"
+     }
     }
    ],
    "stampel": {
     "scen": "k2s02_byn",
     "efter": {
-     "replik": "Hämta halvorna, så läser vi det hos mig!"
+     "replik": "Han skrev var, för länge sen. Hämta halvorna!"
     }
    }
   },

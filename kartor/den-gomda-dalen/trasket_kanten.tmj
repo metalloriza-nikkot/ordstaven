@@ -70,9 +70,9 @@
      "id": 3,
      "name": "vass_tat",
      "type": "sak",
-     "x": 70,
+     "x": 72,
      "y": 0,
-     "width": 50,
+     "width": 48,
      "height": 192,
      "rotation": 0,
      "visible": true,
@@ -123,6 +123,11 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      },
       {
        "name": "sida",
        "type": "string",

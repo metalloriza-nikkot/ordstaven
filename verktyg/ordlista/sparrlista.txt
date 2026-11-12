@@ -1,0 +1,62 @@
+# Spärrlistan (beslut 77.2): grova ord och svordomar ur SALDO som aldrig får "BRA ORD!" i ett skrivpussel.
+# Spelet räknar dem som ett vanligt försök (trappan tar ett steg) med en neutral reaktion, visar inte ordet igen
+# och skriver inte ut det i loggen. Ett grundord per rad spärrar alla dess former i SALDO. En rad som börjar med
+# "del:" spärrar varje form som innehåller delen (sammansättningar). Kör verktyg/ordlista/saldo.py efter en ändring.
+#
+# Barnens egna toalettord (bajs, kiss, prutt) står inte här: de är inte grova, och "BRA ORD! MEN DET HJÄLPER INTE
+# HÄR." är ett ofarligt svar på dem.
+
+# svordomar
+fan
+jävel
+jävla
+jävlas
+djävul
+djävla
+helvete
+satan
+# könsord och sexord
+fitta
+kuk
+kuksugare
+knulla
+knull
+runka
+röv
+rövhål
+arsle
+mutta
+pitt
+balle
+hora
+horunge
+slyna
+slampa
+porr
+# grova skällsord
+skit
+skita
+skitstövel
+idiot
+cp
+mongo
+pucko
+# nedsättande ord om grupper
+neger
+negerboll
+blatte
+svartskalle
+zigenare
+bög
+fikus
+lebb
+
+del:FITT
+del:KUKEN
+del:KNULL
+del:JÄVL
+del:HELVET
+del:HORUNG
+del:RÖVHÅL
+del:BLATT
+del:SKITST

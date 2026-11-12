@@ -2,8 +2,8 @@
  "$schema": "schema/ordlistor.schema.json",
  "format": 1,
  "meta": {
-  "version": "0.11",
-  "datum": "2026-11-10",
+  "version": "0.13",
+  "datum": "2026-11-12",
   "agare": "Innehåll",
   "textform": "Orden lagras med små bokstäver, formler i versaler. Böjda former (skogen, bron) står med när de används som alternativ.",
   "beskrivning": "Ordlistor 1-6 for ORDSTAVEN. Bilderna ar platshallare (emoji) for grabox. Ett ord ligger i den hogsta lista som nagot av dess drag kraver.",
@@ -14,7 +14,9 @@
   "andrat_v08": "13 ordformer som står i lästexter men saknades (Tekniks kontroll i 0.22.0, beslut 43.5): stora, höga, runda, gamla, vita och gula (böjda egenskapsord), stenen, dalens, dinos, fötter och fossil, man och klättrar. Ingen lästext är omskriven, eftersom texterna är spelade och rummen frysta. Listan följer reglerna: dubbelteckning lista 4 (fossil, klättrar, fötter), konsonantgrupp i början lista 3 (stora, stenen), man lista 1 och resten lista 2.",
   "andrat_v09": "vems (rubriken VEMS LAPP? i kapitel 1, det korta passet). Konsonantgrupp i slutet, alltså lista 2.",
   "andrat_v010": "Kapitel 2 (beslut 64): orden i lästexten, uppdragens rubriker, ord han troligen skriver på tangentbordet (tema skrivord, så att de aldrig får pff, 63.3) och bybornas bubblor.",
-  "andrat_v011": "Kapitel 2 (beslut 71.6): sax, kniv, hugg och lys, ord han troligen skriver vid vassen och lyktorna (tema skrivord, så att de aldrig får pff). HUGG och LYS står också på uppdragslappen."
+  "andrat_v011": "Kapitel 2 (beslut 71.6): sax, kniv, hugg och lys, ord han troligen skriver vid vassen och lyktorna (tema skrivord, så att de aldrig får pff). HUGG och LYS står också på uppdragslappen.",
+  "andrat_v012": "Beslut 76.6 (granskning 5, C6): vad (stumt D), sov och kom (O som Å) är inte ljudenliga och står nu i lista 6 som ordbilder. Låg, hel och torr (skyltarna i L4, 76.4).",
+  "andrat_v013": "vän, bor, litet och dörren (kapitel 2, beslut 77.4)."
  },
  "listor": {
   "1": "Korta ljudenliga ord, 2-3 bokstaver, ingen konsonantgrupp, ingen dubbelteckning",
@@ -239,10 +241,12 @@
   },
   {
    "ord": "sov",
-   "lista": 1,
+   "lista": 6,
    "bild": "🛏️",
    "tema": "hemma",
-   "flaggor": []
+   "flaggor": [
+    "ordbild"
+   ]
   },
   {
    "ord": "sur",
@@ -1618,10 +1622,12 @@
   },
   {
    "ord": "kom",
-   "lista": 1,
+   "lista": 6,
    "bild": null,
    "tema": "uppdragslappen",
-   "flaggor": [],
+   "flaggor": [
+    "ordbild"
+   ],
    "varfor": "Uppdragslappen (40.1)"
   },
   {
@@ -1976,10 +1982,12 @@
   },
   {
    "ord": "vad",
-   "lista": 1,
+   "lista": 6,
    "bild": null,
    "tema": "uppdragslappen",
-   "flaggor": [],
+   "flaggor": [
+    "ordbild"
+   ],
    "varfor": "Uppdragslappen (40.1)"
   },
   {
@@ -2543,6 +2551,68 @@
    "tema": "skrivord",
    "flaggor": [],
    "varfor": "Kapitel 2 (beslut 71.6), och uppdragslappen"
+  },
+  {
+   "ord": "låg",
+   "lista": 1,
+   "bild": "⬇️",
+   "tema": "lästext",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Kapitel 2 (beslut 76.4)"
+  },
+  {
+   "ord": "hel",
+   "lista": 1,
+   "bild": null,
+   "tema": "lästext",
+   "flaggor": [],
+   "varfor": "Kapitel 2 (beslut 76.4)"
+  },
+  {
+   "ord": "torr",
+   "lista": 4,
+   "bild": null,
+   "tema": "lästext",
+   "flaggor": [],
+   "varfor": "Kapitel 2 (beslut 76.4)"
+  },
+  {
+   "ord": "vän",
+   "lista": 1,
+   "bild": null,
+   "tema": "lästext",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Kapitel 2 (beslut 77.4)"
+  },
+  {
+   "ord": "bor",
+   "lista": 1,
+   "bild": null,
+   "tema": "lästext",
+   "flaggor": [],
+   "varfor": "Kapitel 2 (beslut 77.4)"
+  },
+  {
+   "ord": "litet",
+   "lista": 2,
+   "bild": null,
+   "tema": "lästext",
+   "flaggor": [],
+   "varfor": "Kapitel 2 (beslut 77.4)"
+  },
+  {
+   "ord": "dörren",
+   "lista": 4,
+   "bild": "🚪",
+   "tema": "lästext",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Kapitel 2 (beslut 77.4)"
   }
  ]
 }

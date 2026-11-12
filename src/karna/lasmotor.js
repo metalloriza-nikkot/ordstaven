@@ -29,7 +29,8 @@ export function valjVariant(varianter, tal) {
 
 /**
  * Nivån ett läsval får med kraven (2.31): en variant med `kraver: { pussel, variant }` gäller bara när det pusslet är
- * löst i den varianten (k2_tavlorna L4 bara efter k2_grodan i L4). Annars närmaste lägre variant.
+ * löst i den varianten (k2_tavlorna L4 bara efter k2_grodan i L4), eller med `eller_niva` när nivån redan är minst
+ * den (2.43). Annars närmaste lägre variant.
  * @param {Record<string, any>} varianter @param {number} tal nivån han är på
  * @param {(pusselId: string, variant: string) => boolean} lostI är pusslet löst i varianten?
  * @returns {number}
@@ -39,7 +40,8 @@ export function nivaMedKrav(varianter, tal, lostI) {
   for (let i = 0; i < 10; i++) {
     const [nyckel, v] = valjVariant(varianter, t);
     const k = v?.kraver;
-    if (!k || lostI(k.pussel, k.variant)) return t;
+    // eller_niva (2.43): varianten gäller också när han redan är på den nivån
+    if (!k || lostI(k.pussel, k.variant) || (k.eller_niva && tal >= tolkaNiva(k.eller_niva).tal)) return t;
     const lagre = lagreVariant(varianter, nyckel);
     if (!lagre) return t;
     t = tolkaNiva(lagre).tal;

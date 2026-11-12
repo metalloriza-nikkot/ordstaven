@@ -100,6 +100,8 @@ export function skapaValj(pussel, { niva, slump = Math.random, iRummet = !!pusse
           return { resultat: s.klar ? 'klar' : 'ratt', reaktion: s.klar ? pussel.vid_ratt ?? null : null, forenklad: false };
         }
         s.klar = true;
+        // flera rätta svar (2.43, stocken): det valda alternativets vid_valj hör till reaktionen
+        if (pussel.flera_ratta && a.vid_valj) return { resultat: 'klar', reaktion: { ...(pussel.vid_ratt ?? {}), ...a.vid_valj }, forenklad: false };
         return { resultat: 'klar', reaktion: pussel.vid_ratt ?? null, forenklad: false };
       }
       s.fel++;
@@ -242,6 +244,25 @@ export function skapaDop(pussel) {
 /** @param {any} pussel @param {{ slump?: () => number }} [opt] */
 export function skapaKrukor(pussel, { slump = Math.random } = {}) {
   const innehall = [...pussel.innehall];
+  // ett fält av tussar (2.43, vassväggen 75.3): innehållet ligger där det står, och vägen är öppen när alla tussar
+  // med falt.klar_nar har fallit. Resten går att hugga, och pusslet är helt klart när allt har fallit.
+  if (pussel.falt) {
+    const gang = pussel.falt.klar_nar;
+    const mal = innehall.map((x, i) => (x === gang ? i : -1)).filter((i) => i >= 0);
+    const s = { antal: innehall.length, slagna: /** @type {(string | null)[]} */ (innehall.map(() => null)), klar: false, oppen: mal.length === 0, mal };
+    return {
+      s,
+      sista: null,
+      /** @param {number} i */
+      sla(i) {
+        if (i < 0 || s.slagna[i] !== null || s.klar) return null;
+        s.slagna[i] = innehall[i];
+        if (mal.every((j) => s.slagna[j] !== null)) s.oppen = true;
+        if (s.slagna.every((x) => x !== null)) s.klar = true;
+        return innehall[i] === gang ? 'tom' : innehall[i];
+      },
+    };
+  }
   // det som alltid hittas sist: sak_i_sista (skattlådan, lådan), eller kartbiten med kartbit_i_sista
   const kartbit = pussel.sak_i_sista && innehall.includes(pussel.sak_i_sista) ? pussel.sak_i_sista
     : pussel.kartbit_i_sista ? innehall.find((x) => x.startsWith('kartbit')) : null;

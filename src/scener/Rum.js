@@ -37,7 +37,7 @@ const GANG_STEG = 5;
  * Gråboxens bild av sakerna han kan ha på sig (lager): en färg per sak. Okända saker ritas i en neutral färg.
  * Riktig grafik kommer med Stil (stilguiden §5).
  */
-const LAGER_FARG = { taggkam: 0x5fae6a, ryggsack_skog: 0x8a5a2b, ryggsack_vass: 0xb8a060, ryggsack_rosa: 0xe58fb0 };
+const LAGER_FARG = { taggkam: 0x5fae6a, drakvimpel: 0xe0503a, ryggsack_skog: 0x8a5a2b, ryggsack_vass: 0xb8a060, ryggsack_rosa: 0xe58fb0 };
 /** Ryggsäckar i en annan färg än Stils bild (72.11): bilden tonas, tills Stil har ritat dem. */
 const SACK_TON = { ryggsack_rosa: 0xffa8cc };
 /** Dräkter han får (72.11): dräktens färg byts mot gåvans, och garderoben byter tillbaka till den han valde. */
@@ -93,6 +93,8 @@ export class Rum extends Phaser.Scene {
     /** föremål som en regi har flyttat i rummet (fjädern som landar vid hjälten, 75.4): id → övre vänstra hörnet */
     /** @type {Map<string, { x: number, y: number }>} */
     this.flyttade = new Map();
+    /** @type {Map<string, any>} tussar som står kvar efter fältet (75.3), tills rummet byts */
+    this.kvarDelar = new Map();
     /** kameran visar kartans visas_forst tills han ska göra något (76.5) */
     this.forstFokus = false;
     /** @type {Map<string, any>} */
@@ -512,13 +514,16 @@ export class Rum extends Phaser.Scene {
     this.sackFram = sackBild ? this.add.image(0, 0, 'hjalte', 'ryggsack_ner_01').setOrigin(0, 0) : null;
     const ton = sack ? SACK_TON[/** @type {keyof SACK_TON} */ (sack)] : undefined;
     if (ton) { this.sackBak?.setTint(ton); this.sackFram?.setTint(ton); }
-    this.kam = this.lager?.hjalmdekor && finns('taggkam_ner_01') ? this.add.image(0, 0, 'hjalte', 'taggkam_ner_01').setOrigin(0, 0) : null;
+    // Stils bild finns bara för taggkammen. Annan hjälmdekor (drakvimpeln, 76.4) är gråbox tills den är ritad
+    this.kam = this.lager?.hjalmdekor === 'taggkam' && finns('taggkam_ner_01') ? this.add.image(0, 0, 'hjalte', 'taggkam_ner_01').setOrigin(0, 0) : null;
     this.stav = this.add.image(0, 0, fargad(this, 'stav', hjaltensByten(hud)), 'stav_hand_ner_01').setOrigin(0, 0).setVisible(!!this.harStav);
     this.hjalte.add(/** @type {any[]} */ ([this.skugga, this.sackBak, this.kropp, this.sackFram, this.kam, this.stav].filter(Boolean)));
     // gråbox för det som inte har bilder än
     if (sack && !sackBild) this.hjalte.addAt(this.add.rectangle(11, 12, 4, 8, farg(sack)).setOrigin(0, 0), this.skugga ? 1 : 0);
     const dekor = this.lager?.hjalmdekor;
-    if (dekor && !this.kam) for (const x of [4, 7, 10]) this.hjalte.add(this.add.rectangle(x, -3, 2, 3, farg(dekor)).setOrigin(0, 0));
+    // drakvimpeln: en pinne på hjälmen med en liten flagga. Annars tre taggar
+    if (dekor === 'drakvimpel') { this.hjalte.add(this.add.rectangle(9, -6, 1, 6, 0x5a4a3a).setOrigin(0, 0)); this.hjalte.add(this.add.triangle(10, -6, 0, 0, 5, 2, 0, 4, farg(dekor)).setOrigin(0, 0)); }
+    else if (dekor && !this.kam) for (const x of [4, 7, 10]) this.hjalte.add(this.add.rectangle(x, -3, 2, 3, farg(dekor)).setOrigin(0, 0));
     this.ritaHjalte();
   }
 
@@ -878,6 +883,7 @@ export class Rum extends Phaser.Scene {
       en_liten_ljusprick: () => this.litenLjusprick(),
       tant_rosa_nar_inte: () => this.tantRosaNarInte(),
       elden_tands: () => this.eldenTands(),
+      draken_flyger_ner_till_barnet: () => this.drakenFlygerNer(),
       byborna_jublar: () => this.byborJublar(),
       // 72.8: lerpölen i vassen
       hjalte_sjunker: () => this.hjalteSjunker(),
@@ -1539,6 +1545,31 @@ export class Rum extends Phaser.Scene {
     return 1600;
   }
 
+  /**
+   * FLYG tar ned draken från taket (76.4, B10): draken lossnar, flyger en sväng över byn och landar hos barnet, som
+   * hoppar. I gråboxen en röd romb med svans. Föremålet på taket döljs, och kartan tar bort det (forsvinner_efter).
+   * @returns {number}
+   */
+  drakenFlygerNer() {
+    const { o } = this.foremalOchBild('drake_tak');
+    const barn = this.ruta('barnet_drake');
+    if (!o || !barn) return 0;
+    const bild = this.ritade.get(o.id); if (bild) /** @type {any} */ (bild).setVisible?.(false);
+    const g = this.add.graphics(); this.lagerLuft.add(g);
+    const fran = { x: o.x + o.b / 2, y: o.y + o.h / 2 }, till = { x: barn.x + barn.b / 2, y: barn.y - 6 };
+    const t = { p: 0 };
+    this.tweens.add({ targets: t, p: 1, duration: 1800, ease: 'Sine.easeInOut', onUpdate: () => {
+      // en sväng uppåt och åt sidan innan den dalar ned till barnet
+      const x = Math.round(fran.x + (till.x - fran.x) * t.p + Math.sin(t.p * Math.PI * 2) * 30);
+      const y = Math.round(fran.y + (till.y - fran.y) * t.p - Math.sin(t.p * Math.PI) * 40);
+      g.clear().fillStyle(0xe0503a, 1).fillTriangle(x, y - 5, x + 4, y, x, y + 5).fillTriangle(x, y - 5, x - 4, y, x, y + 5)
+        .lineStyle(1, 0x5a4a3a, 1).lineBetween(x, y + 5, x - 2 + Math.round(Math.sin(t.p * 20) * 2), y + 11);
+      this.smutsig = true;
+    }, onComplete: () => { g.destroy(); this.smutsig = true; const r = /** @type {any} */ (this.ritade.get('barnet_drake')); if (r?.active) { const y0 = r.y; this.tweens.add({ targets: r, y: y0 - 3, duration: 150, yoyo: true, repeat: 3, onUpdate: () => { this.smutsig = true; }, onComplete: () => { r.y = y0; this.smutsig = true; } }); } } });
+    this.regiLogg.push('draken flyger ned till barnet');
+    return 2200;
+  }
+
   /** Elden tänds på udden, gnistor stiger, och byborna runt elden skuttar och jublar (71.5). @returns {number} */
   eldenTands() {
     const { o } = this.foremalOchBild('lagereld');
@@ -2084,9 +2115,14 @@ export class Rum extends Phaser.Scene {
     this.synliga = synliga;
     if (v.nyttRum || !this.harRum || andrat) {
       const fore = new Set((this.objekt || []).map((o) => o.id));
-      if (v.nyttRum) this.flyttade.clear();
+      if (v.nyttRum) { this.flyttade.clear(); this.kvarDelar.clear(); }
       this.objekt = this.harRum ? rumsObjekt(v.innehall, v.tillstand, v.karta, v.visade) : [];
       for (const o of this.objekt) { const f = this.flyttade.get(o.id); if (f) { o.x = f.x; o.y = f.y; } }
+      // tussarna som står kvar efter fältet (75.3) ersätter det hela föremålet, också i ett annat tillstånd
+      if (this.kvarDelar.size) {
+        const baser = new Set([...this.kvarDelar.values()].map((d) => d.delAv));
+        this.objekt = this.objekt.filter((o) => !baser.has(o.id)).concat([...this.kvarDelar.values()].map((d) => ({ ...d })));
+      }
       // en figur som klättrar ned när den visas (apan när den är räddad, 56.4): bara i rummet han redan är i
       const klattrar = v.nyttRum ? [] : this.objekt.filter((o) => o.klattrarFran && !fore.has(o.id)).map((o) => o.id);
       for (const g of this.hogaBilder) g.destroy(); this.hogaBilder.clear(); this.animerade = [];
@@ -2476,6 +2512,40 @@ export class Rum extends Phaser.Scene {
     return nya;
   }
 
+  /**
+   * Ett fält av tussar (2.43, vassväggen 75.3): föremålet delas i `rader` kolumner från väster till öster, med
+   * `perRad` tussar i varje från norr till söder. Id:na kommer i den ordningen (som pusslets innehall).
+   * @param {string} id @param {number} rader @param {number} perRad @returns {string[]}
+   */
+  delaFalt(id, rader, perRad) {
+    const bas = this.objekt.find((x) => x.id === id);
+    if (!bas) return [];
+    this.objekt = this.objekt.filter((x) => x.id !== id);
+    this.ritade.get(id)?.destroy(); this.ritade.delete(id);
+    const nya = [];
+    for (let r = 0; r < rader; r++) {
+      const x0 = bas.x + Math.round((r * bas.b) / rader), x1 = bas.x + Math.round(((r + 1) * bas.b) / rader);
+      for (let j = 0; j < perRad; j++) {
+        const y0 = bas.y + Math.round((j * bas.h) / perRad), y1 = bas.y + Math.round(((j + 1) * bas.h) / perRad);
+        const i = r * perRad + j;
+        const n = { id: `${id}_${i}`, delAv: id, tuss: true, x: x0, y: y0, b: x1 - x0, h: y1 - y0, sort: /** @type {'sak'} */ ('sak'), ...(bas.bildDel ? { bild: bas.bildDel } : {}),
+          ...(bas.bildHugg ? { bildHugg: bas.bildHugg } : {}), ...(bas.bildKvar ? { bildKvar: bas.bildKvar } : {}) };
+        this.objekt.push(n); this.ritaObjekt(n); nya.push(n.id);
+      }
+    }
+    this.byggHinder();
+    this.b.vidAndring?.();
+    return nya;
+  }
+
+  /**
+   * Tussarna som står kvar när pusslet är klart (75.3) står kvar i rummet tills han går därifrån, också när rummets
+   * tillstånd byts (vassen är oppen). @param {string[]} ids
+   */
+  behallDelar(ids) {
+    for (const id of ids) { const o = this.objekt.find((x) => x.id === id); if (o) this.kvarDelar.set(id, { ...o }); }
+  }
+
   /** Ett föremål hoppar till (det låter därifrån, t.ex. ägglådan som dunkar). @param {string} id */
   hoppa(id) {
     const r = this.ritade.get(id); if (!r) return;
@@ -2784,6 +2854,7 @@ export class Rum extends Phaser.Scene {
    */
   huggen(id) {
     this.smutsig = true;
+    this.kvarDelar.delete(id);
     const r = /** @type {any} */ (this.ritade.get(id));
     const o = this.objekt.find((x) => x.id === id);
     this.objekt = this.objekt.filter((x) => x.id !== id);

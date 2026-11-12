@@ -514,7 +514,15 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
           if (vari.text) textKontroll(vari.text, `${vp} text`, { lasesSjalv: true });
           if (!vari.text && !vari.bild) fel.push(var_(`${vp}: behöver en text eller en bild som ställer frågan`));
           const ratt = vari.alternativ.filter((a) => a.ratt);
-          if (!flera && ratt.length !== 1) fel.push(var_(`${vp}: exakt ett alternativ ska ha "ratt": true (har ${ratt.length})`));
+          // flera rätta svar bara med ett uttryckligt fält (2.43, 77.3), så att två rätta av misstag fortfarande fångas
+          if (!flera && !p.flera_ratta && ratt.length !== 1) fel.push(var_(`${vp}: exakt ett alternativ ska ha "ratt": true (har ${ratt.length})`));
+          if (p.flera_ratta && (ratt.length < 2 || ratt.length === vari.alternativ.length)) fel.push(var_(`${vp}: flera_ratta behöver minst två rätta alternativ och minst ett fel`));
+          for (const a of vari.alternativ) if (a.effekt && !a.ratt) fel.push(var_(`${vp} alternativ ${a.id}: effekt gäller bara ett rätt alternativ`));
+          // lys_ord (2.43): ordet ska stå i texten eller på ett rätt kort
+          if (p.lys_ord) {
+            const ordI = (/** @type {any} */ t) => ord(rader(t).join(' ')).some((o) => versaler(o) === versaler(p.lys_ord));
+            if (!(vari.text && ordI(vari.text)) && !ratt.some((a) => a.ord && ordI(a.ord))) fel.push(var_(`${vp}: ordet ${p.lys_ord} står inte i texten eller på ett rätt kort`));
+          }
           if (flera && (ratt.length < 1 || ratt.length === vari.alternativ.length)) fel.push(var_(`${vp}: minst ett alternativ ska vara rätt och minst ett fel`));
           const ids = vari.alternativ.map((a) => a.id);
           if (new Set(ids).size !== ids.length) fel.push(var_(`${vp}: två alternativ har samma id`));

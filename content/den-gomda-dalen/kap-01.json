@@ -22,7 +22,7 @@
  },
  "meta": {
   "namn": "Skogen",
-  "version": "0.7.13",
+  "version": "0.7.14",
   "datum": "2026-11-11",
   "agare": "Innehåll",
   "kalla": "Manus 15-kapitel1-manus.md v0.18. Byggd på repots kap-01.json från 0.29.0.",
@@ -42,7 +42,8 @@
   "andrat_v0711": "2026-11-08 (beslut 67.9): musik skogen på kapitlet, ljud på mellanscener och reaktioner, och syns_redan på mellanscenerna som redan syns (67.2). Ingen text är ändrad.",
   "andrat_v0712": "2026-11-10 (beslut 68.9): syns_redan på alla reaktioner och knuffar som visade sin text (68.4), ungen som springer mot stigen i k1s03, Stils regier på tolv mellanscener och ekorre_skakar på felen vid baronens lapp (Teknik 31). Ingen text är ändrad.",
   "teknik_72_2": "Teknik 0.57.0 (beslut 72.2): forebild.visas är andra_felet på k1_svard och k1_svard_igen, som i kapitel 2 (69.3). Förebilden kommer efter två fel och täcks vid nästa bricka. Ingen text är ändrad.",
-  "andrat_v0713": "2026-11-11 (beslut 73.2): felrepliken i k1_svard och k1_svard_igen är \"Nästan!\", och reaktionen säger inte längre att ordet tänds, eftersom förebilden kommer efter två fel (72.2). Rättelser av text som inte längre stämde. Ingen ledbild i kapitel 1."
+  "andrat_v0713": "2026-11-11 (beslut 73.2): felrepliken i k1_svard och k1_svard_igen är \"Nästan!\", och reaktionen säger inte längre att ordet tänds, eftersom förebilden kommer efter två fel (72.2). Rättelser av text som inte längre stämde. Ingen ledbild i kapitel 1.",
+  "andrat_v0714": "2026-11-11 (beslut 76.6): återblicken säger att stegen räddade apan, inte SVÄRD. En rättelse av text som inte stämde (brief §4)."
  },
  "var_var_vi": [
   {
@@ -97,7 +98,7 @@
    "lang": [
     {
      "talare": "farfar",
-     "text": "Var var vi? Du skrev SVÄRD och räddade apan.",
+     "text": "Var var vi? Du skrev stege och räddade apan.",
      "upplast": true,
      "via": "radio"
     },

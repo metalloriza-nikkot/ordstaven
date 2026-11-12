@@ -396,12 +396,15 @@ describe('kapitel 2 i schema 2.31 (Teknik 20, beslut 64.2)', () => {
   it('{ord:<pussel>} pekar på ett P11, oppna_lasplatta med skylt och lys_ord, och villkoren i "Var var vi?"', () => {
     const d = med2();
     scen(k2(d), 'k2s10_elden').steg.find((s) => s.typ === 'replik' && s.text.includes('{ord:')).text = 'Du skrev {ord:k2_grodan}.';
-    scen(k2(d), 'k2s04_bryggan').steg.find((s) => s.typ === 'oppna_lasplatta').lys_ord = 'over';
+    // bryggan har ett läsval i stället (k2_halvan, 76.4), så steget prövas med ett eget steg
+    scen(k2(d), 'k2s04_bryggan').steg.push({ typ: 'oppna_lasplatta', skylt: 'brev_halva_1', lys_ord: 'over' });
+    k2(d).pussel.find((p) => p.id === 'k2_halvan').lys_ord = 'under_x';
     k2(d).var_var_vi[2].lang[2].villkor.gren_kvar = 'k2s77';
     delete k2(d).var_var_vi[2].lang[3].villkor; // tre utan villkor och en med: fyra hörs
     const f = kontrollera(d).fel.join('\n');
     expect(f).toMatch(/\{ord:k2_grodan\} pekar inte på ett P11/);
     expect(f).toMatch(/ordet over står inte i skylten brev_halva_1/);
+    expect(f).toMatch(/ordet under_x står inte i texten eller på ett rätt kort/);
     expect(f).toMatch(/villkoret gren_kvar pekar på k2s77/);
     expect(f).toMatch(/lang har 4 repliker som hörs, högst tre/);
   });

@@ -46,7 +46,7 @@ export default defineConfig({
         cacheId: 'ordstaven',
         // Allt som byggs förcachas: sidan, skript, typsnitt, bilder, kartor, data, ljud. Musiken bara som m4a (AAC
         // finns i Safari och Chrome på Mac och iPad): Ogg-filerna (ca 4 MB) hämtas bara där m4a inte går att avkoda.
-        globPatterns: ['**/*.{html,js,css,png,svg,json,tmj,woff2,webmanifest,mp3,m4a,wav}'],
+        globPatterns: ['**/*.{html,js,css,png,svg,json,tmj,woff2,webmanifest,mp3,m4a,wav,txt}'],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         cleanupOutdatedCaches: true,
         navigateFallback: 'index.html',

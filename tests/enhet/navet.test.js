@@ -179,4 +179,10 @@ describe('kapitel 2 del 4: ordet han skrev och variantens krav', () => {
     expect(nivaMedKrav(varianter, 3, () => false)).toBe(3);
     expect(nivaMedKrav(varianter, 7, () => false)).toBe(3);
   });
+  it('kraver med eller_niva (2.43, 76.4): varianten gäller också när nivån redan är minst den', async () => {
+    const { nivaMedKrav } = await import('../../src/karna/lasmotor.js');
+    const varianter = { L3: { text: 'a' }, L4: { text: 'b', kraver: { pussel: 'k2_grodan', variant: 'L4', eller_niva: 'L4' } } };
+    expect(nivaMedKrav(varianter, 4, () => false)).toBe(4);
+    expect(nivaMedKrav(varianter, 3, () => false)).toBe(3);
+  });
 });

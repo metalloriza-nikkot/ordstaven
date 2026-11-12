@@ -1205,6 +1205,28 @@ test('k1s08: krönet är målet i molnet, och ett tryck på det går uppför tra
   expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toMatch(/\[framme\] kronet/);
 });
 
+test('k1s08 med höjdkitet (77.8, Stil 16): trappan står i kullens framsida, och han går uppför den söderifrån till krönet med piltangenten', async ({ page }) => {
+  test.setTimeout(90000);
+  await hoppaKapitel1(page, 6); // k1s08_loven
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 10000 }).toBe('k1s08_loven');
+  await framTill(page, () => window.__ORDSTAVEN.steg()?.mal === 'kronet' && !window.__ORDSTAVEN.fryst());
+  const t = await page.evaluate(() => window.__ORDSTAVEN.ruta('trappa'));
+  const k = await page.evaluate(() => window.__ORDSTAVEN.ruta('kulle'));
+  // trappan sitter i kullens södra kant (framsidan), där molnets bild visar den
+  expect(t.y + t.h).toBeGreaterThanOrEqual(k.y + k.h);
+  expect(t.x).toBeGreaterThan(k.x); expect(t.x + t.b).toBeLessThan(k.x + k.b);
+  // söder om trappan, på marken
+  await page.evaluate(([x, y]) => window.__ORDSTAVEN.gaMot(x, y), [t.x + t.b / 2, t.y + t.h + 18]);
+  await expect.poll(async () => { const p = await page.evaluate(() => window.__ORDSTAVEN.position()); return Math.abs(p.y - (t.y + t.h + 18)) < 4; }, { timeout: 8000 }).toBe(true);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.niva().niva)).toBe(0);
+  await page.screenshot({ path: 'test-results/k1s08-trappan-fran-soder.png' });
+  await page.keyboard.down('ArrowUp');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 10000 }).toMatch(/\[framme\] kronet/);
+  await page.keyboard.up('ArrowUp');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.niva().niva)).toBe(1);
+  await page.screenshot({ path: 'test-results/k1s08-uppe-pa-kronet.png' });
+});
+
 test('menyn för vuxna hoppar till en scen i ett senare kapitel: det som kommer före spolas fram, och ungen är med', async ({ page }) => {
   test.setTimeout(90000);
   await page.goto('./?snabb&ny');
@@ -2277,6 +2299,27 @@ test('gläntans träd i L3 har Stils bilder (beslut 66.2): inget av de tre träd
   await page.screenshot({ path: 'test-results/glantan-l3-traden.png' });
 });
 
+test('SALDO i formeln med tangentbordet (77.2): ett riktigt svenskt ord är aldrig "pff", och ett grovt ord är ett försök som inte syns i loggen', async ({ page }) => {
+  test.setTimeout(90000);
+  const kap2 = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-02.json', import.meta.url), 'utf8'));
+  const over = kap2.pussel.find((p) => p.id === 'k2_over');
+  await provscen(page, { id: 't_saldo', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'pussel', pussel_id: 'k2_over' }, R('Klart.')] }, (t) => { t.spelare.hjalte.formler = ['LJUS', 'SVÄRD']; }, { pussel: [over] });
+  const falt = page.locator('#plattan .formel-skriv .platser .plats');
+  await page.locator('#plattan .replik-ruta').click({ timeout: 10000 }).catch(() => {});
+  await expect(falt).toHaveCount(3, { timeout: 10000 });
+  const logg = () => page.evaluate(() => window.__ORDSTAVEN.logg());
+  // KATTUNGE står inte i spelets ordlistor, men i SALDO
+  await page.keyboard.type('KATTUNGE'); await page.keyboard.press('Enter');
+  await expect.poll(logg, { timeout: 8000 }).toContain('k2_over: KATTUNGE (ord)');
+  await expect(falt.first()).toHaveText('', { timeout: 15000 });
+  // ett grovt ord: ett vanligt försök (ledbilden tänds), och ordet står inte i loggen
+  await page.keyboard.type('KUK'); await page.keyboard.press('Enter');
+  await expect.poll(logg, { timeout: 8000 }).toContain('k2_over: ett ord som inte visas (spärrat)');
+  await expect(falt.first()).toHaveText('', { timeout: 15000 });
+  expect(await logg()).not.toContain('KUK');
+  expect((await logg()).split('\n').filter((r) => r.includes('k2_over:') && r.includes('(fel)')).length).toBe(0);
+});
+
 test('formeln med tangentbordet (kapitel 2, del 2): "pff" bara för det som inte är ett ord, och ordet han skrev blir det som händer', async ({ page }) => {
   test.setTimeout(90000);
   const kap2 = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-02.json', import.meta.url), 'utf8'));
@@ -2408,6 +2451,7 @@ test('knuffen i formeln kommer igen och klättrar (76.2, A3): bilden glimtar, se
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('KLART.', { timeout: 15000 });
 });
 test('kapitel 2 går att gå in i (del 2): SVÄRD och vassväggen, skylten, vattnet, BRO över vattnet och in i byn, med piltangenterna', async ({ page }) => {
+  const kap2data = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-02.json', import.meta.url), 'utf8'));
   test.setTimeout(150000);
   await page.goto('./?snabb&ny&kapitel=kap-02');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
@@ -2436,10 +2480,13 @@ test('kapitel 2 går att gå in i (del 2): SVÄRD och vassväggen, skylten, vatt
     if (scen !== 'k2s01_kanten') break;
     const nyckel = `${st?.typ}:${st?.mal || st?.foremal || st?.pussel_id || ''}`;
     if (st?.typ === 'las_skylt' && !gjort.has(nyckel)) { gjort.add(nyckel); await gaTill(139, 90); continue; }
-    // vassväggen (72.3): han hugger det närmaste lagret med Mellanslag, tills alla har fallit
+    // vassväggen (75.3): han hugger tussarna i gången med Mellanslag, och går sedan genom gången
     if (st?.typ === 'pussel' && st.pussel_id === 'k2_vassvaggen' && !(await page.locator('#plattan').isVisible())) {
-      const kvar = await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt().filter((id) => id.startsWith('vass_tat_')).map((id) => window.__ORDSTAVEN.ruta(id)).sort((a, b) => a.x - b.x));
-      if (kvar.length) { await gaTill(kvar[0].x - 8, 100); await page.keyboard.press('Space'); await page.waitForTimeout(400); }
+      const p = kap2data.pussel.find((x) => x.id === 'k2_vassvaggen');
+      const gang = p.innehall.map((x, i) => (x === p.falt.klar_nar ? `vass_tat_${i}` : null)).filter(Boolean);
+      const kvar = await page.evaluate((g) => g.map((id) => window.__ORDSTAVEN.ruta(id)).filter(Boolean).sort((a, b) => a.x - b.x || a.y - b.y), gang);
+      if (kvar.length) { await gaTill(kvar[0].x - 8, kvar[0].y + kvar[0].h / 2); await page.keyboard.press('Space'); await page.waitForTimeout(400); }
+      else await gaTill(140, 115);
       continue;
     }
     // ungen sitter fast i leran (69.1): han går dit, mot ungen, tills han når den
@@ -2470,7 +2517,7 @@ test('navet i kapitel 2 (del 3): dammen lockar, bryggan först, halvan bärs til
   await page.evaluate(() => {
     const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
     // kapitlen före spolas fram när sidan laddas (namnen finns, så inget dop frågas efter)
-    Object.assign(av, { kapitelId: 'kap-02', scen: 2, scenId: 'k2s03_torget', steg: 6, pass: 2, startad: true, rumstillstand: { byn: 'fri' }, skrivet: { k2_over: 'BRO' } });
+    Object.assign(av, { kapitelId: 'kap-02', scen: 2, scenId: 'k2s03_torget', steg: 6, pass: 2, startad: true, rumstillstand: { byn: 'fri' }, skrivet: { k2_over: 'BRO' }, visade: { byn: ['fjader', 'tant_rosa', 'brevram'] } });
     t.spelare.hjalte.namn = 'TESTA'; t.spelare.unge = { format: 1, steg: 1, formagor: [], ...t.spelare.unge, namn: 'KNOPP', folj: true };
     delete av.nav; delete av.effekt;
     localStorage.setItem('ordstaven_spar', JSON.stringify(t));
@@ -2499,13 +2546,22 @@ test('navet i kapitel 2 (del 3): dammen lockar, bryggan först, halvan bärs til
   await tills(async () => (await scen()) === 'k2s04_bryggan', () => gaMot('stig_bryggan'));
   expect(await logg()).toContain('[vägval] gren k2s04_bryggan först');
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.rumsobjekt())).toContain('brygga');
-  // scenen vid bryggan: halvan läses som en skylt, och sedan bär han den till ramen i byn
+  // scenen vid bryggan: ett läsval på Farfars halva (k2_halvan, 76.4), och sedan bär han den till ramen i byn
   let lyste = [];
+  const halvanFel = page.locator('#plattan .kort[data-id="under"]');
+  let feltProvat = false;
   for (let i = 0; i < 200; i++) {
     const st = await steg();
     if ((await scen()) !== 'k2s04_bryggan') break;
-    // brevets halva igen, med INTE i guld (lys_ord, del 4)
-    if (st?.typ === 'oppna_lasplatta' && (await page.locator('#plattan .ord.lyser').count())) lyste = await page.locator('#plattan .ord.lyser').allTextContents();
+    // INTE i guld när han har valt rätt (lys_ord, 2.43)
+    if (await page.locator('#plattan .ord.lyser').count()) lyste = [...new Set([...lyste, ...(await page.locator('#plattan .ord.lyser').allTextContents())])];
+    if (st?.typ === 'pussel' && st.pussel_id === 'k2_halvan' && (await halvanFel.isVisible().catch(() => false))) {
+      // först baronens mening (fel, han nickar och gräver), sedan den som står på brevet
+      if (!feltProvat) { feltProvat = true; await halvanFel.click(); await page.waitForTimeout(400); continue; }
+      await page.locator('#plattan .kort[data-id="inte_under"]').click({ timeout: 1000 }).catch(() => {});
+      for (let j = 0; j < 20 && !lyste.length; j++) { lyste = await page.locator('#plattan .ord.lyser').allTextContents(); await page.waitForTimeout(100); }
+      continue;
+    }
     if (await page.locator('#plattan').isVisible()) await vidare();
     else if (st?.typ === 'las_skylt') await gaMot(st.foremal);
     else if (st?.typ === 'bara') {
@@ -2516,7 +2572,8 @@ test('navet i kapitel 2 (del 3): dammen lockar, bryggan först, halvan bärs til
     await page.waitForTimeout(200);
   }
   expect(await logg()).toContain('[bära] bryggan → byn');
-  expect(lyste).toEqual(['INTE']);
+  expect(lyste).toContain('INTE');
+  expect(await logg()).toMatch(/k2_halvan: INTE lyser/);
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.rumsobjekt())).toContain('brevram');
   // tillbaka i navet: Tant Rosa, passets slut (▶ fortsätter), och navet med vassen kvar
   await tills(async () => (await steg())?.typ === 'nav', vidare);
@@ -2538,20 +2595,20 @@ test('navet i kapitel 2 (del 3): dammen lockar, bryggan först, halvan bärs til
   await tills(async () => (await scen()) === 'k2s05_vassen', () => gaMot('stig_vassen'));
 });
 
-test('brevet i Tant Rosas hus (kapitel 2, del 4): första meningen är redan läst, och L4 bara efter grodan i L4', async ({ page }) => {
+test('brevet i Tant Rosas hus (kapitel 2, del 4): första meningen är redan läst, och L4 efter grodan i L4 eller på nivå L4', async ({ page }) => {
   test.setTimeout(90000);
-  const sparning = async (grodan) => {
+  const sparning = async (grodan, niva = 4) => {
     await page.goto('./?snabb&ny&kapitel=kap-02');
     await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
-    await page.evaluate((grodan) => {
+    await page.evaluate(([grodan, niva]) => {
       const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
       Object.assign(av, { kapitelId: 'kap-02', scen: 7, scenId: 'k2s08_huset', steg: 3, pass: 3, startad: true, rumstillstand: { byn: 'fri' }, skrivet: { k2_over: 'BRO' } });
       t.spelare.hjalte.namn = 'TESTA'; t.spelare.unge = { format: 1, steg: 1, formagor: [], ...t.spelare.unge, namn: 'KNOPP', folj: true };
       const post = (niva) => ({ niva, streak: 0, miss: 0, uppgifter: 3, forstaForsok: 3, hjalp: 0, aa: 0 });
-      t.spelare.larande.lasning = { P1_las_och_valj: post(4) };
+      t.spelare.larande.lasning = { P1_las_och_valj: post(niva) };
       t.spelare.larande.historik = grodan ? [{ pussel_id: 'k2_grodan', typ: 'P1_las_och_valj', niva: 'L4', ratt: true, nar: 1000 }] : [];
       localStorage.setItem('ordstaven_spar', JSON.stringify(t));
-    }, grodan);
+    }, [grodan, niva]);
     await page.goto('./?snabb&kapitel=kap-02');
     await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
     await page.click('.start-knapp');
@@ -2561,9 +2618,9 @@ test('brevet i Tant Rosas hus (kapitel 2, del 4): första meningen är redan lä
       await page.waitForTimeout(200);
     }
   };
-  // nivån är L4, men grodan är inte löst i L4: tavlorna får L3. Brevet läses först på läsplattan (tre meningar ryms
-  // inte i bubblan), och den första meningen har han redan läst vid bryggan
-  await sparning(false);
+  // nivån är L3, och grodan är inte löst i L4: tavlorna får L3 (med eller_niva gäller L4 när nivån är L4, 76.4).
+  // Brevet läses först på läsplattan (tre meningar ryms inte i bubblan), och den första meningen har han redan läst
+  await sparning(false, 3);
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.variant())).toBe('L3');
   const brev = page.locator('#plattan .lapp .rad');
   await expect(brev).toHaveCount(3);
@@ -2577,6 +2634,9 @@ test('brevet i Tant Rosas hus (kapitel 2, del 4): första meningen är redan lä
   await page.locator('#tanke .tanke-lapp').click();
   await expect(page.locator('#plattan .lapp .rad')).toHaveCount(3);
   await page.screenshot({ path: 'test-results/kap2-brevet-igen.png' });
+  // nivån är L4 utan grodan: L4 (eller_niva, 76.4)
+  await sparning(false, 4);
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.variant())).toBe('L4');
   // efter grodan i L4: L4
   await sparning(true);
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.variant())).toBe('L4');

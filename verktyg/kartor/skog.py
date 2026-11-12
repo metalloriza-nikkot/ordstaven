@@ -35,7 +35,7 @@ BILDER = {
     },
     'buskarna': {'buske_1': 'buske_gron', 'buske_2': 'buske_gul', 'buske_3': 'buske_rod', 'buske_4': 'buske_gron', 'skattlada': 'skattlada'},
     'glantan': {
-        'gren': 'gren', 'apans_bo': 'apans_bo', 'stege': 'stege', 'trappa': 'trappa_vast', 'apans_trad': 'apans_trad',
+        'gren': 'gren', 'apans_bo': 'apans_bo', 'stege': 'stege', 'apans_trad': 'apans_trad',
         'apan_i_nat': 'apa_hanga_01', 'fossil': 'fossil', 'apan': 'apa_vinka_01', 'skylt_farfar_3': 'skylt_farfar',
         'ungt_trad': 'trad_stort_ungt', 'stort_ungt_trad': 'trad_stort_ungt', 'ungt_trad_2': 'trad_stort_ungt',
         'litet_gammalt_trad': 'trad_litet_gammalt', 'gammalt_trad': 'trad_stort_gammalt', 'stort_gammalt_trad': 'trad_stort_gammalt',
@@ -75,7 +75,10 @@ VISAS_FORST = {'glantan': {'apan_i_nat'}}
 # stegen står framför stammen (5d): den skär en öppning i trädets hinder, så att han når den
 OPPNING = {'glantan': {'stege'}}
 # det som ritas i rutlagret och inte som ett föremål
-RUTOR = {'glantan': {'kulle', 'kronet', 'backen'}, 'skogsbrynet': {'snar_vast', 'snar_ost'}}  # 5d: snåren kring liangången
+RUTOR = {'glantan': {'kulle', 'kronet', 'backen', 'trappa'}, 'skogsbrynet': {'snar_vast', 'snar_ost'}}  # 5d: snåren kring liangången
+# Stil 16 (76.6): gläntans trappa flyttas till kullens framsida, där molnets bild visar den, två rutor bred mellan
+# de södra lövhögarna. Den ritas i rutlagret (höjdkitet i 10b), och bilden trappa_vast används inte längre.
+FLYTT = {'glantan': {'trappa': (384, 124, 32, 26)}}
 # 5d: tät skog inne i rummet (ridåns rutor, ovanför figurerna), indragen 8 px mot gången så att ingen ruta täcker lianerna
 # 56.3: det östra snåret börjar en ruta lägre (hörnen från y 64), så att vägen ovanför det till stigen mot buskarna
 # går söder om gångens mynning mot gläntan: annars gick han ut till gläntan på vägen
@@ -164,6 +167,25 @@ def rita(rum, karta, rutnr, storlek):
                 if blom and h(x, y, 5) % 3 == 0: g = ['gras_blommor_1', 'gras_blommor_2'][h(x, y, 6) % 2]
                 namn = wang('vatten', vatten, x, y) or wang('stig', stig, x, y) or g
             golv.append(rutnr[namn])
+    if kulle:  # Stil 16, höjdkitet (10b): skugga på gräset söder och öster om kullen, och trappan i framsidan
+        kx0, ky0 = int(kulle['x'] // R), int(kulle['y'] // R)
+        kb, kh = int(kulle['width'] // R), int(kulle['height'] // R)
+        gras_nr = {rutnr[g] for g in gras}
+
+        def skugga(x, y, namn):
+            if 0 <= x < B and 0 <= y < H and golv[y * B + x] in gras_nr:  # bara på gräs, aldrig på stig eller vatten
+                golv[y * B + x] = rutnr[namn]
+        for x in range(kx0, kx0 + kb):
+            skugga(x, ky0 + kh, 'skugga_S')
+        for y in range(ky0, ky0 + kh):
+            skugga(kx0 + kb, y, 'skugga_NE' if y == ky0 and ky0 > 0 else 'skugga_E')
+        skugga(kx0 + kb, ky0 + kh, 'skugga_SE')
+        t = by.get('trappa')
+        if t:
+            tx0 = int(t['x'] // R)
+            for i, sida in enumerate('VH'):
+                for y, del_ in ((ky0 + kh - 2, 'S'), (ky0 + kh - 1, 'F'), (ky0 + kh, 'fot')):
+                    golv[y * B + tx0 + i] = rutnr[f'trappa_{del_}_{sida}']
     # trädridån längs kanterna (ovanför figurerna), med öppningar vid utgångar, starten och bäcken
     oppet = set()
     for o in obj:
@@ -197,7 +219,14 @@ def rita(rum, karta, rutnr, storlek):
     lager = [{'namn': 'golv', 'data': [n + 1 for n in golv]}, {'namn': 'over', 'data': over}]
     for oid, rekt in EGNA_STIGAR.get(rum, {}).items():
         egna = horn_i(rekt)
-        data = [rutnr[n] + 1 if (n := wang('stig', egna, x, y)) else 0 for y in range(H) for x in range(B)]
+        namn_nr = {v: k for k, v in rutnr.items()}
+
+        def egen_ruta(x, y):
+            n = wang('stig', egna, x, y)
+            if not n: return 0
+            under = namn_nr[golv[y * B + x]]  # Stil 16: skuggan på golvet står kvar under stigen
+            return rutnr.get(f'{n}_{under}', rutnr[n]) + 1 if under.startswith('skugga_') else rutnr[n] + 1
+        data = [egen_ruta(x, y) for y in range(H) for x in range(B)]
         lager.append({'namn': oid, 'data': data, 'visas_med': oid})
     return lager
 
@@ -225,8 +254,11 @@ def kor(prova=False):
                 satt(o, 'bild_anim', ANIM[rum][n][0]); satt(o, 'anim_ms', ANIM[rum][n][1])
             if n in SEDAN.get(rum, {}):
                 satt(o, 'bild_sedan', SEDAN[rum][n][0]); satt(o, 'sedan', SEDAN[rum][n][1])
+            if n in FLYTT.get(rum, {}):
+                o['x'], o['y'], o['width'], o['height'] = FLYTT[rum][n]
             if n in RUTOR.get(rum, set()):
                 satt(o, 'rutor', True)
+                o['properties'] = [p for p in o['properties'] if p['name'] != 'bild']
             if n in HUGG.get(rum, {}):
                 satt(o, 'bild_hugg', HUGG[rum][n][0]); satt(o, 'bild_kvar', HUGG[rum][n][1])
             if n in OVANPA.get(rum, set()):
