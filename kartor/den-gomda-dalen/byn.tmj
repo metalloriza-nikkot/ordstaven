@@ -14,6 +14,11 @@
  "nextobjectid": 51,
  "properties": [
   {
+   "name": "bild",
+   "type": "string",
+   "value": "byn"
+  },
+  {
    "name": "rum",
    "type": "string",
    "value": "byn"
@@ -44,6 +49,11 @@
      "properties": [
       {
        "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "i_bilden",
        "type": "bool",
        "value": true
       },
@@ -407,7 +417,14 @@
      "width": 30,
      "height": 14,
      "rotation": 0,
-     "visible": true
+     "visible": true,
+     "properties": [
+      {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      }
+     ]
     },
     {
      "id": 25,
@@ -564,6 +581,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "riktning",
        "type": "string",
        "value": "upp"
@@ -610,6 +632,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "riktning",
        "type": "string",
        "value": "upp"
@@ -633,6 +660,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "riktning",
        "type": "string",
        "value": "upp"
@@ -655,6 +687,11 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
       {
        "name": "riktning",
        "type": "string",
@@ -735,6 +772,11 @@
        "value": true
       },
       {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "riktning",
        "type": "string",
        "value": "upp"
@@ -759,6 +801,11 @@
      "properties": [
       {
        "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "i_bilden",
        "type": "bool",
        "value": true
       },
@@ -791,6 +838,11 @@
        "value": true
       },
       {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "riktning",
        "type": "string",
        "value": "hoger"
@@ -811,7 +863,14 @@
      "width": 36,
      "height": 10,
      "rotation": 0,
-     "visible": true
+     "visible": true,
+     "properties": [
+      {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      }
+     ]
     },
     {
      "id": 45,

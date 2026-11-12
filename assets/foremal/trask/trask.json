@@ -1,0 +1,1234 @@
+{
+ "frames": {
+  "brev_halva": {
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 12,
+    "h": 12
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 12,
+    "h": 12
+   },
+   "sourceSize": {
+    "w": 12,
+    "h": 12
+   }
+  },
+  "brev_halva_blot_01": {
+   "frame": {
+    "x": 0,
+    "y": 13,
+    "w": 12,
+    "h": 12
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 12,
+    "h": 12
+   },
+   "sourceSize": {
+    "w": 12,
+    "h": 12
+   }
+  },
+  "brev_halva_blot_02": {
+   "frame": {
+    "x": 13,
+    "y": 13,
+    "w": 12,
+    "h": 12
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 12,
+    "h": 12
+   },
+   "sourceSize": {
+    "w": 12,
+    "h": 12
+   }
+  },
+  "brevram_halva": {
+   "frame": {
+    "x": 0,
+    "y": 26,
+    "w": 14,
+    "h": 12
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 14,
+    "h": 12
+   },
+   "sourceSize": {
+    "w": 14,
+    "h": 12
+   }
+  },
+  "brevram_hel": {
+   "frame": {
+    "x": 15,
+    "y": 26,
+    "w": 14,
+    "h": 12
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 14,
+    "h": 12
+   },
+   "sourceSize": {
+    "w": 14,
+    "h": 12
+   }
+  },
+  "brevram_tom": {
+   "frame": {
+    "x": 30,
+    "y": 26,
+    "w": 14,
+    "h": 12
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 14,
+    "h": 12
+   },
+   "sourceSize": {
+    "w": 14,
+    "h": 12
+   }
+  },
+  "brunnen": {
+   "frame": {
+    "x": 0,
+    "y": 39,
+    "w": 28,
+    "h": 30
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 28,
+    "h": 30
+   },
+   "sourceSize": {
+    "w": 28,
+    "h": 30
+   }
+  },
+  "bubbelblommor_01": {
+   "frame": {
+    "x": 0,
+    "y": 70,
+    "w": 40,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 40,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 40,
+    "h": 24
+   }
+  },
+  "bubbelblommor_02": {
+   "frame": {
+    "x": 41,
+    "y": 70,
+    "w": 40,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 40,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 40,
+    "h": 24
+   }
+  },
+  "bubbla": {
+   "frame": {
+    "x": 0,
+    "y": 95,
+    "w": 8,
+    "h": 8
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 8,
+    "h": 8
+   },
+   "sourceSize": {
+    "w": 8,
+    "h": 8
+   }
+  },
+  "drake_flyger_01": {
+   "frame": {
+    "x": 0,
+    "y": 104,
+    "w": 20,
+    "h": 22
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 22
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 22
+   }
+  },
+  "drake_flyger_02": {
+   "frame": {
+    "x": 21,
+    "y": 104,
+    "w": 20,
+    "h": 22
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 22
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 22
+   }
+  },
+  "drake_tak": {
+   "frame": {
+    "x": 0,
+    "y": 127,
+    "w": 20,
+    "h": 22
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 22
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 22
+   }
+  },
+  "fisk_hopp_01": {
+   "frame": {
+    "x": 0,
+    "y": 150,
+    "w": 14,
+    "h": 12
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 14,
+    "h": 12
+   },
+   "sourceSize": {
+    "w": 14,
+    "h": 12
+   }
+  },
+  "fisk_hopp_02": {
+   "frame": {
+    "x": 15,
+    "y": 150,
+    "w": 14,
+    "h": 12
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 14,
+    "h": 12
+   },
+   "sourceSize": {
+    "w": 14,
+    "h": 12
+   }
+  },
+  "fisk_hopp_03": {
+   "frame": {
+    "x": 30,
+    "y": 150,
+    "w": 14,
+    "h": 12
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 14,
+    "h": 12
+   },
+   "sourceSize": {
+    "w": 14,
+    "h": 12
+   }
+  },
+  "fjader": {
+   "frame": {
+    "x": 0,
+    "y": 163,
+    "w": 10,
+    "h": 10
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 10,
+    "h": 10
+   },
+   "sourceSize": {
+    "w": 10,
+    "h": 10
+   }
+  },
+  "groda_gron_prickig_01": {
+   "frame": {
+    "x": 0,
+    "y": 174,
+    "w": 20,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 16
+   }
+  },
+  "groda_gron_prickig_02": {
+   "frame": {
+    "x": 21,
+    "y": 174,
+    "w": 20,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 16
+   }
+  },
+  "groda_gron_slat_01": {
+   "frame": {
+    "x": 0,
+    "y": 191,
+    "w": 20,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 16
+   }
+  },
+  "groda_gron_slat_02": {
+   "frame": {
+    "x": 21,
+    "y": 191,
+    "w": 20,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 16
+   }
+  },
+  "groda_gul_prickig_01": {
+   "frame": {
+    "x": 0,
+    "y": 208,
+    "w": 20,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 16
+   }
+  },
+  "groda_gul_prickig_02": {
+   "frame": {
+    "x": 21,
+    "y": 208,
+    "w": 20,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 16
+   }
+  },
+  "groda_gul_slat_01": {
+   "frame": {
+    "x": 0,
+    "y": 225,
+    "w": 20,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 16
+   }
+  },
+  "groda_gul_slat_02": {
+   "frame": {
+    "x": 21,
+    "y": 225,
+    "w": 20,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 16
+   }
+  },
+  "groda_liten_gron_01": {
+   "frame": {
+    "x": 0,
+    "y": 242,
+    "w": 20,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 16
+   }
+  },
+  "groda_liten_gron_02": {
+   "frame": {
+    "x": 21,
+    "y": 242,
+    "w": 20,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 16
+   }
+  },
+  "groda_liten_gul_01": {
+   "frame": {
+    "x": 0,
+    "y": 259,
+    "w": 20,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 16
+   }
+  },
+  "groda_liten_gul_02": {
+   "frame": {
+    "x": 21,
+    "y": 259,
+    "w": 20,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 16
+   }
+  },
+  "groda_stor_gron_01": {
+   "frame": {
+    "x": 0,
+    "y": 276,
+    "w": 20,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 16
+   }
+  },
+  "groda_stor_gron_02": {
+   "frame": {
+    "x": 21,
+    "y": 276,
+    "w": 20,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 16
+   }
+  },
+  "groda_stor_gul_01": {
+   "frame": {
+    "x": 0,
+    "y": 293,
+    "w": 20,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 16
+   }
+  },
+  "groda_stor_gul_02": {
+   "frame": {
+    "x": 21,
+    "y": 293,
+    "w": 20,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 16
+   }
+  },
+  "lagereld_ljus": {
+   "frame": {
+    "x": 0,
+    "y": 310,
+    "w": 72,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 72,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 72,
+    "h": 48
+   }
+  },
+  "lagereld_slackt": {
+   "frame": {
+    "x": 73,
+    "y": 310,
+    "w": 24,
+    "h": 22
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 22
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 22
+   }
+  },
+  "lagereld_slackt_kvall": {
+   "frame": {
+    "x": 0,
+    "y": 359,
+    "w": 24,
+    "h": 22
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 22
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 22
+   }
+  },
+  "lagereld_tand_kvall_01": {
+   "frame": {
+    "x": 0,
+    "y": 382,
+    "w": 24,
+    "h": 22
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 22
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 22
+   }
+  },
+  "lagereld_tand_kvall_02": {
+   "frame": {
+    "x": 25,
+    "y": 382,
+    "w": 24,
+    "h": 22
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 22
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 22
+   }
+  },
+  "lagereld_tand_kvall_03": {
+   "frame": {
+    "x": 50,
+    "y": 382,
+    "w": 24,
+    "h": 22
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 22
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 22
+   }
+  },
+  "lykta_ljus": {
+   "frame": {
+    "x": 0,
+    "y": 405,
+    "w": 32,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 24
+   }
+  },
+  "lykta_slackt": {
+   "frame": {
+    "x": 33,
+    "y": 405,
+    "w": 12,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 12,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 12,
+    "h": 24
+   }
+  },
+  "lykta_slackt_kvall": {
+   "frame": {
+    "x": 0,
+    "y": 430,
+    "w": 12,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 12,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 12,
+    "h": 24
+   }
+  },
+  "lykta_tand_kvall": {
+   "frame": {
+    "x": 0,
+    "y": 455,
+    "w": 12,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 12,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 12,
+    "h": 24
+   }
+  },
+  "overgang_bro": {
+   "frame": {
+    "x": 0,
+    "y": 480,
+    "w": 96,
+    "h": 26
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 26
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 26
+   }
+  },
+  "overgang_flotte": {
+   "frame": {
+    "x": 97,
+    "y": 480,
+    "w": 96,
+    "h": 26
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 26
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 26
+   }
+  },
+  "overgang_rep": {
+   "frame": {
+    "x": 194,
+    "y": 480,
+    "w": 96,
+    "h": 26
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 26
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 26
+   }
+  },
+  "overgang_stege": {
+   "frame": {
+    "x": 291,
+    "y": 480,
+    "w": 96,
+    "h": 26
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 26
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 26
+   }
+  },
+  "rep_lodrat": {
+   "frame": {
+    "x": 0,
+    "y": 507,
+    "w": 10,
+    "h": 38
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 10,
+    "h": 38
+   },
+   "sourceSize": {
+    "w": 10,
+    "h": 38
+   }
+  },
+  "rep_vagrat": {
+   "frame": {
+    "x": 11,
+    "y": 507,
+    "w": 40,
+    "h": 14
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 40,
+    "h": 14
+   },
+   "sourceSize": {
+    "w": 40,
+    "h": 14
+   }
+  },
+  "skylt_baronen": {
+   "frame": {
+    "x": 0,
+    "y": 546,
+    "w": 16,
+    "h": 22
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 22
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 22
+   }
+  },
+  "soffa": {
+   "frame": {
+    "x": 0,
+    "y": 569,
+    "w": 56,
+    "h": 30
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 56,
+    "h": 30
+   },
+   "sourceSize": {
+    "w": 56,
+    "h": 30
+   }
+  },
+  "stock": {
+   "frame": {
+    "x": 0,
+    "y": 600,
+    "w": 30,
+    "h": 12
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 30,
+    "h": 12
+   },
+   "sourceSize": {
+    "w": 30,
+    "h": 12
+   }
+  },
+  "tavla_liten_fyrkant": {
+   "frame": {
+    "x": 0,
+    "y": 613,
+    "w": 24,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 24
+   }
+  },
+  "tavla_liten_rund": {
+   "frame": {
+    "x": 25,
+    "y": 613,
+    "w": 24,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 24
+   }
+  },
+  "tavla_stor_fyrkant": {
+   "frame": {
+    "x": 0,
+    "y": 638,
+    "w": 24,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 24
+   }
+  },
+  "tavla_stor_rund": {
+   "frame": {
+    "x": 25,
+    "y": 638,
+    "w": 24,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 24
+   }
+  },
+  "vasstuss_bar": {
+   "frame": {
+    "x": 0,
+    "y": 663,
+    "w": 16,
+    "h": 38
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 38
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 38
+   }
+  },
+  "vasstuss_hel": {
+   "frame": {
+    "x": 17,
+    "y": 663,
+    "w": 16,
+    "h": 38
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 38
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 38
+   }
+  },
+  "vasstuss_huggen": {
+   "frame": {
+    "x": 34,
+    "y": 663,
+    "w": 16,
+    "h": 38
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 38
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 38
+   }
+  },
+  "vedpinne": {
+   "frame": {
+    "x": 0,
+    "y": 702,
+    "w": 12,
+    "h": 8
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 12,
+    "h": 8
+   },
+   "sourceSize": {
+    "w": 12,
+    "h": 8
+   }
+  },
+  "vedpinne_kvall": {
+   "frame": {
+    "x": 13,
+    "y": 702,
+    "w": 12,
+    "h": 8
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 12,
+    "h": 8
+   },
+   "sourceSize": {
+    "w": 12,
+    "h": 8
+   }
+  }
+ },
+ "meta": {
+  "image": "trask.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 388,
+   "h": 711
+  },
+  "scale": "1",
+  "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."
+ }
+}

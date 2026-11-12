@@ -1030,3 +1030,11 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **`verktyg/kartor/kap2.py`** sätter `bild: <namn>_ner_01` och `skugga` på byborna (`BYBOR`: kartans id → bildernas namn, `barnet_drake` → `barnet`). Figuren vänder sig mot den som pratar med `<namn>_<riktning>_01`, som Farfar. Föremålens id:n är oförändrade.
 - **Tant Rosas porträtt** (`.p-tant_rosa`) i pratrutan. Den fundersamma minen och vinkningen, jublet och sysslorna i bilder kommer med regierna senare.
 
+## 102. Kapitel 2:s rum som bilder, och vassen vid fötterna (0.68.0, Teknik 42, beslut 82.7–82.8)
+- **Ett fryst uterum är en bild** (82.7), som inomhusrummen: kartans `bild` pekar på `assets/rum/kap-02/<rum>.png`. `ritaGolv` väljer `rum_<bild>_<tillstånd>` när den finns (byn på kvällen, `byn_kvall`) och annars `rum_<bild>`. `rum_<bild>_over` (den höga vassen längs kanterna) ritas i ridåns lager ovanför figurerna.
+- **Där den höga vassen står går han inte** (56.3): `verktyg/kartor/kap2.py` lägger väggar (`vagg`) under `_over`-bilden, en per sträcka av rutor om 8 × 8 med minst en pixel, ihopslagna. De läggs sist i kartan, så att föremålens id står kvar.
+- **`i_bilden`** (kartans egenskap, `Objekt.iBilden`): föremålet är en del av rummets bild (leran, bryggan, vattnet, udden och alla utgångar i kapitel 2). Det ritas som en osynlig ruta, och id:t, zonen och hindret står kvar. Enhetstestet för läsvalens bilder hoppar över ett alternativ som är `i_bilden` (husen på torget står i bilden).
+- **Vassen vid fötterna** (82.8): masken `vassen_falt.png` blir `assets/rum/kap-02/vassen_falt.json` i `inkorg.py` (rader av [x, längd], ingen bild). `faltFor(rum)` i `figurbilder.js` hämtar den. Hjälten och ungen har var sin `vass_fotter_01–02` (24 × 8) överst i sin behållare, mitt under fötterna (`vassVidFotter`), och `ritaVassVidFotter()` i `placera()` visar den när fötterna står i fältet (`iFalt`). Den vajar med ca 300 ms per bild när figuren går. Inte när ungen lyfts (bubblan, hoppet).
+- **Grodorna och tavlorna** har kartans `bild` (`groda_<namn>_01`, `tavla_<namn>`). Föremålen i `foremal/trask/` och de nya bildkorten är inhämtade, men de flesta föremålen får sina bilder i kartan med resten av grafiken.
+- Testkrokarna `rumsbilder()` och `vassVidFotter()`, och webbtestet för hela kapitel 2 prövar bilderna, kvällens bild och att vasstopparna kom fram.
+

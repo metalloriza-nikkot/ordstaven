@@ -11,8 +11,13 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 15,
+ "nextobjectid": 24,
  "properties": [
+  {
+   "name": "bild",
+   "type": "string",
+   "value": "trasket_kanten"
+  },
   {
    "name": "rum",
    "type": "string",
@@ -44,6 +49,11 @@
      "properties": [
       {
        "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "i_bilden",
        "type": "bool",
        "value": true
       },
@@ -125,6 +135,11 @@
      "properties": [
       {
        "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "i_bilden",
        "type": "bool",
        "value": true
       },
@@ -237,6 +252,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "vanster"
@@ -301,6 +321,11 @@
        "value": true
       },
       {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "riktning",
        "type": "string",
        "value": "hoger"
@@ -311,6 +336,105 @@
        "value": "byn"
       }
      ]
+    },
+    {
+     "id": 15,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 0,
+     "width": 464,
+     "height": 16,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 16,
+     "name": "",
+     "type": "vagg",
+     "x": 560,
+     "y": 0,
+     "width": 80,
+     "height": 16,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 17,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 16,
+     "width": 112,
+     "height": 8,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 18,
+     "name": "",
+     "type": "vagg",
+     "x": 128,
+     "y": 16,
+     "width": 112,
+     "height": 8,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 19,
+     "name": "",
+     "type": "vagg",
+     "x": 248,
+     "y": 16,
+     "width": 32,
+     "height": 8,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 20,
+     "name": "",
+     "type": "vagg",
+     "x": 296,
+     "y": 16,
+     "width": 128,
+     "height": 8,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 21,
+     "name": "",
+     "type": "vagg",
+     "x": 432,
+     "y": 16,
+     "width": 32,
+     "height": 8,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 22,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 184,
+     "width": 464,
+     "height": 8,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 23,
+     "name": "",
+     "type": "vagg",
+     "x": 560,
+     "y": 184,
+     "width": 80,
+     "height": 8,
+     "rotation": 0,
+     "visible": true
     }
    ]
   }

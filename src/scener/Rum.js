@@ -11,7 +11,7 @@ import { rumsHinder } from '../karna/rumshinder.js';
 import { skapaNivaer } from '../karna/nivaer.js';
 import { KAMERA, centrera, folj, visaRuta, omradeFor, narmare, enSkarm } from '../karna/kamera.js';
 import { hjaltensByten } from '../karna/fargbyte.js';
-import { laddaGrafik, fargad, riktningFor, foremalsbild, rutnamn, rutanimation } from './figurbilder.js';
+import { laddaGrafik, fargad, riktningFor, foremalsbild, rutnamn, rutanimation, faltFor } from './figurbilder.js';
 import { foremaletsBild } from '../karna/egenskaper.js';
 import { Livet } from './livet.js';
 
@@ -110,6 +110,12 @@ export class Rum extends Phaser.Scene {
     this.massiv = [];
     /** @type {{ x: number, y: number, b: number, h: number }[]} ridåns rutor som hinder (kartans overHinder) */
     this.overHinder = [];
+    /** @type {{ bredd: number, hojd: number, rader: number[][] } | null} rummets fält (82.8, vassen vid fötterna) */
+    this.falt = null;
+    /** @type {any} */ this.vassHjalte = null;
+    /** @type {any} */ this.vassUnge = null;
+    /** @type {{ x: number, y: number } | null} */ this.forraUngePos = null;
+    /** hur många gånger vasstopparna har kommit fram vid hjältens fötter (för testerna) */ this.vassSedd = 0;
     /** @type {{ x: number, y: number }[]} lampor som lyser när rummet är mörkt */
     this.lampor = [];
     /** @type {number | null} hur mörkt rummet är på natten (kartans morker) */
@@ -310,8 +316,16 @@ export class Rum extends Phaser.Scene {
     if (!rum) { g.fillStyle(0x1a1410).fillRect(0, 0, RUM.bredd, RUM.hojd); return; }
     const B = this.storlek.bredd, H = this.storlek.hojd;
     // grafiken: rummets bild (beslut 27.6) eller marken av rutor, ritad en gång till en egen bild (golvdatorn)
-    const bild = this.rumsbild ? `rum_${this.rumsbild}` : this.mark ? this.ritaMark() : null;
-    if (bild && this.textures.exists(bild)) { this.golvBild.setTexture(bild).setVisible(true); return; }
+    // ett rum som bild kan ha en bild per tillstånd (rum_byn_kvall, 82.7) och den höga vassen ovanför figurerna
+    // (rum_<rum>_over), som ridån i skogen
+    const iTillstand = this.rumsbild && this.tillstand ? `rum_${this.rumsbild}_${this.tillstand}` : null;
+    const bild = this.rumsbild ? (iTillstand && this.textures.exists(iTillstand) ? iTillstand : `rum_${this.rumsbild}`) : this.mark ? this.ritaMark() : null;
+    if (bild && this.textures.exists(bild)) {
+      this.golvBild.setTexture(bild).setVisible(true);
+      const over = this.rumsbild ? `rum_${this.rumsbild}_over` : null;
+      if (over && this.textures.exists(over)) this.overBild.setTexture(over).setVisible(true);
+      return;
+    }
     g.fillStyle(FARG.golv).fillRect(0, 0, B, H);
     g.fillStyle(FARG.rutnat);
     for (let x = RUM.ruta; x < B; x += RUM.ruta) g.fillRect(x, 0, 1, H);
@@ -538,7 +552,48 @@ export class Rum extends Phaser.Scene {
     // drakvimpeln: en pinne på hjälmen med en liten flagga. Annars tre taggar
     if (dekor === 'drakvimpel') { this.hjalte.add(this.add.rectangle(9, -6, 1, 6, 0x5a4a3a).setOrigin(0, 0)); this.hjalte.add(this.add.triangle(10, -6, 0, 0, 5, 2, 0, 4, farg(dekor)).setOrigin(0, 0)); }
     else if (dekor && !this.kam) for (const x of [4, 7, 10]) this.hjalte.add(this.add.rectangle(x, -3, 2, 3, farg(dekor)).setOrigin(0, 0));
+    // vasstopparna vid fötterna (82.8), överst: 24 × 8 mitt under fötterna, syns bara i rummets fält
+    this.vassHjalte = this.vassVidFotter(8, 24);
+    if (this.vassHjalte) this.hjalte.add(this.vassHjalte);
     this.ritaHjalte();
+  }
+
+  /**
+   * Vasstopparna vid fötterna (82.8, som det höga gräset i A Link to the Past): en bild på 24 × 8 som ligger överst i
+   * figurens behållare, mitt under fötterna, och syns när fötterna står i rummets fält (kartans mask, <rum>_falt).
+   * @param {number} fx fötternas x i behållaren @param {number} fy fötternas y i behållaren @returns {any}
+   */
+  vassVidFotter(fx, fy) {
+    if (!this.textures.exists('omgivning') || !this.textures.get('omgivning').has('vass_fotter_01')) return null;
+    return this.add.image(fx - 12, fy - 8, 'omgivning', 'vass_fotter_01').setOrigin(0, 0).setVisible(false);
+  }
+
+  /** Står en fot i rummets fält (82.8)? @param {number} x @param {number} y fötternas punkt i världen */
+  iFalt(x, y) {
+    const f = this.falt, rad = f?.rader[Math.floor(y)];
+    if (!rad) return false;
+    const px = Math.floor(x);
+    for (let i = 0; i < rad.length; i += 2) if (px >= rad[i] && px < rad[i] + rad[i + 1]) return true;
+    return false;
+  }
+
+  /**
+   * Vasstopparna vid hjältens och ungens fötter (82.8): syns i fältet, och vajar (två bilder, ca 300 ms) när figuren går.
+   */
+  ritaVassVidFotter() {
+    const nu = this.time.now;
+    const satt = (/** @type {any} */ img, /** @type {boolean} */ i, /** @type {boolean} */ gar) => {
+      if (!img) return;
+      const ram = `vass_fotter_0${gar ? 1 + (Math.floor(nu / 300) % 2) : 1}`;
+      if (img.visible !== i || (i && img.frame.name !== ram)) {
+        if (i && !img.visible && img === this.vassHjalte) this.vassSedd = (this.vassSedd || 0) + 1;
+        img.setVisible(i); if (i) img.setFrame(ram); this.smutsig = true;
+      }
+    };
+    const ungeGar = !!this.forraUngePos && (this.forraUngePos.x !== this.ungePos.x || this.forraUngePos.y !== this.ungePos.y);
+    this.forraUngePos = { x: this.ungePos.x, y: this.ungePos.y };
+    satt(this.vassHjalte, !!this.falt && this.hjalte.visible && this.iFalt(this.pos.x, this.pos.y - 1), !!this.gar);
+    satt(this.vassUnge, !!this.falt && this.unge.visible && !this.ungeLyft && this.iFalt(this.ungePos.x, this.ungePos.y - 1), ungeGar);
   }
 
   /**
@@ -2106,7 +2161,9 @@ export class Rum extends Phaser.Scene {
       // ungen i en ruta på 24 × 24 med fötterna nere, och skuggan under (10b)
       this.ungeSkugga = this.textures.exists('skugga') ? this.add.image(0, 0, 'skugga', 'skugga_24x24').setOrigin(0, 0) : null;
       this.ungeBild = this.add.image(0, 0, 'unge', 'unge1_ga_ner_01').setOrigin(0, 0);
-      this.unge.add(/** @type {any[]} */ ([this.ungeSkugga, this.ungeBild].filter(Boolean)));
+      // vasstopparna vid fötterna (82.8): ungens fötter står i rutans mitt, en pixel ovanför nederkanten
+      this.vassUnge = this.vassVidFotter(12, 23);
+      this.unge.add(/** @type {any[]} */ ([this.ungeSkugga, this.ungeBild, this.vassUnge].filter(Boolean)));
       return;
     }
     this.unge.add([this.add.rectangle(0, 0, 12, 12, FARG.unge).setOrigin(0, 0), this.add.rectangle(2, 6, 8, 5, FARG.ungeMage).setOrigin(0, 0)]);
@@ -2147,7 +2204,7 @@ export class Rum extends Phaser.Scene {
    */
   visa(v) {
     this.harRum = !!v.rum;
-    if (v.nyttRum || !this.harRum) { this.rumsbild = (this.harRum && v.karta?.bild) || null; this.mark = (this.harRum && v.karta?.mark) || null; this.rumId = v.rum; this.markObjekt = v.karta?.objekt || []; }
+    if (v.nyttRum || !this.harRum) { this.rumsbild = (this.harRum && v.karta?.bild) || null; this.falt = faltFor(this.rumsbild); this.mark = (this.harRum && v.karta?.mark) || null; this.rumId = v.rum; this.markObjekt = v.karta?.objekt || []; }
     this.visaUnge = v.unge;
     if (v.nyttRum) { for (const id of [...this.ramSlinga.keys(), ...this.ramTimrar.keys()]) this.stoppaRamar(id); this.ramFor.clear(); this.dolda.clear(); this.ungeMal = null; this.ungeTittarPa = null; this.ungeKlattrar = null; this.stegeNu = null; this.ungeSang = null; this.ungeLyft = 0; this.ungeFast = null; this.hjalteFast = null; this.lerig = 0; this.undvik = []; this.hinderUndvik = null; this.regiFokus = null; this.forstFokus = false; if (this.ungeSvavar) { this.ungeSvavar.g.destroy(); this.ungeSvavar = null; } for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas?.remove(); this.sover = null; } this.vaknar = null; this.rensaRegi(); }
     this.tillstand = v.tillstand;
@@ -2336,6 +2393,11 @@ export class Rum extends Phaser.Scene {
       this.ritade.set(o.id, /** @type {any} */ (img));
       return;
     }
+    // en del av rummets bild (82.7: leran, bryggan, vattnet): bara en osynlig ruta, som hindren och tester kan hitta
+    if (o.iBilden && this.rumsbild && this.golvBild.visible) {
+      const r = this.add.rectangle(o.x, o.y, o.b, o.h, 0, 0).setOrigin(0, 0);
+      this.lagerObjekt.add(r); this.ritade.set(o.id, r); return;
+    }
     // ritat i rutlagret (kullen, krönet, bäcken): bara en osynlig ruta, som hindren och tester kan hitta
     if (o.rutor && this.rutlager?.length) {
       const r = this.add.rectangle(o.x, o.y, o.b, o.h, 0, 0).setOrigin(0, 0);
@@ -2492,6 +2554,7 @@ export class Rum extends Phaser.Scene {
     const nos = m && Math.hypot(m.x - this.ungePos.x, m.y - this.ungePos.y) < 3 ? Math.max(0, Math.sin(this.time.now / 110)) * 3 : 0;
     if (this.ungeBild) { this.unge.setPosition(Math.round(this.ungePos.x - 12), Math.round(this.ungePos.y - 23 - (this.ungeLyft || 0) + (this.ungeFast ? Math.round(this.ungeFast.djup) : 0))); this.ritaUngen(); this.ritaUngeFast(); this.ritaUngeBubbla(); }
     else this.unge.setPosition(Math.round(this.ungePos.x - 6 + (m ? Math.cos(m.mot) * nos : 0)), Math.round(this.ungePos.y - 12 + (m ? Math.sin(m.mot) * nos : 0)));
+    this.ritaVassVidFotter();
     const l = this.ljusboll; l.clear();
     if (l.visible) {
       const cx = Math.round(this.pos.x), cy = Math.round(this.pos.y - 30);

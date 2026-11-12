@@ -21,6 +21,48 @@ from pathlib import Path
 ROT = Path(__file__).resolve().parents[2]
 KARTOR = ROT / 'kartor' / 'den-gomda-dalen'
 R = 16
+# Stils rum som bilder (82.7): assets/rum/kap-02/<rum>.png är rummets bild, och <rum>_over.png den höga vassen längs
+# kanterna, som ritas ovanför figurerna. Där den står är det stängt för fötterna (56.3): en vägg per sträcka av rutor om
+# 8 × 8 där den har en pixel, så att det som ritas ovanför aldrig ligger där han kan gå.
+RUMSBILDER = ROT / 'assets' / 'rum' / 'kap-02'
+OVER_RUTA = 8
+# Föremål som är en del av rummets bild (Stil del 2): de ritas inte som gråboxens rutor, men id:n och zoner står kvar
+I_BILDEN = {'leran', 'leran_brygga', 'lerpol_vassen', 'strand_vassen', 'brygga', 'brygga_fran_torget', 'vattnet', 'udden'}
+
+
+def over_vaggar(rum):
+    """Väggarna under rummets _over-bild: sträckor av rutor om 8 × 8 med minst en pixel, ihopslagna radvis och
+    sedan nedåt när sträckan är densamma."""
+    f = RUMSBILDER / f'{rum}_over.png'
+    if not f.is_file():
+        return []
+    from PIL import Image
+    a = Image.open(f).convert('RGBA').getchannel('A')
+    C = OVER_RUTA
+    rader = []
+    for cy in range(a.height // C):
+        rad, cx = [], 0
+        while cx < a.width // C:
+            if a.crop((cx * C, cy * C, cx * C + C, cy * C + C)).getbbox():
+                start = cx
+                while cx < a.width // C and a.crop((cx * C, cy * C, cx * C + C, cy * C + C)).getbbox():
+                    cx += 1
+                rad.append((start, cx - start))
+            else:
+                cx += 1
+        rader.append(rad)
+    ut, oppna = [], {}
+    for cy, rad in enumerate(rader + [[]]):
+        nya = {}
+        for s in rad:
+            if s in oppna:
+                nya[s] = oppna.pop(s)
+            else:
+                nya[s] = cy
+        for (x, b), y0 in oppna.items():
+            ut.append(vagg(x * C, y0 * C, b * C, (cy - y0) * C))
+        oppna = nya
+    return sorted(ut, key=lambda v: (v[3], v[2]))
 
 
 def utg(namn, x, y, b, h, **e):
@@ -194,10 +236,10 @@ RUMMEN = {
             sak('soffa', 48, 112, 56, 22, sida='alla'),
             liv('katt', 52, 100, 16, 10),  # 72.10: sover på soffan, aldrig nära tavlorna
             # högt på väggen med luft under (71.4): ingen når dem utan staven
-            sak('tavla_stor_rund', 60, 6, 24, 24, sida='under', rackvidd=56),
-            sak('tavla_liten_fyrkant', 112, 6, 24, 24, sida='under', rackvidd=56),
-            sak('tavla_stor_fyrkant', 164, 6, 24, 24, sida='under', rackvidd=56),
-            sak('tavla_liten_rund', 216, 6, 24, 24, sida='under', rackvidd=56),
+            sak('tavla_stor_rund', 60, 6, 24, 24, sida='under', rackvidd=56, bild='tavla_stor_rund'),
+            sak('tavla_liten_fyrkant', 112, 6, 24, 24, sida='under', rackvidd=56, bild='tavla_liten_fyrkant'),
+            sak('tavla_stor_fyrkant', 164, 6, 24, 24, sida='under', rackvidd=56, bild='tavla_stor_fyrkant'),
+            sak('tavla_liten_rund', 216, 6, 24, 24, sida='under', rackvidd=56, bild='tavla_liten_rund'),
             sak('kartbit_3', 144, 64, 14, 10, sida='alla'),
         ],
     },
@@ -212,7 +254,8 @@ RUMMEN = {
             vagg(96, 16, 208, 64, vatten=True),
             figur('bo', 48, 80, sida='alla', talare='bo'),
             liv('fjaril', 170, 14, 48, 30), liv('fagel', 300, 96, 12, 12),
-            *[sak(g, *PLATS[p], 20, 16, sida='alla') for g, p in (
+            # Stils grodor (steg 5 del 1): <groda>_01 sitter, och _02 blåser upp strupen (KVACK)
+            *[sak(g, *PLATS[p], 20, 16, sida='alla', bild=f'{g}_01') for g, p in (
                 ('groda_liten_gron', 'sten'), ('groda_liten_gul', 'vassen'), ('groda_stor_gron', 'under_bladet'), ('groda_stor_gul', 'nackrosbladet'),
                 ('groda_gron_slat', 'sten'), ('groda_gul_slat', 'vassen'), ('groda_gron_prickig', 'under_bladet'), ('groda_gul_prickig', 'nackrosbladet'))],
         ],
@@ -232,7 +275,12 @@ def egenskaper(e):
 def karta(rum, spec):
     bredd, hojd = spec['storlek']
     objekt = []
-    for i, (typ, namn, x, y, b, h, e) in enumerate(spec['objekt'], start=1):
+    bild = (RUMSBILDER / f'{rum}.png').is_file()
+    lista = list(spec['objekt']) + (over_vaggar(rum) if bild else [])
+    for i, (typ, namn, x, y, b, h, e) in enumerate(lista, start=1):
+        # det som är en del av rummets bild: Stils lista, och utgångarna (stigarna och dörrarna står i bilden)
+        if bild and (namn in I_BILDEN or typ == 'utgang'):
+            e = {**e, 'i_bilden': True}
         o = {'id': i, 'name': namn, 'type': '' if typ == 'punkt' else typ, 'x': x, 'y': y, 'width': b, 'height': h,
              'rotation': 0, 'visible': True}
         if typ == 'punkt':
@@ -241,6 +289,8 @@ def karta(rum, spec):
             o['properties'] = egenskaper(e)
         objekt.append(o)
     props = {'rum': rum}
+    if bild:
+        props['bild'] = rum
     if spec.get('inomhus'):
         props['inomhus'] = True
     if spec.get('vagg_bak'):

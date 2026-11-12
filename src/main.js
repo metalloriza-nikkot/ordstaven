@@ -315,6 +315,10 @@ redo.then(() => { startKlar = true; window.clearTimeout(startVakt); window.remov
   bildFor: (id) => { const r = rum.ritade.get(id); return r?.frame?.name ?? null; },
   /** Hur många figurskuggor som står i rummet (kartans `skugga`, 42.2). */
   skuggor: () => rum.figurSkuggor?.filter((s) => s.skugga.active).length ?? 0,
+  /** Vasstopparna vid fötterna (82.8): syns de nu vid hjälten och ungen, och hur många gånger de har kommit fram vid hjälten. */
+  vassVidFotter: () => ({ hjalte: !!rum.vassHjalte?.visible, unge: !!rum.vassUnge?.visible, sedd: rum.vassSedd || 0 }),
+  /** Rummets bild och bilden ovanför figurerna (82.7). */
+  rumsbilder: () => ({ rum: rum.rumId, golv: rum.golvBild.visible ? rum.golvBild.texture.key : null, over: rum.overBild.visible ? rum.overBild.texture.key : null }),
   /** Farfar i dörren (regi, 67.2): var han står och hans bild, eller null */
   farfarIDorren: () => (rum.farfarRegi?.active ? { x: rum.farfarRegi.x, y: Math.round(rum.farfarRegi.y), bild: rum.farfarRegi.frame?.name ?? null } : null),
   rutaPaSkarm: (id) => { const o = rum.ruta(id); if (!o) return null; const a = varldTillSkarm(layout.skala, rum.kamera, o.x, o.y), b = varldTillSkarm(layout.skala, rum.kamera, o.x + o.b, o.y + o.h); return { x: a.x, y: a.y, b: b.x - a.x, h: b.y - a.y }; },

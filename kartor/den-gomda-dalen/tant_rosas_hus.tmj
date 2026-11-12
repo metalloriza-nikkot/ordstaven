@@ -14,6 +14,11 @@
  "nextobjectid": 11,
  "properties": [
   {
+   "name": "bild",
+   "type": "string",
+   "value": "tant_rosas_hus"
+  },
+  {
    "name": "inomhus",
    "type": "bool",
    "value": true
@@ -52,6 +57,11 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
       {
        "name": "riktning",
        "type": "string",
@@ -162,6 +172,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "bild",
+       "type": "string",
+       "value": "tavla_stor_rund"
+      },
+      {
        "name": "rackvidd",
        "type": "int",
        "value": 56
@@ -184,6 +199,11 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "tavla_liten_fyrkant"
+      },
       {
        "name": "rackvidd",
        "type": "int",
@@ -208,6 +228,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "bild",
+       "type": "string",
+       "value": "tavla_stor_fyrkant"
+      },
+      {
        "name": "rackvidd",
        "type": "int",
        "value": 56
@@ -230,6 +255,11 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "tavla_liten_rund"
+      },
       {
        "name": "rackvidd",
        "type": "int",

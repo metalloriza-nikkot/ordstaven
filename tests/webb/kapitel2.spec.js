@@ -40,8 +40,14 @@ test('kapitel 2 går att spela från träsket till elden (gråbox, del 5)', asyn
   /** Använd ett föremål: gå dit och tryck Mellanslag när han är nära. */
   const anvand = async (id) => { await gaMot(id); await page.waitForTimeout(500); if (await page.locator('#plattan').isVisible()) return; await page.keyboard.press('Space'); };
   const scener = [];
+  /** @type {Record<string, any>} rummens bilder (82.7), en gång per rum */
+  const bilder = {};
+  let vassBild = false;
   for (let i = 0; i < 900; i++) {
     const [scen, st] = await ev(() => [window.__ORDSTAVEN.scen(), window.__ORDSTAVEN.steg()]);
+    const rb = await ev(() => ({ ...window.__ORDSTAVEN.rumsbilder(), vass: window.__ORDSTAVEN.vassVidFotter() }));
+    if (rb.rum && !bilder[rb.rum]) bilder[rb.rum] = rb;
+    if (rb.vass.hjalte && !vassBild && !(await page.locator('#plattan').isVisible())) { vassBild = true; await page.screenshot({ path: 'test-results/kap2-vassen-fotterna.png' }); }
     if (scen && scener.at(-1) !== scen) scener.push(scen);
     if (await page.locator('.pass-slut .fortsatt').isVisible()) { if (scen === 'k2s10_elden') break; await vidare(); continue; }
     if (await page.locator('#plattan .formel-skriv').isVisible()) {
@@ -81,6 +87,13 @@ test('kapitel 2 går att spela från träsket till elden (gråbox, del 5)', asyn
     }
     await page.waitForTimeout(250);
   }
+  // Stils rum som bilder (82.7): varje rum har sin bild, och träskkanten, bryggan och vassen den höga vassen ovanför
+  for (const rum of ['trasket_kanten', 'byn', 'bryggan', 'vassen', 'tant_rosas_hus']) expect(bilder[rum]?.golv, rum).toMatch(new RegExp(`^rum_${rum}`));
+  for (const rum of ['trasket_kanten', 'bryggan', 'vassen']) expect(bilder[rum]?.over, rum).toBe(`rum_${rum}_over`);
+  expect(bilder.tant_rosas_hus?.over ?? null).toBe(null);
+  // kvällen i byn är en egen bild (82.7), och vasstopparna kom fram vid hans fötter i vassen (82.8)
+  expect(await ev(() => window.__ORDSTAVEN.rumsbilder().golv)).toBe('rum_byn_kvall');
+  expect((await ev(() => window.__ORDSTAVEN.vassVidFotter())).sedd).toBeGreaterThan(0);
   expect(scener).toEqual(['k2s01_kanten', 'k2s02_byn', 'k2s03_torget', 'k2s05_vassen', 'k2s03_torget', 'k2s04_bryggan', 'k2s07_hela_brevet', 'k2s08_huset', 'k2s09_kartbiten', 'k2s10_elden']);
   // kapitel 2:s mellanscener och formler rör sig i gråboxen (Teknik 32 och 34, beslut 69 och 71)
   const regi = (await ev(() => window.__ORDSTAVEN.grafik())).regi;

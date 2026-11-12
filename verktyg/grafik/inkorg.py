@@ -6,7 +6,9 @@ Läser en kopia av inkorgsmappen och skriver till repot:
 - figurer/<mapp>/*.png   → assets/sprites/<mapp>/<mapp>.png och .json: ett atlas per mapp (Phaser, JSON Hash).
   Bildens namn i atlaset är filens namn (stilguiden §8 och 10b, t.ex. hjalte_ga_ner_01, unge1_glad_hoger_02).
 - foremal/<zon>/*.png    → assets/foremal/<zon>/<zon>.png och .json: ett atlas per zon (föremålen i kartorna).
-- rum/<zon>/<rum>.png    → assets/rum/<zon>/<rum>.png: en bild per inomhusrum (beslut 27.6).
+- rum/<zon>/<rum>.png    → assets/rum/<zon>/<rum>.png: en bild per rum (inomhus 27.6, frysta uterum 82.7), med
+  <rum>_over (ovanför figurerna) och <rum>_<tillstånd> (byn_kvall). En mask <rum>_falt.png (82.8) blir
+  assets/rum/<zon>/<rum>_falt.json, rader av sträckor, och ingen bild.
 - rutor/<zon>/<zon>.png  → assets/tiles/<zon>/<zon>.png och <zon>.json (Tilleds rutset, .tsj).
 - bildkort/*.png         → assets/bildkort/<id>.png: läsplattans bildkort, en bild per id (textlagret visar dem).
 - sidovyer/*.png         → assets/sidovyer/<namn>.png: sidovyernas bakgrunder och det som rör sig i dem.
@@ -94,8 +96,8 @@ def packa(bilder):
 def las_bilder(mapp, fel, alla):
     bilder = {}
     for f in sorted(mapp.glob('*.png')):
-        if f.stem.endswith('_ark'):
-            continue
+        if f.stem.endswith('_ark') or (mapp.parent.name == 'rum' and f.stem.endswith('_falt')):
+            continue  # arken är bara till för att titta på, och ett fält i rum/ är en mask (se falt_json)
         if not NAMN.match(f.stem):
             fel.append(f'{f}: namnet har tecken utanför a–z, 0–9 och _')
             continue
@@ -107,6 +109,26 @@ def las_bilder(mapp, fel, alla):
             alla.setdefault(c, f'{mapp.name}/{f.name}')
         bilder[f.stem] = im
     return bilder
+
+
+def falt_json(f):
+    """En mask i rum/ (<rum>_falt.png, 82.8: vitt = vassfältet) som rader av sträckor: {bredd, hojd, rader}, där
+    rader[y] är en lista [x, längd, x, längd, ...] för de vita pixlarna (ljusare än mitten). Ingen bild i spelet."""
+    im = Image.open(f).convert('L')
+    rader = []
+    for y in range(im.height):
+        rad, x = [], 0
+        while x < im.width:
+            if im.getpixel((x, y)) >= 128:
+                s = x
+                while x < im.width and im.getpixel((x, y)) >= 128:
+                    x += 1
+                rad += [s, x - s]
+            else:
+                x += 1
+        rader.append(rad)
+    return {'om': 'Masken för ' + f.stem + ' (82.8): rader av [x, längd] där fältet är. Skriven av verktyg/grafik/inkorg.py.',
+            'bredd': im.width, 'hojd': im.height, 'rader': rader}
 
 
 def skriv_atlas(bilder, ut, nyckel, prova):
@@ -266,6 +288,15 @@ def main():
             if not arg.prova:
                 (repo / 'assets' / 'rum' / mapp.name).mkdir(parents=True, exist_ok=True)
                 im.save(repo / 'assets' / 'rum' / mapp.name / f'{namn}.png', optimize=True)
+        for f in sorted(mapp.glob('*_falt.png')):
+            if not NAMN.match(f.stem):
+                fel.append(f'{f}: namnet har tecken utanför a–z, 0–9 och _')
+                continue
+            data = falt_json(f)
+            print(f'assets/rum/{mapp.name}/{f.stem}.json (mask {data["bredd"]} × {data["hojd"]})')
+            if not arg.prova:
+                (repo / 'assets' / 'rum' / mapp.name).mkdir(parents=True, exist_ok=True)
+                (repo / 'assets' / 'rum' / mapp.name / f'{f.stem}.json').write_text(json.dumps(data, separators=(',', ':')) + '\n')
     for mapp in sorted((ink / 'rutor').glob('*/')):
         if not med(f'rutor/{mapp.name}'):
             continue

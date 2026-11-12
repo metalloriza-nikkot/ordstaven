@@ -165,6 +165,9 @@ export function lasKarta(tmj) {
       if (egen.bild_del) ut.bildDel = String(egen.bild_del);
       // skugga (kapitel 2, Stil del 1) = figuren har en skugga under sig i sin rutstorlek (skugga_16x24, skugga_24x24)
       if (egen.skugga) ut.skugga = true;
+      // i_bilden (82.7) = föremålet är en del av rummets bild (leran, bryggan, vattnet): det ritas inte som en ruta,
+      // men id:t, zonen och hindret står kvar
+      if (egen.i_bilden) ut.iBilden = true;
       if (egen.sovplats) ut.sovplats = true;
       if (egen.skata_fonster) ut.skataFonster = true;
       if (egen.lyser) ut.lyser = true;

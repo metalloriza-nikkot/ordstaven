@@ -12,6 +12,7 @@ const ramar = /** @type {Record<string, any>} */ (import.meta.glob('../../assets
 const rumsbilder = /** @type {Record<string, string>} */ (import.meta.glob('../../assets/rum/*/*.png', { query: '?url', import: 'default', eager: true }));
 const rutbilder = /** @type {Record<string, string>} */ (import.meta.glob('../../assets/tiles/*/*.png', { query: '?url', import: 'default', eager: true }));
 const rutset = /** @type {Record<string, any>} */ (import.meta.glob('../../assets/tiles/*/*.json', { import: 'default', eager: true }));
+const falten = /** @type {Record<string, { bredd: number, hojd: number, rader: number[][] }>} */ (import.meta.glob('../../assets/rum/*/*_falt.json', { import: 'default', eager: true }));
 const sidovyer = /** @type {Record<string, string>} */ (import.meta.glob('../../assets/sidovyer/*.png', { query: '?url', import: 'default', eager: true }));
 
 const namn = (/** @type {string} */ fil) => /** @type {string} */ (fil.split('/').pop()).replace(/\.[a-z]+$/, '');
@@ -39,6 +40,16 @@ export function laddaGrafik(scen) {
     const n = namn(fil), ts = rutset[fil.replace(/\.png$/, '.json')];
     if (ts && !scen.textures.exists(`rutor_${n}`)) scen.load.spritesheet(`rutor_${n}`, url, { frameWidth: ts.tilewidth, frameHeight: ts.tileheight });
   }
+}
+
+/**
+ * Rummets mask (82.8, <rum>_falt.json): rader av [x, längd] där fältet är, t.ex. vassfältet. null om rummet inte har
+ * någon. @param {string | null} rum rummets bild
+ * @returns {{ bredd: number, hojd: number, rader: number[][] } | null}
+ */
+export function faltFor(rum) {
+  if (!rum) return null;
+  return Object.entries(falten).find(([f]) => namn(f) === `${rum}_falt`)?.[1] ?? null;
 }
 
 /**

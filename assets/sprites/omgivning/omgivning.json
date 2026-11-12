@@ -239,14 +239,54 @@
     "w": 5,
     "h": 4
    }
+  },
+  "vass_fotter_01": {
+   "frame": {
+    "x": 0,
+    "y": 38,
+    "w": 24,
+    "h": 8
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 8
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 8
+   }
+  },
+  "vass_fotter_02": {
+   "frame": {
+    "x": 25,
+    "y": 38,
+    "w": 24,
+    "h": 8
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 8
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 8
+   }
   }
  },
  "meta": {
   "image": "omgivning.png",
   "format": "RGBA8888",
   "size": {
-   "w": 18,
-   "h": 38
+   "w": 50,
+   "h": 47
   },
   "scale": "1",
   "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."

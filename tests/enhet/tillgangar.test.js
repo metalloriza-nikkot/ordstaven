@@ -98,11 +98,13 @@ describe('kartornas grafik', () => {
   const kartor = readdirSync(new URL(kartmapp, rot)).filter((f) => f.endsWith('.tmj')).map((f) => [f, JSON.parse(las(kartmapp + f).toString())]);
   const egen = (o) => Object.fromEntries((o.properties || []).map((p) => [p.name, p.value]));
   const ramar = new Set([...filer('assets/foremal/', '.json'), ...filer('assets/sprites/', '.json')].flatMap((f) => Object.keys(JSON.parse(las(f).toString()).frames)));
+  // rummets bild i någon av rummens mappar (hus, kap-02 …), eller null
+  const rumsbild = (/** @type {string} */ b) => readdirSync(new URL('assets/rum/', rot)).map((z) => `assets/rum/${z}/${b}.png`).find((f) => existsSync(new URL(f, rot))) ?? null;
   it('varje bild som en karta pekar på finns (föremål, figurer, rummens bilder och marken)', () => {
     const saknas = [];
     for (const [f, k] of kartor) {
       const ke = egen(k);
-      if (ke.bild && !existsSync(new URL(`assets/rum/hus/${ke.bild}.png`, rot))) saknas.push(`${f}: rummet ${ke.bild}`);
+      if (ke.bild && !rumsbild(ke.bild)) saknas.push(`${f}: rummet ${ke.bild}`);
       if (ke.mark && !existsSync(new URL(`assets/tiles/${ke.mark}/${ke.mark}.json`, rot))) saknas.push(`${f}: marken ${ke.mark}`);
       for (const l of k.layers) for (const o of l.objects || []) {
         const e = egen(o);
@@ -132,6 +134,8 @@ describe('kartornas grafik', () => {
             const kart = objektI.get(a.objekt);
             // det som inte ritas som bild i världen: stigar och dörrar i marken eller rummets bild, skyltar i textlagret
             if (!kart.bild && !delar) continue;
+            // en del av rummets bild (82.7, i_bilden): husen på torget med sina dörrar står i bilden
+            if (kart.i_bilden) continue;
             provade++;
             if (!foremaletsBild({ kartbild: kart.bild ?? null, delar }, (n) => ramar.has(n))) fel.push(`${fil} ${p.id} ${vn} (L${tal}): ${a.objekt} har ingen bild (${a.bild || a.id}${kart.bild ? ', kartans ' + kart.bild : ''})`);
           }
@@ -172,7 +176,7 @@ describe('kartornas grafik', () => {
   it('rummets bild har kartans storlek', () => {
     for (const [f, k] of kartor) {
       const b = egen(k).bild; if (!b) continue;
-      const png = las(`assets/rum/hus/${b}.png`);
+      const png = las(/** @type {string} */ (rumsbild(b)));
       expect([png.readUInt32BE(16), png.readUInt32BE(20)], f).toEqual([k.width * k.tilewidth, k.height * k.tileheight]);
     }
   });

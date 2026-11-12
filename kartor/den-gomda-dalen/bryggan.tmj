@@ -11,8 +11,13 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 11,
+ "nextobjectid": 13,
  "properties": [
+  {
+   "name": "bild",
+   "type": "string",
+   "value": "bryggan"
+  },
   {
    "name": "rum",
    "type": "string",
@@ -44,6 +49,11 @@
      "properties": [
       {
        "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "i_bilden",
        "type": "bool",
        "value": true
       },
@@ -122,6 +132,11 @@
        "name": "golv",
        "type": "bool",
        "value": true
+      },
+      {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
       }
      ]
     },
@@ -178,6 +193,11 @@
        "value": true
       },
       {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"
@@ -219,6 +239,28 @@
        "value": "fagel"
       }
      ]
+    },
+    {
+     "id": 11,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 0,
+     "width": 120,
+     "height": 16,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 12,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 184,
+     "width": 120,
+     "height": 8,
+     "rotation": 0,
+     "visible": true
     }
    ]
   }

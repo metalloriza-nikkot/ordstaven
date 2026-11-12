@@ -11,8 +11,13 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 15,
+ "nextobjectid": 18,
  "properties": [
+  {
+   "name": "bild",
+   "type": "string",
+   "value": "vassen"
+  },
   {
    "name": "rum",
    "type": "string",
@@ -44,6 +49,11 @@
      "properties": [
       {
        "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "i_bilden",
        "type": "bool",
        "value": true
       },
@@ -120,6 +130,11 @@
      "properties": [
       {
        "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "i_bilden",
        "type": "bool",
        "value": true
       }
@@ -212,6 +227,11 @@
        "name": "golv",
        "type": "bool",
        "value": true
+      },
+      {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
       }
      ]
     },
@@ -290,6 +310,39 @@
      "rotation": 0,
      "visible": true,
      "point": true
+    },
+    {
+     "id": 15,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 0,
+     "width": 520,
+     "height": 32,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 16,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 176,
+     "width": 40,
+     "height": 16,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 17,
+     "name": "",
+     "type": "vagg",
+     "x": 72,
+     "y": 176,
+     "width": 448,
+     "height": 16,
+     "rotation": 0,
+     "visible": true
     }
    ]
   }

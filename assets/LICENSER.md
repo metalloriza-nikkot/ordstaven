@@ -20,6 +20,7 @@ Varje grafik-, ljud- eller typsnittsfil och varje bibliotek som följer med spel
 | Introt (utsikten genom Farfars fönster, solarna, kameran som backar och blicken ned mot skrivbordet), startskärmen (Farfars skrivbord, mässingsskylten, Ordstaven, fotoramen, pilarna, böckerna och spelarnas ramar), pausmenyn och INSTÄLLNINGAR (fönstren och knapparna i 9-slice, volymknapparna och markören) | Egna, ritade för spelet av stilspåret med egna skript (`verktyg/stil/fas4/`) | Egna | Ja | `assets/ui/intro/`, `assets/ui/start/`, `assets/ui/meny/` |
 | Farfars hus: föremålen | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/foremal/hus/` |
 | Skogens föremål (lianerna och liangången, buskarna, träden, stenarna, skyltarna, häcken, stubben, skattlådan, lövhögarna, ugglorna, bron, svamparna och de andra) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/foremal/skog/` |
+| Kapitel 2:s rum (en bild per rum, kvällen i byn, den höga vassen och vassfältets mask) och föremålen i träsket och byn | Egna, ritade för spelet av stilspåret med egna skript (`verktyg/stil/rum2/`, `verktyg/stil/bybor/`) | Egna | Ja | `assets/rum/kap-02/`, `assets/foremal/trask/` |
 | Farfars hus: rummen (en bild per rum) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/rum/hus/` |
 | Skogens rutor (rutset för Tiled) | Egna, ritade för spelet av stilspåret | Egna | Ja | `assets/tiles/skog/` |
 | Herr Skatas skratt | Eget, inspelat för spelet och bearbetat (tonhöjd och filter) så att rösten inte går att känna igen | Egna | Ja | `assets/ljud/herr_skata_skratt.wav` |
