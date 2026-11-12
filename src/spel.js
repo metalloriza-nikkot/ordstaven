@@ -2213,7 +2213,8 @@ export function skapaSpel(d) {
       const x1 = Math.max(...valRutor.map((o) => o.x + o.b)), y1 = Math.max(...valRutor.map((o) => o.y + o.h));
       rum.regiFokus = { x: (x0 + x1) / 2, y: (y0 + y1) / 2 }; rum.forstFokus = true;
       // framme när hela valet syns, inte bara när kameran har stannat
-      await kameranStilla(4000, () => valRutor.every(iBild));
+      // som längst 10 s: på en enhet med glesa bildrutor (iPad i CI) går spelets klocka långsammare, och kameran med den
+      await kameranStilla(10000, () => valRutor.every(iBild));
       logg.handelse('kamera', `${p.id}: valet visas först`);
       const fran = { ...rum.pos };
       const slapp = window.setInterval(() => {

@@ -404,7 +404,8 @@ test('husen på torget (77.4): fyra dörrar, fel dörr öppnas aldrig, och vid d
     for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
     await page.waitForTimeout(250);
   }
-  for (let i = 0; i < 20 && !vidLappen; i++) { if (await page.locator('#plattan:not([hidden]) .lapp, #tanke:not([hidden]) .moln-text').count()) vidLappen = await dorrarSyns(); else await page.waitForTimeout(150); }
+  // på iPad i CI går spelets klocka långsammare, och kameran glider längre: vänta på lappen i upp till 15 s
+  for (let i = 0; i < 100 && !vidLappen; i++) { if (await page.locator('#plattan:not([hidden]) .lapp, #tanke:not([hidden]) .moln-text').count()) vidLappen = await dorrarSyns(); else await page.waitForTimeout(150); }
   expect(vidLappen?.sort()).toEqual([...dorrar].sort());
   for (const d of dorrar) { const o = await O((id) => window.__ORDSTAVEN.ruta(id), d); expect(o.riktning, d).toBe('upp'); }
   expect(await O(() => window.__ORDSTAVEN.variant())).toBe('L3');
