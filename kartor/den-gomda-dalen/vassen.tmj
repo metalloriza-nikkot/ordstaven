@@ -93,6 +93,21 @@
      "visible": true,
      "properties": [
       {
+       "name": "anim_ms",
+       "type": "int",
+       "value": 700
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "bubbelblommor_01"
+      },
+      {
+       "name": "bild_anim",
+       "type": "string",
+       "value": "bubbelblommor_01,bubbelblommor_02"
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"
@@ -110,6 +125,11 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "skylt_farfar"
+      },
       {
        "name": "sida",
        "type": "string",
@@ -151,6 +171,11 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "stubbe"
+      },
       {
        "name": "sida",
        "type": "string",
@@ -247,6 +272,21 @@
      "visible": true,
      "properties": [
       {
+       "name": "anim_ms",
+       "type": "int",
+       "value": 600
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "brev_halva_blot_01"
+      },
+      {
+       "name": "bild_anim",
+       "type": "string",
+       "value": "brev_halva_blot_01,brev_halva_blot_02"
+      },
+      {
        "name": "nas_nara",
        "type": "bool",
        "value": true
@@ -292,6 +332,11 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "stock"
+      },
       {
        "name": "sida",
        "type": "string",

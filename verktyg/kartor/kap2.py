@@ -26,8 +26,40 @@ R = 16
 # 8 × 8 där den har en pixel, så att det som ritas ovanför aldrig ligger där han kan gå.
 RUMSBILDER = ROT / 'assets' / 'rum' / 'kap-02'
 OVER_RUTA = 8
-# Föremål som är en del av rummets bild (Stil del 2): de ritas inte som gråboxens rutor, men id:n och zoner står kvar
-I_BILDEN = {'leran', 'leran_brygga', 'lerpol_vassen', 'strand_vassen', 'brygga', 'brygga_fran_torget', 'vattnet', 'udden'}
+# Föremål som är en del av rummets bild (Stil del 2): de ritas inte som gråboxens rutor, men id:n och zoner står kvar.
+# Lyktraden ritas som Stils lyktor längs raden (Rum.ritaLyktor), och katten ligger på soffan i soffans bild.
+I_BILDEN = {'leran', 'leran_brygga', 'lerpol_vassen', 'strand_vassen', 'brygga', 'brygga_fran_torget', 'vattnet', 'udden',
+            'lyktor_udden', 'katt_52_100'}
+
+# Stils föremål (steg 5 del 1 och 3a): kartans id → bildens egenskaper. Bilden står på föremålets nederkant, mitt i.
+FOREMALSBILDER = {
+    'drake_tak': {'bild': 'drake_tak'},
+    'fjader': {'bild': 'fjader'},
+    'lagereld': {'bild': 'lagereld_slackt', 'bild_kvall': 'lagereld_slackt_kvall'},
+    'ved_1': {'bild': 'vedpinne', 'bild_kvall': 'vedpinne_kvall'},
+    'ved_2': {'bild': 'vedpinne', 'bild_kvall': 'vedpinne_kvall'},
+    'ved_3': {'bild': 'vedpinne', 'bild_kvall': 'vedpinne_kvall'},
+    'brevram': {'bild': 'brevram_tom'},
+    'brunnen': {'bild': 'brunnen'},
+    'rep_vassen': {'bild': 'rep_vagrat'},
+    'rep_brunnen': {'bild': 'rep_vagrat'},
+    'rep_bryggan': {'bild': 'rep_lodrat'},
+    'skylt_vassen': {'bild': 'skylt_baronen'},
+    'skylt_brunnen': {'bild': 'skylt_baronen'},
+    'skylt_bryggan': {'bild': 'skylt_baronen'},
+    'skylt_lera': {'bild': 'skylt_farfar'},
+    'skylt_lera_vassen': {'bild': 'skylt_farfar'},
+    'skylt_lera_brygga': {'bild': 'skylt_farfar'},
+    'stubbe_trask': {'bild': 'stubbe'},
+    'stubbe_vassen': {'bild': 'stubbe'},
+    # vassväggen: fältet ritas som ett rutnät av tussar tills det delas, och en huggen tuss blir en stubbe (75.3)
+    'vass_tat': {'bild_del': 'vasstuss_hel', 'bild_hugg': 'vasstuss_huggen', 'bild_kvar': 'vasstuss_huggen'},
+    'bubbelblommor': {'bild': 'bubbelblommor_01', 'bild_anim': 'bubbelblommor_01,bubbelblommor_02', 'anim_ms': 700},
+    'brev_halva_vatten': {'bild': 'brev_halva_blot_01', 'bild_anim': 'brev_halva_blot_01,brev_halva_blot_02', 'anim_ms': 600},
+    'brev_halva_1': {'bild': 'brev_halva'},
+    'stock_vassen': {'bild': 'stock'},
+    'soffa': {'bild': 'soffa'},
+}
 
 
 def over_vaggar(rum):
@@ -281,6 +313,8 @@ def karta(rum, spec):
         # det som är en del av rummets bild: Stils lista, och utgångarna (stigarna och dörrarna står i bilden)
         if bild and (namn in I_BILDEN or typ == 'utgang'):
             e = {**e, 'i_bilden': True}
+        if bild and namn in FOREMALSBILDER:
+            e = {**e, **FOREMALSBILDER[namn]}
         o = {'id': i, 'name': namn, 'type': '' if typ == 'punkt' else typ, 'x': x, 'y': y, 'width': b, 'height': h,
              'rotation': 0, 'visible': True}
         if typ == 'punkt':

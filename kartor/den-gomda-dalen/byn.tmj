@@ -374,6 +374,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "bild",
+       "type": "string",
+       "value": "drake_tak"
+      },
+      {
        "name": "forsvinner_efter",
        "type": "string",
        "value": "k2_draken"
@@ -401,6 +406,11 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "fjader"
+      },
       {
        "name": "sida",
        "type": "string",
@@ -438,6 +448,16 @@
      "visible": true,
      "properties": [
       {
+       "name": "bild",
+       "type": "string",
+       "value": "lagereld_slackt"
+      },
+      {
+       "name": "bild_kvall",
+       "type": "string",
+       "value": "lagereld_slackt_kvall"
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"
@@ -461,6 +481,16 @@
      "visible": true,
      "properties": [
       {
+       "name": "bild",
+       "type": "string",
+       "value": "vedpinne"
+      },
+      {
+       "name": "bild_kvall",
+       "type": "string",
+       "value": "vedpinne_kvall"
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"
@@ -479,6 +509,16 @@
      "visible": true,
      "properties": [
       {
+       "name": "bild",
+       "type": "string",
+       "value": "vedpinne"
+      },
+      {
+       "name": "bild_kvall",
+       "type": "string",
+       "value": "vedpinne_kvall"
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"
@@ -496,6 +536,16 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "vedpinne"
+      },
+      {
+       "name": "bild_kvall",
+       "type": "string",
+       "value": "vedpinne_kvall"
+      },
       {
        "name": "sida",
        "type": "string",
@@ -566,6 +616,11 @@
        "name": "golv",
        "type": "bool",
        "value": true
+      },
+      {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
       }
      ]
     },
@@ -613,6 +668,11 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "brevram_tom"
+      },
       {
        "name": "sida",
        "type": "string",
@@ -749,6 +809,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "bild",
+       "type": "string",
+       "value": "brunnen"
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"
@@ -881,7 +946,14 @@
      "width": 40,
      "height": 6,
      "rotation": 0,
-     "visible": true
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "rep_vagrat"
+      }
+     ]
     },
     {
      "id": 46,
@@ -894,6 +966,11 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "skylt_baronen"
+      },
       {
        "name": "sida",
        "type": "string",
@@ -910,7 +987,14 @@
      "width": 40,
      "height": 6,
      "rotation": 0,
-     "visible": true
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "rep_vagrat"
+      }
+     ]
     },
     {
      "id": 48,
@@ -923,6 +1007,11 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "skylt_baronen"
+      },
       {
        "name": "sida",
        "type": "string",
@@ -939,7 +1028,14 @@
      "width": 6,
      "height": 32,
      "rotation": 0,
-     "visible": true
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "rep_lodrat"
+      }
+     ]
     },
     {
      "id": 50,
@@ -952,6 +1048,11 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "skylt_baronen"
+      },
       {
        "name": "sida",
        "type": "string",

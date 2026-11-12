@@ -3,7 +3,7 @@
 Version 0.1 (2026-10-24). Utdrag ur designdokumenten som koden behöver. **Fullständig design finns utanför repot.** Det här repot är publikt: här står bara spelvärld, pussel, stil och teknik, aldrig något om en verklig spelare.
 
 ## Spelet
-ORDSTAVEN: DEN GÖMDA DALEN är ett läs- och skriväventyr för 6–8 år. Uppdraget i en mening: dinoungen måste hem till sin mamma i den gömda dalen, men kartan dit är riven i sju bitar, och Baron Gripklo jagar dem också. Hjälten är en ung upptäcktsresande och trollkarl vars magi är läsning och skrivande. Ord som skrivs med Ordstaven blir verklighet.
+ORDSTAVEN: DEN GÖMDA DALEN är ett läs- och skriväventyr för 6–8 år. Uppdraget i en mening: dinoungen måste hem till sin mamma i den gömda dalen, men kartan dit är riven i sex bitar, och baronen jagar dem också. Hjälten är en ung upptäcktsresande och trollkarl vars magi är läsning och skrivande. Ord som skrivs med Ordstaven blir verklighet.
 
 Första äventyret i en tänkt serie. Hjälten (utseende, namn, grad, formler) följer med till nästa äventyr via sparfilen.
 

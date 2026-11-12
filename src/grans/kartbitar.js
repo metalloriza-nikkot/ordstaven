@@ -1,5 +1,5 @@
 // @ts-check
-// Farfars karta (Stil 21:20): ett gammalt papper rivet i sju bitar som passar ihop. Varje bit är en egen bild i
+// Farfars karta (Stil 21:20): ett gammalt papper rivet i sex bitar (beslut 83) som passar ihop. Varje bit är en egen bild i
 // assets/karta/, och karta.json säger var biten ligger i hela kartan (224 × 144). Bitarna läggs ihop där de hör
 // hemma, i heltalsskala (fysiska pixlar), så att pixlarna aldrig blir suddiga. En bit som Stil inte har ritat än
 // visas inte (bit 3–7 är skisser).

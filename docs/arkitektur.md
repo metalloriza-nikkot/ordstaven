@@ -1038,3 +1038,10 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Grodorna och tavlorna** har kartans `bild` (`groda_<namn>_01`, `tavla_<namn>`). Föremålen i `foremal/trask/` och de nya bildkorten är inhämtade, men de flesta föremålen får sina bilder i kartan med resten av grafiken.
 - Testkrokarna `rumsbilder()` och `vassVidFotter()`, och webbtestet för hela kapitel 2 prövar bilderna, kvällens bild och att vasstopparna kom fram.
 
+## 103. Föremålen i kapitel 2 (0.69.0, Teknik 42, Stil steg 5 del 1 och 3a)
+- **`FOREMALSBILDER`** i `verktyg/kartor/kap2.py`: kartans id → bildens egenskaper (`bild`, `bild_kvall`, `bild_anim`, `bild_del` …). De sätts bara i rum som är bilder. Föremålens id:n är oförändrade.
+- **`bild_kvall`** (`Objekt.bildKvall`): bilden i tillståndet `kvall` (lägerelden och vedpinnarna), som `bild_natt` för natten. Både `ritaObjekt` och `egenBild` väljer den.
+- **Ett fält med `bild_del` men utan `bild`** (vassväggen) ritas som ett rutnät av bilden tills pusslet delar det (`delaFalt`), så att det ser ut som tussarna det blir. Tussarna med ett bär (`innehall: bar`) får `vasstuss_bar` med `sattRam` när fältet delas (`spel.js`).
+- **Lyktorna** (`Rum.ritaLyktor`): en bild per punkt i `lyktPunkter()`, släckt (`lykta_slackt`, `lykta_slackt_kvall`) eller tänd (`lykta_tand_kvall` med `lykta_ljus` i ljusets lager). LJUS byter bilden lykta för lykta och minns de tända (`lyktorTanda`) tills rummet byts. Utan Stils bilder ritas gråboxens ljus som förut. `lyktor_udden` är `i_bilden`.
+- **`i_bilden` på `omgivning`**: livet ritar inte saken (katten ligger på soffan i soffans bild).
+

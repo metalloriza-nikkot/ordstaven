@@ -88,6 +88,21 @@
      "visible": true,
      "properties": [
       {
+       "name": "bild_del",
+       "type": "string",
+       "value": "vasstuss_hel"
+      },
+      {
+       "name": "bild_hugg",
+       "type": "string",
+       "value": "vasstuss_huggen"
+      },
+      {
+       "name": "bild_kvar",
+       "type": "string",
+       "value": "vasstuss_huggen"
+      },
+      {
        "name": "delas",
        "type": "string",
        "value": "hela"
@@ -115,6 +130,11 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "skylt_farfar"
+      },
       {
        "name": "sida",
        "type": "string",
@@ -161,6 +181,11 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "stubbe"
+      },
       {
        "name": "sida",
        "type": "string",

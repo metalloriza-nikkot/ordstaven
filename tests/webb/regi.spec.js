@@ -293,6 +293,10 @@ test('vassväggen (72.3, 75.3): ungen biter i vassen, och efter SVÄRD hugger ha
   for (let i = 0; i < 60 && (await tussar()).length === 0; i++) { await vidare(); await page.waitForTimeout(250); }
   expect((await tussar()).length).toBe(15);
   const p = kap2.pussel.find((x) => x.id === 'k2_vassvaggen');
+  // Stils tussar (del 3a): varje tuss har sin bild, och tussarna med ett bär har bilden med bäret
+  const tussbilder = await O(() => window.__ORDSTAVEN.rumsobjekt().filter((id) => id.startsWith('vass_tat_')).map((id) => [id, window.__ORDSTAVEN.bildFor(id)]));
+  for (const [id, bild] of tussbilder) expect(bild, id).toBe(p.innehall[Number(id.split('_').pop())] === 'bar' ? 'vasstuss_bar' : 'vasstuss_hel');
+  await page.screenshot({ path: 'test-results/kap2-vassvaggen-tussar.png' });
   const gang = p.innehall.map((x, i) => (x === 'gang' ? `vass_tat_${i}` : null)).filter(Boolean);
   expect(gang.length).toBe(6);
   // knappen svingar alltid (76.5, B12): långt från vassen blir det ett sving i luften, och ingen tuss faller

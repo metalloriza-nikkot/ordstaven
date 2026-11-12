@@ -116,6 +116,8 @@ export class Rum extends Phaser.Scene {
     /** @type {any} */ this.vassUnge = null;
     /** @type {{ x: number, y: number } | null} */ this.forraUngePos = null;
     /** hur många gånger vasstopparna har kommit fram vid hjältens fötter (för testerna) */ this.vassSedd = 0;
+    /** @type {any[]} lyktornas bilder längs lyktor_udden */ this.lyktBilder = [];
+    /** @type {Set<number>} lyktorna som LJUS har tänt (tills rummet byts) */ this.lyktorTanda = new Set();
     /** @type {{ x: number, y: number }[]} lampor som lyser när rummet är mörkt */
     this.lampor = [];
     /** @type {number | null} hur mörkt rummet är på natten (kartans morker) */
@@ -703,7 +705,7 @@ export class Rum extends Phaser.Scene {
    */
   egenBild(o, img) {
     const natt = this.tillstand === 'natt' || this.tillstand === 'natt_upplyst';
-    const namn = o.bildSedan && this.bytta?.has(o.id) ? o.bildSedan : o.bildNatt && natt ? o.bildNatt : o.bild;
+    const namn = o.bildSedan && this.bytta?.has(o.id) ? o.bildSedan : o.bildNatt && natt ? o.bildNatt : o.bildKvall && this.tillstand === 'kvall' ? o.bildKvall : o.bild;
     const fb = namn ? foremalsbild(this, namn) : null;
     return fb ? { tex: fb.nyckel, ram: fb.ram } : { tex: img.texture.key, ram: img.frame.name };
   }
@@ -1564,6 +1566,34 @@ export class Rum extends Phaser.Scene {
     return sv ? 1500 : 800;
   }
 
+  /**
+   * Lyktorna längs lyktor_udden i Stils bilder (steg 5 del 1): släckt på dagen, släckt i kvällsljuset, och tänd med
+   * sitt ljus när LJUS har tänt den (tills rummet byts). Lyktans fot står på punkten. Utan bilderna ritas inget.
+   */
+  ritaLyktor() {
+    this.lyktBilder = [];
+    const p = this.lyktPunkter();
+    if (!p.length || !foremalsbild(this, 'lykta_slackt')) return;
+    p.forEach((q, i) => {
+      const tand = this.lyktorTanda?.has(i);
+      const fb = /** @type {{ nyckel: string, ram: string }} */ (foremalsbild(this, tand ? 'lykta_tand_kvall' : this.tillstand === 'kvall' ? 'lykta_slackt_kvall' : 'lykta_slackt'));
+      const img = this.add.image(Math.round(q.x), Math.round(q.y), fb.nyckel, fb.ram).setOrigin(0.5, 1);
+      this.lagerObjekt.add(img);
+      this.lyktBilder.push(img);
+      if (tand) this.lyktLjus(i);
+    });
+  }
+
+  /** Ljuset runt en tänd lykta (lykta_ljus), i ljusets lager. @param {number} i lyktans nummer i lyktPunkter() */
+  lyktLjus(i) {
+    const q = this.lyktPunkter()[i], fb = foremalsbild(this, 'lykta_ljus');
+    if (!q || !fb) return false;
+    const img = this.lyktBilder?.[i];
+    const l = this.add.image(Math.round(q.x), Math.round(q.y - (img ? img.height / 2 : 6)), fb.nyckel, fb.ram).setOrigin(0.5, 0.5);
+    this.lagerLjust.add(l);
+    return true;
+  }
+
   /** Lyktornas platser längs lyktor_udden (en var 24:e pixel längs den långa sidan). */
   lyktPunkter() {
     const o = this.ruta('lyktor_udden');
@@ -1574,7 +1604,7 @@ export class Rum extends Phaser.Scene {
 
   /** LJUS: en ljusboll flyger från staven och tänder lyktorna en i taget (71.6). De lyser tills rummet byts. @returns {number} */
   ljusetHopparMellanLyktorna() {
-    const p = this.lyktPunkter();
+    const p = this.lyktPunkter().map((q, n) => ({ ...q, n })); // n: lyktans plats i raden, också när ordningen vänds
     if (!p.length) return 0;
     // ljuset börjar vid lyktan närmast hjälten och går längs raden (från udden upp till torget, 78.4)
     if (Math.hypot(p[p.length - 1].x - this.pos.x, p[p.length - 1].y - this.pos.y) < Math.hypot(p[0].x - this.pos.x, p[0].y - this.pos.y)) p.reverse();
@@ -1586,7 +1616,13 @@ export class Rum extends Phaser.Scene {
       const a = { ...fran }, t = { p: 0 };
       this.regiFokus = { x: q.x, y: q.y };
       this.tweens.add({ targets: t, p: 1, duration: steg - 20, onUpdate: () => { if (!boll.active) return; boll.clear().fillStyle(0xfff2a8, 0.5).fillCircle(Math.round(a.x + (q.x - a.x) * t.p), Math.round(a.y + (q.y - 6 - a.y) * t.p - Math.sin(t.p * Math.PI) * 10), 4).fillStyle(0xffffff, 1).fillCircle(Math.round(a.x + (q.x - a.x) * t.p), Math.round(a.y + (q.y - 6 - a.y) * t.p - Math.sin(t.p * Math.PI) * 10), 2); this.smutsig = true; },
-        onComplete: () => { const l = this.add.graphics(); this.lagerLjust.add(l); this.lagda.push(l); l.fillStyle(0xffd34d, 0.35).fillCircle(Math.round(q.x), Math.round(q.y - 6), 5).fillStyle(0xffe680, 1).fillRect(Math.round(q.x - 1), Math.round(q.y - 8), 3, 4); this.smutsig = true; } });
+        onComplete: () => {
+          // med Stils bilder tänds lyktan och får sitt ljus, och den lyser när rummet ritas om (tills rummet byts)
+          const lykta = this.lyktBilder?.[q.n], tand = foremalsbild(this, 'lykta_tand_kvall');
+          this.lyktorTanda?.add(q.n);
+          if (lykta?.active && tand) { lykta.setTexture(tand.nyckel, tand.ram); this.lyktLjus(q.n); this.smutsig = true; return; }
+          const l = this.add.graphics(); this.lagerLjust.add(l); this.lagda.push(l); l.fillStyle(0xffd34d, 0.35).fillCircle(Math.round(q.x), Math.round(q.y - 6), 5).fillStyle(0xffe680, 1).fillRect(Math.round(q.x - 1), Math.round(q.y - 8), 3, 4); this.smutsig = true;
+        } });
       fran = { x: q.x, y: q.y - 6 };
     }));
     this.time.delayedCall(steg * p.length + 100, () => boll.destroy());
@@ -2244,6 +2280,8 @@ export class Rum extends Phaser.Scene {
       for (const id of this.dolda) /** @type {any} */ (this.ritade.get(id))?.setVisible?.(false);
       for (const id of this.sparrade) { const o = this.ruta(id); if (o) this.ritaGren(o); }
       this.ritaKvar(v.kvar || []);
+      if (v.nyttRum) this.lyktorTanda = new Set();
+      this.ritaLyktor();
       // han ligger kvar i sängen när rummet ritas om (natt till morgon): den nya bilden av sängen visar honom (56.2)
       for (const s of [this.sover, this.vaknar]) {
         const ny = s && /** @type {any} */ (this.ritade.get(s.id));
@@ -2366,7 +2404,7 @@ export class Rum extends Phaser.Scene {
       this.ritade.set(o.id, /** @type {any} */ (rad));
       return;
     }
-    const bildNamn = this.ramFor.has(o.id) ? this.ramFor.get(o.id) : o.bildSedan && this.bytta?.has(o.id) ? o.bildSedan : o.bildNatt && (this.tillstand === 'natt' || this.tillstand === 'natt_upplyst') ? o.bildNatt : o.bild;
+    const bildNamn = this.ramFor.has(o.id) ? this.ramFor.get(o.id) : o.bildSedan && this.bytta?.has(o.id) ? o.bildSedan : o.bildNatt && (this.tillstand === 'natt' || this.tillstand === 'natt_upplyst') ? o.bildNatt : o.bildKvall && this.tillstand === 'kvall' ? o.bildKvall : o.bild;
     // ett föremål som är ett alternativ i ett läsval i rummet (dinomatens lådor) har alternativets bild, i den
     // variant spelaren får (lada_rod, lada_bla_stor …), när Stil har ritat den. Är föremålet alternativets eget
     // (gläntans träd i L3) visar kartans bild alternativet (66.2).
@@ -2392,6 +2430,19 @@ export class Rum extends Phaser.Scene {
       if (ramar.length > 1 && !this.bytta?.has(o.id)) this.animerade.push({ img, ramar, ms: o.animMs || 500, i: 0, senast: performance.now() + Math.random() * 300 });
       this.ritade.set(o.id, /** @type {any} */ (img));
       return;
+    }
+    // ett fält som delas när pusslet börjar (vassväggen, 2.43) och har en bild per del: innan dess ritas det som ett
+    // rutnät av samma bild, så att det ser ut som tussarna det sedan blir (Stil del 3a)
+    if (!o.bild && o.bildDel && foremalsbild(this, o.bildDel)) {
+      const fb = /** @type {{ nyckel: string, ram: string }} */ (foremalsbild(this, o.bildDel));
+      const f = this.textures.getFrame(fb.nyckel, fb.ram);
+      const kol = Math.max(1, Math.round(o.b / (f?.width || 16))), rad = Math.max(1, Math.round(o.h / (f?.height || 16)));
+      const c = this.add.container(0, 0);
+      for (let j = 0; j < rad; j++) for (let i = 0; i < kol; i++) {
+        const x0 = o.x + Math.round((i * o.b) / kol), x1 = o.x + Math.round(((i + 1) * o.b) / kol), y1 = o.y + Math.round(((j + 1) * o.h) / rad);
+        c.add(this.add.image(Math.round((x0 + x1) / 2), y1, fb.nyckel, fb.ram).setOrigin(0.5, 1));
+      }
+      this.lagerObjekt.add(c); this.ritade.set(o.id, /** @type {any} */ (c)); return;
     }
     // en del av rummets bild (82.7: leran, bryggan, vattnet): bara en osynlig ruta, som hindren och tester kan hitta
     if (o.iBilden && this.rumsbild && this.golvBild.visible) {

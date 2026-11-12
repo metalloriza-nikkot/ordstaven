@@ -2995,6 +2995,8 @@ export function skapaSpel(d) {
       const bas = visarFor(p.id)?.id ?? rum.objekt.find((o) => o.sort === 'sak')?.id ?? '';
       if (!visarFor(p.id)) logg.handelse('FEL', `ingen karta visar ${p.id}, krukorna hamnar vid ${bas}`);
       ids = p.falt ? rum.delaFalt(bas, p.falt.rader, p.falt.per_rad) : rum.dela(bas, k.s.antal);
+      // tussarna med ett bär har Stils bild med bäret (vasstuss_bar, del 3a), om den finns
+      if (p.falt) ids.forEach((id, i) => { if (p.innehall?.[i] === 'bar') rum.sattRam(id, 'vasstuss_bar'); });
     }
     // fältet (75.3): när gången är huggen är pusslet löst så fort han går förbi fältet. Tills dess kan han hugga fler
     const faltSlut = () => {

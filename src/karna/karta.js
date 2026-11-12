@@ -137,7 +137,8 @@ export function lasKarta(tmj) {
       // massiv vägg, eller ute (kapitel 2:s gråbox) vatten (egenskapen vatten) och hus: ett hinder som ritas i gråboxen
       if (typ === 'vagg') { massiv.push({ x: Math.round(o.x), y: Math.round(o.y), b: Math.round(o.width), h: Math.round(o.height), ...(egen.vatten ? { vatten: true } : {}) }); continue; }
       // liv i skogen (26.3, 10b): det som rör sig utan att man kan göra något med det. Inget föremål, inget hinder.
-      if (typ === 'omgivning') { omgivning.push({ vad: String(egen.vad || ''), x: Math.round(o.x), y: Math.round(o.y), b: Math.round(o.width), h: Math.round(o.height) }); continue; }
+      // i_bilden (82.7) = saken står redan i en bild (katten på Tant Rosas soffa), och livet ritar den inte
+      if (typ === 'omgivning') { if (!egen.i_bilden) omgivning.push({ vad: String(egen.vad || ''), x: Math.round(o.x), y: Math.round(o.y), b: Math.round(o.width), h: Math.round(o.height) }); continue; }
       /** @type {Objekt} */
       const ut = {
         id: o.name,
@@ -161,6 +162,8 @@ export function lasKarta(tmj) {
       // grafiken (2.14): bildens namn, bilden på natten, och föremålet vars nederkant bilden står på
       if (egen.bild) ut.bild = String(egen.bild);
       if (egen.bild_natt) ut.bildNatt = String(egen.bild_natt);
+      // bild_kvall (kapitel 2, Stil del 1) = bilden i rummets tillstånd kvall (lägerelden, vedpinnarna)
+      if (egen.bild_kvall) ut.bildKvall = String(egen.bild_kvall);
       if (egen.bild_pa) ut.bildPa = String(egen.bild_pa);
       if (egen.bild_del) ut.bildDel = String(egen.bild_del);
       // skugga (kapitel 2, Stil del 1) = figuren har en skugga under sig i sin rutstorlek (skugga_16x24, skugga_24x24)
