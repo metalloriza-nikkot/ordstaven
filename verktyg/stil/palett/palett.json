@@ -1,7 +1,7 @@
 {
- "om": "Masterpaletten (stilguiden §2, beslut 28.4). Sluten: Stils skript ritar bara ur den här listan, och en ny färg läggs till här av Stil, med ett skäl. Teknik: assets/palett.json ska vara samma lista. Fältet forst_i säger var färgen först användes (i mappordning). Bygget 2026-11-03 slog ihop 98 färger som inte gick att skilja åt (deltaE < 3).",
- "version": "1.0 (2026-11-03)",
- "antal": 350,
+ "om": "Masterpaletten (stilguiden §2, beslut 28.4). Sluten: Stils skript ritar bara ur den här listan, och en ny färg läggs till här av Stil, med ett skäl. Teknik: assets/palett.json ska vara samma lista. Fältet forst_i säger var färgen först användes (i mappordning). Bygget 2026-11-03 slog ihop 98 färger som inte gick att skilja åt (deltaE < 3). 1.1 (2026-11-12): 18 färger för byborna i kapitel 2: hjältens tre andra hudval (grön, lila, ockra, samma toner som fargbyte.js räknar fram) och Tant Rosas rosa klänning.",
+ "version": "1.1 (2026-11-12)",
+ "antal": 368,
  "tak_per_zon": 256,
  "farger": [
   {
@@ -1413,6 +1413,78 @@
   {
    "hex": "#e8f2fa",
    "forst_i": "sidovyer"
+  },
+  {
+   "hex": "#1c432e",
+   "forst_i": "figurer/bybor"
+  },
+  {
+   "hex": "#3a8354",
+   "forst_i": "figurer/bybor"
+  },
+  {
+   "hex": "#4fae6a",
+   "forst_i": "figurer/bybor"
+  },
+  {
+   "hex": "#75c987",
+   "forst_i": "figurer/bybor"
+  },
+  {
+   "hex": "#b0e7ba",
+   "forst_i": "figurer/bybor"
+  },
+  {
+   "hex": "#5e1e86",
+   "forst_i": "figurer/bybor"
+  },
+  {
+   "hex": "#8336cc",
+   "forst_i": "figurer/bybor"
+  },
+  {
+   "hex": "#9a6ad8",
+   "forst_i": "figurer/bybor"
+  },
+  {
+   "hex": "#b79ae9",
+   "forst_i": "figurer/bybor"
+  },
+  {
+   "hex": "#eae1fb",
+   "forst_i": "figurer/bybor"
+  },
+  {
+   "hex": "#705d14",
+   "forst_i": "figurer/bybor"
+  },
+  {
+   "hex": "#bb8e27",
+   "forst_i": "figurer/bybor"
+  },
+  {
+   "hex": "#e8b77b",
+   "forst_i": "figurer/bybor"
+  },
+  {
+   "hex": "#5a1a34",
+   "forst_i": "figurer/bybor"
+  },
+  {
+   "hex": "#8a2e56",
+   "forst_i": "figurer/bybor"
+  },
+  {
+   "hex": "#b8467a",
+   "forst_i": "figurer/bybor"
+  },
+  {
+   "hex": "#e07aa6",
+   "forst_i": "figurer/bybor"
+  },
+  {
+   "hex": "#f6b4ce",
+   "forst_i": "figurer/bybor"
   }
  ],
  "tillagg": [],

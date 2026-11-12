@@ -129,35 +129,102 @@ def skog_ruta(h):
 def platå(px,rnd):
     grastextur(px,rnd,PL)
 def kulle_ruta(namn):
+    # Höjdkitet (Stil 16, beslut 76.6): en nivå är en ruta hög. Platån har en ljus läpp, västra sidan är en
+    # upplyst klippvägg (6 px), östra en vägg i skugga (6 px), och framsidan är en hel ruta klippa med gräs som
+    # hänger över kanten och en mörk fot. Skuggan på marken söderut och österut är egna rutor (skugga_*).
     im=Image.new('RGBA',(T,T)); px=im.load(); rnd=random.Random(sum(map(ord,namn))+71)
     if namn.startswith('F'):          # klippans framsida
         for y in range(T):
             for x in range(T):
-                if y>=14: c=G[0] if y==14 else G[1]; px[x,y]=hx(c); continue
-                band=(y+(x//9)%2)//3
+                band=(y+(x//6)%2)//3
                 c=[KL[5],KL[4],KL[3],KL[2],KL[1],KL[0]][min(5,band)]
-                if (x*7+y*5)%13==0: c='#3A2C1C'
-                if y%4==1 and (x//5)%3==0: c=KL[6]
+                if (x*7+y*5)%13==0 and 2<y<13: c=KL[0]
+                if y%4==2 and (x//5)%3==0 and y<12: c=KL[6]
+                if y>=14: c=KL[0] if y==14 else LOV[1]      # mörk fot, sedan marken i kontaktskugga
                 px[x,y]=hx(c)
-        if namn=='FW':
+        for x in range(T):                                  # gräset hänger över kanten, ojämnt
+            px[x,0]=hx(PL[1]); px[x,1]=hx(PL[0] if (x*5)%7<3 else KL[5])
+            if (x*3)%5==0: px[x,2]=hx(PL[0])
+        if namn=='FW':                                      # västra hörnet: den upplysta sidoväggen rundar av
             for y in range(14):
-                for x in range(4): px[x,y]=hx([KL[6],KL[5],KL[4],KL[3]][x] if y>0 else LAPP)
-        if namn=='FE':
+                for x in range(5): px[x,y]=hx([KL[0],KL[3],KL[5],KL[6],KL[5]][x] if y>1 else (KL[0] if x==0 else PL[1]))
+            px[0,14]=hx(LOV[1]); px[1,14]=hx(KL[0])
+        if namn=='FE':                                      # östra hörnet: sidan i skugga
             for y in range(14):
-                for x in range(12,T): px[x,y]=hx(KL[1] if x<15 else KL[0])
+                for x in range(9,T): px[x,y]=hx(([KL[3],KL[2],KL[1],KL[1],KL[0],KL[0],KL[0]][x-9]) if y>1 else (PL[0] if x<15 else KL[0]))
         return im
     platå(px,rnd)
     if 'N' in namn:
         for x in range(T): px[x,0]=hx(LAPP)
     if namn in ('SW','S','SE'):
         for x in range(T): px[x,15]=hx(LAPP)
-    if 'W' in namn:                    # västra sidan: smal klippa i ljus (ljuset kommer från väster)
+    if 'W' in namn:                    # västra sidan: klippvägg i ljus (ljuset kommer uppifrån till vänster)
         for y in range(T):
-            for x in range(5): px[x,y]=hx([KL[2],KL[4],KL[5],KL[6],LAPP][x])
-            if (y*3)%11==0: px[1,y]=hx(KL[1])
-    if namn in ('NE','E','SE'):        # östra sidan i skugga
+            for x in range(7): px[x,y]=hx([KL[0],KL[3],KL[4],KL[5],KL[6],KL[5],LAPP][x])
+            if (y*3)%11==0: px[2,y]=hx(KL[2])
+            if (y*5)%13==4: px[4,y]=hx(KL[4])
+    if 'E' in namn:                    # östra sidan i skugga
         for y in range(T):
-            for x in range(12,T): px[x,y]=hx([LAPP,KL[2],KL[1],KL[0]][x-12])
+            for x in range(9,T): px[x,y]=hx([LAPP,KL[3],KL[2],KL[1],KL[1],KL[0],KL[0]][x-9])
+            if (y*3)%7==2: px[12,y]=hx(KL[2])
+    return im
+
+# --- höjdkitets rutor utanför kullen: skuggan på marken och trappan i klippan ---
+SKUGGA={G[4]:G[1],G[3]:G[0],G[2]:LOV[2],G[1]:LOV[2],G[0]:LOV[1]}   # gräset i skugga, bara färger som finns
+def skugga_ruta(namn, bas=None):
+    """skugga_S (under framsidan), skugga_E (öster om östra sidan), skugga_SE (hörnet), skugga_NE (överst i östra).
+    Med bas läggs skuggan på en annan ruta (stigen längs kullen), och bara gräset mörknar."""
+    im=bas.copy() if bas else gras(0); px=im.load()
+    def mork(x,y):
+        c='#%02X%02X%02X'%px[x,y][:3]
+        if c in SKUGGA or not bas: px[x,y]=hx(SKUGGA.get(c,LOV[2]))
+    for y in range(T):
+        for x in range(T):
+            s=False
+            if namn=='skugga_S': s = y<6 or (y<8 and (x+y)%2==0)
+            if namn=='skugga_E': s = x<6 or (x<8 and (x+y)%2==0)
+            if namn=='skugga_NE': s = (x<6 or (x<8 and (x+y)%2==0)) and y>=x-2
+            if namn=='skugga_SE':                                   # skuggan rundar av mot sydost
+                s = (x<6 and y<6) or (x<8 and y<8 and (x+y)%2==0)   # hörnet: bara där banden möts
+            if s: mork(x,y)
+    return im
+STEN=['#3E4148','#6E747F','#7E838C','#8E949E','#A4A9B0','#B8BEC6']   # trappans sten (samma som förut), mörk -> ljus
+def trappa_ruta(namn):
+    """Trappan huggen i framsidan, två rutor bred: trappa_S_V/H (överst, läppen bruten), trappa_F_V/H (stegen i
+    klippan) och trappa_fot_V/H (det nedersta steget på marken). V och H är vänster och höger halva."""
+    halva=namn[-1]; del_=namn.split('_')[1]
+    if del_=='S': im=kulle_ruta('S')
+    elif del_=='F': im=kulle_ruta('F')
+    else: im=skugga_ruta('skugga_S')
+    px=im.load()
+    kind = (lambda x: x<2) if halva=='V' else (lambda x: x>13)          # stenkanten längs trappans sida
+    def steg(y0,h):                                                     # ett steg: ljus ovansida, mörkare front
+        for y in range(y0,y0+h):
+            for x in range(T):
+                if kind(x): px[x,y]=hx(STEN[1] if halva=='V' else STEN[0]); continue
+                c = STEN[5] if y==y0 else STEN[4] if y==y0+1 else STEN[2] if y<y0+h-1 else STEN[1]
+                if (x==2 and halva=='V') or (x==13 and halva=='H'): c=STEN[3] if y==y0 else STEN[1]
+                if ((x*3+y)%9==0) and y>y0+1: c=STEN[3]
+                px[x,y]=hx(c)
+    if del_=='S':                          # överst: läppen bryts, och trappans översta steg ligger i platåns nivå
+        steg(12,4)
+    elif del_=='F':
+        for k in range(4): steg(k*4,4)
+    else:                                  # foten: det nedersta steget sticker ut på marken
+        steg(0,5)
+        for x in range(T): px[x,5]=hx(G[0])
+    return im
+def stege_ruta(namn):
+    """En trästege mot klippan (för kapitel 2 och senare): stege_F i framsidan, stege_S där den når över kanten."""
+    im=kulle_ruta('F' if namn=='stege_F' else 'S'); px=im.load()
+    TRA=['#4A3020','#6E4A2A','#9A6A3A','#C08A50']
+    y0 = 0 if namn=='stege_F' else 11
+    for y in range(y0,T):
+        for x in (4,11):
+            px[x,y]=hx(TRA[0]); px[x+1,y]=hx(TRA[2])
+        if (y-y0)%4==1:
+            for x in range(5,11): px[x,y]=hx(TRA[3] if x<8 else TRA[2])
+            px[5,y+1 if y+1<T else y]=hx(TRA[1])
     return im
 KULLE=[['NW','N','NE'],['W','C','E'],['SW','S','SE'],['FW','F','FE']]
 
@@ -190,6 +257,17 @@ for rad in KULLE:
     for n in rad: rutor.append(('kulle_'+n,kulle_ruta(n)))
 GLIT0=len(rutor)
 for b in (1,2): rutor.append((f'vatten_glitter_{b+1}',vatten_ruta((1,1,1,1),b)))
+HOJD0=len(rutor)                     # höjdkitet (Stil 16): läggs sist, så att alla äldre rutor behåller sitt nummer
+for n in ('skugga_S','skugga_E','skugga_SE','skugga_NE'): rutor.append((n,skugga_ruta(n)))
+for d in ('S','F','fot'):
+    for h in ('V','H'): rutor.append((f'trappa_{d}_{h}',trappa_ruta(f'trappa_{d}_{h}')))
+for n in ('stege_S','stege_F'): rutor.append((n,stege_ruta(n)))
+# en stig som går längs kullens östra fot (gläntans hemliga stig) ligger i ett eget lager ovanpå golvet:
+# samma stigruta med skuggan i, så att skuggan står kvar när stigen syns
+_namn=dict(rutor)
+for st in ('stig_0101',):
+    for sk in ('skugga_E','skugga_SE'):
+        rutor.append((f'{st}_{sk}',skugga_ruta(sk,_namn[st])))
 rader=(len(rutor)+KOL-1)//KOL
 ark=Image.new('RGBA',(KOL*T,rader*T),(0,0,0,0))
 for i,(n,im) in enumerate(rutor): ark.paste(im,((i%KOL)*T,(i//KOL)*T))
@@ -210,7 +288,7 @@ tsj={'type':'tileset','version':'1.10','tiledversion':'1.11.0','name':'skog','im
      'wangsets':[wangset('gräs/stig',('gräs','stig','#be9a62'),STIG0),
                  wangset('gräs/vatten',('gräs','vatten','#3e7eba'),VATT0),
                  wangset('gräs/skog',('gräs','skog','#2e6a30'),SKOG0)],
-     'properties':[{'name':'beskrivning','type':'string','value':'Skogens rutor (Stil). Kullen: kulle_* i 3 x 4, sista raden är klippans framsida. Vattnets helruta är animerad.'}]}
+     'properties':[{'name':'beskrivning','type':'string','value':'Skogens rutor (Stil). Kullen: kulle_* i 3 x 4, sista raden är klippans framsida. Höjdkitet: skugga_S, skugga_E, skugga_SE och skugga_NE på marken söder och öster om kullen, trappa_S/F/fot_V/H för trappan i framsidan (två rutor bred), och stege_S/F. Vattnets helruta är animerad.'}]}
 anim={t['id']:t['animation'] for t in tsj['tiles']}
 tsj['tiles']=[dict({'id':i,'properties':[{'name':'namn','type':'string','value':n}]},**({'animation':anim[i]} if i in anim else {})) for i,(n,_) in enumerate(rutor)]
 INDEX={n:i for i,(n,_) in enumerate(rutor)}

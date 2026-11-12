@@ -101,9 +101,19 @@
      "visible": true,
      "properties": [
       {
+       "name": "bild",
+       "type": "string",
+       "value": "bo_ner_01"
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"
+      },
+      {
+       "name": "skugga",
+       "type": "bool",
+       "value": true
       },
       {
        "name": "talare",

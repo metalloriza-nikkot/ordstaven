@@ -203,6 +203,8 @@ html, body {
 .p-baronen { background: #9fd0ee url('../assets/portratt/baronen_portratt_stolt.png') center / cover no-repeat; image-rendering: pixelated; }
 .p-baronen.u-forvanad { background-image: url('../assets/portratt/baronen_portratt_forvanad.png'); }
 .p-baronen.u-sur { background-image: url('../assets/portratt/baronen_portratt_sur.png'); }
+/* Tant Rosas porträtt (Stil, steg 5 del 1): stråhatten med rosa band. Den fundersamma minen väntar på en regi. */
+.p-tant_rosa { background: #f2d8de url('../assets/portratt/tant_rosa_portratt_glad.png') center / cover no-repeat; image-rendering: pixelated; }
 .p-herr_skata { background: linear-gradient(135deg, #22252b 0 45%, #ffffff 45% 70%, #2e5966 70%); box-shadow: inset 0 0 0 3px #22252b; }
 
 /* pussel */

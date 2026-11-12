@@ -80,15 +80,32 @@ SLINGOR = {
     ackord=['C', 'Am', 'F', 'G', 'C', 'Em', 'F', 'G', 'Am', 'Em', 'F', 'C/E', 'Dm7', 'G', 'F', 'C'],
     arp_monster=[0, 1, 2, 3, 2, 1, 2, 1], bas_monster=[(0, 4), (7, 4)],
   ),
+  # Byn vid sjön (kapitel 2): vänlig och lite livlig, ett dragspel över bas och ackord på 2 och 4 (umpa). B-dur.
+  'byn': dict(
+    attondel=60 / 96 / 2, takt=8, ton_bas='Bb', lead='dragspel', mel_fc=2400, arp_styrka=0.22, bas_styrka=0.26,
+    melodi=[
+      [('D4', 2), ('F4', 2), ('Bb4', 3), ('A4', 1)], [('G4', 2), ('Bb4', 2), ('D5', 4)],
+      [('C5', 2), ('Bb4', 1), ('G4', 1), ('Eb5', 2), ('C5', 2)], [('A4', 2), ('C5', 2), ('F5', 4)],
+      [('D5', 2), ('D5', 1), ('Eb5', 1), ('F5', 2), ('D5', 2)], [('Eb5', 2), ('G5', 2), ('Bb4', 4)],
+      [('C5', 2), ('D5', 1), ('C5', 1), ('A4', 2), ('F4', 2)], [('Bb4', 6), (None, 2)],
+      [('G4', 2), ('Bb4', 2), ('Eb5', 3), ('D5', 1)], [('D5', 2), ('F5', 2), ('Bb4', 4)],
+      [('Eb5', 2), ('D5', 1), ('C5', 1), ('G4', 2), ('C5', 2)], [('A4', 2), ('C5', 2), ('F5', 4)],
+      [('G5', 2), ('F5', 1), ('Eb5', 1), ('D5', 2), ('Bb4', 2)], [('C5', 2), ('Eb5', 2), ('G5', 2), ('Eb5', 2)],
+      [('F5', 2), ('Eb5', 1), ('D5', 1), ('C5', 2), ('A4', 2)], [('Bb4', 4), ('F4', 2), (None, 2)],
+    ],
+    ackord=['Bb', 'Gm', 'Cm', 'F', 'Bb', 'Eb', 'F', 'Bb', 'Eb', 'Bb', 'Cm', 'F', 'Gm', 'Cm', 'F', 'Bb'],
+    arp_monster=[None, None, 'A', None, None, None, 'A', None], bas_monster=[(0, 2), (None, 2), (7, 2), (None, 2)],
+  ),
 }
 TONER = {'G': ['G3', 'B3', 'D4', 'G4'], 'D/F#': ['F#3', 'A3', 'D4', 'F#4'], 'D': ['D3', 'F#3', 'A3', 'D4'],
          'Em': ['E3', 'G3', 'B3', 'E4'], 'C': ['C3', 'E3', 'G3', 'C4'], 'Am': ['A2', 'C3', 'E3', 'A3'],
          'Am7': ['A2', 'C3', 'E3', 'G3'], 'Bm': ['B2', 'D3', 'F#3', 'B3'], 'D7': ['D3', 'F#3', 'A3', 'C4'],
          'F': ['F3', 'A3', 'C4', 'F4'], 'Dm': ['D3', 'F3', 'A3', 'D4'], 'Bb': ['Bb2', 'D3', 'F3', 'Bb3'],
          'A': ['A2', 'C#3', 'E3', 'A3'], 'A/C#': ['C#3', 'E3', 'A3', 'C#4'], 'A7': ['A2', 'C#3', 'E3', 'G3'],
-         'Gm': ['G2', 'Bb2', 'D3', 'G3'], 'C/E': ['E3', 'G3', 'C4', 'E4'], 'Dm7': ['D3', 'F3', 'A3', 'C4']}
+         'Gm': ['G2', 'Bb2', 'D3', 'G3'], 'C/E': ['E3', 'G3', 'C4', 'E4'], 'Dm7': ['D3', 'F3', 'A3', 'C4'],
+         'Cm': ['C3', 'Eb3', 'G3', 'C4'], 'Eb': ['Eb3', 'G3', 'Bb3', 'Eb4']}
 BAS = {'G': 'G2', 'D/F#': 'F#2', 'D': 'D2', 'Em': 'E2', 'C': 'C2', 'Am': 'A2', 'Am7': 'A2', 'Bm': 'B2', 'D7': 'D2',
-       'F': 'F2', 'Dm': 'D2', 'Bb': 'Bb2', 'A': 'A2', 'A/C#': 'C#2', 'A7': 'A2', 'Gm': 'G2', 'C/E': 'E2', 'Dm7': 'D2'}
+       'F': 'F2', 'Dm': 'D2', 'Bb': 'Bb2', 'A': 'A2', 'A/C#': 'C#2', 'A7': 'A2', 'Gm': 'G2', 'C/E': 'E2', 'Dm7': 'D2', 'Cm': 'C2', 'Eb': 'Eb2'}
 
 # ---------------------------------------------------------------- byggstenarna (som i musik.py)
 def hylsa(n, a=0.01, d=0.25, s=0.55, r=0.12, langd=None):
@@ -123,6 +140,12 @@ def gor(namn):
                     ljud = (np.sin(2 * np.pi * fas + 1.2 * np.exp(-tt * 9) * np.sin(2 * np.pi * 3.5 * fas)) * e
                             + 0.35 * np.sin(2 * np.pi * fas) * np.exp(-tt * 1.2))
                     lagg(mel, t, ljud * hylsa(n, 0.002, 0.05, 1.0, 0.25, h)); t += d * A; continue
+                if S.get('lead') == 'dragspel':        # två lätt ostämda tungor och en smal puls, mjuk ansats, svag tremolo
+                    f2 = np.cumsum(f * 1.0035 * vib / SR); f3 = np.cumsum(f * 0.9965 * vib / SR)
+                    ljud = (0.40 * (4 * np.abs(f2 % 1 - 0.5) - 1) + 0.40 * (4 * np.abs(f3 % 1 - 0.5) - 1)
+                            + 0.22 * lagpass(np.where(fas % 1 < 0.2, 1.0, -0.25), 1800))
+                    ljud *= 1 + 0.08 * np.sin(2 * np.pi * 5.5 * tt)
+                    lagg(mel, t, ljud * hylsa(n, 0.025, 0.2, 0.75, 0.08, h)); t += d * A; continue
                 ljud = 0.55 * np.sin(2 * np.pi * fas) + 0.45 * (4 * np.abs(fas % 1 - 0.5) - 1)
                 if S.get('flojt'):                     # lite andning i ansatsen, som en träflöjt
                     ljud += S['flojt'] * lagpass(rng.uniform(-1, 1, n), 2500) * np.exp(-tt * 18)
@@ -133,6 +156,11 @@ def gor(namn):
         for i, idx in enumerate(S['arp_monster']):
             if idx is None: continue
             styrka = 0.0 if k < 1 else 1.0
+            if idx == 'A':                             # ett kort ackord (umpa): de tre undre tonerna samtidigt
+                n = int(A * SR * 1.2)
+                ack_ = sum(triangel(hz(x), n) for x in toner[:3]) / 2
+                lagg(arp, (k * T + i) * A, ack_ * hylsa(n, 0.004, 0.08, 0.3, 0.06, int(n * 0.6)))
+                continue
             if S.get('gitarr'):                        # knäppt sträng: ljus ansats som mörknar (Karplus-Strong i liten skala)
                 n = int(A * SR * 3); tt = np.arange(n) / SR; f = hz(toner[idx])
                 ton = sum((0.6 ** (j - 1)) * np.sin(2 * np.pi * f * j * tt) * np.exp(-tt * (2.5 + 3 * j)) for j in range(1, 6))
@@ -146,6 +174,7 @@ def gor(namn):
             lagg(arp, k * T * A, S['pad'] / S.get('arp_styrka', 1) * ton * hylsa(n, 0.4, 0.5, 0.8, 0.3, int(T * A * SR)))
         rot = m(BAS[ack]); pos = 0
         for steg, d in S['bas_monster']:
+            if steg is None: pos += d; continue
             h = int(d * A * SR * 0.85); n = h + int(0.05 * SR)
             lagg(bas, (k * T + pos) * A, triangel(hz(rot + steg), n) * hylsa(n, 0.004, 0.1, 0.8, 0.05, h)); pos += d
         if S.get('skakare') and k >= 2:                # en mycket lätt skakare, betoning på 1 och 4

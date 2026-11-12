@@ -100,3 +100,38 @@ test('kapitel 2 går att spela från träsket till elden (gråbox, del 5)', asyn
   expect(t.aventyr['den-gomda-dalen'].skrivet.k2_over).toBe('BRO'); // Farfar säger det vid elden ({ord:k2_over})
   await page.screenshot({ path: 'test-results/kap2-elden.png' });
 });
+
+test('byborna i Stils bilder (42.2): fiskaren, tvätterskan och barnet på torget, med en skugga under var och en', async ({ page }) => {
+  test.setTimeout(90000);
+  const iRummet = async (scenId, rum) => {
+    await page.goto('./?snabb&ny&kapitel=kap-02');
+    await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+    await page.evaluate(({ scenId, rum }) => {
+      const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
+      Object.assign(av, { kapitelId: 'kap-02', scen: 2, scenId, steg: 6, pass: 2, startad: true, rumstillstand: { byn: 'fri' }, skrivet: { k2_over: 'BRO' } });
+      if (rum) av.plats = { rum, x: 160, y: 140 };
+      t.spelare.hjalte.namn = 'TESTA'; t.spelare.unge = { format: 1, steg: 1, formagor: [], ...t.spelare.unge, namn: 'KNOPP', folj: true };
+      localStorage.setItem('ordstaven_spar', JSON.stringify(t));
+    }, { scenId, rum });
+    await page.goto('./?snabb&kapitel=kap-02');
+    await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+    await page.click('.start-knapp');
+    for (let i = 0; i < 40 && (await page.evaluate(() => window.__ORDSTAVEN.steg()?.typ)) !== 'nav'; i++) {
+      for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+      await page.waitForTimeout(200);
+    }
+    await page.waitForFunction(() => !window.__ORDSTAVEN.fryst() && document.querySelector('#plattan').hidden);
+  };
+  await iRummet('k2s03_torget');
+  // Tant Rosa står inte på torget i det här läget, och Bo är vid dammen: deras bilder prövar enhetstestet för kartorna
+  for (const [id, bild] of [['fiskaren', 'fiskaren'], ['tvatterskan', 'tvatterskan'], ['barnet_drake', 'barnet']]) {
+    expect(await page.evaluate((id) => window.__ORDSTAVEN.bildFor(id), id), id).toMatch(new RegExp(`^${bild}_[a-z]+_01$`));
+  }
+  expect(await page.evaluate(() => window.__ORDSTAVEN.skuggor())).toBe(3);
+  await page.screenshot({ path: 'test-results/kap2-byborna-torget.png' });
+  // fiskaren vid stranden: kameran dit, så att skärmdumpen visar honom
+  const o = await page.evaluate(() => window.__ORDSTAVEN.objekt('fiskaren'));
+  await page.mouse.click(o.x, o.y - 40);
+  await page.waitForTimeout(2500);
+  await page.screenshot({ path: 'test-results/kap2-byborna-stranden.png' });
+});

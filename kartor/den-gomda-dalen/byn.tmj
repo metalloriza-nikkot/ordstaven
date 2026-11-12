@@ -269,9 +269,19 @@
      "visible": true,
      "properties": [
       {
+       "name": "bild",
+       "type": "string",
+       "value": "fiskaren_ner_01"
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"
+      },
+      {
+       "name": "skugga",
+       "type": "bool",
+       "value": true
       }
      ]
     },
@@ -287,9 +297,19 @@
      "visible": true,
      "properties": [
       {
+       "name": "bild",
+       "type": "string",
+       "value": "tvatterskan_ner_01"
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"
+      },
+      {
+       "name": "skugga",
+       "type": "bool",
+       "value": true
       }
      ]
     },
@@ -305,9 +325,19 @@
      "visible": true,
      "properties": [
       {
+       "name": "bild",
+       "type": "string",
+       "value": "barnet_ner_01"
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"
+      },
+      {
+       "name": "skugga",
+       "type": "bool",
+       "value": true
       }
      ]
     },
@@ -649,9 +679,19 @@
      "visible": true,
      "properties": [
       {
+       "name": "bild",
+       "type": "string",
+       "value": "tant_rosa_ner_01"
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"
+      },
+      {
+       "name": "skugga",
+       "type": "bool",
+       "value": true
       },
       {
        "name": "talare",

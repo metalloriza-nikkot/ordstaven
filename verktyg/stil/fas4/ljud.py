@@ -356,6 +356,19 @@ def _():
 @ljud('snurr', 'Kapitel 1', 'Ugglorna vrider huvudet, ungen blir yr: ett snurr', styrka=-12)
 def _(): n = int(.6 * SR); f = 600 + 300 * np.sin(2 * np.pi * 5 * tid(.6)[:n]); return rum(sinus(f, n) * np.sin(np.pi * np.linspace(0, 1, n)) * .7, .15)
 
+@ljud('surr', 'Kapitel 2', 'Trollsländan surrar tre varv runt hjälmen: ett lätt vingsurr som kommer och går', styrka=-12)
+def _():
+    # Vingarna slår ca 34 gånger i sekunden: ett mjukt surr kring 170 Hz med övertoner och lite brus i samma takt.
+    # Tre varv runt hjälmen: styrkan sväller tre gånger, och tonen stiger lite på väg mot örat och sjunker på väg bort.
+    r = np.random.default_rng(41); n = int(1.15 * SR); t = tid(1.15)[:n]
+    varv = 0.5 - 0.5 * np.cos(2 * np.pi * 3 * t / t[-1])
+    dop = 1 + 0.05 * np.sin(2 * np.pi * 3 * t / t[-1] + np.pi / 2)
+    vinge = 0.5 + 0.5 * np.sin(2 * np.pi * np.cumsum(34 * dop) / SR)
+    ton_ = sum(a * triangel(170 * k * dop, n) for k, a in ((1, 1), (2, .45), (3, .2)))
+    vind = bp(r.uniform(-1, 1, n), 700, 3200)
+    x = (lp(ton_, 1400) * .8 + vind * .5) * (0.35 + 0.65 * vinge) * (0.15 + 0.85 * varv)
+    return rum(x * hylsa(n, .03, 1.15, 0.6), .12)
+
 def aktiv_rms(x):
     """Ljudstyrkan där ljudet hörs: medel av de starkaste 30 % av 20 ms-fönstren (dB)."""
     w = int(.02 * SR); f = [np.sqrt(np.mean(x[i:i + w] ** 2)) for i in range(0, len(x) - w, w // 2)] or [np.sqrt(np.mean(x ** 2))]

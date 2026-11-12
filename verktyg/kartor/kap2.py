@@ -31,7 +31,15 @@ def sak(namn, x, y, b, h, **e):
     return ('sak', namn, x, y, b, h, e)
 
 
+# Stils bybor (steg 5 del 1): kartans id → bildernas namn. Stillbilden är <namn>_ner_01, och figuren vänder sig
+# mot den som pratar med <namn>_<riktning>_01. Byborna har en skugga under sig (skugga_16x24, Tant Rosa 24 × 24).
+BYBOR = {'fiskaren': 'fiskaren', 'tvatterskan': 'tvatterskan', 'barnet_drake': 'barnet', 'tant_rosa': 'tant_rosa', 'bo': 'bo'}
+
+
 def figur(namn, x, y, **e):
+    if namn in BYBOR:
+        e.setdefault('bild', f'{BYBOR[namn]}_ner_01')
+        e.setdefault('skugga', True)
     return ('figur', namn, x, y, 16, 24, e)
 
 

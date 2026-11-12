@@ -1,4 +1,4 @@
-# Bildkort för krönet (48 x 48): kullen med klippkanten, en trappa upp mitt i klippan
+# Bildkort för krönet (48 x 48): kullen med klippkanten, trappan ur höjdkitet mitt i sydsidan
 # och en lövhög uppe på platån. Används i molnet vid "GÅ UPP PÅ KULLEN!" (k1s08).
 import os, sys
 from PIL import Image
@@ -14,7 +14,6 @@ exec(open('rutor.py').read().split("if __name__=='__main__':")[0])
 os.chdir(_cwd)
 
 def hx(h): return tuple(int(h[i:i+2], 16) for i in (1, 3, 5)) + (255,)
-STEN = ['#3E4148', '#6E747F', '#7E838C', '#8E949E', '#A4A9B0', '#B8BEC6']  # trappans sten, mörk -> ljus
 INK = os.path.join(ROT, 'inkorg')
 
 def kron():
@@ -24,32 +23,27 @@ def kron():
         for rx, kol in enumerate(['W', '', 'E']):
             n = (rad + kol) if rad != 'S' or kol else 'S'
             im.paste(rutor[INDEX['kulle_' + n]][1], (rx * 16, ry * 16))
-    px = im.load()
-    # Trappan: huggen i klippan mitt fram, fyra steg ned mot oss. Ljuset uppifrån till vänster.
-    x0, x1, y0 = 17, 30, 32
-    for y in range(y0, 48):
-        for x in range(x0, x1 + 1):
-            if x in (x0, x1):
-                px[x, y] = hx(STEN[0]); continue           # sidomurarna, mörk kontur
-            k = (y - y0) % 4
-            if k == 0:   c = STEN[0]                         # stegets framkant
-            elif k == 1: c = STEN[5] if x < x0 + 5 else STEN[4]  # stegets ovansida, ljusast till vänster
-            elif k == 2: c = STEN[4] if x < x0 + 5 else STEN[3]
-            else:        c = STEN[2]                         # sättsteget
-            if x == x1 - 1 and k != 0: c = STEN[1]           # skugga mot högra muren
-            px[x, y] = hx(c)
-    # Ljus kant där trappan möter platån.
-    for x in range(x0 + 1, x1):
-        px[x, y0 - 1] = hx(STEN[5])
+    # Trappan: samma rutor som i rummet (höjdkitet, 10b), mitt i sydsidan. Kortet är bara tre rutor
+    # brett, så trappan smalnas till en ruta: vänster halva av V-rutan och höger halva av H-rutan.
+    def halvor(rad, y, h=16):
+        for i, s in enumerate('VH'):
+            r = rutor[INDEX[f'trappa_{rad}_{s}']][1].crop((i * 8, 0, i * 8 + 8, h))
+            yield r, (16 + i * 8, y)
+    for ry, rad in ((1, 'S'), (2, 'F')):
+        for r, xy in halvor(rad, ry * 16):
+            im.alpha_composite(r, xy)
     # Lövhögen uppe på krönet, lite till vänster så att trappan syns fri.
     lov = Image.open(os.path.join(INK, 'foremal/skog/lovhog.png')).convert('RGBA')
     im.alpha_composite(lov, (8, 8))
     # Kortet: kullen flyttas upp 6 pixlar, och en remsa gräs nedanför visar att trappan börjar på marken.
     kort = Image.new('RGBA', (48, 48), (0, 0, 0, 0))
     kort.paste(im.crop((0, 6, 48, 48)), (0, 0))
-    gras = rutor[INDEX['gras_1']][1]
+    # Marken nedanför: kullens skugga söderut och trappans nedersta steg.
+    skugga = rutor[INDEX['skugga_S']][1]
     for rx in range(3):
-        kort.paste(gras.crop((0, 0, 16, 6)), (rx * 16, 42))
+        kort.paste(skugga.crop((0, 0, 16, 6)), (rx * 16, 42))
+    for r, (x, _) in halvor('fot', 0, 6):
+        kort.paste(r, (x, 42))
     return kort
 
 if __name__ == '__main__':

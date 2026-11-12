@@ -169,24 +169,49 @@ def unge_mor_liten():
     prickar(d, [(2, 17), (4, 16), (6, 16)])
     return d.bild()
 
-def mor_huvud():
-    """Mamma som vuxen, bara huvudet in från höger: stort mörkt öga, spetsig nos och mönstret stort på nosen."""
-    d = Duk(46, 48)
-    d.ellips(34, 34, 14, 22, 'oliv', 'hals')
-    d.ellips(24, 14, 13, 10.5, 'huvud', 'huvud', zbias=0.05)
-    d.ellips(13, 18.5, 8.0, 5.6, 'huvud', 'nos', toner=(2, 3, 3, 4), zbias=0.2)
-    skilj(d, 'huvud', 'hals'); skilj(d, 'nos', 'huvud', ton=2)
+def mor_vuxen():
+    """Mamma som vuxen (beslut 76.9): en vuxen av ungens art, ankylosaurusinspirerad, från sidan och vänd åt vänster.
+    Siluetten är den som kartbitarna visar som skugga och ska kännas igen i finalen: låg bred kropp, en rygg av
+    pansar med en rad taggar längs kammen, klubbsvansen högt bakom ryggen, och huvudet lågt fram. Färgerna och
+    ansiktet är ungens (grå rygg, oliv, blå fötter, stort mörkt öga och mönstret på nosen), proportionerna en vuxens:
+    längre kropp, mindre huvud, tjockare ben. Hon sänker nosen mot ägget."""
+    k = 2.15; B_, H_ = 62, 45
+    d = Duk(B_, H_)
+    def E(cx, cy, rx, ry, m, n, **kw): d.ellips(B_ - cx * k, cy * k, rx * k, ry * k, m, n, **kw)
+    ben = [(6.4, 'b'), (9.4, 'n'), (15.0, 'b'), (17.8, 'n')]
+    # svansen: från bakdelen uppåt bakåt, och klubban högt (som skuggan på kartbit 1)
+    E(1.9, 4.6, 2.5, 2.0, 'klubba', 'klubba')
+    for (x, y, r) in [(4.6, 11.4, 1.3), (3.8, 10.2, 1.1), (3.2, 8.9, 1.0), (2.7, 7.6, 0.9), (2.3, 6.4, 0.8)]: E(x, y, r, r, 'oliv', 'svans')
+    for cx, s_ in ben:
+        if s_ == 'b': E(cx, 17.4, 1.9, 2.3, 'oliv', 'benb', toner=(0, 1, 1, 2)); E(cx + 0.3, 19.4, 1.7, 0.9, 'bla', 'fotb', toner=(0, 1, 2, 2))
+    E(12.2, 14.0, 8.6, 4.4, 'oliv', 'kropp')
+    # taggarna längs kammen, före ryggen så att ryggen täcker deras fot
+    for x in (5.6, 7.6, 9.6, 11.6, 13.6, 15.6, 17.4):
+        top = 10.6 - 3.7 * math.sqrt(max(0.0, 1 - ((x - 11.6) / 8.4) ** 2))
+        E(x, top - 0.5, 0.55, 1.0, 'gra', 'tagg', toner=(1, 2, 3, 4), zbias=-0.1)
+    E(11.6, 10.8, 8.4, 3.7, 'gra', 'rygg', platt=0.6, zbias=-0.2)
+    for cx, s_ in ben:
+        if s_ == 'n': E(cx, 17.6, 2.1, 2.3, 'oliv', 'ben'); E(cx + 0.4, 19.6, 1.9, 1.0, 'bla', 'fot')
+    E(20.4, 14.6, 4.3, 3.9, 'huvud', 'huvud', zbias=0.05)
+    E(23.4, 16.6, 2.4, 1.6, 'huvud', 'nos', toner=(2, 3, 3, 4), zbias=0.2)
+    skilj(d, 'huvud', 'kropp'); skilj(d, 'huvud', 'rygg', ton=1); skilj(d, 'rygg', 'kropp', ton=1); skilj(d, 'ben', 'kropp', ton=1)
+    skilj(d, 'rygg', 'tagg', ton=1)
     d.kontur()
-    for (x, y) in [(29, 4), (33, 5), (37, 8), (40, 12), (43, 17)]:     # grå burrig rygg längs nacken
-        d.satt(x, y, 'gra', 3); d.satt(x + 1, y, 'gra', 2); d.satt(x, y - 1, 'gra', 4); d.satt(x + 1, y + 1, 'gra', 2)
-    for (x, y) in [(31, 22), (34, 24), (30, 26), (35, 28)]:   # ränderna
-        d.satt(x, y, 'oliv', 1); d.satt(x + 1, y, 'oliv', 1)
-    # ögat: stort, mörkt, med glans (ungens kännetecken)
-    for (x, y) in [(22, 11), (23, 11), (24, 11), (21, 12), (22, 12), (23, 12), (24, 12), (25, 12), (21, 13), (22, 13), (23, 13), (24, 13), (25, 13), (22, 14), (23, 14), (24, 14)]: d.fast(x, y, '#101C1C')
-    d.fast(22, 12, '#FFFFFF'); d.fast(23, 12, '#FFFFFF'); d.fast(24, 14, '#9FD3DC')
-    for (x, y) in [(8, 21), (9, 22), (10, 22), (11, 22), (12, 21)]: d.fast(x, y, MUN)   # mun som ler
-    d.fast(18, 18, ROS); d.fast(19, 18, ROS)
-    prickar(d, [(8, 15), (11, 14), (14, 14)])
+    # pansarplattorna på ryggen: korta ljusa streck i klungor, och ränderna på sidan som ungens
+    for i in range(7):
+        x = B_ - int((6 + 2.2 * i) * k); y = int(9.8 * k) - (1 if i in (2, 3, 4) else 0)
+        d.satt(x, y, 'gra', 4); d.satt(x + 1, y, 'gra', 3); d.satt(x, y + 2, 'gra', 3)
+    for (cx, cy) in [(8.2, 15.4), (11.6, 16.0), (15.0, 15.4)]:
+        x, y = B_ - int(cx * k), int(cy * k); d.satt(x, y, 'oliv', 1); d.satt(x + 1, y, 'oliv', 1)
+    # ögat: mörkt med glans, mindre än ungens (vuxen), och ett milt leende
+    ox, oy = B_ - int(20.6 * k), int(13.0 * k)
+    for dy in range(3):
+        for dx in range(2): d.fast(ox + dx, oy + dy, '#101C1C')
+    d.fast(ox, oy, '#FFFFFF'); d.fast(ox + 1, oy + 2, '#9FD3DC')
+    mx, my = B_ - int(23.8 * k), int(17.6 * k)
+    for (x, y) in [(mx, my), (mx + 1, my + 1), (mx + 2, my + 1), (mx + 3, my)]: d.fast(x, y, MUN)
+    d.fast(ox + 3, oy + 4, ROS)
+    prickar(d, [(B_ - int(24.6 * k), int(15.4 * k)), (B_ - int(23.2 * k), int(14.8 * k)), (B_ - int(21.8 * k), int(14.6 * k))])
     return d.bild()
 
 def agg(s, cx, cy):
@@ -274,15 +299,16 @@ def uppslag_med_dino():
     return s.bild()
 
 def uppslag_far_agg():
-    """Uppslag 4: vännen har vuxit. Hon puttar sitt ägg mot pojken med nosen, och mönstret syns stort."""
+    """Uppslag 4: vännen har vuxit. Hela hon syns, med samma siluett som skuggan på kartbitarna (76.9), och hon
+    puttar sitt ägg mot pojken med nosen. Mönstret syns på nosen."""
     s = Sida(4)
     himmel(s, '#C8D8EC', '#F6E4C4', 46)
     berg(s, 42, 14, '#A8AECC', 0.3, 2)
     s.dimma(lambda x, y: 36 < y < 56, lambda x, y: 0.5 - abs(y - 46) * 0.06)
     s.lavera(lambda x, y: y > 56 + 2 * math.sin(x * 0.09), '#9CC266', korn=0.14)
-    s.figur(farfar_liten(stav=False), 16, 34)
-    agg(s, 42, 53)
-    s.figur(mor_huvud(), 44, 30, las=(MONSTER.lower(), MONSTER2.lower(), '#101c1c', '#ffffff', '#9fd3dc'))
+    s.figur(farfar_liten(stav=False), 12, 34)
+    agg(s, 44, 54)
+    s.figur(mor_vuxen(), 42, 14, las=(MONSTER.lower(), MONSTER2.lower(), '#101c1c', '#ffffff', '#9fd3dc'))
     s.dimma(lambda x, y: y > 58, lambda x, y: 0.15 + (y - 58) * 0.09)
     return s.bild()
 

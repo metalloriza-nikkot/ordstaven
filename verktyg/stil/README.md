@@ -18,6 +18,12 @@ namnkontrollen. Repot är publikt, så inga riktiga namn står i skripten eller 
     som skriver Stils förslag till kartorna (kopior, aldrig repots kartor) med `skog_forslag.py`, och `rendera.py`,
     som ritar en karta till en provbild. `kap1/liten_lian9.py` (beslut 59.6) ritar den lilla lianen i gångens grön
     och ersätter `svard.py`:s `liten_lian*`, så den körs efter `svard` och `kap1/skog5d.py`.
+    `kap1/lagen13.py` (beslut 67.2) ritar ungens lägen (lyssnar, fnissar med foten för munnen, kryper ihop, biter),
+    Farfar som skriver och gäspar i fåtöljen, SVÄRD som ristas i staven och buskarna som prasslar. Den läser
+    `unge2/anims.py`, `kap1/prolog5e.py`, `ui/start/stav.png` och skogens buskar ur inkorgen, så den körs sist.
+    `kap1/hojd16.py` (beslut 76.6) skriver förslaget till gläntan med höjdkitet (trappan i framsidan och skuggan)
+    i en kopia av kartan och ritar provbilden med det nya rutsetet. Höjdkitets rutor ritas i `rutor/rutor.py`,
+    och `kron/kron.py` ritar krönets bildkort med samma trappa, så den körs efter `rutor`.
   - fas 4 (beslut 61.3): `fas4`. `skiss.py` ritar skissbilderna till startskärmen, pausmenyn och menyn för vuxna
     (läser en skärmdump av skogsbrynet, nedskalad till spelets pixlar, i `/tmp/nat_gangen-soder.png`),
     `mock/skiss.html` sätter ihop dem och `mock/shot.js` tar bilderna (Playwright, Lexend-filerna bredvid).
@@ -36,8 +42,8 @@ namnkontrollen. Repot är publikt, så inga riktiga namn står i skripten eller 
     `musik.py` gör musikprovet (numpy och ffmpeg). `KLANG=spel` ger den mjukare klangen för spelet.
     `ljud.py` (beslut 62.7) gör ljudeffekterna efter ljudlistan i 10c: 80 egna ljud ur syntes (numpy och scipy),
     inga hämtade, till `ut/ljud/effekter/<id>.wav` med `ljud.json` (grupp, händelse, signatur, nivå och längd).
-    `slingor.py <namn>` gör fler musikslingor i samma familj och klang som spelets (`skogen`, `natten`, `raddning`
-    och `lagerelden`), som prov
+    `slingor.py <namn>` gör fler musikslingor i samma familj och klang som spelets (`skogen`, `natten`, `raddning`,
+    `lagerelden` och `byn`), som prov
     eller med `loop <fil>` som loop till `ljud/musik/`, precis som `musik.py`.
 - **Körning:** bilderna i `ut/`-mapparna görs genom att köra skripten i ordningen figurer → `efx` → `prov` → `rutor`
   → `kort` → `hus` → `pass3` → resten, eftersom de senare läser de tidigares bilder och inkorgens bilder. Skripten
@@ -46,3 +52,22 @@ namnkontrollen. Repot är publikt, så inga riktiga namn står i skripten eller 
 - **Ut i spelet:** bilderna läggs i inkorgen och förs in i `assets/` med `verktyg/grafik/inkorg.py`.
 
 Skripten ändras bara av Stil. Teknik byter filerna, ändrar dem inte.
+
+skiss2/ (beslut 79, kedjan i 07 steg 4): skissen av kapitel 2 ovanpå repots kartor. `bas.py` har det som
+alla rum delar (terrängen, vassen, husen, lyktorna), och `rum_trasket.py`, `rum_byn.py`, `rum_ovriga.py`,
+`detaljer.py` och `oversikt.py` ritar bilderna i `skiss2/ut/`. Kör `rum_ovriga.py` från mappen `hus/`
+(den läser `hus.py` för Tant Rosas hus). Reglerna står i 10g.
+
+bybor/ (beslut 80.5, kedjan i 07 steg 5): grafiken till kapitel 2. `bybor.py` ritar byborna i grundställning
+åt fyra håll och gången (`pix.py` är samma lilla motor som Farfars), `rorelser.py` vinkningen, jublet,
+sysslorna och Tant Rosas lägen, `portratt.py` Tant Rosas porträtt, och `foremal_k2.py` grodorna, lyktorna,
+lägerelden med vedhögen, vedpinnen och deras bildkort (kvällens bilder är ritade mörkare en gång, 80.6).
+`foremal_k2b.py` ritar del 3:s föremål (vasstussarna, repen, skyltarna, brunnen, draken, brevramen, blommorna,
+stocken, halvorna, tavlorna, soffan, fisken och övergångarna), `bildkort_k2.py` bildkorten och ledbilderna, och `zon.py`
+håller en zon under 256 färger. `leverera.py` skriver figurerna och förhandsbilderna. Allt hamnar i `bybor/ut/`. Paletten 1.1 har 18 nya
+färger för byborna (hjältens tre andra hudval och Tant Rosas rosa).
+
+rum2/ (beslut 80.5, steg 5): kapitel 2:s rum som färdiga bilder, ritade med skissens verktyg (`skiss2/bas.py`) men
+utan figurer och utan föremål som spelet ritar själv. `rum.py` skriver `rum/kap-02/<rum>.png`, `byn_kvall.png`,
+`<rum>_over.png` (den höga vassen ovanför figurerna) och masken `vassen_falt.png`, och `fotter.py` vassfältets toppar
+vid fötterna (`figurer/omgivning/vass_fotter_01–02`).

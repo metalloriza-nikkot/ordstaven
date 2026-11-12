@@ -217,6 +217,8 @@ export class Rum extends Phaser.Scene {
     this.livet = new Livet(this, this.lagerFigurer);
     /** @type {{ img: any, ramar: string[], ms: number, i: number, senast: number }[]} figurer som rör sig i tomgång (bild_anim) */
     this.animerade = [];
+    /** @type {{ img: any, skugga: any }[]} figurernas skuggor (kartans `skugga`), som följer bilden när en regi flyttar den */
+    this.figurSkuggor = [];
     /** @type {Set<any>} höga föremålsbilder (trädkronor) som ritas bland figurerna, i ordning efter fötterna */
     this.hogaBilder = new Set();
     // det som är i luften (luftskeppet i s22) syns ovanför figurerna
@@ -397,6 +399,17 @@ export class Rum extends Phaser.Scene {
   }
 
   /** Tomgång (Teknik 3): vattnets rutor och figurernas bild_anim byter bild, bara när de syns och högst fyra gånger per sekund. */
+  /** Skuggorna följer sina figurer: läge, synlighet och genomskinlighet (en regi kan flytta eller dölja figuren). */
+  foljSkuggor() {
+    for (const { img, skugga } of this.figurSkuggor) {
+      if (!img.active || !skugga.active) continue;
+      if (skugga.x !== img.x || skugga.y !== img.y || skugga.visible !== img.visible || skugga.alpha !== img.alpha) {
+        skugga.setPosition(img.x, img.y).setVisible(img.visible).setAlpha(img.alpha);
+        this.smutsig = true;
+      }
+    }
+  }
+
   tomgang() {
     const nu = performance.now(), v = this.cameras.main.worldView;
     const syns = (/** @type {number} */ x, /** @type {number} */ y, /** @type {number} */ b, /** @type {number} */ h) => x < v.right && x + b > v.x && y < v.bottom && y + h > v.y;
@@ -409,6 +422,7 @@ export class Rum extends Phaser.Scene {
     if (this.livet?.steg(this.pos, this.fryst || !!this.b.plattaOppen?.(), v)) this.smutsig = true;
     this.ungeKlattrarSteg(); // också medan världen står still
     this.ungeSangSteg();
+    this.foljSkuggor();
     if (this.fryst) return;
     for (const t of this.animerade) {
       if (nu - t.senast < t.ms || !t.img.active) continue;
@@ -2166,7 +2180,7 @@ export class Rum extends Phaser.Scene {
       }
       // en figur som klättrar ned när den visas (apan när den är räddad, 56.4): bara i rummet han redan är i
       const klattrar = v.nyttRum ? [] : this.objekt.filter((o) => o.klattrarFran && !fore.has(o.id)).map((o) => o.id);
-      for (const g of this.hogaBilder) g.destroy(); this.hogaBilder.clear(); this.animerade = [];
+      for (const g of this.hogaBilder) g.destroy(); this.hogaBilder.clear(); this.animerade = []; this.figurSkuggor = [];
       this.lagerObjekt.removeAll(true); this.lagerLjust.removeAll(true); this.ritade.clear(); this.markerade.clear(); this.ritadeDelar.clear(); this.markramar?.clear();
       this.delar = { ...(v.delar || {}) };
       for (const o of [...this.objekt.filter((x) => x.sort === 'yta'), ...this.objekt.filter((x) => x.sort !== 'yta')]) this.ritaObjekt(o);
@@ -2305,6 +2319,13 @@ export class Rum extends Phaser.Scene {
       const pa = (o.bildPa && this.objekt.find((x) => x.id === o.bildPa)) || o;
       const tex = fb.nyckel === 'hjalte' ? this.hjalteTextur || 'hjalte' : fb.nyckel;
       const img = this.add.image(Math.round(pa.x + pa.b / 2), pa.y + pa.h, tex, fb.ram).setOrigin(0.5, 1);
+      // en figur med skugga (kartans `skugga`, byborna i kapitel 2): skuggan i figurens rutstorlek under bilden
+      if (o.skugga && o.sort === 'figur' && this.textures.exists('skugga')) {
+        const ram = this.textures.get('skugga').has(`skugga_${img.width}x24`) ? `skugga_${img.width}x24` : 'skugga_16x24';
+        const sk = this.add.image(img.x, img.y, 'skugga', ram).setOrigin(0.5, 1);
+        this.lagerObjekt.add(sk);
+        this.figurSkuggor.push({ img, skugga: sk });
+      }
       // en hög bild (en trädkrona som sticker upp) ritas bland figurerna, så att hjälten kan gå bakom den
       const hog = !o.lyser && !o.skataFonster && o.sort !== 'yta' && img.height > o.h + 6;
       if (hog) { /** @type {any} */ (img).fot = pa.y + pa.h; this.lagerFigurer.add(img); this.hogaBilder.add(img); this.sorteraFigurer(); }

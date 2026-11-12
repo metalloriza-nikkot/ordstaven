@@ -19,6 +19,14 @@ const namn = (/** @type {string} */ fil) => /** @type {string} */ (fil.split('/'
 /** Föremålens atlas, i ordning: en bild med samma namn hittas i det första som har den. */
 export const FOREMAL_ATLAS = Object.keys(ramar).filter((f) => f.includes('/foremal/')).map(namn);
 
+/**
+ * Figurernas atlas, i ordning efter föremålen: de första i den gamla ordningen, och sedan alla andra figurer som
+ * Stil har ritat (byborna i kapitel 2), så att en ny figur bara behöver sin mapp i assets/sprites/.
+ */
+const FORST = ['hjalte', 'farfar', 'herr_skata', 'unge', 'baronen', 'apa', 'djur', 'omgivning'];
+const UTAN = new Set(['skugga', 'stav', 'effekter']);
+export const FIGUR_ATLAS = [...FORST, ...Object.keys(ramar).filter((f) => f.includes('/sprites/')).map(namn).filter((n) => !FORST.includes(n) && !UTAN.has(n)).sort()];
+
 /** Ladda all grafik (scenens preload). Rummen heter rum_<rum>, rutorna rutor_<zon>, sidovyerna sidovy_<namn>. @param {Phaser.Scene} scen */
 export function laddaGrafik(scen) {
   for (const [fil, url] of Object.entries(bilder)) {
@@ -57,7 +65,7 @@ export function rutanimation(zon) {
  */
 export function foremalsbild(scen, bild) {
   for (const n of FOREMAL_ATLAS) if (scen.textures.exists(n) && scen.textures.get(n).has(bild)) return { nyckel: n, ram: bild };
-  for (const n of ['hjalte', 'farfar', 'herr_skata', 'unge', 'baronen', 'apa', 'djur', 'omgivning']) if (scen.textures.exists(n) && scen.textures.get(n).has(bild)) return { nyckel: n, ram: bild };
+  for (const n of FIGUR_ATLAS) if (scen.textures.exists(n) && scen.textures.get(n).has(bild)) return { nyckel: n, ram: bild };
   return null;
 }
 

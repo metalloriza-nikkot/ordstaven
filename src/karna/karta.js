@@ -163,6 +163,8 @@ export function lasKarta(tmj) {
       if (egen.bild_natt) ut.bildNatt = String(egen.bild_natt);
       if (egen.bild_pa) ut.bildPa = String(egen.bild_pa);
       if (egen.bild_del) ut.bildDel = String(egen.bild_del);
+      // skugga (kapitel 2, Stil del 1) = figuren har en skugga under sig i sin rutstorlek (skugga_16x24, skugga_24x24)
+      if (egen.skugga) ut.skugga = true;
       if (egen.sovplats) ut.sovplats = true;
       if (egen.skata_fonster) ut.skataFonster = true;
       if (egen.lyser) ut.lyser = true;

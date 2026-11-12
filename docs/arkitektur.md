@@ -1023,3 +1023,10 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Testrummet** sätter `antal_falt: TESTRUM.falt` (8) på varje uppgift när kapitlet byggs (`testrumKapitel`), så Innehålls `testrum-skriv.json` behöver inget nytt fält. Ingen formel i testrummet är längre än åtta bokstäver (enhetstestet prövar det), så fälten säger aldrig "längre än åtta".
 - Kapitel 2:s skrivpussel har inget `antal_falt` och visar formelns längd som förut.
 
+## 101. Byborna i Stils bilder (0.67.0, Teknik 42, beslut 82.6)
+- **Paletten 1.1** (368 färger) och Stils skript i `verktyg/stil/` är bytta mot den senaste `stilskript.zip` (118 filer, med `bybor/`, `rum2/` och `skiss2/`). `assets/palett.json` skrivs av `inkorg.py` som förut.
+- **Figurernas atlas** (`FIGUR_ATLAS` i `scener/figurbilder.js`): de åtta gamla i samma ordning, och sedan alla andra mappar i `assets/sprites/` utom skuggan, staven och effekterna. En ny figur behöver bara sin mapp.
+- **Kartans `skugga`** (bool, på en figur): en skugga i figurens rutstorlek (`skugga_16x24`, eller `skugga_24x24` för Tant Rosa) under bilden, i föremålslagret. `Rum.foljSkuggor()` (i tomgången) låter skuggan följa bildens läge, synlighet och genomskinlighet, så att den går med när en regi flyttar figuren (Tant Rosa vid lyktorna, byborna som jublar).
+- **`verktyg/kartor/kap2.py`** sätter `bild: <namn>_ner_01` och `skugga` på byborna (`BYBOR`: kartans id → bildernas namn, `barnet_drake` → `barnet`). Figuren vänder sig mot den som pratar med `<namn>_<riktning>_01`, som Farfar. Föremålens id:n är oförändrade.
+- **Tant Rosas porträtt** (`.p-tant_rosa`) i pratrutan. Den fundersamma minen och vinkningen, jublet och sysslorna i bilder kommer med regierna senare.
+

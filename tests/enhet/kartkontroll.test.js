@@ -368,3 +368,21 @@ describe('kartkontrollen (54.5, 56.7)', () => {
     expect(stigarOchOvanpa('skogsbrynet', k, obj, utan, k.start, 'prov').some((f) => f.includes('ridån'))).toBe(true);
   });
 });
+
+describe('byborna i kapitel 2 (42.2)', () => {
+  // varje figur i kapitel 2:s kartor med en bild har den bilden i ett figuratlas, och bilderna åt alla fyra håll
+  // finns (figuren vänder sig mot den som pratar), och byborna har en skugga
+  const atlas = new Map(readdirSync(new URL('../../assets/sprites/', import.meta.url)).filter((d) => existsSync(new URL(`../../assets/sprites/${d}/${d}.json`, import.meta.url)))
+    .map((d) => [d, new Set(Object.keys(las(`assets/sprites/${d}/${d}.json`).frames))]));
+  const finns = (/** @type {string} */ n) => [...atlas.values()].some((s) => s.has(n));
+  const figurer = ['byn', 'tant_rosas_hus', 'dammen'].flatMap((rum) => lasKarta(las(`kartor/${AVENTYR}/${rum}.tmj`)).objekt.filter((o) => o.sort === 'figur').map((o) => ({ ...o, rum })));
+  it('Tant Rosa, fiskaren, tvätterskan, barnet och Bo står i kartorna med Stils bilder och skugga', () => {
+    expect(new Set(figurer.map((o) => o.id))).toEqual(new Set(['fiskaren', 'tvatterskan', 'barnet_drake', 'tant_rosa', 'bo']));
+    for (const o of figurer) {
+      expect(o.bild, `${o.rum}/${o.id}`).toMatch(/_ner_01$/);
+      expect(o.skugga, `${o.rum}/${o.id}`).toBe(true);
+      const bas = String(o.bild).replace(/_ner_01$/, '');
+      for (const r of ['ner', 'upp', 'hoger', 'vanster']) expect(finns(`${bas}_${r}_01`), `${bas}_${r}_01`).toBe(true);
+    }
+  });
+});
