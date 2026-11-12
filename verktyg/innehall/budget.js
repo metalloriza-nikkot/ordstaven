@@ -3,6 +3,9 @@
 //
 // Per pass: minst ett läsval och en vila, högst två skrivuppgifter och aldrig två i rad, högst tre repliker innan han
 // gör något, och aldrig fler än fem passiva steg i rad. Varje gren i ett nav har en egen uppgift.
+// Räknat som i 08 §4 (beslut 78.3): ett passivt steg är en replik eller en mellanscen (ljud och visa_foremal hör till
+// steget de står i), att leta efter ett dolt mål (ga_till med leta) är vila, och två skrivuppgifter med en ny plats och
+// en ny tid emellan är inte i rad.
 // Per kapitel: högst en ny figur som talar, minst en frivillig formel, baronen talar, och ett ögonblick med mamma.
 // Läsvalen: rätt svar är aldrig det enda udda (alternativen är korsade, eller ett alternativ har inget av dragen).
 // Det som inte går att läsa ur datan (en hemlighet, att baronen läser fel, att det som lovas löses in) prövas inte.
@@ -11,10 +14,15 @@
 const LASVAL = new Set(['P1_las_och_valj', 'P28_packa']);
 /** Skrivuppgifter: han skriver eller stavar ett ord (P15 stavar med brickor, men avgör ingen läsning, 76.3). */
 const SKRIV = new Set(['P11_formel', 'P12_dop', 'P15_raddning']);
-/** Vila: leta, hugga, para ihop (P26), kodlåset (P9). */
+/** Vila: leta, hugga, para ihop (P26), kodlåset (P9), och ett ga_till med `leta` (78.3). */
 const VILA = new Set(['P26_krukorna', 'P9_kodlas']);
-/** Steg där han inte gör något själv. */
-const PASSIVA = new Set(['replik', 'mellanscen', 'ljud', 'visa_foremal', 'ge_sak', 'unge_tillagg', 'visa_ui', 'musik', 'ge_grad', 'bok']);
+/** Passiva steg (78.3, 08 §4): en replik eller en mellanscen. */
+const PASSIVA = new Set(['replik', 'mellanscen']);
+/**
+ * Steg som hör till steget de står i och inte räknas för sig (78.3): ljud, musik, föremål som visas och det han får.
+ * De varken räknas som passiva eller bryter en följd. Alla andra steg är något han gör.
+ */
+const NEUTRALA = new Set(['ljud', 'musik', 'visa_foremal', 'visa_ui', 'ge_sak', 'ge_bar', 'ge_kartbit', 'ge_grad', 'unge_folj', 'unge_tillagg', 'sparpunkt']);
 
 /** Gränserna (76.3). */
 export const BUDGET = Object.freeze({ maxSkriv: 2, maxReplikerFore: 3, maxPassivaIRad: 5, maxNyaFigurer: 1 });
@@ -58,12 +66,13 @@ export function budgetVarningar(k, { tidigareTalare = new Set() } = {}) {
   const typ = (/** @type {any} */ st) => (st.typ === 'pussel' ? pussel.get(st.pussel_id)?.typ ?? null : null);
 
   // ---- per pass: stegen i ordning, navets steg mellan grenarna där de står, frivilliga scener inte med
-  /** @type {Map<number, { lasval: number, vila: number, skriv: number, uppgifter: string[], replikerIRad: number, passivaIRad: number, varnat: Set<string> }>} */
+  /** @type {Map<number, { lasval: number, vila: number, skriv: number, uppgifter: string[], replikerIRad: number, passivaIRad: number, varnat: Set<string>, sistaSkriv: string | null }>} */
   const pass = new Map();
-  const nytt = () => ({ lasval: 0, vila: 0, skriv: 0, uppgifter: /** @type {string[]} */ ([]), replikerIRad: 0, passivaIRad: 0, varnat: new Set() });
-  /** @param {any} st @param {string} plats @param {ReturnType<typeof nytt>} pp @param {number} nr */
-  const steg = (st, plats, pp, nr) => {
-    if (st.typ === 'nav') { (st.mellan_grenar || []).forEach((/** @type {any} */ x, /** @type {number} */ i) => steg(x, `${plats} mellan_grenar ${i + 1}`, pp, nr)); return; }
+  const nytt = () => ({ lasval: 0, vila: 0, skriv: 0, uppgifter: /** @type {string[]} */ ([]), replikerIRad: 0, passivaIRad: 0, varnat: new Set(), sistaSkriv: /** @type {string | null} */ (null) });
+  /** @param {any} st @param {string} plats @param {ReturnType<typeof nytt>} pp @param {number} nr @param {any} [sc] scenen (plats och tid) */
+  const steg = (st, plats, pp, nr, sc) => {
+    if (st.typ === 'nav') { (st.mellan_grenar || []).forEach((/** @type {any} */ x, /** @type {number} */ i) => steg(x, `${plats} mellan_grenar ${i + 1}`, pp, nr, sc)); return; }
+    if (NEUTRALA.has(st.typ)) return;
     if (PASSIVA.has(st.typ)) {
       pp.passivaIRad++;
       if (st.typ === 'replik') pp.replikerIRad++;
@@ -71,8 +80,9 @@ export function budgetVarningar(k, { tidigareTalare = new Set() } = {}) {
       if (pp.passivaIRad === BUDGET.maxPassivaIRad + 1) ut.push(`${k.id} ${plats}: fler än ${BUDGET.maxPassivaIRad} steg i rad där han inte gör något (76.3)`);
       return;
     }
-    if (st.typ === 'sparpunkt') return;
     pp.replikerIRad = 0; pp.passivaIRad = 0;
+    // att leta efter ett mål som är dolt eller måste hittas (78.3) är vila
+    if (st.typ === 'ga_till' && st.leta) { pp.vila++; pp.uppgifter.push('vila'); return; }
     const t = typ(st);
     if (!t) return;
     const sort = LASVAL.has(t) ? 'las' : SKRIV.has(t) ? 'skriv' : VILA.has(t) ? 'vila' : 'annat';
@@ -80,7 +90,12 @@ export function budgetVarningar(k, { tidigareTalare = new Set() } = {}) {
     if (sort === 'vila') pp.vila++;
     if (sort === 'skriv') {
       pp.skriv++;
-      if (pp.uppgifter.at(-1) === 'skriv' && !pp.varnat.has('irad')) { pp.varnat.add('irad'); ut.push(`${k.id} ${plats}: två skrivuppgifter i rad i pass ${nr} (76.3)`); }
+      // plats och tid: scenens rum och tillstånd. Har båda bytts sedan förra skrivuppgiften är de inte i rad (78.3)
+      const har = `${sc?.rum ?? ''}|${sc?.tillstand ?? ''}`;
+      const [r0, t0] = (pp.sistaSkriv ?? '|').split('|');
+      const nyPlatsOchTid = pp.sistaSkriv !== null && r0 !== (sc?.rum ?? '') && t0 !== (sc?.tillstand ?? '');
+      if (pp.uppgifter.at(-1) === 'skriv' && !nyPlatsOchTid && !pp.varnat.has('irad')) { pp.varnat.add('irad'); ut.push(`${k.id} ${plats}: två skrivuppgifter i rad i pass ${nr} (76.3)`); }
+      pp.sistaSkriv = har;
     }
     pp.uppgifter.push(sort);
   };
@@ -89,7 +104,7 @@ export function budgetVarningar(k, { tidigareTalare = new Set() } = {}) {
     if (!pass.has(s.pass)) pass.set(s.pass, nytt());
     const pp = /** @type {ReturnType<typeof nytt>} */ (pass.get(s.pass));
     (s.steg || []).forEach((/** @type {any} */ st, /** @type {number} */ i) => {
-      steg(st, `scen ${s.id} steg ${i + 1}`, pp, s.pass);
+      steg(st, `scen ${s.id} steg ${i + 1}`, pp, s.pass, s);
       // passets slut (sparpunkten med pass_slut, också i navet): nästa pass börjar
       const slut = st.typ === 'sparpunkt' && st.pass_slut;
       const iNavet = st.typ === 'nav' && (st.mellan_grenar || []).some((/** @type {any} */ x) => x.typ === 'sparpunkt' && x.pass_slut);

@@ -42,6 +42,36 @@ describe('budgeten (76.3)', () => {
     expect(v).toMatch(/s1 steg 4: fler än 3 repliker/);
     expect(v).toMatch(/s1 steg 6: fler än 5 steg i rad/);
   });
+  it('räknat som i 08 (78.3): ljud och visa_foremal är inte passiva steg och bryter ingen följd', () => {
+    const k = bra();
+    const L = { typ: 'ljud', id: 'plopp' }, V = { typ: 'visa_foremal', foremal: 'x' };
+    k.scener[0].steg = [R('1 mamma'), L, R('2'), V, L, R('3'), M, L, V, M, P('las'), P('hugg'), R('Ha!', 'baronen'), P('skriv1'), SLUT];
+    expect(budgetVarningar(k, { tidigareTalare: new Set(['farfar', 'baronen']) })).toEqual([]);
+    // en replik till ger fyra repliker och sex passiva, oavsett ljuden emellan
+    k.scener[0].steg.splice(6, 0, L, R('4'));
+    const v = budgetVarningar(k, { tidigareTalare: new Set(['farfar', 'baronen']) }).join('\n');
+    expect(v).toMatch(/fler än 3 repliker/);
+    expect(v).toMatch(/fler än 5 steg i rad/);
+  });
+  it('att leta efter ett dolt mål (ga_till med leta) är vila (78.3)', () => {
+    const k = bra();
+    k.scener[0].steg = [R('Mamma.'), P('las'), { typ: 'ga_till', mal: 'halvan', leta: true }, R('Ha!', 'baronen'), P('skriv1'), SLUT];
+    expect(budgetVarningar(k, { tidigareTalare: new Set(['farfar', 'baronen']) })).toEqual([]);
+    k.scener[0].steg[2] = { typ: 'ga_till', mal: 'halvan' };
+    expect(budgetVarningar(k, { tidigareTalare: new Set(['farfar', 'baronen']) }).join('\n')).toMatch(/pass 1: ingen vila/);
+  });
+  it('två skrivuppgifter med ny plats och ny tid emellan är inte i rad (78.3)', () => {
+    const k = bra();
+    k.scener = [
+      { id: 'huset', pass: 1, rum: 'hus', steg: [R('Mamma.'), P('las'), P('hugg'), R('Ha!', 'baronen'), P('skriv1')] },
+      { id: 'kvall', pass: 1, rum: 'byn', tillstand: 'kvall', steg: [M, P('skriv2'), SLUT] },
+      { id: 'f', pass: 1, frivillig: true, steg: [P('skriv3')] },
+    ];
+    expect(budgetVarningar(k, { tidigareTalare: new Set(['farfar', 'baronen']) })).toEqual([]);
+    // samma plats, ny tid: i rad
+    k.scener[1].rum = 'hus';
+    expect(budgetVarningar(k, { tidigareTalare: new Set(['farfar', 'baronen']) }).join('\n')).toMatch(/två skrivuppgifter i rad/);
+  });
   it('per kapitel: nya figurer, frivillig formel, baronen och mamma', () => {
     const k = bra();
     k.scener = [{ id: 's1', pass: 1, steg: [R('Hej.', 'tant'), R('Hej.', 'bo'), P('las'), P('hugg'), SLUT] }];

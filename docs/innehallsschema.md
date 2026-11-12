@@ -1,6 +1,7 @@
 # Innehållsschema – kapitel i format 2
 
-Version 2.43 (2026-11-12). Ägs av teknikspåret.
+Version 2.44 (2026-11-12). Ägs av teknikspåret.
+2.44: **Budgeten räknas som i 08 §4** (Teknik 39, beslut 78.3). `ga_till` får **`leta: true`** när målet är dolt eller måste hittas: det räknas som vila i passet. Spelet gör inget annorlunda. Kontrollen räknar bara repliker och mellanscener som passiva steg; ljud, musik, `visa_foremal`, gåvor och sparpunkter hör till steget de står i och varken räknas eller bryter en följd. Två skrivuppgifter är inte i rad när både scenens rum och tillstånd har bytts emellan (LYFT i huset och LJUS på kvällen). Formatet är annars oförändrat.
 2.43: **Kapitel 2 efter beslut 75–77** (Teknik 37 och 39). Nya fält, alla är tillägg:
 - **`falt`** på ett P26 (`{ rader, per_rad, klar_nar }`, vassväggen 75.3): föremålet som visar pusslet delas i ett fält av tussar, `rader` från väster till öster med `per_rad` i varje från norr till söder, i samma ordning som `innehall`. Innehållet ligger där det står (det blandas inte). Pusslet är löst när alla tussar med posten `klar_nar` har fallit och han går förbi fältet. Fram till dess kan han hugga fler, och en tuss med `bar` ger ett bär. Tussarna som står kvar står kvar tills han lämnar rummet;
 - **`efter`** på en zon och på ett frivilligt föremål (`{ pussel }` eller `{ scen, <stegtyp>: <mål> }`, t.ex. `{ scen: "k2s01_kanten", ga_till: "unge" }`): det gäller först när pusslet är gjort, eller när berättelsen har gått förbi det steget i scenen;

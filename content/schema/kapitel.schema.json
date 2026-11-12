@@ -755,6 +755,10 @@
             "fri_vag": {
               "type": "boolean",
               "description": "Fritt vägval: de andra utgångarna går också att gå igenom, och rummet bakom visas (med en frivillig scen första gången). Steget är klart när hjälten går genom målet."
+            },
+            "leta": {
+              "type": "boolean",
+              "description": "Målet är dolt eller måste hittas (halvan i vassen, vedpinnarna, 2.44): att leta räknas som vila i budgeten (78.3). Spelet gör inget annorlunda."
             }
           }
         },

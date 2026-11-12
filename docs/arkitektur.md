@@ -983,3 +983,8 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Gläntan** (77.8) har Stils höjdkit: rutsetet har skugga, trappa och stege, och trappan står i kullens framsida i rutlagret. Kartan är skriven med `skog.py` efter Stils ändring, men bara gläntans rutlager och trappan är bytta, så att föremålens id står kvar.
 - **SALDO** (77.2): `verktyg/ordlista/saldo.py` gör om `saldom.xml` till en prefixkodad lista (`assets/ordlista/ord.txt`) och spärrade former (`sparr.txt`). `src/grans/ordlista.js` hämtar dem när ett skrivpussel öppnas, och `skrivord.avkodaOrdlista` packar upp dem. Väntan på listan är högst 2,5 s, och utan den avgör spelets egna ordlistor. Service workern förcachar .txt.
 
+## 95. Budgeten räknas som i 08 (0.62.1, Teknik 39, beslut 78.3)
+- `verktyg/innehall/budget.js` delar stegen i tre sorter: **passiva** (replik och mellanscen), **neutrala** (ljud, musik, `visa_foremal`, `visa_ui`, gåvorna, `unge_folj`, `unge_tillagg` och sparpunkten), som varken räknas eller bryter en följd, och resten, som är något han gör och nollställer följden.
+- Ett `ga_till` med `leta` (2.44) räknas som vila.
+- Två skrivuppgifter i rad varnar bara om scenens rum eller tillstånd är detsamma som vid den förra: med både en ny plats och en ny tid emellan är de inte i rad.
+
