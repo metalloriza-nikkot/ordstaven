@@ -117,10 +117,10 @@ test('kapitel 2:s mellanscener i gråboxen (Teknik 32, 69.1 och 75.4): ungen sju
   const hjalten = await O(() => window.__ORDSTAVEN.position());
   const kartan = JSON.parse(readFileSync(new URL('../../kartor/den-gomda-dalen/byn.tmj', import.meta.url), 'utf8')).layers.flatMap((l) => l.objects || []).find((o) => o.name === 'fjader');
   expect(await O(() => window.__ORDSTAVEN.regi('luftskepp_river_brevet'))).toBeGreaterThan(4000);
-  await page.waitForTimeout(3000);
-  // fjädern dalar ned nära hjälten där han står, inte där den står i kartan (75.4)
+  // fjädern dalar ned nära hjälten där han står, inte där den står i kartan (75.4). Spelets klocka går
+  // långsammare än väggklockan i canvas-läget (Safari, iPad), så testet väntar in den.
+  await expect.poll(() => O(() => window.__ORDSTAVEN.flyttad('fjader')), { timeout: 15000 }).not.toBeNull();
   const fj = await O(() => window.__ORDSTAVEN.flyttad('fjader'));
-  expect(fj).not.toBeNull();
   expect(Math.hypot(fj.x + kartan.width / 2 - hjalten.x, fj.y + kartan.height / 2 - hjalten.y)).toBeLessThan(40);
   expect(Math.hypot(kartan.x - fj.x, kartan.y - fj.y)).toBeGreaterThan(20);
   expect((await O(() => window.__ORDSTAVEN.grafik())).regi).toContain('luftskeppet river brevet');
