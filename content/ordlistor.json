@@ -2,7 +2,7 @@
  "$schema": "schema/ordlistor.schema.json",
  "format": 1,
  "meta": {
-  "version": "0.13",
+  "version": "0.14",
   "datum": "2026-11-12",
   "agare": "Innehåll",
   "textform": "Orden lagras med små bokstäver, formler i versaler. Böjda former (skogen, bron) står med när de används som alternativ.",
@@ -16,7 +16,8 @@
   "andrat_v010": "Kapitel 2 (beslut 64): orden i lästexten, uppdragens rubriker, ord han troligen skriver på tangentbordet (tema skrivord, så att de aldrig får pff, 63.3) och bybornas bubblor.",
   "andrat_v011": "Kapitel 2 (beslut 71.6): sax, kniv, hugg och lys, ord han troligen skriver vid vassen och lyktorna (tema skrivord, så att de aldrig får pff). HUGG och LYS står också på uppdragslappen.",
   "andrat_v012": "Beslut 76.6 (granskning 5, C6): vad (stumt D), sov och kom (O som Å) är inte ljudenliga och står nu i lista 6 som ordbilder. Låg, hel och torr (skyltarna i L4, 76.4).",
-  "andrat_v013": "vän, bor, litet och dörren (kapitel 2, beslut 77.4)."
+  "andrat_v013": "vän, bor, litet och dörren (kapitel 2, beslut 77.4).",
+  "andrat_v014": "samla och ved (kapitel 2, beslut 78.4)."
  },
  "listor": {
   "1": "Korta ljudenliga ord, 2-3 bokstaver, ingen konsonantgrupp, ingen dubbelteckning",
@@ -2613,6 +2614,22 @@
     "aao"
    ],
    "varfor": "Kapitel 2 (beslut 77.4)"
+  },
+  {
+   "ord": "samla",
+   "lista": 2,
+   "bild": null,
+   "tema": "lästext",
+   "flaggor": [],
+   "varfor": "Kapitel 2 (beslut 78.4)"
+  },
+  {
+   "ord": "ved",
+   "lista": 1,
+   "bild": "🪵",
+   "tema": "lästext",
+   "flaggor": [],
+   "varfor": "Kapitel 2 (beslut 78.4)"
   }
  ]
 }

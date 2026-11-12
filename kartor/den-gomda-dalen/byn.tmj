@@ -11,7 +11,7 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 48,
+ "nextobjectid": 51,
  "properties": [
   {
    "name": "rum",
@@ -399,6 +399,60 @@
     },
     {
      "id": 26,
+     "name": "ved_1",
+     "type": "sak",
+     "x": 486,
+     "y": 290,
+     "width": 10,
+     "height": 6,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 27,
+     "name": "ved_2",
+     "type": "sak",
+     "x": 618,
+     "y": 326,
+     "width": 10,
+     "height": 6,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 28,
+     "name": "ved_3",
+     "type": "sak",
+     "x": 528,
+     "y": 366,
+     "width": 10,
+     "height": 6,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 29,
      "name": "regi_fiskaren_kvall",
      "type": "",
      "x": 556,
@@ -410,7 +464,7 @@
      "point": true
     },
     {
-     "id": 27,
+     "id": 30,
      "name": "regi_tvatterskan_kvall",
      "type": "",
      "x": 582,
@@ -422,7 +476,7 @@
      "point": true
     },
     {
-     "id": 28,
+     "id": 31,
      "name": "regi_barnet_drake_kvall",
      "type": "",
      "x": 600,
@@ -434,7 +488,7 @@
      "point": true
     },
     {
-     "id": 29,
+     "id": 32,
      "name": "regi_tant_rosa_kvall",
      "type": "",
      "x": 540,
@@ -446,7 +500,7 @@
      "point": true
     },
     {
-     "id": 30,
+     "id": 33,
      "name": "lyktor_udden",
      "type": "sak",
      "x": 558,
@@ -464,7 +518,7 @@
      ]
     },
     {
-     "id": 31,
+     "id": 34,
      "name": "dorr_rosa",
      "type": "utgang",
      "x": 376,
@@ -492,7 +546,7 @@
      ]
     },
     {
-     "id": 32,
+     "id": 35,
      "name": "brevram",
      "type": "sak",
      "x": 401,
@@ -510,7 +564,7 @@
      ]
     },
     {
-     "id": 33,
+     "id": 36,
      "name": "dorr_stort_bla",
      "type": "utgang",
      "x": 444,
@@ -533,7 +587,7 @@
      ]
     },
     {
-     "id": 34,
+     "id": 37,
      "name": "dorr_stort_rosa",
      "type": "utgang",
      "x": 392,
@@ -556,7 +610,7 @@
      ]
     },
     {
-     "id": 35,
+     "id": 38,
      "name": "dorr_litet_bla",
      "type": "utgang",
      "x": 464,
@@ -579,7 +633,7 @@
      ]
     },
     {
-     "id": 36,
+     "id": 39,
      "name": "tant_rosa",
      "type": "figur",
      "x": 404,
@@ -602,7 +656,7 @@
      ]
     },
     {
-     "id": 37,
+     "id": 40,
      "name": "brunnen",
      "type": "sak",
      "x": 488,
@@ -620,7 +674,7 @@
      ]
     },
     {
-     "id": 38,
+     "id": 41,
      "name": "stig_vassen",
      "type": "utgang",
      "x": 332,
@@ -648,7 +702,7 @@
      ]
     },
     {
-     "id": 39,
+     "id": 42,
      "name": "stig_dammen",
      "type": "utgang",
      "x": 552,
@@ -676,7 +730,7 @@
      ]
     },
     {
-     "id": 40,
+     "id": 43,
      "name": "stig_bryggan",
      "type": "utgang",
      "x": 600,
@@ -704,7 +758,7 @@
      ]
     },
     {
-     "id": 41,
+     "id": 44,
      "name": "brygga_fran_torget",
      "type": "sak",
      "x": 604,
@@ -715,7 +769,7 @@
      "visible": true
     },
     {
-     "id": 42,
+     "id": 45,
      "name": "rep_vassen",
      "type": "sak",
      "x": 326,
@@ -726,7 +780,7 @@
      "visible": true
     },
     {
-     "id": 43,
+     "id": 46,
      "name": "skylt_vassen",
      "type": "sak",
      "x": 368,
@@ -744,7 +798,7 @@
      ]
     },
     {
-     "id": 44,
+     "id": 47,
      "name": "rep_brunnen",
      "type": "sak",
      "x": 546,
@@ -755,7 +809,7 @@
      "visible": true
     },
     {
-     "id": 45,
+     "id": 48,
      "name": "skylt_brunnen",
      "type": "sak",
      "x": 528,
@@ -773,7 +827,7 @@
      ]
     },
     {
-     "id": 46,
+     "id": 49,
      "name": "rep_bryggan",
      "type": "sak",
      "x": 592,
@@ -784,7 +838,7 @@
      "visible": true
     },
     {
-     "id": 47,
+     "id": 50,
      "name": "skylt_bryggan",
      "type": "sak",
      "x": 574,

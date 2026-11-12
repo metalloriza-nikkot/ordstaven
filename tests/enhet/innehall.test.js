@@ -391,7 +391,7 @@ describe('kapitel 2 i schema 2.31 (Teknik 20, beslut 64.2)', () => {
     const f = kontrollera(d).fel.join('\n');
     expect(f).toMatch(/grenens scen k2s99_finns_inte finns inte/);
     expect(f).toMatch(/grenens mål stig_ingenstans finns inte i rummet byn/);
-    expect(f).toMatch(/mellan_grenar 4 \(ga_till\): brunn_saknas finns inte i rummet byn/);
+    expect(f).toContain(`mellan_grenar ${nav.mellan_grenar.length} (ga_till): brunn_saknas finns inte i rummet byn`);
   });
   it('{ord:<pussel>} pekar på ett P11, oppna_lasplatta med skylt och lys_ord, och villkoren i "Var var vi?"', () => {
     const d = med2();

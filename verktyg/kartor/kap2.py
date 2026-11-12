@@ -103,6 +103,9 @@ RUMMEN = {
             sak('fjader', 140, 290, 10, 10, sida='alla'),
             sak('udden', 604, 362, 30, 14),  # uddens spets, bortom lägerelden
             sak('lagereld', 572, 326, 20, 16, sida='alla'),
+            # 78.4: tre vedpinnar på udden och ängen runt elden, bara på kvällen (innehållets syns_i). Han plockar upp
+            # dem när han når dem (leta: true), och de ligger inte där han står när kvällen börjar
+            sak('ved_1', 486, 290, 10, 6, sida='alla'), sak('ved_2', 618, 326, 10, 6, sida='alla'), sak('ved_3', 528, 366, 10, 6, sida='alla'),
             # 71.5: i tillståndet kvall står byborna och Tant Rosa runt elden (fötterna, regi_<figur>_kvall)
             punkt('regi_fiskaren_kvall', 556, 346), punkt('regi_tvatterskan_kvall', 582, 322),
             punkt('regi_barnet_drake_kvall', 600, 346), punkt('regi_tant_rosa_kvall', 540, 322),

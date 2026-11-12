@@ -16,7 +16,7 @@
  },
  "meta": {
   "namn": "Träsket",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "datum": "2026-11-12",
   "agare": "Innehåll",
   "kalla": "Manus 17-kapitel2-manus.md v0.4 (beslut 60–64). Ny fil.",
@@ -29,7 +29,8 @@
   "andrat_v061": "2026-11-11 (beslut 73.3): syns_redan på mellanscenen där dräkten blir grodgrön.",
   "andrat_v07": "2026-11-11 (beslut 75 och 76): vassväggen som ett fält av tussar, lerorna i träskkanten och vid bryggan som pölen i vassen, LYFT godtas och fler rimliga ord, k2_stocken som läsval, bryggans läsval med INTE (k2_halvan), skyltarna i L4 och tavlorna i L4 också när nivån är L4, Farfars rader före vassen, brevet rivs i tre steg, byn i tillståndet morgon utan rep, pratet kortat, baronens kartbit, Farfars tidslinje, mamma vid elden och draken på taket (k2_draken, frivillig). Nya fält: falt i P26, efter på zoner och frivilligt, kraver.eller_niva, flera rätta alternativ med egen vid_valj i P1, och tillståndet morgon.",
   "andrat_v071": "2026-11-12 (beslut 77.4): läsvalet k2_husen i pass 1. Fyra hus på torget (dorr_rosa, dorr_litet_bla, dorr_stort_rosa och dorr_stort_bla), Farfars mening på baksidan av hans lista, Tant Rosa ut genom rätt dörr, och tant_rosa och brevram dolda tills dess. HALLÅ!, ungen mot torget och KOM HIT! är strukna, och Herr Skata har redan brevet när luftskeppet kommer. Uppdraget TANT ROSA har steget HITTA HUSET.",
-  "teknik_77": "Teknik 2026-11-12 (beslut 77.3, schema 2.43): k2_stocken har flera_ratta, och de tre rätta alternativen har sin regi som effekt (samma som formlerna hade i 0.56.0). k2_halvan har lys_ord INTE, som oppna_lasplatta hade vid bryggan (vid_ratt: ordet INTE lyser i guld). Ingen text är ändrad."
+  "teknik_77": "Teknik 2026-11-12 (beslut 77.3, schema 2.43): k2_stocken har flera_ratta, och de tre rätta alternativen har sin regi som effekt (samma som formlerna hade i 0.56.0). k2_halvan har lys_ord INTE, som oppna_lasplatta hade vid bryggan (vid_ratt: ordet INTE lyser i guld). Ingen text är ändrad.",
+  "andrat_v072": "2026-11-12 (beslut 78.3 och 78.4): budgeten räknad som i 08 §4. Farfars två första repliker i k2s01 är en, Tant Rosas replik mellan grenarna är struken, halvan i vassen och vedpinnarna är märkta leta: true, och k2s10 har tre vedpinnar på udden före lyktorna (en vila i pass 3). Uppdraget ELDEN har steget SAMLA VED."
  },
  "var_var_vi": [
   {
@@ -316,6 +317,24 @@
     "lyktor_udden",
     "udden",
     "lagereld",
+    {
+     "id": "ved_1",
+     "syns_i": [
+      "kvall"
+     ]
+    },
+    {
+     "id": "ved_2",
+     "syns_i": [
+      "kvall"
+     ]
+    },
+    {
+     "id": "ved_3",
+     "syns_i": [
+      "kvall"
+     ]
+    },
     "fiskaren",
     "tvatterskan",
     "barnet_drake",
@@ -338,7 +357,7 @@
      "*": "hej"
     }
    },
-   "anteckning": "Navet, 2 × 2 skärmar (64.1). SV: in från bron (stig_kanten). Fiskarens nät och tvättstrecket på stranden. SO: ängen med barnet och draken, och udden med lägerelden. NV: pålhus. NO: TORGET, en skärm, med fyra hus (77.4), korsade två och två: Tant Rosas lilla hus med rosa dörr (dorr_rosa, med brevram på dörren och tant_rosa på trappan), ett litet hus med blå dörr (dorr_litet_bla), ett stort hus med rosa dörr (dorr_stort_rosa) och ett stort hus med blå dörr (dorr_stort_bla). Alla fyra dörrar syns på torgets skärm, och husen är lika i allt utom storlek och dörrens färg. tant_rosa och brevram är dolda tills k2_husen är löst, så att inget visar vilket hus som är rätt. brunnen mitt på torget och tre utgångar: stig_vassen och stig_dammen norrut (stig_dammen går förbi brunnen) och stig_bryggan österut. Bryggans början (brygga_fran_torget) syns från torget, gammal men hel. I tillståndet rep spärrar ett orange rep med en orange skylt var och en av de tre vägarna: rep_vassen över stig_vassen, rep_brunnen runt brunnen och över stig_dammen, och rep_bryggan över stig_bryggan. Repen ser likadana ut och spärrar lika mycket. Läsvalet ryms på torgets skärm. dorr_rosa är låst tills k2s07. Byborna (fiskaren, tvatterskan, barnet_drake) har sina områden i SV och SO, aldrig på torget (63.9). Se meta.teknik om byborna och tillstånden. 71.5: i tillståndet kvall står byborna på udden runt lagereld och jublar, och Tant Rosa sitter med. lyktor_udden är lyktor på pinnar längs stigen från torget till udden. De är släckta tills LJUS har tänt dem (71.6). Liv (26.3, 72.10): byborna räcker. Bara en fågel (fagel) på ett pålhustak i nordväst, långt från torget och byborna, så att högst två saker rör sig på samma skärm (golvet). 76.4: tillståndet morgon är byn i pass 1, utan rep och baronens skyltar. Draken sitter fast på ett tak vid ängen (drake_tak) tills han har hjälpt barnet med FLYG.",
+   "anteckning": "Navet, 2 × 2 skärmar (64.1). SV: in från bron (stig_kanten). Fiskarens nät och tvättstrecket på stranden. SO: ängen med barnet och draken, och udden med lägerelden. NV: pålhus. NO: TORGET, en skärm, med fyra hus (77.4), korsade två och två: Tant Rosas lilla hus med rosa dörr (dorr_rosa, med brevram på dörren och tant_rosa på trappan), ett litet hus med blå dörr (dorr_litet_bla), ett stort hus med rosa dörr (dorr_stort_rosa) och ett stort hus med blå dörr (dorr_stort_bla). Alla fyra dörrar syns på torgets skärm, och husen är lika i allt utom storlek och dörrens färg. tant_rosa och brevram är dolda tills k2_husen är löst, så att inget visar vilket hus som är rätt. brunnen mitt på torget och tre utgångar: stig_vassen och stig_dammen norrut (stig_dammen går förbi brunnen) och stig_bryggan österut. Bryggans början (brygga_fran_torget) syns från torget, gammal men hel. I tillståndet rep spärrar ett orange rep med en orange skylt var och en av de tre vägarna: rep_vassen över stig_vassen, rep_brunnen runt brunnen och över stig_dammen, och rep_bryggan över stig_bryggan. Repen ser likadana ut och spärrar lika mycket. Läsvalet ryms på torgets skärm. dorr_rosa är låst tills k2s07. Byborna (fiskaren, tvatterskan, barnet_drake) har sina områden i SV och SO, aldrig på torget (63.9). Se meta.teknik om byborna och tillstånden. 71.5: i tillståndet kvall står byborna på udden runt lagereld och jublar, och Tant Rosa sitter med. lyktor_udden är lyktor på pinnar längs stigen från torget till udden. De är släckta tills LJUS har tänt dem (71.6). Liv (26.3, 72.10): byborna räcker. Bara en fågel (fagel) på ett pålhustak i nordväst, långt från torget och byborna, så att högst två saker rör sig på samma skärm (golvet). 76.4: tillståndet morgon är byn i pass 1, utan rep och baronens skyltar. Draken sitter fast på ett tak vid ängen (drake_tak) tills han har hjälpt barnet med FLYG. Udden (78.4): tre vedpinnar (ved_1–ved_3) ligger utspridda på udden och ängen runt elden, bara på kvällen. De är små men syns, och de ligger inte där han redan står.",
    "musik": "byn",
    "frivilligt": [
     {
@@ -548,14 +567,7 @@
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "God morgon! Nu är ni vid träsket.",
-     "upplast": true,
-     "via": "radio"
-    },
-    {
-     "typ": "replik",
-     "talare": "farfar",
-     "text": "Kartbit tre visar vägen till mamma.",
+     "text": "God morgon! Kartbit tre visar vägen till mamma.",
      "upplast": true,
      "via": "radio"
     },
@@ -862,12 +874,6 @@
      ],
      "mellan_grenar": [
       {
-       "typ": "replik",
-       "talare": "tant_rosa",
-       "text": "Hämta den andra!",
-       "upplast": true
-      },
-      {
        "typ": "sparpunkt",
        "pass_slut": true,
        "valfri": false
@@ -1013,7 +1019,8 @@
     },
     {
      "typ": "ga_till",
-     "mal": "brev_halva_vatten"
+     "mal": "brev_halva_vatten",
+     "leta": true
     },
     {
      "typ": "replik",
@@ -1364,13 +1371,41 @@
    "steg": [
     {
      "typ": "mellanscen",
-     "beskrivning": "Kväll i byn. Byborna går mot udden med ved i famnen, och Tant Rosa går med. Men stigen dit är mörk, och lyktorna längs den är släckta.",
+     "beskrivning": "Kväll i byn. Byborna samlas på torget med ved i famnen, och Tant Rosa är med. Solen håller på att gå ner.",
      "syns_redan": true
     },
     {
      "typ": "replik",
      "talare": "tant_rosa",
-     "text": "Lyktorna är släckta. Vi ser inte stigen!",
+     "text": "Hämta tre pinnar till elden på udden!",
+     "upplast": true
+    },
+    {
+     "typ": "ga_till",
+     "mal": "ved_1",
+     "bild": "vedpinne",
+     "leta": true
+    },
+    {
+     "typ": "ga_till",
+     "mal": "ved_2",
+     "bild": "vedpinne",
+     "leta": true
+    },
+    {
+     "typ": "ga_till",
+     "mal": "ved_3",
+     "bild": "vedpinne",
+     "leta": true
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Nu har solen gått ner. Byborna vill gå till udden, men stigen är mörk, och lyktorna längs den är släckta."
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Lyktorna är släckta. Byborna ser inte stigen!",
      "upplast": true
     },
     {
@@ -1379,7 +1414,7 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Ljuset hoppar från lykta till lykta, hela vägen ut på udden. Byborna jublar.",
+     "beskrivning": "Ljuset hoppar från lykta till lykta, hela vägen till torget. Byborna jublar och kommer med veden.",
      "ljud": "glitter",
      "bild": "byborna_jublar"
     },
@@ -1392,7 +1427,7 @@
     {
      "typ": "replik",
      "talare": "berattare",
-     "text": "Gå till elden!",
+     "text": "Lägg pinnarna vid elden!",
      "upplast": true
     },
     {
@@ -1447,7 +1482,7 @@
      "valfri": false
     }
    ],
-   "anteckning": "71.5: byn tänder elden för hjälten, som avslöjade baronens lögn och gav byn bryggan tillbaka. Tant Rosa följer med, och byborna står runt elden och jublar. 71.6: LJUS tänder lyktorna längs stigen till udden. Det är en formel han har lärt sig i prologen, och berättelsen behöver den: det är mörkt. Lägerelden (35.6): hjälten sätter sig själv, och ungen somnar mot honom. ORDSMED ges i berättelsen (09 §3). 76.4 (B7): mamma vid elden. Ungen tittar mot dalen och hör ett svagt rop, samma ljud som i slutet av kapitel 1, och svarar. Högst fem passiva steg i rad efter elden (76.3). Tant Rosas tack är struket (B3): byborna jublar för hjälten i mellanscenen."
+   "anteckning": "71.5: byn tänder elden för hjälten, som avslöjade baronens lögn och gav byn bryggan tillbaka. Tant Rosa följer med, och byborna står runt elden och jublar. 71.6: LJUS tänder lyktorna längs stigen till udden. Det är en formel han har lärt sig i prologen, och berättelsen behöver den: det är mörkt. Lägerelden (35.6): hjälten sätter sig själv, och ungen somnar mot honom. ORDSMED ges i berättelsen (09 §3). 76.4 (B7): mamma vid elden. Ungen tittar mot dalen och hör ett svagt rop, samma ljud som i slutet av kapitel 1, och svarar. Högst fem passiva steg i rad efter elden (76.3). Tant Rosas tack är struket (B3): byborna jublar för hjälten i mellanscenen. 78.4: en vila i pass 3. Före lyktorna hämtar han tre vedpinnar på udden (ved_1–ved_3, leta: true, ingen text). De syns bara i tillståndet kvall och plockas upp när han når dem, som fjädern. Hjälten står på udden, och ljuset från LJUS går längs stigen till torget, där byborna väntar."
   }
  ],
  "pussel": [
@@ -3032,6 +3067,13 @@
    "bild": "uppdrag_manen",
    "pass": 3,
    "steg": [
+    {
+     "text": "SAMLA VED",
+     "klart": {
+      "scen": "k2s10_elden",
+      "ga_till": "ved_3"
+     }
+    },
     {
      "text": "LYS UPP",
      "klart": {

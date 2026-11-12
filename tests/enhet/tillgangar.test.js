@@ -223,9 +223,17 @@ describe('mellanscenernas bilder och bildkorten', () => {
     expect(saknas).toEqual([]);
   });
   it('ett mål med egen bild i molnet (ga_till med bild) har sitt bildkort (krönet, 42.4)', () => {
+    // ett kapitel i gråbox (rummen har ingen grafik än, kapitel 2) får använda gråboxens platshållare (vedpinnen, 78.4)
+    const platshallare = JSON.parse(las('kartor/den-gomda-dalen/platshallare.json').toString()).bilder;
+    const medGrafik = (k) => (k.rum || []).some((r) => {
+      const f = new URL(`kartor/den-gomda-dalen/${r.id}.tmj`, rot);
+      return existsSync(f) && (JSON.parse(readFileSync(f).toString()).properties || []).some((p) => (p.name === 'bild' || p.name === 'mark') && p.value);
+    });
     const saknas = [];
     for (const k of kapitel) for (const sc of k.scener) for (const st of sc.steg) {
-      if (st.typ === 'ga_till' && st.bild && !existsSync(new URL(`assets/bildkort/${st.bild}.png`, rot))) saknas.push(`${k.id} ${sc.id}: ${st.bild}`);
+      if (st.typ !== 'ga_till' || !st.bild || existsSync(new URL(`assets/bildkort/${st.bild}.png`, rot))) continue;
+      if (!medGrafik(k) && platshallare[st.bild]) continue;
+      saknas.push(`${k.id} ${sc.id}: ${st.bild}`);
     }
     expect(saknas).toEqual([]);
     expect(kapitel.find((k) => k.id === 'kap-01').scener.find((sc) => sc.id === 'k1s08_loven').steg.find((st) => st.mal === 'kronet').bild).toBe('uppdrag_kullen');

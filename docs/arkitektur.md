@@ -988,3 +988,9 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - Ett `ga_till` med `leta` (2.44) räknas som vila.
 - Två skrivuppgifter i rad varnar bara om scenens rum eller tillstånd är detsamma som vid den förra: med både en ny plats och en ny tid emellan är de inte i rad.
 
+## 96. Det han letar efter plockar han upp (0.63.0, Teknik 39, beslut 78.4)
+- Ett `ga_till` med `leta: true` till en sak han når (kartans sort `sak` utan `nas_nara`) plockar upp saken när han är framme: den döljs i rummet (`rum.gomForemal`), och loggen skriver `[plockar upp] <id>`. En sak han bara ser (halvan ute i vattnet, `nas_nara`) ligger kvar, och utgångar och ytor plockas aldrig.
+- Det han har plockat i scenen som pågår ligger inte kvar när rummet visas igen (`letatIScenen` i `innehallNu`), också efter en omstart. Under "Var var vi?" är `stegIndex` -1, och då räknas steget i sparningen.
+- Vedpinnarna `ved_1`–`ved_3` står i byns karta (`verktyg/kartor/kap2.py`) på ängen och udden runt elden, och innehållet visar dem bara på kvällen (`syns_i`). Bilden i molnet (`vedpinne`) är en platshållare i gråboxen.
+- Testet för bildkorten (`ga_till` med `bild`) godtar gråboxens platshållare i ett kapitel vars rum inte har grafik än.
+

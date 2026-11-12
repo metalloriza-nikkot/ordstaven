@@ -842,7 +842,22 @@ export function skapaSpel(d) {
       const p = b.pussel(o.forsvinnerEfter);
       if (losta.has(o.forsvinnerEfter) || (p?.typ === 'P11_formel' && !iFrivilligt(p.id) && formler.includes(p.svar)) || pusselForbi(o.forsvinnerEfter)) borta.add(o.id);
     }
+    // det han redan har plockat upp i scenen (ett mål med leta: true, vedpinnarna 78.4) ligger inte kvar, också efter en omstart
+    if (b.scen?.rum === r.id) for (const id of letatIScenen()) if (iRummet.has(id) && plockas((kartor[r.id]?.objekt || []).find((/** @type {any} */ o) => o.id === id))) borta.add(id);
     return borta.size ? r.innehall.filter((/** @type {any} */ x) => !borta.has(typeof x === 'string' ? x : x.id)) : r.innehall;
+  }
+  /**
+   * Ett mål med leta: true plockar han upp om det är en sak han når. En sak han bara ser (halvan ute i vattnet,
+   * kartans nas_nara) ligger kvar.
+   */
+  function plockas(/** @type {any} */ o) { return o?.sort === 'sak' && !o.nasNara; }
+  /**
+   * Målen med leta: true som han redan har nått i scenen som pågår (stegen före det nuvarande). Under "Var var vi?"
+   * efter en omstart är stegIndex -1, och steget han fortsätter vid står i sparningen. @returns {string[]}
+   */
+  function letatIScenen() {
+    const i = b.stegIndex < 0 ? (av.steg ?? 0) : b.stegIndex;
+    return (b.scen?.steg || []).slice(0, i).filter((/** @type {any} */ st) => st.typ === 'ga_till' && st.leta && st.mal).map((/** @type {any} */ st) => st.mal);
   }
   /**
    * Det som har bytt bild (kartans bild_sedan och sedan, Teknik 3): häcken med hålet när hålet har visats, stubben med
@@ -1607,6 +1622,9 @@ export function skapaSpel(d) {
     if (mo && !mo.klattra && !skyltMal && !vidObjekt(rum.pos, mo) && !genom(mo, rum.pos)) await rum.ga(framfor(mo), tid(Math.min(600, 20 * Math.hypot(rum.pos.x - framfor(mo).x, rum.pos.y - framfor(mo).y))));
     // dörren öppnas när han är framme (31.7), om berättelsen fortsätter i rummet bakom den: det öppna rummet glider
     // sedan undan. En fel dörr öppnas aldrig (han går inte igenom den)
+    // ett mål han letar efter (leta: true, vedpinnarna 78.4) plockar han upp: det ligger inte kvar
+    const letat = rum.ruta(st.mal);
+    if (st.leta && plockas(letat)) { rum.gomForemal(st.mal, true); logg.handelse('plockar upp', st.mal); }
     const dorr = rum.ruta(st.mal);
     if (dorr?.sort === 'utgang' && !dorr.klattra && !dorr.golv) {
       const scener = b.kapitel.scener, sista = b.stegIndex === (b.scen?.steg?.length ?? 0) - 1;

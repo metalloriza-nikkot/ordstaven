@@ -179,14 +179,40 @@ test('REP, BRO och STEGE tar också ungen i land (71.3), och SVÄRD gör staven 
   expect((await O(() => window.__ORDSTAVEN.grafik())).regi).toContain('staven blir ett svärd');
 });
 
-test('kvällen i byn (71.5, 71.6): LJUS tänder lyktorna, elden tänds, byborna står vid elden; Tant Rosa når inte tavlan (71.4)', async ({ page }) => {
-  test.setTimeout(120000);
+test('kvällen i byn (71.5, 71.6, 78.4): tre vedpinnar, LJUS tänder lyktorna, elden tänds, byborna står vid elden; Tant Rosa når inte tavlan (71.4)', async ({ page }) => {
+  test.setTimeout(150000);
   const O = (f, a) => page.evaluate(f, a);
+  const sc = las('kap-02').scener.find((s) => s.id === 'k2s10_elden');
+  const vedSteg = (id) => sc.steg.findIndex((s) => s.typ === 'ga_till' && s.mal === id);
+  // 78.4: en omstart efter två pinnar: de två han har plockat ligger inte kvar, den tredje gör det
+  await sparadI(page, 'kap-02', 'k2s10_elden', vedSteg('ved_3'), { rumstillstand: { byn: 'kvall' } });
+  await page.waitForTimeout(800);
+  expect(await O(() => window.__ORDSTAVEN.rumsobjekt())).toEqual(expect.arrayContaining(['ved_3']));
+  expect(await O(() => window.__ORDSTAVEN.rumsobjekt().filter((id) => id === 'ved_1' || id === 'ved_2'))).toEqual([]);
   await sparadI(page, 'kap-02', 'k2s10_elden');
   await page.waitForTimeout(800);
   const [eld, fisk] = await O(() => [window.__ORDSTAVEN.ruta('lagereld'), window.__ORDSTAVEN.ruta('fiskaren')]);
   expect(eld && fisk).toBeTruthy();
   expect(Math.hypot(fisk.x + fisk.b / 2 - (eld.x + eld.b / 2), fisk.y + fisk.h - (eld.y + eld.h / 2))).toBeLessThan(60);
+  // de tre vedpinnarna syns på kvällen, inte där han står, och han plockar upp dem en i taget
+  const start = await O(() => window.__ORDSTAVEN.position());
+  for (const id of ['ved_1', 'ved_2', 'ved_3']) {
+    const o = await O((id) => window.__ORDSTAVEN.ruta(id), id);
+    expect(o).toBeTruthy();
+    expect(Math.hypot(o.x + o.b / 2 - start.x, o.y + o.h / 2 - start.y)).toBeGreaterThan(40);
+  }
+  for (const id of ['ved_1', 'ved_2', 'ved_3']) {
+    const o = await O((id) => window.__ORDSTAVEN.ruta(id), id);
+    for (let i = 0; i < 80 && !(await O(() => window.__ORDSTAVEN.logg())).includes('[plockar upp] ' + id); i++) {
+      for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+      await O(([x, y]) => window.__ORDSTAVEN.gaMot(x, y), [o.x + o.b / 2, o.y + o.h + 6]);
+      if (i % 4 === 3 && (await O(() => window.__ORDSTAVEN.steg()))?.mal === id) await page.keyboard.press('Space');
+      await page.waitForTimeout(250);
+    }
+    expect(await O(() => window.__ORDSTAVEN.logg())).toContain('[plockar upp] ' + id);
+    // den han har plockat är borta, de andra ligger kvar
+    if (id === 'ved_1') { await page.waitForTimeout(400); await page.screenshot({ path: 'test-results/regi-vedpinnar.png' }); }
+  }
   // LJUS skrivs som när han spelar: formelns effekt är regin (ljuset hoppar från staven till lyktorna)
   for (let i = 0; i < 60 && !(await page.locator('#plattan .formel-skriv').isVisible()); i++) {
     for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
