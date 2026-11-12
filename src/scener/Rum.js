@@ -2114,6 +2114,8 @@ export class Rum extends Phaser.Scene {
       c.add(ls);
       this.tweens.add({ targets: ls, x: -60, duration: ms * 2.2, onUpdate: () => { ls.x = Math.round(ls.x); this.smutsig = true; } });
     }
+    // under bryggan (Stil del 3b, sidovy/bryggan.py): de står på däcket (fötterna på y 74) i stället för att springa
+    if (bild === 'under_bryggan') { this.underBryggan(bild, c, ms); return; }
     // hjälten och ungen springer på stigen (stigen går tvärs över bilden, fötterna på y 162)
     const fot = 162, figurer = [];
     const skugga = this.textures.exists('skugga');
@@ -2156,6 +2158,57 @@ export class Rum extends Phaser.Scene {
         });
       }
     }
+  }
+
+  /**
+   * Under bryggan (k2s04, Stil del 3b): baronen sitter i leran mellan pålarna och gräver (bild 01–02), och till sist
+   * håller han upp bit 7 (bild 03). Herr Skata sitter på förtöjningspålen, en fisk sprattlar upp ur leran och plumsar
+   * tillbaka, och hjälten och ungen går in på däcket ovanför och stannar. Platserna är Stils (övre vänstra hörnet).
+   * @param {string} bild @param {Phaser.GameObjects.Container} c @param {number} ms
+   */
+  underBryggan(bild, c, ms) {
+    const tid = (/** @type {number} */ d, /** @type {() => void} */ f) => this.time.delayedCall(d, () => { if (c.visible) { f(); this.smutsig = true; } });
+    if (this.textures.exists(`sidovy_${bild}_baronen_01`)) {
+      const baron = this.add.image(150, 128, `sidovy_${bild}_baronen_01`).setOrigin(0, 0);
+      c.add(baron);
+      const grav = this.time.addEvent({ delay: 300, loop: true, callback: () => { if (!baron.active) return grav.remove(); baron.setTexture(`sidovy_${bild}_baronen_0${baron.texture.key.endsWith('01') ? 2 : 1}`); this.smutsig = true; } });
+      if (this.textures.exists(`sidovy_${bild}_baronen_03`)) tid(ms - 600, () => { grav.remove(); if (baron.active) baron.setTexture(`sidovy_${bild}_baronen_03`); });
+    }
+    if (this.textures.exists('herr_skata') && this.textures.get('herr_skata').has('herr_skata_sitta_vanster_01')) {
+      const skata = this.add.image(95, 49, 'herr_skata', 'herr_skata_sitta_vanster_01').setOrigin(0, 0);
+      c.add(skata);
+      const putsa = this.time.addEvent({ delay: 700, loop: true, callback: () => { if (!skata.active) return putsa.remove(); skata.setFrame(`herr_skata_sitta_vanster_0${skata.frame.name.endsWith('01') ? 2 : 1}`); this.smutsig = true; } });
+    }
+    if (this.textures.exists(`sidovy_${bild}_fisk_01`)) {
+      const fisk = this.add.image(226, 150, `sidovy_${bild}_fisk_01`).setOrigin(0, 0).setVisible(false);
+      c.add(fisk);
+      tid(ms * 0.55, () => fisk.setVisible(true));
+      for (let i = 1; i < 6; i++) tid(ms * 0.55 + 150 * i, () => fisk.active && fisk.setTexture(`sidovy_${bild}_fisk_0${1 + (i % 2)}`));
+      tid(ms * 0.55 + 950, () => fisk.active && fisk.setVisible(false));
+    }
+    // hjälten och ungen går in på däcket från vänster och stannar (Stils prov: ungen x 40, hjälten x 66)
+    const fot = 74;
+    const figurer = [];
+    const hjalte = this.add.container(-24, fot - 24);
+    const kropp = this.add.image(0, 0, this.hjalteTextur || 'hjalte', 'hjalte_ga_hoger_01').setOrigin(0, 0);
+    hjalte.add(kropp);
+    if (this.harStav && this.stav) hjalte.add(this.add.image(0, 0, this.stav.texture.key, 'stav_hand_hoger_01').setOrigin(0, 0));
+    figurer.push({ c: hjalte, img: kropp, ram: 'hjalte_ga_hoger_0', till: 66, stilla: 'hjalte_ga_hoger_01' });
+    if (this.textures.exists('unge') && this.visaUnge) {
+      const unge = this.add.container(-52, fot - 24);
+      const ub = this.add.image(0, 0, 'unge', 'unge1_ga_hoger_01').setOrigin(0, 0);
+      unge.add(ub);
+      figurer.push({ c: unge, img: ub, ram: 'unge1_ga_hoger_0', till: 36, stilla: 'unge1_tomgang_hoger_01' });
+    }
+    for (const f of figurer) {
+      c.add(f.c);
+      this.tweens.add({
+        targets: f.c, x: f.till, duration: Math.round(ms * 0.4), delay: 200,
+        onUpdate: () => { f.c.x = Math.round(f.c.x); f.img.setFrame(`${f.ram}${1 + (Math.floor(this.time.now / 110) % 4)}`); this.smutsig = true; },
+        onComplete: () => { if (f.img.active && f.img.texture.has(f.stilla)) f.img.setFrame(f.stilla); this.smutsig = true; },
+      });
+    }
+    this.regiLogg.push('under bryggan');
   }
 
   /** Sidovyn tonas bort när han ska röra sig i rummet igen (in i skogen i början av k1s01). */

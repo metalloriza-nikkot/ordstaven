@@ -440,3 +440,16 @@ test('husen på torget (77.4): fyra dörrar, fel dörr öppnas aldrig, och vid d
   await page.waitForTimeout(600);
   await page.screenshot({ path: 'test-results/regi-husen-tant-rosa.png' });
 });
+
+test('under bryggan (42.6, Stil del 3b): sidovyn med baronen som gräver, Herr Skata på pålen och dem på däcket', async ({ page }) => {
+  test.setTimeout(90000);
+  const O = (f, a) => page.evaluate(f, a);
+  await sparadI(page, 'kap-02', 'k2s04_bryggan');
+  await page.waitForTimeout(1500);
+  const ms = await O(() => window.__ORDSTAVEN.regi('under_bryggan'));
+  expect(ms).toBeGreaterThan(0);
+  await page.waitForTimeout(2600);
+  const g = await O(() => window.__ORDSTAVEN.grafik());
+  expect(g.sidovy).toBe(true); expect(g.senasteSidovy).toBe('under_bryggan'); expect(g.regi).toContain('under bryggan');
+  await page.screenshot({ path: 'test-results/regi-under-bryggan.png' });
+});

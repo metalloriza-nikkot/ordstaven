@@ -1056,3 +1056,7 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Gåvorna:** en ryggsäck med egna bilder (`<säck>_<håll>_01`) används utan ton, och hjälmdekoren är `<dekor>_<håll>_01` (taggkammen och drakvimpeln). `DRAKT_GAVOR.drakt_grodgron` är Stils `#20946A`.
 - Testkrokarna `hjalteLeraBild()` och `gavobilder()`.
 
+## 105. Sidovyn under bryggan (0.71.0, Teknik 42, Stil del 3b)
+- `visaSidovy('under_bryggan')` går till `Rum.underBryggan`: bakgrunden, baronen på (150, 128) som gräver (`_baronen_01–02`, ca 300 ms) och till sist håller upp biten (`_baronen_03`), Herr Skata (`herr_skata_sitta_vanster_01–02`) på (95, 49), fisken (`_fisk_01–02`) på (226, 150) en stund mitt i, och hjälten och ungen som går in på däcket (fötterna på y 74) och stannar. Platserna är Stils, övre vänstra hörnet (`verktyg/stil/sidovy/bryggan.py`).
+- Sidovyn visas av mellanscenens `bild: "under_bryggan"` (Innehålls fält). Webbtestet kör regin direkt.
+
