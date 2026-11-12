@@ -3,8 +3,8 @@
 // visar dem som skrivpusslen i kapitel 2 (P11 med tangentbordet). Ingen text står här: allt han ser och hör kommer
 // ur uppgifterna. Får inte importera Phaser eller röra DOM.
 
-/** Kapitlets id (kap-90, ett nummer som inget äventyr använder), rummets och scenens id och sparplatsen. */
-export const TESTRUM = { kapitel: 'kap-90', nummer: 90, rum: 'testrummet', scen: 'tr_skriv', plats: 'testrum' };
+/** Kapitlets id (kap-90, ett nummer som inget äventyr använder), rummets och scenens id, sparplatsen och antalet fält. */
+export const TESTRUM = { kapitel: 'kap-90', nummer: 90, rum: 'testrummet', scen: 'tr_skriv', plats: 'testrum', falt: 8 };
 
 /**
  * Kapitlet i testrummet: ett rum utan karta och en scen med en skrivuppgift i taget, i filens ordning.
@@ -20,7 +20,9 @@ export function testrumKapitel(data) {
     meta: { namn: 'Testrummet', version: data?.meta?.version ?? '0', testrum: true },
     rum: [{ id: TESTRUM.rum, namn: 'Testrummet', innehall: [] }],
     scener: [{ id: TESTRUM.scen, pass: 1, rum: TESTRUM.rum, steg: uppgifter.map((u) => ({ typ: 'pussel', pussel_id: u.id })) }],
-    pussel: uppgifter.map((u) => structuredClone(u)),
+    // lika många fält i varje uppgift (82.2): fälten får inte säga hur långt ordet är, eftersom uppgiften är att se
+    // vilka ord han väljer själv. Fälten växer om han skriver fler bokstäver.
+    pussel: uppgifter.map((u) => ({ ...structuredClone(u), antal_falt: TESTRUM.falt })),
     uppdrag: [],
     var_var_vi: [],
   };

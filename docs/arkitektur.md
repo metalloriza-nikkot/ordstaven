@@ -1017,3 +1017,9 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Kontrollen** prövar testrummet som ett kapitel. Schema 2.45: `kapitel` får vara upp till 99 (testrummet är 90).
 - Gråboxens platshållare har bilderna för uppgifterna och ledbilderna som saknade bildkort (`tr_…`, `lapp`, `morot`, `pump`, `vattendroppe`, `paraply`).
 - (0.65.1) Kameran räknas som framme när hela valet syns, inte när den har stått still en stund: på iPad i CI kom bildrutorna så glest att kameran såg stilla ut mitt i glidningen. Annars betyder still oförändrad i 300 ms.
+
+## 100. Fälten säger inte ordets längd i testrummet (0.66.0, Teknik 42, beslut 82.2)
+- **`antal_falt`** på en P11 (schema 2.46): så många fält från början, oavsett formeln. `antalFalt()` (`karna/skrivord.js`) tar det före formelns längd, och fälten växer som förut när han skriver fler bokstäver, högst `MAX_BOKSTAVER`.
+- **Testrummet** sätter `antal_falt: TESTRUM.falt` (8) på varje uppgift när kapitlet byggs (`testrumKapitel`), så Innehålls `testrum-skriv.json` behöver inget nytt fält. Ingen formel i testrummet är längre än åtta bokstäver (enhetstestet prövar det), så fälten säger aldrig "längre än åtta".
+- Kapitel 2:s skrivpussel har inget `antal_falt` och visar formelns längd som förut.
+

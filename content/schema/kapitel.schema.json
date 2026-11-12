@@ -1558,6 +1558,12 @@
             }
           }
         },
+        "antal_falt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "description": "Hur många fält han skriver i från början (2.46, beslut 82.2, bara med skriv: tangentbord). Utan det är det formelns längd. Med det är det alltid så många, så att fälten inte säger hur långt ordet är. Fälten växer när han skriver fler bokstäver. Testrummet sätter 8 på varje uppgift när kapitlet byggs."
+        },
         "ledbild": {
           "$ref": "#/$defs/id",
           "description": "Hjälpens andra trappsteg (2.36, beslut 69.3, bara med skriv: tangentbord): en bild som tänds bredvid bilden efter första felet, till exempel tankebubbla_bro (en bro i ett moln). Den visar en väg att lösa problemet, aldrig ordet."

@@ -1,6 +1,7 @@
 # Innehållsschema – kapitel i format 2
 
-Version 2.45 (2026-11-12). Ägs av teknikspåret.
+Version 2.46 (2026-11-12). Ägs av teknikspåret.
+2.46: **Fälten säger inte ordets längd** (beslut 82.2). En P11 med `skriv: tangentbord` får **`antal_falt`** (heltal 1–10): så många fält från början, oavsett formeln. Fälten växer när han skriver fler bokstäver, som förut. Testrummet sätter 8 på varje uppgift när kapitlet byggs, så Innehålls fil behöver inget nytt fält. Utan fältet är det som förut, formelns längd.
 2.45: **Testrummet för fritt skrivande** (Teknik 41, 76.9). `content/testrum-skriv.json` (Innehålls fil) har `meta` och `uppgifter`, och varje uppgift är ett skrivpussel `P11_formel` med `skriv: tangentbord`, som i kapitel 2. Spelet bygger ett kapitel av dem (`kap-90`, ett rum utan karta och en scen med en uppgift i taget) och kontrollen prövar det som ett kapitel. Därför får `kapitel` vara upp till 99. Formatet är annars oförändrat.
 2.44: **Budgeten räknas som i 08 §4** (Teknik 39, beslut 78.3). `ga_till` får **`leta: true`** när målet är dolt eller måste hittas: det räknas som vila i passet. Är målet en sak han når, plockar han upp den när han är framme (från 0.63.0, vedpinnarna); en sak han bara ser (`nas_nara`) ligger kvar. Kontrollen räknar bara repliker och mellanscener som passiva steg; ljud, musik, `visa_foremal`, gåvor och sparpunkter hör till steget de står i och varken räknas eller bryter en följd. Två skrivuppgifter är inte i rad när både scenens rum och tillstånd har bytts emellan (LYFT i huset och LJUS på kvällen). Formatet är annars oförändrat.
 2.43: **Kapitel 2 efter beslut 75–77** (Teknik 37 och 39). Nya fält, alla är tillägg:

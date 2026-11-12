@@ -2,6 +2,7 @@
 
 | Version | Datum | Vad |
 |---|---|---|
+| 0.66.0 | 2026-11-12 | **Testrummets rutor säger inte hur långt ordet är.** Varje uppgift i testrummet har åtta rutor från början, och de växer om han skriver ett längre ord. Förut gav bollen på taket fem rutor, som pekade mot STEGE. Instruktionen till fågeln är kortad till två rader (Innehålls pass 82). |
 | 0.65.2 | 2026-11-12 | Husen på torget föll igen på iPad i CI: där går spelets klocka så långsamt att kameran inte hann fram till dörrarna inom 4 s. Spelet väntar nu upp till 10 s (på en vanlig enhet tar glidningen under en sekund), och testet väntar på lappen i upp till 15 s. 0.65.1 publicerades aldrig. |
 | 0.65.1 | 2026-11-12 | Testet för husen på torget föll på iPad i CI: kameran hann inte fram till dörrarna innan lappen visades, eftersom bildrutorna kommer glest där. Nu väntar spelet tills alla fyra dörrar syns. 0.65.0 publicerades aldrig, och 0.65.1 har allt från 0.64.0 och 0.65.0. |
 | 0.65.0 | 2026-11-12 | **Testrummet för fritt skrivande.** I INSTÄLLNINGAR finns ett eget rum med nio vardagliga problem att skriva ord till, som inte finns i äventyret. Det sparar ingenting och rör inte lärandet, och alla ord han skriver står i loggen. Fjädern i byn plockas nu upp när han tar den. |

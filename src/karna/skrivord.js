@@ -33,10 +33,13 @@ export function kandaOrd(ordlistor, kapitel = []) {
 }
 
 /**
- * Fälten han skriver i: formelns längd från början, och de växer när han skriver fler bokstäver.
+ * Fälten han skriver i: formelns längd från början, och de växer när han skriver fler bokstäver. Ett pussel med
+ * `antal_falt` har alltid så många fält från början, oavsett formeln, så att fälten inte säger hur långt ordet är
+ * (testrummet, beslut 82.2).
  * @param {any} pussel @param {string} skrivet
  */
-export const antalFalt = (pussel, skrivet) => Math.min(MAX_BOKSTAVER, Math.max([...versaler(pussel.svar || '')].length, [...skrivet].length));
+export const antalFalt = (pussel, skrivet) => Math.min(MAX_BOKSTAVER, Math.max(
+  Number.isInteger(pussel.antal_falt) ? pussel.antal_falt : [...versaler(pussel.svar || '')].length, [...skrivet].length));
 
 /** Vokaler han förväxlar (läspedagogen V6): Å och Ä, O som Å (SOV, KOM), E och Ä. */
 const VOKALPAR = [['Å', 'Ä'], ['Å', 'O'], ['E', 'Ä']];

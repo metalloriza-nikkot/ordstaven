@@ -1,9 +1,10 @@
 {
  "meta": {
-  "version": "0.1",
+  "version": "0.1.1",
   "datum": "2026-11-12",
   "beskrivning": "Testrummet för fritt skrivande (76.9, Teknik 41). Nio vardagliga problem som inte finns i äventyret. Spelaren ser bilden, hör instruktionen och skriver ett ord på tangentbordet. Alla ord han skriver loggas.",
-  "anteckning": "Samma form som skrivpusslen i kapitel 2 (P11 med skriv: tangentbord), så att samma kod kan visa dem. Flera ord fungerar i varje uppgift, och de rimliga orden får en egen reaktion och räknas aldrig som fel. Andra riktiga ord får vanligt_svar, och bara det som inte är ett ord får pff (76.2). Effekterna och bilderna är namn: i gråbox räcker bilden av problemet, och en liten fest när det är löst. Ordningen spelar ingen roll, men tr_hunden är lättast. Rummet påverkar inte sparningen eller lärandeprofilen."
+  "anteckning": "Samma form som skrivpusslen i kapitel 2 (P11 med skriv: tangentbord), så att samma kod kan visa dem. Flera ord fungerar i varje uppgift, och de rimliga orden får en egen reaktion och räknas aldrig som fel. Andra riktiga ord får vanligt_svar, och bara det som inte är ett ord får pff (76.2). Effekterna och bilderna är namn: i gråbox räcker bilden av problemet, och en liten fest när det är löst. Ordningen spelar ingen roll, men tr_hunden är lättast. Rummet påverkar inte sparningen eller lärandeprofilen.",
+  "andrat_v011": "2026-11-12 (beslut 82.2): instruktionen till fågelungen är kortad till två rader."
  },
  "uppgifter": [
   {
@@ -756,7 +757,7 @@
      "reaktion": "boet sitter redan i trädet",
      "replik": {
       "talare": "berattare",
-      "text": "Ja, boet är där uppe. Hur kommer ungen dit?",
+      "text": "Ja, boet är där uppe. Hur kommer fågeln dit?",
       "upplast": true
      }
     },
@@ -765,7 +766,7 @@
      "reaktion": "fågelmamman tittar ner och piper",
      "replik": {
       "talare": "berattare",
-      "text": "Mamma väntar. Hur kommer ungen upp?",
+      "text": "Mamma väntar. Hur kommer fågeln upp?",
       "upplast": true
      }
     }
@@ -794,7 +795,7 @@
    "hjalp": "ett_ord",
    "instruktion": {
     "talare": "berattare",
-    "text": "Fågelungen föll ur sitt bo. Skriv ett ord som hjälper!",
+    "text": "Fågeln föll ur boet. Skriv ett ord som hjälper!",
     "upplast": true
    },
    "vid_ratt": {
@@ -814,7 +815,7 @@
    "knuff": {
     "handling": "fågelungen piper och tittar upp"
    },
-   "anteckning": "FLYG och LYFT kan han från kapitel 2. Här prövas om han tar dem till ett nytt problem."
+   "anteckning": "FLYG och LYFT kan han från kapitel 2. Här prövas om han tar dem till ett nytt problem. 82.2: instruktionen är kortad till två rader, och fågelungen heter fågeln i repliker, så att den inte blandas ihop med dinoungen."
   }
  ]
 }

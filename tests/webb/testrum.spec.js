@@ -48,6 +48,9 @@ test('testrummet: skrivuppgifterna en i taget, orden i loggen, och äventyrets s
     await page.waitForTimeout(250);
   }
   expect(await page.evaluate(() => window.__ORDSTAVEN.steg()?.pussel_id)).toBe(forsta.id);
+  // fälten säger inte hur långt ordet är (82.2): åtta fält, fast formeln är kortare
+  expect(Math.max(...forsta.formler.map((f) => [...f.ord].length))).toBeLessThan(8);
+  await expect(page.locator('#plattan .formel-skriv .platser .plats')).toHaveCount(8);
   await page.screenshot({ path: 'test-results/testrum-forsta.png' });
   // ett rimligt ord, sedan ett ord som löser problemet
   await skriv(forsta.rimliga[0].ord);

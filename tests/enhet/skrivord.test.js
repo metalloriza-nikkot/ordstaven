@@ -4,6 +4,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { bedomOrd, kandaOrd, antalFalt, MAX_BOKSTAVER, naraStavning, avkodaOrdlista } from '../../src/karna/skrivord.js';
 import { ristasNu } from '../../src/karna/hjalte.js';
+import { testrumKapitel, TESTRUM } from '../../src/karna/testrum.js';
 
 const las = (/** @type {string} */ f) => JSON.parse(readFileSync(new URL(`../../${f}`, import.meta.url), 'utf8'));
 const ordlistor = las('content/ordlistor.json');
@@ -39,6 +40,21 @@ describe('formeln med tangentbordet (kapitel 2)', () => {
     expect(antalFalt(P('k2_over'), 'ST')).toBe(3);
     expect(antalFalt(P('k2_over'), 'FLOTTE')).toBe(6);
     expect(antalFalt(P('k2_over'), 'X'.repeat(14))).toBe(MAX_BOKSTAVER);
+  });
+  it('i testrummet visar fälten inte ordets längd: lika många i varje uppgift, och de växer när han skriver (82.2)', () => {
+    const tr = testrumKapitel(las('content/testrum-skriv.json'));
+    expect(tr.pussel.length).toBeGreaterThan(0);
+    for (const p of tr.pussel) {
+      expect(antalFalt(p, '')).toBe(TESTRUM.falt);
+      expect(antalFalt(p, 'AB')).toBe(TESTRUM.falt);
+    }
+    const p = tr.pussel[0];
+    expect(antalFalt(p, 'X'.repeat(TESTRUM.falt + 1))).toBe(TESTRUM.falt + 1);
+    expect(antalFalt(p, 'X'.repeat(14))).toBe(MAX_BOKSTAVER);
+    // ingen formel i testrummet är längre än fälten, så fälten säger aldrig "längre än åtta"
+    for (const q of tr.pussel) for (const f of q.formler || []) expect([...f.ord].length).toBeLessThanOrEqual(TESTRUM.falt);
+    // Innehålls fil är orörd: fälten sätts när kapitlet byggs
+    expect(las('content/testrum-skriv.json').uppgifter.some((/** @type {any} */ u) => 'antal_falt' in u)).toBe(false);
   });
   it('BRO ristas inte in på staven, men FLYG gör det första gången (67.6)', () => {
     expect(ristasNu(P('k2_over'), [], 'BRO')).toBe(false);
