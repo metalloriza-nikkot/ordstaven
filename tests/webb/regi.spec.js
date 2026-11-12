@@ -199,7 +199,13 @@ test('kvällen i byn (71.5, 71.6): LJUS tänder lyktorna, elden tänds, byborna 
   await page.screenshot({ path: 'test-results/regi-lyktorna.png' }); // kameran följer ljuset ned mot udden
   // Gå till elden: han går dit, och Fiskaren tänder elden (mellanscenen elden_tands)
   await gaTill(page, 566, 312, (p) => p.y > 300 && p.x > 540);
-  await page.keyboard.press('Space');
+  // repliken "Gå till elden" kan komma efter att han redan står vid elden (långsammare webbläsare i CI): då
+  // väntar steget på ett tryck, som när han spelar. Testet trycker tills Fiskaren tänder elden
+  for (let i = 0; i < 40 && !(await O(() => window.__ORDSTAVEN.grafik())).regi.includes('elden tänds'); i++) {
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    if ((await O(() => window.__ORDSTAVEN.steg()))?.typ === 'ga_till') await page.keyboard.press('Space');
+    await page.waitForTimeout(300);
+  }
   await expect.poll(async () => (await O(() => window.__ORDSTAVEN.grafik())).regi, { timeout: 15000 }).toContain('elden tänds');
   await page.waitForTimeout(700);
   await page.screenshot({ path: 'test-results/regi-elden-tands.png' });
