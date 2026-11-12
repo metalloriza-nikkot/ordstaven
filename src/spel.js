@@ -405,15 +405,19 @@ export function skapaSpel(d) {
   function molnHtml(bild, r) {
     return `${bild ? `<span class="moln-bild">${bild}</span>` : ''}${r ? `<span class="instruktion">${ui.rader(r.text, varden())}</span><button type="button" class="moln-hogtalare" aria-label="Läs igen">${ikon('hogtalare')}</button>` : ''}`;
   }
-  /** Vänta tills kameran står still (den har glidit dit den ska), som längst ms. @param {number} ms */
-  function kameranStilla(ms) {
+  /**
+   * Vänta tills kameran står still (den har glidit dit den ska), eller tills framme() säger ja, som längst ms. Still
+   * betyder oförändrad i 300 ms: på en långsam enhet (iPad i CI) kan bildrutorna komma glest. @param {number} ms
+   * @param {(() => boolean) | null} [framme]
+   */
+  function kameranStilla(ms, framme = null) {
     return new Promise((klar) => {
       const slut = performance.now() + ms;
       let forra = '', lika = 0;
       const t = window.setInterval(() => {
         const nu = `${rum.kamera.x},${rum.kamera.y}`;
         lika = nu === forra ? lika + 1 : 0; forra = nu;
-        if (lika >= 3 || performance.now() > slut) { window.clearInterval(t); klar(undefined); }
+        if ((framme ? framme() : lika >= 6) || performance.now() > slut) { window.clearInterval(t); klar(undefined); }
       }, 50);
     });
   }
@@ -2203,13 +2207,13 @@ export function skapaSpel(d) {
     // står han för långt bort för att valet och han ska synas på samma skärm (fjädern vid stranden, husen på torget)
     // glider kameran till valet ändå, och följer honom igen när han börjar gå (80.4)
     const valRutor = omrade.map((id) => rum.ruta(id)).filter(Boolean);
-    const k0 = rum.kamera;
-    const iBild = (/** @type {any} */ o) => o.x >= k0.x && o.y >= k0.y && o.x + o.b <= k0.x + RUM.bredd && o.y + o.h <= k0.y + RUM.hojd;
+    const iBild = (/** @type {any} */ o) => { const k = rum.kamera; return o.x >= k.x && o.y >= k.y && o.x + o.b <= k.x + RUM.bredd && o.y + o.h <= k.y + RUM.hojd; };
     if (valRutor.length && !valRutor.every(iBild)) {
       const x0 = Math.min(...valRutor.map((o) => o.x)), y0 = Math.min(...valRutor.map((o) => o.y));
       const x1 = Math.max(...valRutor.map((o) => o.x + o.b)), y1 = Math.max(...valRutor.map((o) => o.y + o.h));
       rum.regiFokus = { x: (x0 + x1) / 2, y: (y0 + y1) / 2 }; rum.forstFokus = true;
-      await kameranStilla(2500);
+      // framme när hela valet syns, inte bara när kameran har stannat
+      await kameranStilla(4000, () => valRutor.every(iBild));
       logg.handelse('kamera', `${p.id}: valet visas först`);
       const fran = { ...rum.pos };
       const slapp = window.setInterval(() => {

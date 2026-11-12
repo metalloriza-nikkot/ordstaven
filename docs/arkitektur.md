@@ -1016,4 +1016,4 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
   - INSTÄLLNINGAR har `Tillbaka till äventyret`, som laddar sidan utan `?testrum`.
 - **Kontrollen** prövar testrummet som ett kapitel. Schema 2.45: `kapitel` får vara upp till 99 (testrummet är 90).
 - Gråboxens platshållare har bilderna för uppgifterna och ledbilderna som saknade bildkort (`tr_…`, `lapp`, `morot`, `pump`, `vattendroppe`, `paraply`).
-
+- (0.65.1) Kameran räknas som framme när hela valet syns, inte när den har stått still en stund: på iPad i CI kom bildrutorna så glest att kameran såg stilla ut mitt i glidningen. Annars betyder still oförändrad i 300 ms.

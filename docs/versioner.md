@@ -2,6 +2,7 @@
 
 | Version | Datum | Vad |
 |---|---|---|
+| 0.65.1 | 2026-11-12 | Testet för husen på torget föll på iPad i CI: kameran hann inte fram till dörrarna innan lappen visades, eftersom bildrutorna kommer glest där. Nu väntar spelet tills alla fyra dörrar syns. 0.65.0 publicerades aldrig, och 0.65.1 har allt från 0.64.0 och 0.65.0. |
 | 0.65.0 | 2026-11-12 | **Testrummet för fritt skrivande.** I INSTÄLLNINGAR finns ett eget rum med nio vardagliga problem att skriva ord till, som inte finns i äventyret. Det sparar ingenting och rör inte lärandet, och alla ord han skriver står i loggen. Fjädern i byn plockas nu upp när han tar den. |
 | 0.64.0 | 2026-11-12 | **Det han ska göra något med visas först.** På kvällen visar kameran elden på udden innan Tant Rosa ber om pinnar, och före LJUS går hon till den första släckta lyktan medan kameran glider längs raden ned till hjälten. Ljuset går från udden upp till torget. På torget står alla fyra dörrarna mot söder, och kameran visar dem innan Farfars lapp öppnas. |
 | 0.63.1 | 2026-11-12 | **Texten kapas aldrig.** Hos Bo i dammen gick frågan utanför molnet och kapades nedtill. Nu står frågan ovanför lappen när de inte ryms bredvid varandra, och ryms lappen ändå inte läser han den på läsplattan först, som Farfars brev. Ett nytt test öppnar varje läsval, lapp och skylt i prologen och kapitel 1–2 i spelarens två fönster. |
