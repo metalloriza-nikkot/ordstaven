@@ -1007,3 +1007,13 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Läsvalet i rummet visas innan frågan** (80.4): kameran glider till valet innan lappen eller brevet öppnas. Står han för långt bort för att han och valet ska synas på samma skärm (husen på torget, när han står vid stranden), glider kameran till valet ändå och följer honom igen när han börjar gå. Kameran väntas in i verklig tid, också i testläget.
 - **Torgets södra hus** (80.4, 10g): huset med stor rosa dörr är 72 × 40, huset med liten blå dörr står på 452, 136, och båda dörrarna sitter i fasaden mot söder (`riktning: upp`, `sida: under`). Alla fyra dörrarna syns på torgets skärm. Kartkontrollen går igenom.
 
+## 99. Fjädern plockas upp, och testrummet för fritt skrivande (0.65.0, Teknik 41, beslut 76.9, 80.3 och 80.8)
+- **Fjädern** i byn har `leta: true` (Innehålls pass 80) och plockas upp när han når den, som vedpinnarna (§96).
+- **Testrummet** öppnas i INSTÄLLNINGAR, PASS OCH KAPITEL (`Testrummet för fritt skrivande`), som laddar sidan med `?testrum`. Där:
+  - kapitlet byggs av Innehålls `content/testrum-skriv.json` (`src/karna/testrum.js`): `kap-90`, ett tomt rum utan karta (`testrummet`) och en scen (`tr_skriv`) med en skrivuppgift i taget, i filens ordning. Uppgifterna är `P11_formel` med `skriv: tangentbord`, som i kapitel 2, så motorn är densamma: trappan, knuffen, nära stavning, SALDO och spärrlistan;
+  - sparningen ligger på en egen plats (`ordstaven_spar_testrum`) och börjar om varje gång. Äventyrets sparning och lärandet rörs aldrig;
+  - varje ord han skriver står i loggen som i kapitlen (`[formel] tr_…: ORD (formel|rimligt|ord|nästan|spärrat)`), och loggen sparas som vanligt i SPARFIL;
+  - INSTÄLLNINGAR har `Tillbaka till äventyret`, som laddar sidan utan `?testrum`.
+- **Kontrollen** prövar testrummet som ett kapitel. Schema 2.45: `kapitel` får vara upp till 99 (testrummet är 90).
+- Gråboxens platshållare har bilderna för uppgifterna och ledbilderna som saknade bildkort (`tr_…`, `lapp`, `morot`, `pump`, `vattendroppe`, `paraply`).
+

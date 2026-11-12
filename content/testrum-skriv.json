@@ -1,0 +1,820 @@
+{
+ "meta": {
+  "version": "0.1",
+  "datum": "2026-11-12",
+  "beskrivning": "Testrummet för fritt skrivande (76.9, Teknik 41). Nio vardagliga problem som inte finns i äventyret. Spelaren ser bilden, hör instruktionen och skriver ett ord på tangentbordet. Alla ord han skriver loggas.",
+  "anteckning": "Samma form som skrivpusslen i kapitel 2 (P11 med skriv: tangentbord), så att samma kod kan visa dem. Flera ord fungerar i varje uppgift, och de rimliga orden får en egen reaktion och räknas aldrig som fel. Andra riktiga ord får vanligt_svar, och bara det som inte är ett ord får pff (76.2). Effekterna och bilderna är namn: i gråbox räcker bilden av problemet, och en liten fest när det är löst. Ordningen spelar ingen roll, men tr_hunden är lättast. Rummet påverkar inte sparningen eller lärandeprofilen."
+ },
+ "uppgifter": [
+  {
+   "id": "tr_bollen",
+   "typ": "P11_formel",
+   "niva": "S3",
+   "skriv": "tangentbord",
+   "bild": "tr_boll_pa_taket",
+   "svar": "STEGE",
+   "formler": [
+    {
+     "ord": "STEGE",
+     "effekt": "en_stege_mot_taket",
+     "ristas": false
+    },
+    {
+     "ord": "FLYG",
+     "effekt": "bollen_svavar_ner",
+     "ristas": false
+    },
+    {
+     "ord": "NER",
+     "effekt": "bollen_rullar_ner",
+     "ristas": false
+    }
+   ],
+   "rimliga": [
+    {
+     "ord": "HOPPA",
+     "reaktion": "hjälten hoppar men når inte",
+     "replik": {
+      "talare": "berattare",
+      "text": "Taket är för högt.",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "KASTA",
+     "reaktion": "hjälten kastar en kotte som studsar tillbaka",
+     "replik": {
+      "talare": "berattare",
+      "text": "Bra ord! Men med vad?",
+      "upplast": true
+     }
+    }
+   ],
+   "vanligt_svar": {
+    "talare": "berattare",
+    "text": "Bra ord! Men det hjälper inte här.",
+    "upplast": true
+   },
+   "nastan": [
+    {
+     "ord": "STEG",
+     "effekt": "ett_enda_trappsteg"
+    },
+    {
+     "ord": "FLYK",
+     "effekt": "bollen_hoppar_till"
+    }
+   ],
+   "forebild": {
+    "text": "STEGE",
+    "upplast": false,
+    "visas": "andra_felet"
+   },
+   "ledbild": "tankebubbla_stege",
+   "hjalp": "ett_ord",
+   "instruktion": {
+    "talare": "berattare",
+    "text": "Bollen sitter på taket. Skriv ett ord som hjälper!",
+    "upplast": true
+   },
+   "vid_ratt": {
+    "handling": "det han skrev blir till och löser problemet",
+    "fest": "liten",
+    "ljud": "puff"
+   },
+   "vid_fel": {
+    "reaktion": "staven fräser, pff",
+    "replik": {
+     "talare": "berattare",
+     "text": "Pff! Skriv ett ord som hjälper.",
+     "upplast": true
+    },
+    "ljud": "fras"
+   },
+   "knuff": {
+    "handling": "bollen gungar i takrännan"
+   },
+   "anteckning": "Samma sorts problem som draken i kapitel 2, men en sak han inte har sett i äventyret."
+  },
+  {
+   "id": "tr_baten",
+   "typ": "P11_formel",
+   "niva": "S3",
+   "skriv": "tangentbord",
+   "bild": "tr_bat_som_lacker",
+   "svar": "LAPP",
+   "formler": [
+    {
+     "ord": "LAPP",
+     "effekt": "en_lapp_over_halet",
+     "ristas": false
+    },
+    {
+     "ord": "TEJP",
+     "effekt": "tejp_over_halet",
+     "ristas": false
+    },
+    {
+     "ord": "HINK",
+     "effekt": "en_hink_oser_ut_vattnet",
+     "ristas": false
+    }
+   ],
+   "rimliga": [
+    {
+     "ord": "SIMMA",
+     "reaktion": "hjälten doppar tån",
+     "replik": {
+      "talare": "berattare",
+      "text": "Brrr! Det är för kallt.",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "VATTEN",
+     "reaktion": "hjälten pekar på vattnet i båten",
+     "replik": {
+      "talare": "berattare",
+      "text": "Ja, där är vattnet. Hur stoppar du det?",
+      "upplast": true
+     }
+    }
+   ],
+   "vanligt_svar": {
+    "talare": "berattare",
+    "text": "Bra ord! Men det hjälper inte här.",
+    "upplast": true
+   },
+   "nastan": [
+    {
+     "ord": "LAP",
+     "effekt": "en_pytteliten_lapp"
+    },
+    {
+     "ord": "TEP",
+     "effekt": "en_bit_tejp_som_lossnar"
+    }
+   ],
+   "forebild": {
+    "text": "LAPP",
+    "upplast": false,
+    "visas": "andra_felet"
+   },
+   "ledbild": "tankebubbla_lapp",
+   "hjalp": "ett_ord",
+   "instruktion": {
+    "talare": "berattare",
+    "text": "Båten läcker. Skriv ett ord som hjälper!",
+    "upplast": true
+   },
+   "vid_ratt": {
+    "handling": "det han skrev blir till och löser problemet",
+    "fest": "liten",
+    "ljud": "puff"
+   },
+   "vid_fel": {
+    "reaktion": "staven fräser, pff",
+    "replik": {
+     "talare": "berattare",
+     "text": "Pff! Skriv ett ord som hjälper.",
+     "upplast": true
+    },
+    "ljud": "fras"
+   },
+   "knuff": {
+    "handling": "vattnet porlar in genom hålet"
+   },
+   "anteckning": "Ett problem där flera vardagliga ord fungerar. LAPP har dubbelteckning, TEJP ett J efter E."
+  },
+  {
+   "id": "tr_skapet",
+   "typ": "P11_formel",
+   "niva": "S3",
+   "skriv": "tangentbord",
+   "bild": "tr_morkt_skap",
+   "svar": "LJUS",
+   "formler": [
+    {
+     "ord": "LJUS",
+     "effekt": "ljuset_lyser_i_skapet",
+     "ristas": false
+    },
+    {
+     "ord": "LAMPA",
+     "effekt": "en_lampa_tands",
+     "ristas": false
+    },
+    {
+     "ord": "LYS",
+     "effekt": "ljuset_lyser_i_skapet",
+     "ristas": false
+    }
+   ],
+   "rimliga": [
+    {
+     "ord": "ÖPPNA",
+     "reaktion": "dörren står redan öppen",
+     "replik": {
+      "talare": "berattare",
+      "text": "Skåpet är öppet. Men det är mörkt.",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "ELD",
+     "reaktion": "en liten gnista sprakar och slocknar",
+     "replik": {
+      "talare": "berattare",
+      "text": "Bra ord! Men inte i ett skåp.",
+      "upplast": true
+     }
+    }
+   ],
+   "vanligt_svar": {
+    "talare": "berattare",
+    "text": "Bra ord! Men det hjälper inte här.",
+    "upplast": true
+   },
+   "nastan": [
+    {
+     "ord": "JUS",
+     "effekt": "en_liten_ljusprick"
+    },
+    {
+     "ord": "LAMA",
+     "effekt": "en_pytteliten_lampa"
+    }
+   ],
+   "forebild": {
+    "text": "LJUS",
+    "upplast": false,
+    "visas": "andra_felet"
+   },
+   "ledbild": "tankebubbla_ljusboll",
+   "hjalp": "ett_ord",
+   "instruktion": {
+    "talare": "berattare",
+    "text": "Skåpet är mörkt. Skriv ett ord som hjälper!",
+    "upplast": true
+   },
+   "vid_ratt": {
+    "handling": "det han skrev blir till och löser problemet",
+    "fest": "liten",
+    "ljud": "puff"
+   },
+   "vid_fel": {
+    "reaktion": "staven fräser, pff",
+    "replik": {
+     "talare": "berattare",
+     "text": "Pff! Skriv ett ord som hjälper.",
+     "upplast": true
+    },
+    "ljud": "fras"
+   },
+   "knuff": {
+    "handling": "något blinkar längst in i skåpet"
+   },
+   "anteckning": "LJUS är en formel han kan. Här prövas om han tar den till ett nytt problem."
+  },
+  {
+   "id": "tr_snogubben",
+   "typ": "P11_formel",
+   "niva": "S3",
+   "skriv": "tangentbord",
+   "bild": "tr_snogubbe_utan_nasa",
+   "svar": "MOROT",
+   "formler": [
+    {
+     "ord": "MOROT",
+     "effekt": "en_morot_som_nasa",
+     "ristas": false
+    },
+    {
+     "ord": "NÄSA",
+     "effekt": "en_nasa_dyker_upp",
+     "ristas": false
+    },
+    {
+     "ord": "STEN",
+     "effekt": "en_sten_som_nasa",
+     "ristas": false
+    }
+   ],
+   "rimliga": [
+    {
+     "ord": "SNÖ",
+     "reaktion": "en liten snöboll faller av",
+     "replik": {
+      "talare": "berattare",
+      "text": "Bra ord! Men snö har han redan.",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "ÖGON",
+     "reaktion": "två stenar blir ögon",
+     "replik": {
+      "talare": "berattare",
+      "text": "Han har ögon. Men ingen näsa!",
+      "upplast": true
+     }
+    }
+   ],
+   "vanligt_svar": {
+    "talare": "berattare",
+    "text": "Bra ord! Men det hjälper inte här.",
+    "upplast": true
+   },
+   "nastan": [
+    {
+     "ord": "MORT",
+     "effekt": "en_pytteliten_morot"
+    },
+    {
+     "ord": "NESA",
+     "effekt": "en_pytteliten_nasa"
+    }
+   ],
+   "forebild": {
+    "text": "MOROT",
+    "upplast": false,
+    "visas": "andra_felet"
+   },
+   "ledbild": "tankebubbla_morot",
+   "hjalp": "ett_ord",
+   "instruktion": {
+    "talare": "berattare",
+    "text": "Snögubben har ingen näsa. Skriv ett ord som hjälper!",
+    "upplast": true
+   },
+   "vid_ratt": {
+    "handling": "det han skrev blir till och löser problemet",
+    "fest": "liten",
+    "ljud": "puff"
+   },
+   "vid_fel": {
+    "reaktion": "staven fräser, pff",
+    "replik": {
+     "talare": "berattare",
+     "text": "Pff! Skriv ett ord som hjälper.",
+     "upplast": true
+    },
+    "ljud": "fras"
+   },
+   "knuff": {
+    "handling": "snögubben nyser utan näsa"
+   },
+   "anteckning": "MOROT och NÄSA går att ljuda fram. Ä mot E räknas som nära."
+  },
+  {
+   "id": "tr_cykeln",
+   "typ": "P11_formel",
+   "niva": "S3",
+   "skriv": "tangentbord",
+   "bild": "tr_cykel_utan_luft",
+   "svar": "PUMP",
+   "formler": [
+    {
+     "ord": "PUMP",
+     "effekt": "en_pump_blaser_upp_hjulet",
+     "ristas": false
+    },
+    {
+     "ord": "LUFT",
+     "effekt": "hjulet_fylls_med_luft",
+     "ristas": false
+    },
+    {
+     "ord": "LAPP",
+     "effekt": "en_lapp_over_halet",
+     "ristas": false
+    }
+   ],
+   "rimliga": [
+    {
+     "ord": "CYKEL",
+     "reaktion": "cykeln gungar",
+     "replik": {
+      "talare": "berattare",
+      "text": "Bra ord! Men hjulet är platt.",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "BLÅS",
+     "reaktion": "hjälten blåser på hjulet",
+     "replik": {
+      "talare": "berattare",
+      "text": "Bra ord! Men det räcker inte.",
+      "upplast": true
+     }
+    }
+   ],
+   "vanligt_svar": {
+    "talare": "berattare",
+    "text": "Bra ord! Men det hjälper inte här.",
+    "upplast": true
+   },
+   "nastan": [
+    {
+     "ord": "PUM",
+     "effekt": "en_pytteliten_pump"
+    },
+    {
+     "ord": "LUF",
+     "effekt": "hjulet_pyser_lite"
+    }
+   ],
+   "forebild": {
+    "text": "PUMP",
+    "upplast": false,
+    "visas": "andra_felet"
+   },
+   "ledbild": "tankebubbla_pump",
+   "hjalp": "ett_ord",
+   "instruktion": {
+    "talare": "berattare",
+    "text": "Hjulet har ingen luft. Skriv ett ord som hjälper!",
+    "upplast": true
+   },
+   "vid_ratt": {
+    "handling": "det han skrev blir till och löser problemet",
+    "fest": "liten",
+    "ljud": "puff"
+   },
+   "vid_fel": {
+    "reaktion": "staven fräser, pff",
+    "replik": {
+     "talare": "berattare",
+     "text": "Pff! Skriv ett ord som hjälper.",
+     "upplast": true
+    },
+    "ljud": "fras"
+   },
+   "knuff": {
+    "handling": "hjulet pyser"
+   },
+   "anteckning": "PUMP och LUFT har konsonantgrupp i slutet (lista 2)."
+  },
+  {
+   "id": "tr_blomman",
+   "typ": "P11_formel",
+   "niva": "S3",
+   "skriv": "tangentbord",
+   "bild": "tr_vissen_blomma",
+   "svar": "VATTEN",
+   "formler": [
+    {
+     "ord": "VATTEN",
+     "effekt": "vatten_regnar_over_blomman",
+     "ristas": false
+    },
+    {
+     "ord": "REGN",
+     "effekt": "ett_moln_regnar",
+     "ristas": false
+    },
+    {
+     "ord": "KANNA",
+     "effekt": "en_kanna_vattnar",
+     "ristas": false
+    }
+   ],
+   "rimliga": [
+    {
+     "ord": "SOL",
+     "reaktion": "solen skiner ännu mer",
+     "replik": {
+      "talare": "berattare",
+      "text": "Bra ord! Men det är redan varmt.",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "JORD",
+     "reaktion": "lite jord faller ner",
+     "replik": {
+      "talare": "berattare",
+      "text": "Bra ord! Men jorden är torr.",
+      "upplast": true
+     }
+    }
+   ],
+   "vanligt_svar": {
+    "talare": "berattare",
+    "text": "Bra ord! Men det hjälper inte här.",
+    "upplast": true
+   },
+   "nastan": [
+    {
+     "ord": "VATEN",
+     "effekt": "nagra_droppar"
+    },
+    {
+     "ord": "KANA",
+     "effekt": "en_pytteliten_kanna"
+    }
+   ],
+   "forebild": {
+    "text": "VATTEN",
+    "upplast": false,
+    "visas": "andra_felet"
+   },
+   "ledbild": "tankebubbla_vattendroppe",
+   "hjalp": "ett_ord",
+   "instruktion": {
+    "talare": "berattare",
+    "text": "Blomman är torr. Skriv ett ord som hjälper!",
+    "upplast": true
+   },
+   "vid_ratt": {
+    "handling": "det han skrev blir till och löser problemet",
+    "fest": "liten",
+    "ljud": "puff"
+   },
+   "vid_fel": {
+    "reaktion": "staven fräser, pff",
+    "replik": {
+     "talare": "berattare",
+     "text": "Pff! Skriv ett ord som hjälper.",
+     "upplast": true
+    },
+    "ljud": "fras"
+   },
+   "knuff": {
+    "handling": "blomman hänger med huvudet"
+   },
+   "anteckning": "VATTEN och KANNA har dubbelteckning (lista 4). REGN har G efter N, som hörs."
+  },
+  {
+   "id": "tr_hunden",
+   "typ": "P11_formel",
+   "niva": "S3",
+   "skriv": "tangentbord",
+   "bild": "tr_hund_tom_skal",
+   "svar": "MAT",
+   "formler": [
+    {
+     "ord": "MAT",
+     "effekt": "mat_i_skalen",
+     "ristas": false
+    },
+    {
+     "ord": "BEN",
+     "effekt": "ett_ben_i_skalen",
+     "ristas": false
+    },
+    {
+     "ord": "KORV",
+     "effekt": "en_korv_i_skalen",
+     "ristas": false
+    }
+   ],
+   "rimliga": [
+    {
+     "ord": "VATTEN",
+     "reaktion": "skålen fylls med vatten, och hunden dricker lite",
+     "replik": {
+      "talare": "berattare",
+      "text": "Bra ord! Men hunden är hungrig.",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "BOLL",
+     "reaktion": "en boll rullar fram",
+     "replik": {
+      "talare": "berattare",
+      "text": "Hunden vill hellre äta.",
+      "upplast": true
+     }
+    }
+   ],
+   "vanligt_svar": {
+    "talare": "berattare",
+    "text": "Bra ord! Men det hjälper inte här.",
+    "upplast": true
+   },
+   "nastan": [
+    {
+     "ord": "MATT",
+     "effekt": "lite_mat_i_skalen"
+    },
+    {
+     "ord": "KOR",
+     "effekt": "en_pytteliten_korv"
+    }
+   ],
+   "forebild": {
+    "text": "MAT",
+    "upplast": false,
+    "visas": "andra_felet"
+   },
+   "ledbild": "tankebubbla_ben",
+   "hjalp": "ett_ord",
+   "instruktion": {
+    "talare": "berattare",
+    "text": "Hunden är hungrig. Skriv ett ord som hjälper!",
+    "upplast": true
+   },
+   "vid_ratt": {
+    "handling": "det han skrev blir till och löser problemet",
+    "fest": "liten",
+    "ljud": "puff"
+   },
+   "vid_fel": {
+    "reaktion": "staven fräser, pff",
+    "replik": {
+     "talare": "berattare",
+     "text": "Pff! Skriv ett ord som hjälper.",
+     "upplast": true
+    },
+    "ljud": "fras"
+   },
+   "knuff": {
+    "handling": "hunden puttar på skålen med nosen"
+   },
+   "anteckning": "Den lättaste uppgiften, med ord från lista 1. Bra att ha först eller när han har kört fast."
+  },
+  {
+   "id": "tr_regnet",
+   "typ": "P11_formel",
+   "niva": "S3",
+   "skriv": "tangentbord",
+   "bild": "tr_barn_i_regnet",
+   "svar": "PARAPLY",
+   "formler": [
+    {
+     "ord": "PARAPLY",
+     "effekt": "ett_paraply_slas_upp",
+     "ristas": false
+    },
+    {
+     "ord": "HATT",
+     "effekt": "en_hatt_pa_huvudet",
+     "ristas": false
+    },
+    {
+     "ord": "TAK",
+     "effekt": "ett_tak_over_barnet",
+     "ristas": false
+    }
+   ],
+   "rimliga": [
+    {
+     "ord": "SOL",
+     "reaktion": "solen tittar fram en stund",
+     "replik": {
+      "talare": "berattare",
+      "text": "Bra ord! Men det regnar fortfarande.",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "JACKA",
+     "reaktion": "barnet får en jacka",
+     "replik": {
+      "talare": "berattare",
+      "text": "Bra ord! Men huvudet blir blött.",
+      "upplast": true
+     }
+    }
+   ],
+   "vanligt_svar": {
+    "talare": "berattare",
+    "text": "Bra ord! Men det hjälper inte här.",
+    "upplast": true
+   },
+   "nastan": [
+    {
+     "ord": "HAT",
+     "effekt": "en_pytteliten_hatt"
+    },
+    {
+     "ord": "PARAPI",
+     "effekt": "ett_pyttelitet_paraply"
+    }
+   ],
+   "forebild": {
+    "text": "PARAPLY",
+    "upplast": false,
+    "visas": "andra_felet"
+   },
+   "ledbild": "tankebubbla_paraply",
+   "hjalp": "ett_ord",
+   "instruktion": {
+    "talare": "berattare",
+    "text": "Det regnar på barnet. Skriv ett ord som hjälper!",
+    "upplast": true
+   },
+   "vid_ratt": {
+    "handling": "det han skrev blir till och löser problemet",
+    "fest": "liten",
+    "ljud": "puff"
+   },
+   "vid_fel": {
+    "reaktion": "staven fräser, pff",
+    "replik": {
+     "talare": "berattare",
+     "text": "Pff! Skriv ett ord som hjälper.",
+     "upplast": true
+    },
+    "ljud": "fras"
+   },
+   "knuff": {
+    "handling": "regnet smattrar på barnets huvud"
+   },
+   "anteckning": "PARAPLY är långt (7 bokstäver). HATT och TAK är korta vägar, och det får han välja."
+  },
+  {
+   "id": "tr_fageln",
+   "typ": "P11_formel",
+   "niva": "S3",
+   "skriv": "tangentbord",
+   "bild": "tr_fagelunge_pa_marken",
+   "svar": "FLYG",
+   "formler": [
+    {
+     "ord": "FLYG",
+     "effekt": "ungen_svavar_upp_i_boet",
+     "ristas": false
+    },
+    {
+     "ord": "STEGE",
+     "effekt": "en_stege_mot_tradet",
+     "ristas": false
+    },
+    {
+     "ord": "LYFT",
+     "effekt": "ungen_lyfts_upp_i_boet",
+     "ristas": false
+    }
+   ],
+   "rimliga": [
+    {
+     "ord": "BO",
+     "reaktion": "boet sitter redan i trädet",
+     "replik": {
+      "talare": "berattare",
+      "text": "Ja, boet är där uppe. Hur kommer ungen dit?",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "MAMMA",
+     "reaktion": "fågelmamman tittar ner och piper",
+     "replik": {
+      "talare": "berattare",
+      "text": "Mamma väntar. Hur kommer ungen upp?",
+      "upplast": true
+     }
+    }
+   ],
+   "vanligt_svar": {
+    "talare": "berattare",
+    "text": "Bra ord! Men det hjälper inte här.",
+    "upplast": true
+   },
+   "nastan": [
+    {
+     "ord": "FLYK",
+     "effekt": "ungen_hoppar_till"
+    },
+    {
+     "ord": "LYF",
+     "effekt": "ungen_lyfts_lite"
+    }
+   ],
+   "forebild": {
+    "text": "FLYG",
+    "upplast": false,
+    "visas": "andra_felet"
+   },
+   "ledbild": "tankebubbla_fagel",
+   "hjalp": "ett_ord",
+   "instruktion": {
+    "talare": "berattare",
+    "text": "Fågelungen föll ur sitt bo. Skriv ett ord som hjälper!",
+    "upplast": true
+   },
+   "vid_ratt": {
+    "handling": "det han skrev blir till och löser problemet",
+    "fest": "liten",
+    "ljud": "puff"
+   },
+   "vid_fel": {
+    "reaktion": "staven fräser, pff",
+    "replik": {
+     "talare": "berattare",
+     "text": "Pff! Skriv ett ord som hjälper.",
+     "upplast": true
+    },
+    "ljud": "fras"
+   },
+   "knuff": {
+    "handling": "fågelungen piper och tittar upp"
+   },
+   "anteckning": "FLYG och LYFT kan han från kapitel 2. Här prövas om han tar dem till ett nytt problem."
+  }
+ ]
+}

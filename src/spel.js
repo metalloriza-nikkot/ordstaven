@@ -4074,7 +4074,8 @@ export function skapaSpel(d) {
     // den valda delen i fönstret till höger. Allt i världens pixlar över spelytan, texten i Lexend.
     const delar = [
       ['spelare', 'SPELARE', spelargrupp() || '<div class="menygrupp"><small>En spelare på den här enheten.</small></div>'],
-      ['pass', 'PASS OCH KAPITEL', `<div class="menygrupp passlista"><b>Börja ett pass</b> <small>(namnen och det som kommer före finns kvar, och lärandet blir som när passet började):</small> ${passStart}${utanBild ? '<small class="utan-bild">* Där står lärandet kvar som det är nu, eftersom det inte finns någon bild av det från passets början.</small>' : ''}${las ? `<div class="kapitel-las">${las}</div>` : ''}</div>`],
+      ['pass', 'PASS OCH KAPITEL', `<div class="menygrupp passlista"><b>Börja ett pass</b> <small>(namnen och det som kommer före finns kvar, och lärandet blir som när passet började):</small> ${passStart}${utanBild ? '<small class="utan-bild">* Där står lärandet kvar som det är nu, eftersom det inte finns någon bild av det från passets början.</small>' : ''}${las ? `<div class="kapitel-las">${las}</div>` : ''}</div>
+        <div class="menygrupp testrum-grupp">${d.testrum ? '<button type="button" class="menyval testrum-ut">Tillbaka till äventyret</button><small>Testrummet sparar ingenting. Orden han skrev står i loggen (SPARFIL, Spara loggen).</small>' : '<button type="button" class="menyval testrum-in">Testrummet för fritt skrivande</button><small>Ett tomt rum med skrivuppgifter som inte finns i äventyret. Det påverkar inte sparningen eller lärandet, och alla ord han skriver står i loggen.</small>'}</div>`],
       ['lasning', 'LÄSNING', `<div class="menygrupp lasniva"><b>Läsnivå (läs och välj):</b> ${Array.from({ length: Math.max(4, niva) }, (_, i) => i + 1).map((n) => `<button type="button" class="menyval niva ${n === niva ? 'nu' : ''}" data-n="${n}">L${n}</button>`).join('')} <small class="niva-i-kapitlet">${nivaIKapitlet()}</small></div>`],
       ['ljud', 'LJUD OCH RÖST', `<div class="menygrupp"><label><input type="checkbox" class="foralder" ${inst.foralderLaser ? 'checked' : ''}> Föräldern läser ${ui.esc(Object.values(aventyr.talare).filter((/** @type {any} */ t) => t.rost === 'foraldern_eller_datorrost').map((/** @type {any} */ t) => t.namn).join(' och ') || 'rollernas')} repliker</label>
         <label><input type="checkbox" class="rostval" ${inst.rost ? 'checked' : ''}> Datorrösten läser upp (av: rullningen piper i ordtakt)</label>
@@ -4124,6 +4125,9 @@ export function skapaSpel(d) {
     s.querySelector('.helskarm')?.addEventListener('click', () => {
       vaxlaHelskarm().finally(() => setTimeout(() => { if (!ui.$('#vuxenmeny').hidden) oppnaMeny(); }, 300));
     });
+    // testrummet (41): sidan laddas om med eller utan ?testrum, och äventyrets sparning rörs inte
+    s.querySelector('.testrum-in')?.addEventListener('click', () => { logg.handelse('testrum', 'öppnas'); logg.spara?.(true); location.assign(location.pathname + '?testrum'); });
+    s.querySelector('.testrum-ut')?.addEventListener('click', () => { logg.handelse('testrum', 'stängs'); logg.spara?.(true); location.assign(location.pathname); });
     s.querySelector('.foralder')?.addEventListener('change', (e) => { inst.foralderLaser = /** @type {HTMLInputElement} */ (e.target).checked; spara(); });
     s.querySelector('.rostval')?.addEventListener('change', (e) => { inst.rost = /** @type {HTMLInputElement} */ (e.target).checked; logg.handelse('inställning', `rösten ${inst.rost ? 'på' : 'av'}`); spara(); });
     s.querySelector('.markeraval')?.addEventListener('change', (e) => { inst.markera = /** @type {HTMLInputElement} */ (e.target).checked; logg.handelse('inställning', `markeringen ${inst.markera ? 'på' : 'av'}`); spara(); });

@@ -16,7 +16,7 @@
  },
  "meta": {
   "namn": "Träsket",
-  "version": "0.7.3",
+  "version": "0.7.4",
   "datum": "2026-11-12",
   "agare": "Innehåll",
   "kalla": "Manus 17-kapitel2-manus.md v0.4 (beslut 60–64). Ny fil.",
@@ -31,7 +31,8 @@
   "andrat_v071": "2026-11-12 (beslut 77.4): läsvalet k2_husen i pass 1. Fyra hus på torget (dorr_rosa, dorr_litet_bla, dorr_stort_rosa och dorr_stort_bla), Farfars mening på baksidan av hans lista, Tant Rosa ut genom rätt dörr, och tant_rosa och brevram dolda tills dess. HALLÅ!, ungen mot torget och KOM HIT! är strukna, och Herr Skata har redan brevet när luftskeppet kommer. Uppdraget TANT ROSA har steget HITTA HUSET.",
   "teknik_77": "Teknik 2026-11-12 (beslut 77.3, schema 2.43): k2_stocken har flera_ratta, och de tre rätta alternativen har sin regi som effekt (samma som formlerna hade i 0.56.0). k2_halvan har lys_ord INTE, som oppna_lasplatta hade vid bryggan (vid_ratt: ordet INTE lyser i guld). Ingen text är ändrad.",
   "andrat_v072": "2026-11-12 (beslut 78.3 och 78.4): budgeten räknad som i 08 §4. Farfars två första repliker i k2s01 är en, Tant Rosas replik mellan grenarna är struken, halvan i vassen och vedpinnarna är märkta leta: true, och k2s10 har tre vedpinnar på udden före lyktorna (en vila i pass 3). Uppdraget ELDEN har steget SAMLA VED.",
-  "andrat_v073": "2026-11-12 (beslut 79.3): det han ska göra något med visas först. I k2s10 visar kameran elden på udden innan pinnarna (visas_forst på lagereld på kvällen), och mellanscenen före LJUS har regin rosa_vid_lyktorna: Tant Rosa vid den första släckta lyktan och kameran längs raden till hjälten. Ingen text som spelaren läser är ändrad."
+  "andrat_v073": "2026-11-12 (beslut 79.3): det han ska göra något med visas först. I k2s10 visar kameran elden på udden innan pinnarna (visas_forst på lagereld på kvällen), och mellanscenen före LJUS har regin rosa_vid_lyktorna: Tant Rosa vid den första släckta lyktan och kameran längs raden till hjälten. Ingen text som spelaren läser är ändrad.",
+  "andrat_v074": "2026-11-12 (beslut 80.3): fjädern i k2s02 plockas upp (leta: true på ga_till fjader) och räknas som vila."
  },
  "var_var_vi": [
   {
@@ -759,7 +760,8 @@
     },
     {
      "typ": "ga_till",
-     "mal": "fjader"
+     "mal": "fjader",
+     "leta": true
     },
     {
      "typ": "mellanscen",
@@ -816,7 +818,7 @@
      "valfri": false
     }
    ],
-   "anteckning": "76.4 (B6): brevet rivs i tre steg. Herr Skata nafsar och baronen drar, RITS, baronens halva åker till bryggan, och den andra landar i vattnet vid vassen, PLASK. Berättaren pekar ut båda halvorna, och sedan landar fjädern (75.4: nära hjälten). Byn är i tillståndet morgon, utan rep: baronen spärrar vägarna efter landningen, och repen syns först i pass 2. Herr Skata har redan tagit brevet från Tant Rosas trappa, och Tant Rosa syns inte förrän hon öppnar sin dörr (77.4). Farfars tidslinje (B9, 06 §2): han gömde biten hos Rosa för länge sen och skrev var i ett brev, så att han inte skulle glömma. Rosa fick inte öppna det förrän hans barnbarn kom. Nu minns han inte var, och brevet behövs. Högst tre repliker i rad (76.3). 77.4: pass 1 har ett läsval i världen (k2_husen). Farfar säger på radion att brevet var hans och att det står på baksidan av hans lista var vännen bor. Spelaren läser listan och knackar på ett av fyra hus. Vid rätt dörr kommer Tant Rosa ut, och brevramen syns på dörren. HALLÅ!, ungen som springer mot torget och KOM HIT! är strukna, och närbilden av brevramen också, eftersom ramen syns på dörren när den går upp (vid_ratt). Efter läsvalet är det fem passiva steg i rad med Tekniks räkning (visa_foremal räknas) och tre repliker."
+   "anteckning": "76.4 (B6): brevet rivs i tre steg. Herr Skata nafsar och baronen drar, RITS, baronens halva åker till bryggan, och den andra landar i vattnet vid vassen, PLASK. Berättaren pekar ut båda halvorna, och sedan landar fjädern (75.4: nära hjälten). Byn är i tillståndet morgon, utan rep: baronen spärrar vägarna efter landningen, och repen syns först i pass 2. Herr Skata har redan tagit brevet från Tant Rosas trappa, och Tant Rosa syns inte förrän hon öppnar sin dörr (77.4). Farfars tidslinje (B9, 06 §2): han gömde biten hos Rosa för länge sen och skrev var i ett brev, så att han inte skulle glömma. Rosa fick inte öppna det förrän hans barnbarn kom. Nu minns han inte var, och brevet behövs. Högst tre repliker i rad (76.3). 77.4: pass 1 har ett läsval i världen (k2_husen). Farfar säger på radion att brevet var hans och att det står på baksidan av hans lista var vännen bor. Spelaren läser listan och knackar på ett av fyra hus. Vid rätt dörr kommer Tant Rosa ut, och brevramen syns på dörren. HALLÅ!, ungen som springer mot torget och KOM HIT! är strukna, och närbilden av brevramen också, eftersom ramen syns på dörren när den går upp (vid_ratt). Efter läsvalet är det fem passiva steg i rad med Tekniks räkning (visa_foremal räknas) och tre repliker. 80.3: ga_till fjader har leta: true. Han hämtar fjädern och stoppar den i ryggsäcken, så den plockas upp och ligger inte kvar på marken, och steget räknas som vila."
   },
   {
    "id": "k2s03_torget",

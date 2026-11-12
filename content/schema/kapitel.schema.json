@@ -28,7 +28,8 @@
     "kapitel": {
       "type": "integer",
       "minimum": 0,
-      "maximum": 7
+      "maximum": 99,
+      "description": "Äventyrets kapitel 0–7. 90 är testrummet för fritt skrivande (Teknik 41), som byggs av content/testrum-skriv.json."
     },
     "meta": {
       "$ref": "#/$defs/meta"

@@ -13,6 +13,7 @@ import ordlistor from '../content/ordlistor.json';
 // Koden vet inget om ett visst äventyr. Med flera äventyr väljs ett med ?aventyr=<id>, annars det första.
 const aventyrsfiler = import.meta.glob('../content/*/aventyr.json', { import: 'default', eager: true });
 const kapitelfiler = import.meta.glob('../content/*/kap-*.json', { import: 'default', eager: true });
+const testrumfiler = import.meta.glob('../content/testrum-skriv.json', { import: 'default', eager: true });
 const kartfiler = import.meta.glob('../kartor/*/*.tmj', { query: '?raw', import: 'default', eager: true });
 const platshallarfiler = import.meta.glob('../kartor/*/platshallare.json', { import: 'default', eager: true });
 const mappAv = (/** @type {string} */ fil) => fil.split('/').at(-2);
@@ -36,13 +37,18 @@ import { skapaTangentbord } from './grans/tangentbord.js';
 import { bevakaBildrutor } from './grans/prestanda.js';
 import { Rum } from './scener/Rum.js';
 import { skapaSpel } from './spel.js';
+import { testrumKapitel, testrumAventyr, TESTRUM } from './karna/testrum.js';
 
 const VERSION = __VERSION__;
 const parametrar = new URLSearchParams(location.search);
 const allaAventyr = Object.entries(aventyrsfiler).map(([fil, a]) => ({ mapp: mappAv(fil), data: /** @type {any} */ (a) })).sort((x, y) => x.mapp.localeCompare(y.mapp));
 const valt = allaAventyr.find((a) => a.data.id === parametrar.get('aventyr')) ?? allaAventyr[0];
-const aventyr = valt.data;
-const kapitel = Object.entries(kapitelfiler).filter(([fil]) => mappAv(fil) === valt.mapp).map(([, k]) => /** @type {any} */ (structuredClone(k)));
+// Testrummet för fritt skrivande (76.9, Teknik 41): ?testrum visar Innehålls skrivuppgifter i ett tomt rum, på en
+// egen sparplats, så att äventyrets sparning och lärandet aldrig påverkas
+const testrumet = parametrar.has('testrum') ? testrumfiler['../content/testrum-skriv.json'] ?? null : null;
+const aventyr = testrumet ? testrumAventyr(valt.data) : valt.data;
+const kapitel = testrumet ? [testrumKapitel(/** @type {any} */ (testrumet))]
+  : Object.entries(kapitelfiler).filter(([fil]) => mappAv(fil) === valt.mapp).map(([, k]) => /** @type {any} */ (structuredClone(k)));
 // Bara för webbläsartesterna (?snabb&testscen, eller ?test&testscen i vanlig takt): en provscen ur localStorage läggs
 // till i första kapitlet, så att motorns steg kan provas innan innehållet använder dem. Påverkar aldrig ett vanligt spel.
 /** @type {Record<string, any>} provkartor (Tiled-JSON per rum) för webbläsartesterna */
@@ -80,9 +86,11 @@ logg.handelse('start', `ORDSTAVEN ${VERSION}`, { lagring: lagring.typ, snabb });
 
 // sparplatserna (F1): en sparning per spelare. Startskärmen väljer spelare och startar om spelet på hans plats.
 const platser = skapaPlatser({ lagring, logg });
-const plats = platser.aktiv();
+const plats = testrumet ? TESTRUM.plats : platser.aktiv();
 const sparning = skapaSparning({ lagring, spelversion: VERSION, logg, plats });
-if (parametrar.has('ny')) sparning.nollstall();
+// testrummet börjar alltid från början: där finns inget att spara mellan gångerna
+if (parametrar.has('ny') || testrumet) sparning.nollstall();
+if (testrumet) logg.handelse('testrum', 'testrummet för fritt skrivande', { uppgifter: kapitel[0].pussel.length });
 const tillstand = sparning.las();
 // bara i testläge (?snabb eller ?test): ?sedan=<dygn> låtsas att han spelade senast för så länge sedan (F2, Farfars långa "Var var vi?")
 if ((parametrar.has('snabb') || parametrar.has('test')) && parametrar.has('sedan')) tillstand.sparad = new Date(Date.now() - Number(parametrar.get('sedan')) * 864e5).toISOString();
@@ -217,9 +225,10 @@ const spelet = skapaSpel({
   // sparfilen i INSTÄLLNINGAR: hela sparningen som en fil, och tillbaka
   filer: { laddaNed, tidsstampel, meddelande },
   // ?kapitel=kap-01: börja i ett kapitel som ännu saknar kartor (gråbox för den vuxne)
-  valtKapitel: parametrar.get('kapitel'),
+  valtKapitel: testrumet ? TESTRUM.kapitel : parametrar.get('kapitel'),
+  testrum: !!testrumet,
   // introt (F4): när spelet startar, inte i snabbläget eller testläget (?intro visar det ändå) och inte efter ett byte av spelare
-  intro: utanIntro() ? false : (parametrar.has('intro') || (!snabb && !parametrar.has('test'))),
+  intro: utanIntro() || testrumet ? false : (parametrar.has('intro') || (!snabb && !parametrar.has('test'))),
   // testläget (62.6): Hoppa till scen och objektens namn i INSTÄLLNINGAR, bara med ?test (och ?snabb, testernas läge)
   testlage: parametrar.has('test') || snabb,
   // startskärmens foto (F4), inte i snabbläget (?foto tar det ändå): på en långsam testmaskin kostar bilden tid

@@ -86,7 +86,12 @@ test('kapitel 2 går att spela från träsket till elden (gråbox, del 5)', asyn
   const regi = (await ev(() => window.__ORDSTAVEN.grafik())).regi;
   for (const r of ['ungen biter i vass_tat', 'staven blir ett svärd', 'ungen sjunker i leran', 'ungen dras upp', 'luftskeppet river brevet', 'blommorna blåser bubblor', 'ungen jagar bubblor', 'halvan flyger till handen',
     // beslut 71 (Teknik 34): stocken, Tant Rosa, lyktorna och elden
-    'ungen hoppar på stocken', 'ungen piper på stocken', 'stocken flyger till stranden', 'ungen hoppar i land', 'Tant Rosa når inte', 'ljuset hoppar mellan lyktorna', 'elden tänds']) expect(regi, r).toContain(r);
+    'ungen hoppar på stocken', 'ungen piper på stocken', 'stocken flyger till stranden', 'ungen hoppar i land', 'Tant Rosa når inte', 'ljuset hoppar mellan lyktorna', 'elden tänds',
+    // 79.3: Tant Rosa vid lyktorna innan han ska tända dem
+    'Tant Rosa vid lyktorna']) expect(regi, r).toContain(r);
+  // 80.3: fjädern plockas upp (leta: true) och ligger inte kvar, och vedpinnarna likaså (78.4)
+  const loggen = await ev(() => window.__ORDSTAVEN.logg());
+  for (const id of ['fjader', 'ved_1', 'ved_2', 'ved_3']) expect(loggen, id).toContain('[plockar upp] ' + id);
   const t = await ev(() => window.__ORDSTAVEN.tillstand());
   expect(t.spelare.hjalte.lager.ryggsack).toBe('ryggsack_rosa'); // Tant Rosas ryggsäck (72.11)
   expect(t.spelare.hjalte.grad).toBe('Ordsmed');

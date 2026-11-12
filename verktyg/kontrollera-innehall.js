@@ -3,6 +3,7 @@
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { kontrollera } from './innehall/kontroll.js';
 import { lasKarta } from '../src/karna/karta.js';
+import { testrumKapitel, testrumAventyr } from '../src/karna/testrum.js';
 
 const rot = new URL('../content/', import.meta.url);
 const las = (u) => JSON.parse(readFileSync(u, 'utf8'));
@@ -33,6 +34,16 @@ for (const mapp of readdirSync(rot, { withFileTypes: true }).filter((d) => d.isD
   }
   for (const f of r.fel) console.log('FEL      ' + f);
   for (const v of r.varningar) console.log('varning  ' + v);
+  fel += r.fel.length; varningar += r.varningar.length;
+}
+// testrummet för fritt skrivande (41): Innehålls uppgifter som ett kapitel, med samma kontroll som skrivpusslen
+const testrumFil = new URL('testrum-skriv.json', rot);
+if (existsSync(testrumFil)) {
+  const aventyr = las(new URL('den-gomda-dalen/aventyr.json', rot));
+  const r = kontrollera({ aventyr: testrumAventyr(aventyr), kapitel: [testrumKapitel(las(testrumFil))], ordlistor, kartor: {} });
+  console.log(`\n== testrummet: ${r.pass.length ? 'ett pass' : 'inga pass'} ==`);
+  for (const f of r.fel) console.log('FEL      testrummet: ' + f);
+  for (const v of r.varningar) console.log('varning  testrummet: ' + v);
   fel += r.fel.length; varningar += r.varningar.length;
 }
 console.log(`\nInnehållskontroll: ${fel} fel, ${varningar} varningar.`);
