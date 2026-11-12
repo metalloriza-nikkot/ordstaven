@@ -455,6 +455,11 @@ html, body {
 #tanke .bild.bubbla { font-size: inherit; }
 /* målet i molnet efter en dialog (beslut 31.2): föremålets egen pixelbild, i heltalsskala */
 #tanke .bild.malbild { image-rendering: pixelated; flex: none; display: block; }
+/* frågan ovanför lappen när de inte ryms bredvid varandra (79.2): frågan och högtalaren överst, lappen under */
+#tanke.staplad { display: grid; grid-template-columns: auto auto; justify-content: start; align-items: center; column-gap: calc(10px * var(--t)); row-gap: calc(8px * var(--t)); }
+#tanke.staplad .instruktion { grid-row: 1; grid-column: 1; }
+#tanke.staplad .moln-hogtalare { grid-row: 1; grid-column: 2; }
+#tanke.staplad .moln-bild { grid-row: 2; grid-column: 1 / span 2; }
 #tanke .tanke-lapp { pointer-events: auto; font-size: inherit; background: none; border: 0; cursor: pointer; padding: 0 4px; }
 #tanke.puls { animation: tankepuls .6s ease-in-out 3; }
 @keyframes tankepuls { 50% { scale: 1.12; } }

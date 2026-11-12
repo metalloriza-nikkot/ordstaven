@@ -279,6 +279,8 @@ redo.then(() => { startKlar = true; window.clearTimeout(startVakt); window.remov
   pausad: () => spelet.pausad,
   /** Varianten (nivån) i pusslet som pågår, t.ex. "L2". */
   variant: () => spelet.variant,
+  /** Öppna en skylt i rummet på läsplattan (79.2). @param {string} id */
+  lasSkylt: (id) => spelet.lasSkylt(id),
   stegIndex: () => spelet.stegIndex,
   /** Föremålets sort (utgang, sak, figur). @param {string} id */
   sort: (id) => rum.ruta(id)?.sort ?? null,

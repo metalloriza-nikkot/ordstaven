@@ -362,6 +362,31 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     }
     t.style.left = ''; t.style.top = ''; t.style.transform = '';
   }
+  /**
+   * Ryms molnet och all dess text (79.2)? Molnet är helt inom fönstret, och varje rad, bild och knapp i det står
+   * inom molnet. Text får aldrig kapas eller gå utanför sin ruta. @returns {boolean}
+   */
+  function tankeRyms() {
+    const t = $('#tanke');
+    if (t.hidden) return true;
+    const r = t.getBoundingClientRect(), luft = 1;
+    if (r.left < -luft || r.top < -luft || r.right > window.innerWidth + luft || r.bottom > window.innerHeight + luft) return false;
+    return [...t.querySelectorAll('.rad, .instruktion, .moln-text, .moln-bild, .moln-hogtalare, .tanke-lapp')].every((e) => {
+      const q = e.getBoundingClientRect();
+      return q.width === 0 || (q.left >= r.left - luft && q.right <= r.right + luft && q.top >= r.top - luft && q.bottom <= r.bottom + luft);
+    });
+  }
+  /**
+   * Molnet med frågan och lappen (79.2): ryms de inte bredvid varandra står frågan ovanför lappen. Säger om det ryms
+   * då; om inte öppnar spelet lappen på läsplattan. Texten krymper aldrig. @returns {boolean}
+   */
+  function passaTanke() {
+    const t = $('#tanke');
+    t.classList.remove('staplad');
+    if (tankeRyms()) return true;
+    t.classList.add('staplad');
+    return tankeRyms();
+  }
   function pulseraTanke() { const t = $('#tanke'); t.classList.remove('puls'); void t.offsetWidth; t.classList.add('puls'); }
   /**
    * @typedef {{ lage?: 'over' | 'pa' | 'vanster' | 'hoger', under?: number, rumTopp: number, rumBotten?: number, ram?: { vanster: number, hoger: number }, objekt?: string }} Plats
@@ -776,7 +801,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     styrhjalp,
     flygBar,
     handknapp,
-    ljudord, visaTanke, placeraTanke, pulseraTanke, ordskylt, skyltar, rumsskyltar, skyltHjalte, sattDorrRutor, ordnaSkyltar, skyltStor, pulseraSkylt, skyltNara, ropa,
+    ljudord, visaTanke, placeraTanke, pulseraTanke, tankeRyms, passaTanke, ordskylt, skyltar, rumsskyltar, skyltHjalte, sattDorrRutor, ordnaSkyltar, skyltStor, pulseraSkylt, skyltNara, ropa,
     ui, $, plattan, rader, esc, visaPlatta, doljPlatta, vidPapper, vantaFortsatt, visaRegi, doljRegi, visaFest,
     uppdateraHud, sattLappknapp, glimta, pulsera, ikonKnappar, visaSkarm, doljSkarm, iris, visaMeny, doljMeny, visaPausmeny, doljPausmeny, etiketter, sattNos, vaxlaNos, ljuda, arHelord,
     fanga, tandNos, markeraOrd,

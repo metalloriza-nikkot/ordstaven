@@ -994,3 +994,9 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - Vedpinnarna `ved_1`–`ved_3` står i byns karta (`verktyg/kartor/kap2.py`) på ängen och udden runt elden, och innehållet visar dem bara på kvällen (`syns_i`). Bilden i molnet (`vedpinne`) är en platshållare i gråboxen.
 - Testet för bildkorten (`ga_till` med `bild`) godtar gråboxens platshållare i ett kapitel vars rum inte har grafik än.
 
+## 97. Texten kapas aldrig (0.63.1, Teknik, beslut 79.2)
+- **Molnet mäter sig** varje gång det visas (`ui.passaTanke`): det ska stå helt i fönstret, och varje rad, bild och knapp ska stå inom molnet (`ui.tankeRyms`). Ryms frågan och lappen inte bredvid varandra står frågan överst och lappen under (klassen `staplad`, ett rutnät i två rader). Texten krymper aldrig.
+- **Ryms lappen inte ens då** i ett läsval i rummet (Bos SAKNAS-lapp i remsan på MacBooken) läser han den på läsplattan först, som Farfars brev, och molnet visar papperet. Ett tryck på papperet eller lappknappen öppnar den igen. Provet görs tyst innan pusslet börjar (`molnRyms`), och loggen skriver `ryms inte i molnet, läses på läsplattan`.
+- **Webbtestet** `tests/webb/textkapas.spec.js` öppnar varje läsval (på varje nivå pusslet har), varje lapp och varje skylt i prologen och kapitel 1–2 i spelarens två fönster, 1280 × 800 och 1280 × 762, och går fram till varje föremål med ett ord i läsvalen i rummet. Det säger fel om en rad går utanför sin ruta eller skärmen, eller om en ruta klipper sitt innehåll. En skylt vid ett föremål utanför bilden följer föremålet och prövas inte. Testet ställer in fönstret själv och körs bara på MacBook-profilen.
+- Testkroken `__ORDSTAVEN.lasSkylt(id)` öppnar en skylt i rummet på läsplattan, som när han går dit.
+

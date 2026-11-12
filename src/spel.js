@@ -401,6 +401,17 @@ export function skapaSpel(d) {
   function handlingGjord(namn) { const f = vantarPaHandling.get(namn); if (f) { vantarPaHandling.delete(namn); f(); } }
   ui.vidNos((vad, ord) => { if (vad === 'tand') handlingGjord('nosen'); else { handlingGjord('nosa:' + versaler(ord || '')); if (ord) nosSpar?.nosade?.push(versaler(ord)); } });
 
+  /** Molnets innehåll: bilden (eller lappen) och uppgiften med högtalaren. @param {string | null} bild @param {any} r */
+  function molnHtml(bild, r) {
+    return `${bild ? `<span class="moln-bild">${bild}</span>` : ''}${r ? `<span class="instruktion">${ui.rader(r.text, varden())}</span><button type="button" class="moln-hogtalare" aria-label="Läs igen">${ikon('hogtalare')}</button>` : ''}`;
+  }
+  /** Ryms det här i molnet (79.2)? Provas tyst, och molnet döljs igen. @param {string | null} bild @param {any} r */
+  function molnRyms(bild, r) {
+    ui.visaTanke(molnHtml(bild, r));
+    const ryms = ui.passaTanke();
+    ui.visaTanke(null); molnNu = '';
+    return ryms;
+  }
   /**
    * Molnet nere till vänster (stilguiden §3, T4c): uppgiften och frågan i samma moln, alltid med en bild av
    * handlingen. En uppgift som läses upp har sin text och en högtalare (ett tryck läser den igen). Frågan som han
@@ -410,12 +421,14 @@ export function skapaSpel(d) {
   let molnNu = '';
   function visaMoln(bild, r = null) {
     if (!bild && !r) { ui.visaTanke(null); molnNu = ''; return; }
-    const html = `${bild ? `<span class="moln-bild">${bild}</span>` : ''}${r ? `<span class="instruktion">${ui.rader(r.text, varden())}</span><button type="button" class="moln-hogtalare" aria-label="Läs igen">${ikon('hogtalare')}</button>` : ''}`;
+    const html = molnHtml(bild, r);
     if (html !== molnNu) { ljud.spela('pling'); if (lappen.framme && !lappVantar) lappen.fallIhop(true); }
     molnNu = html;
     ui.visaTanke(html);
     if (r) ui.$('#tanke .moln-hogtalare')?.addEventListener('click', (e) => { e.stopPropagation(); sag(r); ui.pulseraTanke(); });
     if (b) placeraMoln([]);
+    // texten får aldrig kapas (79.2): frågan ställer sig ovanför lappen om de inte ryms bredvid varandra
+    return ui.passaTanke();
   }
   /** Molnet täcker aldrig ett alternativ, en skylt eller en knapp. @param {{ left: number, top: number, right: number, bottom: number }[]} rutor */
   function placeraMoln(rutor) { const s = layout.skala; ui.placeraTanke([...rutor, ...viktigaRutor()], { vanster: s.vanster, topp: s.topp, bredd: s.cssBredd, hojd: s.cssHojd }); }
@@ -2163,7 +2176,12 @@ export function skapaSpel(d) {
     // eller minns den. Bubblan visar lappen, och ett tryck på den öppnar lappen igen.
     // Ett brev med tre meningar eller fler (Farfars brev i Tant Rosas hus) ryms inte i bubblan: han läser det på
     // läsplattan först, och sedan visar bubblan papperet, som för en lapp han redan har. Två rader ryms (dinomaten).
-    const brev = !(av.lappar || []).includes(p.id) && Array.isArray(v.s.text) && v.s.text.length >= 3;
+    let brev = !(av.lappar || []).includes(p.id) && Array.isArray(v.s.text) && v.s.text.length >= 3;
+    // ...och en lapp som inte ryms i molnet med frågan, inte ens med frågan ovanför (Bos lapp i ett smalt fönster,
+    // 79.2): texten får aldrig kapas, så han läser den på läsplattan först, som brevet
+    if (!brev && !p.skylt && !(av.lappar || []).includes(p.id) && !v.s.bild && v.s.text) {
+      if (!molnRyms(`<span class="moln-text">${lasText(p, v.s.text)}</span>`, p.instruktion ?? null)) { brev = true; logg.handelse('lappen', `${p.id}: ryms inte i molnet, läses på läsplattan`); }
+    }
     const harLapp = (av.lappar || []).includes(p.id) || brev;
     lappPussel = harLapp ? p.id : null; // lappknappen öppnar Farfars lapp medan pusslet pågår
     if (brev) { logg.handelse('lappen', `${p.id}: brevet läses först`); await visaLapp(p, true); }
@@ -4145,6 +4163,8 @@ export function skapaSpel(d) {
     get steg() { return aktuelltSteg; },
     get pausad() { return pausad; },
     get variant() { return aktuellVariant; },
+    /** Öppna en skylt i rummet på läsplattan, som när han går dit (testet för text som kapas, 79.2). @param {string} id */
+    lasSkylt(id) { const sk = skyltarIRummet().find((x) => x.id === id); if (sk) lasSkyltText(sk); return !!sk; },
     get stegIndex() { return b?.stegIndex ?? null; },
     lasmotor,
   };
