@@ -318,6 +318,16 @@
      "visible": true,
      "properties": [
       {
+       "name": "bild",
+       "type": "string",
+       "value": "overgang_bro"
+      },
+      {
+       "name": "bild_ord",
+       "type": "string",
+       "value": "k2_over"
+      },
+      {
        "name": "golv",
        "type": "bool",
        "value": true

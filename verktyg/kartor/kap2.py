@@ -39,7 +39,13 @@ FOREMALSBILDER = {
     'ved_1': {'bild': 'vedpinne', 'bild_kvall': 'vedpinne_kvall'},
     'ved_2': {'bild': 'vedpinne', 'bild_kvall': 'vedpinne_kvall'},
     'ved_3': {'bild': 'vedpinne', 'bild_kvall': 'vedpinne_kvall'},
-    'brevram': {'bild': 'brevram_tom'},
+    # brevramen: tom, med en halva och hel, efter hur många halvor som har lämnats där (bild_lagen)
+    'brevram': {'bild': 'brevram_tom', 'bild_lagen': 'brevram_tom,brevram_halva,brevram_hel'},
+    # övergången: ordet han skrev väljer bilden (overgang_bro, _stege, _rep och _flotte)
+    'overgang': {'bild': 'overgang_bro', 'bild_ord': 'k2_over'},
+    # barnet håller draken när FLYG har tagit ned den (76.4)
+    'barnet_drake': {'bild_sedan': 'barnet_drake_ner_01', 'sedan': 'k2_draken'},
+    'fisk_hopp': {'bild': 'fisk_hopp_01'},
     'brunnen': {'bild': 'brunnen'},
     'rep_vassen': {'bild': 'rep_vagrat'},
     'rep_brunnen': {'bild': 'rep_vagrat'},

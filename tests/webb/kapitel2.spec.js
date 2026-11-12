@@ -107,6 +107,8 @@ test('kapitel 2 går att spela från träsket till elden (gråbox, del 5)', asyn
   for (const id of ['fjader', 'ved_1', 'ved_2', 'ved_3']) expect(loggen, id).toContain('[plockar upp] ' + id);
   const t = await ev(() => window.__ORDSTAVEN.tillstand());
   expect(t.spelare.hjalte.lager.ryggsack).toBe('ryggsack_rosa'); // Tant Rosas ryggsäck (72.11)
+  // i Stils bild (del 3b), inte den bruna tonad
+  await expect.poll(() => ev(() => window.__ORDSTAVEN.gavobilder().sack), { timeout: 10000 }).toMatch(/^ryggsack_rosa_(ner|upp|hoger|vanster)_01$/);
   expect(t.spelare.hjalte.grad).toBe('Ordsmed');
   expect(t.spelare.hjalte.formler).toEqual(expect.arrayContaining(['FLYG']));
   expect(t.aventyr['den-gomda-dalen'].kartbitar).toContain(3);

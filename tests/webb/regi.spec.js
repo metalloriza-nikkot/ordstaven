@@ -99,7 +99,8 @@ test('kapitel 2:s mellanscener i gråboxen (Teknik 32, 69.1 och 75.4): ungen sju
   const [u, l] = await O(() => [window.__ORDSTAVEN.ungePos(), window.__ORDSTAVEN.ruta('leran')]);
   expect(u.x).toBeGreaterThanOrEqual(l.x); expect(u.x).toBeLessThanOrEqual(l.x + l.b);
   expect(u.y).toBeGreaterThanOrEqual(l.y); expect(u.y).toBeLessThanOrEqual(l.y + l.h);
-  expect(await O(() => window.__ORDSTAVEN.ungeRam())).toMatch(/^unge1_radd_ner_0[12]$/);
+  // Stils lera (del 3b): ungen sprattlar i pölen (unge1_lera_ner_01–02)
+  expect(await O(() => window.__ORDSTAVEN.ungeRam())).toMatch(/^unge1_lera_ner_0[12]$/);
   await page.screenshot({ path: 'test-results/regi-unge-i-leran.png' });
   // utan unge_till gör regin ingenting (och då visar spelet beskrivningen)
   expect(await O(() => window.__ORDSTAVEN.regi('unge_sjunker'))).toBe(0);
@@ -354,8 +355,11 @@ test('leran i träskkanten (75.5): en pöl först när ungen är uppdragen, och 
     await page.waitForTimeout(200);
   }
   await expect.poll(() => O(() => window.__ORDSTAVEN.hjalteFast()), { timeout: 5000 }).toBeGreaterThan(4);
+  // Stils bilder (del 3b): han sjunker och viftar med armarna i leran, i sina egna färger
+  expect(await O(() => window.__ORDSTAVEN.hjalteLeraBild())).toMatch(/^hjalte_(sjunker|lera)_ner_0[1-3]$/);
   await page.screenshot({ path: 'test-results/regi-leran-kanten.png' });
   await expect.poll(() => O(() => window.__ORDSTAVEN.hjalteFast()), { timeout: 10000 }).toBe(0);
+  expect(await O(() => window.__ORDSTAVEN.hjalteLeraBild())).toBe(null);
 });
 
 test('leran i träskkanten (75.5): före ungen är uppdragen är leran ingen pöl', async ({ page }) => {
@@ -389,6 +393,9 @@ test('draken på taket (76.4): frivilligt efter FLYG, draken flyger ned till bar
   await page.waitForTimeout(1500);
   await page.screenshot({ path: 'test-results/regi-draken-nere.png' });
   await expect.poll(() => O(() => window.__ORDSTAVEN.tillstand().spelare.hjalte.lager?.hjalmdekor), { timeout: 15000 }).toBe('drakvimpel');
+  // drakvimpeln i Stils bild på hjälmen (del 3b), och barnet håller draken (bild_sedan)
+  await expect.poll(() => O(() => window.__ORDSTAVEN.gavobilder().dekor), { timeout: 10000 }).toMatch(/^drakvimpel_(ner|upp|hoger|vanster)_01$/);
+  await page.screenshot({ path: 'test-results/regi-drakvimpeln.png' });
   await expect.poll(() => O(() => window.__ORDSTAVEN.rumsobjekt()), { timeout: 10000 }).not.toContain('drake_tak');
 });
 

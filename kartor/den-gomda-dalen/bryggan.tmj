@@ -175,6 +175,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "bild",
+       "type": "string",
+       "value": "fisk_hopp_01"
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"

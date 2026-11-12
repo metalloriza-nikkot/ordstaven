@@ -164,6 +164,11 @@ export function lasKarta(tmj) {
       if (egen.bild_natt) ut.bildNatt = String(egen.bild_natt);
       // bild_kvall (kapitel 2, Stil del 1) = bilden i rummets tillstånd kvall (lägerelden, vedpinnarna)
       if (egen.bild_kvall) ut.bildKvall = String(egen.bild_kvall);
+      // bild_lagen (brevramen) = en bild per läge: den första tills något har lämnats här (bara till föremålet), sedan
+      // en bild till per sak som har lämnats. bild_ord (övergången) = bilden efter ordet han skrev i pusslet:
+      // <id>_<ordet med gemener>, t.ex. overgang_stege
+      if (egen.bild_lagen) ut.bildLagen = String(egen.bild_lagen).split(',').map((t) => t.trim()).filter(Boolean);
+      if (egen.bild_ord) ut.bildOrd = String(egen.bild_ord);
       if (egen.bild_pa) ut.bildPa = String(egen.bild_pa);
       if (egen.bild_del) ut.bildDel = String(egen.bild_del);
       // skugga (kapitel 2, Stil del 1) = figuren har en skugga under sig i sin rutstorlek (skugga_16x24, skugga_24x24)

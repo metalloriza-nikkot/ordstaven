@@ -1045,3 +1045,14 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Lyktorna** (`Rum.ritaLyktor`): en bild per punkt i `lyktPunkter()`, släckt (`lykta_slackt`, `lykta_slackt_kvall`) eller tänd (`lykta_tand_kvall` med `lykta_ljus` i ljusets lager). LJUS byter bilden lykta för lykta och minns de tända (`lyktorTanda`) tills rummet byts. Utan Stils bilder ritas gråboxens ljus som förut. `lyktor_udden` är `i_bilden`.
 - **`i_bilden` på `omgivning`**: livet ritar inte saken (katten ligger på soffan i soffans bild).
 
+## 104. Figurernas lägen och regierna i Stils bilder (0.70.0, Teknik 42, Stil steg 5 del 1 och 3b)
+- **Ungen i leran:** `ritaUngen` väljer `unge1_sjunker_ner_01–03` efter djupet och sedan `unge1_lera_ner_01–02` (`ungeLeraBilder()`). Med bilderna skärs ungen inte av, flyttas inte ned och får ingen ring (pölen står i bilden). I vatten är det som förut.
+- **Hjälten i leran** (`hjalteLeraBild`): en egen bild i hjältens behållare, 24 × 24 i hans färger (`hjalteTextur`), `hjalte_sjunker_ner_01–03` efter djupet och sedan `hjalte_lera_ner_01–02`. De vanliga lagren döljs under tiden, och `ritaHjalte` väntar. När han är uppe syns lagren igen.
+- **`ungeLage`** räknar alla bilder i ett läge (hoppet och skakningen har tre). Jättehoppet (`unge1_hopp_<håll>`), nafset efter bubblan, pipet på stocken och skakningen i land använder det.
+- **Byborna:** `vinka` spelar `<namn>_vinka_<håll>_01–02` mot hjälten, `byborJublar` `<namn>_jubel_ner_01–02`, och `tantRosaNarInte` `tant_rosa_strack_upp_01–02`, med `regiRamar`. Utan bilderna är det skutten som förut.
+- **Draken** fladdrar som `drake_flyger_01–02` och barnet håller den i en slinga. Kartans `bild_sedan` (`barnet_drake_ner_01` efter `k2_draken`) gör att den står kvar när rummet ritas om. **Elden** är `lagereld_tand_kvall_01–03` i en slinga med `lagereld_ljus`.
+- **`bild_lagen`** (brevramen): en bild per läge, efter hur många `bara` till föremålet som är gjorda (`gjordaSteg` i `spel.js`), och nästa bild när en halva läggs dit. **`bild_ord`** (övergången): `<id>_<ordet med gemener>` efter `av.skrivet[pussel]`. Båda sätts av `bildlagen()` när rummet har ritats.
+- **Hägern** i `livet.js` har samma lägen som i gråboxen, men bilderna `hager_sta_<håll>_01–02` och `hager_flyger_<håll>_01–02`.
+- **Gåvorna:** en ryggsäck med egna bilder (`<säck>_<håll>_01`) används utan ton, och hjälmdekoren är `<dekor>_<håll>_01` (taggkammen och drakvimpeln). `DRAKT_GAVOR.drakt_grodgron` är Stils `#20946A`.
+- Testkrokarna `hjalteLeraBild()` och `gavobilder()`.
+

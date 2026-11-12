@@ -718,7 +718,7 @@ test('Bos grodgröna dräkt (72.11): dräktens färg byts direkt, och garderoben
   await provscen(page, { id: 't_drakt', pass: 1, rum: 'provskogen', steg: [
     { typ: 'ge_sak', sort: 'drakt', id: 'drakt_grodgron' }, { typ: 'ga_till', mal: 'sten' }, R('Klart.'),
   ] }, null, { rum: { provskogen: { innehall: ['sten'] } } });
-  const forut = 0x3a3e48, gron = 0x4f9a3a;
+  const forut = 0x3a3e48, gron = 0x20946a; // Stils grodgröna (10g, del 3b)
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.draktFarg()), { timeout: 8000 }).toBe(gron);
   expect(await page.evaluate(() => window.__ORDSTAVEN.lager().drakt)).toBe('drakt_grodgron');
   await expect.poll(() => steg(page).then((s) => s?.typ), { timeout: 5000 }).toBe('ga_till');

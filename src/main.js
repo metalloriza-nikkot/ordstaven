@@ -316,6 +316,10 @@ redo.then(() => { startKlar = true; window.clearTimeout(startVakt); window.remov
   /** Hur många figurskuggor som står i rummet (kartans `skugga`, 42.2). */
   skuggor: () => rum.figurSkuggor?.filter((s) => s.skugga.active).length ?? 0,
   /** Vasstopparna vid fötterna (82.8): syns de nu vid hjälten och ungen, och hur många gånger de har kommit fram vid hjälten. */
+  /** Hjälten i leran i Stils bilder (del 3b): bildens namn, eller null när de vanliga lagren syns. */
+  hjalteLeraBild: () => (rum.hjalteLeraImg?.visible ? rum.hjalteLeraImg.frame.name : null),
+  /** Hjältens lager i bild: ryggsäckens och hjälmdekorens bild just nu (Stils gåvor, del 3b). */
+  gavobilder: () => ({ sack: rum.sackFram?.frame?.name ?? rum.sackBak?.frame?.name ?? null, dekor: rum.kam?.frame?.name ?? null }),
   vassVidFotter: () => ({ hjalte: !!rum.vassHjalte?.visible, unge: !!rum.vassUnge?.visible, sedd: rum.vassSedd || 0 }),
   /** Rummets bild och bilden ovanför figurerna (82.7). */
   rumsbilder: () => ({ rum: rum.rumId, golv: rum.golvBild.visible ? rum.golvBild.texture.key : null, over: rum.overBild.visible ? rum.overBild.texture.key : null }),

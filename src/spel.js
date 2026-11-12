@@ -914,6 +914,32 @@ export function skapaSpel(d) {
    * en omstart), och ett pussel i det frivilliga när det frivilliga är gjort. Lianerna som har huggits (k1_lianerna)
    * står alltså inte där igen. @param {string} pid
    */
+  /**
+   * Föremål vars bild beror på hur långt berättelsen har kommit (Stils bilder, kapitel 2): brevramen visar hur många
+   * halvor som sitter i (kartans bild_lagen, en bild per gjort `bara` till föremålet), och övergången visar ordet han
+   * skrev (bild_ord). Körs när rummet har ritats och när något har lämnats.
+   */
+  function bildlagen() {
+    for (const o of rum.objekt) {
+      if (o.bildLagen?.length) {
+        const n = gjordaSteg((/** @type {any} */ st) => st.typ === 'bara' && st.till === o.id);
+        rum.sattRam(o.id, o.bildLagen[Math.min(n, o.bildLagen.length - 1)]);
+      }
+      const ord = o.bildOrd ? av.skrivet?.[o.bildOrd] : null;
+      if (ord) rum.sattRam(o.id, `${o.id}_${String(ord).toLowerCase()}`);
+    }
+  }
+  /** Hur många steg i kapitlets scener som är gjorda och passar. @param {(st: any) => boolean} passar */
+  function gjordaSteg(passar) {
+    const sc = b?.kapitel?.scener || [];
+    let n = 0;
+    sc.forEach((/** @type {any} */ s, si) => (s.steg || []).forEach((/** @type {any} */ st, ti) => {
+      if (!passar(st) || s.frivillig) return;
+      const nu = b.scenIndex === si ? Math.max(b.stegIndex, av.scen === si ? (av.steg ?? -1) : -1) : -1;
+      if (b.scenIndex > si || nu > ti) n++;
+    }));
+    return n;
+  }
   function pusselForbi(pid) {
     const sc = b?.kapitel?.scener || [];
     for (let si = 0; si < sc.length; si++) {
@@ -994,6 +1020,7 @@ export function skapaSpel(d) {
     rum.visa({ rum: scen.rum, tillstand: b.rumsTillstand(scen.rum), innehall: r ? innehallNu(r) : [], kvar: r ? kvarNu(r) : [], bytta: r ? byttaNu(r) : [], unge: tillstand.spelare.unge?.folj ?? !!tillstand.spelare.unge?.namn, nyttRum: nytt,
       karta: scen.rum ? kartor[scen.rum] ?? null : null, franRum, delar: scen.rum ? delarIRummet(kartor[scen.rum]) : {}, visade: scen.rum ? b.visade(scen.rum) : [] });
     if (nytt) rullning.rumOppnat(); // rummet laddas: glapp nu säger inget om datorn (75.6)
+    if (scen.rum) bildlagen();
     visaRumsskyltar();
     // hjälten sover i sängen när scenen börjar så (scenens hjalte: "sover"), tills han ska röra sig
     if (scen.hjalte === 'sover' && scen === b?.scen && b.stegIndex <= 0 && sovitI !== scen.id) { sovitI = scen.id; rum.sov(); }
@@ -3316,6 +3343,9 @@ export function skapaSpel(d) {
     try { await rum.vantaPa([st.till]); } finally { window.clearInterval(omplacera); malNu = null; if (instr) visaMoln(null); }
     rum.markera(st.till, false);
     rum.lagg(st.till);
+    // brevramen får nästa bild när halvan sitter i (bild_lagen): det här steget räknas som gjort
+    const malObj = rum.ruta(st.till);
+    if (malObj?.bildLagen?.length) rum.sattRam(st.till, malObj.bildLagen[Math.min(gjordaSteg((/** @type {any} */ x) => x.typ === 'bara' && x.till === st.till) + 1, malObj.bildLagen.length - 1)]);
     ljud.spela('sus'); // saken som svävade läggs på målet: ett mjukt sus (10c)
     await vanta(tid(400));
   }

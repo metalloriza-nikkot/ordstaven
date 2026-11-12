@@ -41,8 +41,19 @@ function ritaGra(s) {
 }
 
 /**
+ * Hägern i Stils bilder (del 3b): den står på ett ben och vrider huvudet ibland (hager_sta_<håll>_01–02), och flyger
+ * bort från hjälten (hager_flyger_<håll>_01–02). Gråboxens lägen (`img.ram`) blir bilder. @param {any} s @param {number} nu
+ */
+function ritaHager(s, nu) {
+  const img = s.img, ram = img.ram;
+  const hall = s.dx > 0 ? 'hoger' : 'vanster';
+  const namn = ram === 'vilar' ? `hager_sta_${hall}_0${1 + (Math.floor(nu / 2600) % 2)}` : `hager_flyger_${hall}_0${ram === 'flyger_1' ? 1 : 2}`;
+  if (img.frame?.name !== namn) img.setFrame(namn);
+}
+
+/**
  * @typedef {{ vad: string, x: number, y: number, b: number, h: number }} Omgivning
- * @typedef {{ o: Omgivning, img: any, lage: string, nasta: number, t: number, i: number, x: number, y: number, dx: number, gra?: boolean }} Sak
+ * @typedef {{ o: Omgivning, img: any, lage: string, nasta: number, t: number, i: number, x: number, y: number, dx: number, gra?: boolean, bild?: boolean }} Sak
  */
 
 export class Livet {
@@ -66,6 +77,15 @@ export class Livet {
       // gråbox (72.10): hägern, grodan och katten har inga bilder än, och fågeln och fjärilen ritas som former där
       // Stils bilder inte är laddade. Lövet och ekorren finns bara med bilder.
       const gra = GRABOX.includes(o.vad) && !(tex.exists(nyckel) && tex.get(nyckel).has(ram) && (o.vad === 'fagel' || o.vad === 'fjaril'));
+      // hägern med Stils bilder: samma lägen som i gråboxen, men bilder (fötterna på rutans nederkant)
+      if (o.vad === 'hager' && tex.exists('omgivning') && tex.get('omgivning').has('hager_sta_vanster_01')) {
+        const fy = Math.round(o.y + o.h);
+        const img = /** @type {any} */ (this.scen.add.image(x, fy, 'omgivning', 'hager_sta_vanster_01').setOrigin(0.5, 1));
+        img.ram = 'vilar';
+        this.lager.add(img);
+        this.saker.push({ o, img, lage: 'vilar', nasta: performance.now() + 1000, t: 0, i: 0, x, y: fy, dx: -1, gra: true, bild: true });
+        continue;
+      }
       if (gra) {
         const g = /** @type {any} */ (this.scen.add.graphics({ x, y }));
         g.ram = 'vilar';
@@ -106,7 +126,7 @@ export class Livet {
       else if (o.vad === 'fjaril') this.fjaril(s, nu);
       else if (o.vad === 'lov') this.lov(s, nu);
       else if (o.vad === 'ekorre') this.ekorre(s, nu);
-      if (s.gra) ritaGra(s);
+      if (s.bild) ritaHager(s, nu); else if (s.gra) ritaGra(s);
       if (las() !== fore) andrat = true;
     }
     return andrat;

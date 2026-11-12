@@ -340,6 +340,16 @@
        "value": "barnet_ner_01"
       },
       {
+       "name": "bild_sedan",
+       "type": "string",
+       "value": "barnet_drake_ner_01"
+      },
+      {
+       "name": "sedan",
+       "type": "string",
+       "value": "k2_draken"
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"
@@ -672,6 +682,11 @@
        "name": "bild",
        "type": "string",
        "value": "brevram_tom"
+      },
+      {
+       "name": "bild_lagen",
+       "type": "string",
+       "value": "brevram_tom,brevram_halva,brevram_hel"
       },
       {
        "name": "sida",
