@@ -1000,3 +1000,10 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Webbtestet** `tests/webb/textkapas.spec.js` öppnar varje läsval (på varje nivå pusslet har), varje lapp och varje skylt i prologen och kapitel 1–2 i spelarens två fönster, 1280 × 800 och 1280 × 762, och går fram till varje föremål med ett ord i läsvalen i rummet. Det säger fel om en rad går utanför sin ruta eller skärmen, eller om en ruta klipper sitt innehåll. En skylt vid ett föremål utanför bilden följer föremålet och prövas inte. Testet ställer in fönstret själv och körs bara på MacBook-profilen.
 - Testkroken `__ORDSTAVEN.lasSkylt(id)` öppnar en skylt i rummet på läsplattan, som när han går dit.
 
+## 98. Det han ska göra något med visas först, och torgets södra hus (0.64.0, Teknik, beslut 79.3 och 80)
+- **`visas_forst` kan gälla ett tillstånd** (80.2): `true` som förut, eller namnet på ett tillstånd. Elden på udden har `visas_forst: kvall`, så kameran visar den när kvällen börjar och följer hjälten igen när han ska hämta pinnarna. Det är kartans sak, inte en regi, så samma egenskap räcker för fler rum.
+- **Regin `rosa_vid_lyktorna`** (79.3): Tant Rosa går till lyktan längst från hjälten (vid torget) och lyfter på den, kameran glider längs raden av släckta lyktor till hjälten på udden, och hon går tillbaka. Ca 4 s.
+- **LJUS** tänder lyktorna från den som står närmast hjälten, längs raden till torget.
+- **Läsvalet i rummet visas innan frågan** (80.4): kameran glider till valet innan lappen eller brevet öppnas. Står han för långt bort för att han och valet ska synas på samma skärm (husen på torget, när han står vid stranden), glider kameran till valet ändå och följer honom igen när han börjar gå. Kameran väntas in i verklig tid, också i testläget.
+- **Torgets södra hus** (80.4, 10g): huset med stor rosa dörr är 72 × 40, huset med liten blå dörr står på 452, 136, och båda dörrarna sitter i fasaden mot söder (`riktning: upp`, `sida: under`). Alla fyra dörrarna syns på torgets skärm. Kartkontrollen går igenom.
+

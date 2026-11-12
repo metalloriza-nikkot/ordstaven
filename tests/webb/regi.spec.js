@@ -189,11 +189,13 @@ test('kvällen i byn (71.5, 71.6, 78.4): tre vedpinnar, LJUS tänder lyktorna, e
   await page.waitForTimeout(800);
   expect(await O(() => window.__ORDSTAVEN.rumsobjekt())).toEqual(expect.arrayContaining(['ved_3']));
   expect(await O(() => window.__ORDSTAVEN.rumsobjekt().filter((id) => id === 'ved_1' || id === 'ved_2'))).toEqual([]);
-  await sparadI(page, 'kap-02', 'k2s10_elden');
+  await sparadI(page, 'kap-02', 'k2s10_elden', 0, { visade: { byn: ['fjader', 'tant_rosa', 'brevram'] } });
   await page.waitForTimeout(800);
   const [eld, fisk] = await O(() => [window.__ORDSTAVEN.ruta('lagereld'), window.__ORDSTAVEN.ruta('fiskaren')]);
   expect(eld && fisk).toBeTruthy();
   expect(Math.hypot(fisk.x + fisk.b / 2 - (eld.x + eld.b / 2), fisk.y + fisk.h - (eld.y + eld.h / 2))).toBeLessThan(60);
+  // 79.3, 80.2: kameran visar elden på udden när kvällen börjar, innan han ombeds hämta pinnar dit
+  await expect.poll(async () => { const k = await O(() => window.__ORDSTAVEN.kamera()); return eld.x >= k.x && eld.x + eld.b <= k.x + 320 && eld.y >= k.y && eld.y + eld.h <= k.y + 192; }, { timeout: 5000 }).toBe(true);
   // de tre vedpinnarna syns på kvällen, inte där han står, och han plockar upp dem en i taget
   const start = await O(() => window.__ORDSTAVEN.position());
   for (const id of ['ved_1', 'ved_2', 'ved_3']) {
@@ -219,6 +221,8 @@ test('kvällen i byn (71.5, 71.6, 78.4): tre vedpinnar, LJUS tänder lyktorna, e
     await page.waitForTimeout(250);
   }
   await expect(page.locator('#plattan .formel-skriv')).toBeVisible();
+  // 79.3: Tant Rosa har gått till den första släckta lyktan, och kameran har glidit längs raden till honom
+  expect((await O(() => window.__ORDSTAVEN.grafik())).regi).toContain('Tant Rosa vid lyktorna');
   await page.keyboard.type('LJUS'); await page.keyboard.press('Enter');
   await expect.poll(async () => (await O(() => window.__ORDSTAVEN.grafik())).regi, { timeout: 10000 }).toContain('ljuset hoppar mellan lyktorna');
   await page.waitForTimeout(1600);
@@ -391,10 +395,18 @@ test('husen på torget (77.4): fyra dörrar, fel dörr öppnas aldrig, och vid d
   const sc = kap2.scener.find((s) => s.id === 'k2s02_byn');
   const steg = sc.steg.findIndex((s) => s.typ === 'pussel' && s.pussel_id === 'k2_husen');
   await sparadI(page, 'kap-02', 'k2s02_byn', steg, { visade: { byn: ['fjader'] } });
+  // 80.4: alla fyra dörrarna står i fasaden mot söder, och kameran visar dem innan Farfars lapp öppnas
+  const dorrar = ['dorr_rosa', 'dorr_litet_bla', 'dorr_stort_rosa', 'dorr_stort_bla'];
+  const dorrarSyns = () => O((ids) => { const c = document.querySelector('canvas').getBoundingClientRect(); return ids.filter((id) => { const r = window.__ORDSTAVEN.rutaPaSkarm(id); return r && r.x >= c.left - 1 && r.y >= c.top - 1 && r.x + r.b <= c.right + 1 && r.y + r.h <= c.bottom + 1; }); }, dorrar);
+  let vidLappen = null;
   for (let i = 0; i < 60 && !(await O(() => window.__ORDSTAVEN.variant())); i++) {
+    if (!vidLappen && (await page.locator('#plattan:not([hidden]) .lapp, #tanke:not([hidden]) .moln-text').count())) vidLappen = await dorrarSyns();
     for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
     await page.waitForTimeout(250);
   }
+  for (let i = 0; i < 20 && !vidLappen; i++) { if (await page.locator('#plattan:not([hidden]) .lapp, #tanke:not([hidden]) .moln-text').count()) vidLappen = await dorrarSyns(); else await page.waitForTimeout(150); }
+  expect(vidLappen?.sort()).toEqual([...dorrar].sort());
+  for (const d of dorrar) { const o = await O((id) => window.__ORDSTAVEN.ruta(id), d); expect(o.riktning, d).toBe('upp'); }
   expect(await O(() => window.__ORDSTAVEN.variant())).toBe('L3');
   for (let i = 0; i < 10; i++) { for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {}); await page.waitForTimeout(150); }
   const ids = await O(() => window.__ORDSTAVEN.rumsobjekt());

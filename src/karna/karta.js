@@ -195,7 +195,9 @@ export function lasKarta(tmj) {
       // är räddad), med bilderna <namn>_klattra_ned_01–02 (annars <namn>_klattra_01–02)
       if (egen.klattrar_fran) ut.klattrarFran = String(egen.klattrar_fran);
       // visas_forst (76.5, D5) = kameran visar figuren först när han kommer in i rummet, tills han ska göra något
+      // ...i alla tillstånd (true) eller bara i ett (namnet på tillståndet, elden på kvällen, 80.2)
       if (egen.visas_forst === true || egen.visas_forst === 'true') ut.visasForst = true;
+      else if (typeof egen.visas_forst === 'string' && egen.visas_forst) ut.visasForst = egen.visas_forst;
       if (egen.bild_vinka) ut.bildVinka = String(egen.bild_vinka).split(',').map((t) => t.trim()).filter(Boolean);
       if (egen.bild_anim) { ut.bildAnim = String(egen.bild_anim).split(',').map((t) => t.trim()).filter(Boolean); ut.animMs = Math.max(250, tal(egen.anim_ms, 500)); }
       if (egen.rutor) ut.rutor = true;

@@ -16,7 +16,7 @@
  },
  "meta": {
   "namn": "Träsket",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "datum": "2026-11-12",
   "agare": "Innehåll",
   "kalla": "Manus 17-kapitel2-manus.md v0.4 (beslut 60–64). Ny fil.",
@@ -30,7 +30,8 @@
   "andrat_v07": "2026-11-11 (beslut 75 och 76): vassväggen som ett fält av tussar, lerorna i träskkanten och vid bryggan som pölen i vassen, LYFT godtas och fler rimliga ord, k2_stocken som läsval, bryggans läsval med INTE (k2_halvan), skyltarna i L4 och tavlorna i L4 också när nivån är L4, Farfars rader före vassen, brevet rivs i tre steg, byn i tillståndet morgon utan rep, pratet kortat, baronens kartbit, Farfars tidslinje, mamma vid elden och draken på taket (k2_draken, frivillig). Nya fält: falt i P26, efter på zoner och frivilligt, kraver.eller_niva, flera rätta alternativ med egen vid_valj i P1, och tillståndet morgon.",
   "andrat_v071": "2026-11-12 (beslut 77.4): läsvalet k2_husen i pass 1. Fyra hus på torget (dorr_rosa, dorr_litet_bla, dorr_stort_rosa och dorr_stort_bla), Farfars mening på baksidan av hans lista, Tant Rosa ut genom rätt dörr, och tant_rosa och brevram dolda tills dess. HALLÅ!, ungen mot torget och KOM HIT! är strukna, och Herr Skata har redan brevet när luftskeppet kommer. Uppdraget TANT ROSA har steget HITTA HUSET.",
   "teknik_77": "Teknik 2026-11-12 (beslut 77.3, schema 2.43): k2_stocken har flera_ratta, och de tre rätta alternativen har sin regi som effekt (samma som formlerna hade i 0.56.0). k2_halvan har lys_ord INTE, som oppna_lasplatta hade vid bryggan (vid_ratt: ordet INTE lyser i guld). Ingen text är ändrad.",
-  "andrat_v072": "2026-11-12 (beslut 78.3 och 78.4): budgeten räknad som i 08 §4. Farfars två första repliker i k2s01 är en, Tant Rosas replik mellan grenarna är struken, halvan i vassen och vedpinnarna är märkta leta: true, och k2s10 har tre vedpinnar på udden före lyktorna (en vila i pass 3). Uppdraget ELDEN har steget SAMLA VED."
+  "andrat_v072": "2026-11-12 (beslut 78.3 och 78.4): budgeten räknad som i 08 §4. Farfars två första repliker i k2s01 är en, Tant Rosas replik mellan grenarna är struken, halvan i vassen och vedpinnarna är märkta leta: true, och k2s10 har tre vedpinnar på udden före lyktorna (en vila i pass 3). Uppdraget ELDEN har steget SAMLA VED.",
+  "andrat_v073": "2026-11-12 (beslut 79.3): det han ska göra något med visas först. I k2s10 visar kameran elden på udden innan pinnarna (visas_forst på lagereld på kvällen), och mellanscenen före LJUS har regin rosa_vid_lyktorna: Tant Rosa vid den första släckta lyktan och kameran längs raden till hjälten. Ingen text som spelaren läser är ändrad."
  },
  "var_var_vi": [
   {
@@ -1371,7 +1372,7 @@
    "steg": [
     {
      "typ": "mellanscen",
-     "beskrivning": "Kväll i byn. Byborna samlas på torget med ved i famnen, och Tant Rosa är med. Solen håller på att gå ner.",
+     "beskrivning": "Kväll i byn. Byborna samlas på torget med ved i famnen, och Tant Rosa är med. Solen håller på att gå ner. Kameran glider ned till udden, där veden ligger i en hög till elden, och stannar där medan Tant Rosa talar. Den följer hjälten igen när han ska leta (kartans visas_forst på lagereld, bara på kvällen).",
      "syns_redan": true
     },
     {
@@ -1400,7 +1401,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Nu har solen gått ner. Byborna vill gå till udden, men stigen är mörk, och lyktorna längs den är släckta."
+     "beskrivning": "Nu har solen gått ner. Uppe på torget går Tant Rosa till den första lyktan vid stigen och lyfter på den. Den är släckt. Kameran glider från henne ned längs raden av släckta lyktor till hjälten på udden. Byborna står kvar i mörkret på torget.",
+     "bild": "rosa_vid_lyktorna"
     },
     {
      "typ": "replik",
@@ -1482,7 +1484,7 @@
      "valfri": false
     }
    ],
-   "anteckning": "71.5: byn tänder elden för hjälten, som avslöjade baronens lögn och gav byn bryggan tillbaka. Tant Rosa följer med, och byborna står runt elden och jublar. 71.6: LJUS tänder lyktorna längs stigen till udden. Det är en formel han har lärt sig i prologen, och berättelsen behöver den: det är mörkt. Lägerelden (35.6): hjälten sätter sig själv, och ungen somnar mot honom. ORDSMED ges i berättelsen (09 §3). 76.4 (B7): mamma vid elden. Ungen tittar mot dalen och hör ett svagt rop, samma ljud som i slutet av kapitel 1, och svarar. Högst fem passiva steg i rad efter elden (76.3). Tant Rosas tack är struket (B3): byborna jublar för hjälten i mellanscenen. 78.4: en vila i pass 3. Före lyktorna hämtar han tre vedpinnar på udden (ved_1–ved_3, leta: true, ingen text). De syns bara i tillståndet kvall och plockas upp när han når dem, som fjädern. Hjälten står på udden, och ljuset från LJUS går längs stigen till torget, där byborna väntar."
+   "anteckning": "71.5: byn tänder elden för hjälten, som avslöjade baronens lögn och gav byn bryggan tillbaka. Tant Rosa följer med, och byborna står runt elden och jublar. 71.6: LJUS tänder lyktorna längs stigen till udden. Det är en formel han har lärt sig i prologen, och berättelsen behöver den: det är mörkt. Lägerelden (35.6): hjälten sätter sig själv, och ungen somnar mot honom. ORDSMED ges i berättelsen (09 §3). 76.4 (B7): mamma vid elden. Ungen tittar mot dalen och hör ett svagt rop, samma ljud som i slutet av kapitel 1, och svarar. Högst fem passiva steg i rad efter elden (76.3). Tant Rosas tack är struket (B3): byborna jublar för hjälten i mellanscenen. 78.4: en vila i pass 3. Före lyktorna hämtar han tre vedpinnar på udden (ved_1–ved_3, leta: true, ingen text). De syns bara i tillståndet kvall och plockas upp när han når dem, som fjädern. Hjälten står på udden, och ljuset från LJUS går längs stigen till torget, där byborna väntar. 79.3: det han ombeds göra något med har han sett först. Elden på udden visas när han kommer ut på kvällen (kartans visas_forst på lagereld, bara i tillståndet kvall), innan Tant Rosa ber honom hämta pinnar dit. Lyktorna visas innan han ska tända dem: regin rosa_vid_lyktorna låter Tant Rosa gå till den första släckta lyktan vid torget, och kameran glider från henne ned längs raden till hjälten på udden. Hjälten står på udden efter pinnarna (78.4), så kameran glider ned mot honom och inte från honom. Ingen ny scen, bara ordningen."
   }
  ],
  "pussel": [

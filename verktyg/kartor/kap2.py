@@ -92,7 +92,9 @@ RUMMEN = {
             # 77.4: torgets fyra hus, korsade två och två: i norr Tant Rosas lilla hus med rosa dörr och ett stort
             # med blå dörr, i söder ett stort med rosa dörr och ett litet med blå. Husets storlek är väggens storlek
             vagg(360, 0, 56, 40), vagg(416, 0, 80, 56), vagg(496, 0, 56, 40), vagg(580, 0, 60, 40), vagg(600, 40, 40, 60),
-            vagg(368, 136, 72, 56), vagg(452, 152, 48, 40),
+            # 80.4 (10g, Torgets södra hus): snett uppifrån syns bara husens södra sida, så alla fyra dörrar står i
+            # fasaden mot söder. Söder om de södra husen går en gång av kullersten (y 176–200), som han når runt östra sidan
+            vagg(368, 136, 72, 40), vagg(452, 136, 48, 40),
             # vattnet längs stranden i söder och öster
             vagg(0, 352, 520, 32, vatten=True), vagg(604, 124, 36, 176, vatten=True),
             figur('fiskaren', 88, 316, sida='alla'),
@@ -102,7 +104,8 @@ RUMMEN = {
             vagg(392, 200, 64, 32), sak('drake_tak', 414, 192, 20, 16, sida='under', rackvidd=56, forsvinner_efter='k2_draken'),
             sak('fjader', 140, 290, 10, 10, sida='alla'),
             sak('udden', 604, 362, 30, 14),  # uddens spets, bortom lägerelden
-            sak('lagereld', 572, 326, 20, 16, sida='alla'),
+            # 79.3, 80.2: kameran visar elden först när kvällen börjar, innan han ska hämta pinnar dit
+            sak('lagereld', 572, 326, 20, 16, sida='alla', visas_forst='kvall'),
             # 78.4: tre vedpinnar på udden och ängen runt elden, bara på kvällen (innehållets syns_i). Han plockar upp
             # dem när han når dem (leta: true), och de ligger inte där han står när kvällen börjar
             sak('ved_1', 486, 290, 10, 6, sida='alla'), sak('ved_2', 618, 326, 10, 6, sida='alla'), sak('ved_3', 528, 366, 10, 6, sida='alla'),
@@ -115,8 +118,8 @@ RUMMEN = {
             utg('dorr_rosa', 376, 24, 24, 16, riktning='upp', sida='under', till='tant_rosas_hus'),
             sak('brevram', 401, 22, 14, 12, sida='under'),
             utg('dorr_stort_bla', 444, 40, 24, 16, riktning='upp', sida='under'),
-            utg('dorr_stort_rosa', 392, 136, 24, 16, riktning='ned', sida='over'),
-            utg('dorr_litet_bla', 464, 152, 24, 16, riktning='ned', sida='over'),
+            utg('dorr_stort_rosa', 392, 160, 24, 16, riktning='upp', sida='under'),
+            utg('dorr_litet_bla', 464, 160, 24, 16, riktning='upp', sida='under'),
             figur('tant_rosa', 404, 42, sida='alla', talare='tant_rosa'),
             sak('brunnen', 488, 100, 28, 24, sida='alla'),
             utg('stig_vassen', 332, 0, 28, 40, **STIG, riktning='upp', till='vassen'),

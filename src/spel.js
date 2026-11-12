@@ -405,6 +405,18 @@ export function skapaSpel(d) {
   function molnHtml(bild, r) {
     return `${bild ? `<span class="moln-bild">${bild}</span>` : ''}${r ? `<span class="instruktion">${ui.rader(r.text, varden())}</span><button type="button" class="moln-hogtalare" aria-label="Läs igen">${ikon('hogtalare')}</button>` : ''}`;
   }
+  /** Vänta tills kameran står still (den har glidit dit den ska), som längst ms. @param {number} ms */
+  function kameranStilla(ms) {
+    return new Promise((klar) => {
+      const slut = performance.now() + ms;
+      let forra = '', lika = 0;
+      const t = window.setInterval(() => {
+        const nu = `${rum.kamera.x},${rum.kamera.y}`;
+        lika = nu === forra ? lika + 1 : 0; forra = nu;
+        if (lika >= 3 || performance.now() > slut) { window.clearInterval(t); klar(undefined); }
+      }, 50);
+    });
+  }
   /** Ryms det här i molnet (79.2)? Provas tyst, och molnet döljs igen. @param {string | null} bild @param {any} r */
   function molnRyms(bild, r) {
     ui.visaTanke(molnHtml(bild, r));
@@ -2184,6 +2196,27 @@ export function skapaSpel(d) {
     }
     const harLapp = (av.lappar || []).includes(p.id) || brev;
     lappPussel = harLapp ? p.id : null; // lappknappen öppnar Farfars lapp medan pusslet pågår
+    // kameran visar hela valet innan lappen eller brevet öppnas (alla fyra dörrarna på torget, 80.4)
+    const omrade = [...v.s.alternativ.flatMap((a) => (a.objekt ? [a.objekt, rum.ruta(a.objekt)?.lapp ?? ''] : [])), p.skylt ?? ''].filter(Boolean);
+    rum.visaOmrade(omrade);
+    await kameranStilla(1500); // kameran glider i verklig tid, också i testläget
+    // står han för långt bort för att valet och han ska synas på samma skärm (fjädern vid stranden, husen på torget)
+    // glider kameran till valet ändå, och följer honom igen när han börjar gå (80.4)
+    const valRutor = omrade.map((id) => rum.ruta(id)).filter(Boolean);
+    const k0 = rum.kamera;
+    const iBild = (/** @type {any} */ o) => o.x >= k0.x && o.y >= k0.y && o.x + o.b <= k0.x + RUM.bredd && o.y + o.h <= k0.y + RUM.hojd;
+    if (valRutor.length && !valRutor.every(iBild)) {
+      const x0 = Math.min(...valRutor.map((o) => o.x)), y0 = Math.min(...valRutor.map((o) => o.y));
+      const x1 = Math.max(...valRutor.map((o) => o.x + o.b)), y1 = Math.max(...valRutor.map((o) => o.y + o.h));
+      rum.regiFokus = { x: (x0 + x1) / 2, y: (y0 + y1) / 2 }; rum.forstFokus = true;
+      await kameranStilla(2500);
+      logg.handelse('kamera', `${p.id}: valet visas först`);
+      const fran = { ...rum.pos };
+      const slapp = window.setInterval(() => {
+        if (!rum.forstFokus) { window.clearInterval(slapp); return; }
+        if (Math.hypot(rum.pos.x - fran.x, rum.pos.y - fran.y) > 6) { window.clearInterval(slapp); rum.slappForst(); }
+      }, 100);
+    }
     if (brev) { logg.handelse('lappen', `${p.id}: brevet läses först`); await visaLapp(p, true); }
     // Står frågan på en skylt i rummet (p.skylt, Farfars skylt vid stenarna) läser han den där: bubblan visar ett
     // papper, och skylten öppnas när han går dit eller trycker på papperet. Den läses aldrig upp.
@@ -2207,7 +2240,7 @@ export function skapaSpel(d) {
     };
     rum.frys(false);
     // kameran visar hela valet: alla alternativ, deras skyltar och frågans skylt (beslut 18.1)
-    rum.visaOmrade([...v.s.alternativ.flatMap((a) => (a.objekt ? [a.objekt, rum.ruta(a.objekt)?.lapp ?? ''] : [])), p.skylt ?? ''].filter(Boolean));
+    rum.visaOmrade(omrade);
     rum.sattInteraktiva(kvarSaker());
     for (const a of v.s.alternativ) { if (a.objekt) doljEtikett.add(a.objekt); const l = a.objekt && rum.ruta(a.objekt)?.lapp; if (l) doljEtikett.add(l); }
     visaEtiketter();

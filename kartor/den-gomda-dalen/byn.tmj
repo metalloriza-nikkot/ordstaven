@@ -206,7 +206,7 @@
      "x": 368,
      "y": 136,
      "width": 72,
-     "height": 56,
+     "height": 40,
      "rotation": 0,
      "visible": true
     },
@@ -215,7 +215,7 @@
      "name": "",
      "type": "vagg",
      "x": 452,
-     "y": 152,
+     "y": 136,
      "width": 48,
      "height": 40,
      "rotation": 0,
@@ -394,6 +394,11 @@
        "name": "sida",
        "type": "string",
        "value": "alla"
+      },
+      {
+       "name": "visas_forst",
+       "type": "string",
+       "value": "kvall"
       }
      ]
     },
@@ -591,7 +596,7 @@
      "name": "dorr_stort_rosa",
      "type": "utgang",
      "x": 392,
-     "y": 136,
+     "y": 160,
      "width": 24,
      "height": 16,
      "rotation": 0,
@@ -600,12 +605,12 @@
       {
        "name": "riktning",
        "type": "string",
-       "value": "ned"
+       "value": "upp"
       },
       {
        "name": "sida",
        "type": "string",
-       "value": "over"
+       "value": "under"
       }
      ]
     },
@@ -614,7 +619,7 @@
      "name": "dorr_litet_bla",
      "type": "utgang",
      "x": 464,
-     "y": 152,
+     "y": 160,
      "width": 24,
      "height": 16,
      "rotation": 0,
@@ -623,12 +628,12 @@
       {
        "name": "riktning",
        "type": "string",
-       "value": "ned"
+       "value": "upp"
       },
       {
        "name": "sida",
        "type": "string",
-       "value": "over"
+       "value": "under"
       }
      ]
     },

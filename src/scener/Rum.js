@@ -880,6 +880,7 @@ export class Rum extends Phaser.Scene {
       stege_till_stocken: () => this.tillStocken('stege'),
       unge_hoppar_i_land: () => this.ungeHopparILand(),
       ljuset_hoppar_mellan_lyktorna: () => this.ljusetHopparMellanLyktorna(),
+      rosa_vid_lyktorna: () => this.rosaVidLyktorna(),
       en_liten_ljusprick: () => this.litenLjusprick(),
       tant_rosa_nar_inte: () => this.tantRosaNarInte(),
       elden_tands: () => this.eldenTands(),
@@ -1506,6 +1507,8 @@ export class Rum extends Phaser.Scene {
   ljusetHopparMellanLyktorna() {
     const p = this.lyktPunkter();
     if (!p.length) return 0;
+    // ljuset börjar vid lyktan närmast hjälten och går längs raden (från udden upp till torget, 78.4)
+    if (Math.hypot(p[p.length - 1].x - this.pos.x, p[p.length - 1].y - this.pos.y) < Math.hypot(p[0].x - this.pos.x, p[0].y - this.pos.y)) p.reverse();
     const boll = this.add.graphics(); this.lagerLjust.add(boll);
     let fran = { x: this.pos.x + 6, y: this.pos.y - 26 };
     const steg = 360, slut = steg * p.length + 900;
@@ -1521,6 +1524,44 @@ export class Rum extends Phaser.Scene {
     this.time.delayedCall(slut, () => { this.regiFokus = null; });
     this.regiLogg.push('ljuset hoppar mellan lyktorna');
     return slut;
+  }
+
+  /**
+   * Lyktorna visas innan han ska tända dem (79.3): Tant Rosa går till lyktan längst från hjälten (vid torget) och
+   * lyfter på den, och kameran glider från henne ned längs raden av släckta lyktor till hjälten. Sedan går hon
+   * tillbaka dit hon stod. I gråboxen bara figuren som går och en liten gungning. @returns {number}
+   */
+  rosaVidLyktorna() {
+    const p = this.lyktPunkter();
+    const { o, r } = this.foremalOchBild('tant_rosa');
+    if (!p.length || !o || !r?.active) return 0;
+    const hjalte = { x: this.pos.x, y: this.pos.y };
+    const avst = (/** @type {{ x: number, y: number }} */ q) => Math.hypot(q.x - hjalte.x, q.y - hjalte.y);
+    const rad = avst(p[0]) > avst(p[p.length - 1]) ? p : [...p].reverse(); // från torget till udden
+    const lykta = rad[0];
+    const start = { x: r.x, y: r.y, ox: o.x, oy: o.y };
+    // hon ställer sig till vänster om lyktan, med fötterna vid lyktans fot
+    const dx = Math.round(lykta.x - 10 - (o.x + o.b / 2)), dy = Math.round(lykta.y + 4 - (o.y + o.h));
+    const ga = 1200, lyft = 600, glid = 2200;
+    const t = { p: 0 };
+    this.tweens.add({ targets: t, p: 1, duration: ga, onUpdate: () => {
+      if (!r.active) return;
+      r.x = Math.round(start.x + dx * t.p); r.y = Math.round(start.y + dy * t.p);
+      this.regiFokus = { x: start.ox + o.b / 2 + dx * t.p, y: start.oy + o.h / 2 + dy * t.p };
+      this.smutsig = true;
+    } });
+    // hon lyfter på lyktan: en liten gungning
+    this.time.delayedCall(ga, () => { if (r.active) this.tweens.add({ targets: r, y: r.y - 2, duration: 150, yoyo: true, repeat: 1, onUpdate: () => { this.smutsig = true; } }); });
+    // kameran glider längs raden till hjälten, och hon går tillbaka
+    this.time.delayedCall(ga + lyft, () => {
+      const g = { p: 0 }, fran = { x: lykta.x, y: lykta.y };
+      this.tweens.add({ targets: g, p: 1, duration: glid, ease: 'Sine.easeInOut', onUpdate: () => { this.regiFokus = { x: fran.x + (hjalte.x - fran.x) * g.p, y: fran.y + (hjalte.y - fran.y) * g.p }; } });
+      const b2 = { p: 0 }, nu = { x: r.x, y: r.y };
+      this.tweens.add({ targets: b2, p: 1, duration: ga, onUpdate: () => { if (!r.active) return; r.x = Math.round(nu.x + (start.x - nu.x) * b2.p); r.y = Math.round(nu.y + (start.y - nu.y) * b2.p); this.smutsig = true; } });
+    });
+    this.time.delayedCall(ga + lyft + glid + 100, () => { this.regiFokus = null; });
+    this.regiLogg.push('Tant Rosa vid lyktorna');
+    return ga + lyft + glid + 100;
   }
 
   /** Nästan LJUS: en liten ljusprick vid stavens ände som slocknar. @returns {number} */
@@ -2155,7 +2196,8 @@ export class Rum extends Phaser.Scene {
         this.sattKamera(enSkarm(this.storlek) ? { x: 0, y: 0 } : centrera(this.pos, this.storlek));
         // kartans visas_forst (76.5, D5): kameran glider till figuren som scenen börjar med (apan i nätet), och
         // tillbaka till hjälten när han ska göra något (slappForst) eller efter högst 20 s
-        const forst = this.objekt.find((o) => o.visasForst);
+        // visas_forst kan gälla ett enda tillstånd (elden på udden bara på kvällen, 80.2)
+        const forst = this.objekt.find((o) => o.visasForst === true || (!!o.visasForst && o.visasForst === v.tillstand));
         if (forst && !enSkarm(this.storlek)) {
           this.regiFokus = { x: forst.x + forst.b / 2, y: forst.y + forst.h / 2 }; this.forstFokus = true;
           this.time.delayedCall(20000, () => this.slappForst());
