@@ -90,7 +90,19 @@ export function fargad(scen, nyckel, byten) {
   const ny = `${nyckel}:${[...byten].map(([a, b]) => `${a.toString(16)}-${b.toString(16)}`).join(',')}`;
   if (scen.textures.exists(ny)) return ny;
   const bas = scen.textures.get(nyckel);
-  const bild = /** @type {HTMLImageElement} */ (bas.getSourceImage());
+  // från dagens bild, också på kvällen: kvällen läggs på efter hud och dräkt
+  const duk = medByten(/** @type {HTMLImageElement | HTMLCanvasElement} */ (DAG.get(nyckel) ?? bas.getSourceImage()), byten);
+  const tex = /** @type {Phaser.Textures.CanvasTexture} */ (scen.textures.addCanvas(ny, duk));
+  for (const n of bas.getFrameNames()) {
+    const f = bas.get(n);
+    tex.add(n, 0, f.cutX, f.cutY, f.cutWidth, f.cutHeight);
+  }
+  if (kvallNu && kvallBerors(ny)) vaxla(scen, ny, kvallNu);
+  return ny;
+}
+
+/** En kopia av bilden med färgerna bytta. @param {HTMLImageElement | HTMLCanvasElement} bild @param {Map<number, number>} byten */
+function medByten(bild, byten) {
   const duk = document.createElement('canvas');
   duk.width = bild.width; duk.height = bild.height;
   const c = /** @type {CanvasRenderingContext2D} */ (duk.getContext('2d', { willReadFrequently: true }));
@@ -103,12 +115,46 @@ export function fargad(scen, nyckel, byten) {
     p[i] = (till >> 16) & 255; p[i + 1] = (till >> 8) & 255; p[i + 2] = till & 255;
   }
   c.putImageData(d, 0, 0);
-  const tex = /** @type {Phaser.Textures.CanvasTexture} */ (scen.textures.addCanvas(ny, duk));
-  for (const n of bas.getFrameNames()) {
-    const f = bas.get(n);
-    tex.add(n, 0, f.cutX, f.cutY, f.cutWidth, f.cutHeight);
-  }
-  return ny;
+  return duk;
+}
+
+/**
+ * Kvällen på figurerna (Stil, beslut 84.2): hjälten (i spelarens färger), staven, ungen och byborna ritas med
+ * kvällstabellen. Bilderna byggs en gång per atlas, första gången ett rum har tillståndet kvall, och atlasens källa
+ * byts sedan mellan dagens och kvällens bild när rummet laddas. Alla bilder ur atlasen följer med utan att någon
+ * figur behöver veta om det.
+ */
+export const KVALL_FIGURER = ['hjalte', 'stav', 'unge', 'tant_rosa', 'fiskaren', 'tvatterskan', 'barnet', 'bo'];
+const kvallBerors = (/** @type {string} */ k) => KVALL_FIGURER.some((f) => k === f || k.startsWith(`${f}:`));
+/** atlas → dagens källa, och atlas → kvällens bild */
+const DAG = /** @type {Map<string, HTMLImageElement | HTMLCanvasElement>} */ (new Map());
+const KVALL = /** @type {Map<string, HTMLCanvasElement>} */ (new Map());
+let kvallNu = /** @type {Map<number, number> | null} */ (null);
+
+/** @param {Phaser.Scene} scen @param {string} k @param {Map<number, number> | null} byten */
+function vaxla(scen, k, byten) {
+  const src = scen.textures.get(k).source[0];
+  if (!src) return;
+  if (!DAG.has(k)) { if (!byten) return; DAG.set(k, /** @type {any} */ (src.image)); }
+  const dag = /** @type {HTMLImageElement | HTMLCanvasElement} */ (DAG.get(k));
+  let mal = dag;
+  if (byten) { mal = KVALL.get(k) ?? medByten(dag, byten); KVALL.set(k, /** @type {HTMLCanvasElement} */ (mal)); }
+  if (src.image !== mal) src.updateSource(mal);
+}
+
+/**
+ * Kväll eller dag på figurerna. Billigt när inget ändras. @param {Phaser.Scene} scen
+ * @param {Map<number, number> | null} byten kvällstabellen, eller null för dag
+ */
+export function sattKvall(scen, byten) {
+  if (kvallNu === byten) return;
+  kvallNu = byten;
+  for (const k of scen.textures.getTextureKeys()) if (kvallBerors(k)) vaxla(scen, k, byten);
+}
+
+/** Atlasen som just nu har kvällens bild (för testerna). @param {Phaser.Scene} scen @returns {string[]} */
+export function kvallsAtlas(scen) {
+  return scen.textures.getTextureKeys().filter((k) => KVALL.has(k) && scen.textures.get(k).source[0]?.image === KVALL.get(k));
 }
 
 /** Åt vilket håll en figur som är vänd så här tittar i bilderna. @param {{ x: number, y: number }} v */

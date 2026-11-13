@@ -10,8 +10,12 @@ import { skapaHinder } from '../karna/vag.js';
 import { rumsHinder } from '../karna/rumshinder.js';
 import { skapaNivaer } from '../karna/nivaer.js';
 import { KAMERA, centrera, folj, visaRuta, omradeFor, narmare, enSkarm } from '../karna/kamera.js';
-import { hjaltensByten } from '../karna/fargbyte.js';
-import { laddaGrafik, fargad, riktningFor, foremalsbild, rutnamn, rutanimation, faltFor } from './figurbilder.js';
+import { hjaltensByten, kvallTabell } from '../karna/fargbyte.js';
+import kvallJson from '../../assets/sprites/kvall.json';
+import { laddaGrafik, fargad, riktningFor, foremalsbild, rutnamn, rutanimation, faltFor, sattKvall, kvallsAtlas } from './figurbilder.js';
+
+/** Kvällen på figurerna (Stil, 84.2): palettfärg → kvällsfärg. */
+const KVALL_TABELL = kvallTabell(kvallJson);
 import { foremaletsBild } from '../karna/egenskaper.js';
 import { Livet } from './livet.js';
 
@@ -485,6 +489,9 @@ export class Rum extends Phaser.Scene {
     this.textures.addCanvas(ut, duk);
     return ut;
   }
+
+  /** Figurernas atlas som just nu har kvällens bild (testerna, 84.2). @returns {string[]} */
+  kvallFigurer() { return kvallsAtlas(this); }
 
   /**
    * En hjälte i andra färger som bild (startskärmens spelarkort, F1), utan att rummets hjälte ändras.
@@ -2368,6 +2375,8 @@ export class Rum extends Phaser.Scene {
     this.visaUnge = v.unge;
     if (v.nyttRum) { for (const id of [...this.ramSlinga.keys(), ...this.ramTimrar.keys()]) this.stoppaRamar(id); this.ramFor.clear(); this.dolda.clear(); this.ungeMal = null; this.ungeTittarPa = null; this.ungeKlattrar = null; this.stegeNu = null; this.ungeSang = null; this.ungeLyft = 0; this.ungeFast = null; this.hjalteFast = null; this.lerig = 0; this.undvik = []; this.hinderUndvik = null; this.regiFokus = null; this.forstFokus = false; if (this.ungeSvavar) { this.ungeSvavar.g.destroy(); this.ungeSvavar = null; } for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas?.remove(); this.sover = null; } this.vaknar = null; this.rensaRegi(); }
     this.tillstand = v.tillstand;
+    // figurerna på kvällen (84.2): bilderna byggs första gången, sedan byts bara atlasens källa
+    sattKvall(this, this.harRum && v.tillstand === 'kvall' ? KVALL_TABELL : null);
     if (v.nyttRum || !this.harRum) this.regiPunkter = (this.harRum && v.karta?.regi) || {};
     if (v.nyttRum || !this.harRum) this.inomhus = !!v.karta?.inomhus;
     this.lampor = v.karta?.lampor || [];

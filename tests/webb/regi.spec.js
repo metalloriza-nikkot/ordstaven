@@ -195,6 +195,10 @@ test('kvällen i byn (71.5, 71.6, 78.4): tre vedpinnar, LJUS tänder lyktorna, e
   await sparadI(page, 'kap-02', 'k2s10_elden', 0, { visade: { byn: ['fjader', 'tant_rosa', 'brevram'] } });
   await page.waitForTimeout(800);
   const [eld, fisk] = await O(() => [window.__ORDSTAVEN.ruta('lagereld'), window.__ORDSTAVEN.ruta('fiskaren')]);
+  // 84.2: figurerna i kvällens färger, med Stils tabell (hjälten i spelarens färger, ungen och byborna)
+  const kvall = await O(() => window.__ORDSTAVEN.kvallFigurer());
+  expect(kvall).toEqual(expect.arrayContaining(['unge', 'fiskaren', 'tant_rosa']));
+  expect(kvall.some((k) => /^hjalte(:|$)/.test(k))).toBe(true);
   expect(eld && fisk).toBeTruthy();
   expect(Math.hypot(fisk.x + fisk.b / 2 - (eld.x + eld.b / 2), fisk.y + fisk.h - (eld.y + eld.h / 2))).toBeLessThan(60);
   // 79.3, 80.2: kameran visar elden på udden när kvällen börjar, innan han ombeds hämta pinnar dit
@@ -408,6 +412,8 @@ test('husen på torget (77.4): fyra dörrar, fel dörr öppnas aldrig, och vid d
   const sc = kap2.scener.find((s) => s.id === 'k2s02_byn');
   const steg = sc.steg.findIndex((s) => s.typ === 'pussel' && s.pussel_id === 'k2_husen');
   await sparadI(page, 'kap-02', 'k2s02_byn', steg, { visade: { byn: ['fjader'] } });
+  // på dagen har figurerna dagens färger (84.2)
+  expect(await O(() => window.__ORDSTAVEN.kvallFigurer())).toEqual([]);
   // 80.4: alla fyra dörrarna står i fasaden mot söder, och kameran visar dem innan Farfars lapp öppnas
   const dorrar = ['dorr_rosa', 'dorr_litet_bla', 'dorr_stort_rosa', 'dorr_stort_bla'];
   const dorrarSyns = () => O((ids) => { const c = document.querySelector('canvas').getBoundingClientRect(); return ids.filter((id) => { const r = window.__ORDSTAVEN.rutaPaSkarm(id); return r && r.x >= c.left - 1 && r.y >= c.top - 1 && r.x + r.b <= c.right + 1 && r.y + r.h <= c.bottom + 1; }); }, dorrar);

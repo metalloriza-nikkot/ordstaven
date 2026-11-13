@@ -49,3 +49,17 @@ export function hjaltensByten(hud, drakt) {
   if (drakt !== undefined && drakt !== DRAKT_A.mitt) for (const t of DRAKT_A.toner) m.set(t, t === DRAKT_A.mitt ? drakt : flyttaTon(t, DRAKT_A.mitt, drakt));
   return m;
 }
+
+/**
+ * Kvällen på figurerna (Stil, beslut 84.2): varje palettfärg → sin kvällsfärg, ur `assets/sprites/kvall.json`.
+ * Färger som är sig själva tas inte med. Läggs på efter hjältens hud och dräkt.
+ * @param {{ tabell: Record<string, string> }} json @returns {Map<number, number>}
+ */
+export function kvallTabell(json) {
+  const m = new Map();
+  for (const [fran, till] of Object.entries(json?.tabell || {})) {
+    const a = parseInt(fran.slice(1), 16), b = parseInt(till.slice(1), 16);
+    if (/^#[0-9a-f]{6}$/i.test(fran) && /^#[0-9a-f]{6}$/i.test(till) && a !== b) m.set(a, b);
+  }
+  return m;
+}
