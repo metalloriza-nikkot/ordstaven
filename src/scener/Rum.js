@@ -11,7 +11,7 @@ import { rumsHinder } from '../karna/rumshinder.js';
 import { skapaNivaer } from '../karna/nivaer.js';
 import { KAMERA, centrera, folj, visaRuta, omradeFor, narmare, enSkarm } from '../karna/kamera.js';
 import { hjaltensByten, kvallTabell } from '../karna/fargbyte.js';
-import kvallJson from '../../assets/sprites/kvall.json';
+import kvallJson from '../../assets/kvall.json';
 import { laddaGrafik, fargad, riktningFor, foremalsbild, rutnamn, rutanimation, faltFor, sattKvall, kvallsAtlas } from './figurbilder.js';
 
 /** Kvällen på figurerna (Stil, 84.2): palettfärg → kvällsfärg. */
@@ -1233,8 +1233,11 @@ export class Rum extends Phaser.Scene {
     const l = /** @type {any} */ (this.luft), img = l.img;
     const under = () => ({ x: Math.round(img.x + img.width / 2), y: Math.round(img.y + img.height + 1) });
     const papper = 0xf4ecd8, kant = 0x8a7a5a;
-    const brev = this.add.rectangle(under().x, under().y, 10, 7, papper).setStrokeStyle(1, kant).setOrigin(0.5, 0);
+    // Stils bilder (del 3, 13/11): dragkampen mellan baronen och Herr Skata, och RITS. Utan dem: gråboxens brev
+    const stils = ['luftskepp_river_brevet_01', 'luftskepp_brevet_rivet'].every((r) => this.textures.get('baronen').has(r));
+    const brev = this.add.rectangle(under().x, under().y, 10, 7, papper).setStrokeStyle(1, kant).setOrigin(0.5, 0).setVisible(!stils);
     this.lagerLuft.add(brev);
+    if (stils) l.tider.push(this.time.delayedCall(1900, () => { if (this.luft !== l) return; l.glider = false; this.luftskepp('river_brevet'); }));
     const folj = this.time.addEvent({ delay: 40, loop: true, callback: () => { if (!brev.active) return; const u = under(); brev.setPosition(u.x + (l.rycker ? (Math.floor(this.time.now / 90) % 2 ? 1 : -1) : 0), u.y); this.smutsig = true; } });
     l.tider.push(folj);
     const mitt = (/** @type {string} */ id, /** @type {{ x: number, y: number }} */ annars) => { const o = this.ruta(id); return o ? { x: o.x + o.b / 2, y: o.y + o.h / 2 } : annars; };
@@ -1253,8 +1256,24 @@ export class Rum extends Phaser.Scene {
         const t = { p: 0 };
         this.tweens.add({ targets: t, p: 1, duration: ms, ease: 'Sine.easeIn', onUpdate: () => { if (!h.active) return; h.setPosition(Math.round(p.x + dx + (till.x - p.x) * t.p + Math.sin(t.p * 14) * 3), Math.round(p.y + (till.y - p.y) * t.p)); h.setAngle(Math.sin(t.p * 18) * 25); this.smutsig = true; }, onComplete: () => h.destroy() });
       };
-      flyg(-3, mitt('stig_vassen', { x: p.x, y: p.y - 200 }), 1700);
-      flyg(3, mitt('brygga_fran_torget', { x: p.x + 220, y: p.y }), 1500);
+      if (stils) {
+        // RITS: baronen håller upp sin halva, och den andra fladdrar från Herr Skatas plats ned mot vassen
+        this.luftskepp('brevet_rivet');
+        const fb = foremalsbild(this, 'brev_halva_faller_01');
+        const fran = { x: img.x + 88, y: img.y + 44 }, mot = mitt('stig_vassen', { x: fran.x, y: fran.y - 200 });
+        const h = fb ? this.add.image(fran.x, fran.y, fb.nyckel, 'brev_halva_faller_01').setOrigin(0.5, 0.5) : null;
+        if (h) {
+          this.lagerLuft.add(h);
+          const byt = this.time.addEvent({ delay: 250, loop: true, callback: () => { if (h.active) { h.setFrame(h.frame.name.endsWith('_01') ? 'brev_halva_faller_02' : 'brev_halva_faller_01'); this.smutsig = true; } } });
+          const d = Math.hypot(mot.x - fran.x, mot.y - fran.y) || 1, langd = Math.min(d, 220);
+          const till = { x: fran.x + ((mot.x - fran.x) / d) * langd, y: fran.y + ((mot.y - fran.y) / d) * langd };
+          const t = { p: 0 };
+          this.tweens.add({ targets: t, p: 1, duration: 1900, ease: 'Sine.easeIn', onUpdate: () => { if (!h.active) return; h.setPosition(Math.round(fran.x + (till.x - fran.x) * t.p + Math.sin(t.p * 12) * 4), Math.round(fran.y + (till.y - fran.y) * t.p)); this.smutsig = true; }, onComplete: () => { byt.remove(); h.destroy(); } });
+        } else flyg(-3, mot, 1700);
+      } else {
+        flyg(-3, mitt('stig_vassen', { x: p.x, y: p.y - 200 }), 1700);
+        flyg(3, mitt('brygga_fran_torget', { x: p.x + 220, y: p.y }), 1500);
+      }
       // Herr Skatas fjäder dalar ned vid hjältens fötter
       const fo = this.ruta('fjader') ?? { b: 10, h: 10 };
       const flytt = { x: landning.x - Math.round(fo.b / 2), y: landning.y - Math.round(fo.h / 2) };
@@ -1269,7 +1288,7 @@ export class Rum extends Phaser.Scene {
       // luftskeppet sjunker mot bryggan och ut ur bild
       const bryggan = mitt('brygga_fran_torget', { x: img.x + 300, y: img.y + 60 });
       const fran = { x: img.x + img.width / 2, y: img.y + img.height / 2 }, dd = Math.hypot(bryggan.x - fran.x, bryggan.y - fran.y) || 1;
-      if (this.textures.get('baronen').has('luftskepp_flyger_fel_01')) this.luftskepp('flyger_fel');
+      if (!stils && this.textures.get('baronen').has('luftskepp_flyger_fel_01')) this.luftskepp('flyger_fel');
       l.glider = true;
       this.tweens.add({ targets: img, x: img.x + ((bryggan.x - fran.x) / dd) * 380, y: img.y + Math.max(20, ((bryggan.y - fran.y) / dd) * 380), duration: 1900, ease: 'Sine.easeIn', onUpdate: () => { img.x = Math.round(img.x); img.y = Math.round(img.y); this.smutsig = true; } });
     });
@@ -1986,6 +2005,7 @@ export class Rum extends Phaser.Scene {
       return true;
     }
     if (lage === 'flyger_fel') { vaxla(['flyger_fel_01', 'flyger_fel_02'], 140); return true; }
+    if (lage === 'river_brevet' && this.textures.get('baronen').has('luftskepp_river_brevet_02')) { vaxla(['river_brevet_01', 'river_brevet_02'], 200); return true; }
     if (this.textures.get('baronen').has(`luftskepp_${lage}`)) { ram(lage); return true; }
     return false;
   }

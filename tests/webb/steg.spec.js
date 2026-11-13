@@ -2694,3 +2694,20 @@ test('ekorren på kortet (Teknik 31, R67–R70): en felreaktion med bild visar e
   await expect(page.locator('.kort-figur')).toHaveCount(0, { timeout: 5000 });
   expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('[reaktion] ekorre_skakar på kortet');
 });
+
+test('närbilden av brevramen (Stil del 3): bilden på läsplattan efter hur många halvor som sitter i, och ingen text', async ({ page }) => {
+  await provscen(page, { id: 't_narbild', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [R('Titta.'), { typ: 'mellanscen', bild: 'brevram_nara', beskrivning: 'Närbild: ramen.' }, R('Klart.')] });
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('TITTA.', { timeout: 8000 });
+  // spelets klocka står still medan testet tittar (hjalp/klocka.js)
+  await page.clock.pauseAt((await page.evaluate(() => Date.now())) + 10);
+  await page.locator('#plattan .replik-ruta').click();
+  await page.clock.runFor(5); // i snabbläget står närbilden bara 30 ms
+  const kort = page.locator('#plattan:not([hidden]) [data-narbild="brevram_nara_tom"] img');
+  await expect(kort).toBeVisible({ timeout: 5000 });
+  expect(await kort.evaluate((i) => i.complete && i.naturalWidth)).toBe(110);
+  expect(await page.locator('#regi').isVisible().catch(() => false)).toBe(false); // ingen beskrivning för den vuxne
+  await page.screenshot({ path: 'test-results/narbild-brevram.png' });
+  await page.clock.resume();
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('[närbild] brevram_nara_tom');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('KLART.', { timeout: 8000 });
+});

@@ -186,7 +186,7 @@ def tant_rosas_hus():
     for x in range(34, 110):                                              # fiskenätet uppe i hörnet
         for y in range(6, 22 - (x - 34) // 6):
             if (x + y) % 5 == 0 or (x - y) % 5 == 0: d.satt(x, y, '#C8C0A0')
-    d.rekt(258, 40, 26, 30, '#3A3A44'); d.rekt(258, 40, 26, 3, '#5A5A66'); d.ellips(271, 60, 5, 4, '#F08A2A', '#7A3010')   # spisen
+    d.rekt(258, 40, 26, 30, '#3A3A44'); d.rekt(258, 40, 26, 3, '#5A5A66'); d.ellips(271, 60, 5, 4, '#C23A2E', '#6A2420'); d.ellips(271, 60.5, 2.2, 1.6, '#E8D07A')   # spisen: glöd i rött med en blekgul kärna, inte orange (orange är baronens)
     for y in range(4, 40): d.satt(266, y, '#3A3A44'); d.satt(267, y, '#5A5A66')
     d.bild(INK + '/foremal/hus/fatolj_hoger.png', 230, 84)                  # gungstolen
     kras_ihop(d)

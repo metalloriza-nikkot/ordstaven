@@ -107,3 +107,29 @@ export function reaktionerSomVisas(kapitel) {
   for (const r of kapitel?.rum || []) for (const f of r.frivilligt || []) steg(f.steg, `rum ${r.id} frivilligt ${f.foremal}`);
   return ut;
 }
+
+/**
+ * Närbilder på läsplattan (Stil del 3, 13/11): mellanscenens `bild` → föremålet vars läge avgör bilden, och bildkorten
+ * per läge. Läget är hur många `bara` till föremålet som är gjorda (bryggans halva kommer alltid först, navet i
+ * kapitel 2). `blot`: lägena där den sista halvan är blöt först och torkar efter en stund, när den sattes i i samma
+ * scen (halvan från vassen).
+ * @type {Record<string, { foremal: string, lagen: string[], blot: string[] }>}
+ */
+export const NARBILDER = Object.freeze({
+  brevram_nara: { foremal: 'brevram', lagen: ['brevram_nara_tom', 'brevram_nara_vanster', 'brevram_nara_hel'], blot: ['brevram_nara_hel'] },
+});
+
+/** Hur länge närbilden står (ms), och hur länge en blöt halva är blöt innan den torkar. */
+export const NARBILD_MS = 2600, BLOT_MS = 1000;
+
+/**
+ * Vilken närbild som visas. @param {string} bild mellanscenens bild @param {number} gjorda antal `bara` till föremålet
+ * @param {boolean} iScenen den sista sattes i i den här scenen @returns {{ bilder: string[] } | null} en eller två bilder i följd
+ */
+export function narbildFor(bild, gjorda, iScenen) {
+  const n = NARBILDER[bild];
+  if (!n) return null;
+  const id = n.lagen[Math.max(0, Math.min(gjorda, n.lagen.length - 1))];
+  return { bilder: iScenen && n.blot.includes(id) ? [`${id}_blot`, id] : [id] };
+}
+

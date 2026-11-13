@@ -121,6 +121,14 @@ test('kapitel 2:s mellanscener i gråboxen (Teknik 32, 69.1 och 75.4): ungen sju
   const hjalten = await O(() => window.__ORDSTAVEN.position());
   const kartan = JSON.parse(readFileSync(new URL('../../kartor/den-gomda-dalen/byn.tmj', import.meta.url), 'utf8')).layers.flatMap((l) => l.objects || []).find((o) => o.name === 'fjader');
   expect(await O(() => window.__ORDSTAVEN.regi('luftskepp_river_brevet'))).toBeGreaterThan(4000);
+  // Stils bilder (13/11): dragkampen, och sedan RITS med baronens halva
+  // spelets klocka (hjalp/klocka.js): 2,1 s in i regin pågår dragkampen, och vid 2,7 s rivs brevet
+  await page.waitForTimeout(2100);
+  expect(await O(() => window.__ORDSTAVEN.grafik().luftskepp)).toMatch(/^luftskepp_river_brevet_0[12]$/);
+  await page.screenshot({ path: 'test-results/regi-dragkampen.png' });
+  await expect.poll(() => O(() => window.__ORDSTAVEN.grafik().luftskepp), { timeout: 10000 }).toBe('luftskepp_brevet_rivet');
+  await page.waitForTimeout(500);
+  await page.screenshot({ path: 'test-results/regi-rits.png' });
   // fjädern dalar ned nära hjälten där han står, inte där den står i kartan (75.4). Spelets klocka går
   // långsammare än väggklockan i canvas-läget (Safari, iPad), så testet väntar in den.
   await expect.poll(() => O(() => window.__ORDSTAVEN.flyttad('fjader')), { timeout: 15000 }).not.toBeNull();
@@ -129,7 +137,7 @@ test('kapitel 2:s mellanscener i gråboxen (Teknik 32, 69.1 och 75.4): ungen sju
   expect(Math.hypot(kartan.x - fj.x, kartan.y - fj.y)).toBeGreaterThan(20);
   expect((await O(() => window.__ORDSTAVEN.grafik())).regi).toContain('luftskeppet river brevet');
   await page.screenshot({ path: 'test-results/regi-luftskeppet-river-brevet.png' });
-  expect(await O(() => window.__ORDSTAVEN.grafik().luftskepp)).toMatch(/^luftskepp_/);
+  expect(await O(() => window.__ORDSTAVEN.grafik().luftskepp)).toBe('luftskepp_brevet_rivet');
 });
 
 test('vassen i gråboxen (Teknik 32 och 34, 71.3): bubblorna, halvan till handen, ungen på stocken, FLYG tar stocken i land', async ({ page }) => {

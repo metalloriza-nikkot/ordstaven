@@ -51,7 +51,7 @@ export function hjaltensByten(hud, drakt) {
 }
 
 /**
- * Kvällen på figurerna (Stil, beslut 84.2): varje palettfärg → sin kvällsfärg, ur `assets/sprites/kvall.json`.
+ * Kvällen på figurerna (Stil, beslut 84.2): varje palettfärg → sin kvällsfärg, ur `assets/kvall.json`.
  * Färger som är sig själva tas inte med. Läggs på efter hjältens hud och dräkt.
  * @param {{ tabell: Record<string, string> }} json @returns {Map<number, number>}
  */

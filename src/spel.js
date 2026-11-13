@@ -13,7 +13,7 @@ import { aventyrFor, spelareAttVisa } from './karna/sparning.js';
 import { varVarVi, senastSpelad } from './karna/varvarvi.js';
 import { musikFor } from './karna/musik.js';
 import { ljudLista } from './karna/ljudid.js';
-import { SYNS_REDAN_MS, UNGE_TILL_MS, visarRegi, lockarVisarBeskrivning } from './karna/mellanscen.js';
+import { SYNS_REDAN_MS, UNGE_TILL_MS, visarRegi, lockarVisarBeskrivning, NARBILDER, narbildFor, NARBILD_MS, BLOT_MS } from './karna/mellanscen.js';
 import { bubblaFor, BUBBLA_MS } from './karna/bubblor.js';
 import { sparaPassbild, aterstallLarande, forstaIPasset } from './karna/larandebild.js';
 import { pekningOmMs, skapaHjalpSpar, knufftidMs } from './karna/hjalp.js';
@@ -1302,6 +1302,21 @@ export function skapaSpel(d) {
         if (st.bild === 'kartbit_unge') {
           const el = /** @type {HTMLElement | null} */ (ui.$('#narbild .karta-bitar'));
           if (el && !ui.$('#narbild').hidden && laggUngenPaKartan(el)) { logg.handelse('narbild', 'ungen på kartbiten'); await vanta(tid(2600)); return; }
+        }
+        // närbilden på läsplattan (brevramen, Stil del 3): bilden efter hur många halvor som sitter i. Bara bilden,
+        // ingen text: texten på halvan står på läsplattan när han läser den
+        if (st.bild && NARBILDER[st.bild]) {
+          const f = NARBILDER[st.bild].foremal, arBara = (/** @type {any} */ x) => x.typ === 'bara' && x.till === f;
+          const iScenen = (b.scen.steg || []).slice(0, b.stegIndex).some(arBara);
+          const nb = narbildFor(st.bild, gjordaSteg(arBara), iScenen);
+          if (nb) {
+            for (const [i, id] of nb.bilder.entries()) {
+              logg.handelse('närbild', id);
+              ui.visaPlatta(`<div class="bok-bild narbild-kort" data-narbild="${id}">${bilder.html(id)}</div>`, 'pussel narbild-platta');
+              await vanta(tid(i < nb.bilder.length - 1 ? BLOT_MS : NARBILD_MS));
+            }
+            ui.doljPlatta(); return;
+          }
         }
         // ungen springer till ett föremål och väntar där (67.2): den nosar mot det tills nästa mål är nått
         const ungen = st.unge_till ? rum.ungePekar(st.unge_till) : false;

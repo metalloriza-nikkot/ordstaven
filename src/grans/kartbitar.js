@@ -2,7 +2,7 @@
 // Farfars karta (Stil 21:20): ett gammalt papper rivet i sex bitar (beslut 83) som passar ihop. Varje bit är en egen bild i
 // assets/karta/, och karta.json säger var biten ligger i hela kartan (224 × 144). Bitarna läggs ihop där de hör
 // hemma, i heltalsskala (fysiska pixlar), så att pixlarna aldrig blir suddiga. En bit som Stil inte har ritat än
-// visas inte (bit 3–6 är skisser).
+// visas inte (bit 4–6 är skisser).
 
 import KARTA from '../../assets/karta/karta.json';
 
@@ -18,7 +18,7 @@ for (const [namn, url] of Object.entries(BILDER)) {
   img.src = url;
 }
 /** Kända storlekar (om bilden inte har laddats när kartan visas första gången). */
-const KANDA = /** @type {Record<string, { b: number, h: number }>} */ ({ kartbit_1: { b: 87, h: 60 }, kartbit_2: { b: 111, h: 49 } });
+const KANDA = /** @type {Record<string, { b: number, h: number }>} */ ({ kartbit_1: { b: 87, h: 60 }, kartbit_2: { b: 111, h: 49 }, kartbit_3: { b: 75, h: 58 } });
 
 /** Finns bilden av biten? @param {number} n */
 export const harKartbit = (n) => !!BILDER[`kartbit_${n}`];

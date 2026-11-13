@@ -1,8 +1,11 @@
-# Farfars karta (beslut 31.6, Stil 2026-11-03): ett gammalt papper rivet i sju bitar som passar ihop.
-# Vägen går runt dalen: bit 2 (skogen) -> 3 -> 4 -> 5 -> 6 -> 7 (kompassrosen, hos baronen) -> 1 (dalen i mitten).
-# Bit 1: berg, en dal full av moln och mammas stora skugga, som liknar ungen (13, s14).
-# Bit 2: Farfars hus, skogen, stenen, bron och träsket (15, k1s11, granskningen A 1).
-# Bit 3–7 är skisser som ändras när kapitlen skrivs.
+# Farfars karta (beslut 31.6, Stil 2026-11-03; sex bitar efter beslut 83.3, Stil 2026-11-12):
+# ett gammalt papper rivet i sex bitar som passar ihop, en bit per kapitel.
+# Vägen går runt dalen: bit 2 (skogen) -> 3 (träsket) -> 4 (floden) -> 5 (berget) -> 6 (molnkanten, baronens bit) -> 1 (dalen i mitten).
+# Bit 1: berg, en dal full av moln och mammas stora skugga, som liknar ungen (13, s14). Fryst.
+# Bit 2: Farfars hus, skogen, stenen, bron och träsket (15, k1s11, granskningen A 1). Fryst.
+# Bit 3: vassbyn, vassen och vägen fram till en bred flod (17, k2s09). Färdig.
+# Bit 4–6 är skisser som ändras när kapitlen skrivs.
+# Bit 1 och 2 ritas exakt som förut: de ritas med den gamla teckningen (sju bitar) och klistras in pixel för pixel.
 # Allt ritas ur masterpaletten (palett/palett.json): färgerna väljs med pf(), som tar palettens närmaste.
 import os, sys, math, random
 from PIL import Image
@@ -38,8 +41,8 @@ def t1(y): return 116 + brus(y, 5)
 def b1(y): return 108 + brus(y, 6)
 def bit(x, y):
     if y < h1(x): return 4 if x < t1(y) else 5
-    if y >= h2(x): return 2 if x < b1(y) else 7
-    return 3 if x < v1(y) else (1 if x < v2(y) else 6)
+    if y >= h2(x): return 2 if x < b1(y) else 6
+    return 3 if x < v1(y) else (1 if x < v2(y) else 5)
 ID = [[bit(x, y) for x in range(W)] for y in range(H)]
 def kant_avst(x, y):
     """Avståndet (0–3) till en riven kant eller papperets ytterkant."""
@@ -54,19 +57,22 @@ def kant_avst(x, y):
 im = Image.new('RGBA', (W, H), (0, 0, 0, 0)); p = im.load()
 rnd = random.Random(7)
 flackar = [(rnd.randint(0, W), rnd.randint(0, H), rnd.randint(4, 12)) for _ in range(14)]
-for y in range(H):
-    for x in range(W):
-        d = kant_avst(x, y)
-        c = PAPPER[1]
-        if (x * 7 + y * 13) % 29 == 0: c = PAPPER[0]                      # ljusa fibrer
-        if any((x - fx) ** 2 + (y - fy) ** 2 < fr * fr for fx, fy, fr in flackar) and (x * 5 + y * 3) % 7 == 0: c = PAPPER[2]   # gamla fläckar, glesa
-        if d == 2 and (x + y) % 2: c = PAPPER[2]
-        if d == 1: c = PAPPER[3]
-        if d == 0: c = PAPPER[4]
-        p[x, y] = c
+def papper():
+    for y in range(H):
+        for x in range(W):
+            d = kant_avst(x, y)
+            c = PAPPER[1]
+            if (x * 7 + y * 13) % 29 == 0: c = PAPPER[0]                      # ljusa fibrer
+            if any((x - fx) ** 2 + (y - fy) ** 2 < fr * fr for fx, fy, fr in flackar) and (x * 5 + y * 3) % 7 == 0: c = PAPPER[2]   # gamla fläckar, glesa
+            if d == 2 and (x + y) % 2: c = PAPPER[2]
+            if d == 1: c = PAPPER[3]
+            if d == 0: c = PAPPER[4]
+            p[x, y] = c
+papper()
 
+FRYST = set()          # bitar som den nya teckningen inte får röra
 def satt(x, y, c, bara=None):
-    if 0 <= x < W and 0 <= y < H and kant_avst(x, y) >= 1 and (bara is None or ID[y][x] == bara):
+    if 0 <= x < W and 0 <= y < H and kant_avst(x, y) >= 1 and (bara is None or ID[y][x] == bara) and ID[y][x] not in FRYST:
         p[x, y] = c
 def linje(x0, y0, x1, y1, c, streckad=False):
     n = max(abs(x1 - x0), abs(y1 - y0), 1)
@@ -187,35 +193,145 @@ def kompassros(cx, cy, r=7):
                    (cx + 1, cy - r - 2), (cx + 1, cy - r - 3), (cx + 1, cy - r - 4), (cx + 1, cy - r - 5)]:
         satt(x, y, BLACK)                                    # N
 
-# ---------- bit 1: dalen i molnen ----------
-for (x, h) in [(82, 12), (92, 16), (102, 11), (124, 13), (134, 17), (144, 12)]: berg(x, 64, h)
-for (x, h) in [(80, 9), (146, 10)]: berg(x, 92, h, sno=False)
-moln(100, 80, 14, 6); moln(126, 84, 13, 5)
-mamma(110, 77)
-moln(96, 90, 11, 4); moln(124, 92, 12, 4); moln(140, 76, 8, 4)
-# ---------- bit 2: skogen ----------
-hus(6, 136)
-for (x, y) in [(22, 122), (28, 132), (34, 118), (16, 112), (40, 137), (24, 108)]: trad(x, y)
-sten(46, 126)
-back([(60, 101), (58, 108), (62, 114), (60, 122), (63, 130), (61, 143)])
-bro(61, 118)
-trask(72, 104, 30, 22)
-# ---------- bit 3–7: skisser ----------
-flod([(4, 58), (20, 66), (34, 64), (50, 76), (66, 73)])
-for (x, y) in [(14, 84), (40, 90), (56, 56)]: trad(x, y)
-vulkan(40, 40); berg(80, 34, 10, skiss=True); berg(96, 40, 8, skiss=True)
-isberg(150, 30); isberg(176, 24); berg(206, 36, 9, skiss=True)
-berg(190, 76, 15, skiss=True); berg(176, 92, 8, skiss=True)   # bit 6: ett högt berg vid molnkanten (06 v0.22), inget luftskepp
-kompassros(198, 124, 8)
-# ---------- vägen (streckad, rödbrun) ----------
-VAGEN = [(12, 134), (24, 128), (40, 126), (52, 121), (61, 117), (74, 113), (88, 118), (96, 110), (82, 104), (64, 97),
-         (44, 86), (28, 74), (20, 60), (28, 46), (44, 26), (66, 20), (92, 24), (118, 18), (142, 14), (170, 30),
-         (196, 40), (204, 56), (196, 74), (186, 90), (180, 102), (166, 116), (146, 114), (130, 104), (124, 98)]
-for a, b in zip(VAGEN, VAGEN[1:]): linje(*a, *b, VAG, streckad=True)
-# Vägen slutar vid molnkanten (06 v0.22): kartan visar vägen fram till molnen, inte genom dem.
-# Inne i molnen leder ungen med nosen (kapitel 7). Sista strecken tonar bort i molnet.
-for (x, y) in [(124, 98), (123, 97), (122, 96)]: satt(x, y, VAG)
-for (x, y, c) in [(120, 95, '#C8706A'), (119, 94, '#E0B0AC'), (117, 93, '#E0B0AC')]: satt(x, y, rgb(c))
+# ---------- symboler för bit 3–6 ----------
+ROSA = rgb('#D9789A')
+def vass(x, y, n=3):
+    """En tuss vass: gröna strån med en brun kolv i toppen."""
+    for i in range(n):
+        dx = (i - n // 2) * 2; hh = 4 + (i * 7 + x) % 3
+        for k in range(hh): satt(x + dx, y - k, GRON[0] if k < 2 else GRON[1])
+        satt(x + dx, y - hh, TRA[0]); satt(x + dx, y - hh - 1, TRA[0])
+def pol(cx, cy, rx):
+    ellips(cx, cy, rx, 1.8, VATTEN[2], VATTEN[1])
+def hus_rosa(x, y):
+    """Ett litet hus i vassbyn: rosa tak (vassbyns färg, stilguiden §2) och en rund dörr."""
+    for dy in range(-7, -3):
+        w = dy + 8
+        for dx in range(-w, w + 1): satt(x + 3 + dx, y + dy, ROSA if dy > -7 else BLACK)
+    for dy in range(-3, 1):
+        for dx in range(0, 7): satt(x + dx, y + dy, PAPPER[0] if 0 < dx < 6 and dy < 0 else BLACK)
+    satt(x + 3, y - 1, TRA[0]); satt(x + 3, y - 2, TRA[0])
+def flod_bred(punkter, bredd):
+    """En bred flod: mörk kant, mellanblått och ljusa glimtar. bredd(x) ger halva bredden."""
+    for (x0, y0), (x1, y1) in zip(punkter, punkter[1:]):
+        n = max(abs(x1 - x0), abs(y1 - y0), 1)
+        for i in range(n + 1):
+            x, y = round(x0 + (x1 - x0) * i / n), round(y0 + (y1 - y0) * i / n)
+            w = bredd(x)
+            for k in range(-w, w + 1):
+                c = VATTEN[0] if abs(k) == w else VATTEN[1]
+                satt(x, y + k, c)
+    for (x0, y0), (x1, y1) in zip(punkter, punkter[1:]):           # glimtar ovanpå
+        n = max(abs(x1 - x0), abs(y1 - y0), 1)
+        for i in range(0, n + 1, 5):
+            x, y = round(x0 + (x1 - x0) * i / n), round(y0 + (y1 - y0) * i / n)
+            satt(x, y - 1, VATTEN[2]); satt(x + 1, y - 1, VATTEN[2])
+def on(cx, cy):
+    """Ön i floden, som Farfar ritade den: en rund grön ö med sandkant och två träd."""
+    ellips(cx, cy, 8.5, 4.6, STEN[2], TRA[1])
+    ellips(cx, cy - 0.5, 7, 3.6, GRON[1], GRON[0])
+    trad(cx - 3, cy + 1); trad(cx + 3, cy)
+def vulkan_ny(x, y):
+    """Berget som ryker: en bred kon i bläck med krater, och rök som stiger snett åt höger."""
+    for i in range(18):
+        w = 16 - i * 13 // 18
+        satt(x - w, y - i, BLACK); satt(x + w, y - i, BLACK)
+        for j in range(1, w, 2):
+            if i < 16: satt(x + j, y - i, BLACK3 if (j + i) % 4 else BLACK2)
+    for dx in range(-3, 4): satt(x + dx, y - 18, BLACK)
+    for dx in range(-2, 3): satt(x + dx, y - 17, VAG)
+    for (ox, oy, r) in [(1, -22, 2.4), (4, -26, 3.0), (8, -31, 3.6), (13, -36, 3.2)]:
+        ellips(x + ox, y + oy, r, r * 0.8, MOLN[2], STEN[0])
+def isberg_ny(x, y, h, grotta=True):
+    """Ett isberg: blå kontur, ljus is på vänster sida (ljuset från vänster), och en mörk grottmun."""
+    for i in range(h):
+        w = h - 1 - i
+        satt(x - w, y - i, VATTEN[0]); satt(x + w, y - i, VATTEN[0])
+        for j in range(-w + 1, w):
+            satt(x + j, y - i, MOLN[1] if j < 0 else VATTEN[2])
+    satt(x, y - h, VATTEN[0])
+    if grotta:
+        for dy in range(0, 4):
+            for dx in range(-2, 3):
+                if abs(dx) + max(0, dy - 1) < 4 and not (dy == 3 and abs(dx) == 2): satt(x + dx, y - dy, SKUGGA[0])
+def molntapp(cx, cy, rx):
+    ellips(cx, cy, rx, rx * 0.45, MOLN[0], MOLN[1])
+
+def ny_teckning():
+    # ---------- bit 3: träsket (kapitel 2, färdig) ----------
+    for (cx, cy, rx) in [(12, 84, 4), (20, 70, 3)]: pol(cx, cy, rx)
+    for (x, y) in [(6, 92), (16, 88), (8, 78), (26, 84), (14, 66), (48, 72), (64, 86), (60, 70), (40, 66), (4, 70)]: vass(x, y)
+    hus_rosa(30, 95); hus_rosa(42, 94)
+    pol(58, 79, 5)
+    for dx in range(-5, -1): satt(58 + dx, 79, TRA[1]); satt(58 + dx, 80, TRA[0])     # bryggan ut i dammen
+    # den breda floden, som börjar i bit 3 och går genom bit 4 mot berget
+    FLOD = [(-2, 62), (12, 58), (26, 51), (40, 42), (54, 36), (68, 34), (84, 30), (100, 31), (114, 35), (126, 38), (138, 40)]
+    flod_bred(FLOD, lambda x: 4 if x < 44 else (5 if 54 <= x <= 80 else 3))
+    # ---------- bit 4: floden (kapitel 3, skiss) ----------
+    on(66, 34)
+    for (x, y) in [(10, 22), (22, 14), (8, 36), (90, 16), (104, 22), (40, 22), (98, 10)]: trad(x, y)
+    for (x, y) in [(30, 32), (76, 44), (110, 44)]: vass(x, y, 2)
+    # ---------- bit 5: berget (kapitel 4, skiss): vulkanen och isgrottorna ----------
+    vulkan_ny(152, 44)
+    isberg_ny(188, 40, 12); isberg_ny(208, 30, 9, grotta=False); isberg_ny(174, 30, 7, grotta=False)
+    isberg_ny(200, 70, 13); isberg_ny(182, 80, 7, grotta=False)
+    berg(214, 92, 8, skiss=True); berg(166, 64, 7, skiss=True)
+    # ---------- bit 6: molnkanten och baronens bit (kapitel 5, skiss) ----------
+    for (cx, cy, rx) in [(120, 116, 6), (132, 126, 5), (114, 132, 7)]: molntapp(cx, cy, rx)
+    for (x, y) in [(158, 134), (170, 140), (214, 140)]: trad(x, y)
+    sten(146, 136); sten(182, 132)
+    kompassros(198, 124, 8)
+    # ---------- vägen ----------
+    VAGEN = [(64, 97), (56, 90), (46, 85), (36, 79), (29, 71), (26, 63), (28, 56),          # bit 3: genom byn och vassen till floden
+             (36, 46), (48, 40), (58, 36),                                               # bit 4: längs floden till ön
+             (74, 32), (88, 28), (102, 29), (116, 33), (128, 36),                         # ... och vidare nedför floden
+             (138, 36), (144, 28), (150, 26), (158, 28), (170, 36), (184, 40),            # bit 5: upp på vulkanen och in i isgrottan
+             (200, 72), (198, 77), (192, 84), (186, 90),                                  # ... ut ur grottan nedanför
+             (180, 102), (166, 116), (146, 114), (130, 104), (124, 98)]                   # bit 6: till molnkanten
+    for a, b in zip(VAGEN, VAGEN[1:]):
+        if a == (184, 40): continue                                                     # inne i berget syns inte vägen
+        linje(*a, *b, VAG, streckad=True)
+
+def gammal_teckning():
+    """Kartan som den var med sju bitar. Används bara för bit 1 och 2, som är frysta."""
+    # ---------- bit 1: dalen i molnen ----------
+    for (x, h) in [(82, 12), (92, 16), (102, 11), (124, 13), (134, 17), (144, 12)]: berg(x, 64, h)
+    for (x, h) in [(80, 9), (146, 10)]: berg(x, 92, h, sno=False)
+    moln(100, 80, 14, 6); moln(126, 84, 13, 5)
+    mamma(110, 77)
+    moln(96, 90, 11, 4); moln(124, 92, 12, 4); moln(140, 76, 8, 4)
+    # ---------- bit 2: skogen ----------
+    hus(6, 136)
+    for (x, y) in [(22, 122), (28, 132), (34, 118), (16, 112), (40, 137), (24, 108)]: trad(x, y)
+    sten(46, 126)
+    back([(60, 101), (58, 108), (62, 114), (60, 122), (63, 130), (61, 143)])
+    bro(61, 118)
+    trask(72, 104, 30, 22)
+    # ---------- bit 3–7: skisser ----------
+    flod([(4, 58), (20, 66), (34, 64), (50, 76), (66, 73)])
+    for (x, y) in [(14, 84), (40, 90), (56, 56)]: trad(x, y)
+    vulkan(40, 40); berg(80, 34, 10, skiss=True); berg(96, 40, 8, skiss=True)
+    isberg(150, 30); isberg(176, 24); berg(206, 36, 9, skiss=True)
+    berg(190, 76, 15, skiss=True); berg(176, 92, 8, skiss=True)   # bit 6: ett högt berg vid molnkanten (06 v0.22), inget luftskepp
+    kompassros(198, 124, 8)
+    # ---------- vägen (streckad, rödbrun) ----------
+    VAGEN = [(12, 134), (24, 128), (40, 126), (52, 121), (61, 117), (74, 113), (88, 118), (96, 110), (82, 104), (64, 97),
+             (44, 86), (28, 74), (20, 60), (28, 46), (44, 26), (66, 20), (92, 24), (118, 18), (142, 14), (170, 30),
+             (196, 40), (204, 56), (196, 74), (186, 90), (180, 102), (166, 116), (146, 114), (130, 104), (124, 98)]
+    for a, b in zip(VAGEN, VAGEN[1:]): linje(*a, *b, VAG, streckad=True)
+    # Vägen slutar vid molnkanten (06 v0.22): kartan visar vägen fram till molnen, inte genom dem.
+    # Inne i molnen leder ungen med nosen (kapitel 5 efter beslut 83). Sista strecken tonar bort i molnet.
+    for (x, y) in [(124, 98), (123, 97), (122, 96)]: satt(x, y, VAG)
+    for (x, y, c) in [(120, 95, '#C8706A'), (119, 94, '#E0B0AC'), (117, 93, '#E0B0AC')]: satt(x, y, rgb(c))
+
+
+gammal_teckning()
+FRYS = {(x, y): p[x, y] for y in range(H) for x in range(W) if ID[y][x] in (1, 2)}
+papper()
+FRYST = {1, 2}
+ny_teckning()
+for (x, y), c in FRYS.items(): p[x, y] = c
+FRYST = set()
 
 # ---------- ut ----------
 def bitbild(n, glipa=True):
@@ -237,7 +353,8 @@ if __name__ == '__main__':
     os.makedirs('ut/karta', exist_ok=True)
     hel.save('ut/karta/karta_hel.png')
     for n in (1, 2): bitbild(n).save(f'ut/karta/kartbit_{n}.png')
-    for n in (3, 4, 5, 6, 7): bitbild(n).save(f'ut/karta/skiss_kartbit_{n}.png')
+    bitbild(3).save('ut/karta/kartbit_3.png')
+    for n in (4, 5, 6): bitbild(n).save(f'ut/karta/skiss_kartbit_{n}.png')
     import json
     json.dump({'om': 'Var varje bit ligger i hela kartan (224 x 144), övre vänstra hörnet. Bitarna läggs ihop med 1 pixels glipa (rivna kanter).',
                'storlek': [W, H], 'bitar': POS}, open('ut/karta/karta.json', 'w'), ensure_ascii=False, indent=1)

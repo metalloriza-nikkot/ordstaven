@@ -221,6 +221,8 @@ describe('mellanscenernas bilder och bildkorten', () => {
           : STILS_REGI[st.bild] ? STILS_REGI[st.bild].every((r) => ramar.has(r))
           // kapitel 2:s gråbox (69.1): ritas med figurerna som finns och gråboxens former
           : GRABOX_REGI.has(st.bild) ? true
+          // närbilderna på läsplattan (brevramen, Stil del 3): bildkorten prövas i kvall.test.js
+          : st.bild === 'brevram_nara' ? true
           : existsSync(new URL(`assets/sidovyer/${st.bild}_bakgrund.png`, rot));
       if (!finns) saknas.push(`${k.id} ${sc.id}: ${st.bild}`);
     }
@@ -271,9 +273,11 @@ describe('mellanscenernas bilder och bildkorten', () => {
   });
   it('bildkorten är 48 × 48, och sidovyns bakgrund fyller skärmen (320 × 192)', () => {
     const storlek = (f) => { const png = las(f); return [png.readUInt32BE(16), png.readUInt32BE(20)]; };
-    // expeditionsbokens bilder är 110 × 70 (bokbildens ruta i halva storleken, 10f), alla andra 48 × 48
+    // expeditionsbokens bilder och närbilderna av brevramen är 110 × 70 (bokbildens ruta i halva storleken, 10f),
+    // alla andra 48 × 48
     const BOKBILDER = ['dal_i_moln', 'ordtradet', 'unge_farfar_med_dino', 'unge_farfar_far_agg'];
-    for (const f of filer('assets/bildkort/', '.png')) expect(storlek(f), f).toEqual(BOKBILDER.some((b) => f.endsWith(`/${b}.png`)) ? [110, 70] : [48, 48]);
+    const stor = (f) => BOKBILDER.some((b) => f.endsWith(`/${b}.png`)) || /\/brevram_nara_[a-z_]+\.png$/.test(f);
+    for (const f of filer('assets/bildkort/', '.png')) expect(storlek(f), f).toEqual(stor(f) ? [110, 70] : [48, 48]);
     for (const b of BOKBILDER) expect(existsSync(new URL(`assets/bildkort/${b}.png`, rot)), b).toBe(true);
     for (const f of filer('assets/sidovyer/', '_bakgrund.png')) expect(storlek(f), f).toEqual([320, 192]);
     expect(existsSync(new URL('assets/bildkort/filt_rod.png', rot))).toBe(true);
