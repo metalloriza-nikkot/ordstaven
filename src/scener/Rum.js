@@ -957,6 +957,7 @@ export class Rum extends Phaser.Scene {
       litet_svard_kittlar_vassen: () => this.litetSvardKittlar(),
       unge_hoppar_pa_stocken: () => this.ungeHopparPaStocken(),
       unge_piper_pa_stocken: () => this.ungePiperPaStocken(),
+      trollslanda_landar: () => this.trollslandaLandar(),
       stocken_flyger_till_stranden: () => this.stockenIland('flyg'),
       rep_till_ungen: () => this.stockenIland('rep'),
       bro_till_stocken: () => this.tillStocken('bro'),
@@ -1260,13 +1261,14 @@ export class Rum extends Phaser.Scene {
         // RITS: baronen håller upp sin halva, och den andra fladdrar från Herr Skatas plats ned mot vassen
         this.luftskepp('brevet_rivet');
         const fb = foremalsbild(this, 'brev_halva_faller_01');
-        const fran = { x: img.x + 88, y: img.y + 44 }, mot = mitt('stig_vassen', { x: fran.x, y: fran.y - 200 });
+        // från Herr Skata (skeppets x + 88, y + 40) och nedåt, åt vassens håll (Stils granskning 13/11, 87.2)
+        const fran = { x: img.x + 88, y: img.y + 40 }, vass = mitt('stig_vassen', { x: fran.x - 80, y: fran.y });
+        const mot = { x: fran.x + Math.max(-120, Math.min(120, vass.x - fran.x)), y: fran.y + 110 };
         const h = fb ? this.add.image(fran.x, fran.y, fb.nyckel, 'brev_halva_faller_01').setOrigin(0.5, 0.5) : null;
         if (h) {
           this.lagerLuft.add(h);
           const byt = this.time.addEvent({ delay: 250, loop: true, callback: () => { if (h.active) { h.setFrame(h.frame.name.endsWith('_01') ? 'brev_halva_faller_02' : 'brev_halva_faller_01'); this.smutsig = true; } } });
-          const d = Math.hypot(mot.x - fran.x, mot.y - fran.y) || 1, langd = Math.min(d, 220);
-          const till = { x: fran.x + ((mot.x - fran.x) / d) * langd, y: fran.y + ((mot.y - fran.y) / d) * langd };
+          const till = mot;
           const t = { p: 0 };
           this.tweens.add({ targets: t, p: 1, duration: 1900, ease: 'Sine.easeIn', onUpdate: () => { if (!h.active) return; h.setPosition(Math.round(fran.x + (till.x - fran.x) * t.p + Math.sin(t.p * 12) * 4), Math.round(fran.y + (till.y - fran.y) * t.p)); this.smutsig = true; }, onComplete: () => { byt.remove(); h.destroy(); } });
         } else flyg(-3, mot, 1700);
@@ -1545,6 +1547,49 @@ export class Rum extends Phaser.Scene {
     return 3000;
   }
 
+  /**
+   * Trollsländan (Stil 13/11, den frivilliga scenen i träskkanten): den surrar tre varv runt hjälmen i små steg, med
+   * vingarna som slår var 120:e ms, och landar på ungens nos. Då blir ungen skelögd (`unge1_trollslanda_ner_01–02`),
+   * och trollsländan ritas inte för sig. Sedan flyger den tillbaka till sin plats. @returns {number}
+   */
+  trollslandaLandar() {
+    const { o, r } = this.foremalOchBild('trollslanda');
+    if (!o || !r?.active || typeof r.setFrame !== 'function' || !foremalsbild(this, 'trollslanda_02')) return 0;
+    const hem = { x: r.x, y: r.y }, STEG = 120, VARV = 3, PER_VARV = 8, lager = r.parentContainer;
+    // i luften ovanför figurerna medan den surrar
+    this.lagerLuft.add(r);
+    const mitt = () => ({ x: Math.round(this.pos.x), y: Math.round(this.pos.y - 24) });
+    let i = 0;
+    const surr = this.time.addEvent({ delay: STEG, repeat: VARV * PER_VARV + 4, callback: () => {
+      if (!r.active) return;
+      i++;
+      r.setFrame(i % 2 ? 'trollslanda_02' : 'trollslanda_01');
+      if (i <= VARV * PER_VARV) {
+        const v = (i / PER_VARV) * Math.PI * 2, c = mitt();
+        r.setPosition(c.x + Math.round(Math.cos(v) * 12), c.y + Math.round(Math.sin(v) * 5));
+      } else {
+        // mot ungens nos, i fyra steg
+        const n = i - VARV * PER_VARV, u = { x: Math.round(this.ungePos.x), y: Math.round(this.ungePos.y - 12) };
+        r.setPosition(Math.round(r.x + (u.x - r.x) * n / 4), Math.round(r.y + (u.y - r.y) * n / 4));
+      }
+      this.smutsig = true;
+    } });
+    const landar = STEG * (VARV * PER_VARV + 5);
+    this.time.delayedCall(landar, () => {
+      surr.remove();
+      if (this.ungeLage('trollslanda', 'ner', 300, 3)) r.setVisible(false);
+      this.smutsig = true;
+    });
+    this.time.delayedCall(landar + 1900, () => {
+      if (!r.active) return;
+      r.setVisible(true).setFrame('trollslanda_01').setPosition(hem.x, hem.y);
+      lager?.add(r);
+      this.smutsig = true;
+    });
+    this.regiLogg.push('trollsländan landar på ungens nos');
+    return landar + 2000;
+  }
+
   /** Ungen sitter på stocken och piper: små skutt, och den tittar på vattnet och på hjälten. @returns {number} */
   ungePiperPaStocken() {
     const sv = this.ungeSvavar;
@@ -1804,6 +1849,12 @@ export class Rum extends Phaser.Scene {
   eldenTands() {
     const { o } = this.foremalOchBild('lagereld');
     if (!o) return 0;
+    // hjälten står bredvid elden, väster om den, inte i den eller bakom den (Stils granskning 13/11, 87.2)
+    // (precis söder om elden täcker lågorna ansiktet, och väster om den står fiskaren): snett söder om den
+    const vid = { x: Math.round(o.x - 4), y: Math.round(o.y + o.h + 22) };
+    if (Math.abs(this.pos.x - (o.x + o.b / 2)) < o.b / 2 + 10 && this.pos.y > o.y - 24 && this.pos.y < o.y + o.h + 28) {
+      this.ga(vid, 350).then(() => { this.vand = { x: 1, y: 0.01 }; this.ritaHjalte(); this.placera(); });
+    }
     // Stils eld (steg 5 del 1): lågorna i tre bilder och ljuset runt elden, tills rummet ritas om
     if (foremalsbild(this, 'lagereld_tand_kvall_01')) {
       this.slingaRamar('lagereld', ['lagereld_tand_kvall_01', 'lagereld_tand_kvall_02', 'lagereld_tand_kvall_03'], 150);

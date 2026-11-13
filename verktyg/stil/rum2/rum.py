@@ -163,7 +163,7 @@ def dammen():
     d.mark('gras', (0, 0, 320, 192)); pensel(d, 'stig', [(160, 192), (160, 140), (120, 110), (70, 104)], 22)
     d.mark('vatten', rundrekt(96, 16, 208, 64, 6))
     rita_terrang(d, seed=71); gras_tuvor(d, 70, seed=10)
-    for (x, y, r) in ((130, 30, 6), (176, 56, 5), (236, 66, 8), (262, 34, 6), (210, 24, 5)):   # näckrosbladen
+    for (x, y, r) in ((130, 30, 6), (176, 56, 5), (246, 75, 8), (262, 34, 6), (210, 24, 5), (274, 75, 6)):   # näckrosbladen; två vid södra kanten under grodorna i L3 och L4 (86.10)
         d.ellips(x, y, r, r * 0.65, '#5E9E40', '#2E5E24')
         d.satt(int(x), int(y - r * 0.3), '#2E5E24'); d.satt(int(x) + 1, int(y - r * 0.3) + 1, '#2E5E24')
     d.ellips(212, 22, 2, 1.6, '#F6B4CE', '#B8467A')

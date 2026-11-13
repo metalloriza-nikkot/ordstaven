@@ -2705,6 +2705,10 @@ test('närbilden av brevramen (Stil del 3): bilden på läsplattan efter hur må
   const kort = page.locator('#plattan:not([hidden]) [data-narbild="brevram_nara_tom"] img');
   await expect(kort).toBeVisible({ timeout: 5000 });
   expect(await kort.evaluate((i) => i.complete && i.naturalWidth)).toBe(110);
+  // en riktig närbild (87.2): två av världens pixlar per bildpixel, och världen dämpas bakom
+  const [bredd, vpx] = await kort.evaluate((i) => [i.getBoundingClientRect().width, parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--vpx'))]);
+  expect(Math.round(bredd)).toBe(Math.round(220 * vpx));
+  expect(await page.locator('#plattan').evaluate((e) => getComputedStyle(e).boxShadow)).toContain('rgba');
   expect(await page.locator('#regi').isVisible().catch(() => false)).toBe(false); // ingen beskrivning för den vuxne
   await page.screenshot({ path: 'test-results/narbild-brevram.png' });
   await page.clock.resume();

@@ -1160,10 +1160,50 @@
     "h": 24
    }
   },
-  "vasstuss_bar": {
+  "trollslanda_01": {
    "frame": {
     "x": 0,
     "y": 680,
+    "w": 12,
+    "h": 10
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 12,
+    "h": 10
+   },
+   "sourceSize": {
+    "w": 12,
+    "h": 10
+   }
+  },
+  "trollslanda_02": {
+   "frame": {
+    "x": 13,
+    "y": 680,
+    "w": 12,
+    "h": 10
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 12,
+    "h": 10
+   },
+   "sourceSize": {
+    "w": 12,
+    "h": 10
+   }
+  },
+  "vasstuss_bar": {
+   "frame": {
+    "x": 0,
+    "y": 691,
     "w": 16,
     "h": 38
    },
@@ -1183,7 +1223,7 @@
   "vasstuss_hel": {
    "frame": {
     "x": 17,
-    "y": 680,
+    "y": 691,
     "w": 16,
     "h": 38
    },
@@ -1203,7 +1243,7 @@
   "vasstuss_huggen": {
    "frame": {
     "x": 34,
-    "y": 680,
+    "y": 691,
     "w": 16,
     "h": 38
    },
@@ -1223,7 +1263,7 @@
   "vedpinne": {
    "frame": {
     "x": 0,
-    "y": 719,
+    "y": 730,
     "w": 12,
     "h": 8
    },
@@ -1243,7 +1283,7 @@
   "vedpinne_kvall": {
    "frame": {
     "x": 13,
-    "y": 719,
+    "y": 730,
     "w": 12,
     "h": 8
    },
@@ -1266,7 +1306,7 @@
   "format": "RGBA8888",
   "size": {
    "w": 388,
-   "h": 728
+   "h": 739
   },
   "scale": "1",
   "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."

@@ -52,6 +52,22 @@ function ritaHager(s, nu) {
 }
 
 /**
+ * De små grodorna i Stils bilder (13/11): vilar (strupen blåses upp en kort stund ibland), hopp och plums (ringarna,
+ * två bilder). Fötterna står på rutans nederkant. @param {any} s @param {number} nu
+ */
+function ritaGroda(s, nu) {
+  const img = s.img, ram = img.ram;
+  const namn = ram === 'vilar' ? `groda_vilar_0${Math.floor(nu / 250) % 24 === 0 ? 2 : 1}` : ram === 'hopp' ? 'groda_hopp_01' : `groda_plums_0${s.t >= 4 ? 2 : 1}`;
+  if (img.frame?.name !== namn) img.setFrame(namn);
+}
+
+/** Saker med Stils bilder, och vilken bild de börjar med. */
+const BILDER = /** @type {Record<string, { forsta: string, rita: (s: any, nu: number) => void }>} */ ({
+  hager: { forsta: 'hager_sta_vanster_01', rita: ritaHager },
+  groda: { forsta: 'groda_vilar_01', rita: ritaGroda },
+});
+
+/**
  * @typedef {{ vad: string, x: number, y: number, b: number, h: number }} Omgivning
  * @typedef {{ o: Omgivning, img: any, lage: string, nasta: number, t: number, i: number, x: number, y: number, dx: number, gra?: boolean, bild?: boolean }} Sak
  */
@@ -77,10 +93,11 @@ export class Livet {
       // gråbox (72.10): hägern, grodan och katten har inga bilder än, och fågeln och fjärilen ritas som former där
       // Stils bilder inte är laddade. Lövet och ekorren finns bara med bilder.
       const gra = GRABOX.includes(o.vad) && !(tex.exists(nyckel) && tex.get(nyckel).has(ram) && (o.vad === 'fagel' || o.vad === 'fjaril'));
-      // hägern med Stils bilder: samma lägen som i gråboxen, men bilder (fötterna på rutans nederkant)
-      if (o.vad === 'hager' && tex.exists('omgivning') && tex.get('omgivning').has('hager_sta_vanster_01')) {
+      // hägern och grodan med Stils bilder: samma lägen som i gråboxen, men bilder (fötterna på rutans nederkant)
+      const b = BILDER[o.vad];
+      if (b && tex.exists('omgivning') && tex.get('omgivning').has(b.forsta)) {
         const fy = Math.round(o.y + o.h);
-        const img = /** @type {any} */ (this.scen.add.image(x, fy, 'omgivning', 'hager_sta_vanster_01').setOrigin(0.5, 1));
+        const img = /** @type {any} */ (this.scen.add.image(x, fy, 'omgivning', b.forsta).setOrigin(0.5, 1));
         img.ram = 'vilar';
         this.lager.add(img);
         this.saker.push({ o, img, lage: 'vilar', nasta: performance.now() + 1000, t: 0, i: 0, x, y: fy, dx: -1, gra: true, bild: true });
@@ -126,7 +143,7 @@ export class Livet {
       else if (o.vad === 'fjaril') this.fjaril(s, nu);
       else if (o.vad === 'lov') this.lov(s, nu);
       else if (o.vad === 'ekorre') this.ekorre(s, nu);
-      if (s.bild) ritaHager(s, nu); else if (s.gra) ritaGra(s);
+      if (s.bild) BILDER[o.vad].rita(s, nu); else if (s.gra) ritaGra(s);
       if (las() !== fore) andrat = true;
     }
     return andrat;
@@ -181,7 +198,7 @@ export class Livet {
       if (s.lage === 'hoppar') {
         s.t++;
         if (s.t <= 2) { img.ram = 'hopp'; img.setPosition(img.x + s.dx * 6, img.y + 3); }
-        else if (s.t === 3) img.ram = 'plums';
+        else if (s.t === 3 || s.t === 4) img.ram = 'plums';
         else if (s.t >= 5) { s.lage = 'borta'; img.setVisible(false); s.nasta = nu + 15000; }
         return;
       }

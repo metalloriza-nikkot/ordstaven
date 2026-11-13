@@ -204,7 +204,7 @@ describe('mellanscenernas bilder och bildkorten', () => {
   });
   const GRABOX_REGI = new Set(['rosa_vid_lyktorna', 'unge_sjunker', 'unge_dras_upp', 'bubblor_fran_blommorna', 'halvan_flyger_till_handen',
     // beslut 71 (Teknik 34): stocken, Tant Rosa, lyktorna och elden
-    'unge_hoppar_pa_stocken', 'unge_piper_pa_stocken', 'unge_hoppar_i_land', 'tant_rosa_nar_inte', 'byborna_jublar', 'elden_tands']);
+    'unge_hoppar_pa_stocken', 'unge_piper_pa_stocken', 'unge_hoppar_i_land', 'tant_rosa_nar_inte', 'byborna_jublar', 'elden_tands', 'trollslanda_landar']);
   it('varje mellanscen med bild har grafik (morgonen i sängen, luftskeppets lägen, sidovyerna, ungen på kartbiten, ägget)', () => {
     const saknas = [];
     for (const k of kapitel) for (const sc of k.scener) for (const st of sc.steg) {

@@ -1312,7 +1312,7 @@ export function skapaSpel(d) {
           if (nb) {
             for (const [i, id] of nb.bilder.entries()) {
               logg.handelse('närbild', id);
-              ui.visaPlatta(`<div class="bok-bild narbild-kort" data-narbild="${id}">${bilder.html(id)}</div>`, 'pussel narbild-platta');
+              ui.visaPlatta(`<div class="bok-bild narbild-kort" data-narbild="${id}">${bilder.html(id)}</div>`, 'narbild-platta');
               await vanta(tid(i < nb.bilder.length - 1 ? BLOT_MS : NARBILD_MS));
             }
             ui.doljPlatta(); return;

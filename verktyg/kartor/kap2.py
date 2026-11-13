@@ -58,6 +58,8 @@ FOREMALSBILDER = {
     'skylt_lera_brygga': {'bild': 'skylt_farfar'},
     'stubbe_trask': {'bild': 'stubbe'},
     'stubbe_vassen': {'bild': 'stubbe'},
+    # trollsländan (Stil 13/11) sitter still i rummet (golvet), och vingarna slår bara när den surrar (regin)
+    'trollslanda': {'bild': 'trollslanda_01'},
     # vassväggen: fältet ritas som ett rutnät av tussar tills det delas, och en huggen tuss blir en stubbe (75.3)
     'vass_tat': {'bild_del': 'vasstuss_hel', 'bild_hugg': 'vasstuss_huggen', 'bild_kvar': 'vasstuss_huggen'},
     'bubbelblommor': {'bild': 'bubbelblommor_01', 'bild_anim': 'bubbelblommor_01,bubbelblommor_02', 'anim_ms': 700},
@@ -139,7 +141,9 @@ def liv(vad, x, y, b, h):
 STIG = {'golv': True}
 
 # Grodornas platser vid dammen (69.8): x, y för en ruta på 20 × 16
-PLATS = {'sten': (68, 36), 'vassen': (286, 68), 'under_bladet': (140, 80), 'nackrosbladet': (236, 62)}
+# 'vassen' flyttades från (286, 68), där grodan satt i trädets krona, till näckrosbladet Stil lade i dammens bild
+# (Stils granskning 13/11, 87.2: en rättelse av läsbarheten)
+PLATS = {'sten': (68, 36), 'vassen': (264, 62), 'under_bladet': (140, 80), 'nackrosbladet': (236, 62)}
 
 
 RUMMEN = {

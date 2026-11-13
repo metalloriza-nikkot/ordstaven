@@ -2400,7 +2400,7 @@
     "h": 24
    }
   },
-  "unge1_yr_ner_01": {
+  "unge1_trollslanda_ner_01": {
    "frame": {
     "x": 0,
     "y": 1425,
@@ -2420,10 +2420,50 @@
     "h": 24
    }
   },
-  "unge1_yr_ner_02": {
+  "unge1_trollslanda_ner_02": {
    "frame": {
     "x": 25,
     "y": 1425,
+    "w": 24,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 24
+   }
+  },
+  "unge1_yr_ner_01": {
+   "frame": {
+    "x": 0,
+    "y": 1450,
+    "w": 24,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 24
+   }
+  },
+  "unge1_yr_ner_02": {
+   "frame": {
+    "x": 25,
+    "y": 1450,
     "w": 24,
     "h": 24
    },
@@ -2446,7 +2486,7 @@
   "format": "RGBA8888",
   "size": {
    "w": 100,
-   "h": 1450
+   "h": 1475
   },
   "scale": "1",
   "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."

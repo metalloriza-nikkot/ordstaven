@@ -120,10 +120,110 @@
     "h": 6
    }
   },
-  "hager_flyger_hoger_01": {
+  "groda_hopp_01": {
    "frame": {
     "x": 0,
     "y": 23,
+    "w": 10,
+    "h": 8
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 10,
+    "h": 8
+   },
+   "sourceSize": {
+    "w": 10,
+    "h": 8
+   }
+  },
+  "groda_plums_01": {
+   "frame": {
+    "x": 0,
+    "y": 32,
+    "w": 12,
+    "h": 6
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 12,
+    "h": 6
+   },
+   "sourceSize": {
+    "w": 12,
+    "h": 6
+   }
+  },
+  "groda_plums_02": {
+   "frame": {
+    "x": 13,
+    "y": 32,
+    "w": 12,
+    "h": 6
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 12,
+    "h": 6
+   },
+   "sourceSize": {
+    "w": 12,
+    "h": 6
+   }
+  },
+  "groda_vilar_01": {
+   "frame": {
+    "x": 0,
+    "y": 39,
+    "w": 10,
+    "h": 8
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 10,
+    "h": 8
+   },
+   "sourceSize": {
+    "w": 10,
+    "h": 8
+   }
+  },
+  "groda_vilar_02": {
+   "frame": {
+    "x": 11,
+    "y": 39,
+    "w": 10,
+    "h": 8
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 10,
+    "h": 8
+   },
+   "sourceSize": {
+    "w": 10,
+    "h": 8
+   }
+  },
+  "hager_flyger_hoger_01": {
+   "frame": {
+    "x": 0,
+    "y": 48,
     "w": 32,
     "h": 24
    },
@@ -143,7 +243,7 @@
   "hager_flyger_hoger_02": {
    "frame": {
     "x": 33,
-    "y": 23,
+    "y": 48,
     "w": 32,
     "h": 24
    },
@@ -163,7 +263,7 @@
   "hager_flyger_vanster_01": {
    "frame": {
     "x": 0,
-    "y": 48,
+    "y": 73,
     "w": 32,
     "h": 24
    },
@@ -183,7 +283,7 @@
   "hager_flyger_vanster_02": {
    "frame": {
     "x": 33,
-    "y": 48,
+    "y": 73,
     "w": 32,
     "h": 24
    },
@@ -203,7 +303,7 @@
   "hager_sta_hoger_01": {
    "frame": {
     "x": 0,
-    "y": 73,
+    "y": 98,
     "w": 20,
     "h": 32
    },
@@ -223,7 +323,7 @@
   "hager_sta_hoger_02": {
    "frame": {
     "x": 21,
-    "y": 73,
+    "y": 98,
     "w": 20,
     "h": 32
    },
@@ -243,7 +343,7 @@
   "hager_sta_vanster_01": {
    "frame": {
     "x": 0,
-    "y": 106,
+    "y": 131,
     "w": 20,
     "h": 32
    },
@@ -263,7 +363,7 @@
   "hager_sta_vanster_02": {
    "frame": {
     "x": 21,
-    "y": 106,
+    "y": 131,
     "w": 20,
     "h": 32
    },
@@ -283,7 +383,7 @@
   "lov_gron2_01": {
    "frame": {
     "x": 0,
-    "y": 139,
+    "y": 164,
     "w": 5,
     "h": 4
    },
@@ -303,7 +403,7 @@
   "lov_gron2_02": {
    "frame": {
     "x": 6,
-    "y": 139,
+    "y": 164,
     "w": 5,
     "h": 4
    },
@@ -323,7 +423,7 @@
   "lov_gron_01": {
    "frame": {
     "x": 0,
-    "y": 144,
+    "y": 169,
     "w": 5,
     "h": 4
    },
@@ -343,7 +443,7 @@
   "lov_gron_02": {
    "frame": {
     "x": 6,
-    "y": 144,
+    "y": 169,
     "w": 5,
     "h": 4
    },
@@ -363,7 +463,7 @@
   "lov_gulgron_01": {
    "frame": {
     "x": 0,
-    "y": 149,
+    "y": 174,
     "w": 5,
     "h": 4
    },
@@ -383,7 +483,7 @@
   "lov_gulgron_02": {
    "frame": {
     "x": 6,
-    "y": 149,
+    "y": 174,
     "w": 5,
     "h": 4
    },
@@ -403,7 +503,7 @@
   "vass_fotter_01": {
    "frame": {
     "x": 0,
-    "y": 154,
+    "y": 179,
     "w": 24,
     "h": 8
    },
@@ -423,7 +523,7 @@
   "vass_fotter_02": {
    "frame": {
     "x": 25,
-    "y": 154,
+    "y": 179,
     "w": 24,
     "h": 8
    },
@@ -446,7 +546,7 @@
   "format": "RGBA8888",
   "size": {
    "w": 66,
-   "h": 163
+   "h": 188
   },
   "scale": "1",
   "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."

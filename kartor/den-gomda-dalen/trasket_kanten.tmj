@@ -205,6 +205,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "bild",
+       "type": "string",
+       "value": "trollslanda_01"
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"

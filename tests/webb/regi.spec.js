@@ -253,6 +253,10 @@ test('kvällen i byn (71.5, 71.6, 78.4): tre vedpinnar, LJUS tänder lyktorna, e
   }
   await expect.poll(async () => (await O(() => window.__ORDSTAVEN.grafik())).regi, { timeout: 15000 }).toContain('elden tänds');
   await page.waitForTimeout(700);
+  // Stils granskning (87.2): hjälten står bredvid elden, snett söder om den, så att lågorna inte täcker ansiktet
+  const [hp, eo] = await O(() => [window.__ORDSTAVEN.position(), window.__ORDSTAVEN.ruta('lagereld')]);
+  expect(hp.x).toBeLessThan(eo.x + eo.b / 2 - 6);
+  expect(hp.y - 24).toBeGreaterThan(eo.y + eo.h - 12); // huvudet är nedanför lågorna
   await page.screenshot({ path: 'test-results/regi-elden-tands.png' });
   const regi = (await O(() => window.__ORDSTAVEN.grafik())).regi;
   for (const r of ['ljuset hoppar mellan lyktorna', 'elden tänds']) expect(regi).toContain(r);
@@ -468,4 +472,23 @@ test('under bryggan (42.6, Stil del 3b): sidovyn med baronen som gräver, Herr S
   const g = await O(() => window.__ORDSTAVEN.grafik());
   expect(g.sidovy).toBe(true); expect(g.senasteSidovy).toBe('under_bryggan'); expect(g.regi).toContain('under bryggan');
   await page.screenshot({ path: 'test-results/regi-under-bryggan.png' });
+});
+
+test('trollsländan och de små grodorna i Stils bilder (13/11, 87.2): den surrar runt hjälmen och landar på ungens nos', async ({ page }) => {
+  const O = (f, a) => page.evaluate(f, a);
+  await sparadI(page, 'kap-02', 'k2s01_kanten');
+  await page.waitForTimeout(800);
+  // grodorna vid stranden är Stils bilder, inte gråboxens former
+  const liv = await O(() => window.__ORDSTAVEN.livet());
+  expect(liv.filter((s) => s.vad === 'groda').length).toBeGreaterThan(0);
+  for (const s of liv.filter((x) => x.vad === 'groda')) expect(s.bild).toMatch(/^groda_vilar_0[12]$/);
+  expect((await O(() => window.__ORDSTAVEN.samtal('trollslanda'))).figur).toBe('trollslanda_01');
+  expect(await O(() => window.__ORDSTAVEN.regi('trollslanda_landar'))).toBeGreaterThan(3000);
+  await page.waitForTimeout(1000);
+  expect((await O(() => window.__ORDSTAVEN.samtal('trollslanda'))).figur).toMatch(/^trollslanda_0[12]$/);
+  await page.screenshot({ path: 'test-results/regi-trollslanda.png' });
+  await page.waitForTimeout(2600);
+  expect((await O(() => window.__ORDSTAVEN.samtal())).unge).toMatch(/^unge1_trollslanda_ner_0[12]$/);
+  await page.screenshot({ path: 'test-results/regi-trollslanda-nosen.png' });
+  expect((await O(() => window.__ORDSTAVEN.grafik())).regi).toContain('trollsländan landar på ungens nos');
 });

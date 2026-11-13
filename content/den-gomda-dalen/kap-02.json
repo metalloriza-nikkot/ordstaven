@@ -16,8 +16,8 @@
  },
  "meta": {
   "namn": "Träsket",
-  "version": "0.7.4",
-  "datum": "2026-11-12",
+  "version": "0.7.5",
+  "datum": "2026-11-13",
   "agare": "Innehåll",
   "kalla": "Manus 17-kapitel2-manus.md v0.4 (beslut 60–64). Ny fil.",
   "teknik": "Förslag från Innehåll (2026-11-08), byggt på Tekniks svar 26 och beslut 64.2. Fält som kontrollen inte känner än: P11 skriv, godtas, tand, rimliga, vanligt_svar och nastan.replik (Teknik 26). Steget nav med grenar (scen, mal, bild för ringen på lappen), mellan_grenar som steg (64.2) och knuff. Navets sparpunkt i mellan_grenar slutar pass 2, och det som kommer efter den räknas som pass 3 (var_var_vi pass 3 och passens tider). Grenarnas scener står som pass 2, eftersom ordningen är fri. {ord:k2_over} = ordet han skrev i k2_over (64.2), i k2s10 och i stämpeln för ELDEN. kraver på en variant (k2_tavlorna L4 bara om k2_grodan är löst i L4), och villkor gren_kvar på en replik i var_var_vi pass 3. Med villkoret har lang fyra repliker, men han hör bara tre. ristas: false på en formel som inte ska ristas in (BRO, STEGE, REP och FLOTTE i k2_over, REP i k2_bubblan). oppna_lasplatta med skylt i stället för pussel_id, och lys_ord (k2s04: brevets halva läses först med las_skylt, sedan visas den igen med INTE i guld). redan_last: 1 på k2_tavlorna (första raden grå med en bock, 63.6). ga_till unge: ungen i leran är målet (k2s01). bara över två rum: halvan bärs från bryggan och vassen till brevram i byn (k2s04 och k2s05). Medan bara pågår i vassen är rummets utgångar stängda, och målet glimtar (64.2). lockar på den frivilliga scenen k2s06 (58.5): draget vid stig_dammen, igen varje gång han går förbi tills han har varit där, aldrig under en replik eller ett läsval, och grodorna landar aldrig på torget under k2_skyltarna. Läsvalet med skyltarna: alternativen är skyltar med en mening (ord) i rummet, och varianten har bara bild (skylt_baronen) eftersom frågan är instruktionen. Byborna (17, Byborna, och 63.9) står bara i rummets anteckning och i 17 (Byborna): fiskaren, tvatterskan och barnet_drake är figurer i byns innehåll. Säg hur deras områden, sysslor, vinkningen vid ett tryck och bubblorna (SUCK, FISK, OJ, HURRA, HEJ) ska stå i datan, så skriver jag det. Tillstånden i byn: rep (k2s02–k2s03 till lögnen), fri (efter lögnen), kvall (k2s10). Repen och skyltarna syns bara i rep. dorr_rosa är låst tills k2s07. Effekterna i formler (bro_over_vattnet, bubblan_foljer_staven …) är namn för gråboxen, och vid_ratt beskriver dem. Mellanscenerna har ingen bild än, så att testet av bilderna går igenom. Stil ritar dem i kedjans steg 4–5 (65.4), och då får de bild: luftskepp_river_brevet, brevram_tom, brevram_halva (en eller två halvor), brevram_hel och under_bryggan. Uppdragens bildkort är lånade tills Stil har ritat kapitlets egna (TRÄSKET, TANT ROSA, BREVET, TAVLORNA och ELDEN, och ringarna med bryggan och vassen, som står som bild på navets grenar). musik och ljud på reaktionerna (64.5–64.6) kommer när Teknik har sagt hur de står i datan (27). k2_bubblan är räddningen.",
@@ -32,7 +32,8 @@
   "teknik_77": "Teknik 2026-11-12 (beslut 77.3, schema 2.43): k2_stocken har flera_ratta, och de tre rätta alternativen har sin regi som effekt (samma som formlerna hade i 0.56.0). k2_halvan har lys_ord INTE, som oppna_lasplatta hade vid bryggan (vid_ratt: ordet INTE lyser i guld). Ingen text är ändrad.",
   "andrat_v072": "2026-11-12 (beslut 78.3 och 78.4): budgeten räknad som i 08 §4. Farfars två första repliker i k2s01 är en, Tant Rosas replik mellan grenarna är struken, halvan i vassen och vedpinnarna är märkta leta: true, och k2s10 har tre vedpinnar på udden före lyktorna (en vila i pass 3). Uppdraget ELDEN har steget SAMLA VED.",
   "andrat_v073": "2026-11-12 (beslut 79.3): det han ska göra något med visas först. I k2s10 visar kameran elden på udden innan pinnarna (visas_forst på lagereld på kvällen), och mellanscenen före LJUS har regin rosa_vid_lyktorna: Tant Rosa vid den första släckta lyktan och kameran längs raden till hjälten. Ingen text som spelaren läser är ändrad.",
-  "andrat_v074": "2026-11-12 (beslut 80.3): fjädern i k2s02 plockas upp (leta: true på ga_till fjader) och räknas som vila."
+  "andrat_v074": "2026-11-12 (beslut 80.3): fjädern i k2s02 plockas upp (leta: true på ga_till fjader) och räknas som vila.",
+  "andrat_v075": "2026-11-13 (beslut 86.8.1, Tekniks lista): bild på fem mellanscener, under_bryggan i k2s04 steg 0, brevram_nara i k2s04 steg 16, k2s05 steg 18 och k2s07 steg 0, och kartbit_unge i k2s09 steg 0. Ingen text är ändrad."
  },
  "var_var_vi": [
   {
@@ -908,7 +909,8 @@
     {
      "typ": "mellanscen",
      "beskrivning": "Sidovy: vid bryggans landände är det lera, och där står Farfars skylt. Under bryggan sitter baronen fast i leran till knäna och gräver och gräver med en liten spade. Herr Skata sitter på en påle. Upp kommer en gammal stövel. Sedan en fisk, som sprattlar och hoppar tillbaka.",
-     "ljud": "baron"
+     "ljud": "baron",
+     "bild": "under_bryggan"
     },
     {
      "typ": "replik",
@@ -988,7 +990,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Närbild: halvan sätts i ramen. Den passar i sin rivna kontur."
+     "beskrivning": "Närbild: halvan sätts i ramen. Den passar i sin rivna kontur.",
+     "bild": "brevram_nara"
     },
     {
      "typ": "replik",
@@ -1105,7 +1108,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Närbild: halvan sätts i ramen. Den passar i sin rivna kontur, och i ramen torkar den så att bokstäverna syns."
+     "beskrivning": "Närbild: halvan sätts i ramen. Den passar i sin rivna kontur, och i ramen torkar den så att bokstäverna syns.",
+     "bild": "brevram_nara"
     },
     {
      "typ": "replik",
@@ -1211,7 +1215,8 @@
    "steg": [
     {
      "typ": "mellanscen",
-     "beskrivning": "Närbild: brevramen med båda halvorna. Farfars sigill med kompassrosen sitter ihop igen. Tant Rosa tar ner brevet."
+     "beskrivning": "Närbild: brevramen med båda halvorna. Farfars sigill med kompassrosen sitter ihop igen. Tant Rosa tar ner brevet.",
+     "bild": "brevram_nara"
     },
     {
      "typ": "replik",
@@ -1320,7 +1325,8 @@
    "steg": [
     {
      "typ": "mellanscen",
-     "beskrivning": "Kartbit 3 passar ihop med bit 2. Vägen går från träsket genom vassen och vidare till en bred flod. Mammas skugga syns större."
+     "beskrivning": "Kartbit 3 passar ihop med bit 2. Vägen går från träsket genom vassen och vidare till en bred flod. Mammas skugga syns större.",
+     "bild": "kartbit_unge"
     },
     {
      "typ": "ge_kartbit",

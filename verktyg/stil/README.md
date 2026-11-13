@@ -66,7 +66,7 @@ lägerelden med vedhögen, vedpinnen och deras bildkort (kvällens bilder är ri
 stocken, halvorna, tavlorna, soffan, fisken och övergångarna), `bildkort_k2.py` bildkorten och ledbilderna, och `zon.py`
 håller en zon under 256 färger. `lagen_k2.py` ritar figurernas lägen i kapitel 2 (ungen och hjälten i leran,
 ungen som nafsar, hoppar, piper och skakar sig, hägern och gåvorna som lager), och `sidovy/bryggan.py` sidovyn under
-bryggan med baronen i leran. `brevet_k2.py` ritar brevets mellanscener i luftskeppet (dragkampen och RITS), halvan som faller och brevramens närbilder i sex lägen. `leverera.py` skriver figurerna och förhandsbilderna. Allt hamnar i `bybor/ut/`. Paletten 1.1 har 18 nya
+bryggan med baronen i leran. `brevet_k2.py` ritar brevets mellanscener i luftskeppet (dragkampen och RITS), halvan som faller och brevramens närbilder i sex lägen. `smadjur_k2.py` ritar trollsländan, ungen med trollsländan på nosen och de små grodorna i träskkanten och vassen. `leverera.py` skriver figurerna och förhandsbilderna. Allt hamnar i `bybor/ut/`. Paletten 1.1 har 18 nya
 färger för byborna (hjältens tre andra hudval och Tant Rosas rosa).
 
 rum2/ (beslut 80.5, steg 5): kapitel 2:s rum som färdiga bilder, ritade med skissens verktyg (`skiss2/bas.py`) men

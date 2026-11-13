@@ -926,3 +926,9 @@ html, body {
 .snabb #styrhjalp .tangent-bild .nere { animation: none; }
 /* ledbilden i P11 med tangentbordet (69.3): efter första felet, bredvid bilden av problemet */
 .formel-bild.ledbild { background: transparent; box-shadow: none; animation: luft .4s ease; }
+
+/* Närbilden av brevramen (Stils granskning 13/11, 87.2): en riktig närbild. Världen dämpas bakom den, och bilden
+   står i dubbel storlek, två av världens pixlar per bildpixel (heltal, så att den aldrig blir suddig). */
+#plattan.narbild-platta { top: calc(var(--rum-topp) + var(--rum-hojd) / 2); transform: translate(-50%, -50%); max-width: none; box-shadow: 0 0 0 200vmax rgba(14, 12, 10, .62); border-radius: 2px; }
+#plattan.narbild-platta .narbild-kort { background: none; width: auto; height: auto; }
+#plattan.narbild-platta .narbild-kort > .bild.bildkort { width: calc(220 * var(--vpx)); height: calc(140 * var(--vpx)); margin: 0; display: block; }

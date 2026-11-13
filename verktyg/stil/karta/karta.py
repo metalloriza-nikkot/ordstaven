@@ -3,7 +3,7 @@
 # Vägen går runt dalen: bit 2 (skogen) -> 3 (träsket) -> 4 (floden) -> 5 (berget) -> 6 (molnkanten, baronens bit) -> 1 (dalen i mitten).
 # Bit 1: berg, en dal full av moln och mammas stora skugga, som liknar ungen (13, s14). Fryst.
 # Bit 2: Farfars hus, skogen, stenen, bron och träsket (15, k1s11, granskningen A 1). Fryst.
-# Bit 3: vassbyn, vassen och vägen fram till en bred flod (17, k2s09). Färdig.
+# Bit 3: vassbyn, vassen och vägen fram till en bred flod med en ö (17, k2s09, och manus 19 v0.3 k3s01). Färdig.
 # Bit 4–6 är skisser som ändras när kapitlen skrivs.
 # Bit 1 och 2 ritas exakt som förut: de ritas med den gamla teckningen (sju bitar) och klistras in pixel för pixel.
 # Allt ritas ur masterpaletten (palett/palett.json): färgerna väljs med pf(), som tar palettens närmaste.
@@ -226,11 +226,13 @@ def flod_bred(punkter, bredd):
         for i in range(0, n + 1, 5):
             x, y = round(x0 + (x1 - x0) * i / n), round(y0 + (y1 - y0) * i / n)
             satt(x, y - 1, VATTEN[2]); satt(x + 1, y - 1, VATTEN[2])
-def on(cx, cy):
-    """Ön i floden, som Farfar ritade den: en rund grön ö med sandkant och två träd."""
-    ellips(cx, cy, 8.5, 4.6, STEN[2], TRA[1])
-    ellips(cx, cy - 0.5, 7, 3.6, GRON[1], GRON[0])
-    trad(cx - 3, cy + 1); trad(cx + 3, cy)
+def on(cx, cy, k=1.0):
+    """Ön i floden, som Farfar ritade den: en rund grön ö med sandkant och träd. Inget skal (den avslöjar inte sköldpaddan)."""
+    ellips(cx, cy, 8.5 * k, 4.6 * k, STEN[2], TRA[1])
+    ellips(cx, cy - 0.5, 7 * k, 3.6 * k, GRON[1], GRON[0])
+    if k >= 1: trad(cx - 3, cy + 1); trad(cx + 3, cy)
+    else:
+        for (dx, dy) in ((-2, -1), (1, -2), (2, 0)): satt(cx + dx, cy + dy, GRON[0]); satt(cx + dx, cy + dy - 1, GRON[1])   # buskar
 def vulkan_ny(x, y):
     """Berget som ryker: en bred kon i bläck med krater, och rök som stiger snett åt höger."""
     for i in range(18):
@@ -266,9 +268,9 @@ def ny_teckning():
     for dx in range(-5, -1): satt(58 + dx, 79, TRA[1]); satt(58 + dx, 80, TRA[0])     # bryggan ut i dammen
     # den breda floden, som börjar i bit 3 och går genom bit 4 mot berget
     FLOD = [(-2, 62), (12, 58), (26, 51), (40, 42), (54, 36), (68, 34), (84, 30), (100, 31), (114, 35), (126, 38), (138, 40)]
-    flod_bred(FLOD, lambda x: 4 if x < 44 else (5 if 54 <= x <= 80 else 3))
+    flod_bred(FLOD, lambda x: 6 if 4 <= x <= 26 else (4 if x < 44 else 3))   # floden vidgar sig runt ön
     # ---------- bit 4: floden (kapitel 3, skiss) ----------
-    on(66, 34)
+    on(14, 57, k=0.8)        # ön ligger på bit 3, i floden där biten tar slut (manus 19 v0.3, k3s01: kartbit 3 i närbild visar ön)
     for (x, y) in [(10, 22), (22, 14), (8, 36), (90, 16), (104, 22), (40, 22), (98, 10)]: trad(x, y)
     for (x, y) in [(30, 32), (76, 44), (110, 44)]: vass(x, y, 2)
     # ---------- bit 5: berget (kapitel 4, skiss): vulkanen och isgrottorna ----------
@@ -282,8 +284,8 @@ def ny_teckning():
     sten(146, 136); sten(182, 132)
     kompassros(198, 124, 8)
     # ---------- vägen ----------
-    VAGEN = [(64, 97), (56, 90), (46, 85), (36, 79), (29, 71), (26, 63), (28, 56),          # bit 3: genom byn och vassen till floden
-             (36, 46), (48, 40), (58, 36),                                               # bit 4: längs floden till ön
+    VAGEN = [(64, 97), (56, 90), (46, 85), (36, 79), (29, 71), (24, 64), (17, 61),          # bit 3: genom byn och vassen till floden och ön
+             (24, 55), (36, 46), (48, 40), (58, 36),                                     # bit 4: längs floden mot berget
              (74, 32), (88, 28), (102, 29), (116, 33), (128, 36),                         # ... och vidare nedför floden
              (138, 36), (144, 28), (150, 26), (158, 28), (170, 36), (184, 40),            # bit 5: upp på vulkanen och in i isgrottan
              (200, 72), (198, 77), (192, 84), (186, 90),                                  # ... ut ur grottan nedanför
