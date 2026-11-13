@@ -5,7 +5,7 @@ import { skapaBerattelse, spolaFram, aterstallFramsteg, barFore, grenarI } from 
 import { sammanfatta } from './karna/foraldravy.js';
 import { skapaLasmotor, valjVariant, nivaMedKrav } from './karna/lasmotor.js';
 import { egenskaper, egetForemal, synligaEgenskaper, PALETT } from './karna/egenskaper.js';
-import { skapaValj, skapaFormel, skapaDop, skapaKrukor, skapaRaddning, skapaTryck } from './karna/pussel.js';
+import { skapaValj, skapaFormel, skapaDop, skapaKrukor, skapaRaddning, skapaTryck, skapaMeddelande } from './karna/pussel.js';
 import { forSkarm, versaler } from './karna/text.js';
 import { rumTillSkarm, varldTillSkarm, RUM, textskala } from './karna/skalning.js';
 import { framfor, lasplats, vidObjekt, genom, stigStart, RACKVIDD } from './karna/rumslayout.js';
@@ -1870,10 +1870,13 @@ export function skapaSpel(d) {
     const senast = new Map();
     window.setInterval(() => {
       if (!b || pausad || rum.fryst || !ui.plattan.hidden || !rum.harRum || !aktuelltRum) return;
-      if (!['ga_till', 'nav', 'fritt'].includes(aktuelltSteg?.typ) || aktuelltSteg?.mal === 'unge') return;
+      if (!garFritt()) return;
+      const vidForemal = b.frivilligaVid(aktuelltRum);
       for (const sc of b.kapitel.scener) {
         const l = sc.lockar;
         if (!l || !sc.frivillig || b.frivilligtGjort(sc.id)) continue;
+        // en scen som börjar vid ett föremål lockar bara när den går att starta (2.47: från pass 2 tills duellen)
+        if (sc.startar_vid && !vidForemal.includes(sc)) continue;
         const o = rum.ruta(l.vid);
         if (!o) continue;
         const nu = avstandTill(rum.pos, o) <= RUM.ruta * 3;
@@ -1928,7 +1931,45 @@ export function skapaSpel(d) {
    * Har kapitlet en sidogren (en frivillig scen som startar i ett rum)? Då är vägarna mellan kapitlets områden
    * öppna under varje ga_till (beslut 26.2). Prologen har ingen, och där är det som förut.
    */
-  const harSidogren = () => (b?.kapitel?.scener || []).some((/** @type {any} */ s) => s.frivillig && s.startar_i_rum);
+  const harSidogren = () => (b?.kapitel?.scener || []).some((/** @type {any} */ s) => s.frivillig && s.startar_i_rum && !s.startar_vid);
+  /**
+   * Går han fritt? Ett mål (inte ungen), navet, fri lek, eller när han letar (P26: snäckorna, tången). Då kan det
+   * som lockar hända, och en frivillig scen vid ett föremål börja (2.47).
+   */
+  function garFritt() {
+    const st = aktuelltSteg;
+    if (!st) return false;
+    if (['ga_till', 'nav', 'fritt'].includes(st.typ)) return st.mal !== 'unge';
+    return st.typ === 'pussel' && b.pussel(st.pussel_id)?.typ === 'P26_krukorna';
+  }
+  /**
+   * En frivillig scen som börjar vid ett föremål (startar_vid, 2.47: skalkanten). Den börjar när han går fram till
+   * föremålet medan han går fritt och scenen är öppen (karna/berattelse.js: från sitt pass tills duellen börjar).
+   * Stegen spelas där han står, och sedan fortsätter steget som pågick (målet eller letandet) som förut.
+   */
+  {
+    let pagar = false;
+    window.setInterval(async () => {
+      if (!b || pagar || pausad || rum.fryst || !ui.plattan.hidden || !rum.harRum || !aktuelltRum || !garFritt()) return;
+      const sc = b.frivilligaVid(aktuelltRum).find((/** @type {any} */ s) => { const o = rum.ruta(s.startar_vid); return !!o && vidObjekt(rum.pos, o); });
+      if (!sc) return;
+      pagar = true;
+      const forra = aktuelltSteg, varPussel = pusselPagar, moln = molnNu;
+      const radion = new Map(senaste);
+      logg.handelse('frivilligt', `scen ${sc.id} vid ${sc.startar_vid}`);
+      rum.frys(true); inmatning.rensaGaTill(); rum.ungePekar(null); ui.doljRegi();
+      try {
+        for (const x of sc.steg) { aktuelltSteg = x; b.effektUtanfor(x, sc.rum); await utfor(x); }
+        b.frivilligtKlart(sc.id); spara();
+      } finally {
+        aktuelltSteg = forra; pusselPagar = varPussel; visaEtiketter();
+        for (const [nyckel, r] of radion) senaste.set(nyckel, r);
+        if (moln) { ui.visaTanke(moln); molnNu = moln; } else visaMoln(null);
+        ui.uppdateraHud(av); rum.frys(false); pagar = false;
+        logg.handelse('frivilligt', `scen ${sc.id} klar, tillbaka till ${forra?.typ ?? '?'}`);
+      }
+    }, 150);
+  }
   /** Rummen han har varit i i kapitlet: scenerna fram till den som pågår, och sidogrenarna han har tagit. */
   function kandaRum() {
     const sc = b.kapitel.scener, i = sc.indexOf(b.scen);
@@ -2068,7 +2109,7 @@ export function skapaSpel(d) {
         raddningPagar = true; spelaPlatsensMusik();
         try { res = await raddning(p); } finally { raddningPagar = false; spelaPlatsensMusik(); }
         break;
-      case 'P9_kodlas': res = await kodlas(p); break;
+      case 'P9_kodlas': res = p.lage === 'meddelande' ? await meddelande(p) : await kodlas(p); break;
       case 'P29_tryck': res = await tryckRakna(p); break;
       default:
         // P15, P9 och andra typer byggs i fas 3. Gråboxen hoppar över dem.
@@ -2984,6 +3025,72 @@ export function skapaSpel(d) {
         if (h.typ === 'bokstav') svar(f.skriv(h.tecken));
         if (h.typ === 'sudda' && !upptagen && f.sudda()) rita();
       });
+      rita();
+    });
+  }
+
+  /**
+   * Chiffret som meddelande (P9 med lage meddelande, 2.47, kapitel 3): Farfars tecken i en rad med en ruta under
+   * varje, och nyckeln bredvid. En ruta i taget är markerad, och han skriver bokstaven på tangentbordet. Rätt bokstav
+   * står kvar direkt och nästa tecken markeras (karna/pussel.js). Ett fel skakar rutan och bokstaven faller bort. Hjälpen
+   * gäller tecknet: efter två fel lyser tecknet och dess bokstav på nyckeln (förenklingen), efter tre nosar ungen på
+   * det, och knuffen får tecknet att glimta. Loggen har tid, fel och hjälp per tecken. Ingen tidspress. @param {any} p
+   */
+  async function meddelande(p) {
+    const m = skapaMeddelande(p, { nu: () => performance.now() });
+    const c = p.chiffer;
+    // nosen räknas som hjälp på tecknet han står vid
+    let nosad = false;
+    const spar = { get hjalp() { return nosad; }, set hjalp(v) { if (v) { nosad = true; m.hjalp(); } } };
+    if (p.instruktion) sag(p.instruktion);
+    rum.frys(true);
+    return new Promise((klar) => {
+      let upptagen = false, glimt = false;
+      const k = knuffKlocka(p.knuff, () => { glimt = true; rita(); window.setTimeout(() => { glimt = false; if (!upptagen) rita(); }, tid(1600)); });
+      const rita = (/** @type {{ plats: number, bokstav: string } | null} */ fel = null) => {
+        const tecknet = m.tecknetNu, lys = m.forenklad, nos = m.s.felNu >= 3;
+        const rad = c.tecken.map((/** @type {string} */ t, /** @type {number} */ i) => (t === ' ' ? '<span class="med-mellanrum" aria-hidden="true"></span>'
+          : `<span class="med-ruta ${i === m.s.nu ? 'nu' : ''} ${m.s.skrivet[i] ? 'ratt' : ''} ${fel?.plats === i ? 'skakar' : ''}" data-plats="${i}"><span class="med-tecken">${bilder.html(t)}</span><span class="plats ${m.s.skrivet[i] ? 'last' : ''}">${ui.esc(fel?.plats === i ? fel.bokstav : m.s.skrivet[i])}</span></span>`)).join('');
+        const nyckel = `<div class="kod-kort kod-nyckel">${c.nyckel.map((/** @type {any} */ n) => `<span class="kod-par ${n.tecken === tecknet && lys ? 'tips' : ''} ${n.tecken === tecknet && nos ? 'nosar' : ''} ${n.tecken === tecknet && glimt ? 'glimt' : ''}" data-tecken="${ui.esc(n.tecken)}">${bilder.html(n.tecken)}<span class="kod-bokstav">${ui.esc(n.bokstav)}</span></span>`).join('')}</div>`;
+        const fraga = p.instruktion ? fragaRadHtml(p.instruktion, '', true) : '';
+        const knappar = d.pek() ? '' : '<div class="dop-knappar"><button type="button" class="knapp visa-tb" aria-label="Visa tangentbordet">⌨</button></div>';
+        ui.visaPlatta(`<div class="pussel-ruta kod-ruta meddelande-ruta">${fraga}<div class="med-rad">${rad}</div>${nyckel}${knappar}</div>`, 'pussel P9_kodlas meddelande');
+        tillatNos(p, /** @type {any} */ (spar));
+        if (p.instruktion) for (const el of ui.plattan.querySelectorAll('.fraga-rad .las-igen, .fraga-rad .hogtalare')) el.addEventListener('click', (e) => { e.stopPropagation(); sag(p.instruktion); });
+        ui.plattan.querySelector('.visa-tb')?.addEventListener('click', () => { tangentbord.visa(); layout.sattReserv(TANGENTBORD_HOJD); });
+      };
+      const svar = async (/** @type {string} */ bokstav) => {
+        if (upptagen) return;
+        const r = m.skriv(bokstav);
+        if (r.resultat === 'ingen') return;
+        k.nollstall();
+        if (r.resultat === 'fel') {
+          upptagen = true;
+          logg.handelse('val', `${p.id}: ${String(bokstav).toLocaleUpperCase('sv-SE')} vid tecken ${m.tecknetNu}`, { resultat: 'fel', felNu: r.felNu });
+          felljud(p.vid_fel); rita({ plats: r.plats, bokstav: String(bokstav).toLocaleUpperCase('sv-SE') });
+          await vanta(tid(450));
+          if (r.felNu === (p.forenkla?.efter_fel ?? 2)) logg.handelse('förenkla', `${p.id}: ${m.tecknetNu} och ${m.bokstavNu} lyser på nyckeln`);
+          if (r.felNu === 3 && p.efter_3_fel) logg.handelse('ungen', `${p.id}: nosar på ${m.tecknetNu} på nyckeln`);
+          rita(); upptagen = false; return;
+        }
+        const x = m.s.logg[m.s.logg.length - 1];
+        logg.handelse('tecken', `${p.id} ${m.s.logg.length}: ${x.tecken} ${x.bokstav}`, { sek: Math.round(x.ms / 100) / 10, fel: x.fel, hjalp: x.hjalp });
+        nosad = false;
+        brickljud(m.s.logg.length);
+        if (r.resultat === 'ratt') { rita(); return; }
+        // klart: de två orden lyser i guld en stund (lästid, kortas inte i snabbläget)
+        upptagen = true; k.stopp(); sluta();
+        tangentbord.dolj(); layout.sattReserv(0);
+        logg.handelse('val', `${p.id}: ${m.text}`, { resultat: 'klar', fel: m.s.fel });
+        ljud.spela('ratt'); rita();
+        ui.visaPlatta(`<div class="formel-i-luften meddelande-luft">${ui.esc(versaler(p.svar))}</div>`, 'formel-luft');
+        await vanta((p.svar_lyser_sek ?? 1) * 1000);
+        ui.doljPlatta();
+        if (p.vid_ratt) await reaktion(p.vid_ratt);
+        klar({ niva: p.niva, forstaForsoket: m.s.fel === 0, forsok: m.s.fel + 1, hjalp: m.s.logg.some((y) => y.hjalp) });
+      };
+      const sluta = lyssnaHandling((h) => { if (h.typ === 'bokstav') svar(h.tecken); });
+      if (d.pek()) { tangentbord.visa(); layout.sattReserv(TANGENTBORD_HOJD); }
       rita();
     });
   }

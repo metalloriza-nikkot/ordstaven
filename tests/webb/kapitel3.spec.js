@@ -8,16 +8,16 @@ const kap = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-0
 const pussel = new Map(kap.pussel.map((p) => [p.id, p]));
 
 /** Starta kapitel 3 vid en scen, med namnen klara. @param {any} page @param {string} scenId */
-async function starta(page, scenId) {
+async function starta(page, scenId, scen = 0, steg = 0) {
   await page.goto('./?snabb&ny&kapitel=kap-03');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
-  await page.evaluate((scenId) => {
+  await page.evaluate(({ scenId, scen, steg }) => {
     const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
-    Object.assign(av, { kapitelId: 'kap-03', scen: 0, scenId, steg: 0, startad: false });
+    Object.assign(av, { kapitelId: 'kap-03', scen, scenId, steg, startad: steg > 0, pass: scen ? 2 : 1 });
     t.spelare.hjalte.namn = 'TESTA'; t.spelare.hjalte.formler = ['LJUS', 'SVÄRD', 'FLYG'];
     t.spelare.unge = { format: 1, steg: 1, formagor: [], ...t.spelare.unge, namn: 'KNOPP', folj: true };
     localStorage.setItem('ordstaven_spar', JSON.stringify(t));
-  }, scenId);
+  }, { scenId, scen, steg });
   await page.goto('./?snabb&kapitel=kap-03');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.click('.start-knapp');
@@ -103,4 +103,91 @@ test('flodmannen säger ahoj! i gemener (87.7)', async ({ page }) => {
   await expect(page.locator('#rop')).toHaveText('ahoj!');
   expect(await ev(() => window.__ORDSTAVEN.logg())).toContain('[bubbla] flodman: ahoj!');
   await page.screenshot({ path: 'test-results/kap3-ahoj.png' });
+});
+
+test('kapitel 3 pass 2: snäckorna, skalkanten mitt i letandet, chiffret, fenan och kramen (steg 2)', { tag: '@rok-mac' }, async ({ page }, info) => {
+  test.skip(!['mac-helskarm', 'ipad-10', 'mac-safari'].includes(info.project.name), 'tre projekt räcker, som kapitel 2 (84.6)');
+  test.setTimeout(240000);
+  await starta(page, 'k3s03_sandbanken', kap.scener.findIndex((s) => s.id === 'k3s03_sandbanken'));
+  const ev = (fn, arg) => page.evaluate(fn, arg);
+  const vidare = async () => { for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta), .pass-slut .fortsatt').all()) await v.click({ timeout: 300 }).catch(() => {}); };
+  const gaMot = (id) => ev((id) => { const o = window.__ORDSTAVEN.ruta(id); if (!o) return false; window.__ORDSTAVEN.gaMot(o.x + o.b / 2, o.y + o.h + 6); return true; }, id);
+  const typ = async (ord) => { for (const c of ord) { if ('ÅÄÖ'.includes(c)) await ev((k) => window.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true })), c.toLowerCase()); else await page.keyboard.type(c); } };
+  const anvand = async (id) => { await gaMot(id); await page.waitForTimeout(500); if (await page.locator('#plattan').isVisible()) return; await page.keyboard.press('Space'); };
+  const chiffer = pussel.get('k3_chiffret').chiffer;
+  const nyckel = new Map(chiffer.nyckel.map((n) => [n.tecken, n.bokstav]));
+  let skalkant = false, chifferBild = false, felSkrivet = false;
+  for (let i = 0; i < 500; i++) {
+    const [scen, st] = await ev(() => [window.__ORDSTAVEN.scen(), window.__ORDSTAVEN.steg()]);
+    if (await page.locator('.pass-slut .fortsatt').isVisible()) break;
+    if (await page.locator('#plattan .meddelande-ruta').isVisible()) {
+      if (!chifferBild) {
+        chifferBild = true; await page.screenshot({ path: 'test-results/kap3-chiffret.png' });
+        // allt ryms på skärmen (79.2): instruktionen, tecknen och nyckeln
+        const ruta = await page.locator('#plattan .meddelande-ruta').boundingBox();
+        const vy = page.viewportSize();
+        expect(ruta.y).toBeGreaterThanOrEqual(0);
+        expect(ruta.y + ruta.height).toBeLessThanOrEqual(vy.height);
+        expect((await page.locator('#plattan .meddelande-ruta .fraga-rad').boundingBox()).y).toBeGreaterThanOrEqual(0);
+      }
+      // ett fel först (rutan skakar), sedan hela meddelandet
+      if (!felSkrivet) { felSkrivet = true; await typ('Q'); await page.waitForTimeout(800); }
+      await typ(chiffer.tecken.filter((t) => t !== ' ').map((t) => nyckel.get(t)).join(''));
+      await page.waitForTimeout(3000); continue;
+    }
+    if (await page.locator('#plattan .formel-skriv').isVisible()) {
+      const p = pussel.get(st?.pussel_id);
+      await typ(p.svar); await page.keyboard.press('Enter'); await page.waitForTimeout(800); continue;
+    }
+    if (await page.locator('#plattan').isVisible()) { await vidare(); await page.waitForTimeout(150); continue; }
+    const p = st?.typ === 'pussel' ? pussel.get(st.pussel_id) : null;
+    if (st?.typ === 'ga_till' && st.mal === 'unge') await ev(() => { const u = window.__ORDSTAVEN.ungePos(); window.__ORDSTAVEN.gaMot(u.x + 14, u.y); });
+    else if (st?.typ === 'ga_till') await anvand(st.mal);
+    else if (p?.typ === 'P26_krukorna') {
+      const loggen = await ev(() => window.__ORDSTAVEN.logg());
+      // efter första snäckan går han till skalets kant: den frivilliga scenen börjar där
+      if (!skalkant && loggen.includes('[svinga] snacka_')) { skalkant = true; await gaMot('skalkant'); await page.waitForTimeout(1500); continue; }
+      const kvar = p.foremal.filter((id) => !loggen.includes(`[svinga] ${id}:`));
+      if (kvar.length) await anvand(kvar[0]);
+    } else if (p?.i_rummet) {
+      const v = await ev(() => window.__ORDSTAVEN.variant());
+      const m = (p.varianter[v] || Object.values(p.varianter)[0]).alternativ.find((a) => a.ratt).objekt;
+      await anvand(m);
+    }
+    await page.waitForTimeout(250);
+  }
+  const loggen = await ev(() => window.__ORDSTAVEN.logg());
+  // skalkanten: scenen spelades mitt i letandet, med LJUS och sidan i Dinoboken, och letandet fortsatte
+  expect(loggen).toContain('[frivilligt] scen k3s06_skalkant vid skalkant');
+  expect(loggen).toContain('[frivilligt] scen k3s06_skalkant klar, tillbaka till pussel');
+  expect(loggen).toMatch(/\[val\] k3_morkret|k3_morkret/);
+  // chiffret: ett fel på första tecknet, och sedan tio tecken med loggen per tecken
+  expect(loggen).toContain('[val] k3_chiffret: Q vid tecken vag');
+  expect(loggen.split('\n').filter((r) => r.includes('[tecken] k3_chiffret'))).toHaveLength(10);
+  expect(loggen).toContain('[val] k3_chiffret: UNDER FENAN');
+  const t = await ev(() => window.__ORDSTAVEN.tillstand());
+  const av = t.aventyr['den-gomda-dalen'];
+  expect(av.frivilligt).toContain('k3s06_skalkant');
+  expect(av.rumstillstand.sandbanken).toBe('fena_uppe');
+  await page.screenshot({ path: 'test-results/kap3-pass2-slut.png' });
+});
+
+test('chiffret ryms på skärmen i alla storlekar, med instruktionen överst (79.2)', async ({ page }) => {
+  test.setTimeout(60000);
+  const sc = kap.scener.findIndex((s) => s.id === 'k3s03_sandbanken');
+  await starta(page, 'k3s03_sandbanken', sc, kap.scener[sc].steg.findIndex((x) => x.pussel_id === 'k3_chiffret'));
+  for (let i = 0; i < 60 && !(await page.locator('#plattan .meddelande-ruta').isVisible()); i++) {
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    await page.waitForTimeout(250);
+  }
+  const ruta = await page.locator('#plattan .meddelande-ruta').boundingBox();
+  const vy = page.viewportSize();
+  expect(ruta.y).toBeGreaterThanOrEqual(0);
+  expect(ruta.x).toBeGreaterThanOrEqual(0);
+  expect(ruta.y + ruta.height).toBeLessThanOrEqual(vy.height);
+  expect(ruta.x + ruta.width).toBeLessThanOrEqual(vy.width);
+  for (const el of await page.locator('#plattan .meddelande-ruta :is(.fraga-rad, .med-ruta, .kod-par)').all()) {
+    const b = await el.boundingBox();
+    expect(b.y).toBeGreaterThanOrEqual(0); expect(b.y + b.height).toBeLessThanOrEqual(vy.height);
+  }
 });

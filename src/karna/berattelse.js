@@ -367,7 +367,28 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
      * @param {string} rumId
      */
     frivilligScen(rumId) {
-      return kapitel.scener.find((/** @type {any} */ s) => s.frivillig && (s.startar_i_rum || s.rum) === rumId && !av.frivilligt.includes(s.id)) ?? null;
+      // en scen som börjar vid ett föremål (startar_vid, 2.47) startar inte när han går in i rummet
+      return kapitel.scener.find((/** @type {any} */ s) => s.frivillig && !s.startar_vid && (s.startar_i_rum || s.rum) === rumId && !av.frivilligt.includes(s.id)) ?? null;
+    },
+    /**
+     * Frivilliga scener som börjar vid ett föremål i rummet (startar_vid, 2.47: skalkanten) och går att starta nu:
+     * från början av scenens pass, tills berättelsen kommer till till_scen. I till_scen stänger den när scenens första
+     * ordduell börjar (88.6: skalkanten är öppen tills duellen börjar), och utan duell när till_scen börjar. Inte om den
+     * redan är spelad. @param {string} rumId @returns {any[]}
+     */
+    frivilligaVid(rumId) {
+      const nu = kapitel.scener[scenIndex];
+      if (!nu || nu.frivillig) return [];
+      return kapitel.scener.filter((/** @type {any} */ s) => {
+        if (!s.frivillig || !s.startar_vid || (s.startar_i_rum || s.rum) !== rumId || av.frivilligt.includes(s.id)) return false;
+        if (passFor(nu) < s.pass) return false;
+        if (!s.till_scen) return true;
+        const ti = scenNr(s.till_scen);
+        if (ti < 0 || scenIndex < ti) return true;
+        if (scenIndex > ti) return false;
+        const duell = (nu.steg || []).findIndex((/** @type {any} */ x) => x.typ === 'pussel' && pussel.get(x.pussel_id)?.typ === 'P16_ordduell');
+        return duell >= 0 && stegIndex < duell;
+      });
     },
     /** Ett frivilligt steg eller föremål utanför scenernas ordning (rum.frivilligt, en frivillig scen). Effekten görs här. @param {any} st @param {string | null} rumId */
     effektUtanfor(st, rumId) { effekt(st, rumId); },

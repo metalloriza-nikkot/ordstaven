@@ -435,3 +435,64 @@ export function skapaTryck(pussel) {
     },
   };
 }
+
+// ---------------------------------------------------------------------------------------------
+// P9 med lage meddelande (2.47, chiffret i kapitel 3)
+// ---------------------------------------------------------------------------------------------
+/**
+ * Ett meddelande i Farfars tecken: en ruta i taget, och han skriver bokstaven för tecknet med tangentbordet. Rätt
+ * bokstav står kvar direkt och nästa tecken markeras. Ett mellanslag mellan två ord hoppas över. Hjälpen och loggen
+ * gäller tecknet han står vid: fel per tecken, och om hjälpen (förenklingen eller nosen) användes.
+ * @param {{ chiffer: { tecken: string[], nyckel: { tecken: string, bokstav: string }[] }, forenkla?: { efter_fel: number } }} pussel
+ * @param {{ nu?: () => number }} [opt]
+ */
+export function skapaMeddelande(pussel, { nu = () => 0 } = {}) {
+  const nyckel = new Map(pussel.chiffer.nyckel.map((n) => [n.tecken, n.bokstav]));
+  const tecken = pussel.chiffer.tecken;
+  /** platserna med ett tecken (inte mellanslagen), i ordning */
+  const platser = tecken.map((t, i) => (t === ' ' ? -1 : i)).filter((i) => i >= 0);
+  const forenklaEfter = pussel.forenkla?.efter_fel ?? 2;
+  const s = {
+    /** bokstäverna som står, per plats i tecken ('' = tom, ' ' = mellanslag) */
+    skrivet: tecken.map((t) => (t === ' ' ? ' ' : '')),
+    /** platsen i tecken som är markerad, eller -1 när meddelandet är klart */
+    nu: platser[0] ?? -1,
+    fel: 0,
+    /** per tecken: fel, hjälp och tid */
+    logg: /** @type {{ plats: number, tecken: string, bokstav: string, fel: number, hjalp: boolean, ms: number }[]} */ ([]),
+    felNu: 0, hjalpNu: false, start: nu(),
+    klar: false,
+  };
+  const ratt = (/** @type {number} */ i) => nyckel.get(tecken[i]) ?? '';
+  return {
+    s,
+    /** Bokstaven för den markerade platsen. */
+    get bokstavNu() { return s.nu >= 0 ? ratt(s.nu) : null; },
+    /** Tecknet på den markerade platsen. */
+    get tecknetNu() { return s.nu >= 0 ? tecken[s.nu] : null; },
+    /** Ska tecknet och dess bokstav lysa på nyckeln (förenklingen efter två fel på samma tecken)? */
+    get forenklad() { return s.felNu >= forenklaEfter; },
+    /** Hjälpen användes på tecknet (nosen, eller förenklingen syntes). */
+    hjalp() { s.hjalpNu = true; },
+    /**
+     * En bokstav. @param {string} bokstav
+     * @returns {{ resultat: 'ratt' | 'fel' | 'klar' | 'ingen', plats: number, felNu?: number }}
+     */
+    skriv(bokstav) {
+      if (s.klar || s.nu < 0) return { resultat: 'ingen', plats: -1 };
+      const plats = s.nu;
+      const b = String(bokstav).toLocaleUpperCase('sv-SE');
+      if (b !== ratt(plats)) { s.fel++; s.felNu++; if (s.felNu >= forenklaEfter) s.hjalpNu = true; return { resultat: 'fel', plats, felNu: s.felNu }; }
+      s.skrivet[plats] = b;
+      const t = nu();
+      s.logg.push({ plats, tecken: tecken[plats], bokstav: b, fel: s.felNu, hjalp: s.hjalpNu, ms: Math.round(t - s.start) });
+      s.felNu = 0; s.hjalpNu = false; s.start = t;
+      const nasta = platser.find((i) => i > plats);
+      s.nu = nasta ?? -1;
+      if (s.nu < 0) { s.klar = true; return { resultat: 'klar', plats }; }
+      return { resultat: 'ratt', plats };
+    },
+    /** Meddelandet som det står, i versaler. */
+    get text() { return s.skrivet.join(''); },
+  };
+}

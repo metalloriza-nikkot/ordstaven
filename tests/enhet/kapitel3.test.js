@@ -2,7 +2,9 @@
 // strecket i sköld|padda, budgeten och skepparens röst.
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { skapaTryck, reaktionForAntal, skapaKrukor } from '../../src/karna/pussel.js';
+import { skapaTryck, reaktionForAntal, skapaKrukor, skapaMeddelande } from '../../src/karna/pussel.js';
+import { skapaBerattelse } from '../../src/karna/berattelse.js';
+import { nyttTillstand } from '../../src/karna/sparning.js';
 import { bubblaFor, bubblaText } from '../../src/karna/bubblor.js';
 import { ord, forSkarm } from '../../src/karna/text.js';
 import { tonFor } from '../../src/grans/rost.js';
@@ -107,5 +109,63 @@ describe('skepparens röst (87.9)', () => {
     const s = tonFor('skeppare', 'Ahoj! Ön?'), farfar = tonFor('gammal', 'Ahoj! Ön?'), tant = tonFor('tant', 'Ahoj! Ön?');
     expect(s.pitch).toBeGreaterThan(farfar.pitch);
     expect(s.pitch).toBeLessThan(tant.pitch);
+  });
+});
+
+describe('chiffret som meddelande (steg 2)', () => {
+  const p = () => pusselI(kap3(), 'k3_chiffret');
+  it('en ruta i taget, mellanslaget hoppas över, och rätt bokstav står kvar', () => {
+    let klocka = 0;
+    const m = skapaMeddelande(p(), { nu: () => klocka });
+    expect(m.tecknetNu).toBe('vag');
+    for (const b of 'UNDER') { klocka += 1000; expect(m.skriv(b).resultat).toBe('ratt'); }
+    expect(m.tecknetNu).toBe('fjaril'); // mellanslaget hoppas över
+    for (const b of 'FENA') m.skriv(b);
+    expect(m.skriv('N').resultat).toBe('klar');
+    expect(m.text).toBe('UNDER FENAN');
+    expect(m.s.logg).toHaveLength(10);
+    expect(m.s.logg[0]).toMatchObject({ tecken: 'vag', bokstav: 'U', fel: 0, hjalp: false, ms: 1000 });
+  });
+  it('fel per tecken, förenklingen efter två och hjälpen i loggen för just det tecknet', () => {
+    const m = skapaMeddelande(p());
+    expect(m.skriv('x')).toMatchObject({ resultat: 'fel', felNu: 1 });
+    expect(m.forenklad).toBe(false);
+    m.skriv('Q');
+    expect(m.forenklad).toBe(true);
+    expect(m.skriv('u').resultat).toBe('ratt'); // gemen räknas som versal
+    expect(m.s.logg[0]).toMatchObject({ fel: 2, hjalp: true });
+    m.skriv('N');
+    expect(m.s.logg[1]).toMatchObject({ fel: 0, hjalp: false });
+    m.hjalp(); m.skriv('D');
+    expect(m.s.logg[2].hjalp).toBe(true); // nosen på tecknet
+    expect(m.s.fel).toBe(2);
+  });
+});
+
+describe('skalkanten är öppen från pass 2 tills duellen börjar (88.6)', () => {
+  const nu = (scenId, steg) => {
+    const k = kap3(); const t = nyttTillstand('t');
+    const b = skapaBerattelse({ aventyr: {}, kapitel: k, tillstand: t, aventyrId: 'den-gomda-dalen' });
+    for (let i = 0; i < 200 && !(b.scen.id === scenId && b.stegIndex === steg); i++) { b.aktuellt(); b.klar({}); }
+    expect([b.scen.id, b.stegIndex]).toEqual([scenId, steg]);
+    return b;
+  };
+  const oppen = (b) => b.frivilligaVid('sandbanken').map((s) => s.id);
+  it('stängd i pass 1, öppen i pass 2 och i början av pass 3, stängd när duellen börjar', () => {
+    const k = kap3();
+    const ankaret = k.scener.find((s) => s.id === 'k3s04_ankaret');
+    const duell = ankaret.steg.findIndex((x) => x.pussel_id === 'k3_duellen');
+    expect(oppen(nu('k3s02_on', 1))).toEqual([]);
+    expect(oppen(nu('k3s03_sandbanken', 1))).toEqual(['k3s06_skalkant']);
+    expect(oppen(nu('k3s04_ankaret', 0))).toEqual(['k3s06_skalkant']);
+    expect(oppen(nu('k3s04_ankaret', duell - 1))).toEqual(['k3s06_skalkant']);
+    expect(oppen(nu('k3s04_ankaret', duell))).toEqual([]);
+    expect(oppen(nu('k3s05_resan', 0))).toEqual([]);
+  });
+  it('en gång: efter besöket är den stängd, och den startar inte när han går in i rummet', () => {
+    const b = nu('k3s03_sandbanken', 1);
+    expect(b.frivilligScen('sandbanken')).toBeNull();
+    b.frivilligtKlart('k3s06_skalkant');
+    expect(oppen(b)).toEqual([]);
   });
 });

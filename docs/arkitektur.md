@@ -1082,3 +1082,9 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **En mellanscen med `tillstand_efter`** byter rummets tillstånd när den börjar, och berättelsen sätter det också när steget är klart.
 - **En skylt med flera rader** i rummet är alltid en mening (papperet), som stenen vid hornet.
 - **P9 meddelande, P16 ordduellen, `tryck` och `lockar.vid` vid ett föremål** är bara i schemat och kontrollen. De byggs i steg 2–4, och tills dess visar gråboxen en platshållare för P16.
+
+## 109. Kapitel 3 i gråbox, steg 2 (0.76.0, Teknik 43, beslut 88.9)
+- **Chiffret som meddelande** (`skapaMeddelande` i `karna/pussel.js`, `meddelande` i `spel.js`): P9 med `lage: meddelande` får en egen ruta på läsplattan med tecknen i en rad, en ruta under varje och nyckeln i två rader. Rätt bokstav står kvar och nästa tecken markeras, och mellanslaget hoppas över. Hjälpen gäller tecknet: förenklingen efter `forenkla.efter_fel` fel, ungen efter tre, och knuffen. Nosen räknas som hjälp på tecknet. Loggen har en rad per tecken (`[tecken]`) med tid, fel och hjälp. Ordet lyser `svar_lyser_sek` utan förkortning i testläget. Rutan ryms i alla skärmstorlekar (testet *chiffret ryms på skärmen*).
+- **En frivillig scen vid ett föremål** (`frivilligaVid` i `karna/berattelse.js`): öppen från sitt pass tills `till_scen`, och i `till_scen` tills scenens första ordduell (88.6). `spel.js` startar den när han står vid föremålet och går fritt (`garFritt`: ett mål som inte är ungen, navet, fri lek eller P26), spelar stegen där han står och återställer sedan steget, molnet och pusslet som pågick. `lockar` lockar bara när scenen är öppen. Sådana scener startar inte när han går in i rummet, och de gör inte kapitlet till ett kapitel med sidogren.
+- **Platshållarna** för kapitel 3:s tecken och bildkort står i `kartor/den-gomda-dalen/platshallare.json` (våg, droppe, krabba, fjäril, måne, stjärna, korten och tången) tills Stil har ritat dem.
+
