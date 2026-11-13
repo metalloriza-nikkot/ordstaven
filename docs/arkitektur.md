@@ -1101,3 +1101,9 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Kontrollen** prövar filen som ett kapitel. `pekar_pa` får vara en bild i ett tomt rum.
 - **Webbtestet** använder en provfil med påhittade ord (`tests/fixturer/testrum-duell-prov.json`), som läggs i localStorage (`ordstaven_testrum_duell`) i testläget, tills Innehålls fil finns.
 
+## 112. Hjälpen i skrivpusslen kommer av försöken (0.79.0, beslut 89.3–89.4)
+- **`skrivKnuff`** i `spel.js` ersätter `knuffKlocka` i skrivpusslen (`formel`, `formelSkriv`, `kodlas` och `meddelande`): tidigast `SKRIV_KNUFF_MS` (25 s) även om `knuff.efter_sek` är kortare, högst en gång, och en lyssnare på `keydown` (och på skärmtangentbordet) startar om klockan för varje tangent, också en som inte skriver något. Knuffen visar högst ledbilden och får bilden att glimta. I chiffret glimtar rutan han står vid, inte nyckeln. Räddningen (P15) har kvar sin egen knuff (58.2).
+- **Förebilden** tänds bara av försöken (trappan i 76.2) och aldrig av knuffen. En förebild som syns från början (`fran_start`, titta–täck) tänds inte heller igen av tiden.
+- **Nivån (89.4):** `formel` och `formelSkriv` rapporterar en lösning med förebild som hjälp till läsmotorn (`hjalp_anvand`), så att streaken inte växer och nivån inte stiger av den, som 62.2 säger. Loggen skriver `klar med förebild` också när förebilden syntes från början.
+- **Kapitel 1 och 2 (89.8):** kapitel 2:s sex skrivpussel och testrummet hade samma knuff som klättrade av tiden (9 s, ledbilden och sedan förebilden). Kapitel 1:s SVÄRD hade det inte: knuffen fick bara bilden att glimta tills han hade gjort två fel. Prologens LJUS (förebilden syns från början) tände förebilden igen av knuffen. Allt följer nu samma regel.
+

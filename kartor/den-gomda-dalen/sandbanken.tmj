@@ -101,19 +101,12 @@
      "id": 5,
      "name": "skoldpadda",
      "type": "sak",
-     "x": 160,
+     "x": 262,
      "y": 24,
-     "width": 136,
-     "height": 104,
+     "width": 30,
+     "height": 14,
      "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "golv",
-       "type": "bool",
-       "value": true
-      }
-     ]
+     "visible": true
     },
     {
      "id": 6,

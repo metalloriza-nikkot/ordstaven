@@ -11,7 +11,7 @@ const NIVA = { L1: 1, L2: 2, L3: 3, L4: 4 };
 /** Allt att öppna: läsvalen och lapparna (pussel med text, papper eller skylt), las_skylt och rummens skyltar. */
 function fall() {
   const ut = [];
-  for (const kap of ['kap-00', 'kap-01', 'kap-02']) {
+  for (const kap of ['kap-00', 'kap-01', 'kap-02', 'kap-03']) {
     const k = las(kap);
     const ps = new Map(k.pussel.map((p) => [p.id, p]));
     const sett = new Set();
@@ -114,7 +114,7 @@ async function sparadI(page, f0) {
 
 
 for (const [bredd, hojd, fonster] of FONSTER) {
-  test(`texten kapas aldrig: läsval, lappar och skyltar i prologen och kapitel 1–2 (${fonster}, 79.2)`, async ({ page }, info) => {
+  test(`texten kapas aldrig: läsval, lappar och skyltar i prologen och kapitel 1–3 (${fonster}, 79.2)`, async ({ page }, info) => {
     test.skip(info.project.name !== 'mac-helskarm', 'testet ställer in fönstret själv');
     test.setTimeout(900000);
     await page.setViewportSize({ width: bredd, height: hojd });

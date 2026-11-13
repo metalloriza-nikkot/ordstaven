@@ -44,6 +44,12 @@ const MED_RADIOMARKE = new Set(['farfar']);
  * följer med än glimtar målet (beslut 31.2, 39.4: 15 s i stället för 10, så att han hinner hitta själv).
  */
 const MAL_KNUFF_MS = 15000;
+/**
+ * Knuffen av tiden i ett skrivpussel (beslut 89.3): tidigast efter ca 25 s, högst en gång, och den visar högst
+ * ledbilden. Förebilden tänds bara efter ett försök som inte löser pusslet, aldrig av tiden. Varje tangent han trycker
+ * startar om klockan. Räddningarna (58.2) har egna regler.
+ */
+const SKRIV_KNUFF_MS = 25000;
 /** Styrbilden kommer igen när han har stått vid en sak så här länge utan att göra något (granskningen A 23). */
 const STYR_STILLA_MS = 4500;
 const vanta = (/** @type {number} */ ms) => new Promise((r) => setTimeout(r, ms));
@@ -709,6 +715,23 @@ export function skapaSpel(d) {
    * peka = visa pekningen i världen (ungen springer till rätt dörr). Då visas inte knuffens beskrivning, som är skriven för den vuxne.
    * @param {number} [efterMs] tiden när knuffen inte har efter_sek (läsplattan: efter textmängden)
    */
+  /**
+   * Knuffen i ett skrivpussel (89.3): tidigast efter SKRIV_KNUFF_MS, en gång, och varje tangent på tangentbordet
+   * (också de som inte skriver något) startar om klockan. extra visar högst ledbilden. @param {any} knuff
+   * @param {() => void} extra @returns {{ nollstall(): void, stopp(): void }}
+   */
+  function skrivKnuff(knuff, extra) {
+    let gjord = false;
+    const k0 = knuffKlocka({ handling: '', ...(knuff || {}), efter_sek: Math.max(SKRIV_KNUFF_MS / 1000, knuff?.efter_sek ?? 0) }, () => { gjord = true; k0.stopp(); extra(); }, undefined, SKRIV_KNUFF_MS);
+    const tangent = () => { if (!gjord) k0.nollstall(); };
+    window.addEventListener('keydown', tangent, true);
+    ui.$('#tangentbord')?.addEventListener('pointerdown', tangent, true);
+    return {
+      nollstall() { if (!gjord) k0.nollstall(); },
+      stopp() { k0.stopp(); window.removeEventListener('keydown', tangent, true); ui.$('#tangentbord')?.removeEventListener('pointerdown', tangent, true); },
+    };
+  }
+
   function knuffKlocka(knuff, extra, vakt, efterMs = KNUFF_MS) {
     if (!knuff) return { nollstall() {}, stopp() {} };
     let t = 0, t2 = 0;
@@ -2590,10 +2613,10 @@ export function skapaSpel(d) {
         fb.syns = true; fb.kvar = true; spar.forebild = true;
         logg.handelse('formel', `${p.id}: förebilden tänds (${varfor}) och står kvar`);
       };
-      // knuffen: utifrån bilden glimtar bilden (förebilden pekar på svaret och kommer först efter fel), annars förebilden
-      const k = knuffKlocka(p.knuff, () => {
-        if (vidFel && (trappa ? fel < 2 : !fb.visad)) { const b = ui.plattan.querySelector('.formel-bild'); b?.classList.remove('puls'); void (/** @type {HTMLElement | null} */ (b))?.offsetWidth; b?.classList.add('puls'); return; }
-        tandForebild('knuff'); rita(); ui.plattan.querySelector('.forebild .bokstav')?.classList.add('blinkar');
+      // knuffen av tiden (89.3): högst ledbilden, en gång, och annars glimtar bilden. Förebilden tänds bara av ett försök
+      const k = skrivKnuff(p.knuff, () => {
+        if (p.ledbild && !fb.ledbild) { fb.ledbild = true; logg.handelse('formel', `${p.id}: ledbilden ${p.ledbild} tänds (knuff)`); rita(); }
+        const b = ui.plattan.querySelector('.formel-bild'); b?.classList.remove('puls'); void (/** @type {HTMLElement | null} */ (b))?.offsetWidth; b?.classList.add('puls');
       });
       if (!fb.brickor) window.setTimeout(() => { fb.brickor = true; if (!upptagen) rita(); }, tid(p.forebild.brickor_efter_sek * 1000));
       const tack = () => {
@@ -2687,9 +2710,12 @@ export function skapaSpel(d) {
         ui.visaPlatta(ordet, 'formel-luft');
         await vanta(tid(1000)); ui.doljPlatta();
         ordkraft(p.svar);
-        if (tt) logg.handelse('formel', `${p.id}: klar ${spar.forebild ? 'med' : 'utan'} förebild`);
+        // en lösning med förebild räknas som hjälp, så att nivån inte stiger av den (89.4, 62.2). En förebild som syns
+        // från början (han skriver av) är också en förebild
+        const medForebild = spar.forebild || (!!p.forebild && !vidFel);
+        logg.handelse('formel', `${p.id}: klar ${medForebild ? 'med' : 'utan'} förebild`);
         await reaktion(r.reaktion);
-        klar({ niva: p.niva, forstaForsoket: f.forstaForsoket, forsok: f.s.fel + 1, hjalp: spar.hjalp });
+        klar({ niva: p.niva, forstaForsoket: f.forstaForsoket, forsok: f.s.fel + 1, hjalp: spar.hjalp || medForebild });
       };
       const sluta = lyssnaHandling((h) => {
         if (h.typ === 'bokstav' && fb.brickor) svar(f.skriv(h.tecken));
@@ -2736,16 +2762,13 @@ export function skapaSpel(d) {
     };
     const tandLedbild = (knuff = false) => { if (p.ledbild && (knuff || steg >= 1) && !fb.ledbild) { fb.ledbild = true; logg.handelse('formel', `${p.id}: ledbilden ${p.ledbild} tänds${knuff ? ' (knuff)' : ''}`); return true; } return false; };
     return new Promise((klar) => {
-      // knuffen kommer igen och klättrar (76.2, A3): varje knuff är ett steg i trappan. Bilden glimtar, och först
-      // tänds ledbilden, sedan förebilden. När förebilden syns blinkar dess första bokstav.
+      // knuffen av tiden (89.3): tidigast efter ca 25 s, en gång, och högst ledbilden. Förebilden tänds bara efter ett
+      // försök som inte löser pusslet (trappan, 76.2), och varje tangent startar om klockan (skrivKnuff)
       const pulsBild = () => { for (const b of ui.plattan.querySelectorAll('.formel-bild')) { b.classList.remove('puls'); void (/** @type {HTMLElement} */ (b)).offsetWidth; b.classList.add('puls'); } };
-      const k = knuffKlocka(p.knuff, () => {
+      const k = skrivKnuff(p.knuff, () => {
         if (fardigt) return;
-        if (fb.visad) ui.plattan.querySelector('.forebild .bokstav')?.classList.add('blinkar');
-        else if (tandLedbild(true)) { rita(); pulsBild(); }
-        else if (p.forebild) { fb.visad = true; spar.forebild = true; logg.handelse('formel', `${p.id}: förebilden tänds (knuff)`); rita(); ui.plattan.querySelector('.forebild .bokstav')?.classList.add('blinkar'); }
-        else pulsBild();
-        k.nollstall();
+        if (tandLedbild(true)) rita();
+        pulsBild();
       });
       const rita = () => {
         const n = antalFalt(p, skrivet), tecken = [...skrivet];
@@ -2773,8 +2796,9 @@ export function skapaSpel(d) {
       };
       const visaTangentbord = () => { tangentbord.visa(); layout.sattReserv(TANGENTBORD_HOJD); };
       const skriv = (/** @type {string} */ b) => {
+        k.nollstall();
         if (upptagen || fardigt || [...skrivet].length >= MAX_BOKSTAVER) return;
-        k.nollstall(); skrivet += versaler(b); brickljud([...skrivet].length); rita();
+        skrivet += versaler(b); brickljud([...skrivet].length); rita();
       };
       const sudda = () => { if (upptagen || fardigt || !skrivet) return; skrivet = [...skrivet].slice(0, -1).join(''); ljud.spela('klick'); rita(); };
       const tom = () => { skrivet = ''; rita(); };
@@ -2833,7 +2857,8 @@ export function skapaSpel(d) {
         if (effektMs) { logg.handelse('formel', `${p.id}: ${b.formel.effekt}`); await vanta(tid(effektMs)); }
         await reaktion(effektMs && p.vid_ratt ? { ...p.vid_ratt, syns_redan: true } : p.vid_ratt);
         logg.handelse('formel', `${p.id}: klar ${spar.forebild ? 'med' : 'utan'} förebild`, { forsok: steg + 1, ...nosadeIPusslet(spar) });
-        klar({ niva: p.niva, forstaForsoket: fel === 0, forsok: fel + 1, hjalp: spar.hjalp, ord: b.ord, ristas: b.formel.ristas !== false });
+        // en lösning med förebild räknas som hjälp, så att nivån inte stiger av den (89.4, 62.2)
+        klar({ niva: p.niva, forstaForsoket: fel === 0, forsok: fel + 1, hjalp: spar.hjalp || spar.forebild, ord: b.ord, ristas: b.formel.ristas !== false });
       };
       const sluta = lyssnaHandling((h) => {
         if (h.typ === 'bokstav') skriv(h.tecken);
@@ -2989,7 +3014,7 @@ export function skapaSpel(d) {
     if (visar >= 0) logg.handelse('kodlås', 'ungen visar första tecknet (inte hjälp)');
     return new Promise((klar) => {
       let upptagen = false;
-      const k = knuffKlocka(p.knuff, () => ui.plattan.querySelector('.kod-nyckel')?.classList.add('puls'));
+      const k = skrivKnuff(p.knuff, () => ui.plattan.querySelector('.kod-nyckel')?.classList.add('puls')); // 89.3: tidigast efter ca 25 s, en gång
       const tipsBokstav = () => (f.s.tips === null ? null : f.s.brickor.find((x) => x.id === f.s.tips)?.bokstav ?? null);
       const rita = () => {
         const bokstav = (/** @type {number | null} */ id) => (id === null ? '' : f.s.brickor.find((x) => x.id === id)?.bokstav ?? '');
@@ -3050,12 +3075,14 @@ export function skapaSpel(d) {
     rum.frys(true);
     return new Promise((klar) => {
       let upptagen = false, glimt = false;
-      const k = knuffKlocka(p.knuff, () => { glimt = true; rita(); window.setTimeout(() => { glimt = false; if (!upptagen) rita(); }, tid(1600)); });
+      // knuffen av tiden (89.3) visar inte svaret: rutan han står vid glimtar (vilket tecken han letar efter), aldrig
+      // nyckeln, tidigast efter ca 25 s och en gång. Förenklingen på nyckeln kommer bara av fel
+      const k = skrivKnuff(p.knuff, () => { glimt = true; logg.handelse('knuff', `${p.id}: rutan glimtar`); rita(); window.setTimeout(() => { glimt = false; if (!upptagen) rita(); }, tid(1600)); });
       const rita = (/** @type {{ plats: number, bokstav: string } | null} */ fel = null) => {
         const tecknet = m.tecknetNu, lys = m.forenklad, nos = m.s.felNu >= 3;
         const rad = c.tecken.map((/** @type {string} */ t, /** @type {number} */ i) => (t === ' ' ? '<span class="med-mellanrum" aria-hidden="true"></span>'
-          : `<span class="med-ruta ${i === m.s.nu ? 'nu' : ''} ${m.s.skrivet[i] ? 'ratt' : ''} ${fel?.plats === i ? 'skakar' : ''}" data-plats="${i}"><span class="med-tecken">${bilder.html(t)}</span><span class="plats ${m.s.skrivet[i] ? 'last' : ''}">${ui.esc(fel?.plats === i ? fel.bokstav : m.s.skrivet[i])}</span></span>`)).join('');
-        const nyckel = `<div class="kod-kort kod-nyckel">${c.nyckel.map((/** @type {any} */ n) => `<span class="kod-par ${n.tecken === tecknet && lys ? 'tips' : ''} ${n.tecken === tecknet && nos ? 'nosar' : ''} ${n.tecken === tecknet && glimt ? 'glimt' : ''}" data-tecken="${ui.esc(n.tecken)}">${bilder.html(n.tecken)}<span class="kod-bokstav">${ui.esc(n.bokstav)}</span></span>`).join('')}</div>`;
+          : `<span class="med-ruta ${i === m.s.nu ? 'nu' : ''} ${i === m.s.nu && glimt ? 'glimt' : ''} ${m.s.skrivet[i] ? 'ratt' : ''} ${fel?.plats === i ? 'skakar' : ''}" data-plats="${i}"><span class="med-tecken">${bilder.html(t)}</span><span class="plats ${m.s.skrivet[i] ? 'last' : ''}">${ui.esc(fel?.plats === i ? fel.bokstav : m.s.skrivet[i])}</span></span>`)).join('');
+        const nyckel = `<div class="kod-kort kod-nyckel">${c.nyckel.map((/** @type {any} */ n) => `<span class="kod-par ${n.tecken === tecknet && lys ? 'tips' : ''} ${n.tecken === tecknet && nos ? 'nosar' : ''}" data-tecken="${ui.esc(n.tecken)}">${bilder.html(n.tecken)}<span class="kod-bokstav">${ui.esc(n.bokstav)}</span></span>`).join('')}</div>`;
         const fraga = p.instruktion ? fragaRadHtml(p.instruktion, '', true) : '';
         const knappar = d.pek() ? '' : '<div class="dop-knappar"><button type="button" class="knapp visa-tb" aria-label="Visa tangentbordet">⌨</button></div>';
         ui.visaPlatta(`<div class="pussel-ruta kod-ruta meddelande-ruta">${fraga}<div class="med-rad">${rad}</div>${nyckel}${knappar}</div>`, 'pussel P9_kodlas meddelande');

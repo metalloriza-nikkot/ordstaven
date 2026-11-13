@@ -967,3 +967,4 @@ html, body {
 .duell-hjalp { font-style: italic; opacity: .8; }
 .sammansatt { white-space: nowrap; }
 .glipa { width: .12em; }
+.med-ruta.glimt { animation: puls .5s ease 3; }

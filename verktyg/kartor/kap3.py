@@ -39,16 +39,18 @@ RUMMEN = {
             vagg(0, 104, 344, 88, vatten=True),
             vagg(344, 152, 296, 40, vatten=True),
             vagg(600, 104, 40, 48, vatten=True),
-            # pråmarna i rad med plankor emellan: golv ute i vattnet, från stranden
-            sak('pramarna', 344, 104, 256, 48, golv=True),
+            # pråmarna i rad med plankor emellan ute i vattnet, från stranden: vattnet runt dem är väggar, så han går på dem
+            # pråmarna är marken mellan vattnet: i gråboxen en liten markör i hörnet, så att inget står i vägen för sakerna
+            # på dem (kartkontrollen). Stil ritar pråmarna i skissen
+            sak('pramarna', 344, 140, 24, 10),
             figur('flodman', 396, 108, sida='alla'),
             figur('skepparen', 548, 104, sida='alla', talare='skepparen'),
             sak('hornet', 576, 112, 14, 12, sida='alla', visas_forst='morgon'),
             sak('sten_horn', 520, 92, 14, 12, sida='alla'),
             # ön stiger söder om skepparens pråm (tillståndet on): i vattnet, och tången hänger från kanten mot pråmen
             sak('on', 472, 160, 120, 32, sida='over'),
-            sak('tang_gardin', 512, 152, 56, 8, sida='over', golv=True),
-            sak('planka_on', 532, 152, 16, 8, golv=True),
+            sak('tang_gardin', 512, 152, 56, 8, sida='over'),
+            sak('planka_on', 532, 144, 16, 8),
             # resan (kvall, pass 3): flaskan han håller när han sitter på skalet ute på floden
             sak('flaska_i_handen', 300, 160, 10, 10, sida='alla'),
             liv('fagel', 210, 132, 12, 12),
@@ -80,7 +82,8 @@ RUMMEN = {
         'objekt': [
             punkt('start', 48, 150),
             vagg(0, 0, 320, 16, vatten=True), vagg(304, 16, 16, 176, vatten=True), vagg(0, 180, 304, 12, vatten=True),
-            sak('skoldpadda', 160, 24, 136, 104, golv=True),
+            # skalet är marken han går på: i gråboxen en liten markör baktill, så att skylten och snäckorna går att nå
+            sak('skoldpadda', 262, 24, 30, 14),
             sak('skylt_skal', 214, 52, 18, 12, sida='alla'),
             sak('snacka_1', 210, 66, 6, 6, sida='alla'), sak('snacka_2', 218, 66, 6, 6, sida='alla'),
             sak('snacka_3', 226, 66, 6, 6, sida='alla'), sak('snacka_4', 234, 66, 6, 6, sida='alla'),

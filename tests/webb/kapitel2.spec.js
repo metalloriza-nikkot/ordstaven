@@ -51,6 +51,8 @@ test('kapitel 2 går att spela från träsket till elden (gråbox, del 5)', { ta
     if (rb.vass.hjalte && !vassBild && !(await page.locator('#plattan').isVisible())) { vassBild = true; await page.screenshot({ path: 'test-results/kap2-vassen-fotterna.png' }); }
     if (scen && scener.at(-1) !== scen) scener.push(scen);
     if (await page.locator('.pass-slut .fortsatt').isVisible()) { if (scen === 'k2s10_elden') break; await vidare(); continue; }
+    // kapitel 3 är låst från början (0.78.0): kapitel 2 slutar med slutrutan
+    if (scen === 'k2s10_elden' && await page.locator('.pass-slut.kapitel-last').isVisible()) break;
     if (await page.locator('#plattan .formel-skriv').isVisible()) {
       const p = pussel.get(st?.pussel_id);
       await typ(p.svar); await page.keyboard.press('Enter'); await page.waitForTimeout(800); continue;

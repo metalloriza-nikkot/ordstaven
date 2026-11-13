@@ -1235,7 +1235,7 @@ test('menyn för vuxna hoppar till en scen i ett senare kapitel: det som kommer 
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('s00_start');
   await page.keyboard.press('Control+Shift+KeyM');
   await page.click('#vuxenmeny .del[data-del="test"]');
-  await expect(page.locator('#vuxenmeny .kapitelrad')).toHaveCount(3); // prologen, kapitel 1 och kapitel 2 (0.45.0)
+  await expect(page.locator('#vuxenmeny .kapitelrad')).toHaveCount(4); // prologen och kapitel 1–3 (kapitel 3 från 0.78.0)
   await page.screenshot({ path: 'test-results/meny-alla-kapitel.png' });
   await page.click('#vuxenmeny .scenlista .scen[data-kapitel="kap-01"][data-i="5"]'); // k1s07_stigarna, pass 2
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
@@ -1358,7 +1358,7 @@ test('menyn för vuxna startar ett pass: pass 3 börjar med morgonen, namnen och
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.keyboard.press('Control+Shift+KeyM');
   await page.click('#vuxenmeny .del[data-del="pass"]');
-  await expect(page.locator('#vuxenmeny .pass-start')).toHaveCount(8); // prologens tre pass, kapitel 1:s två och kapitel 2:s tre
+  await expect(page.locator('#vuxenmeny .pass-start')).toHaveCount(11); // prologens tre pass, kapitel 1:s två, och kapitel 2:s och 3:s tre
   await page.screenshot({ path: 'test-results/meny-pass.png' });
   await page.locator('#vuxenmeny .pass-start', { hasText: 'Prologen, pass 3' }).click();
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
@@ -1941,7 +1941,9 @@ test('menyn sätter tillbaka lärandet till passets början, utan spår av det s
   await page.keyboard.press('Control+Shift+KeyM');
   await page.click('#vuxenmeny .del[data-del="pass"]');
   // passen utan bild av lärandet är märkta
-  await expect(page.locator('#vuxenmeny .pass-start[data-bild="nej"]')).toHaveText(['Prologen, pass 2 *', 'Skogen, pass 2 *', 'Träsket, pass 1 *', 'Träsket, pass 2 *', 'Träsket, pass 3 *']);
+  // kapitel 3:s namn i menyn är kapitlets meta.namn (Innehålls fält)
+  const kap3namn = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-03.json', import.meta.url), 'utf8')).meta.namn;
+  await expect(page.locator('#vuxenmeny .pass-start[data-bild="nej"]')).toHaveText(['Prologen, pass 2 *', 'Skogen, pass 2 *', 'Träsket, pass 1 *', 'Träsket, pass 2 *', 'Träsket, pass 3 *', ...[1, 2, 3].map((n) => `${kap3namn}, pass ${n} *`)]);
   await expect(page.locator('#vuxenmeny .utan-bild')).toBeVisible();
   await page.screenshot({ path: 'test-results/meny-larandet.png' });
   await Promise.all([page.waitForEvent('load'), page.locator('#vuxenmeny .pass-start', { hasText: 'Prologen, pass 3' }).click()]);
@@ -2433,22 +2435,49 @@ test('hjälpens trappa i formeln med tangentbordet (69.3 och 76.2): varje förs�
   expect(l).not.toContain('k2_over: BRÅ (fel)');
 });
 
-test('knuffen i formeln kommer igen och klättrar (76.2, A3): bilden glimtar, sedan ledbilden och sedan förebilden', async ({ page }) => {
-  test.setTimeout(60000);
+test('knuffen av tiden i formeln (89.3): tidigast efter ca 25 s, en gång, högst ledbilden, varje tangent startar om klockan, och nivån stiger inte med förebild (89.4)', async ({ page }) => {
+  test.setTimeout(240000);
   const kap2 = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-02.json', import.meta.url), 'utf8'));
+  // efter_sek 1 i datan: knuffen kommer ändå inte före ca 25 s
   const over = { ...kap2.pussel.find((p) => p.id === 'k2_over'), ledbild: 'tankebubbla_bro', knuff: { handling: 'bilden glimtar', efter_sek: 1, syns_redan: true } };
   over.forebild = { text: 'BRO', upplast: false, visas: 'andra_felet' };
   await provscen(page, { id: 't_knuff', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'pussel', pussel_id: 'k2_over' }, R('Klart.')] }, (t) => { t.spelare.hjalte.formler = ['LJUS', 'SVÄRD']; }, { pussel: [over] });
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('SKRIV ETT ORD MED STAVEN!', { timeout: 10000 });
   await page.locator('#plattan .replik-ruta').click();
+  await expect(page.locator('#plattan .formel-skriv')).toBeVisible({ timeout: 10000 });
   const logg = () => page.evaluate(() => window.__ORDSTAVEN.logg());
-  await expect.poll(logg, { timeout: 10000 }).toContain('k2_over: ledbilden tankebubbla_bro tänds (knuff)');
+  // han letar efter en tangent: en tangent som inte skriver något (Shift) efter 20 s startar om klockan
+  await page.waitForTimeout(20000);
+  await page.keyboard.press('Shift');
+  await page.waitForTimeout(15000);
+  expect(await logg()).not.toContain('ledbilden tankebubbla_bro tänds');
+  // 25 s efter tangenten: ledbilden, en gång, och ingen förebild av tiden
+  await page.waitForTimeout(12000);
+  expect(await logg()).toContain('k2_over: ledbilden tankebubbla_bro tänds (knuff)');
   await expect(page.locator('#plattan .formel-bild.ledbild')).toBeVisible();
-  await expect.poll(logg, { timeout: 10000 }).toContain('k2_over: förebilden tänds (knuff)');
+  // en gång: ingen ny knuff och ingen förebild av tiden, också 30 s senare
+  await page.waitForTimeout(30000);
+  expect(await logg()).not.toContain('förebilden tänds');
+  expect((await logg()).split('ledbilden tankebubbla_bro tänds').length - 1).toBe(1);
+  await expect(page.locator('#plattan .forebild')).toHaveCount(0);
+  // förebilden kommer bara efter försök (trappan: två försök som inte löser pusslet)
+  for (const ord of ['APA', 'BOR']) {
+    await page.keyboard.type(ord); await page.keyboard.press('Enter');
+    await expect.poll(logg, { timeout: 8000 }).toContain(`k2_over: ${ord} (`);
+    await expect(page.locator('#plattan .platser .plats.fylld')).toHaveCount(0, { timeout: 15000 });
+  }
+  await expect.poll(logg, { timeout: 8000 }).toContain('k2_over: förebilden tänds (');
   await expect(page.locator('#plattan .forebild')).toBeVisible();
-  // han kan alltid skriva av ordet: det kör aldrig fast
+  // klar med förebild: nivån stiger inte (89.4), det räknas som hjälp
+  const fore = await page.evaluate(() => JSON.parse(JSON.stringify(window.__ORDSTAVEN.tillstand().spelare.larande.skrivning || {})));
   await page.keyboard.type('BRO'); await page.keyboard.press('Enter');
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('KLART.', { timeout: 15000 });
+  expect(await logg()).toContain('k2_over: klar med förebild');
+  const efter = await page.evaluate(() => window.__ORDSTAVEN.tillstand().spelare.larande.skrivning);
+  const nyckel = Object.keys(efter).find((x) => x.startsWith('P11_formel'));
+  expect(efter[nyckel].niva).toBe(fore[nyckel]?.niva ?? efter[nyckel].niva);
+  expect(efter[nyckel].streak ?? 0).toBe(0);
+  expect(efter[nyckel].hjalp).toBeGreaterThanOrEqual(1);
 });
 test('kapitel 2 går att gå in i (del 2): SVÄRD och vassväggen, skylten, vattnet, BRO över vattnet och in i byn, med piltangenterna', async ({ page }) => {
   const kap2data = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-02.json', import.meta.url), 'utf8'));
