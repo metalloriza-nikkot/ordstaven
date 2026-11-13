@@ -1,7 +1,7 @@
 name: Stora kontrollen
 # Hela webbsviten i hela matrisen (beslut 84.6): när den vuxne ska spela en version (Actions → Stora kontrollen →
 # Run workflow, eller `gh workflow run stora.yml`), och varje natt om något har pushats sedan förra natten.
-# Fyra delar som körs samtidigt. Publicerar inget: det gör den snabba kontrollen (pages.yml).
+# Sex delar som körs samtidigt, delade efter profil så att de tar ungefär lika lång tid. Publicerar inget: det gör den snabba kontrollen (pages.yml).
 # Tester som ibland faller (taggen @ostadig, docs/testmatris.md) körs för sig och stoppar inget.
 on:
   workflow_dispatch:
@@ -36,7 +36,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        del: [1, 2, 3, 4]
+        include:
+          # mac-helskarm har de flesta testerna (ca 170), och de andra profilerna mest röktestet och genomspelningarna
+          - { del: 1, val: '--project=mac-helskarm --shard=1/3' }
+          - { del: 2, val: '--project=mac-helskarm --shard=2/3' }
+          - { del: 3, val: '--project=mac-helskarm --shard=3/3' }
+          - { del: 4, val: '--project=mac-safari' }
+          - { del: 5, val: '--project=ipad-10' }
+          - { del: 6, val: '--project=ipad-43 --project=ipad-mini --project=mac-lister --project=win-1080 --project=win-125 --project=win-liten --project=smalt-fonster --project=laptop-720p --project=win-150 --project=4k --project=ultrabred' }
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -48,14 +55,15 @@ jobs:
         run: npm run kontroll
       - name: Bygg
         run: npm run build
-      - name: Webbläsartester, del ${{ matrix.del }} av 4
-        run: npx playwright test --shard=${{ matrix.del }}/4 --reporter=blob,github,list
+      - name: Webbläsartester, del ${{ matrix.del }} av 6
+        run: npx playwright test ${{ matrix.val }} --reporter=blob,github,list
         env:
           CI: '1'
+          PLAYWRIGHT_BLOB_OUTPUT_NAME: report-${{ matrix.del }}.zip
       - name: Tester som ibland faller (stoppar inget)
         if: always()
         continue-on-error: true
-        run: npx playwright test --shard=${{ matrix.del }}/4 --reporter=list --pass-with-no-tests
+        run: npx playwright test ${{ matrix.val }} --reporter=list --pass-with-no-tests
         env:
           CI: '1'
           SVIT: ostadiga

@@ -20,7 +20,7 @@ I canvasläget ritar spelet högst 30 bildrutor per sekund, och bara när något
 | Kontroll | När | Vad | Tid | Stoppar publiceringen |
 |---|---|---|---|---|
 | **Snabba kontrollen** (`.github/workflows/pages.yml`) | varje push | innehållskontrollen och enhetstesterna, bygget, **röktestet** i alla 14 profiler (`npm run test:rok`), och **textkapas** när text eller layout har ändrats (filerna i `verktyg/test/textkapas-filer.txt`) | ca 10–15 min till publicerad | ja |
-| **Stora kontrollen** (`.github/workflows/stora.yml`) | när den vuxne ska spela en version (Run workflow, eller `gh workflow run stora.yml`), och varje natt om main har ändrats | hela webbsviten i hela matrisen, i fyra delar samtidigt, med en samlad rapport (`stora-testrapport`) | ca 15–20 min | nej, men en version går inte till den vuxne förrän den har gått igenom |
+| **Stora kontrollen** (`.github/workflows/stora.yml`) | när den vuxne ska spela en version (Run workflow, eller `gh workflow run stora.yml`), och varje natt om main har ändrats | hela webbsviten i hela matrisen, i sex delar samtidigt (mac-helskarm i tre, Safari, iPad 10 och resten), med en samlad rapport (`stora-testrapport`) | ca 10–15 min | nej, men en version går inte till den vuxne förrän den har gått igenom |
 
 Namnkontrollen körs före varje push på datorn som pushar (`verktyg/git-krokar/pre-push`).
 
