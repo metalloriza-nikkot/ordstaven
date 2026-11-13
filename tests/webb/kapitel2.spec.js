@@ -44,6 +44,7 @@ test('kapitel 2 går att spela från träsket till elden (gråbox, del 5)', { ta
   /** @type {Record<string, any>} rummens bilder (82.7), en gång per rum */
   const bilder = {};
   let vassBild = false;
+  let slutruta = false;
   for (let i = 0; i < 900; i++) {
     const [scen, st] = await ev(() => [window.__ORDSTAVEN.scen(), window.__ORDSTAVEN.steg()]);
     const rb = await ev(() => ({ ...window.__ORDSTAVEN.rumsbilder(), vass: window.__ORDSTAVEN.vassVidFotter() }));
@@ -52,7 +53,7 @@ test('kapitel 2 går att spela från träsket till elden (gråbox, del 5)', { ta
     if (scen && scener.at(-1) !== scen) scener.push(scen);
     if (await page.locator('.pass-slut .fortsatt').isVisible()) { if (scen === 'k2s10_elden') break; await vidare(); continue; }
     // kapitel 3 är låst från början (0.78.0): kapitel 2 slutar med slutrutan
-    if (scen === 'k2s10_elden' && await page.locator('.pass-slut.kapitel-last').isVisible()) break;
+    if (scener.includes('k2s10_elden') && await page.locator('.pass-slut.kapitel-last').isVisible()) { slutruta = true; break; }
     if (await page.locator('#plattan .formel-skriv').isVisible()) {
       const p = pussel.get(st?.pussel_id);
       await typ(p.svar); await page.keyboard.press('Enter'); await page.waitForTimeout(800); continue;
@@ -97,6 +98,8 @@ test('kapitel 2 går att spela från träsket till elden (gråbox, del 5)', { ta
   // kvällen i byn är en egen bild (82.7), och vasstopparna kom fram vid hans fötter i vassen (82.8)
   expect(await ev(() => window.__ORDSTAVEN.rumsbilder().golv)).toBe('rum_byn_kvall');
   expect((await ev(() => window.__ORDSTAVEN.vassVidFotter())).sedd).toBeGreaterThan(0);
+  // kapitel 3 är låst: kapitel 2 slutar med slutrutan, och genomspelningen slutar där (0.78.0)
+  expect(slutruta).toBe(true);
   expect(scener).toEqual(['k2s01_kanten', 'k2s02_byn', 'k2s03_torget', 'k2s05_vassen', 'k2s03_torget', 'k2s04_bryggan', 'k2s07_hela_brevet', 'k2s08_huset', 'k2s09_kartbiten', 'k2s10_elden']);
   // kapitel 2:s mellanscener och formler rör sig i gråboxen (Teknik 32 och 34, beslut 69 och 71)
   const regi = (await ev(() => window.__ORDSTAVEN.grafik())).regi;
