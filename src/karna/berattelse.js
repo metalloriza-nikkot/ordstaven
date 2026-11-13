@@ -312,6 +312,8 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
         if (p && (p.typ === 'P1_las_och_valj' || p.typ === 'P28_packa') && p.kan_oppnas_igen && !av.lappar.includes(p.id)) av.lappar.push(p.id);
       }
       if (st && p && p.tillstand_efter && scen.rum && st.typ === 'pussel') av.rumstillstand[av.flyttad?.rum ?? scen.rum] = p.tillstand_efter;
+      // en mellanscen som byter rummets tillstånd (2.47, ön stiger)
+      if (st && st.typ === 'mellanscen' && st.tillstand_efter && scen.rum) av.rumstillstand[scen.rum] = st.tillstand_efter;
       effektGjord = false;
       if (stegIndex === -1) { stegIndex = aterupptaSteg; av.steg = stegIndex; return; }
       // stegen mellan grenarna: nästa, och efter det sista navet igen. Efter navets sparpunkt börjar nästa pass.

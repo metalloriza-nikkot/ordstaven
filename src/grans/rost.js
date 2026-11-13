@@ -14,6 +14,9 @@ const ROLLER = {
   // Tant Rosa: ljusare än Farfar och lite långsam. Bo: ljus och snabb (beslut 67.5)
   tant: { pitch: 1.15, rate: 0.9 },
   barn: { pitch: 1.5, rate: 1.1 },
+  // skepparen i kapitel 3 (87.9, Teknik väljer): en gammal kvinna på floden. Mörkare än Tant Rosa och lugnare än
+  // berättaren, men ljusare än Farfar, och lite levande, så att hon inte låter som någon av dem
+  skeppare: { pitch: 0.98, rate: 0.9, levande: 0.06 },
   fanig: { pitch: 1.35, rate: 1.05 },
   metall: { pitch: 1.6, rate: 1.15 },
   fagel: { pitch: 1.45, rate: 1.12, levande: 0.15 },

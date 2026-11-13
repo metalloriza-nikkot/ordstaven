@@ -263,6 +263,27 @@ export function skapaKrukor(pussel, { slump = Math.random } = {}) {
       },
     };
   }
+  // sak_vid (2.47, skylten under mossan): posten på den platsen hittas alltid som nummer sak_vid, oavsett vilken sak
+  // han lyfter, och då är pusslet klart. Han letar lite men behöver aldrig lyfta alla.
+  if (pussel.sak_vid && pussel.sak_vid <= innehall.length) {
+    const nr = pussel.sak_vid;
+    const sak = innehall[nr - 1];
+    const ovriga = blanda(innehall.filter((_, i) => i !== nr - 1), slump);
+    const s = { antal: innehall.length, slagna: /** @type {(string | null)[]} */ (innehall.map(() => null)), klar: false };
+    return {
+      s,
+      sista: sak,
+      /** @param {number} i */
+      sla(i) {
+        if (s.slagna[i] !== null || s.klar) return null;
+        const gjorda = s.slagna.filter((x) => x !== null).length;
+        const fynd = gjorda + 1 === nr ? sak : /** @type {string} */ (ovriga.shift() ?? 'tom');
+        s.slagna[i] = fynd;
+        if (gjorda + 1 === nr) s.klar = true;
+        return fynd;
+      },
+    };
+  }
   // det som alltid hittas sist: sak_i_sista (skattlådan, lådan), eller kartbiten med kartbit_i_sista
   const kartbit = pussel.sak_i_sista && innehall.includes(pussel.sak_i_sista) ? pussel.sak_i_sista
     : pussel.kartbit_i_sista ? innehall.find((x) => x.startsWith('kartbit')) : null;
@@ -371,5 +392,46 @@ export function skapaRaddning(pussel) {
     /** Fler fel än tillåtet (mjukt misslyckande). */
     get forMangaFel() { return s.fel > s.tillatnaFel; },
     get forstaForsoket() { return s.fel === 0; },
+  };
+}
+
+// ---------------------------------------------------------------------------------------------
+// P29 läs och gör med antal (2.47, hornet)
+// ---------------------------------------------------------------------------------------------
+/**
+ * Reaktionen för ett antal tryck som inte är rätt: "2" gäller exakt två, och "3+" tre eller fler (det största
+ * "n+" som räcker). @param {Record<string, any> | undefined} vidAntal @param {number} antal @returns {any}
+ */
+export function reaktionForAntal(vidAntal, antal) {
+  if (!vidAntal) return null;
+  if (vidAntal[String(antal)]) return vidAntal[String(antal)];
+  let bast = null, bastN = -1;
+  for (const [k, h] of Object.entries(vidAntal)) {
+    const m = /^(\d+)\+$/.exec(k);
+    if (m && Number(m[1]) <= antal && Number(m[1]) > bastN) { bast = h; bastN = Number(m[1]); }
+  }
+  return bast;
+}
+
+/**
+ * Hornet: varje tryck räknas, och när det har varit tyst (spelet håller klockan) bedöms antalet. Rätt antal löser
+ * pusslet. Annars kommer reaktionen för antalet, och han kan försöka igen. Ingen klocka går innan första trycket.
+ * @param {{ ratt: number, vid_antal?: Record<string, any>, vid_fel?: any }} pussel
+ */
+export function skapaTryck(pussel) {
+  const s = { antal: 0, fel: 0, forsok: 0, klar: false };
+  return {
+    s,
+    /** Ett tryck. @returns {number} antalet i det här försöket */
+    tryck() { if (!s.klar) s.antal++; return s.antal; },
+    /** Det har varit tyst: bedöm försöket. @returns {{ resultat: 'ratt' | 'fel' | 'inget', antal: number, reaktion?: any }} */
+    bedom() {
+      const antal = s.antal;
+      if (!antal || s.klar) return { resultat: 'inget', antal };
+      s.antal = 0; s.forsok++;
+      if (antal === pussel.ratt) { s.klar = true; return { resultat: 'ratt', antal }; }
+      s.fel++;
+      return { resultat: 'fel', antal, reaktion: reaktionForAntal(pussel.vid_antal, antal) ?? pussel.vid_fel ?? null };
+    },
   };
 }

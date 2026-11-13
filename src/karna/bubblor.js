@@ -16,3 +16,12 @@ export function bubblaFor(rum, figur, tillstand) {
   if (!b) return null;
   return (tillstand && b[tillstand]) || b['*'] || null;
 }
+
+/**
+ * Bubblans text och skrift (2.47, 87.7): en sträng visas i versaler som all speltext, och { text, gemener: true }
+ * visas som den står ("ahoj!" i kapitel 3). @param {any} b det bubblaFor gav @returns {{ text: string, gemener: boolean } | null}
+ */
+export function bubblaText(b) {
+  if (!b) return null;
+  return typeof b === 'string' ? { text: b, gemener: false } : { text: b.text, gemener: !!b.gemener };
+}

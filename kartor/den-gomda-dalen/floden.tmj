@@ -1,0 +1,321 @@
+{
+ "type": "map",
+ "version": "1.10",
+ "tiledversion": "1.11.0",
+ "orientation": "orthogonal",
+ "renderorder": "right-down",
+ "width": 40,
+ "height": 12,
+ "tilewidth": 16,
+ "tileheight": 16,
+ "infinite": false,
+ "compressionlevel": -1,
+ "nextlayerid": 2,
+ "nextobjectid": 16,
+ "properties": [
+  {
+   "name": "rum",
+   "type": "string",
+   "value": "floden"
+  }
+ ],
+ "tilesets": [],
+ "layers": [
+  {
+   "id": 1,
+   "name": "foremal",
+   "type": "objectgroup",
+   "draworder": "index",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 1,
+     "name": "stig_trasket",
+     "type": "utgang",
+     "x": 40,
+     "y": 0,
+     "width": 28,
+     "height": 36,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "riktning",
+       "type": "string",
+       "value": "upp"
+      }
+     ]
+    },
+    {
+     "id": 2,
+     "name": "start",
+     "type": "",
+     "x": 54,
+     "y": 56,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 3,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 104,
+     "width": 344,
+     "height": 88,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vatten",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 4,
+     "name": "",
+     "type": "vagg",
+     "x": 344,
+     "y": 152,
+     "width": 296,
+     "height": 40,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vatten",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 5,
+     "name": "",
+     "type": "vagg",
+     "x": 600,
+     "y": 104,
+     "width": 40,
+     "height": 48,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vatten",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 6,
+     "name": "pramarna",
+     "type": "sak",
+     "x": 344,
+     "y": 104,
+     "width": 256,
+     "height": 48,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 7,
+     "name": "flodman",
+     "type": "figur",
+     "x": 396,
+     "y": 108,
+     "width": 16,
+     "height": 24,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 8,
+     "name": "skepparen",
+     "type": "figur",
+     "x": 548,
+     "y": 104,
+     "width": 16,
+     "height": 24,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      },
+      {
+       "name": "talare",
+       "type": "string",
+       "value": "skepparen"
+      }
+     ]
+    },
+    {
+     "id": 9,
+     "name": "hornet",
+     "type": "sak",
+     "x": 576,
+     "y": 112,
+     "width": 14,
+     "height": 12,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      },
+      {
+       "name": "visas_forst",
+       "type": "string",
+       "value": "morgon"
+      }
+     ]
+    },
+    {
+     "id": 10,
+     "name": "sten_horn",
+     "type": "sak",
+     "x": 520,
+     "y": 92,
+     "width": 14,
+     "height": 12,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 11,
+     "name": "on",
+     "type": "sak",
+     "x": 472,
+     "y": 160,
+     "width": 120,
+     "height": 32,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "over"
+      }
+     ]
+    },
+    {
+     "id": 12,
+     "name": "tang_gardin",
+     "type": "sak",
+     "x": 512,
+     "y": 152,
+     "width": 56,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "over"
+      }
+     ]
+    },
+    {
+     "id": 13,
+     "name": "planka_on",
+     "type": "sak",
+     "x": 532,
+     "y": 152,
+     "width": 16,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 14,
+     "name": "flaska_i_handen",
+     "type": "sak",
+     "x": 300,
+     "y": 160,
+     "width": 10,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 15,
+     "name": "fagel_210_132",
+     "type": "omgivning",
+     "x": 210,
+     "y": 132,
+     "width": 12,
+     "height": 12,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vad",
+       "type": "string",
+       "value": "fagel"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

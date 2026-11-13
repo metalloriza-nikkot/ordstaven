@@ -18,6 +18,15 @@ const kartfiler = import.meta.glob('../kartor/*/*.tmj', { query: '?raw', import:
 const platshallarfiler = import.meta.glob('../kartor/*/platshallare.json', { import: 'default', eager: true });
 const mappAv = (/** @type {string} */ fil) => fil.split('/').at(-2);
 
+/**
+ * Äventyret med ett valt kapitel som inte står i listan än (87.9). Annars är äventyret oförändrat.
+ * @param {any} a @param {string | null} id @param {any[]} kapitel
+ */
+function medValtKapitel(a, id, kapitel) {
+  if (!id || a.kapitel.includes(id) || !kapitel.some((k) => k.id === id)) return a;
+  return { ...a, kapitel: [...a.kapitel, id] };
+}
+
 import { skapaLogg } from './karna/logg.js';
 import { skapaSparning, skapaPlatser } from './karna/sparning.js';
 import { skapaInmatning } from './karna/inmatning.js';
@@ -46,9 +55,12 @@ const valt = allaAventyr.find((a) => a.data.id === parametrar.get('aventyr')) ??
 // Testrummet för fritt skrivande (76.9, Teknik 41): ?testrum visar Innehålls skrivuppgifter i ett tomt rum, på en
 // egen sparplats, så att äventyrets sparning och lärandet aldrig påverkas
 const testrumet = parametrar.has('testrum') ? testrumfiler['../content/testrum-skriv.json'] ?? null : null;
-const aventyr = testrumet ? testrumAventyr(valt.data) : valt.data;
 const kapitel = testrumet ? [testrumKapitel(/** @type {any} */ (testrumet))]
   : Object.entries(kapitelfiler).filter(([fil]) => mappAv(fil) === valt.mapp).map(([, k]) => /** @type {any} */ (structuredClone(k)));
+// ?kapitel=<id> för ett kapitel som finns i content/ men inte står i äventyrets lista än (kapitel 3 i gråbox, 87.9):
+// kapitlet läggs till efter de listade, bara i den här sidvisningen, för den vuxne och webbläsartesterna. Ett vanligt
+// spel ser det inte, och kapitlet före slutar som förut.
+const aventyr = testrumet ? testrumAventyr(valt.data) : medValtKapitel(valt.data, parametrar.get('kapitel'), kapitel);
 // Bara för webbläsartesterna (?snabb&testscen, eller ?test&testscen i vanlig takt): en provscen ur localStorage läggs
 // till i första kapitlet, så att motorns steg kan provas innan innehållet använder dem. Påverkar aldrig ett vanligt spel.
 /** @type {Record<string, any>} provkartor (Tiled-JSON per rum) för webbläsartesterna */

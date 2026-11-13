@@ -26,7 +26,10 @@ export const MAX_MINUTER_PER_PASS = 10;
  * läsförståelse. P11 (formeln) avgör också: han skriver ordet som löser det (beslut 68.3). P15 (räddningen) avgör
  * ingen läsning: alla brickor går att trycka, och stegen visar ordet (76.3, C4).
  */
-export const LASUPPGIFTER = new Set(['P1_las_och_valj', 'P28_packa', 'P11_formel']);
+// P29 (hornet) och P16 (ordduellen) är läsval, och P9 med lage meddelande (chiffret) är en skrivuppgift (2.47, 87.6)
+export const LASUPPGIFTER = new Set(['P1_las_och_valj', 'P28_packa', 'P11_formel', 'P29_tryck', 'P16_ordduell']);
+/** Avgör pusslet en läs- eller skrivuppgift? @param {any} p */
+export const arLasuppgift = (p) => LASUPPGIFTER.has(p.typ) || (p.typ === 'P9_kodlas' && p.lage === 'meddelande');
 
 let ajv;
 function validerare() {
@@ -145,17 +148,19 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
   // Svåra ljud sitter i stammen, så böjda former fångas också (berget, köket, kistan).
   const arSparrat = (o) => { const n = versaler(o); for (const s of sparrad) if (n === s || (s.length >= 3 && n.startsWith(s))) return s.toLocaleLowerCase('sv-SE'); return null; };
 
+  // kapitlets plats i äventyret, och kapitlets nummer för ett kapitel som inte står i listan än (kapitel 3 i gråbox, 87.9)
+  const ordningen = (aventyr.kapitel || []).map((/** @type {any} */ x) => (typeof x === 'string' ? x : x.id));
+  const kapitelPlats = (/** @type {any} */ k) => (ordningen.includes(k.id) ? ordningen.indexOf(k.id) : k.kapitel ?? -1);
   const talare = new Set(Object.keys(aventyr.talare));
   const platshallare = new Set(Object.keys(aventyr.platshallare).map((p) => p.slice(1, -1)));
   const kapitelIds = new Set(kapitel.map((k) => k.id));
   for (const k of aventyr.kapitel) if (!kapitelIds.has(k)) varningar.push(`aventyr.json: kapitel ${k} saknas än`);
   // budgeten per pass och kapitel (76.3), från kapitel 2: talarna i kapitlen före räknas inte som nya figurer
   {
-    const ordning = (aventyr.kapitel || []).map((x) => (typeof x === 'string' ? x : x.id));
-    const sorterade = [...kapitel].sort((a, b) => ordning.indexOf(a.id) - ordning.indexOf(b.id));
+    const sorterade = [...kapitel].sort((a, b) => kapitelPlats(a) - kapitelPlats(b));
     const tidigare = new Set();
     for (const k of sorterade) {
-      if (ordning.indexOf(k.id) >= 2) varningar.push(...budgetVarningar(k, { tidigareTalare: new Set(tidigare) }));
+      if (kapitelPlats(k) >= 2) varningar.push(...budgetVarningar(k, { tidigareTalare: new Set(tidigare) }));
       for (const t of talareI(k)) tidigare.add(t);
     }
   }
@@ -313,6 +318,13 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
           pp.sek += 4;
           // ungen springer till något i rummet (67.2)
           if (st.unge_till && (!s.rum || !rum.get(s.rum)?.innehall.map(objId).includes(st.unge_till))) fel.push(var_(`${sp}: ungen springer till ${st.unge_till}, men det finns inte i rummet ${s.rum}`));
+          // rummets tillstånd från mellanscenen (2.47): ett tillstånd som rummet har
+          if (st.tillstand_efter && !(rum.get(s.rum)?.tillstand || []).includes(st.tillstand_efter)) fel.push(var_(`${sp}: tillstand_efter ${st.tillstand_efter}, men rummet ${s.rum} har inte det tillståndet`));
+          break;
+        // ett tryck på ett föremål i rummet (2.47, resan)
+        case 'tryck':
+          pp.sek += 3;
+          if (!s.rum || !rum.get(s.rum)?.innehall.map(objId).includes(st.foremal)) fel.push(var_(`${sp}: ${st.foremal} finns inte i rummet ${s.rum}`));
           break;
         case 'musik': break; // tar ingen tid
         case 'ljud':
@@ -373,9 +385,16 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
             }
             const ids2 = s.rum && rum.get(s.rum) ? rum.get(s.rum).innehall.map(objId) : [];
             if (p.skylt && !ids2.includes(p.skylt)) fel.push(var_(`${sp}: ${p.id} står på skylten ${p.skylt}, som inte finns i rummet ${s.rum}`));
-            for (const fid of p.foremal || []) if (!ids2.includes(fid)) fel.push(var_(`${sp}: ${p.id} svingar mot ${fid}, som inte finns i rummet ${s.rum}`));
+            if (Array.isArray(p.foremal)) for (const fid of p.foremal) if (!ids2.includes(fid)) fel.push(var_(`${sp}: ${p.id} ${p.verb === 'lyfta' ? 'lyfter på' : 'svingar mot'} ${fid}, som inte finns i rummet ${s.rum}`));
+            // hornet (2.47): föremålet han trycker på står i rummet
+            if (p.typ === 'P29_tryck' && !ids2.includes(p.foremal)) fel.push(var_(`${sp}: ${p.id} trycker på ${p.foremal}, som inte finns i rummet ${s.rum}`));
+            // ordduellen (2.47): motståndaren och det som det handlar om står i rummet
+            if (p.typ === 'P16_ordduell') {
+              for (const r of p.ronder) for (const u of r.utfall) if (!ids2.includes(u.pekar_pa)) fel.push(var_(`${sp}: ${p.id} pekar på ${u.pekar_pa}, som inte finns i rummet ${s.rum}`));
+              if (p.skold) { const fore = s.steg.slice(0, s.steg.indexOf(st)).some((x) => x.typ === 'pussel' && x.pussel_id === p.skold); if (!fore) fel.push(var_(`${sp}: ${p.id} skold ${p.skold} görs inte före duellen i scenen`)); }
+            }
             pp.sek += p.typ === 'P26_krukorna' ? 30 : p.typ === 'P12_dop' ? 45 : 40;
-            if (LASUPPGIFTER.has(p.typ)) pp.lasuppgifter++;
+            if (arLasuppgift(p)) pp.lasuppgifter++;
           } else pp.sek += 10;
           break;
         }
@@ -432,6 +451,10 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
       const pp = s.frivillig ? { sek: 0, lasuppgifter: 0, sistaSparpunkt: false } : perPass.get(s.pass);
       if (s.frivillig && (!s.startar_i_rum || !rum.has(s.startar_i_rum))) fel.push(var_(`${plats}: en frivillig scen behöver startar_i_rum med ett rum som finns`));
       if (!s.frivillig && s.startar_i_rum) fel.push(var_(`${plats}: startar_i_rum gäller bara en frivillig scen`));
+      // en frivillig scen som börjar vid ett föremål och går till en viss scen (2.47, skalkanten)
+      if (s.startar_vid && (!s.frivillig || !rum.get(s.startar_i_rum)?.innehall.map(objId).includes(s.startar_vid))) fel.push(var_(`${plats}: startar_vid ${s.startar_vid} gäller en frivillig scen och ett föremål i startar_i_rum`));
+      if (s.till_scen && (!s.frivillig || !k.scener.some((x) => x.id === s.till_scen && !x.frivillig))) fel.push(var_(`${plats}: till_scen ${s.till_scen} gäller en frivillig scen och en scen i kapitlet`));
+      if (s.lockar && s.startar_vid && s.lockar.vid !== s.startar_vid) varningar.push(var_(`${plats}: lockar vid ${s.lockar.vid}, men scenen börjar vid ${s.startar_vid}`));
       if (s.rum !== null && !rum.has(s.rum)) fel.push(var_(`${plats}: rummet ${s.rum} finns inte`));
       if (s.tillstand && !tillstand.has(s.tillstand)) fel.push(var_(`${plats}: tillståndet ${s.tillstand} finns inte i något rum och skapas inte av någon formel`));
       if (s.vid_omstart) replikKontroll(s.vid_omstart, `${plats} vid_omstart`);
@@ -554,7 +577,7 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
         if (p.skriv === 'tangentbord' && p.forebild && p.forebild.visas !== 'andra_felet') varningar.push(var_(`${plats}: förebilden tänds före två fel (69.3: forebild.visas andra_felet)`));
         if (p.skriv !== 'tangentbord' && p.forebild?.visas === 'vid_fel') varningar.push(var_(`${plats}: förebilden tänds efter ett fel (72.2: forebild.visas andra_felet)`));
         // ledbilden gäller från kapitel 2 (08, beslut 73.2): prologen och kapitel 1 har ingen
-        const franKapitel2 = (aventyr?.kapitel || []).map((x) => (typeof x === 'string' ? x : x.id)).indexOf(k.id) >= 2;
+        const franKapitel2 = kapitelPlats(k) >= 2;
         if (franKapitel2 && p.forebild?.visas === 'andra_felet' && !p.ledbild) varningar.push(var_(`${plats}: ingen ledbild efter första felet (72.6)`));
         if (p.ledbild && p.forebild?.visas !== 'andra_felet') varningar.push(var_(`${plats}: ledbilden tänds bara med forebild.visas andra_felet`));
         for (const f of p.formler) for (const o of f.ord.split(' ')) if (!ordmap.has(o)) varningar.push(var_(`${plats}: formeln ${o} finns inte i ordlistorna`));
@@ -576,11 +599,13 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
         const svar = versaler(p.svar);
         if (p.chiffer) {
           const nyckel = new Map(p.chiffer.nyckel.map((n) => [n.tecken, n.bokstav]));
-          const avkodat = p.chiffer.tecken.map((t) => nyckel.get(t) ?? '?').join('');
+          const avkodat = p.chiffer.tecken.map((t) => (t === ' ' ? ' ' : nyckel.get(t) ?? '?')).join('');
           if (avkodat !== svar) fel.push(var_(`${plats}: tecknen ger ${avkodat} med nyckeln, svaret är ${svar}`));
           const bokstaver = p.chiffer.nyckel.map((n) => n.bokstav);
           if (new Set(bokstaver).size !== bokstaver.length) fel.push(var_(`${plats}: två tecken i nyckeln har samma bokstav`));
         }
+        if (p.lage === 'meddelande' && p.brickor) fel.push(var_(`${plats}: ett meddelande skrivs på tangentbordet, inte med brickor (2.47)`));
+        if (p.lage !== 'meddelande' && svar.includes(' ')) fel.push(var_(`${plats}: svaret har ett mellanslag, och det går bara i ett meddelande (lage meddelande)`));
         if (p.brickor) {
           const kvar = [...p.brickor];
           for (const ch of svar) { const i = kvar.indexOf(ch); if (i < 0) fel.push(var_(`${plats}: brickorna saknar ${ch} till ${svar}`)); else kvar.splice(i, 1); }
@@ -590,6 +615,33 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
       if (p.typ === 'P26_krukorna') {
         if (p.sak_i_sista && !p.innehall.includes(p.sak_i_sista)) fel.push(var_(`${plats}: sak_i_sista ${p.sak_i_sista} finns inte i innehall`));
         if (p.foremal && p.foremal.length !== p.innehall.length) fel.push(var_(`${plats}: ${p.foremal.length} föremål men ${p.innehall.length} poster i innehall`));
+        // sak_vid (2.47): en plats i innehall, och inte samtidigt som sak_i_sista
+        if (p.sak_vid && p.sak_vid > p.innehall.length) fel.push(var_(`${plats}: sak_vid ${p.sak_vid}, men innehall har ${p.innehall.length} poster`));
+        if (p.sak_vid && p.sak_i_sista) fel.push(var_(`${plats}: sak_vid och sak_i_sista går inte ihop`));
+      }
+      if (p.typ === 'P29_tryck') {
+        for (const [niva, vari] of Object.entries(p.varianter)) textKontroll(vari.text, `${plats} ${niva} text`, { lasesSjalv: true });
+        for (const [antal, h] of Object.entries(p.vid_antal || {})) {
+          const n = parseInt(antal, 10);
+          if (n === p.ratt) fel.push(var_(`${plats}: vid_antal ${antal} är det rätta antalet`));
+          handlingKontroll(h, `${plats} vid_antal ${antal}`);
+        }
+      }
+      if (p.typ === 'P16_ordduell') {
+        replikKontroll(p.regel, `${plats} regel`);
+        handlingKontroll(p.vid_vinst, `${plats} vid_vinst`);
+        if (p.skold && !k.pussel.some((x) => x.id === p.skold && x.typ === 'P11_formel')) fel.push(var_(`${plats}: skold ${p.skold} är ingen formel i kapitlet`));
+        p.ronder.forEach((r, i) => r.utfall.forEach((u, j) => {
+          const up = `${plats} rond ${i + 1}${r.utfall.length > 1 ? ` utfall ${j + 1}` : ''}`;
+          u.ropar.forEach((x) => replikKontroll(x, `${up} ropar`));
+          const ratt = u.alternativ.filter((a) => a.ratt);
+          if (ratt.length !== 1) fel.push(var_(`${up}: exakt ett kort ska ha "ratt": true (har ${ratt.length})`));
+          for (const a of u.alternativ) {
+            if (/\|/.test(a.text) && !/[A-Za-zÅÄÖåäö]\|[A-Za-zÅÄÖåäö]/.test(a.text)) fel.push(var_(`${up}: strecket i ${a.text} står inte inne i ett ord`));
+            textKontroll(a.text, `${up} kort`, { lasesSjalv: true });
+          }
+          handlingKontroll(u.vid_ratt, `${up} vid_ratt`); handlingKontroll(u.vid_fel, `${up} vid_fel`);
+        }));
       }
       if (p.typ === 'P12_dop' && p.min_bokstaver && p.max_bokstaver && p.min_bokstaver > p.max_bokstaver) fel.push(var_(`${plats}: min_bokstaver är större än max_bokstaver`));
     }

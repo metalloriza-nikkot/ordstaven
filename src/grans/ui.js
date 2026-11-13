@@ -90,10 +90,11 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
   /**
    * Textrader som HTML med varje ord i en egen span (för nosen). Raderna bryts aldrig inom en rad i listan.
    * @param {string | string[]} text @param {Record<string, string>} varden @param {string} [klass]
+   * @param {'versaler' | 'vanlig'} [skrift] vanlig = som texten står (gemener i bubblan, 2.47)
    */
-  function rader(text, varden, klass = 'rad') {
+  function rader(text, varden, klass = 'rad', skrift = /** @type {'versaler' | 'vanlig'} */ ('versaler')) {
     const bryts = !Array.isArray(text);
-    return forSkarm(text, { varden })
+    return forSkarm(text, { varden, skrift })
       .map((r) => `<span class="${klass}${bryts ? ' bryts' : ''}">${r.split(/(\s+)/).map((d) => (/\S/.test(d) ? ordSpan(d) : d)).join('')}</span>`)
       .join('');
   }

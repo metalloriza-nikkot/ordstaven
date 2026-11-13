@@ -5,7 +5,7 @@ import { skapaBerattelse, spolaFram, aterstallFramsteg, barFore, grenarI } from 
 import { sammanfatta } from './karna/foraldravy.js';
 import { skapaLasmotor, valjVariant, nivaMedKrav } from './karna/lasmotor.js';
 import { egenskaper, egetForemal, synligaEgenskaper, PALETT } from './karna/egenskaper.js';
-import { skapaValj, skapaFormel, skapaDop, skapaKrukor, skapaRaddning } from './karna/pussel.js';
+import { skapaValj, skapaFormel, skapaDop, skapaKrukor, skapaRaddning, skapaTryck } from './karna/pussel.js';
 import { forSkarm, versaler } from './karna/text.js';
 import { rumTillSkarm, varldTillSkarm, RUM, textskala } from './karna/skalning.js';
 import { framfor, lasplats, vidObjekt, genom, stigStart, RACKVIDD } from './karna/rumslayout.js';
@@ -14,7 +14,7 @@ import { varVarVi, senastSpelad } from './karna/varvarvi.js';
 import { musikFor } from './karna/musik.js';
 import { ljudLista } from './karna/ljudid.js';
 import { SYNS_REDAN_MS, UNGE_TILL_MS, visarRegi, lockarVisarBeskrivning, NARBILDER, narbildFor, NARBILD_MS, BLOT_MS } from './karna/mellanscen.js';
-import { bubblaFor, BUBBLA_MS } from './karna/bubblor.js';
+import { bubblaFor, bubblaText, BUBBLA_MS } from './karna/bubblor.js';
 import { sparaPassbild, aterstallLarande, forstaIPasset } from './karna/larandebild.js';
 import { pekningOmMs, skapaHjalpSpar, knufftidMs } from './karna/hjalp.js';
 import { HJALTE_FARGER, HJALTE_FAST } from './scener/Rum.js';
@@ -46,6 +46,11 @@ const MAL_KNUFF_MS = 15000;
 /** Styrbilden kommer igen när han har stått vid en sak så här länge utan att göra något (granskningen A 23). */
 const STYR_STILLA_MS = 4500;
 const vanta = (/** @type {number} */ ms) => new Promise((r) => setTimeout(r, ms));
+/**
+ * Pusseltyper som räknas som läsval och följer läsvalens nivå (2.47, 87.4): hornet och ordduellen. Nivån sätts och
+ * registreras som för P1, så att lärandet är ett och detsamma.
+ */
+const LASNIVA_TYP = /** @type {Record<string, string>} */ ({ P29_tryck: 'P1_las_och_valj', P16_ordduell: 'P1_las_och_valj' });
 
 /**
  * @param {{ aventyr: any, kartor?: Record<string, import('./karna/karta.js').Karta>, kapitel: any[], ordlistor: any, tillstand: any, sparning: any, logg: any, rost: any, ljud: any,
@@ -153,7 +158,7 @@ export function skapaSpel(d) {
    */
   const rumsNiva = new Map();
   /** @param {any} p */
-  const nivaFor = (p) => rumsNiva.get(p.id) ?? medKrav(p, lasniva(p.typ));
+  const nivaFor = (p) => rumsNiva.get(p.id) ?? medKrav(p, lasniva(LASNIVA_TYP[p.typ] ?? p.typ));
   /** Är pusslet löst i varianten (det finns i lärandets historik)? @param {string} pid @param {string} variant */
   const lostI = (pid, variant) => (tillstand.spelare.larande?.historik || []).some((/** @type {any} */ h) => h.pussel_id === pid && h.niva === variant);
   /** Nivån med variantens krav (`kraver`, 2.31). @param {any} p @param {number} tal */
@@ -474,6 +479,7 @@ export function skapaSpel(d) {
           const v = visarFor(p.id);
           ids = p.foremal?.length ? p.foremal : rum.objekt.filter((/** @type {any} */ o) => o.visar === p.id || (v && o.id.startsWith(v.id + '_'))).map((/** @type {any} */ o) => o.id);
         }
+        else if (p?.typ === 'P29_tryck') ids = [p.foremal, p.skylt];
         else if (p?.skylt) ids = [p.skylt];
       }
       ids = ids.filter((id) => id && rum.ruta(id));
@@ -1066,14 +1072,17 @@ export function skapaSpel(d) {
   let bubblaTimer = 0;
   rum.fragaIgen = (/** @type {any} */ o) => {
     // en bybo (kapitel 2) vinkar och visar sitt ord i en bubbla en stund. Det räknas inte som något.
-    const ord = !o.talare && aktuelltRum ? bubblaFor(b?.rum(aktuelltRum), o.id, b?.rumsTillstand(aktuelltRum) ?? null) : null;
+    // en figur som talar (skepparen, 2.47) har också en bubbla, när den inte har något att upprepa
+    const harSagt = !!o.talare && senaste.has(o.talare);
+    const ord = !harSagt && aktuelltRum ? bubblaText(bubblaFor(b?.rum(aktuelltRum), o.id, b?.rumsTillstand(aktuelltRum) ?? null)) : null;
     if (ord) {
       if (pausad || !ui.plattan.hidden) return true;
       rum.vinka(o.id);
-      ui.ropa(ui.rader(ord, varden()), skarm(o.x + o.b / 2, o.y));
+      // gemener (87.7): bubblan står som den är skriven, "ahoj!"
+      ui.ropa(ui.rader(ord.text, varden(), 'rad', ord.gemener ? 'vanlig' : 'versaler'), skarm(o.x + o.b / 2, o.y));
       window.clearTimeout(bubblaTimer);
       bubblaTimer = window.setTimeout(() => ui.ropa(null), BUBBLA_MS);
-      logg.handelse('bubbla', `${o.id}: ${ord}`);
+      logg.handelse('bubbla', `${o.id}: ${ord.text}`);
       return true;
     }
     const r = o.talare ? senaste.get(o.talare) : null;
@@ -1169,7 +1178,8 @@ export function skapaSpel(d) {
 
   // ------------------------------------------------------------------ rummets skyltar (beslut 15.2)
   /** En skylt med en mening (inte ett ord) öppnas på läsplattan när han går dit. @param {string} text */
-  const arMening = (text) => /\s/.test(text.trim()) || /[.!?]$/.test(text.trim());
+  // en skylt med flera rader (stenen vid hornet, 2.47) är alltid en mening
+  const arMening = (text) => (Array.isArray(text) ? text.length > 1 || arMening(text[0] ?? '') : /\s/.test(text.trim()) || /[.!?]$/.test(text.trim()));
   /**
    * Skyltarna i rummet just nu: rummets egna (rum.skyltar), och skylten med frågan i ett läsval i världen
    * (pusslets skylt, t.ex. Farfars skylt vid stenarna) medan scenen har det pusslet. Pusslets skylt har texten
@@ -1296,6 +1306,9 @@ export function skapaSpel(d) {
         if (st.kapitelrubrik) ljud.spela('kapitel'); // kapitelrubriken: en kort fanfar (10c)
         return st.vantar_pa ? replikVantar(st) : st.vid === 'ungen' ? replikVidUngen(st) : replik(st);
       case 'mellanscen': {
+        // rummets tillstånd byts när mellanscenen börjar (2.47: ön stiger, och rummet blir on). Berättelsen sätter
+        // det också när steget är klart, så att det står kvar efter en omstart.
+        if (st.tillstand_efter && b.scen?.rum) { av.rumstillstand[b.scen.rum] = st.tillstand_efter; logg.handelse('rummet', `${b.scen.rum}: ${st.tillstand_efter}`); await visaScen(visadScen); }
         if (st.ljud) ljud.spelaRad?.(st.ljud); // det som låter i mellanscenen (64.6), samtidigt som den börjar
         // med bild händer det i rummet (Stils bilder), och beskrivningen behövs inte. Annars som i gråboxen.
         // ungen på kartbiten (k1s11): i närbildens HTML, med nosen på mammas skugga
@@ -2056,6 +2069,7 @@ export function skapaSpel(d) {
         try { res = await raddning(p); } finally { raddningPagar = false; spelaPlatsensMusik(); }
         break;
       case 'P9_kodlas': res = await kodlas(p); break;
+      case 'P29_tryck': res = await tryckRakna(p); break;
       default:
         // P15, P9 och andra typer byggs i fas 3. Gråboxen hoppar över dem.
         await ui.visaRegi(`(${p.typ} byggs i fas 3)`, tid(1500)); ui.doljRegi(); res = {};
@@ -2073,7 +2087,7 @@ export function skapaSpel(d) {
     if (res && aktuelltRum && (kartor[aktuelltRum]?.objekt || []).some((/** @type {any} */ o) => o.sedan === p.id)) { losta.add(p.id); await visaScen(visadScen); }
     if (res && res.niva) {
       // en knuff före valet räknas som hjälp för nivån, men valet är rätt i föräldravyn (beslut 62.2)
-      lasmotor.registrera({ pussel_id: p.id, typ: p.typ, niva: res.niva, ratt: res.forstaForsoket, antal_forsok: res.forsok, hjalp_anvand: res.hjalp, knuff_fore: !!res.knuffFore, tid: performance.now() - start });
+      lasmotor.registrera({ pussel_id: p.id, typ: LASNIVA_TYP[p.typ] ?? p.typ, niva: res.niva, ratt: res.forstaForsoket, antal_forsok: res.forsok, hjalp_anvand: res.hjalp, knuff_fore: !!res.knuffFore, tid: performance.now() - start });
     }
     spara();
     return res;
@@ -3019,11 +3033,83 @@ export function skapaSpel(d) {
    * föremål som inte är svingat och nosar mot det, och det glimtar (beskrivningen är för den vuxne och visas inte).
    * @param {any} p
    */
+  /**
+   * Läs och gör med antal (P29_tryck, 2.47, hornet). Frågan står på en skylt i rummet (stenen) och öppnas när han går
+   * dit, som i ett läsval. Varje tryck på föremålet när han står vid det är ett tut, och när det har varit tyst i
+   * tystnad_sek bedöms antalet (karna/pussel.js). Ingen klocka går innan första trycket, och ett fel är bara
+   * reaktionen för antalet: han kan tuta igen. Nivån följer läsvalen (LASNIVA_TYP). @param {any} p
+   */
+  async function tryckRakna(p) {
+    const r = skapaTryck(p);
+    const [variantNyckel, vari] = valjVariant(p.varianter, nivaFor(p));
+    const spar = { hjalp: false };
+    const hjalpSpar = skapaHjalpSpar(() => performance.now());
+    const tystMs = (p.tystnad_sek ?? 3) * 1000;
+    const skylt = p.skylt && rum.ruta(p.skylt) ? { id: p.skylt, text: vari.text, papper: p.papper || 'skylt', mening: true, pussel: p } : null;
+    if (p.skylt && !skylt) logg.handelse('FEL', `${p.id}: skylten ${p.skylt} finns inte i rummet`);
+    const fraga = () => visaMoln(skylt ? `<button type="button" class="tanke-lapp tanke-skylt" aria-label="Skylten">${ikon('lapp', 'stor')}</button>`
+      : `<span class="moln-text">${lasText(p, vari.text)}</span>`, p.instruktion ?? null);
+    const tankeTryck = (/** @type {Event} */ e) => { if (skylt && !rum.fryst && /** @type {HTMLElement} */ (e.target).closest('.tanke-skylt')) lasSkyltText(skylt); };
+    ui.$('#tanke').addEventListener('click', tankeTryck);
+    if (skylt) { skyltStyrs.add(skylt.id); skyltSpar = spar; skyltPusselNu = skylt.id; }
+    fraga();
+    if (p.instruktion) sag(p.instruktion);
+    tillatNos(p, spar);
+    rum.frys(false);
+    // skylten öppnas när han går dit (efter att ha gått därifrån)
+    let skyltVapnad = false;
+    const skyltTick = window.setInterval(() => {
+      if (!skylt || rum.fryst || pausad || !ui.plattan.hidden) return;
+      const so = rum.ruta(skylt.id);
+      if (so && !vidObjekt(rum.pos, so)) skyltVapnad = true;
+      else if (so && skyltVapnad) { skyltVapnad = false; lasSkyltText(skylt); }
+    }, 80);
+    const k = knuffKlocka(p.knuff, () => { ui.pulseraTanke(); if (skylt) { ui.pulseraSkylt(skylt.id); rum.markera(skylt.id, true); } }, { spar: hjalpSpar, pekOmMs: () => 0 });
+    let forenklad = false;
+    try {
+      while (!r.s.klar) {
+        const val = anvand([p.foremal], { verb: 'anvand' });
+        // tystnaden räknas från senaste trycket, och bara när han har tryckt (ingen klocka före första). Den är en del
+        // av regeln och kortas inte i testläget, som knuffen (spelets klocka)
+        const tyst = r.s.antal ? vanta(tystMs).then(() => null) : new Promise(() => {});
+        const id = await Promise.race([val, tyst]);
+        if (id) {
+          k.nollstall(); if (skylt) rum.markera(skylt.id, false);
+          const n = r.tryck();
+          styrGjort('anvand'); rum.vandMot?.(p.foremal);
+          ljud.spela('tut'); visaLjudord('tut', '', p.foremal);
+          logg.handelse('tryck', `${p.id}: ${n}`);
+          continue;
+        }
+        val.avbryt();
+        const res = r.bedom();
+        logg.handelse('val', `${p.id}: ${res.antal} tryck`, { resultat: res.resultat, sek: Math.round(hjalpSpar.sedanStart() / 100) / 10, ...hjalpSpar.fore(), ...nosadeIPusslet(nosSpar) });
+        if (res.resultat !== 'fel') continue;
+        rum.frys(true);
+        felljud(res.reaktion);
+        await reaktion(res.reaktion, p.foremal);
+        // förenklingen (ETT lyser på stenen): texten för den vuxne i gråboxen, en gång
+        if (p.forenkla && !forenklad && r.s.fel >= p.forenkla.efter_fel) { forenklad = true; logg.handelse('förenkla', p.forenkla.andring); await ui.visaRegi(p.forenkla.andring, tid(1500)); ui.doljRegi(); }
+        fraga(); rum.frys(false); k.nollstall();
+      }
+    } finally {
+      window.clearInterval(skyltTick); k.stopp(); visaMoln(null);
+      ui.$('#tanke').removeEventListener('click', tankeTryck);
+      if (skylt) { rum.markera(skylt.id, false); skyltStyrs.delete(skylt.id); skyltSpar = null; skyltPusselNu = null; }
+    }
+    ljud.spela('ratt');
+    rum.frys(true);
+    if (p.vid_ratt) await reaktion(p.vid_ratt, p.foremal);
+    return { niva: variantNyckel, forstaForsoket: r.s.fel === 0, forsok: r.s.forsok, hjalp: spar.hjalp, knuffFore: false };
+  }
+
   async function krukor(p) {
     const k = skapaKrukor(p);
     // hugga (beslut 39.3): staven är ett svärd, och varje hugg fäller en lian. Samma knapp som att svinga,
     // inga missar och ingen tid. Svinga: krukor, buskar och löv
     const hugga = p.verb === 'hugga';
+    // lyfta (2.47, mossan och tången): han lyfter på saken med handen, och staven används inte (16 §3)
+    const lyfta = p.verb === 'lyfta';
     if (hugga) rum.svard(true);
     if (p.instruktion) await replik(p.instruktion);
     rum.frys(false);
@@ -3083,7 +3169,7 @@ export function skapaSpel(d) {
         window.clearInterval(tick);
         if (vad === null) { val.avbryt(); rum.sattInteraktiva([]); logg.handelse('hugga', `${p.id}: gick vidare, ${kvar.length} kvar`); break; }
         id = /** @type {string} */ (vad);
-      } else id = await anvand(kvar, { verb: 'svinga', vidMiss: miss });
+      } else id = await anvand(kvar, lyfta ? { verb: 'anvand' } : { verb: 'svinga', vidMiss: miss });
       knuff.nollstall(); rum.markera(id, false);
       if (pekad) { rum.markera(pekad, false); rum.ungePekar(null); pekad = null; }
       const fynd = k.sla(ids.indexOf(id));
@@ -3093,13 +3179,13 @@ export function skapaSpel(d) {
       const typ = !hugga ? 'sida' : sista ? 'snurr' : (ids.length - kvar.length) % 2 ? 'uppifran' : 'sida';
       // han vänder sig mot det han hugger (76.5, B12), också när han kom dit med ett tryck
       rum.vandMot?.(id);
-      rum.svinga(tid(80), typ);
+      if (!lyfta) rum.svinga(tid(80), typ);
       if (hugga) logg.handelse('hugg', `${typ}: ${id}`);
       await vanta(tid(typ === 'snurr' ? 160 : 80));
       // träffen: en kort paus i världen och lite olika tonhöjd varje gång (B12)
       if (hugga) { ljud.spela('hugg', { fart: [1, 0.92, 1.08][antalHugg++ % 3] }); rum.traffpaus?.(tid(60)); rum.lovYr?.(id, sista ? 3 : 1); rum.huggen(id); }
       else { ljud.spela(p.foremal ? 'prassel' : 'sla'); rum.slagen(id); }
-      logg.handelse(hugga ? 'hugga' : 'svinga', `${id}: ${fynd}`);
+      logg.handelse(hugga ? 'hugga' : lyfta ? 'lyfta' : 'svinga', `${id}: ${fynd}`);
       if (fynd === 'bar') { av.bar++; ui.uppdateraHud(av); ljud.spela('bar'); await ui.visaFest('🫐', tid(600)); }
       else if (fynd && fynd === k.sista) { ljud.spela(fynd.startsWith('kartbit') ? 'fest_stor' : 'fest_mellan'); await ui.visaFest(fynd.startsWith('kartbit') ? kartbitFest(Number(fynd.split('_')[1])) : bilder.emoji(fynd) || '✨', tid(900), true); }
       else if (fynd && fynd !== 'tom') { ljud.spela('allmant'); await ui.visaFest(bilder.emoji(fynd) || '✨', tid(700)); }
@@ -3955,7 +4041,7 @@ export function skapaSpel(d) {
    * kartor i T5). Med ?kapitel=<id> spelas ett kapitel ändå, med föremålen placerade automatiskt (för den vuxne).
    * @param {any} kapitel
    */
-  const stodsAvGrabox = (kapitel) => kapitel.pussel.every((/** @type {any} */ p) => ['P1_las_och_valj', 'P28_packa', 'P11_formel', 'P12_dop', 'P26_krukorna', 'P15_raddning', 'P9_kodlas'].includes(p.typ))
+  const stodsAvGrabox = (kapitel) => kapitel.pussel.every((/** @type {any} */ p) => ['P1_las_och_valj', 'P28_packa', 'P11_formel', 'P12_dop', 'P26_krukorna', 'P15_raddning', 'P9_kodlas', 'P29_tryck', 'P16_ordduell'].includes(p.typ))
     && (d.valtKapitel === kapitel.id || kapitel.rum.every((/** @type {any} */ r) => !!kartor[r.id]));
 
 

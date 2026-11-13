@@ -1072,3 +1072,13 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Brevet rivs:** `luftskeppRiverBrevet` växlar till `luftskepp('river_brevet')` (200 ms) när skeppet har glidit in, och vid RITS (2,7 s) `brevet_rivet` och halvan `brev_halva_faller_01–02` från skeppets x + 88, y + 44 mot `stig_vassen`. Skeppet sjunker sedan mot bryggan med baronens halva. Utan Stils bilder: gråboxens brev som förut.
 - **Närbilderna:** en mellanscen vars `bild` står i `NARBILDER` (karna/mellanscen.js) visar ett bildkort centrerat över rummet. `brevram_nara`: läget efter antalet gjorda `bara` till `brevram` (tom, vänster, hel, eftersom bryggans halva alltid kommer först), och `_blot` först i 1 s när den sista halvan sattes i i samma scen.
 
+## 108. Kapitel 3 i gråbox, steg 1 (0.75.0, Teknik 46, beslut 87.9.3)
+- **Schemat 2.47** har alla kapitel 3:s fält (`docs/innehallsschema.md`), så att Innehålls `kap-03.json` v0.2 går igenom kontrollen. Kontrollen prövar dem (`verktyg/innehall/kontroll.js`), och `budget.js` räknar P29 och P16 som läsval och P9 med `lage: meddelande` som en skrivuppgift. Ett kapitel som inte står i äventyrets lista än får sin plats efter kapitlets nummer (`kapitelPlats`).
+- **Kartorna** skrivs av `verktyg/kartor/kap3.py` med hjälparna i `kap2.py`: floden 2 × 1 skärmar (pråmarna är golv ute i vattnet, ön och tången syns i tillståndet `on`), ön en skärm och sandbanken en skärm.
+- **`?kapitel=<id>`** öppnar ett kapitel som finns i `content/` men inte står i listan (`medValtKapitel` i `main.js`), bara i den sidvisningen. Ett vanligt spel ser det inte.
+- **Hornet** (`skapaTryck` i `karna/pussel.js`, `tryckRakna` i `spel.js`): frågan står på stenen och öppnas när han går dit. Varje tryck är ett tut, och när det har varit tyst i `tystnad_sek` (spelets klocka, inte förkortad) bedöms antalet. `LASNIVA_TYP` gör att hornet och duellen har läsvalens nivå och lärande.
+- **P26 `lyfta`** använder handen (`anvand`) och svingar inte, och `sak_vid` i `skapaKrukor` ger posten som nummer `sak_vid`.
+- **Bubblan** (`bubblaText` i `karna/bubblor.js`): `{ text, gemener }` visas med `ui.rader(..., 'vanlig')`. En figur som talar (skepparen) visar sin bubbla när den inte har något att upprepa.
+- **En mellanscen med `tillstand_efter`** byter rummets tillstånd när den börjar, och berättelsen sätter det också när steget är klart.
+- **En skylt med flera rader** i rummet är alltid en mening (papperet), som stenen vid hornet.
+- **P9 meddelande, P16 ordduellen, `tryck` och `lockar.vid` vid ett föremål** är bara i schemat och kontrollen. De byggs i steg 2–4, och tills dess visar gråboxen en platshållare för P16.

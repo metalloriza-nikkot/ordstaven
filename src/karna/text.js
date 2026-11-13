@@ -48,7 +48,7 @@ export function forSkarm(text, { skrift = 'versaler', varden = {} } = {}) {
   });
 }
 
-/** Orden i en rad, utan skiljetecken och platshållare. @param {string} rad */
+/** Orden i en rad, utan skiljetecken och platshållare. Strecket i sköld|padda (2.47) delar inte ordet. @param {string} rad */
 export function ord(rad) {
-  return rad.replace(PLATSHALLARE, ' ').split(/[^A-Za-zÅÄÖåäöÉé]+/).filter(Boolean);
+  return rad.replace(/\|/g, '').replace(PLATSHALLARE, ' ').split(/[^A-Za-zÅÄÖåäöÉé]+/).filter(Boolean);
 }

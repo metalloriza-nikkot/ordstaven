@@ -1,0 +1,427 @@
+{
+ "type": "map",
+ "version": "1.10",
+ "tiledversion": "1.11.0",
+ "orientation": "orthogonal",
+ "renderorder": "right-down",
+ "width": 20,
+ "height": 12,
+ "tilewidth": 16,
+ "tileheight": 16,
+ "infinite": false,
+ "compressionlevel": -1,
+ "nextlayerid": 2,
+ "nextobjectid": 23,
+ "properties": [
+  {
+   "name": "rum",
+   "type": "string",
+   "value": "sandbanken"
+  }
+ ],
+ "tilesets": [],
+ "layers": [
+  {
+   "id": 1,
+   "name": "foremal",
+   "type": "objectgroup",
+   "draworder": "index",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 1,
+     "name": "start",
+     "type": "",
+     "x": 48,
+     "y": 150,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 2,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 0,
+     "width": 320,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vatten",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 3,
+     "name": "",
+     "type": "vagg",
+     "x": 304,
+     "y": 16,
+     "width": 16,
+     "height": 176,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vatten",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 4,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 180,
+     "width": 304,
+     "height": 12,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vatten",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 5,
+     "name": "skoldpadda",
+     "type": "sak",
+     "x": 160,
+     "y": 24,
+     "width": 136,
+     "height": 104,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 6,
+     "name": "skylt_skal",
+     "type": "sak",
+     "x": 214,
+     "y": 52,
+     "width": 18,
+     "height": 12,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 7,
+     "name": "snacka_1",
+     "type": "sak",
+     "x": 210,
+     "y": 66,
+     "width": 6,
+     "height": 6,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 8,
+     "name": "snacka_2",
+     "type": "sak",
+     "x": 218,
+     "y": 66,
+     "width": 6,
+     "height": 6,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 9,
+     "name": "snacka_3",
+     "type": "sak",
+     "x": 226,
+     "y": 66,
+     "width": 6,
+     "height": 6,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 10,
+     "name": "snacka_4",
+     "type": "sak",
+     "x": 234,
+     "y": 66,
+     "width": 6,
+     "height": 6,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 11,
+     "name": "skoldpadda_huvud",
+     "type": "sak",
+     "x": 120,
+     "y": 52,
+     "width": 36,
+     "height": 28,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 12,
+     "name": "skoldpadda_fena",
+     "type": "sak",
+     "x": 150,
+     "y": 120,
+     "width": 32,
+     "height": 18,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 13,
+     "name": "under_fenan",
+     "type": "sak",
+     "x": 156,
+     "y": 140,
+     "width": 16,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 14,
+     "name": "bakom_fenan",
+     "type": "sak",
+     "x": 186,
+     "y": 128,
+     "width": 14,
+     "height": 12,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 15,
+     "name": "under_huvudet",
+     "type": "sak",
+     "x": 126,
+     "y": 84,
+     "width": 16,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 16,
+     "name": "bakom_huvudet",
+     "type": "sak",
+     "x": 140,
+     "y": 30,
+     "width": 14,
+     "height": 12,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 17,
+     "name": "tang_1",
+     "type": "sak",
+     "x": 140,
+     "y": 156,
+     "width": 10,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 18,
+     "name": "tang_2",
+     "type": "sak",
+     "x": 158,
+     "y": 158,
+     "width": 10,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 19,
+     "name": "tang_3",
+     "type": "sak",
+     "x": 176,
+     "y": 156,
+     "width": 10,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 20,
+     "name": "skalkant",
+     "type": "sak",
+     "x": 284,
+     "y": 64,
+     "width": 14,
+     "height": 30,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "vanster"
+      }
+     ]
+    },
+    {
+     "id": 21,
+     "name": "fena_trappa",
+     "type": "sak",
+     "x": 182,
+     "y": 112,
+     "width": 16,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 22,
+     "name": "ankare",
+     "type": "sak",
+     "x": 84,
+     "y": 120,
+     "width": 14,
+     "height": 14,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

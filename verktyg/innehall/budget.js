@@ -11,9 +11,9 @@
 // Det som inte går att läsa ur datan (en hemlighet, att baronen läser fel, att det som lovas löses in) prövas inte.
 
 /** Läsval: han läser och väljer. */
-const LASVAL = new Set(['P1_las_och_valj', 'P28_packa']);
+const LASVAL = new Set(['P1_las_och_valj', 'P28_packa', 'P29_tryck', 'P16_ordduell']);
 /** Skrivuppgifter: han skriver eller stavar ett ord (P15 stavar med brickor, men avgör ingen läsning, 76.3). */
-const SKRIV = new Set(['P11_formel', 'P12_dop', 'P15_raddning']);
+const SKRIV = new Set(['P11_formel', 'P12_dop', 'P15_raddning', 'P9_meddelande']);
 /** Vila: leta, hugga, para ihop (P26), kodlåset (P9), och ett ga_till med `leta` (78.3). */
 const VILA = new Set(['P26_krukorna', 'P9_kodlas']);
 /** Passiva steg (78.3, 08 §4): en replik eller en mellanscen. */
@@ -63,7 +63,8 @@ export function rattArUdda(alternativ) {
 export function budgetVarningar(k, { tidigareTalare = new Set() } = {}) {
   const ut = [];
   const pussel = new Map((k.pussel || []).map((/** @type {any} */ p) => [p.id, p]));
-  const typ = (/** @type {any} */ st) => (st.typ === 'pussel' ? pussel.get(st.pussel_id)?.typ ?? null : null);
+  // P9 med lage meddelande (chiffret, 2.47) är en skrivuppgift, och kodlåset utan läge är vila (87.6)
+  const typ = (/** @type {any} */ st) => { const p = st.typ === 'pussel' ? pussel.get(st.pussel_id) : null; return !p ? null : p.typ === 'P9_kodlas' && p.lage === 'meddelande' ? 'P9_meddelande' : p.typ; };
 
   // ---- per pass: stegen i ordning, navets steg mellan grenarna där de står, frivilliga scener inte med
   /** @type {Map<number, { lasval: number, vila: number, skriv: number, uppgifter: string[], replikerIRad: number, passivaIRad: number, varnat: Set<string>, sistaSkriv: string | null }>} */

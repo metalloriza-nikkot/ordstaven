@@ -2,8 +2,8 @@
  "$schema": "schema/ordlistor.schema.json",
  "format": 1,
  "meta": {
-  "version": "0.14",
-  "datum": "2026-11-12",
+  "version": "0.15",
+  "datum": "2026-11-13",
   "agare": "Innehåll",
   "textform": "Orden lagras med små bokstäver, formler i versaler. Böjda former (skogen, bron) står med när de används som alternativ.",
   "beskrivning": "Ordlistor 1-6 for ORDSTAVEN. Bilderna ar platshallare (emoji) for grabox. Ett ord ligger i den hogsta lista som nagot av dess drag kraver.",
@@ -17,7 +17,8 @@
   "andrat_v011": "Kapitel 2 (beslut 71.6): sax, kniv, hugg och lys, ord han troligen skriver vid vassen och lyktorna (tema skrivord, så att de aldrig får pff). HUGG och LYS står också på uppdragslappen.",
   "andrat_v012": "Beslut 76.6 (granskning 5, C6): vad (stumt D), sov och kom (O som Å) är inte ljudenliga och står nu i lista 6 som ordbilder. Låg, hel och torr (skyltarna i L4, 76.4).",
   "andrat_v013": "vän, bor, litet och dörren (kapitel 2, beslut 77.4).",
-  "andrat_v014": "samla och ved (kapitel 2, beslut 78.4)."
+  "andrat_v014": "samla och ved (kapitel 2, beslut 78.4).",
+  "andrat_v015": "Kapitel 3 (beslut 86.8): orden i lästexterna (tut, tre, padda, sköldpadda, fenan, stort, grönt, grått), Var var vi? (flod, fena), bubblorna (ahoj, där), Dinoboken (dino), uppdragslappens ord och skrivord vid tången och mörkret, och tre ord som ger bilderna i gråboxen (tång, ankare, mörker). Sköldpadda står i lista 5 (sj-ljud) som berättelseord, eftersom det är kapitlets ord och läses i två delar."
  },
  "listor": {
   "1": "Korta ljudenliga ord, 2-3 bokstaver, ingen konsonantgrupp, ingen dubbelteckning",
@@ -2630,6 +2631,247 @@
    "tema": "lästext",
    "flaggor": [],
    "varfor": "Kapitel 2 (beslut 78.4)"
+  },
+  {
+   "ord": "ön",
+   "lista": 1,
+   "bild": "🏝️",
+   "tema": "natur",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Kapitel 3 (beslut 86.8)"
+  },
+  {
+   "ord": "er",
+   "lista": 1,
+   "bild": null,
+   "tema": "smaord",
+   "flaggor": [],
+   "varfor": "Kapitel 3 (beslut 86.8): uppdragslappen (SKYDDA ER)"
+  },
+  {
+   "ord": "tut",
+   "lista": 1,
+   "bild": "📯",
+   "tema": "lästext",
+   "flaggor": [],
+   "varfor": "Kapitel 3 (beslut 86.8)"
+  },
+  {
+   "ord": "tre",
+   "lista": 3,
+   "bild": "3️⃣",
+   "tema": "lästext",
+   "flaggor": [],
+   "varfor": "Kapitel 3 (beslut 86.8)"
+  },
+  {
+   "ord": "padda",
+   "lista": 4,
+   "bild": "🐸",
+   "tema": "djur",
+   "flaggor": [],
+   "varfor": "Kapitel 3 (beslut 86.8)"
+  },
+  {
+   "ord": "sköldpadda",
+   "lista": 5,
+   "bild": "🐢",
+   "tema": "djur",
+   "flaggor": [
+    "aao",
+    "berattelseord"
+   ],
+   "varfor": "Kapitel 3 (beslut 86.8): kapitlets ord, läst i två delar"
+  },
+  {
+   "ord": "fenan",
+   "lista": 2,
+   "bild": null,
+   "tema": "lästext",
+   "flaggor": [],
+   "varfor": "Kapitel 3 (beslut 86.8)"
+  },
+  {
+   "ord": "fena",
+   "lista": 2,
+   "bild": null,
+   "tema": "lästext",
+   "flaggor": [],
+   "varfor": "Kapitel 3 (beslut 86.8) (Var var vi?)"
+  },
+  {
+   "ord": "stort",
+   "lista": 3,
+   "bild": null,
+   "tema": "egenskap",
+   "flaggor": [],
+   "varfor": "Kapitel 3 (beslut 86.8)"
+  },
+  {
+   "ord": "grönt",
+   "lista": 3,
+   "bild": null,
+   "tema": "färg",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Kapitel 3 (beslut 86.8)"
+  },
+  {
+   "ord": "grått",
+   "lista": 4,
+   "bild": null,
+   "tema": "färg",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Kapitel 3 (beslut 86.8)"
+  },
+  {
+   "ord": "ahoj",
+   "lista": 2,
+   "bild": null,
+   "tema": "bubbla",
+   "flaggor": [
+    "berattelseord"
+   ],
+   "varfor": "Kapitel 3 (beslut 86.8): flodfolkets hälsning"
+  },
+  {
+   "ord": "där",
+   "lista": 1,
+   "bild": null,
+   "tema": "bubbla",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Kapitel 3 (beslut 86.8)"
+  },
+  {
+   "ord": "tången",
+   "lista": 5,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "aao",
+    "berattelseord"
+   ],
+   "varfor": "Kapitel 3 (beslut 86.8): uppdragslappen (uppläst)"
+  },
+  {
+   "ord": "snäckorna",
+   "lista": 4,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "aao",
+    "berattelseord"
+   ],
+   "varfor": "Kapitel 3 (beslut 86.8): uppdragslappen (uppläst)"
+  },
+  {
+   "ord": "tecknen",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "berattelseord"
+   ],
+   "varfor": "Kapitel 3 (beslut 86.8): uppdragslappen (uppläst)"
+  },
+  {
+   "ord": "platsen",
+   "lista": 3,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "berattelseord"
+   ],
+   "varfor": "Kapitel 3 (beslut 86.8): uppdragslappen (uppläst)"
+  },
+  {
+   "ord": "flaskan",
+   "lista": 3,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "berattelseord"
+   ],
+   "varfor": "Kapitel 3 (beslut 86.8): uppdragslappen (uppläst)"
+  },
+  {
+   "ord": "duellen",
+   "lista": 4,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "berattelseord"
+   ],
+   "varfor": "Kapitel 3 (beslut 86.8): uppdragslappen (uppläst)"
+  },
+  {
+   "ord": "skydda",
+   "lista": 4,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [
+    "berattelseord"
+   ],
+   "varfor": "Kapitel 3 (beslut 86.8): uppdragslappen (uppläst)"
+  },
+  {
+   "ord": "tuta",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Kapitel 3 (beslut 86.8): uppdragslappen (uppläst)"
+  },
+  {
+   "ord": "skylten",
+   "lista": 3,
+   "bild": null,
+   "tema": "uppdragslappen",
+   "flaggor": [],
+   "varfor": "Kapitel 3 (beslut 86.8): uppdragslappen (uppläst)"
+  },
+  {
+   "ord": "tång",
+   "lista": 4,
+   "bild": "🌿",
+   "tema": "natur",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Kapitel 3 (beslut 86.8): bilden i gråboxen vid tången (tang_gardin)"
+  },
+  {
+   "ord": "ankare",
+   "lista": 3,
+   "bild": "⚓",
+   "tema": "verktyg",
+   "flaggor": [],
+   "varfor": "Kapitel 3 (beslut 86.8): bilden i gråboxen vid SKÖLD (ankare_faller)"
+  },
+  {
+   "ord": "mörker",
+   "lista": 3,
+   "bild": "🌑",
+   "tema": "natur",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Kapitel 3 (beslut 86.8): bilden i gråboxen vid mörkret (morker_kant)"
+  },
+  {
+   "ord": "planka",
+   "lista": 3,
+   "bild": null,
+   "tema": "skrivord",
+   "flaggor": [],
+   "varfor": "Kapitel 3 (beslut 86.8): ett ord han kan skriva vid tången"
   }
  ]
 }

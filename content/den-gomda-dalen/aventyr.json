@@ -43,6 +43,11 @@
    "rost": "datorrost",
    "rollrost": "barn",
    "portratt": "bo"
+  },
+  "skepparen": {
+   "namn": "Skepparen",
+   "rost": "datorrost",
+   "rollrost": "skeppare"
   }
  },
  "platshallare": {
