@@ -21,6 +21,12 @@ describe('bilderna i formlerna', () => {
     expect(saknas).toEqual([]);
   });
 
+  it('duellens testrum (90.7): det halmdockan pekar på har en bild i gråboxen', () => {
+    const saknas = [];
+    for (const d of las('../../content/testrum-duell.json').dueller) for (const r of d.ronder) for (const u of r.utfall) if (bilder.html(u.pekar_pa).includes('❔')) saknas.push(`${d.id}: ${u.pekar_pa}`);
+    expect(saknas).toEqual([]);
+  });
+
   it('Stils färdiga tankebubbla visas som den är, inte i en bubbla till', () => {
     expect(bilder.html('tankebubbla_svard')).toMatch(/<img[^>]*data-bild="tankebubbla_svard"/);
     expect(bilder.html('tankebubbla_svard')).not.toContain('bubbla-ytter');

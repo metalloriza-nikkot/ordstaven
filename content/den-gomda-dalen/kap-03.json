@@ -15,13 +15,14 @@
   ]
  },
  "meta": {
-  "namn": "Kapitel 3. Floden. Ön som simmade.",
-  "version": "0.2",
+  "namn": "Floden",
+  "version": "0.2.1",
   "datum": "2026-11-13",
   "agare": "Innehåll",
   "kalla": "Manus 19 v0.3.3 (Ön som simmade), godkänt 13/11 med ledningens två ändringar (86.4 och 87.3).",
   "teknik": "v0.2 följer manus 19 v0.3.3 och Tekniks fält i schema 2.47 (rapport-teknik 13/11 16:55, godkända i 87.4). Schemat är inte byggt än, så kontrollen säger fel på de nya fälten tills det finns. Fälten: P29_tryck (k3_hornet: foremal, ratt, tystnad_sek, vid_antal med 2 och 3+, lästexten i varianter); P9 med lage meddelande och skriv tangentbord (k3_chiffret: ett mellanslag mellan orden i tecken, nyckeln i den blandade ordningen, svar med mellanslag); P26 med verb lyfta (k3_mossan med sak_vid 4, där posten skylt står fjärde i innehall, och k3_tangtussarna med sak_i_sista); P16_ordduell (k3_duellen: motstandare, harmare, regel, skold, ronder med utfall, pekar_pa, ropar och alternativ med text och ratt, sköld|padda i rond 3, hjalp och vid_vinst); steget tryck (resan); och en frivillig scen som börjar vid ett föremål (k3s06_skalkant: startar_vid, till_scen och lockar.vid). Två förslag som inte stod i Tekniks tabell: en bubbla får vara {text, gemener} (ahoj! i gemener, 87.7), och tillstånden fena_uppe och luftskepp visar sköldpaddans fena uppe och tången under den. Byt gärna namnen, så skriver Innehåll om datan. Bilder som Stil inte har ritat än: kort_skold, kort_sol, kort_padda, kort_panna, kort_pil, kort_on och kort_flaska (uppdragen lånar over_vattnet och brev tills dess), tang_gardin, ankare_faller och morker_kant (i gråboxen visas ordlistornas 🌿, ⚓ och 🌑), platsbilderna i k3_fenan, skoldpadda_huvud och skoldpadda_fena i sina lägen, malning_skal, nyckelns fem nya tecken (vag, fisk, droppe, krabba och fjaril) och chiffernyckel_hel. Mellanscenerna har ingen bild än, utom kartbit_unge i k3s05. Teknik 13/11 (0.75.0, schema 2.47): mellanscenen där ön stiger (k3s01 steg 13) har tillstand_efter on, efter Innehålls anteckning i k3s01. Ingen text är ändrad.",
-  "andrat_v02": "Beslut 87: Tekniks fält i stället för den billigaste formen (hornet som P29_tryck, chiffret som meddelande, mossan och tången som P26 med verb lyfta, duellen som P16_ordduell, tryck på resan och skalkanten som en frivillig scen med lockar), ahoj! i gemener i bubblan (87.7), och mammas skugga växer inte i kapitel 3 (87.4)."
+  "andrat_v02": "Beslut 87: Tekniks fält i stället för den billigaste formen (hornet som P29_tryck, chiffret som meddelande, mossan och tången som P26 med verb lyfta, duellen som P16_ordduell, tryck på resan och skalkanten som en frivillig scen med lockar), ahoj! i gemener i bubblan (87.7), och mammas skugga växer inte i kapitel 3 (87.4).",
+  "andrat_v021": "2026-11-13 (beslut 90.5 och 90.7): meta.namn är Floden, som Skogen och Träsket, och knuffen i k3_chiffret följer det som är byggt (89.3): rutan han står vid glimtar, tidigast efter ca 25 s."
  },
  "var_var_vi": [
   {
@@ -1203,8 +1204,8 @@
     "syns_redan": true
    },
    "knuff": {
-    "handling": "tecknet glimtar på nyckeln",
-    "efter_sek": 15
+    "handling": "rutan han står vid glimtar",
+    "efter_sek": 25
    },
    "forenkla": {
     "efter_fel": 2,
@@ -1213,7 +1214,7 @@
    "efter_3_fel": {
     "handling": "ungen sätter nosen på rätt tecken på nyckeln"
    },
-   "anteckning": "Manus 19, Chiffret, med Tekniks lage: meddelande (87.4). Ett meddelande som ska läsas, inte ett lås (granskning 8, fynd 8): UNDER FENAN, två ord och tio tecken, med ett mellanslag mellan orden i tecken. Låset, bygeln och lådan ritas inte. En ruta i taget, och han skriver på tangentbordet (elva brickor tar för stor plats). Räknas som skrivuppgift i budgeten (87.6). Nyckeln är kapitel 3:s egen med elva tecken, hel från början och blandad: ordningen ovan är den som gäller, och inga två tecken som står bredvid varandra i meddelandet står bredvid varandra på nyckeln (13/11). De fem nya tecknen är vag, fisk, droppe, krabba och fjaril. Rätt bokstav står kvar direkt, och nästa tecken markeras. Spelet ber honom inte skriva i äventyrsboken (13/11). Ingen tidspress: det är passets stora uppgift, med vila före (snäckorna) och efter (kramen). Loggen per tecken: tid, antal fel och om hjälpen användes."
+   "anteckning": "Manus 19, Chiffret, med Tekniks lage: meddelande (87.4). Ett meddelande som ska läsas, inte ett lås (granskning 8, fynd 8): UNDER FENAN, två ord och tio tecken, med ett mellanslag mellan orden i tecken. Låset, bygeln och lådan ritas inte. En ruta i taget, och han skriver på tangentbordet (elva brickor tar för stor plats). Räknas som skrivuppgift i budgeten (87.6). Nyckeln är kapitel 3:s egen med elva tecken, hel från början och blandad: ordningen ovan är den som gäller, och inga två tecken som står bredvid varandra i meddelandet står bredvid varandra på nyckeln (13/11). De fem nya tecknen är vag, fisk, droppe, krabba och fjaril. Rätt bokstav står kvar direkt, och nästa tecken markeras. Spelet ber honom inte skriva i äventyrsboken (13/11). Ingen tidspress: det är passets stora uppgift, med vila före (snäckorna) och efter (kramen). Loggen per tecken: tid, antal fel och om hjälpen användes. 90.7: knuffen glimtar rutan han står vid, aldrig nyckeln, tidigast efter ca 25 s, och varje tangent startar om klockan (89.3)."
   },
   {
    "id": "k3_fenan",

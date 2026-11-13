@@ -1,0 +1,251 @@
+{
+ "meta": {
+  "version": "0.1",
+  "datum": "2026-11-13",
+  "beskrivning": "Testrummet för ordduellen (61.1, beslut 90.7). En halmdocka som inte finns i äventyret ropar fel om det som syns, och spelaren väljer det kort som stämmer med bilden. Två dueller med tre ronder var, i samma trappa som kapitel 3: ett ord (L2), en mening med två egenskaper (L3) och ett sammansatt ord (L4). Duellen kan inte förloras, och korten läses aldrig upp.",
+  "anteckning": "Det halmdockan ropar om (pekar_pa) är ett ord i ordlistorna med en bild, och bilden visar sanningen. Fel kort är det halmdockan ropar, så den som lyssnar väljer fel och den som läser väljer rätt. I rond 2 skiljer båda egenskaperna, och korten är lika långa eller det rätta längre. I rond 3 läser halmdockan bara slutet av ordet, som baronen med SKÖLDPADDA, och det rätta kortet är det längre. Rösten väljer Teknik."
+ },
+ "talare": {
+  "halmdockan": {
+   "namn": "Halmdockan",
+   "rost": "datorrost",
+   "rollrost": "fanig"
+  }
+ },
+ "dueller": [
+  {
+   "id": "tr_duell_1",
+   "typ": "P16_ordduell",
+   "motstandare": "halmdockan",
+   "regel": {
+    "talare": "berattare",
+    "text": "Den ser fel. Läs du rätt!",
+    "upplast": true
+   },
+   "ronder": [
+    {
+     "form": "ord",
+     "niva": "L2",
+     "utfall": [
+      {
+       "pekar_pa": "bil",
+       "ropar": [
+        {
+         "talare": "halmdockan",
+         "text": "Det är en båt!",
+         "upplast": true
+        }
+       ],
+       "alternativ": [
+        {
+         "text": "Bil",
+         "ratt": true
+        },
+        {
+         "text": "Båt"
+        }
+       ],
+       "vid_ratt": {
+        "handling": "halmdockan blir förvirrad, och ett halmstrå trillar av den, och den backar själv ett steg"
+       },
+       "vid_fel": {
+        "handling": "halmdockan hoppar ett steg närmare och vickar på huvudet"
+       }
+      }
+     ]
+    },
+    {
+     "form": "mening",
+     "niva": "L3",
+     "utfall": [
+      {
+       "pekar_pa": "svamp",
+       "ropar": [
+        {
+         "talare": "halmdockan",
+         "text": "Den är gul med röda prickar!",
+         "upplast": true
+        }
+       ],
+       "alternativ": [
+        {
+         "text": "En röd svamp med vita prickar.",
+         "ratt": true
+        },
+        {
+         "text": "En gul svamp med röda prickar."
+        }
+       ],
+       "vid_ratt": {
+        "handling": "halmdockan blir förvirrad, och dess hatt trillar av, och den backar själv ett steg"
+       },
+       "vid_fel": {
+        "handling": "halmdockan hoppar ett steg närmare och vickar på huvudet"
+       }
+      }
+     ]
+    },
+    {
+     "form": "sammansatt",
+     "niva": "L4",
+     "utfall": [
+      {
+       "pekar_pa": "snogubbe",
+       "ropar": [
+        {
+         "talare": "halmdockan",
+         "text": "Det är en gubbe!",
+         "upplast": true
+        }
+       ],
+       "alternativ": [
+        {
+         "text": "Det är en snö|gubbe.",
+         "ratt": true
+        },
+        {
+         "text": "Det är en gubbe."
+        }
+       ],
+       "vid_ratt": {
+        "handling": "halmdockan blir förvirrad, och en knapp trillar av den, och den backar själv ett steg"
+       },
+       "vid_fel": {
+        "handling": "halmdockan hoppar ett steg närmare och vickar på huvudet"
+       }
+      }
+     ]
+    }
+   ],
+   "hjalp": {
+    "efter_fel": 2,
+    "handling": "ungen håller för hjältens öron med tassarna (läs, lyssna inte)"
+   },
+   "knuff": {
+    "handling": "korten glimtar"
+   },
+   "vid_vinst": {
+    "handling": "halmdockan trillar baklänges i en hög med hö, och halmstråna yr",
+    "fest": "stor"
+   },
+   "anteckning": "Duell 1. Rond 1: bilen, och BIL och BÅT börjar på B och har tre bokstäver. Rond 2: svampen är röd med vita prickar (🍄), och korten är lika långa. Rond 3: en snögubbe är ingen gubbe."
+  },
+  {
+   "id": "tr_duell_2",
+   "typ": "P16_ordduell",
+   "motstandare": "halmdockan",
+   "regel": {
+    "talare": "berattare",
+    "text": "Den ser fel. Läs du rätt!",
+    "upplast": true
+   },
+   "ronder": [
+    {
+     "form": "ord",
+     "niva": "L2",
+     "utfall": [
+      {
+       "pekar_pa": "hund",
+       "ropar": [
+        {
+         "talare": "halmdockan",
+         "text": "Det är ett hus!",
+         "upplast": true
+        }
+       ],
+       "alternativ": [
+        {
+         "text": "Hund",
+         "ratt": true
+        },
+        {
+         "text": "Hus"
+        }
+       ],
+       "vid_ratt": {
+        "handling": "halmdockan blir förvirrad, och ett halmstrå trillar av den, och den backar själv ett steg"
+       },
+       "vid_fel": {
+        "handling": "halmdockan hoppar ett steg närmare och vickar på huvudet"
+       }
+      }
+     ]
+    },
+    {
+     "form": "mening",
+     "niva": "L3",
+     "utfall": [
+      {
+       "pekar_pa": "kopp",
+       "ropar": [
+        {
+         "talare": "halmdockan",
+         "text": "Den är tom och gul!",
+         "upplast": true
+        }
+       ],
+       "alternativ": [
+        {
+         "text": "En full vit kopp.",
+         "ratt": true
+        },
+        {
+         "text": "En tom gul kopp."
+        }
+       ],
+       "vid_ratt": {
+        "handling": "halmdockan blir förvirrad, och dess halsduk trillar av, och den backar själv ett steg"
+       },
+       "vid_fel": {
+        "handling": "halmdockan hoppar ett steg närmare och vickar på huvudet"
+       }
+      }
+     ]
+    },
+    {
+     "form": "sammansatt",
+     "niva": "L4",
+     "utfall": [
+      {
+       "pekar_pa": "solros",
+       "ropar": [
+        {
+         "talare": "halmdockan",
+         "text": "Det är en ros!",
+         "upplast": true
+        }
+       ],
+       "alternativ": [
+        {
+         "text": "Det är en sol|ros.",
+         "ratt": true
+        },
+        {
+         "text": "Det är en ros."
+        }
+       ],
+       "vid_ratt": {
+        "handling": "halmdockan blir förvirrad, och en knapp trillar av den, och den backar själv ett steg"
+       },
+       "vid_fel": {
+        "handling": "halmdockan hoppar ett steg närmare och vickar på huvudet"
+       }
+      }
+     ]
+    }
+   ],
+   "hjalp": {
+    "efter_fel": 2,
+    "handling": "ungen håller för hjältens öron med tassarna (läs, lyssna inte)"
+   },
+   "knuff": {
+    "handling": "korten glimtar"
+   },
+   "vid_vinst": {
+    "handling": "halmdockan snurrar runt tre varv och sätter sig på rumpan i höet",
+    "fest": "stor"
+   },
+   "anteckning": "Duell 2, för ett andra varv. Rond 1: hunden, och HUND och HUS börjar på H. Det rätta kortet är det längre. Rond 2: koppen är full och vit (☕), och det rätta kortet är det längre. Rond 3: en solros är ingen ros."
+  }
+ ]
+}

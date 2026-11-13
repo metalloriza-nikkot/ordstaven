@@ -118,3 +118,45 @@ test('testrummet för ordduellen (61.1): samma regler som i kapitel 3, påhittad
   // äventyrets sparning är orörd
   expect(await page.evaluate(() => localStorage.getItem('ordstaven_spar'))).toBe(fore2);
 });
+
+test('duellens testrum med Innehålls fil (90.7): knappen i INSTÄLLNINGAR, halmdockan och båda duellerna till vinst', async ({ page }) => {
+  test.setTimeout(180000);
+  const fil = JSON.parse(readFileSync(new URL('../../content/testrum-duell.json', import.meta.url), 'utf8'));
+  await page.goto('./?snabb&ny');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.evaluate(() => localStorage.removeItem('ordstaven_testrum_duell'));
+  await page.goto('./?snabb');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  // knappen syns nu när filen finns
+  await page.keyboard.press('Control+Shift+KeyM');
+  await page.click('#vuxenmeny .del[data-del="pass"]');
+  await expect(page.locator('#vuxenmeny .testrum-duell-in')).toBeVisible();
+  await Promise.all([page.waitForURL(/\?testrum=duell$/), page.click('#vuxenmeny .testrum-duell-in')]);
+  await page.goto('./?snabb&testrum=duell');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 15000 }).toBe('tr_duell');
+  const norm = (s) => s.replace(/\|/g, '').replace(/\s+/g, ' ').trim().toLocaleUpperCase('sv-SE');
+  const ronder = fil.dueller.flatMap((d) => d.ronder);
+  let rond = 0;
+  for (let i = 0; i < 300 && rond < ronder.length; i++) {
+    if (await page.locator('#plattan .duell-kort').isVisible()) {
+      const kort = page.locator('#plattan .duell-kort .kort');
+      const texter = (await kort.allTextContents()).map(norm);
+      const ratt = texter.indexOf(norm(ronder[rond].utfall[0].alternativ.find((a) => a.ratt).text));
+      expect(ratt).toBeGreaterThanOrEqual(0);
+      // det halmdockan pekar på har en bild, aldrig ❔
+      await expect(page.locator('#plattan')).not.toContainText('❔');
+      if (rond === 5) await page.screenshot({ path: 'test-results/testrum-duell-solros.png' });
+      await kort.nth(ratt).click(); rond++;
+      await page.waitForTimeout(2500); continue;
+    }
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    await page.waitForTimeout(250);
+  }
+  expect(rond).toBe(6);
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 15000 }).toContain('[rond] tr_duell_2 3:');
+  const loggen = await page.evaluate(() => window.__ORDSTAVEN.logg());
+  expect(loggen).toContain('[rond] tr_duell_1 3:');
+  expect(loggen).not.toMatch(/\[val\] tr_duell_\d rond \d: fel/);
+});

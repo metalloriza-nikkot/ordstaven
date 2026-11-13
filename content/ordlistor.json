@@ -2,7 +2,7 @@
  "$schema": "schema/ordlistor.schema.json",
  "format": 1,
  "meta": {
-  "version": "0.15",
+  "version": "0.16",
   "datum": "2026-11-13",
   "agare": "Innehåll",
   "textform": "Orden lagras med små bokstäver, formler i versaler. Böjda former (skogen, bron) står med när de används som alternativ.",
@@ -18,7 +18,8 @@
   "andrat_v012": "Beslut 76.6 (granskning 5, C6): vad (stumt D), sov och kom (O som Å) är inte ljudenliga och står nu i lista 6 som ordbilder. Låg, hel och torr (skyltarna i L4, 76.4).",
   "andrat_v013": "vän, bor, litet och dörren (kapitel 2, beslut 77.4).",
   "andrat_v014": "samla och ved (kapitel 2, beslut 78.4).",
-  "andrat_v015": "Kapitel 3 (beslut 86.8): orden i lästexterna (tut, tre, padda, sköldpadda, fenan, stort, grönt, grått), Var var vi? (flod, fena), bubblorna (ahoj, där), Dinoboken (dino), uppdragslappens ord och skrivord vid tången och mörkret, och tre ord som ger bilderna i gråboxen (tång, ankare, mörker). Sköldpadda står i lista 5 (sj-ljud) som berättelseord, eftersom det är kapitlets ord och läses i två delar."
+  "andrat_v015": "Kapitel 3 (beslut 86.8): orden i lästexterna (tut, tre, padda, sköldpadda, fenan, stort, grönt, grått), Var var vi? (flod, fena), bubblorna (ahoj, där), Dinoboken (dino), uppdragslappens ord och skrivord vid tången och mörkret, och tre ord som ger bilderna i gråboxen (tång, ankare, mörker). Sköldpadda står i lista 5 (sj-ljud) som berättelseord, eftersom det är kapitlets ord och läses i två delar.",
+  "andrat_v016": "2026-11-13 (beslut 90.7): orden i duellens testrum som saknades, snögubbe, gubbe, solros, ros och tom. Snögubbe och solros har bilder, eftersom halmdockan pekar på dem."
  },
  "listor": {
   "1": "Korta ljudenliga ord, 2-3 bokstaver, ingen konsonantgrupp, ingen dubbelteckning",
@@ -2872,6 +2873,48 @@
    "tema": "skrivord",
    "flaggor": [],
    "varfor": "Kapitel 3 (beslut 86.8): ett ord han kan skriva vid tången"
+  },
+  {
+   "ord": "snögubbe",
+   "lista": 4,
+   "bild": "⛄",
+   "tema": "natur",
+   "flaggor": [
+    "aao"
+   ],
+   "varfor": "Testrummet för ordduellen (beslut 90.7): rond 3, ett sammansatt ord"
+  },
+  {
+   "ord": "gubbe",
+   "lista": 4,
+   "bild": null,
+   "tema": "lästext",
+   "flaggor": [],
+   "varfor": "Testrummet för ordduellen (beslut 90.7): rond 3"
+  },
+  {
+   "ord": "solros",
+   "lista": 2,
+   "bild": "🌻",
+   "tema": "natur",
+   "flaggor": [],
+   "varfor": "Testrummet för ordduellen (beslut 90.7): rond 3, ett sammansatt ord"
+  },
+  {
+   "ord": "ros",
+   "lista": 1,
+   "bild": "🌹",
+   "tema": "natur",
+   "flaggor": [],
+   "varfor": "Testrummet för ordduellen (beslut 90.7): rond 3"
+  },
+  {
+   "ord": "tom",
+   "lista": 1,
+   "bild": null,
+   "tema": "egenskap",
+   "flaggor": [],
+   "varfor": "Testrummet för ordduellen (beslut 90.7): rond 2"
   }
  ]
 }
