@@ -1,6 +1,6 @@
 # Testmatris
 
-Version 0.3 (2026-11-03). Princip: spelet ska fungera i en modern webbläsare på dator och iPad. **Den svagaste enheten är golvet.**
+Version 0.4 (2026-11-13). Princip: spelet ska fungera i en modern webbläsare på dator och iPad. **Den svagaste enheten är golvet.**
 
 **Golvet (beslut 19):** MacBook Pro 13" 2015 med **ritning i mjukvara**: canvas, utan grafikkort. Den kör macOS Sequoia via OpenCore, och Chrome har stängt av grafikkortet (`chrome://gpu`). Safari tappar WebGL på samma dator. **Målet** är jämn rörelse, minst ca 30 bildrutor per sekund. Varje fas testas där.
 
@@ -15,7 +15,24 @@ I canvasläget ritar spelet högst 30 bildrutor per sekund, och bara när något
 | iPad | Safari, installerad på hemskärmen | Sekundär | 1 (grind), fullt från 2 |
 | Ny utvecklingsdator | Chrome/Safari | Utveckling. Ändrar inte golvet. | – |
 
-## Automatiska tester (körs vid varje push, stoppar publicering)
+## Automatiska tester: två kontroller (beslut 84.6)
+
+| Kontroll | När | Vad | Tid | Stoppar publiceringen |
+|---|---|---|---|---|
+| **Snabba kontrollen** (`.github/workflows/pages.yml`) | varje push | innehållskontrollen och enhetstesterna, bygget, **röktestet** i alla 14 profiler (`npm run test:rok`), och **textkapas** när text eller layout har ändrats (filerna i `verktyg/test/textkapas-filer.txt`) | ca 10–15 min till publicerad | ja |
+| **Stora kontrollen** (`.github/workflows/stora.yml`) | när den vuxne ska spela en version (Run workflow, eller `gh workflow run stora.yml`), och varje natt om main har ändrats | hela webbsviten i hela matrisen, i fyra delar samtidigt, med en samlad rapport (`stora-testrapport`) | ca 15–20 min | nej, men en version går inte till den vuxne förrän den har gått igenom |
+
+Namnkontrollen körs före varje push på datorn som pushar (`verktyg/git-krokar/pre-push`).
+
+**Röktestet** är tester med taggen `@rok` (i alla profiler) och `@rok-mac` (bara mac-helskarm i röktestet, men i sina vanliga profiler i den stora kontrollen): spelet startar med hel skala och rummet i bild, textlagret är Lexend, ett tryck på ett föremål fungerar, dialogrutan täcker inte målet, och prologen och kapitel 2 spelas igenom en gång i Chromium.
+
+**Tester som ibland faller** får taggen `@ostadig`. De körs för sig efter de andra (`SVIT=ostadiga`) och stoppar inget, tills de är rättade och taggen tas bort. Listan är taggarna: `grep -rn @ostadig tests/webb`.
+
+**Spelets klocka:** alla webbtester importerar `test` från `tests/webb/hjalp/klocka.js`. Där tar Playwrights klocka över `Date`, `setTimeout` och `requestAnimationFrame`, och `page.waitForTimeout(ms)` spolar fram spelet `ms` i stället för att vänta i verklig tid. På en långsam maskin (iPad i CI) får spelet lika många bildrutor och timrar som på en snabb. Väntan på något utifrån (bilder som laddas, en sida som byts) görs med `expect.poll` eller `waitForFunction`. `PW_VERKLIG_TID=1` kör på det gamla sättet.
+
+**Lokalt** (teknikchatten): kör testerna som rör det som ändrades (`npx playwright test <fil> -g "<titel>" --project=mac-helskarm`) och `npm run test:rok` före push. Hela sviten (`npm run test:webb`) bara när motorn ändras brett. Samla uppgifter som hör ihop i en push (en commit per steg).
+
+### Profilerna
 
 | Projekt | Motor | Fönster (CSS) | dpr | Pek |
 |---|---|---|---|---|

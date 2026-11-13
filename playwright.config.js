@@ -19,6 +19,16 @@ const ipad = (namn, bredd, hojd) => ({
   },
 });
 
+// Vilken svit (beslut 84.6, docs/testmatris.md): SVIT=rok är röktestet vid varje push, SVIT=ostadiga testerna
+// med taggen @ostadig (de stoppar inget), och utan SVIT körs hela sviten utom de ostadiga.
+const svit = process.env.SVIT || 'hela';
+const filter = (namn) => {
+  if (svit === 'ostadiga') return { grep: /@ostadig/ };
+  if (svit === 'rok') return { grep: namn === 'mac-helskarm' ? /@rok/ : /@rok(?![-\w])/, grepInvert: /@ostadig/ };
+  return { grepInvert: /@ostadig/ };
+};
+const ut = process.env.PW_UT || 'test-results';
+
 const alla = [
   chromium('mac-helskarm', { viewport: { width: 1280, height: 800 }, deviceScaleFactor: 2 }),
   chromium('mac-lister', { viewport: { width: 1280, height: 700 }, deviceScaleFactor: 2 }),
@@ -39,13 +49,15 @@ const alla = [
 
 export default defineConfig({
   testDir: 'tests/webb',
-  outputDir: 'test-results',
+  outputDir: ut,
+  // testerna i en fil är oberoende av varandra: de delas ut ett och ett, så att en lång fil inte bestämmer tiden
+  fullyParallel: true,
   timeout: 30000,
   retries: process.env.CI ? 1 : 0,
   // 'github' gör varje fel till en anteckning på körningen, läsbar via GitHubs API.
-  reporter: process.env.CI ? [['github'], ['list'], ['html', { open: 'never' }]] : 'list',
+  reporter: process.env.CI ? [['github'], ['list'], ['html', { open: 'never', outputFolder: process.env.PW_UT ? `${ut}-rapport` : 'playwright-report' }]] : 'list',
   use: { baseURL: 'http://localhost:4173/ordstaven/', serviceWorkers: 'allow', screenshot: 'only-on-failure' },
-  projects: lokalChromium ? alla.filter((p) => p.use.browserName === 'chromium') : alla,
+  projects: (lokalChromium ? alla.filter((p) => p.use.browserName === 'chromium') : alla).map((p) => ({ ...p, ...filter(p.name) })),
   webServer: {
     command: 'npm run preview',
     url: 'http://localhost:4173/ordstaven/',

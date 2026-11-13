@@ -1,6 +1,6 @@
 // Provsidan för textgrammatiken (beslut 13.3): alla former laddas utan fel, ord för ord kommer fram
 // ett ord i taget, allt på en gång visar allt direkt, och ett tryck på texten visar allt.
-import { test, expect } from '@playwright/test';
+import { test, expect } from './hjalp/klocka.js';
 import { mkdirSync } from 'node:fs';
 
 mkdirSync('tests/skarmdumpar', { recursive: true });

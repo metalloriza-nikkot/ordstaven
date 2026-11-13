@@ -1,5 +1,5 @@
 // Motorreglerna i 2b (granskningen A 23–25, beslut 31.3 och 41.5): molnet, styrbilderna, ljudorden och dialogrutan.
-import { test, expect } from '@playwright/test';
+import { test, expect } from './hjalp/klocka.js';
 
 async function provscen(page, scen, stall, extra = {}) {
   await page.goto('./?snabb&ny');
@@ -100,7 +100,7 @@ test('ljudordet står kvar ca 2 s (A 24), och nästa steg väntar inte på det',
 });
 
 const over = (a, b) => a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
-test('dialogrutan täcker aldrig det som ska hittas härnäst (31.3, 2b): också före bära, inte bara före ett mål', async ({ page }) => {
+test('dialogrutan täcker aldrig det som ska hittas härnäst (31.3, 2b): också före bära, inte bara före ett mål', { tag: '@rok' }, async ({ page }) => {
   // hallen på morgonen: ytterdörren står nere till höger, där repliken annars står. Utan plats för remsan:
   await page.setViewportSize({ width: 1280, height: 700 });
   await provscen(page, { id: 't_hitta', pass: 1, rum: 'hallen', tillstand: 'morgon', steg: [R('Bär filten till dörren!'), { typ: 'bara', bild: 'filt', till: 'dorr_ut' }, R('Klart.')] });

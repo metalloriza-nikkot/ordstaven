@@ -1,6 +1,6 @@
 // Grunden: skalan är hel, texten är Lexend, hjälten går med piltangenter och tryck,
 // spelet startar offline och minns var det var.
-import { test, expect } from '@playwright/test';
+import { test, expect } from './hjalp/klocka.js';
 import { mkdirSync } from 'node:fs';
 
 mkdirSync('tests/skarmdumpar', { recursive: true });
@@ -35,7 +35,7 @@ async function tillScen(page, index, extra = {}) {
 }
 const pos = (page) => page.evaluate(() => window.__ORDSTAVEN.position());
 
-test('startar utan fel, med hel skala och rummet helt i bild', async ({ page }, info) => {
+test('startar utan fel, med hel skala och rummet helt i bild', { tag: '@rok' }, async ({ page }, info) => {
   const fel = await starta(page);
   const m = await page.evaluate(() => {
     const c = document.querySelector('#varld canvas').getBoundingClientRect();
@@ -53,7 +53,7 @@ test('startar utan fel, med hel skala och rummet helt i bild', async ({ page }, 
   expect(fel).toEqual([]);
 });
 
-test('textlagret använder Lexend, och versionsraden täcker aldrig rummet', async ({ page }) => {
+test('textlagret använder Lexend, och versionsraden täcker aldrig rummet', { tag: '@rok' }, async ({ page }) => {
   await starta(page);
   const prov = page.locator('#textlager .typsnittsprov');
   await expect(prov).toHaveText('ÅÄÖ');
@@ -86,7 +86,7 @@ test('piltangenterna flyttar hjälten', async ({ page }, info) => {
   expect(Math.abs((await pos(page)).y - stopp.y)).toBeLessThan(3);
 });
 
-test('tryck på ett föremål: hjälten går dit, handen visas, och först ett tryck till öppnar', async ({ page }, info) => {
+test('tryck på ett föremål: hjälten går dit, handen visas, och först ett tryck till öppnar', { tag: '@rok' }, async ({ page }, info) => {
   test.setTimeout(60000);
   await tillScen(page, 3);
   const pt = await page.evaluate(() => window.__ORDSTAVEN.objekt('lada_med_stav'));

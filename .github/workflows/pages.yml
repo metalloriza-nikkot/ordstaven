@@ -1,4 +1,8 @@
-name: Testa och publicera
+name: Snabb kontroll och publicering
+# Varje push (beslut 84.6): innehållskontrollen, enhetstesterna, bygget och röktestet i varje profil, och
+# textkapas när text eller layout har ändrats. Publiceras inom ca 10–15 minuter.
+# Hela webbsviten i hela matrisen är "Stora kontrollen" (stora.yml): när den vuxne ska spela, och varje natt.
+# Namnkontrollen körs före push på datorn som pushar (verktyg/git-krokar/pre-push).
 on:
   push:
   workflow_dispatch:
@@ -10,7 +14,25 @@ concurrency:
   group: pages-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  andrat:
+    # Har text eller layout ändrats sedan förra pushen? Då körs textkapas.
+    runs-on: ubuntu-24.04
+    outputs:
+      text: ${{ steps.diff.outputs.text }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: diff
+        run: |
+          FORE="${{ github.event.before }}"
+          if [ "${{ github.event_name }}" != "push" ] || [ -z "$FORE" ] || ! git cat-file -e "$FORE^{commit}" 2>/dev/null; then
+            echo "text=ja" >> "$GITHUB_OUTPUT"; echo "ingen jämförelse: textkapas körs"; exit 0
+          fi
+          git diff --name-only "$FORE" "$GITHUB_SHA" | tee filer.txt
+          if grep -qE -f verktyg/test/textkapas-filer.txt filer.txt; then echo "text=ja" >> "$GITHUB_OUTPUT"; else echo "text=nej" >> "$GITHUB_OUTPUT"; fi
   testa:
+    needs: andrat
     runs-on: ubuntu-24.04
     # Playwrights egen bild med samma version som package.json: webbläsarna och deras systempaket finns redan.
     # Att installera dem i varje körning hängde flera gånger hos GitHub (apt och nedladdningen).
@@ -23,14 +45,20 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Enhetstester
+      - name: Innehållskontroll och enhetstester
         run: npm run kontroll
       - name: Bygg
         run: npm run build
-      - name: Webbläsartester (hela testmatrisen)
-        run: npm run test:webb
+      - name: Röktest i varje profil
+        run: npm run test:rok
         env:
           CI: '1'
+      - name: Textkapas (text eller layout har ändrats)
+        if: needs.andrat.outputs.text == 'ja'
+        run: npx playwright test textkapas --project=mac-helskarm
+        env:
+          CI: '1'
+          PW_UT: test-results-textkapas
       - name: Spara skärmdumpar och testrapport
         if: always()
         uses: actions/upload-artifact@v4
@@ -40,6 +68,8 @@ jobs:
             tests/skarmdumpar/
             playwright-report/
             test-results/
+            test-results-textkapas/
+            test-results-textkapas-rapport/
           retention-days: 14
       - name: Förbered publicering
         if: github.ref == 'refs/heads/main'
@@ -47,7 +77,7 @@ jobs:
         with:
           path: dist
   publicera:
-    # Publiceras bara från main, och bara om alla tester gick igenom.
+    # Publiceras bara från main, och bara om röktestet gick igenom.
     if: github.ref == 'refs/heads/main'
     needs: testa
     runs-on: ubuntu-24.04

@@ -1,0 +1,9 @@
+^content/
+^kartor/
+^index\.html$
+^src/.*\.css$
+^src/grans/
+^src/karna/(text|skalning|lasmotor)\.js$
+^assets/ui/
+^verktyg/lexend-bredder\.json$
+^tests/webb/textkapas\.spec\.js$

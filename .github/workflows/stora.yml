@@ -1,0 +1,98 @@
+name: Stora kontrollen
+# Hela webbsviten i hela matrisen (beslut 84.6): när den vuxne ska spela en version (Actions → Stora kontrollen →
+# Run workflow, eller `gh workflow run stora.yml`), och varje natt om något har pushats sedan förra natten.
+# Fyra delar som körs samtidigt. Publicerar inget: det gör den snabba kontrollen (pages.yml).
+# Tester som ibland faller (taggen @ostadig, docs/testmatris.md) körs för sig och stoppar inget.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 2 * * *' # 03:17 svensk vintertid
+permissions:
+  contents: read
+concurrency:
+  group: stora
+  cancel-in-progress: true
+jobs:
+  behovs:
+    # På natten: bara om main har ändrats det senaste dygnet.
+    runs-on: ubuntu-24.04
+    outputs:
+      kor: ${{ steps.koll.outputs.kor }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - id: koll
+        run: |
+          if [ "${{ github.event_name }}" != "schedule" ]; then echo "kor=ja" >> "$GITHUB_OUTPUT"; exit 0; fi
+          SEDAN=$(( $(date +%s) - $(git log -1 --format=%ct) ))
+          if [ "$SEDAN" -lt 90000 ]; then echo "kor=ja" >> "$GITHUB_OUTPUT"; else echo "kor=nej" >> "$GITHUB_OUTPUT"; echo "inget nytt sedan i går"; fi
+  testa:
+    needs: behovs
+    if: needs.behovs.outputs.kor == 'ja'
+    runs-on: ubuntu-24.04
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
+    strategy:
+      fail-fast: false
+      matrix:
+        del: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Innehållskontroll och enhetstester
+        run: npm run kontroll
+      - name: Bygg
+        run: npm run build
+      - name: Webbläsartester, del ${{ matrix.del }} av 4
+        run: npx playwright test --shard=${{ matrix.del }}/4 --reporter=blob,github,list
+        env:
+          CI: '1'
+      - name: Tester som ibland faller (stoppar inget)
+        if: always()
+        continue-on-error: true
+        run: npx playwright test --shard=${{ matrix.del }}/4 --reporter=list --pass-with-no-tests
+        env:
+          CI: '1'
+          SVIT: ostadiga
+          PW_UT: test-results-ostadiga
+      - name: Spara testresultaten
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stora-del-${{ matrix.del }}
+          path: |
+            blob-report/
+            tests/skarmdumpar/
+            test-results/
+            test-results-ostadiga/
+          retention-days: 14
+  rapport:
+    # En samlad testrapport för alla fyra delarna.
+    needs: testa
+    if: always() && needs.testa.result != 'skipped'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: stora-del-*
+          path: delar
+      - run: |
+          mkdir -p alla-blobbar
+          find delar -path '*blob-report/*.zip' -exec cp {} alla-blobbar/ \;
+          npx playwright merge-reports --reporter html ./alla-blobbar
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stora-testrapport
+          path: playwright-report/
+          retention-days: 14

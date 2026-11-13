@@ -1,6 +1,6 @@
 // Testrummet för fritt skrivande (76.9, Teknik 41): Innehålls skrivuppgifter i ett tomt rum på en egen sparplats.
 // Det öppnas i INSTÄLLNINGAR, orden han skriver står i loggen, och äventyrets sparning och lärandet rörs inte.
-import { test, expect } from '@playwright/test';
+import { test, expect } from './hjalp/klocka.js';
 import { readFileSync } from 'node:fs';
 
 const tr = JSON.parse(readFileSync(new URL('../../content/testrum-skriv.json', import.meta.url), 'utf8'));

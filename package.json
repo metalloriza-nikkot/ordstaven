@@ -1,6 +1,6 @@
 {
   "name": "ordstaven",
-  "version": "0.71.0",
+  "version": "0.72.0",
   "private": true,
   "description": "ORDSTAVEN: DEN GÖMDA DALEN – läs- och skriväventyr",
   "license": "UNLICENSED",
@@ -11,6 +11,8 @@
     "preview": "vite preview --port 4173 --strictPort",
     "kontroll": "node verktyg/kontrollera-innehall.js && vitest run",
     "test:webb": "playwright test",
+    "test:rok": "SVIT=rok playwright test",
+    "test:stora": "gh workflow run stora.yml",
     "test": "npm run kontroll && npm run build && npm run test:webb"
   },
   "dependencies": {

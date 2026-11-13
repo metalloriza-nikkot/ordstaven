@@ -1060,3 +1060,10 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - `visaSidovy('under_bryggan')` går till `Rum.underBryggan`: bakgrunden, baronen på (150, 128) som gräver (`_baronen_01–02`, ca 300 ms) och till sist håller upp biten (`_baronen_03`), Herr Skata (`herr_skata_sitta_vanster_01–02`) på (95, 49), fisken (`_fisk_01–02`) på (226, 150) en stund mitt i, och hjälten och ungen som går in på däcket (fötterna på y 74) och stannar. Platserna är Stils, övre vänstra hörnet (`verktyg/stil/sidovy/bryggan.py`).
 - Sidovyn visas av mellanscenens `bild: "under_bryggan"` (Innehålls fält). Webbtestet kör regin direkt.
 
+## 106. Två kontroller och spelets klocka i testerna (0.72.0, Teknik 44, beslut 84.6)
+- **Snabba kontrollen** (`pages.yml`, varje push): `npm run kontroll`, bygget, `npm run test:rok` (`SVIT=rok`), och textkapas om `git diff` mot förra pushen träffar ett mönster i `verktyg/test/textkapas-filer.txt` (ett eget litet jobb räknar ut det). Publiceras när den går igenom.
+- **Stora kontrollen** (`stora.yml`, `workflow_dispatch` och natt 02:17 UTC om main ändrats det senaste dygnet): hela sviten med `--shard=n/4` i fyra jobb, blob-rapporter som slås ihop till `stora-testrapport`. De ostadiga körs efter i varje del med `continue-on-error`.
+- **Sviterna** i `playwright.config.js`: `SVIT=rok` sätter `grep` per projekt (`@rok` överallt, `@rok-mac` bara i mac-helskarm), `SVIT=ostadiga` kör bara `@ostadig`, och annars körs allt utom `@ostadig`. `fullyParallel: true`, så att en lång fil (steg.spec.js, ca 10 min) delas på flera arbetare. `PW_UT` ger en egen resultatmapp när två körningar sker i samma jobb.
+- **Spelets klocka:** `tests/webb/hjalp/klocka.js` utökar `test` så att varje sida får `page.clock.install()` och `page.waitForTimeout = runFor`. Phaser går på `requestAnimationFrame` och `performance.now`, och DOM-lagret på `setTimeout`, så båda spolas lika. Hela sviten gick igenom i Chromium på första försöket med klockan.
+- **Genomspelningen av prologen** fälls när inget har hänt på 60 s (scen, steg, pussel, mål, lager eller stegindex), inte efter 400 varv.
+

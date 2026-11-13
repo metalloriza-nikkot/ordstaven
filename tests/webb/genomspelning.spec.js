@@ -1,6 +1,6 @@
 // Spelar hela prologen i webbläsaren, som en spelare: trycker på det som syns på skärmen.
 // Rätt svar tas från innehållet. Testläget (?snabb) stänger av rösten och kortar pauserna.
-import { test, expect } from '@playwright/test';
+import { test, expect } from './hjalp/klocka.js';
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 
 // PW_CANVAS=1 spelar med canvas-ritningen (som en dator utan WebGL)
@@ -104,7 +104,9 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
   const stangda = new Set();
   const sparadeDumpar = new Set();
   const oppnade = new Set();
-  for (let varv = 0; varv < 400; varv++) {
+  // inget tak på antalet varv (en långsam iPad i CI behöver fler): det som fäller testet är att inget händer på 60 s
+  let senast = { nyckel: '', tid: Date.now() };
+  for (let varv = 0; Date.now() - senast.tid < 60000; varv++) {
     const lage = await page.evaluate(() => {
       const O = window.__ORDSTAVEN; const st = O.steg();
       const synlig = (s) => { const e = document.querySelector(s); return !!e && !e.closest('[hidden]') && e.offsetParent !== null; };
@@ -120,10 +122,14 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
     // inget som är till för den vuxne syns under ett pass (gråboxens etiketter är avstängda från början)
     expect(lage.vuxen, `etiketter för den vuxne syns i ${lage.scen}`).toBe(false);
     // prologen är klar när slutskärmen kommer, när slutrutan för det låsta kapitlet kommer, eller när kapitel 1 börjar
-    if (lage.slut || /^k1s/.test(lage.scen || '')) return sett;
-    if (stoppVid && lage.scen === stoppVid) return sett;
+    if (lage.slut || /^k1s/.test(lage.scen || '') || (stoppVid && lage.scen === stoppVid)) {
+      if (process.env.PW_TIDER) console.log('varv', varv);
+      return sett;
+    }
     if (process.env.PW_TIDER && !sett.has(lage.scen)) console.log('tid', ((Date.now() - T0) / 1000).toFixed(1), lage.scen);
     sett.add(lage.scen);
+    const framsteg = JSON.stringify([lage.scen, lage.typ, lage.pusselId, lage.mal, lage.replik, lage.kort, lage.lapp, await page.evaluate(() => window.__ORDSTAVEN.stegIndex())]);
+    if (framsteg !== senast.nyckel) senast = { nyckel: framsteg, tid: Date.now() };
     const nyckel = `${lage.scen}-${lage.typ}-${lage.pusselId || ''}`;
     if (dumpa && !sparadeDumpar.has(nyckel) && (lage.replik || lage.kort || lage.formel || lage.dop || lage.bok || lage.hjalte || lage.lapp)) {
       sparadeDumpar.add(nyckel);
@@ -365,11 +371,11 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
   }
   // vad som hände sist, så att ett fel som bara kommer ibland går att förstå
   const lage = await page.evaluate(() => ({ pos: window.__ORDSTAVEN.position(), synlig: window.__ORDSTAVEN.synlig(), fryst: window.__ORDSTAVEN.fryst(), steg: window.__ORDSTAVEN.steg(), logg: window.__ORDSTAVEN.logg().split('\n').filter((r) => /^\d\d:/.test(r) && !/\[(hack|bildrutor|rullning)\]/.test(r)).slice(-25).join('\n') }));
-  throw new Error('prologen tog inte slut\n' + JSON.stringify({ ...lage, logg: undefined }) + '\n' + lage.logg);
+  throw new Error('prologen tog inte slut: inget hände på 60 s\n' + JSON.stringify({ ...lage, logg: undefined }) + '\n' + lage.logg);
 }
 
 test.describe('genomspelning av prologen', () => {
-  test('hela prologen går att spela, med fel svar och omstart mitt i', async ({ page }, info) => {
+  test('hela prologen går att spela, med fel svar och omstart mitt i', { tag: '@rok-mac' }, async ({ page }, info) => {
     test.skip(!process.env.SATT && !['mac-helskarm', 'ipad-10', 'mac-safari'].includes(info.project.name), 'tre projekt räcker');
     test.setTimeout(420000); // hela prologen, två gånger halva: långsamma CI-maskiner behöver marginal
     const fel = []; page.on('pageerror', (e) => { fel.push(String(e)); if (process.env.PW_STACK) console.log('STACK', e.stack); });

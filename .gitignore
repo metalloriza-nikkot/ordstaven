@@ -6,3 +6,5 @@ test-results/
 playwright-report/
 tests/skarmdumpar/
 .DS_Store
+test-results-*/
+blob-report/

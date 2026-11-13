@@ -11,7 +11,9 @@ Läs- och skriväventyr för barn 6–8 år, byggt för en spelare först. Webba
 ## Arbetssätt
 - All text i spelet på svenska. Den **visas i VERSALER** men lagras i vanlig skrift (se arkitekturreglerna). Kod, kommentarer och commit-meddelanden på svenska.
 - **En avgränsad uppgift per session.** En commit per steg. Varje push till `main` publiceras automatiskt om testerna går igenom.
-- Kör före varje commit: `npm run kontroll` (innehållskontroll + enhetstester) och `npm run test:webb` (Playwright). Ta skärmdumpar och titta på dem innan du lämnar över.
+- Kör före varje commit: `npm run kontroll` (innehållskontroll + enhetstester) och webbtesterna som rör ändringen (`npx playwright test <fil> -g "<titel>" --project=mac-helskarm`). Före push: `npm run test:rok`. Ta skärmdumpar och titta på dem innan du lämnar över.
+- Varje push kör den snabba kontrollen och publiceras (ca 10–15 min). **Den stora kontrollen** (hela sviten i hela matrisen, `gh workflow run stora.yml`) körs när den vuxne ska spela en version, och varje natt. Samla uppgifter som hör ihop i en push. Se `docs/testmatris.md`.
+- Nya webbtester importerar `test` från `tests/webb/hjalp/klocka.js` och väntar med spelets klocka, inte i verklig tid. Ett test som ibland faller får taggen `@ostadig` tills det är rättat.
 - Höj `version` i `package.json` vid varje leverans och skriv en rad i `docs/versioner.md`.
 - Bygg inget som inte står i nuvarande fas i färdplanen. Nya idéer skrivs ned, de byggs inte.
 

@@ -1,12 +1,13 @@
 // Spelar hela kapitel 2 i gråbox (Teknik 20 del 5), som en spelare med tryck på marken och tangentbordet: från
 // träsket genom byn, navet (vassen först), Tant Rosas hus och till elden. Rätt svar tas från innehållet.
-import { test, expect } from '@playwright/test';
+import { test, expect } from './hjalp/klocka.js';
 import { readFileSync } from 'node:fs';
 
 const kap = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-02.json', import.meta.url), 'utf8'));
 const pussel = new Map(kap.pussel.map((p) => [p.id, p]));
 
-test('kapitel 2 går att spela från träsket till elden (gråbox, del 5)', async ({ page }) => {
+test('kapitel 2 går att spela från träsket till elden (gråbox, del 5)', { tag: '@rok-mac' }, async ({ page }, info) => {
+  test.skip(!['mac-helskarm', 'ipad-10', 'mac-safari'].includes(info.project.name), 'tre projekt räcker, som prologen (84.6)');
   test.setTimeout(360000);
   await page.goto('./?snabb&ny&kapitel=kap-02');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);

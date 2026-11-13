@@ -1439,7 +1439,7 @@ export class Rum extends Phaser.Scene {
   /** Hjälten i leran: bilderna skärs av vid marken och leran ringar sig runt honom, och lerig om benen efteråt. Anropas av placera(). */
   ritaHjalteFast() {
     const d = this.hjalteFast ? Math.round(this.hjalteFast.djup) : 0;
-    if (this.hjalteLeraBild(this.hjalteFast ? this.hjalteFast.djup : 0)) return;
+    if (this.hjalteLeraBild(d)) return; // samma avrundade djup som resten (CI: en rest på 0,3 lämnade lerbilden kvar)
     for (const x of /** @type {any[]} */ (this.hjalte.list)) {
       if (x === this.hjalteLera || !x.setCrop) continue;
       if (d > 0) x.setCrop(0, 0, x.width, Math.max(0, FIGUR.hojd - d - (x.y || 0))); else if (x.isCropped) x.setCrop();

@@ -1,7 +1,7 @@
 // Uppdragslappen (beslut 47 och 48, 2g): molnet säger vad han ska göra nu, och lappen är hopfälld bakom lappknappen.
 // Den fälls ut när ett uppdrag börjar, när ett pass börjar och vid tryck, med rubrik, bild, bockar och ringar.
 // Stämpeln slår ned bredvid hjälten, och MIN BOK har fliken KLART som en lista.
-import { test, expect } from '@playwright/test';
+import { test, expect } from './hjalp/klocka.js';
 
 async function provscen(page, scen, extra = {}, sok = '?snabb&testscen&kapitel=kap-00') {
   await page.goto('./?snabb&ny');

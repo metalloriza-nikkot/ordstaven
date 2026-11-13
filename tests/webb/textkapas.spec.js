@@ -1,7 +1,7 @@
 // Texten kapas aldrig (beslut 79.2): varje läsval, lapp och skylt i prologen och kapitel 1–2 öppnas i spelarens två
 // fönster (MacBooken i helskärm och appen, 1280 × 762), på varje nivå som pusslet har, och testet säger fel om någon
 // rad går utanför sin ruta eller skärmen. Testet ställer själv in fönstrets storlek och körs bara på MacBook-profilen.
-import { test, expect } from '@playwright/test';
+import { test, expect } from './hjalp/klocka.js';
 import { readFileSync } from 'node:fs';
 
 const las = (k) => JSON.parse(readFileSync(new URL(`../../content/den-gomda-dalen/${k}.json`, import.meta.url), 'utf8'));

@@ -1,5 +1,5 @@
 // Stils mellanscener som regier i rummet (Teknik 31, beslut 68.5): varje regi går i sitt rum, med Stils bilder.
-import { test, expect } from '@playwright/test';
+import { test, expect } from './hjalp/klocka.js';
 import { readFileSync } from 'node:fs';
 const kap2 = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-02.json', import.meta.url), 'utf8'));
 
@@ -23,6 +23,8 @@ async function sparadI(page, kap, scenId, steg = 0, extra = {}) {
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 15000 }).toBe(scenId);
   await page.waitForTimeout(1200);
 }
+// regierna är spelets logik och Stils bilder, inte skärmens storlek: Chromium, Safari och iPad räcker (84.6)
+test.beforeEach(({}, info) => { test.skip(!['mac-helskarm', 'ipad-10', 'mac-safari'].includes(info.project.name), 'tre projekt räcker'); });
 const regi = (page, bild) => page.evaluate((b) => window.__ORDSTAVEN.regi(b), bild);
 /** Vänta på en regi medan repliker och rutor klickas bort (berättelsen går vidare som när han spelar). */
 async function vantaPaRegi(page, namn) {

@@ -1,5 +1,5 @@
 // Motorns nya steg, provade med en provscen (?snabb&testscen) innan innehållet använder dem.
-import { test, expect } from '@playwright/test';
+import { test, expect } from './hjalp/klocka.js';
 
 test.beforeEach(({}, info) => { test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker'); });
 
