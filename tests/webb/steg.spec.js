@@ -2699,7 +2699,7 @@ test('närbilden av brevramen (Stil del 3): bilden på läsplattan efter hur må
   await provscen(page, { id: 't_narbild', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [R('Titta.'), { typ: 'mellanscen', bild: 'brevram_nara', beskrivning: 'Närbild: ramen.' }, R('Klart.')] });
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('TITTA.', { timeout: 8000 });
   // spelets klocka står still medan testet tittar (hjalp/klocka.js)
-  await page.clock.pauseAt((await page.evaluate(() => Date.now())) + 10);
+  await page.clock.pauseAt((await page.evaluate(() => Date.now())) + 1000); // marginal: sidans klocka går medan anropet görs
   await page.locator('#plattan .replik-ruta').click();
   await page.clock.runFor(5); // i snabbläget står närbilden bara 30 ms
   const kort = page.locator('#plattan:not([hidden]) [data-narbild="brevram_nara_tom"] img');
