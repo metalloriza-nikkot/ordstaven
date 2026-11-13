@@ -390,10 +390,12 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
             if (p.typ === 'P29_tryck' && !ids2.includes(p.foremal)) fel.push(var_(`${sp}: ${p.id} trycker på ${p.foremal}, som inte finns i rummet ${s.rum}`));
             // ordduellen (2.47): motståndaren och det som det handlar om står i rummet
             if (p.typ === 'P16_ordduell') {
-              for (const r of p.ronder) for (const u of r.utfall) if (!ids2.includes(u.pekar_pa)) fel.push(var_(`${sp}: ${p.id} pekar på ${u.pekar_pa}, som inte finns i rummet ${s.rum}`));
+              // i ett tomt rum (testrummet) är det en bild, annars ett föremål i rummet (manus 19)
+              for (const r of p.ronder) for (const u of r.utfall) if (ids2.length && !ids2.includes(u.pekar_pa)) fel.push(var_(`${sp}: ${p.id} pekar på ${u.pekar_pa}, som inte finns i rummet ${s.rum}`));
               if (p.skold) { const fore = s.steg.slice(0, s.steg.indexOf(st)).some((x) => x.typ === 'pussel' && x.pussel_id === p.skold); if (!fore) fel.push(var_(`${sp}: ${p.id} skold ${p.skold} görs inte före duellen i scenen`)); }
             }
-            pp.sek += p.typ === 'P26_krukorna' ? 30 : p.typ === 'P12_dop' ? 45 : 40;
+            // ordduellen: regeln, och per rond ropen och valet (ca 30 s)
+            pp.sek += p.typ === 'P26_krukorna' ? 30 : p.typ === 'P12_dop' ? 45 : p.typ === 'P16_ordduell' ? 20 + 30 * p.ronder.length : 40;
             if (arLasuppgift(p)) pp.lasuppgifter++;
           } else pp.sek += 10;
           break;

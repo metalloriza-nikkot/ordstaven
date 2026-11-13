@@ -207,3 +207,23 @@ describe('ordduellen (P16, steg 3)', () => {
     expect(forst).toEqual(new Set([0, 1]));
   });
 });
+
+describe('testrummet för ordduellen (steg 4, 61.1)', () => {
+  it('Innehålls dueller blir ett kapitel med samma kontroll, och testrummets talare läggs till', async () => {
+    const { testrumDuellKapitel, testrumDuellAventyr, TESTRUM_DUELL } = await import('../../src/karna/testrum.js');
+    const prov = JSON.parse(readFileSync(new URL('../fixturer/testrum-duell-prov.json', import.meta.url), 'utf8'));
+    const k = testrumDuellKapitel(prov);
+    expect(k.id).toBe(TESTRUM_DUELL.kapitel);
+    expect(k.scener[0].steg).toEqual([{ typ: 'pussel', pussel_id: 'tr_duell_1' }]);
+    const av = testrumDuellAventyr(las('den-gomda-dalen/aventyr.json'), prov);
+    expect(av.kapitel).toEqual([TESTRUM_DUELL.kapitel]);
+    expect(av.talare.halmdockan.namn).toBe('Halmdockan');
+    expect(av.talare.farfar).toBeTruthy();
+    const r = kontrollera({ aventyr: av, kapitel: [k], ordlistor: las('ordlistor.json'), kartor: {} });
+    expect(r.fel).toEqual([]);
+    // samma regler som i kapitel 3
+    const d = skapaOrdduell(k.pussel[0], { slump: () => 0.5 });
+    for (let i = 0; i < 3; i++) d.valj(d.kort.findIndex((a) => a.ratt));
+    expect(d.s.klar).toBe(true);
+  });
+});

@@ -1095,3 +1095,9 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Strecket i ett ord** (`ui.ordSpan`): `sköld|padda` blir två ord-spann med en glipa i ett spann som inte bryts (`.sammansatt`), så nosen läser en del i taget.
 - **Kvar i gråboxen:** hjälten står vid stranden i resan (han ska sitta på skalet ute på floden), och baronen, repstegen och ankaret syns inte i rummet. Det ritas i skissen och grafiken.
 
+## 111. Ordduellen i testrummet (0.78.0, Teknik 21 och 43, beslut 61.1 och 88.9)
+- **`?testrum=duell`** bygger ett kapitel (`kap-91`) av Innehålls `content/testrum-duell.json` (`testrumDuellKapitel` och `testrumDuellAventyr` i `karna/testrum.js`): ett tomt rum, en scen med duellerna i filens ordning, och testrummets egna talare utöver äventyrets. Det spelas på testrummets sparplats, som nollställs varje gång, så äventyrets sparning och lärandet rörs inte. Reglerna är desamma som i kapitel 3 (`karna/ordduell.js`).
+- **INSTÄLLNINGAR, PASS OCH KAPITEL** visar knappen *Testrummet för ordduellen* bara när filen finns.
+- **Kontrollen** prövar filen som ett kapitel. `pekar_pa` får vara en bild i ett tomt rum.
+- **Webbtestet** använder en provfil med påhittade ord (`tests/fixturer/testrum-duell-prov.json`), som läggs i localStorage (`ordstaven_testrum_duell`) i testläget, tills Innehålls fil finns.
+

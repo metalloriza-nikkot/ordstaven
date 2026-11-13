@@ -2825,7 +2825,8 @@ export function skapaSpel(d) {
         // kolla: förebilden lyser över hans ord när det är samma ord (titta, täck, skriv, kolla)
         const kolla = fb.visad && p.forebild && versaler(p.forebild.text) === versaler(b.ord) ? `<div class="forebild kolla">${[...p.forebild.text].map((c) => `<span class="bokstav">${ui.esc(c)}</span>`).join('')}</div>` : '';
         ui.visaPlatta(`<div class="formel-luft-ruta">${kolla}<div class="formel-i-luften">${ui.esc(b.ord)}</div></div>`, 'formel-luft');
-        await vanta(tid(1000)); ui.doljPlatta();
+        // lästid: han ska hinna se att hans ord är förebildens (kortas inte i testläget, som ordet i kodlåset)
+        await vanta(kolla ? 1000 : tid(1000)); ui.doljPlatta();
         ordkraft(b.ord);
         // formelns effekt som regi i rummet (Teknik 34): då visar reaktionen inte sin text för den vuxne
         const effektMs = b.formel.effekt ? rum.regi(b.formel.effekt) : 0;
@@ -4398,7 +4399,7 @@ export function skapaSpel(d) {
     const delar = [
       ['spelare', 'SPELARE', spelargrupp() || '<div class="menygrupp"><small>En spelare på den här enheten.</small></div>'],
       ['pass', 'PASS OCH KAPITEL', `<div class="menygrupp passlista"><b>Börja ett pass</b> <small>(namnen och det som kommer före finns kvar, och lärandet blir som när passet började):</small> ${passStart}${utanBild ? '<small class="utan-bild">* Där står lärandet kvar som det är nu, eftersom det inte finns någon bild av det från passets början.</small>' : ''}${las ? `<div class="kapitel-las">${las}</div>` : ''}</div>
-        <div class="menygrupp testrum-grupp">${d.testrum ? '<button type="button" class="menyval testrum-ut">Tillbaka till äventyret</button><small>Testrummet sparar ingenting. Orden han skrev står i loggen (SPARFIL, Spara loggen).</small>' : '<button type="button" class="menyval testrum-in">Testrummet för fritt skrivande</button><small>Ett tomt rum med skrivuppgifter som inte finns i äventyret. Det påverkar inte sparningen eller lärandet, och alla ord han skriver står i loggen.</small>'}</div>`],
+        <div class="menygrupp testrum-grupp">${d.testrum ? '<button type="button" class="menyval testrum-ut">Tillbaka till äventyret</button><small>Testrummet sparar ingenting. Orden han skrev står i loggen (SPARFIL, Spara loggen).</small>' : '<button type="button" class="menyval testrum-in">Testrummet för fritt skrivande</button><small>Ett tomt rum med skrivuppgifter som inte finns i äventyret. Det påverkar inte sparningen eller lärandet, och alla ord han skriver står i loggen.</small>'}${!d.testrum && d.testrumDuell ? '<button type="button" class="menyval testrum-duell-in">Testrummet för ordduellen</button><small>Ordduellen med påhittade ord och en motståndare som inte finns i äventyret (61.1). Det påverkar inte sparningen eller lärandet, och korten han väljer står i loggen.</small>' : ''}</div>`],
       ['lasning', 'LÄSNING', `<div class="menygrupp lasniva"><b>Läsnivå (läs och välj):</b> ${Array.from({ length: Math.max(4, niva) }, (_, i) => i + 1).map((n) => `<button type="button" class="menyval niva ${n === niva ? 'nu' : ''}" data-n="${n}">L${n}</button>`).join('')} <small class="niva-i-kapitlet">${nivaIKapitlet()}</small></div>`],
       ['ljud', 'LJUD OCH RÖST', `<div class="menygrupp"><label><input type="checkbox" class="foralder" ${inst.foralderLaser ? 'checked' : ''}> Föräldern läser ${ui.esc(Object.values(aventyr.talare).filter((/** @type {any} */ t) => t.rost === 'foraldern_eller_datorrost').map((/** @type {any} */ t) => t.namn).join(' och ') || 'rollernas')} repliker</label>
         <label><input type="checkbox" class="rostval" ${inst.rost ? 'checked' : ''}> Datorrösten läser upp (av: rullningen piper i ordtakt)</label>
@@ -4450,6 +4451,7 @@ export function skapaSpel(d) {
     });
     // testrummet (41): sidan laddas om med eller utan ?testrum, och äventyrets sparning rörs inte
     s.querySelector('.testrum-in')?.addEventListener('click', () => { logg.handelse('testrum', 'öppnas'); logg.spara?.(true); location.assign(location.pathname + '?testrum'); });
+    s.querySelector('.testrum-duell-in')?.addEventListener('click', () => { logg.handelse('testrum', 'ordduellen öppnas'); logg.spara?.(true); location.assign(location.pathname + '?testrum=duell'); });
     s.querySelector('.testrum-ut')?.addEventListener('click', () => { logg.handelse('testrum', 'stängs'); logg.spara?.(true); location.assign(location.pathname); });
     s.querySelector('.foralder')?.addEventListener('change', (e) => { inst.foralderLaser = /** @type {HTMLInputElement} */ (e.target).checked; spara(); });
     s.querySelector('.rostval')?.addEventListener('change', (e) => { inst.rost = /** @type {HTMLInputElement} */ (e.target).checked; logg.handelse('inställning', `rösten ${inst.rost ? 'på' : 'av'}`); spara(); });

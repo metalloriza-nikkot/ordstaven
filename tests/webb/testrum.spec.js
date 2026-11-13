@@ -69,3 +69,47 @@ test('testrummet: skrivuppgifterna en i taget, orden i loggen, och äventyrets s
   await page.click('#vuxenmeny .del[data-del="pass"]');
   await Promise.all([page.waitForURL((u) => !u.search.includes('testrum')), page.click('#vuxenmeny .testrum-ut')]);
 });
+
+test('testrummet för ordduellen (61.1): samma regler som i kapitel 3, påhittade ord, och äventyrets sparning rörs inte', async ({ page }) => {
+  test.setTimeout(120000);
+  const prov = JSON.parse(readFileSync(new URL('../fixturer/testrum-duell-prov.json', import.meta.url), 'utf8'));
+  await page.goto('./?snabb&ny');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  const fore = await page.evaluate((prov) => {
+    const t = window.__ORDSTAVEN.tillstand();
+    t.spelare.hjalte.namn = 'TESTA';
+    localStorage.setItem('ordstaven_spar', JSON.stringify(t));
+    localStorage.setItem('ordstaven_testrum_duell', JSON.stringify(prov));
+    return localStorage.getItem('ordstaven_spar');
+  }, prov);
+  await page.goto('./?snabb&testrum=duell');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  // äventyrets sparning när testrummet öppnas (äventyrets sida sparade när den lämnades)
+  const fore2 = await page.evaluate(() => localStorage.getItem('ordstaven_spar'));
+  expect(JSON.parse(fore2).spelare.hjalte.namn).toBe(JSON.parse(fore).spelare.hjalte.namn);
+  await page.click('.start-knapp');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 15000 }).toBe('tr_duell');
+  const norm = (s) => s.replace(/\|/g, '').replace(/\s+/g, ' ').trim().toLocaleUpperCase('sv-SE');
+  const ronder = prov.dueller[0].ronder;
+  let rond = 0, felValt = false;
+  for (let i = 0; i < 200 && rond < ronder.length; i++) {
+    if (await page.locator('#plattan .duell-kort').isVisible()) {
+      const kort = page.locator('#plattan .duell-kort .kort');
+      const texter = (await kort.allTextContents()).map(norm);
+      const ratt = texter.indexOf(norm(ronder[rond].utfall[0].alternativ.find((a) => a.ratt).text));
+      expect(ratt).toBeGreaterThanOrEqual(0);
+      if (!felValt) { felValt = true; await kort.nth(1 - ratt).click(); await page.waitForTimeout(2500); continue; }
+      await kort.nth(ratt).click(); rond++;
+      await page.waitForTimeout(2500); continue;
+    }
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    await page.waitForTimeout(250);
+  }
+  expect(rond).toBe(3);
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 10000 }).toContain('[rond] tr_duell_1 3:');
+  const loggen = await page.evaluate(() => window.__ORDSTAVEN.logg());
+  expect(loggen).toContain('testrummet för ordduellen');
+  expect(loggen).toMatch(/\[val\] tr_duell_1 rond 1: fel/);
+  // äventyrets sparning är orörd
+  expect(await page.evaluate(() => localStorage.getItem('ordstaven_spar'))).toBe(fore2);
+});

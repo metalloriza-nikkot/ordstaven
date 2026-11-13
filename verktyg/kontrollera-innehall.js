@@ -3,7 +3,7 @@
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { kontrollera } from './innehall/kontroll.js';
 import { lasKarta } from '../src/karna/karta.js';
-import { testrumKapitel, testrumAventyr } from '../src/karna/testrum.js';
+import { testrumKapitel, testrumAventyr, testrumDuellKapitel, testrumDuellAventyr } from '../src/karna/testrum.js';
 
 const rot = new URL('../content/', import.meta.url);
 const las = (u) => JSON.parse(readFileSync(u, 'utf8'));
@@ -44,6 +44,16 @@ if (existsSync(testrumFil)) {
   console.log(`\n== testrummet: ${r.pass.length ? 'ett pass' : 'inga pass'} ==`);
   for (const f of r.fel) console.log('FEL      testrummet: ' + f);
   for (const v of r.varningar) console.log('varning  testrummet: ' + v);
+  fel += r.fel.length; varningar += r.varningar.length;
+}
+// testrummet för ordduellen (61.1): Innehålls dueller som ett kapitel, med samma kontroll som duellen i kapitel 3
+const duellFil = new URL('testrum-duell.json', rot);
+if (existsSync(duellFil)) {
+  const aventyr = las(new URL('den-gomda-dalen/aventyr.json', rot)), data = las(duellFil);
+  const r = kontrollera({ aventyr: testrumDuellAventyr(aventyr, data), kapitel: [testrumDuellKapitel(data)], ordlistor, kartor: {} });
+  console.log(`\n== testrummet för ordduellen: ${testrumDuellKapitel(data).pussel.length} dueller ==`);
+  for (const f of r.fel) console.log('FEL      testrummet för ordduellen: ' + f);
+  for (const v of r.varningar) console.log('varning  testrummet för ordduellen: ' + v);
   fel += r.fel.length; varningar += r.varningar.length;
 }
 console.log(`\nInnehållskontroll: ${fel} fel, ${varningar} varningar.`);

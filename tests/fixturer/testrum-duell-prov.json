@@ -1,0 +1,131 @@
+{
+ "meta": {
+  "version": "prov",
+  "beskrivning": "Testfixtur för webbtestet av duellens testrum (61.1). Påhittade ord och en påhittad motståndare. Innehålls riktiga fil är content/testrum-duell.json."
+ },
+ "talare": {
+  "halmdockan": {
+   "namn": "Halmdockan",
+   "rost": "datorrost",
+   "rollrost": "fanig"
+  }
+ },
+ "dueller": [
+  {
+   "id": "tr_duell_1",
+   "typ": "P16_ordduell",
+   "motstandare": "halmdockan",
+   "regel": {
+    "talare": "berattare",
+    "text": "Den ser fel. Läs du rätt!",
+    "upplast": true
+   },
+   "ronder": [
+    {
+     "form": "ord",
+     "niva": "L2",
+     "utfall": [
+      {
+       "pekar_pa": "sol",
+       "ropar": [
+        {
+         "talare": "halmdockan",
+         "text": "En boll!",
+         "upplast": true
+        }
+       ],
+       "alternativ": [
+        {
+         "text": "Sol",
+         "ratt": true
+        },
+        {
+         "text": "Sal"
+        }
+       ],
+       "vid_ratt": {
+        "handling": "halmdockan blir förvirrad och backar ett steg"
+       },
+       "vid_fel": {
+        "handling": "halmdockan kommer ett steg närmare"
+       }
+      }
+     ]
+    },
+    {
+     "form": "mening",
+     "niva": "L3",
+     "utfall": [
+      {
+       "pekar_pa": "fisk",
+       "ropar": [
+        {
+         "talare": "halmdockan",
+         "text": "Den är liten och röd!",
+         "upplast": true
+        }
+       ],
+       "alternativ": [
+        {
+         "text": "En stor blå fisk.",
+         "ratt": true
+        },
+        {
+         "text": "En liten röd fisk."
+        }
+       ],
+       "vid_ratt": {
+        "handling": "halmdockan blir förvirrad och backar ett steg"
+       },
+       "vid_fel": {
+        "handling": "halmdockan kommer ett steg närmare"
+       }
+      }
+     ]
+    },
+    {
+     "form": "sammansatt",
+     "niva": "L4",
+     "utfall": [
+      {
+       "pekar_pa": "sten",
+       "ropar": [
+        {
+         "talare": "halmdockan",
+         "text": "Det är en sol!",
+         "upplast": true
+        }
+       ],
+       "alternativ": [
+        {
+         "text": "Det är en sten|bit.",
+         "ratt": true
+        },
+        {
+         "text": "Det är en sten."
+        }
+       ],
+       "vid_ratt": {
+        "handling": "halmdockan blir förvirrad och backar ett steg"
+       },
+       "vid_fel": {
+        "handling": "halmdockan kommer ett steg närmare"
+       }
+      }
+     ]
+    }
+   ],
+   "hjalp": {
+    "efter_fel": 2,
+    "handling": "ungen håller för hjältens öron"
+   },
+   "knuff": {
+    "handling": "korten glimtar"
+   },
+   "vid_vinst": {
+    "handling": "halmdockan trillar baklänges i höet",
+    "fest": "stor"
+   }
+  }
+ ]
+}
