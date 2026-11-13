@@ -63,6 +63,11 @@ test('testrummet: skrivuppgifterna en i taget, orden i loggen, och äventyrets s
   // äventyrets sparning är orörd, och testrummet sparar på sin egen plats
   expect(await page.evaluate(() => localStorage.getItem('ordstaven_spar'))).toBe(fore2);
   expect(await page.evaluate(() => !!localStorage.getItem('ordstaven_spar_testrum'))).toBe(true);
+  // båten (89.5): ett försök som inte lagar båten tänder ledbilden, tejpen i molnet, och förebilden är TEJP
+  expect(tr.uppgifter[1].id).toBe('tr_baten');
+  await skriv('KATT');
+  await expect(page.locator('#plattan .formel-bild.ledbild [data-bild="tankebubbla_tejp"]')).toBeVisible({ timeout: 10000 });
+  await expect(page.locator('#plattan .forebild')).toHaveCount(0);
   await page.screenshot({ path: 'test-results/testrum-andra.png' });
   // tillbaka till äventyret
   await page.keyboard.press('Control+Shift+KeyM');

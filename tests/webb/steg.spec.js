@@ -2401,7 +2401,8 @@ test('hjälpens trappa i formeln med tangentbordet (69.3 och 76.2): varje förs�
   // första försöket, ett riktigt ord som inte hjälper: inget "pff", men trappan tar ett steg till bron i molnet
   await skriv('APA', 'ord');
   await expect(ledbild).toBeVisible();
-  await expect(ledbild.locator('.bubbla')).toHaveCount(1);
+  // Stils färdiga tankebubbla (bildkortet med bubblan ritad), inte en bubbla runt bron
+  await expect(ledbild.locator('img.bildkort[data-bild="tankebubbla_bro"]')).toHaveCount(1);
   await expect(forebild).toHaveCount(0);
   await expect(page.locator('#plattan .plats.tand')).toHaveCount(0);
   // andra försöket, ett nästan (BOR): nu förebilden

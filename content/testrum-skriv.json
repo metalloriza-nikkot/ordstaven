@@ -1,10 +1,11 @@
 {
  "meta": {
-  "version": "0.1.1",
-  "datum": "2026-11-12",
+  "version": "0.1.2",
+  "datum": "2026-11-13",
   "beskrivning": "Testrummet för fritt skrivande (76.9, Teknik 41). Nio vardagliga problem som inte finns i äventyret. Spelaren ser bilden, hör instruktionen och skriver ett ord på tangentbordet. Alla ord han skriver loggas.",
   "anteckning": "Samma form som skrivpusslen i kapitel 2 (P11 med skriv: tangentbord), så att samma kod kan visa dem. Flera ord fungerar i varje uppgift, och de rimliga orden får en egen reaktion och räknas aldrig som fel. Andra riktiga ord får vanligt_svar, och bara det som inte är ett ord får pff (76.2). Effekterna och bilderna är namn: i gråbox räcker bilden av problemet, och en liten fest när det är löst. Ordningen spelar ingen roll, men tr_hunden är lättast. Rummet påverkar inte sparningen eller lärandeprofilen.",
-  "andrat_v011": "2026-11-12 (beslut 82.2): instruktionen till fågelungen är kortad till två rader."
+  "andrat_v011": "2026-11-12 (beslut 82.2): instruktionen till fågelungen är kortad till två rader.",
+  "andrat_v012": "2026-11-13 (beslut 89.5): förebilden är det ord ett barn tänker på först, och ledbilden pekar åt samma håll. Fågeln får LYFT med en hand som lyfter, båten TEJP, hunden en full matskål som ledbild, och PUMPA och VATTNA godtas. Bollen, skåpet, snögubben och regnet står kvar."
  },
  "uppgifter": [
   {
@@ -95,7 +96,7 @@
    "knuff": {
     "handling": "bollen gungar i takrännan"
    },
-   "anteckning": "Samma sorts problem som draken i kapitel 2, men en sak han inte har sett i äventyret."
+   "anteckning": "Samma sorts problem som draken i kapitel 2, men en sak han inte har sett i äventyret. 89.5: förebilden STEGE står kvar, eftersom det är ordet ett barn tänker på först."
   },
   {
    "id": "tr_baten",
@@ -103,21 +104,26 @@
    "niva": "S3",
    "skriv": "tangentbord",
    "bild": "tr_bat_som_lacker",
-   "svar": "LAPP",
+   "svar": "TEJP",
    "formler": [
-    {
-     "ord": "LAPP",
-     "effekt": "en_lapp_over_halet",
-     "ristas": false
-    },
     {
      "ord": "TEJP",
      "effekt": "tejp_over_halet",
      "ristas": false
     },
     {
+     "ord": "LAPP",
+     "effekt": "en_lapp_over_halet",
+     "ristas": false
+    },
+    {
      "ord": "HINK",
      "effekt": "en_hink_oser_ut_vattnet",
+     "ristas": false
+    },
+    {
+     "ord": "LAGA",
+     "effekt": "halet_lagas",
      "ristas": false
     }
    ],
@@ -154,14 +160,18 @@
     {
      "ord": "TEP",
      "effekt": "en_bit_tejp_som_lossnar"
+    },
+    {
+     "ord": "TÄJP",
+     "effekt": "lite_tejp_over_halet"
     }
    ],
    "forebild": {
-    "text": "LAPP",
+    "text": "TEJP",
     "upplast": false,
     "visas": "andra_felet"
    },
-   "ledbild": "tankebubbla_lapp",
+   "ledbild": "tankebubbla_tejp",
    "hjalp": "ett_ord",
    "instruktion": {
     "talare": "berattare",
@@ -185,7 +195,7 @@
    "knuff": {
     "handling": "vattnet porlar in genom hålet"
    },
-   "anteckning": "Ett problem där flera vardagliga ord fungerar. LAPP har dubbelteckning, TEJP ett J efter E."
+   "anteckning": "Ett problem där flera vardagliga ord fungerar. LAPP har dubbelteckning, TEJP ett J efter E. 89.5: förebilden är TEJP, det barn lagar saker med, i stället för LAPP (dubbelt P). LAGA fungerar också, och TÄJP är nära stavning (E och Ä)."
   },
   {
    "id": "tr_skapet",
@@ -275,7 +285,7 @@
    "knuff": {
     "handling": "något blinkar längst in i skåpet"
    },
-   "anteckning": "LJUS är en formel han kan. Här prövas om han tar den till ett nytt problem."
+   "anteckning": "LJUS är en formel han kan. Här prövas om han tar den till ett nytt problem. 89.5: förebilden LJUS står kvar, eftersom det är ordet ett barn tänker på först."
   },
   {
    "id": "tr_snogubben",
@@ -365,7 +375,7 @@
    "knuff": {
     "handling": "snögubben nyser utan näsa"
    },
-   "anteckning": "MOROT och NÄSA går att ljuda fram. Ä mot E räknas som nära."
+   "anteckning": "MOROT och NÄSA går att ljuda fram. Ä mot E räknas som nära. 89.5: förebilden MOROT står kvar, eftersom det är ordet ett barn tänker på först."
   },
   {
    "id": "tr_cykeln",
@@ -378,7 +388,10 @@
     {
      "ord": "PUMP",
      "effekt": "en_pump_blaser_upp_hjulet",
-     "ristas": false
+     "ristas": false,
+     "godtas": [
+      "PUMPA"
+     ]
     },
     {
      "ord": "LUFT",
@@ -455,7 +468,7 @@
    "knuff": {
     "handling": "hjulet pyser"
    },
-   "anteckning": "PUMP och LUFT har konsonantgrupp i slutet (lista 2)."
+   "anteckning": "PUMP och LUFT har konsonantgrupp i slutet (lista 2). 89.5: PUMPA godtas som PUMP, eftersom ett barn ofta skriver det man gör."
   },
   {
    "id": "tr_blomman",
@@ -468,7 +481,10 @@
     {
      "ord": "VATTEN",
      "effekt": "vatten_regnar_over_blomman",
-     "ristas": false
+     "ristas": false,
+     "godtas": [
+      "VATTNA"
+     ]
     },
     {
      "ord": "REGN",
@@ -545,7 +561,7 @@
    "knuff": {
     "handling": "blomman hänger med huvudet"
    },
-   "anteckning": "VATTEN och KANNA har dubbelteckning (lista 4). REGN har G efter N, som hörs."
+   "anteckning": "VATTEN och KANNA har dubbelteckning (lista 4). REGN har G efter N, som hörs. 89.5: VATTNA godtas som VATTEN, eftersom ett barn ofta skriver det man gör."
   },
   {
    "id": "tr_hunden",
@@ -611,7 +627,7 @@
     "upplast": false,
     "visas": "andra_felet"
    },
-   "ledbild": "tankebubbla_ben",
+   "ledbild": "tankebubbla_matskal",
    "hjalp": "ett_ord",
    "instruktion": {
     "talare": "berattare",
@@ -635,7 +651,7 @@
    "knuff": {
     "handling": "hunden puttar på skålen med nosen"
    },
-   "anteckning": "Den lättaste uppgiften, med ord från lista 1. Bra att ha först eller när han har kört fast."
+   "anteckning": "Den lättaste uppgiften, med ord från lista 1. Bra att ha först eller när han har kört fast. 89.5: ledbilden är en full matskål, så att den pekar åt samma håll som förebilden MAT."
   },
   {
    "id": "tr_regnet",
@@ -725,7 +741,7 @@
    "knuff": {
     "handling": "regnet smattrar på barnets huvud"
    },
-   "anteckning": "PARAPLY är långt (7 bokstäver). HATT och TAK är korta vägar, och det får han välja."
+   "anteckning": "PARAPLY är långt (7 bokstäver). HATT och TAK är korta vägar, och det får han välja. 89.5: förebilden PARAPLY står kvar, eftersom det är ordet ett barn tänker på först."
   },
   {
    "id": "tr_fageln",
@@ -733,8 +749,16 @@
    "niva": "S3",
    "skriv": "tangentbord",
    "bild": "tr_fagelunge_pa_marken",
-   "svar": "FLYG",
+   "svar": "LYFT",
    "formler": [
+    {
+     "ord": "LYFT",
+     "effekt": "ungen_lyfts_upp_i_boet",
+     "ristas": false,
+     "godtas": [
+      "LYFTA"
+     ]
+    },
     {
      "ord": "FLYG",
      "effekt": "ungen_svavar_upp_i_boet",
@@ -743,11 +767,6 @@
     {
      "ord": "STEGE",
      "effekt": "en_stege_mot_tradet",
-     "ristas": false
-    },
-    {
-     "ord": "LYFT",
-     "effekt": "ungen_lyfts_upp_i_boet",
      "ristas": false
     }
    ],
@@ -787,11 +806,11 @@
     }
    ],
    "forebild": {
-    "text": "FLYG",
+    "text": "LYFT",
     "upplast": false,
     "visas": "andra_felet"
    },
-   "ledbild": "tankebubbla_fagel",
+   "ledbild": "tankebubbla_hand_lyfter",
    "hjalp": "ett_ord",
    "instruktion": {
     "talare": "berattare",
@@ -815,7 +834,7 @@
    "knuff": {
     "handling": "fågelungen piper och tittar upp"
    },
-   "anteckning": "FLYG och LYFT kan han från kapitel 2. Här prövas om han tar dem till ett nytt problem. 82.2: instruktionen är kortad till två rader, och fågelungen heter fågeln i repliker, så att den inte blandas ihop med dinoungen."
+   "anteckning": "FLYG och LYFT kan han från kapitel 2. Här prövas om han tar dem till ett nytt problem. 82.2: instruktionen är kortad till två rader, och fågelungen heter fågeln i repliker, så att den inte blandas ihop med dinoungen. 89.5: förebilden är LYFT (lyft upp den i boet), eftersom FLYG inte är det första man tänker på när en unge har ramlat ur boet. Ledbilden är en hand som lyfter. FLYG, STEGE och LYFT fungerar alla tre."
   }
  ]
 }

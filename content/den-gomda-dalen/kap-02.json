@@ -16,7 +16,7 @@
  },
  "meta": {
   "namn": "Träsket",
-  "version": "0.7.5",
+  "version": "0.7.6",
   "datum": "2026-11-13",
   "agare": "Innehåll",
   "kalla": "Manus 17-kapitel2-manus.md v0.4 (beslut 60–64). Ny fil.",
@@ -33,7 +33,8 @@
   "andrat_v072": "2026-11-12 (beslut 78.3 och 78.4): budgeten räknad som i 08 §4. Farfars två första repliker i k2s01 är en, Tant Rosas replik mellan grenarna är struken, halvan i vassen och vedpinnarna är märkta leta: true, och k2s10 har tre vedpinnar på udden före lyktorna (en vila i pass 3). Uppdraget ELDEN har steget SAMLA VED.",
   "andrat_v073": "2026-11-12 (beslut 79.3): det han ska göra något med visas först. I k2s10 visar kameran elden på udden innan pinnarna (visas_forst på lagereld på kvällen), och mellanscenen före LJUS har regin rosa_vid_lyktorna: Tant Rosa vid den första släckta lyktan och kameran längs raden till hjälten. Ingen text som spelaren läser är ändrad.",
   "andrat_v074": "2026-11-12 (beslut 80.3): fjädern i k2s02 plockas upp (leta: true på ga_till fjader) och räknas som vila.",
-  "andrat_v075": "2026-11-13 (beslut 86.8.1, Tekniks lista): bild på fem mellanscener, under_bryggan i k2s04 steg 0, brevram_nara i k2s04 steg 16, k2s05 steg 18 och k2s07 steg 0, och kartbit_unge i k2s09 steg 0. Ingen text är ändrad."
+  "andrat_v075": "2026-11-13 (beslut 86.8.1, Tekniks lista): bild på fem mellanscener, under_bryggan i k2s04 steg 0, brevram_nara i k2s04 steg 16, k2s05 steg 18 och k2s07 steg 0, och kartbit_unge i k2s09 steg 0. Ingen text är ändrad.",
+  "andrat_v076": "2026-11-13 (beslut 88.3): trollsländans mellanscen i träskkanten får bild trollslanda_landar (regin finns sedan 0.74.0). Ingen text ändrad."
  },
  "var_var_vi": [
   {
@@ -204,7 +205,8 @@
       },
       {
        "typ": "mellanscen",
-       "beskrivning": "Trollsländan surrar tre varv runt hjälmen och landar på ungens nos. Ungen blir skelögd."
+       "beskrivning": "Trollsländan surrar tre varv runt hjälmen och landar på ungens nos. Ungen blir skelögd.",
+       "bild": "trollslanda_landar"
       }
      ],
      "anteckning": "Småfigur. Kan strykas utan att något annat ändras."

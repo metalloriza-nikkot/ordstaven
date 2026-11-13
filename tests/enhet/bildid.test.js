@@ -14,4 +14,17 @@ describe('bilderna i formlerna', () => {
     for (const k of kapitel) for (const p of k.pussel || []) if (p.typ === 'P11_formel') for (const id of [p.bild, p.ledbild].filter(Boolean)) if (bilder.html(id).includes('❔')) saknas.push(`${p.id}: ${id}`);
     expect(saknas).toEqual([]);
   });
+
+  it('testrummets bilder och ledbilder har en bild i gråboxen (89.5: handen, tejpen och matskålen)', () => {
+    const saknas = [];
+    for (const u of las('../../content/testrum-skriv.json').uppgifter) for (const id of [u.bild, u.ledbild].filter(Boolean)) if (bilder.html(id).includes('❔')) saknas.push(`${u.id}: ${id}`);
+    expect(saknas).toEqual([]);
+  });
+
+  it('Stils färdiga tankebubbla visas som den är, inte i en bubbla till', () => {
+    expect(bilder.html('tankebubbla_svard')).toMatch(/<img[^>]*data-bild="tankebubbla_svard"/);
+    expect(bilder.html('tankebubbla_svard')).not.toContain('bubbla-ytter');
+    // utan Stils bild ritas bubblan runt platshållaren
+    expect(bilder.html('tankebubbla_matskal')).toContain('bubbla-ytter');
+  });
 });

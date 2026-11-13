@@ -43,6 +43,12 @@ const RITADE = /** @type {Record<string, (farg?: string) => string>} */ ({
     <path d="M74 26 l6 -6 l6 6 v10 h-12 z" fill="#b08a58"/><path d="M84 30 l4 -4 l4 4 v6 h-8 z" fill="#9a7a4e"/>
     <path d="M24 30 Q48 -2 72 30" stroke="#f2c14e" stroke-width="2.5" stroke-dasharray="3 4" fill="none" stroke-linecap="round"/>
   </svg>`,
+  // en tejprulle med en bit som hänger ut (testrummets båt, 89.5): det finns ingen emoji för tejp
+  tejp: () => `<svg class="ritad" viewBox="0 0 64 64" width="1em" height="1em" aria-hidden="true">
+    <circle cx="28" cy="30" r="20" fill="#d9c79a"/><circle cx="28" cy="30" r="20" fill="none" stroke="#b9a676" stroke-width="2"/>
+    <circle cx="28" cy="30" r="9" fill="#8a7a55"/><circle cx="28" cy="30" r="6" fill="#f4efe2"/>
+    <path d="M44 42 l16 8 l-3 8 l-17 -8 z" fill="#e8dab3" stroke="#b9a676" stroke-width="1.5"/>
+  </svg>`,
 });
 
 /** @param {any} ordlistor @param {Record<string, string>} [platshallare] äventyrets egna bild-id → emoji */
@@ -61,7 +67,10 @@ export function skapaBilder(ordlistor, platshallare = {}) {
   function html(id) {
     const delar = id.split('_');
     if (delar[0] === 'tankebubbla') {
-      const e = kort(delar.slice(1).join('_')) || hitta(delar.slice(1).join('_')) || '❔';
+      // Stils färdiga tankebubbla (assets/bildkort/tankebubbla_<sak>.png) har bubblan ritad, och den går först.
+      // Annars ritas bubblan runt sakens bildkort eller platshållare
+      const helt = kort(id); if (helt) return helt;
+      const e =kort(delar.slice(1).join('_')) || hitta(delar.slice(1).join('_')) || '❔';
       return `<span class="bild bubbla" data-bild="${id}"><span class="bubbla-ytter">${e}</span><span class="bubbla-prick"></span></span>`;
     }
     const k = kort(id); if (k) return k;
