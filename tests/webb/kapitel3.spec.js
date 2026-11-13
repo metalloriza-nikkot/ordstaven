@@ -13,7 +13,7 @@ async function starta(page, scenId, scen = 0, steg = 0) {
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.evaluate(({ scenId, scen, steg }) => {
     const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
-    Object.assign(av, { kapitelId: 'kap-03', scen, scenId, steg, startad: steg > 0, pass: scen ? 2 : 1 });
+    Object.assign(av, { kapitelId: 'kap-03', scen, scenId, steg, startad: steg > 0, pass: scenId === 'k3s04_ankaret' ? 3 : scen ? 2 : 1 });
     t.spelare.hjalte.namn = 'TESTA'; t.spelare.hjalte.formler = ['LJUS', 'SVÄRD', 'FLYG'];
     t.spelare.unge = { format: 1, steg: 1, formagor: [], ...t.spelare.unge, namn: 'KNOPP', folj: true };
     localStorage.setItem('ordstaven_spar', JSON.stringify(t));
@@ -190,4 +190,66 @@ test('chiffret ryms på skärmen i alla storlekar, med instruktionen överst (79
     const b = await el.boundingBox();
     expect(b.y).toBeGreaterThanOrEqual(0); expect(b.y + b.height).toBeLessThanOrEqual(vy.height);
   }
+});
+
+test('kapitel 3 pass 3: tången, SKÖLD, ordduellen, resan med två tryck och kartbit 4 (steg 3)', { tag: '@rok-mac' }, async ({ page }, info) => {
+  test.skip(!['mac-helskarm', 'ipad-10', 'mac-safari'].includes(info.project.name), 'tre projekt räcker, som kapitel 2 (84.6)');
+  test.setTimeout(240000);
+  await starta(page, 'k3s04_ankaret', kap.scener.findIndex((s) => s.id === 'k3s04_ankaret'));
+  const ev = (fn, arg) => page.evaluate(fn, arg);
+  const vidare = async () => { for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {}); };
+  const gaMot = (id) => ev((id) => { const o = window.__ORDSTAVEN.ruta(id); if (!o) return false; window.__ORDSTAVEN.gaMot(o.x + o.b / 2, o.y + o.h + 6); return true; }, id);
+  const typ = async (ord) => { for (const c of ord) { if ('ÅÄÖ'.includes(c)) await ev((k) => window.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true })), c.toLowerCase()); else await page.keyboard.type(c); } };
+  const anvand = async (id) => { await gaMot(id); await page.waitForTimeout(500); if (await page.locator('#plattan').isVisible()) return; await page.keyboard.press('Space'); };
+  const duell = pussel.get('k3_duellen');
+  const norm = (s) => s.replace(/\|/g, '').replace(/\s+/g, ' ').trim().toLocaleUpperCase('sv-SE');
+  let rond = 0, felValt = false, duellBild = false, slut = false;
+  for (let i = 0; i < 600; i++) {
+    const st = await ev(() => window.__ORDSTAVEN.steg());
+    if (await page.locator('.pass-slut .fortsatt, .pass-slut .om').first().isVisible().catch(() => false)) { slut = true; break; }
+    if (await page.locator('#plattan .duell-kort').isVisible()) {
+      if (!duellBild && rond === 2) {
+        duellBild = true; await page.screenshot({ path: 'test-results/kap3-duellen.png' });
+        // sköld|padda är ett ord med en glipa: delarna står på samma rad, och nosen läser en del i taget
+        const delar = page.locator('#plattan .duell-kort .sammansatt .ord');
+        await expect(delar).toHaveCount(2);
+        const [a, b] = [await delar.nth(0).boundingBox(), await delar.nth(1).boundingBox()];
+        expect(Math.abs(a.y - b.y)).toBeLessThan(2);
+      }
+      const kort = page.locator('#plattan .duell-kort .kort');
+      const texter = (await kort.allTextContents()).map(norm);
+      const alt = duell.ronder[rond].utfall[0].alternativ;
+      const ratt = texter.indexOf(norm(alt.find((a) => a.ratt).text));
+      // första ronden: ett fel först (han klättrar ned), sedan rätt
+      if (rond === 0 && !felValt) { felValt = true; await kort.nth(1 - ratt).click(); await page.waitForTimeout(2500); continue; }
+      await kort.nth(ratt).click(); rond++;
+      await page.waitForTimeout(2500); continue;
+    }
+    if (await page.locator('#plattan :is(.formel-skriv, .formel-ruta)').first().isVisible().catch(() => false)) {
+      const p = pussel.get(st?.pussel_id); if (p?.svar) { await typ(p.svar); await page.keyboard.press('Enter'); await page.waitForTimeout(1200); continue; }
+    }
+    if (await page.locator('#plattan').isVisible()) { await vidare(); await page.waitForTimeout(150); continue; }
+    const p = st?.typ === 'pussel' ? pussel.get(st.pussel_id) : null;
+    if (st?.typ === 'ga_till') await anvand(st.mal);
+    else if (st?.typ === 'tryck') { await page.waitForTimeout(400); await page.keyboard.press('Space'); }
+    else if (p?.typ === 'P26_krukorna') {
+      const loggen = await ev(() => window.__ORDSTAVEN.logg());
+      const kvar = p.foremal.filter((id) => !loggen.includes(`[lyfta] ${id}:`));
+      if (kvar.length) await anvand(kvar[0]);
+    }
+    await page.waitForTimeout(250);
+  }
+  const loggen = await ev(() => window.__ORDSTAVEN.logg());
+  expect(rond).toBe(3);
+  expect(loggen).toContain('[lyfta] tang_3: flaska');
+  expect(loggen).toMatch(/\[val\] k3_duellen rond 1: fel/);
+  for (const n of [1, 2, 3]) expect(loggen).toContain(`[rond] k3_duellen ${n}:`);
+  expect(loggen).toContain('[tryck] flaska_i_handen');
+  expect(loggen).toContain('[tryck] skepparen');
+  const t = await ev(() => window.__ORDSTAVEN.tillstand());
+  const av = t.aventyr['den-gomda-dalen'];
+  expect(av.kartbitar).toContain(4);
+  expect(t.spelare.hjalte.formler).toContain('SKÖLD');
+  expect(t.spelare.hjalte.grad).toBe('Lögnavslöjare');
+  await page.screenshot({ path: 'test-results/kap3-resan.png' });
 });

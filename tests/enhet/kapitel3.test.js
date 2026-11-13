@@ -4,6 +4,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { skapaTryck, reaktionForAntal, skapaKrukor, skapaMeddelande } from '../../src/karna/pussel.js';
 import { skapaBerattelse } from '../../src/karna/berattelse.js';
+import { skapaOrdduell, MAX_NARMARE } from '../../src/karna/ordduell.js';
 import { nyttTillstand } from '../../src/karna/sparning.js';
 import { bubblaFor, bubblaText } from '../../src/karna/bubblor.js';
 import { ord, forSkarm } from '../../src/karna/text.js';
@@ -167,5 +168,42 @@ describe('skalkanten är öppen från pass 2 tills duellen börjar (88.6)', () =
     expect(b.frivilligScen('sandbanken')).toBeNull();
     b.frivilligtKlart('k3s06_skalkant');
     expect(oppen(b)).toEqual([]);
+  });
+});
+
+describe('ordduellen (P16, steg 3)', () => {
+  const duell = () => pusselI(kap3(), 'k3_duellen');
+  const rattIndex = (d) => d.kort.findIndex((a) => a.ratt);
+  it('tre ronder i ordning, och det sista rätta kortet vinner', () => {
+    const d = skapaOrdduell(duell(), { slump: () => 0.7 });
+    expect(d.rond.form).toBe('ord');
+    expect(d.valj(rattIndex(d)).resultat).toBe('ratt');
+    expect(d.rond.form).toBe('mening');
+    expect(d.valj(rattIndex(d)).resultat).toBe('ratt');
+    expect(d.sista).toBe(true);
+    const r = d.valj(rattIndex(d));
+    expect(r).toMatchObject({ resultat: 'vinst', steg: 0 });
+    expect(d.s.klar).toBe(true);
+    expect(d.s.logg.map((x) => [x.form, x.niva, x.forsok])).toEqual([['ord', 'L2', 1], ['mening', 'L3', 1], ['sammansatt', 'L4', 1]]);
+    expect(d.valj(0).resultat).toBe('ingen');
+  });
+  it('fel: han klättrar ned och ronden står kvar, hjälpen efter två fel, och det går inte att förlora', () => {
+    const d = skapaOrdduell(duell(), { slump: () => 0.2 });
+    const fel = () => d.kort.findIndex((a) => !a.ratt);
+    const start = d.s.steg;
+    expect(d.valj(fel())).toMatchObject({ resultat: 'fel', hjalpNu: false, steg: start + 1 });
+    expect(d.valj(fel())).toMatchObject({ resultat: 'fel', hjalpNu: true });
+    expect(d.hjalp).toBe(true);
+    for (let i = 0; i < 6; i++) d.valj(fel());
+    expect(d.s.steg).toBe(start + MAX_NARMARE);
+    expect(d.rond.form).toBe('ord');
+    expect(d.valj(rattIndex(d)).resultat).toBe('ratt');
+    expect(d.hjalp).toBe(false); // ny rond, nya fel
+    expect(d.s.logg[0]).toMatchObject({ forsok: 9, fel: 8 });
+  });
+  it('korten blandas, så att det rätta inte alltid står först', () => {
+    const forst = new Set();
+    for (const s of [0, 0.3, 0.6, 0.9]) { const d = skapaOrdduell(duell(), { slump: () => s }); forst.add(rattIndex(d)); }
+    expect(forst).toEqual(new Set([0, 1]));
   });
 });

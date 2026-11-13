@@ -4,6 +4,7 @@
 import { skapaBerattelse, spolaFram, aterstallFramsteg, barFore, grenarI } from './karna/berattelse.js';
 import { sammanfatta } from './karna/foraldravy.js';
 import { skapaLasmotor, valjVariant, nivaMedKrav } from './karna/lasmotor.js';
+import { skapaOrdduell } from './karna/ordduell.js';
 import { egenskaper, egetForemal, synligaEgenskaper, PALETT } from './karna/egenskaper.js';
 import { skapaValj, skapaFormel, skapaDop, skapaKrukor, skapaRaddning, skapaTryck, skapaMeddelande } from './karna/pussel.js';
 import { forSkarm, versaler } from './karna/text.js';
@@ -1393,6 +1394,7 @@ export function skapaSpel(d) {
       case 'ta_emot': return taEmot(st);
       case 'las_skylt': return lasSkylt(st);
       case 'visa_foremal': return visaForemal(st);
+      case 'tryck': return tryckSteg(st);
       case 'ge_sak': return geSakSteg(st);
       case 'dinobok': return dinobok(st);
       case 'unge_tillagg': return ungeTillagg(st);
@@ -2111,6 +2113,7 @@ export function skapaSpel(d) {
         break;
       case 'P9_kodlas': res = p.lage === 'meddelande' ? await meddelande(p) : await kodlas(p); break;
       case 'P29_tryck': res = await tryckRakna(p); break;
+      case 'P16_ordduell': res = await ordduell(p); break;
       default:
         // P15, P9 och andra typer byggs i fas 3. Gråboxen hoppar över dem.
         await ui.visaRegi(`(${p.typ} byggs i fas 3)`, tid(1500)); ui.doljRegi(); res = {};
@@ -3146,6 +3149,81 @@ export function skapaSpel(d) {
    * tystnad_sek bedöms antalet (karna/pussel.js). Ingen klocka går innan första trycket, och ett fel är bara
    * reaktionen för antalet: han kan tuta igen. Nivån följer läsvalen (LASNIVA_TYP). @param {any} p
    */
+  /**
+   * Ordduellen (P16, 2.47, 61.1 och 87.4). Reglerna står i karna/ordduell.js, så att testrummet kör samma kod.
+   * Regeln sägs först. I varje rond ropar motståndaren (och hämnaren efter), och läsplattan visar det han ropar om
+   * (pekar_pa, det han ser är sanningen) och två kort som aldrig läses upp. Nosen fungerar. Rätt: motståndaren blir
+   * förvirrad och klättrar själv upp. Fel: han klättrar ett steg ned, och korten står kvar. Efter två fel i samma rond
+   * kommer hjälpen. Det sista rätta kortet vinner. Varje rond registreras som ett läsval på sin nivå, och loggen har
+   * form, nivå, försök och orden han nosade på per rond. @param {any} p
+   */
+  async function ordduell(p) {
+    const d2 = skapaOrdduell(p);
+    if (p.regel) await replik(p.regel);
+    const hjalpSpar = skapaHjalpSpar(() => performance.now());
+    let rondStart = performance.now();
+    for (;;) {
+      const r = d2.rond, u = d2.utfall;
+      const spar = { hjalp: false };
+      // det han ropar om syns hela tiden: kameran visar det i rummet
+      if (rum.ruta(u.pekar_pa)) rum.visaOmrade([u.pekar_pa]);
+      if (d2.s.forsokIRond === 0) for (const x of u.ropar || []) await replik(x);
+      rum.frys(true);
+      const val = await new Promise((klar) => {
+        const k = knuffKlocka(p.knuff, () => ui.plattan.querySelectorAll('.duell-kort .kort').forEach((e) => e.classList.add('puls')), { spar: hjalpSpar, pekOmMs: () => 0 });
+        const bild = bilder.html(u.pekar_pa);
+        const hjalp = d2.hjalp && p.hjalp ? `<div class="duell-hjalp vuxen">${ui.esc(p.hjalp.handling)}</div>` : '';
+        ui.visaPlatta(`<div class="pussel-ruta duell-ruta">${bild ? `<div class="fraga duell-sak">${bild}</div>` : ''}<div class="kortrad duell-kort">${d2.kort.map((a, i) => `<button type="button" class="kort duell" data-i="${i}"><span class="kort-etikett">${ui.rader(a.text, varden(), 'kort-ord')}</span></button>`).join('')}</div>${hjalp}</div>`, 'pussel P16_ordduell');
+        tillatNos({ hjalp: 'ett_ord' }, spar);
+        for (const e of ui.plattan.querySelectorAll('.duell-kort .kort')) e.addEventListener('click', () => { k.stopp(); klar(Number(/** @type {HTMLElement} */ (e).dataset.i)); });
+      });
+      const res = d2.valj(val);
+      logg.handelse('val', `${p.id} rond ${d2.s.logg.length + (res.resultat === 'fel' ? 1 : 0)}: ${res.resultat}`, { steg: res.steg, ...nosadeIPusslet(nosSpar) });
+      ui.doljPlatta();
+      if (res.resultat === 'fel') {
+        felljud(res.reaktion);
+        await reaktion(res.reaktion);
+        if (res.hjalpNu && p.hjalp) { logg.handelse('hjälp', `${p.id}: ${p.hjalp.handling}`); await ui.visaRegi(p.hjalp.handling, tid(1800)); ui.doljRegi(); }
+        continue;
+      }
+      // ronden är klar: ett läsval på sin nivå
+      const x = d2.s.logg[d2.s.logg.length - 1];
+      logg.handelse('rond', `${p.id} ${x.rond}: ${x.form ?? ''} ${x.niva ?? ''}`, { forsok: x.forsok, fel: x.fel, hjalp: spar.hjalp });
+      if (r.niva) lasmotor.registrera({ pussel_id: p.id, typ: 'P1_las_och_valj', niva: r.niva, ratt: x.forsok === 1, antal_forsok: x.forsok, hjalp_anvand: spar.hjalp, knuff_fore: false, tid: performance.now() - rondStart });
+      rondStart = performance.now();
+      ljud.spela('ratt');
+      await reaktion(res.reaktion);
+      if (res.resultat === 'vinst') break;
+    }
+    rum.visaOmrade(null);
+    if (p.vid_vinst) await reaktion(p.vid_vinst);
+    // ronderna är redan registrerade: pusslet registreras inte en gång till
+    return { duell: d2.s.logg };
+  }
+
+  /**
+   * Ett tryck på ett föremål i rummet (steget tryck, 2.47, resan): han behöver inte gå dit, och kan inte gå. Föremålet
+   * glimtar och har handen, och ett tryck på det (eller på handen, eller Mellanslag) räcker. @param {any} st
+   */
+  async function tryckSteg(st) {
+    const o = rum.ruta(st.foremal);
+    if (!o) { logg.handelse('FEL', 'tryck: föremålet finns inte i rummet: ' + st.foremal); return; }
+    rum.frys(true);
+    rum.visaOmrade([st.foremal]);
+    rum.markera(st.foremal, true);
+    await new Promise((klar) => {
+      const gjort = () => { ui.handknapp(null); rum.tryckFri = null; sluta(); k.stopp(); klar(null); };
+      const [pt, plats] = skyltPlats(o);
+      ui.handknapp(pt, gjort, plats);
+      rum.tryckFri = (/** @type {string} */ id) => { if (id === st.foremal) gjort(); };
+      const sluta = lyssnaHandling((h) => { if (h.typ === 'interagera') gjort(); });
+      const k = knuffKlocka({ handling: '' }, () => { rum.markera(st.foremal, true); ui.pulsera?.('#handknapp'); });
+    });
+    rum.markera(st.foremal, false); rum.visaOmrade(null);
+    logg.handelse('tryck', st.foremal);
+    ljud.spela('klick');
+  }
+
   async function tryckRakna(p) {
     const r = skapaTryck(p);
     const [variantNyckel, vari] = valjVariant(p.varianter, nivaFor(p));

@@ -957,3 +957,13 @@ html, body {
 .meddelande-ruta .med-tecken .ikon, .meddelande-ruta .med-tecken img { width: calc(40px * var(--t)); height: calc(40px * var(--t)); }
 .meddelande-ruta .med-ruta .plats { height: calc(56px * var(--t)); }
 .meddelande-ruta .dop-knappar { margin-top: 0; }
+/* strecket i ett ord (sköld|padda, 2.47): en smal glipa mellan delarna, och nosen läser en del i taget */
+.glipa { display: inline-block; width: .18em; }
+
+/* Ordduellen (P16, 2.47): det han ropar om och två kort */
+.duell-ruta { gap: 18px; align-items: center; }
+.duell-sak .bild.emoji { font-size: calc(96px * var(--t)); }
+.duell-kort .kort.duell { min-width: calc(260px * var(--t)); }
+.duell-hjalp { font-style: italic; opacity: .8; }
+.sammansatt { white-space: nowrap; }
+.glipa { width: .12em; }

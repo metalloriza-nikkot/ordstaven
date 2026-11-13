@@ -100,6 +100,9 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
   }
   /** @param {string} d ett ord med eventuella skiljetecken */
   function ordSpan(d) {
+    // ett streck inne i ett ord (sköld|padda, 2.47): delarna med en smal glipa, och nosen läser en del i taget
+    // och ordet bryts aldrig vid glipan (det är ett ord)
+    if (/[A-Za-zÅÄÖåäöÉé]\|[A-Za-zÅÄÖåäöÉé]/.test(d)) return `<span class="sammansatt">${d.split('|').map((x) => ordSpan(x)).join('<span class="glipa" aria-hidden="true"></span>')}</span>`;
     const m = /^([^A-Za-zÅÄÖåäöÉé]*)([A-Za-zÅÄÖåäöÉé]+)([^A-Za-zÅÄÖåäöÉé]*)$/.exec(d);
     if (!m) return esc(d);
     return `${esc(m[1])}<span class="ord" data-ord="${esc(m[2])}">${esc(m[2])}</span>${esc(m[3])}`;

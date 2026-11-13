@@ -182,6 +182,8 @@ export class Rum extends Phaser.Scene {
     this.malFor = null;
     /** @type {((o: any) => boolean) | null} ett tryck på en figur: upprepa dess senaste instruktion */
     this.fragaIgen = null;
+    /** @type {((id: string) => void) | null} steget tryck: ett tryck på ett föremål, och han går inte (2.47) */
+    this.tryckFri = null;
     /** @type {any} saken hjälten bär (filten), som svävar efter honom */
     this.buren = null;
     /** @type {string[]} föremål som går att använda just nu */
@@ -254,6 +256,8 @@ export class Rum extends Phaser.Scene {
     // tryck på ett objekt = gå fram till det
     this.b.inmatning.lyssna((h) => {
       if (h.typ !== 'tryck') return;
+      // steget tryck (2.47, resan): han går inte, och ett tryck på föremålet räcker
+      if (this.tryckFri) { this.b.inmatning.rensaGaTill(); const o = this.traff(h); if (o) this.tryckFri(o.id); return; }
       // ett tryck medan världen står still (rummet tonas in, en reaktion, han går tillbaka från kurvan) sparas
       // en kort stund och görs när världen går igen, som ett vanligt tryck. Annars skulle han senare gå till
       // själva tryckpunkten i stället för till föremålet.
@@ -270,14 +274,20 @@ export class Rum extends Phaser.Scene {
   }
 
   /** Ett tryck i rummet: på ett föremål går han dit (eller använder det), på golvet går han dit. @param {{ x: number, y: number }} h */
-  trycktPa(h) {
-    if (!this.harRum) return;
-    // närmaste objekt vars ruta (med lite marginal) innehåller trycket. En yta (kullen, trappan) är golv:
-    // ett tryck där går dit, som på golvet.
-    // dekor (52.2) har inget samspel: ett tryck på den är ett tryck på marken
+  /**
+   * Närmaste objekt vars ruta (med lite marginal) innehåller trycket. En yta (kullen, trappan) är golv: ett tryck där
+   * går dit, som på golvet. Dekor (52.2) har inget samspel: ett tryck på den är ett tryck på marken.
+   * @param {{ x: number, y: number }} h
+   */
+  traff(h) {
     const traffar = this.objekt.filter((x) => x.sort !== 'yta' && !x.dekor && h.x >= x.x - 4 && h.x <= x.x + x.b + 4 && h.y >= x.y - 4 && h.y <= x.y + x.h + 4);
     const avst = (/** @type {any} */ x) => Math.hypot(h.x - (x.x + x.b / 2), h.y - (x.y + x.h / 2));
-    const o = traffar.sort((a, c) => avst(a) - avst(c))[0];
+    return traffar.sort((a, c) => avst(a) - avst(c))[0] ?? null;
+  }
+
+  trycktPa(h) {
+    if (!this.harRum) return;
+    const o = this.traff(h);
     if (!o) return;
     // står hjälten redan vid föremålet, och det är det aktiva, räknas trycket som att använda det.
     // Är det en annan sak än den aktiva går han närmare den, så att den blir aktiv.
