@@ -4004,7 +4004,17 @@ export function skapaSpel(d) {
    * hjälte, äventyret från början på en egen plats. Inget raderas, och inga ord under knapparna (62.5). Första
    * gången finns bara den stora boken. Bilderna och trycken står i grans/startskarm.js.
    */
+  /**
+   * Världen vilar medan startskärmen eller introt täcker den (92.15): duken ritas inte och döljs, så att golvdatorn
+   * bara målar skrivbordet. @param {boolean} pa
+   */
+  function varldVilar(pa) {
+    rum.vilar = pa;
+    document.body.classList.toggle('varld-vilar', pa);
+    logg.handelse('ritning', pa ? 'världen vilar bakom startskärmen' : 'världen ritas igen');
+  }
   async function startskarm() {
+    varldVilar(true);
     // introt (F4): bara när spelet startar, aldrig efter ett byte av spelare (laddaOm) och aldrig i snabbläget
     if (d.intro && !introVisat) {
       introVisat = true;
@@ -4060,6 +4070,7 @@ export function skapaSpel(d) {
       irisStangd = true; logg.handelse('iris', `stängd på ${ms} ms`);
       setTimeout(oppnaIris, tid(2500)); // om något annat än ett rum kommer först
     }
+    varldVilar(false);
     ui.doljSkarm();
   }
   let irisStangd = false;

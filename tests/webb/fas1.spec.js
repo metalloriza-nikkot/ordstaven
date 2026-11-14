@@ -53,6 +53,22 @@ test('startar utan fel, med hel skala och rummet helt i bild', { tag: '@rok' }, 
   expect(fel).toEqual([]);
 });
 
+test('startskärmen: världen vilar bakom skrivbordet och ritas igen när han börjar (92.15)', async ({ page }) => {
+  // canvas, som golvdatorn: där väljer rummet själv när duken ritas
+  await starta(page, '?snabb&canvas');
+  await expect(page.locator('.start-knapp')).toBeVisible();
+  const ritade = () => page.evaluate(() => window.__ORDSTAVEN.ritade());
+  const synlig = () => page.evaluate(() => getComputedStyle(document.querySelector('#varld canvas')).visibility);
+  await page.waitForTimeout(500);
+  const fore = await ritade();
+  await page.waitForTimeout(3000);
+  expect(await ritade()).toBe(fore); // inte en enda gång på tre sekunder
+  expect(await synlig()).toBe('hidden');
+  await page.click('.start-knapp');
+  await expect.poll(synlig, { timeout: 10000 }).toBe('visible');
+  await expect.poll(ritade, { timeout: 10000 }).toBeGreaterThan(fore);
+});
+
 test('textlagret använder Lexend, och versionsraden täcker aldrig rummet', { tag: '@rok' }, async ({ page }) => {
   await starta(page);
   const prov = page.locator('#textlager .typsnittsprov');

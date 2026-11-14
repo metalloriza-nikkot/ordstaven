@@ -145,6 +145,8 @@ export class Rum extends Phaser.Scene {
     this.duellFig = null;
     /** @type {any[] | null} baronen och Herr Skata vid bryggan uppifrån (92.4) */
     this.bryggFig = null;
+    /** världen är täckt av startskärmen eller introt och ritas inte (92.15) */
+    this.vilar = false;
     /** @type {any} Farfar i dörren (regi, 67.2), tills han går ut eller rummet byts */
     this.farfarRegi = null;
     /** @type {Record<string, { x: number, y: number }>} kartans punkter för regin (regi_farfar) */
@@ -313,6 +315,9 @@ export class Rum extends Phaser.Scene {
    */
   valjRitning() {
     this.antalSteg = (this.antalSteg || 0) + 1;
+    // startskärmen och introt täcker hela rummet (92.15): världen ritas inte alls bakom dem, så att golvdatorn inte
+    // målar om skrivbordet ovanpå en duk som ingen ser. När de stängs ritas världen direkt
+    if (this.vilar) { this.sys.settings.visible = false; this.smutsig = true; return; }
     const nu = this.time.now, h = this.hjalte, u = this.unge, k = this.cameras.main, bu = this.buren;
     const sig = `${this.kropp?.frame.name},${this.ungeBild?.frame.name},${h.x},${h.y},${h.visible},${u.x},${u.y},${u.visible},${k.scrollX},${k.scrollY},${bu ? bu.x + ',' + bu.y : ''}`;
     const rorlig = this.tweens.getTweens().some((t) => !this.oandliga.has(t) && t.isPlaying());

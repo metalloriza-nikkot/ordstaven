@@ -126,6 +126,8 @@ html, body {
 
 #varld { transition: left .25s ease, top .25s ease, width .25s ease, height .25s ease; }
 #varld canvas { transition: width .25s ease, height .25s ease; }
+/* 92.15: startskärmen och introt täcker rummet helt, och duken under dem målas inte (golvdatorn ritar utan grafikkort) */
+.varld-vilar #varld canvas { visibility: hidden; }
 
 #ui { position: fixed; inset: 0; pointer-events: none; font-family: var(--typsnitt); z-index: 5; }
 #ui > * { pointer-events: auto; }

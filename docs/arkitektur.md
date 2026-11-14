@@ -1118,3 +1118,7 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Ordet eller meningen vid föremålet** (`#ordskylt`, `.skylt`) har `width: max-content` och högst rummets bredd, så att rutan inte krymper vid rummets kant. `placera()` flyttar in den i sidled och väljer ovanför eller nedanför så att den aldrig går under rummet. Textkapas-testet ställer rummet i det tillstånd där läsvalets saker syns (`syns_i`), och prövar att rutan och texten står inne i rummet och att en mening har meningarnas storlek.
 - **Baronen och Herr Skata vid bryggan** (`Rum.bryggfigurer`) ställs ut uppifrån när sidovyn under bryggan visas, där sidovyn har dem längs bryggan. Regierna `skata_ramlar_av_palen` och `baronen_lyfter` får dem att ramla och lämna rummet.
 - **Kartans `landar_nara`**: ett föremål som kommer fram med `visa_foremal` dalar ned nära hjälten (`Rum.landaNara`), och ett `ga_till` dit plockar upp det.
+
+## 115. Världen vilar bakom startskärmen (0.84.0, beslut 92.15)
+- `spel.js` sätter `rum.vilar` och klassen `varld-vilar` på `body` medan startskärmen eller introt visas. I canvas-läget (golvdatorn) ritar `Rum.valjRitning` då inte duken alls, och CSS döljer duken, så att webbläsaren inte målar om skrivbordet ovanpå en duk som ingen ser. När han börjar ritas världen direkt.
+- Mätningen gjordes lokalt med Chromium utan grafikkort och processorn nedsaktad fyra gånger: på startskärmen gick webbläsarens målning av skärmen (`Display::DrawAndSwap`) från 3,8 gånger per sekund (ca 21 ms per sekund) till 0. Inne i spelet är det oförändrat.
