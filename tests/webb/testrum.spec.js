@@ -160,3 +160,55 @@ test('duellens testrum med Innehålls fil (90.7): knappen i INSTÄLLNINGAR, halm
   expect(loggen).toContain('[rond] tr_duell_1 3:');
   expect(loggen).not.toMatch(/\[val\] tr_duell_\d rond \d: fel/);
 });
+
+test('halmdockan i duellens testrum (91.5): ropar, blir förvirrad och tappar sin sak, backar, hoppar närmare vid fel och trillar i höet', async ({ page }) => {
+  test.setTimeout(180000);
+  const fil = JSON.parse(readFileSync(new URL('../../content/testrum-duell.json', import.meta.url), 'utf8'));
+  // utan ?snabb: reaktionerna väntar på bilderna som i spelet (spelets klocka spolas)
+  await page.goto('./?test&testrum=duell');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  const fig = () => page.evaluate(() => {
+    const f = window.__ORDSTAVEN.spel.scene.getScene('Rum').duellFig;
+    return f ? { ram: f.img.frame.name, y: f.img.y, x: f.img.x, saker: f.saker.map((s) => s.frame.name), synlig: f.img.visible && f.img.active } : null;
+  });
+  await expect.poll(fig, { timeout: 15000 }).not.toBeNull();
+  const start = await fig();
+  expect(start.synlig).toBe(true);
+  const hjalten = await page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').pos);
+  expect(start.y).toBeLessThan(hjalten.y - 24); // fötterna ovanför hjältens huvud: de står mittemot varandra
+  const norm = (s) => s.replace(/\|/g, '').replace(/\s+/g, ' ').trim().toLocaleUpperCase('sv-SE');
+  const ronder = fil.dueller.flatMap((d) => d.ronder);
+  /** spolar fram och samlar bilderna som visas */
+  const sett = new Set();
+  const spola = async (ms) => { for (let t = 0; t < ms; t += 50) { await page.waitForTimeout(50); const f = await fig(); if (f) sett.add(f.ram); } };
+  let rond = 0, felGjort = false, yForeFel = 0, roparBild = false;
+  for (let i = 0; i < 400 && rond < 3; i++) {
+    const f = await fig(); if (f) sett.add(f.ram);
+    if (f?.ram.includes('_ropar_') && !roparBild) { roparBild = true; await page.screenshot({ path: 'test-results/halmdockan-ropar.png' }); }
+    if (await page.locator('#plattan .duell-kort').isVisible()) {
+      const kort = page.locator('#plattan .duell-kort .kort');
+      const texter = (await kort.allTextContents()).map(norm);
+      const ratt = texter.indexOf(norm(ronder[rond].utfall[0].alternativ.find((a) => a.ratt).text));
+      // ett fel i rond 1: den hoppar ett steg närmare
+      if (rond === 0 && !felGjort) { felGjort = true; yForeFel = f.y; await kort.nth(1 - ratt).click(); await spola(800); expect((await fig()).y).toBe(yForeFel + 10); continue; }
+      const fore = await fig(); 
+      await kort.nth(ratt).click(); rond++;
+      await spola(1200);
+      const efter = await fig();
+      expect(efter.y).toBe(fore.y - 10); // backar ett steg
+      expect(efter.saker.length).toBe(rond);
+      if (rond === 2) { expect(efter.ram).toMatch(/_utan_hatt$/); await page.screenshot({ path: 'test-results/halmdockan-utan-hatt.png' }); }
+      continue;
+    }
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    await page.waitForTimeout(100);
+  }
+  expect(rond).toBe(3);
+  // vinsten i duell 1: trillar i höet, utan hatt och knapp, och ligger kvar
+  await expect.poll(async () => { await page.waitForTimeout(100); const f = await fig(); if (f) sett.add(f.ram); return f?.ram; }, { timeout: 15000 }).toBe('halmdockan_trillar_03_utan_hatt_knapp');
+  await page.screenshot({ path: 'test-results/halmdockan-i-hoet.png' });
+  for (const l of ['grund', 'ropar', 'forvirrad', 'backar', 'narmare', 'trillar']) expect([...sett].some((r) => r.startsWith(`halmdockan_${l}_`)), l).toBe(true);
+  const saker = (await fig()).saker;
+  expect(saker).toEqual(['halmdocka_sak_halmstra_01', 'halmdocka_sak_hatt_01', 'halmdocka_sak_knapp_01']);
+});

@@ -18,6 +18,8 @@ import { laddaGrafik, fargad, riktningFor, foremalsbild, rutnamn, rutanimation, 
 const KVALL_TABELL = kvallTabell(kvallJson);
 import { foremaletsBild } from '../karna/egenskaper.js';
 import { Livet } from './livet.js';
+import { Duellfigur } from './duellfigur.js';
+import { figurensBilder } from '../karna/duellfigur.js';
 
 const FARG = {
   golv: 0x8c8a86, rutnat: 0x7f7d79, kant: 0x5d5b58,
@@ -139,6 +141,8 @@ export class Rum extends Phaser.Scene {
     this.lagda = [];
     /** @type {any} luftskeppet i rummet (regi, s22): bilden, läget och dess timrar */
     this.luft = null;
+    /** @type {Duellfigur | null} motståndaren i ordduellen (91.5) */
+    this.duellFig = null;
     /** @type {any} Farfar i dörren (regi, 67.2), tills han går ut eller rummet byts */
     this.farfarRegi = null;
     /** @type {Record<string, { x: number, y: number }>} kartans punkter för regin (regi_farfar) */
@@ -1951,8 +1955,27 @@ export class Rum extends Phaser.Scene {
     return c.toDataURL();
   }
 
+  /**
+   * Motståndaren i ordduellen som figur (91.5): Stils bilder <figur>_grund_01_hel osv. Den står mittemot hjälten, ovanför
+   * honom, och flyttas ett steg i taget. null om figuren inte har bilderna (baronen i kapitel 3:s gråbox), och då står
+   * det som händer som text för den vuxne. Ett nytt anrop tar bort den förra figuren och sakerna den tappade.
+   * @param {string | null | undefined} figur @returns {Duellfigur | null}
+   */
+  duellfigur(figur) {
+    this.duellFig?.taBort(); this.duellFig = null;
+    if (!figur) return null;
+    const fb = foremalsbild(this, `${figur}_grund_01_hel`);
+    const info = fb ? figurensBilder(figur, this.textures.get(fb.nyckel).getFrameNames()) : null;
+    if (!fb || !info) return null;
+    const maxY = Math.round(this.pos.y - 30), minY = 36;
+    const y = Math.max(minY + 20, Math.min(maxY - 20, this.pos.y - 56));
+    this.duellFig = new Duellfigur(this, fb.nyckel, figur, info, { x: this.pos.x, y, minY, maxY });
+    return this.duellFig;
+  }
+
   /** Luftskeppet, hjälmen och sidovyn tas bort (nytt rum). */
   rensaRegi() {
+    this.duellFig?.taBort(); this.duellFig = null;
     this.farfarRegi?.destroy(); this.farfarRegi = null;
     this.blomBubblor?.remove(); this.blomBubblor = null;
     this.bubbelJakt?.remove(); this.bubbelJakt = null;

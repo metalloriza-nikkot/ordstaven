@@ -3187,6 +3187,11 @@ export function skapaSpel(d) {
    */
   async function ordduell(p) {
     const d2 = skapaOrdduell(p);
+    // motståndaren som figur (91.5, Stils halmdocka), om den har bilderna: då syns det som händer, och texten för den
+    // vuxne visas inte. Annars (baronen i kapitel 3:s gråbox) står det som text
+    const fig = rum.duellfigur?.(p.motstandare) ?? null;
+    const syns = (/** @type {any} */ h) => (fig && h ? { ...h, syns_redan: true } : h);
+    const medFigur = (/** @type {any} */ h, /** @type {number} */ ms) => Promise.all([reaktion(syns(h)), vanta(tid(ms))]);
     if (p.regel) await replik(p.regel);
     const hjalpSpar = skapaHjalpSpar(() => performance.now());
     let rondStart = performance.now();
@@ -3195,7 +3200,7 @@ export function skapaSpel(d) {
       const spar = { hjalp: false };
       // det han ropar om syns hela tiden: kameran visar det i rummet
       if (rum.ruta(u.pekar_pa)) rum.visaOmrade([u.pekar_pa]);
-      if (d2.s.forsokIRond === 0) for (const x of u.ropar || []) await replik(x);
+      if (d2.s.forsokIRond === 0) for (const x of u.ropar || []) { fig?.ropar(x.talare === p.motstandare); await replik(x); fig?.ropar(false); }
       rum.frys(true);
       const val = await new Promise((klar) => {
         const k = knuffKlocka(p.knuff, () => ui.plattan.querySelectorAll('.duell-kort .kort').forEach((e) => e.classList.add('puls')), { spar: hjalpSpar, pekOmMs: () => 0 });
@@ -3210,7 +3215,7 @@ export function skapaSpel(d) {
       ui.doljPlatta();
       if (res.resultat === 'fel') {
         felljud(res.reaktion);
-        await reaktion(res.reaktion);
+        if (fig) await medFigur(res.reaktion, fig.fel()); else await reaktion(res.reaktion);
         if (res.hjalpNu && p.hjalp) { logg.handelse('hjälp', `${p.id}: ${p.hjalp.handling}`); await ui.visaRegi(p.hjalp.handling, tid(1800)); ui.doljRegi(); }
         continue;
       }
@@ -3220,11 +3225,12 @@ export function skapaSpel(d) {
       if (r.niva) lasmotor.registrera({ pussel_id: p.id, typ: 'P1_las_och_valj', niva: r.niva, ratt: x.forsok === 1, antal_forsok: x.forsok, hjalp_anvand: spar.hjalp, knuff_fore: false, tid: performance.now() - rondStart });
       rondStart = performance.now();
       ljud.spela('ratt');
-      await reaktion(res.reaktion);
+      if (fig) await medFigur(res.reaktion, fig.ratt(res.reaktion?.handling)); else await reaktion(res.reaktion);
       if (res.resultat === 'vinst') break;
     }
     rum.visaOmrade(null);
-    if (p.vid_vinst) await reaktion(p.vid_vinst);
+    if (p.vid_vinst && fig) await medFigur(p.vid_vinst, fig.vinst(p.vid_vinst.handling));
+    else if (p.vid_vinst) await reaktion(p.vid_vinst);
     // ronderna är redan registrerade: pusslet registreras inte en gång till
     return { duell: d2.s.logg };
   }

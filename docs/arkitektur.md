@@ -1107,3 +1107,8 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Nivån (89.4):** `formel` och `formelSkriv` rapporterar en lösning med förebild som hjälp till läsmotorn (`hjalp_anvand`), så att streaken inte växer och nivån inte stiger av den, som 62.2 säger. Loggen skriver `klar med förebild` också när förebilden syntes från början.
 - **Kapitel 1 och 2 (89.8):** kapitel 2:s sex skrivpussel och testrummet hade samma knuff som klättrade av tiden (9 s, ledbilden och sedan förebilden). Kapitel 1:s SVÄRD hade det inte: knuffen fick bara bilden att glimta tills han hade gjort två fel. Prologens LJUS (förebilden syns från början) tände förebilden igen av knuffen. Allt följer nu samma regel.
 
+
+## 113. Motståndaren i ordduellen som figur (0.82.0, beslut 91.5)
+- `rum.duellfigur(figur)` (scener/duellfigur.js) ställer motståndaren mittemot hjälten, ovanför honom, när figuren har Stils bilder `<figur>_<läge>_<nr>_<utrustning>` (halmdockan i duellens testrum). Utan dem (baronen i kapitel 3:s gråbox) blir det ingen figur, och det som händer står som text för den vuxne som förut.
+- Med figuren visas inte reaktionernas text: den ropar medan den pratar, vid rätt kort är den förvirrad, tappar saken som `vid_ratt.handling` nämner (en av atlasens `<…>_sak_<sak>`) och backar ett steg, vid fel hoppar den ett steg närmare, och vinsten är `trillar` eller `snurrar` och `sitter` efter `vid_vinst.handling`. Utrustningen följer det som har trillat av (karna/duellfigur.js, utan Phaser).
+- Det som måste hända (saken som faller, steget bort) görs färdigt direkt om spelet går vidare innan bilderna är klara, så att figuren aldrig står fel.
