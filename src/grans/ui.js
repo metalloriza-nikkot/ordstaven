@@ -422,14 +422,31 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     // ett föremål utanför bilden (ett stort område) får sin skylt där föremålet är: den klipps, och syns när kameran kommer dit
     const iBild = !plats?.ram || (punkt.x >= plats.ram.vanster && punkt.x <= plats.ram.hoger);
     e.style.left = punkt.x + 'px'; e.style.top = punkt.y + 'px';
-    if (lage === 'over' && plats && punkt.y - e.offsetHeight - 6 < plats.rumTopp) { e.classList.add('under'); e.style.top = (plats.under ?? punkt.y) + 'px'; }
-    // en skylt eller lapp får aldrig täcka knapparna (bär, nos, radio, paus): då står den under föremålet
-    if (lage === 'over' && plats && !e.classList.contains('under') && tackerKnapp(e)) { e.classList.add('under'); e.style.top = (plats.under ?? punkt.y) + 'px'; }
-    // alltid helt inne i rummet
-    if (plats?.ram && iBild) {
+    // alltid helt inne i rummet i sidled (bredden krymper aldrig vid kanten, se stil.css: width max-content)
+    const isida = () => {
+      if (!plats?.ram || !iBild) return;
+      e.style.left = punkt.x + 'px';
       const r = e.getBoundingClientRect();
       if (r.left < plats.ram.vanster) e.style.left = punkt.x + (plats.ram.vanster - r.left) + 'px';
       else if (r.right > plats.ram.hoger) e.style.left = punkt.x - (r.right - plats.ram.hoger) + 'px';
+    };
+    isida();
+    const under = () => { e.classList.add('under'); e.style.top = (plats?.under ?? punkt.y) + 'px'; };
+    if (lage === 'over' && plats && punkt.y - e.offsetHeight - 6 < plats.rumTopp) under();
+    // en skylt eller lapp får aldrig täcka knapparna (bär, nos, radio, paus): då står den under föremålet
+    if (lage === 'over' && plats && !e.classList.contains('under') && tackerKnapp(e)) under();
+    // och aldrig nedanför rummet (92.2, skylten vid bryggan): ryms den inte under, står den ovanför om det går,
+    // annars så långt ned som rummet räcker. Hela texten syns alltid
+    if (lage === 'over' && plats?.rumBotten !== undefined && e.classList.contains('under')) {
+      const r = e.getBoundingClientRect();
+      if (r.bottom > plats.rumBotten) {
+        const ovanforRyms = punkt.y - e.offsetHeight - 6 >= plats.rumTopp;
+        e.classList.remove('under'); e.style.top = punkt.y + 'px';
+        if (!ovanforRyms || tackerKnapp(e)) {
+          e.classList.add('under');
+          e.style.top = Math.max(plats.rumTopp, plats.rumBotten - e.offsetHeight - 6 - 2) + 'px';
+        }
+      }
     }
   }
 

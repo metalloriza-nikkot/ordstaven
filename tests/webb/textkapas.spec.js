@@ -8,6 +8,21 @@ const las = (k) => JSON.parse(readFileSync(new URL(`../../content/den-gomda-dale
 const FONSTER = [[1280, 800, 'helskärm'], [1280, 762, 'appen']];
 const NIVA = { L1: 1, L2: 2, L3: 3, L4: 4 };
 
+/**
+ * Rummets tillstånd där läsvalets saker syns (92.2: skyltarna vid bryggan syns bara medan repen spärrar, `rep`).
+ * Testet hoppar till pusslets steg, och då har scenen före inte satt tillståndet. @returns {any}
+ */
+function tillstandDarDetSyns(k, rumId, p) {
+  const r = k.rum.find((x) => x.id === rumId);
+  if (!r?.tillstand) return undefined;
+  const ids = new Set(Object.values(p.varianter || {}).flatMap((v) => (v.alternativ || []).map((a) => a.objekt).filter(Boolean)));
+  const post = (id) => (r.innehall || []).find((x) => (typeof x === 'string' ? x : x.id) === id);
+  const syns = (t) => [...ids].every((id) => { const e = post(id); return !e || typeof e === 'string' || !e.syns_i || e.syns_i.includes(t); });
+  if (syns(r.tillstand[0])) return undefined;
+  const t = r.tillstand.find(syns);
+  return t ? { rumstillstand: { [rumId]: t } } : undefined;
+}
+
 /** Allt att öppna: läsvalen och lapparna (pussel med text, papper eller skylt), las_skylt och rummens skyltar. */
 function fall() {
   const ut = [];
@@ -19,7 +34,8 @@ function fall() {
       sc.steg.forEach((st, i) => {
         const p = st.typ === 'pussel' ? ps.get(st.pussel_id) : null;
         if (p && (p.typ === 'P1_las_och_valj' || p.typ === 'P28_packa')) {
-          for (const niva of Object.keys(p.varianter || { L2: 1 })) ut.push({ kap, scen: sc.id, steg: i, namn: `${p.id} ${niva}`, niva: NIVA[niva] ?? 2, pussel: p });
+          const extra = p.i_rummet ? tillstandDarDetSyns(k, sc.rum, p) : undefined;
+          for (const niva of Object.keys(p.varianter || { L2: 1 })) ut.push({ kap, scen: sc.id, steg: i, namn: `${p.id} ${niva}`, niva: NIVA[niva] ?? 2, pussel: p, extra });
         }
         if (st.typ === 'las_skylt') { const id = st.foremal || st.skylt; sett.add(id); ut.push({ kap, scen: sc.id, steg: i, namn: `skylten ${id}`, niva: 2, skylt: id }); }
       });
@@ -43,7 +59,7 @@ function utanfor() {
   const synlig = (e) => { const s = getComputedStyle(e); if (s.visibility === 'hidden' || s.display === 'none') return false; const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && !e.closest('[hidden]'); };
   const fel = [];
   const W = window.innerWidth, H = window.innerHeight;
-  const text = [...document.querySelectorAll('#plattan .rad, #plattan .kort-etikett, #plattan .lapp, #tanke .rad, #tanke .instruktion, #tanke .moln-text, #ordskylt .kort, #ordskylt .rad, #skyltar .kort, #rumsskyltar .kort')].filter(synlig);
+  const text = [...document.querySelectorAll('#plattan .rad, #plattan .kort-etikett, #plattan .lapp, #tanke .rad, #tanke .instruktion, #tanke .moln-text, #ordskylt .kort, #ordskylt .rad, #ordskylt .kort-ord, #skyltar .kort, #rumsskyltar .kort')].filter(synlig);
   // rummet på skärmen: skyltarna i världen (dörrarnas, stigarnas och föremålens) hör till rummet
   const c = document.querySelector('canvas')?.getBoundingClientRect();
   for (const e of text) {
@@ -55,6 +71,12 @@ function utanfor() {
       if (mx < c.left || mx > c.right || my < c.top || my > c.bottom) continue;
       // dörrskylten på väggen sitter fast vid dörren och får gå ut över ramen (hallens BOK), men aldrig utanför skärmen
       if (r.left < -1 || r.top < -1 || r.right > W + 1 || r.bottom > H + 1) fel.push(`utanför skärmen: ${namn}`);
+      // ordet eller meningen vid föremålet han står vid (92.2): hela rutan inne i rummet, och texten inne i rutan
+      if (e.closest('#ordskylt')) {
+        if (r.left < c.left - 1 || r.top < c.top - 1 || r.right > c.right + 1 || r.bottom > c.bottom + 1) fel.push(`utanför rummet: ${namn}`);
+        const kort = e.parentElement?.closest('.kort');
+        if (kort) { const q = kort.getBoundingClientRect(); if (r.left < q.left - 1 || r.top < q.top - 1 || r.right > q.right + 1 || r.bottom > q.bottom + 1) fel.push(`utanför sin ruta (kort): ${namn}`); }
+      }
       continue;
     }
     if (r.left < -1 || r.top < -1 || r.right > W + 1 || r.bottom > H + 1) fel.push(`utanför skärmen: ${namn}`);
@@ -90,7 +112,7 @@ async function sparadI(page, f0) {
     t.spelare.larande.lasning = { ...(t.spelare.larande.lasning || {}), P1_las_och_valj: post, P28_packa: post };
     av.passbilder = [];
     localStorage.setItem('ordstaven_spar', JSON.stringify(t));
-  }, [{ kap: f.kap, scen: f.scen, steg: f.steg, niva: f.niva, extra: via?.extra }, k.scener.findIndex((s) => s.id === f.scen)]);
+  }, [{ kap: f.kap, scen: f.scen, steg: f.steg, niva: f.niva, extra: via?.extra ?? f0.extra }, k.scener.findIndex((s) => s.id === f.scen)]);
   await page.goto(`./?snabb&kapitel=${f.kap}`);
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.click('.start-knapp');
@@ -151,9 +173,15 @@ for (const [bredd, hojd, fonster] of FONSTER) {
         for (const a of alt) {
           const sort = await page.evaluate((id) => window.__ORDSTAVEN.ruta(id)?.sort, a.objekt);
           if (!sort || sort === 'utgang') continue; // dörrarnas och stigarnas skyltar syns hela tiden och är redan prövade
-          for (let i = 0; i < 25 && !(await page.locator('#ordskylt:not([hidden]) .kort').count()); i++) {
-            await page.evaluate((id) => { const o = window.__ORDSTAVEN.ruta(id); window.__ORDSTAVEN.gaMot(o.x + o.b / 2, o.y + o.h + 6); }, a.objekt);
+          // fram till föremålet: nedanför, och annars från vänster, ovanför eller höger (skylten vid repet till bryggan)
+          for (let i = 0; i < 80 && !(await page.locator('#ordskylt:not([hidden]) .kort').count()); i++) {
+            await page.evaluate(([id, i]) => { const o = window.__ORDSTAVEN.ruta(id); const q = [[o.x + o.b / 2, o.y + o.h + 6], [o.x - 6, o.y + o.h / 2], [o.x + o.b / 2, o.y - 4], [o.x + o.b + 6, o.y + o.h / 2]][Math.floor(i / 20)]; window.__ORDSTAVEN.gaMot(q[0], q[1]); }, [a.objekt, i]);
             await page.waitForTimeout(200);
+          }
+          // en mening vid föremålet står i meningarnas storlek, 48 punkter gånger textskalan (92.2)
+          if (a.ord.includes(' ')) {
+            const st = await page.evaluate(() => { const e = document.querySelector('#ordskylt .kort-etikett'); return { fs: parseFloat(getComputedStyle(e).fontSize), t: parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--t')) || 1 }; });
+            expect(st.fs, `${vad} ${a.id}: meningens storlek`).toBeCloseTo(48 * st.t, 0);
           }
           await expect(page.locator('#ordskylt:not([hidden]) .kort'), `${vad} ${a.id}: ordet syns inte vid föremålet`).toBeVisible();
           await page.waitForTimeout(300); await prova(`${vad} ${a.id}`);

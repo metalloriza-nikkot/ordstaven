@@ -286,13 +286,23 @@
      "id": 10,
      "name": "kartbit_3",
      "type": "sak",
-     "x": 144,
+     "x": 140,
      "y": 64,
-     "width": 14,
-     "height": 10,
+     "width": 24,
+     "height": 14,
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "kartbit_3_golv"
+      },
+      {
+       "name": "landar_nara",
+       "type": "bool",
+       "value": true
+      },
       {
        "name": "sida",
        "type": "string",

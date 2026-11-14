@@ -282,7 +282,9 @@ RUMMEN = {
             sak('tavla_liten_fyrkant', 112, 6, 24, 24, sida='under', rackvidd=56, bild='tavla_liten_fyrkant'),
             sak('tavla_stor_fyrkant', 164, 6, 24, 24, sida='under', rackvidd=56, bild='tavla_stor_fyrkant'),
             sak('tavla_liten_rund', 216, 6, 24, 24, sida='under', rackvidd=56, bild='tavla_liten_rund'),
-            sak('kartbit_3', 144, 64, 14, 10, sida='alla'),
+            # 92.7: kartbitens bild (Stils kartbit_3 i en tredjedels storlek tills Stil ritar den på golvet), och den dalar
+            # ned nära hjälten när den visas
+            sak('kartbit_3', 140, 64, 24, 14, sida='alla', bild='kartbit_3_golv', landar_nara=True),
         ],
     },
     # Sidogren, en skärm: dammen med fyra grodor utspridda (69.8): på en sten i väster, i vassen i öster, under ett blad

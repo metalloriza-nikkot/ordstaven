@@ -12,7 +12,7 @@ const FIGUR_HOJD = 24;
  *             till?: string, sida?: 'under' | 'over' | 'vanster' | 'hoger' | 'alla', golv?: boolean, visar?: string,
  *             riktning?: 'vanster' | 'hoger' | 'upp' | 'ned', klattra?: 'upp' | 'ned', ute?: boolean, lapp?: string,
  *             talare?: string, lastI?: string[], storlek?: { bredd: number, hojd: number }, forsvinnerEfter?: string, oppning?: boolean,
- *             bildSitter?: string, bildSedan?: string, sedan?: string, bildAnim?: string[], animMs?: number, rutor?: boolean, nasNara?: boolean, rackvidd?: number,
+ *             bildSitter?: string, bildSedan?: string, sedan?: string, bildAnim?: string[], animMs?: number, rutor?: boolean, nasNara?: boolean, landarNara?: boolean, rackvidd?: number,
  *             bild?: string, bildNatt?: string, bildKvall?: string, bildLagen?: string[], bildOrd?: string, bildPa?: string, bildDel?: string, skugga?: boolean, iBilden?: boolean, sovplats?: boolean, skataFonster?: boolean, lyser?: boolean, delasHela?: boolean, delasDjup?: boolean, dekor?: boolean, ovanpa?: boolean, delar?: number, bildTaEmot?: string[], bildLas?: string[], kommerFran?: string, klattrarFran?: string, visasForst?: boolean | string, bildVinka?: string[],
  *             bildRad?: string[], bildHugg?: string[], bildKvar?: string }} Objekt
  * till = rummet en utgång leder till, sida = var hjälten ställer sig, golv = man går på det (stig, grind).

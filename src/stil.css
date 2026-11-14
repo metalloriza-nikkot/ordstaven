@@ -465,7 +465,8 @@ html, body {
 #tanke .tanke-lapp { pointer-events: auto; font-size: inherit; background: none; border: 0; cursor: pointer; padding: 0 4px; }
 #tanke.puls { animation: tankepuls .6s ease-in-out 3; }
 @keyframes tankepuls { 50% { scale: 1.12; } }
-#ordskylt { position: absolute; transform: translate(-50%, calc(-100% - 6px)); z-index: 5; }
+/* bredden krymper aldrig vid rummets kant (92.2): rutan blir bredare innan den blir högre, och placera() flyttar in den */
+#ordskylt { position: absolute; transform: translate(-50%, calc(-100% - 6px)); z-index: 5; width: max-content; max-width: calc(var(--rum-bredd) - 16px); }
 /* skyltarna på dörrar och stigar i ett val: syns hela tiden, handen bara på den han står vid */
 #skyltar { position: absolute; inset: 0; pointer-events: none; z-index: 4; }
 .platta-oppen #skyltar { display: none; }
@@ -477,7 +478,7 @@ html, body {
 .kort.mening-skylt { min-width: calc(56px * var(--t)); font-size: calc(36px * var(--t)); line-height: 1; padding: 6px 10px; }
 .skylt.puls .kort { animation: skyltpuls .6s ease-in-out 3; }
 @keyframes skyltpuls { 50% { transform: scale(1.15); } }
-.skylt { position: absolute; transform: translate(-50%, calc(-100% - 6px)); pointer-events: auto; }
+.skylt { position: absolute; transform: translate(-50%, calc(-100% - 6px)); pointer-events: auto; width: max-content; max-width: calc(var(--rum-bredd) - 16px); }
 .skylt.pa { transform: translate(-50%, -50%); }
 .skylt.under { transform: translate(-50%, 6px); }
 .skylt.vanster { transform: translate(calc(-100% - 6px), -50%); }

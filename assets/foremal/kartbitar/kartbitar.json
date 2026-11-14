@@ -1,0 +1,34 @@
+{
+ "frames": {
+  "kartbit_3_golv": {
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 19
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 19
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 19
+   }
+  }
+ },
+ "meta": {
+  "image": "kartbitar.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 25,
+   "h": 20
+  },
+  "scale": "1",
+  "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."
+ }
+}

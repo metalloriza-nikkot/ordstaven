@@ -1440,6 +1440,8 @@ export function skapaSpel(d) {
       await Promise.race([rum.figurKommer(o.id), vanta(12000)]);
       return;
     }
+    // ett föremål som dalar ned nära hjälten (kartans landar_nara, 92.7: kartbiten bakom tavlan)
+    if (o.landarNara && rum.landaNara) { ljud.spela('prassel'); await vanta(tid(rum.landaNara(o.id))); rum.markera(o.id, true); await vanta(tid(900)); rum.markera(o.id, false); return; }
     ljud.spela('prassel'); rum.hoppa(o.id); rum.markera(o.id, true);
     await vanta(tid(900));
     rum.markera(o.id, false);
@@ -1733,7 +1735,8 @@ export function skapaSpel(d) {
     // sedan undan. En fel dörr öppnas aldrig (han går inte igenom den)
     // ett mål han letar efter (leta: true, vedpinnarna 78.4) plockar han upp: det ligger inte kvar
     const letat = rum.ruta(st.mal);
-    if (st.leta && plockas(letat)) { rum.gomForemal(st.mal, true); logg.handelse('plockar upp', st.mal); }
+    // ...och så gör han med en sak som dalade ned till honom (landar_nara, 92.7): kartbiten tar han med sig
+    if ((st.leta || letat?.landarNara) && plockas(letat)) { rum.gomForemal(st.mal, true); logg.handelse('plockar upp', st.mal); }
     const dorr = rum.ruta(st.mal);
     if (dorr?.sort === 'utgang' && !dorr.klattra && !dorr.golv) {
       const scener = b.kapitel.scener, sista = b.stegIndex === (b.scen?.steg?.length ?? 0) - 1;

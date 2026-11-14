@@ -216,6 +216,8 @@ export function lasKarta(tmj) {
       if (egen.rutor) ut.rutor = true;
       // nas_nara (Teknik 34, 71.2) = han når den aldrig (halvan ute i vattnet): ett ga_till dit är klart när han är nära
       if (egen.nas_nara) ut.nasNara = true;
+      // landar_nara (92.7) = när den visas (visa_foremal) dalar den ned nära hjälten där han står: kartbiten bakom tavlan
+      if (egen.landar_nara) ut.landarNara = true;
       // rackvidd (Teknik 34) = han når den på längre håll än vanligt: tavlorna högt på väggen (71.4), halvan i vattnet
       if (egen.rackvidd) ut.rackvidd = Math.max(1, tal(egen.rackvidd, 0));
       objekt.push(ut);

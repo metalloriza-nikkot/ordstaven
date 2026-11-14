@@ -137,7 +137,11 @@ test('kapitel 2:s mellanscener i gråboxen (Teknik 32, 69.1 och 75.4): ungen sju
   expect(Math.hypot(kartan.x - fj.x, kartan.y - fj.y)).toBeGreaterThan(20);
   expect((await O(() => window.__ORDSTAVEN.grafik())).regi).toContain('luftskeppet river brevet');
   await page.screenshot({ path: 'test-results/regi-luftskeppet-river-brevet.png' });
-  expect(await O(() => window.__ORDSTAVEN.grafik().luftskepp)).toBe('luftskepp_brevet_rivet');
+  // 92.1: när de har flugit iväg är luftskeppet borta ur rummet, och det står inte kvar öster om bilden
+  await expect.poll(() => O(() => window.__ORDSTAVEN.grafik().luftskepp), { timeout: 15000 }).toBeNull();
+  expect((await O(() => window.__ORDSTAVEN.grafik())).regi).toContain('luftskeppet borta');
+  const kvar = await O(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').lagerLuft.list.filter((x) => x.texture?.key === 'baronen').length);
+  expect(kvar).toBe(0);
 });
 
 test('vassen i gråboxen (Teknik 32 och 34, 71.3): bubblorna, halvan till handen, ungen på stocken, FLYG tar stocken i land', async ({ page }) => {
@@ -472,6 +476,53 @@ test('under bryggan (42.6, Stil del 3b): sidovyn med baronen som gräver, Herr S
   const g = await O(() => window.__ORDSTAVEN.grafik());
   expect(g.sidovy).toBe(true); expect(g.senasteSidovy).toBe('under_bryggan'); expect(g.regi).toContain('under bryggan');
   await page.screenshot({ path: 'test-results/regi-under-bryggan.png' });
+  // 92.4: samma plats uppifrån. Baronen i leran söder om däcket och Herr Skata på pålen norr om det
+  const fig = () => O(() => (window.__ORDSTAVEN.spel.scene.getScene('Rum').bryggFig || []).filter((f) => f.active).map((f) => ({ ram: f.frame.name, x: f.x, y: f.y, synlig: f.visible && f.alpha > 0 })));
+  await O(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').doljSidovy());
+  await page.waitForTimeout(500);
+  const b = await O(() => window.__ORDSTAVEN.ruta('brygga'));
+  const [baron, skata] = await fig();
+  expect(baron.ram).toBe('baronen_ga_ner_01'); expect(baron.synlig).toBe(true);
+  expect(baron.x).toBeGreaterThan(b.x); expect(baron.x).toBeLessThan(b.x + b.b); expect(baron.y).toBeGreaterThan(b.y + b.h);
+  expect(skata.ram).toBe('herr_skata_sitta_hoger_01');
+  expect(skata.x).toBeGreaterThan(b.x); expect(skata.x).toBeLessThan(baron.x); expect(skata.y).toBeLessThanOrEqual(b.y);
+  await page.screenshot({ path: 'test-results/regi-bryggan-uppifran.png' });
+  // Herr Skata ramlar av pålen, och baronen lyfter: de är borta ur rummet
+  expect(await O(() => window.__ORDSTAVEN.regi('skata_ramlar_av_palen'))).toBeGreaterThan(0);
+  await page.waitForTimeout(200);
+  expect((await fig())[1].ram).toMatch(/^herr_skata_krascha_hoger_0[1-4]$/);
+  await page.waitForTimeout(900);
+  expect(await O(() => window.__ORDSTAVEN.regi('baronen_lyfter'))).toBeGreaterThan(0);
+  await page.waitForTimeout(1700);
+  expect(await fig()).toEqual([]);
+  expect((await O(() => window.__ORDSTAVEN.grafik())).regi).toContain('baronen lyfter från bryggan');
+});
+
+test('kartbiten från tavlan (92.7): den har sin bild, dalar ned nära hjälten och tas med ett tryck', async ({ page }) => {
+  test.setTimeout(90000);
+  const O = (f, a) => page.evaluate(f, a);
+  const sc = kap2.scener.find((s) => s.id === 'k2s08_huset');
+  const visa = sc.steg.findIndex((st) => st.typ === 'visa_foremal' && st.foremal === 'kartbit_3');
+  await sparadI(page, 'kap-02', 'k2s08_huset', visa, { rumstillstand: {}, lappar: ['k2_tavlorna'] });
+  const hjalten = await O(() => window.__ORDSTAVEN.position());
+  for (let i = 0; i < 60 && !(await O(() => window.__ORDSTAVEN.flyttad('kartbit_3'))); i++) {
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    await page.waitForTimeout(250);
+  }
+  expect(await O(() => window.__ORDSTAVEN.flyttad('kartbit_3'))).not.toBeNull();
+  const o = await O(() => window.__ORDSTAVEN.ruta('kartbit_3'));
+  expect(Math.hypot(o.x + o.b / 2 - hjalten.x, o.y + o.h / 2 - hjalten.y)).toBeLessThan(40);
+  expect(await O(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').ritade.get('kartbit_3')?.frame?.name)).toBe('kartbit_3_golv');
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: 'test-results/regi-kartbiten-pa-golvet.png' });
+  // ett tryck på kartbiten: han går dit och tar den, och den ligger inte kvar
+  for (let i = 0; i < 40 && (await O(() => window.__ORDSTAVEN.scen())) === 'k2s08_huset'; i++) {
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    const p = await O(() => window.__ORDSTAVEN.objekt('kartbit_3'));
+    if (p && i % 4 === 0) await page.mouse.click(p.x, p.y);
+    await page.waitForTimeout(250);
+  }
+  expect(await O(() => window.__ORDSTAVEN.scen())).toBe('k2s09_kartbiten');
 });
 
 test('trollsländan och de små grodorna i Stils bilder (13/11, 87.2): den surrar runt hjälmen och landar på ungens nos', async ({ page }) => {
