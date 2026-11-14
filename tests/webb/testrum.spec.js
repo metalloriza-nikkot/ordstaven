@@ -182,7 +182,8 @@ test('halmdockan i duellens testrum (91.5): ropar, blir förvirrad och tappar si
   /** spolar fram och samlar bilderna som visas */
   const sett = new Set();
   const spola = async (ms) => { for (let t = 0; t < ms; t += 50) { await page.waitForTimeout(50); const f = await fig(); if (f) sett.add(f.ram); } };
-  let rond = 0, felGjort = false, yForeFel = 0, roparBild = false;
+  let rond = 0, felGjort = false, yForeFel = 0, roparBild = false, portrattBild = false;
+  const portratt = new Set();
   for (let i = 0; i < 400 && rond < 3; i++) {
     const f = await fig(); if (f) sett.add(f.ram);
     if (f?.ram.includes('_ropar_') && !roparBild) { roparBild = true; await page.screenshot({ path: 'test-results/halmdockan-ropar.png' }); }
@@ -201,10 +202,16 @@ test('halmdockan i duellens testrum (91.5): ropar, blir förvirrad och tappar si
       if (rond === 2) { expect(efter.ram).toMatch(/_utan_hatt$/); await page.screenshot({ path: 'test-results/halmdockan-utan-hatt.png' }); }
       continue;
     }
+    // Stils porträtt i pratrutan (93.5): bilden efter vad halmdockan gör
+    // (Vite lägger små bilder direkt i stilmallen, så det är klassen som säger vilket ansikte och bilden att det finns ett)
+    for (const [b, k] of await page.locator('#plattan .p-halmdockan').evaluateAll((el) => el.map((e) => [getComputedStyle(e).backgroundImage, e.className]))) portratt.add(b === 'none' ? 'ingen' : (k.match(/u-([a-z]+)/) || [0, 'ropar'])[1]);
+    if (portratt.size === 1 && !portrattBild) { portrattBild = true; await page.screenshot({ path: 'test-results/halmdockan-portratt.png' }); }
     for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
     await page.waitForTimeout(100);
   }
   expect(rond).toBe(3);
+  expect([...portratt]).toContain('ropar');
+  expect([...portratt]).not.toContain('ingen');
   // vinsten i duell 1: trillar i höet, utan hatt och knapp, och ligger kvar
   await expect.poll(async () => { await page.waitForTimeout(100); const f = await fig(); if (f) sett.add(f.ram); return f?.ram; }, { timeout: 15000 }).toBe('halmdockan_trillar_03_utan_hatt_knapp');
   await page.screenshot({ path: 'test-results/halmdockan-i-hoet.png' });

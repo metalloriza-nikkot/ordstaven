@@ -960,10 +960,70 @@
     "h": 32
    }
   },
-  "halmdockan_ropar_01_hel": {
+  "halmdockan_portratt_forvirrad": {
    "frame": {
     "x": 0,
     "y": 1364,
+    "w": 48,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 48,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 48,
+    "h": 48
+   }
+  },
+  "halmdockan_portratt_ropar": {
+   "frame": {
+    "x": 49,
+    "y": 1364,
+    "w": 48,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 48,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 48,
+    "h": 48
+   }
+  },
+  "halmdockan_portratt_yr": {
+   "frame": {
+    "x": 98,
+    "y": 1364,
+    "w": 48,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 48,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 48,
+    "h": 48
+   }
+  },
+  "halmdockan_ropar_01_hel": {
+   "frame": {
+    "x": 0,
+    "y": 1413,
     "w": 32,
     "h": 32
    },
@@ -983,7 +1043,7 @@
   "halmdockan_ropar_01_utan_halsduk": {
    "frame": {
     "x": 0,
-    "y": 1397,
+    "y": 1446,
     "w": 32,
     "h": 32
    },
@@ -1003,7 +1063,7 @@
   "halmdockan_ropar_01_utan_halsduk_knapp": {
    "frame": {
     "x": 0,
-    "y": 1430,
+    "y": 1479,
     "w": 32,
     "h": 32
    },
@@ -1023,7 +1083,7 @@
   "halmdockan_ropar_01_utan_hatt": {
    "frame": {
     "x": 0,
-    "y": 1463,
+    "y": 1512,
     "w": 32,
     "h": 32
    },
@@ -1043,7 +1103,7 @@
   "halmdockan_ropar_01_utan_hatt_knapp": {
    "frame": {
     "x": 0,
-    "y": 1496,
+    "y": 1545,
     "w": 32,
     "h": 32
    },
@@ -1063,7 +1123,7 @@
   "halmdockan_ropar_02_hel": {
    "frame": {
     "x": 0,
-    "y": 1529,
+    "y": 1578,
     "w": 32,
     "h": 32
    },
@@ -1083,7 +1143,7 @@
   "halmdockan_ropar_02_utan_halsduk": {
    "frame": {
     "x": 0,
-    "y": 1562,
+    "y": 1611,
     "w": 32,
     "h": 32
    },
@@ -1103,7 +1163,7 @@
   "halmdockan_ropar_02_utan_halsduk_knapp": {
    "frame": {
     "x": 0,
-    "y": 1595,
+    "y": 1644,
     "w": 32,
     "h": 32
    },
@@ -1123,7 +1183,7 @@
   "halmdockan_ropar_02_utan_hatt": {
    "frame": {
     "x": 0,
-    "y": 1628,
+    "y": 1677,
     "w": 32,
     "h": 32
    },
@@ -1143,7 +1203,7 @@
   "halmdockan_ropar_02_utan_hatt_knapp": {
    "frame": {
     "x": 0,
-    "y": 1661,
+    "y": 1710,
     "w": 32,
     "h": 32
    },
@@ -1163,7 +1223,7 @@
   "halmdockan_sitter_01_hel": {
    "frame": {
     "x": 0,
-    "y": 1694,
+    "y": 1743,
     "w": 48,
     "h": 32
    },
@@ -1183,7 +1243,7 @@
   "halmdockan_sitter_01_utan_halsduk": {
    "frame": {
     "x": 0,
-    "y": 1727,
+    "y": 1776,
     "w": 48,
     "h": 32
    },
@@ -1203,7 +1263,7 @@
   "halmdockan_sitter_01_utan_halsduk_knapp": {
    "frame": {
     "x": 0,
-    "y": 1760,
+    "y": 1809,
     "w": 48,
     "h": 32
    },
@@ -1223,7 +1283,7 @@
   "halmdockan_sitter_01_utan_hatt": {
    "frame": {
     "x": 0,
-    "y": 1793,
+    "y": 1842,
     "w": 48,
     "h": 32
    },
@@ -1243,7 +1303,7 @@
   "halmdockan_sitter_01_utan_hatt_knapp": {
    "frame": {
     "x": 0,
-    "y": 1826,
+    "y": 1875,
     "w": 48,
     "h": 32
    },
@@ -1263,7 +1323,7 @@
   "halmdockan_snurrar_01_hel": {
    "frame": {
     "x": 0,
-    "y": 1859,
+    "y": 1908,
     "w": 32,
     "h": 32
    },
@@ -1283,7 +1343,7 @@
   "halmdockan_snurrar_01_utan_halsduk": {
    "frame": {
     "x": 0,
-    "y": 1892,
+    "y": 1941,
     "w": 32,
     "h": 32
    },
@@ -1303,7 +1363,7 @@
   "halmdockan_snurrar_01_utan_halsduk_knapp": {
    "frame": {
     "x": 0,
-    "y": 1925,
+    "y": 1974,
     "w": 32,
     "h": 32
    },
@@ -1323,7 +1383,7 @@
   "halmdockan_snurrar_01_utan_hatt": {
    "frame": {
     "x": 0,
-    "y": 1958,
+    "y": 2007,
     "w": 32,
     "h": 32
    },
@@ -1343,7 +1403,7 @@
   "halmdockan_snurrar_01_utan_hatt_knapp": {
    "frame": {
     "x": 0,
-    "y": 1991,
+    "y": 2040,
     "w": 32,
     "h": 32
    },
@@ -1363,7 +1423,7 @@
   "halmdockan_snurrar_02_hel": {
    "frame": {
     "x": 0,
-    "y": 2024,
+    "y": 2073,
     "w": 32,
     "h": 32
    },
@@ -1383,7 +1443,7 @@
   "halmdockan_snurrar_02_utan_halsduk": {
    "frame": {
     "x": 0,
-    "y": 2057,
+    "y": 2106,
     "w": 32,
     "h": 32
    },
@@ -1403,7 +1463,7 @@
   "halmdockan_snurrar_02_utan_halsduk_knapp": {
    "frame": {
     "x": 0,
-    "y": 2090,
+    "y": 2139,
     "w": 32,
     "h": 32
    },
@@ -1423,7 +1483,7 @@
   "halmdockan_snurrar_02_utan_hatt": {
    "frame": {
     "x": 0,
-    "y": 2123,
+    "y": 2172,
     "w": 32,
     "h": 32
    },
@@ -1443,7 +1503,7 @@
   "halmdockan_snurrar_02_utan_hatt_knapp": {
    "frame": {
     "x": 0,
-    "y": 2156,
+    "y": 2205,
     "w": 32,
     "h": 32
    },
@@ -1463,7 +1523,7 @@
   "halmdockan_trillar_01_hel": {
    "frame": {
     "x": 0,
-    "y": 2189,
+    "y": 2238,
     "w": 48,
     "h": 32
    },
@@ -1483,7 +1543,7 @@
   "halmdockan_trillar_01_utan_halsduk": {
    "frame": {
     "x": 0,
-    "y": 2222,
+    "y": 2271,
     "w": 48,
     "h": 32
    },
@@ -1503,7 +1563,7 @@
   "halmdockan_trillar_01_utan_halsduk_knapp": {
    "frame": {
     "x": 0,
-    "y": 2255,
+    "y": 2304,
     "w": 48,
     "h": 32
    },
@@ -1523,7 +1583,7 @@
   "halmdockan_trillar_01_utan_hatt": {
    "frame": {
     "x": 0,
-    "y": 2288,
+    "y": 2337,
     "w": 48,
     "h": 32
    },
@@ -1543,7 +1603,7 @@
   "halmdockan_trillar_01_utan_hatt_knapp": {
    "frame": {
     "x": 0,
-    "y": 2321,
+    "y": 2370,
     "w": 48,
     "h": 32
    },
@@ -1563,7 +1623,7 @@
   "halmdockan_trillar_02_hel": {
    "frame": {
     "x": 0,
-    "y": 2354,
+    "y": 2403,
     "w": 48,
     "h": 32
    },
@@ -1583,7 +1643,7 @@
   "halmdockan_trillar_02_utan_halsduk": {
    "frame": {
     "x": 0,
-    "y": 2387,
+    "y": 2436,
     "w": 48,
     "h": 32
    },
@@ -1603,7 +1663,7 @@
   "halmdockan_trillar_02_utan_halsduk_knapp": {
    "frame": {
     "x": 0,
-    "y": 2420,
+    "y": 2469,
     "w": 48,
     "h": 32
    },
@@ -1623,7 +1683,7 @@
   "halmdockan_trillar_02_utan_hatt": {
    "frame": {
     "x": 0,
-    "y": 2453,
+    "y": 2502,
     "w": 48,
     "h": 32
    },
@@ -1643,7 +1703,7 @@
   "halmdockan_trillar_02_utan_hatt_knapp": {
    "frame": {
     "x": 0,
-    "y": 2486,
+    "y": 2535,
     "w": 48,
     "h": 32
    },
@@ -1663,7 +1723,7 @@
   "halmdockan_trillar_03_hel": {
    "frame": {
     "x": 0,
-    "y": 2519,
+    "y": 2568,
     "w": 48,
     "h": 32
    },
@@ -1683,7 +1743,7 @@
   "halmdockan_trillar_03_utan_halsduk": {
    "frame": {
     "x": 0,
-    "y": 2552,
+    "y": 2601,
     "w": 48,
     "h": 32
    },
@@ -1703,7 +1763,7 @@
   "halmdockan_trillar_03_utan_halsduk_knapp": {
    "frame": {
     "x": 0,
-    "y": 2585,
+    "y": 2634,
     "w": 48,
     "h": 32
    },
@@ -1723,7 +1783,7 @@
   "halmdockan_trillar_03_utan_hatt": {
    "frame": {
     "x": 0,
-    "y": 2618,
+    "y": 2667,
     "w": 48,
     "h": 32
    },
@@ -1743,7 +1803,7 @@
   "halmdockan_trillar_03_utan_hatt_knapp": {
    "frame": {
     "x": 0,
-    "y": 2651,
+    "y": 2700,
     "w": 48,
     "h": 32
    },
@@ -1765,8 +1825,8 @@
   "image": "halmdockan.png",
   "format": "RGBA8888",
   "size": {
-   "w": 49,
-   "h": 2684
+   "w": 147,
+   "h": 2733
   },
   "scale": "1",
   "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."

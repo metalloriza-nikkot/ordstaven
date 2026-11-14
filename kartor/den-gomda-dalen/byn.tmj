@@ -471,11 +471,6 @@
        "name": "sida",
        "type": "string",
        "value": "alla"
-      },
-      {
-       "name": "visas_forst",
-       "type": "string",
-       "value": "kvall"
       }
      ]
     },

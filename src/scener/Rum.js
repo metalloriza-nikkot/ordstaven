@@ -19,7 +19,7 @@ const KVALL_TABELL = kvallTabell(kvallJson);
 import { foremaletsBild } from '../karna/egenskaper.js';
 import { Livet } from './livet.js';
 import { Duellfigur } from './duellfigur.js';
-import { figurensBilder } from '../karna/duellfigur.js';
+import { figurensBilder, portrattUttryck } from '../karna/duellfigur.js';
 
 const FARG = {
   golv: 0x8c8a86, rutnat: 0x7f7d79, kant: 0x5d5b58,
@@ -993,6 +993,7 @@ export class Rum extends Phaser.Scene {
       elden_tands: () => this.eldenTands(),
       draken_flyger_ner_till_barnet: () => this.drakenFlygerNer(),
       byborna_jublar: () => this.byborJublar(),
+      bryggan_avslojad: () => this.brygganAvslojad(),
       // 72.8: lerpölen i vassen
       hjalte_sjunker: () => this.hjalteSjunker(),
       unge_drar_upp_hjalten: () => this.ungeDrarUppHjalten(),
@@ -1791,7 +1792,7 @@ export class Rum extends Phaser.Scene {
     const start = { x: r.x, y: r.y, ox: o.x, oy: o.y };
     // hon ställer sig till vänster om lyktan, med fötterna vid lyktans fot
     const dx = Math.round(lykta.x - 10 - (o.x + o.b / 2)), dy = Math.round(lykta.y + 4 - (o.y + o.h));
-    const ga = 1200, lyft = 600, glid = 2200;
+    const ga = 1200, lyft = 600, glid = 3200, vila = 900;
     const t = { p: 0 };
     this.tweens.add({ targets: t, p: 1, duration: ga, onUpdate: () => {
       if (!r.active) return;
@@ -1801,16 +1802,24 @@ export class Rum extends Phaser.Scene {
     } });
     // hon lyfter på lyktan: en liten gungning
     this.time.delayedCall(ga, () => { if (r.active) this.tweens.add({ targets: r, y: r.y - 2, duration: 150, yoyo: true, repeat: 1, onUpdate: () => { this.smutsig = true; } }); });
-    // kameran glider längs raden till hjälten, och hon går tillbaka
+    // kameran glider längs raden ned till udden, där veden ligger (pass 92, 93.5), och sedan tillbaka till hjälten.
+    // Hon går tillbaka under tiden
+    const eld = this.ruta('lagereld');
+    const udden = eld ? { x: eld.x + eld.b / 2, y: eld.y + eld.h / 2 } : rad[rad.length - 1];
+    // kameran stannar en stund vid elden (vila), så att han hinner se var pinnarna ska ligga
     this.time.delayedCall(ga + lyft, () => {
-      const g = { p: 0 }, fran = { x: lykta.x, y: lykta.y };
-      this.tweens.add({ targets: g, p: 1, duration: glid, ease: 'Sine.easeInOut', onUpdate: () => { this.regiFokus = { x: fran.x + (hjalte.x - fran.x) * g.p, y: fran.y + (hjalte.y - fran.y) * g.p }; } });
+      const fran = { x: lykta.x, y: lykta.y };
+      const langd = Math.hypot(udden.x - fran.x, udden.y - fran.y), langd2 = Math.hypot(hjalte.x - udden.x, hjalte.y - udden.y);
+      const t1 = Math.round(glid * langd / Math.max(1, langd + langd2)), t2 = glid - t1;
+      const glida = (a, b, ms, sen) => { const g = { p: 0 }; this.tweens.add({ targets: g, p: 1, duration: Math.max(1, ms), delay: sen, ease: 'Sine.easeInOut', onUpdate: () => { this.regiFokus = { x: a.x + (b.x - a.x) * g.p, y: a.y + (b.y - a.y) * g.p }; } }); };
+      glida(fran, udden, t1, 0);
+      glida(udden, hjalte, t2, t1 + vila);
       const b2 = { p: 0 }, nu = { x: r.x, y: r.y };
       this.tweens.add({ targets: b2, p: 1, duration: ga, onUpdate: () => { if (!r.active) return; r.x = Math.round(nu.x + (start.x - nu.x) * b2.p); r.y = Math.round(nu.y + (start.y - nu.y) * b2.p); this.smutsig = true; } });
     });
-    this.time.delayedCall(ga + lyft + glid + 100, () => { this.regiFokus = null; });
+    this.time.delayedCall(ga + lyft + glid + vila + 100, () => { this.regiFokus = null; });
     this.regiLogg.push('Tant Rosa vid lyktorna');
-    return ga + lyft + glid + 100;
+    return ga + lyft + glid + vila + 100;
   }
 
   /** Nästan LJUS: en liten ljusprick vid stavens ände som slocknar. @returns {number} */
@@ -1880,7 +1889,9 @@ export class Rum extends Phaser.Scene {
     // hjälten står bredvid elden, väster om den, inte i den eller bakom den (Stils granskning 13/11, 87.2)
     // (precis söder om elden täcker lågorna ansiktet, och väster om den står fiskaren): snett söder om den
     const vid = { x: Math.round(o.x - 4), y: Math.round(o.y + o.h + 22) };
-    if (Math.abs(this.pos.x - (o.x + o.b / 2)) < o.b / 2 + 10 && this.pos.y > o.y - 24 && this.pos.y < o.y + o.h + 28) {
+    // 93.5: med pinnarna i valfri ordning kan han komma österifrån (ved_2) och stå i ungen: han går dit också då
+    const nara = Math.abs(this.pos.x - (o.x + o.b / 2)) < o.b / 2 + 50 && this.pos.y > o.y - 24 && this.pos.y < o.y + o.h + 28;
+    if (nara && Math.hypot(this.pos.x - vid.x, this.pos.y - vid.y) > 3) {
       this.ga(vid, 350).then(() => { this.vand = { x: 1, y: 0.01 }; this.ritaHjalte(); this.placera(); });
     }
     // Stils eld (steg 5 del 1): lågorna i tre bilder och ljuset runt elden, tills rummet ritas om
@@ -1896,6 +1907,42 @@ export class Rum extends Phaser.Scene {
     this.byborJublar(400);
     this.regiLogg.push('elden tänds');
     return 2000;
+  }
+
+  /**
+   * Skylten om bryggan är avslöjad (92.3, 93.5): byborna jublar, och fiskaren går ut på bryggan och fiskar, ca 4 s.
+   * Fiskaren bor på andra sidan torget, så han kommer in i bild nedifrån, nära hjälten, går ut på bryggans början
+   * (`brygga_fran_torget`) och kastar åt höger. Han står kvar och fiskar tills rummet ritas om. @returns {number}
+   */
+  brygganAvslojad() {
+    this.byborJublar();
+    const { o, r } = this.foremalOchBild('fiskaren');
+    const bryggan = this.ruta('brygga_fran_torget') || this.ruta('stig_bryggan');
+    if (!o || !r?.active || !bryggan || !foremalsbild(this, 'fiskaren_ga_hoger_01')) { this.regiLogg.push('bryggan avslöjad'); return 1400; }
+    const k = this.kamera;
+    const mal = { x: Math.round(bryggan.x + 8), y: Math.round(bryggan.y + bryggan.h) };
+    // in i bild nedifrån, en bit till vänster om bryggan (där han inte står nu om han är långt bort)
+    const iBild = r.x > k.x && r.x < k.x + RUM.bredd && r.y > k.y && r.y < k.y + RUM.hojd + 24;
+    const start = iBild ? { x: r.x, y: r.y } : { x: Math.round(Math.max(k.x + 16, mal.x - 70)), y: Math.round(k.y + RUM.hojd + 26) };
+    r.setPosition(start.x, start.y);
+    const ga = Math.min(2600, Math.max(1200, (Math.hypot(mal.x - start.x, mal.y - start.y) / 45) * 1000));
+    const rikt = Math.abs(mal.x - start.x) > Math.abs(mal.y - start.y) ? (mal.x > start.x ? 'hoger' : 'vanster') : (mal.y > start.y ? 'ner' : 'upp');
+    const fore = 500; // han jublar en kort stund med de andra först
+    const t = { p: 0 };
+    this.time.delayedCall(fore, () => {
+      if (!r.active) return;
+      this.regiRamar('fiskaren', [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4].slice(0, Math.max(4, Math.round(ga / 150))).map((n) => `fiskaren_ga_${rikt}_0${n}`), 150);
+      this.tweens.add({ targets: t, p: 1, duration: ga, onUpdate: () => { if (!r.active) return; r.x = Math.round(start.x + (mal.x - start.x) * t.p); r.y = Math.round(start.y + (mal.y - start.y) * t.p); r.fot = r.y; this.smutsig = true; } });
+    });
+    // på bryggan: han kastar ut reven och står och fiskar
+    this.time.delayedCall(fore + ga + 50, () => {
+      if (!r.active) return;
+      const fb = foremalsbild(this, 'fiskaren_fiskar_hoger_01');
+      if (fb) { r.setPosition(mal.x, mal.y); this.slingaRamar('fiskaren', ['fiskaren_fiskar_hoger_01', 'fiskaren_fiskar_hoger_02'], 500); }
+      this.smutsig = true;
+    });
+    this.regiLogg.push('bryggan avslöjad');
+    return Math.max(4000, fore + ga + 900);
   }
 
   /** Byborna (och Tant Rosa) skuttar och jublar där de står. @param {number} [fore] */
@@ -2076,7 +2123,7 @@ export class Rum extends Phaser.Scene {
       this.luft = { img, lage: '', tider: /** @type {Phaser.Time.TimerEvent[]} */ ([]), gung, glider: false, mal };
     }
     const l = this.luft, img = l.img;
-    this.regiLogg.push(lage); if (this.regiLogg.length > 80) this.regiLogg.shift();
+    this.regiLogg.push(lage); if (this.regiLogg.length > 160) this.regiLogg.shift();
     for (const t of l.tider) t.remove();
     l.tider = []; l.lage = lage;
     // hjälten håller upp kartbiten från att baronen ser den tills han har talat klart om den (Stil 21:20)
@@ -2143,7 +2190,7 @@ export class Rum extends Phaser.Scene {
     this.tweens.killTweensOf(l.img);
     l.img.destroy();
     this.luft = null;
-    this.regiLogg.push('luftskeppet borta'); if (this.regiLogg.length > 80) this.regiLogg.shift();
+    this.regiLogg.push('luftskeppet borta'); if (this.regiLogg.length > 160) this.regiLogg.shift();
     this.smutsig = true;
   }
 
@@ -2155,7 +2202,7 @@ export class Rum extends Phaser.Scene {
     const ny = bild && this.textures.exists('hjalte') && this.textures.get('hjalte').has(bild) ? bild : null;
     if (ny === this.hjaltePose) return;
     this.hjaltePose = ny; this.smutsig = true;
-    this.regiLogg.push(`pose:${ny ?? '-'}`); if (this.regiLogg.length > 80) this.regiLogg.shift();
+    this.regiLogg.push(`pose:${ny ?? '-'}`); if (this.regiLogg.length > 160) this.regiLogg.shift();
     this.ritaHjalte();
   }
 
@@ -2236,6 +2283,7 @@ export class Rum extends Phaser.Scene {
    * @returns {string | null}
    */
   uttryck(talare) {
+    if (this.duellFig && talare === this.duellFig.figur) return portrattUttryck(this.duellFig.lage);
     if (talare !== 'baronen' || !this.luft) return null;
     return ['glider', 'skata_landar', 'ser_kartan'].includes(this.luft.lage) ? 'forvanad' : 'stolt';
   }
@@ -2371,8 +2419,19 @@ export class Rum extends Phaser.Scene {
     if (lage === 'sitter') {
       this.bryggFig?.forEach((f) => f.destroy());
       this.bryggFig = [];
-      if (this.textures.exists('baronen') && this.textures.get('baronen').has('baronen_ga_ner_01')) {
-        // sidovyns baron står på x 150–198: mitten 174. Fötterna i leran strax söder om däcket, avskuren vid knäna
+      const tex = this.textures.exists('baronen') ? this.textures.get('baronen') : null;
+      if (tex?.has('baronen_lera_ner_01')) {
+        // Stils baron till knäna i leran (93.7), i två bilder som växlar långsamt (golvets gränser, minst 400 ms).
+        // Sidovyns baron står på x 150–198: mitten 174, i leran strax söder om däcket
+        const baron = this.add.image(x(174), b.y + b.h + 14, 'baronen', 'baronen_lera_ner_01').setOrigin(0.5, 1);
+        /** @type {any} */ (baron).fot = baron.y;
+        this.lagerFigurer.add(baron); this.bryggFig.push(baron);
+        if (tex.has('baronen_lera_ner_02')) {
+          const vick = this.time.addEvent({ delay: 600, loop: true, callback: () => { if (!baron.active || !/** @type {any} */ (baron).iLeran) { vick.remove(); return; } baron.setFrame(baron.frame.name.endsWith('_01') ? 'baronen_lera_ner_02' : 'baronen_lera_ner_01'); this.smutsig = true; } });
+          /** @type {any} */ (baron).iLeran = true;
+        }
+      } else if (tex?.has('baronen_ga_ner_01')) {
+        // utan Stils bild: hans stillbild, avskuren vid knäna
         const baron = this.add.image(x(174), b.y + b.h + 14, 'baronen', 'baronen_ga_ner_01').setOrigin(0.5, 1);
         baron.setCrop(0, 0, baron.width, baron.height - 7);
         baron.y += 7; /** @type {any} */ (baron).fot = baron.y;
@@ -2403,7 +2462,8 @@ export class Rum extends Phaser.Scene {
     for (const f of [baron, skata]) {
       if (!f) continue;
       if (f === skata && this.textures.get('herr_skata').has('herr_skata_flyga_hoger_01')) skata.setFrame('herr_skata_flyga_hoger_01');
-      if (f === baron) baron.setCrop();
+      // baronen går ur leran med sin vanliga gång (Stil 93.7)
+      if (f === baron) { baron.setCrop(); /** @type {any} */ (baron).iLeran = false; if (this.textures.get('baronen').has('baronen_ga_hoger_01')) baron.setFrame('baronen_ga_hoger_01'); }
       this.tweens.add({ targets: f, x: ande.x, y: ande.y, alpha: 0, duration: 1400, ease: 'Sine.easeIn', onUpdate: () => { f.x = Math.round(f.x); f.y = Math.round(f.y); this.smutsig = true; }, onComplete: () => { f.destroy(); this.smutsig = true; } });
     }
     this.bryggFig = [];
@@ -3080,7 +3140,7 @@ export class Rum extends Phaser.Scene {
     r.setPosition(slut.x, slut.y - 70);
     const t = { p: 0 };
     this.tweens.add({ targets: t, p: 1, duration: 1100, ease: 'Sine.easeOut', onUpdate: () => { if (!r.active) return; r.setPosition(Math.round(slut.x + Math.sin(t.p * 10) * 6 * (1 - t.p)), Math.round(slut.y - 70 * (1 - t.p))); this.smutsig = true; }, onComplete: () => { if (r.active) r.setPosition(slut.x, slut.y); this.smutsig = true; } });
-    this.regiLogg.push(`${id} landar nära hjälten`); if (this.regiLogg.length > 80) this.regiLogg.shift();
+    this.regiLogg.push(`${id} landar nära hjälten`); if (this.regiLogg.length > 160) this.regiLogg.shift();
     return 1200;
   }
 

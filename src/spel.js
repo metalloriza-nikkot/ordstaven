@@ -3408,6 +3408,9 @@ export function skapaSpel(d) {
       if (hugga) { ljud.spela('hugg', { fart: [1, 0.92, 1.08][antalHugg++ % 3] }); rum.traffpaus?.(tid(60)); rum.lovYr?.(id, sista ? 3 : 1); rum.huggen(id); }
       else { ljud.spela(p.foremal ? 'prassel' : 'sla'); rum.slagen(id); }
       logg.handelse(hugga ? 'hugga' : lyfta ? 'lyfta' : 'svinga', `${id}: ${fynd}`);
+      // lyfta en sak som är det han hittar (pinnarna till elden, 93.5: ved_1 med innehållet ved): han tar den, och
+      // den försvinner från marken som fjädern (80.3). Mossan och tången ligger kvar, eftersom det är något under dem
+      if (lyfta && fynd && fynd !== 'tom' && (id === fynd || id.startsWith(fynd + '_'))) { rum.gomForemal(id, true); logg.handelse('plockar upp', id); }
       if (fynd === 'bar') { av.bar++; ui.uppdateraHud(av); ljud.spela('bar'); await ui.visaFest('🫐', tid(600)); }
       else if (fynd && fynd === k.sista) { ljud.spela(fynd.startsWith('kartbit') ? 'fest_stor' : 'fest_mellan'); await ui.visaFest(fynd.startsWith('kartbit') ? kartbitFest(Number(fynd.split('_')[1])) : bilder.emoji(fynd) || '✨', tid(900), true); }
       else if (fynd && fynd !== 'tom') { ljud.spela('allmant'); await ui.visaFest(bilder.emoji(fynd) || '✨', tid(700)); }

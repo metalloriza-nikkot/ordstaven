@@ -1,7 +1,7 @@
 // Motståndaren i ordduellen som figur (91.5): vilken sak som trillar av, utrustningen och vinsten.
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { sakI, utrustningEfter, vinstLage, figurensBilder } from '../../src/karna/duellfigur.js';
+import { sakI, utrustningEfter, vinstLage, figurensBilder, portrattUttryck } from '../../src/karna/duellfigur.js';
 
 const UTR = ['hel', 'utan_halsduk', 'utan_halsduk_knapp', 'utan_hatt', 'utan_hatt_knapp'];
 const SAKER = ['halmstra', 'halsduk', 'hatt', 'knapp'];
@@ -56,5 +56,21 @@ describe('duellens figur (91.5)', () => {
 
   it('en figur utan grundställningen (baronen i kapitel 3:s gråbox) blir ingen duellfigur', () => {
     expect(figurensBilder('baronen', ['baronen_ga_ner_01', 'baronen_ga_ner_02'])).toBeNull();
+  });
+});
+
+describe('porträttet i duellen (93.5)', () => {
+  it('förvirrad när den tappar och backar, yr när den trillar, annars grundbilden', () => {
+    expect(portrattUttryck('forvirrad')).toBe('forvirrad');
+    expect(portrattUttryck('backar')).toBe('forvirrad');
+    for (const l of ['trillar', 'snurrar', 'sitter']) expect(portrattUttryck(l)).toBe('yr');
+    for (const l of ['grund', 'ropar', 'narmare']) expect(portrattUttryck(l)).toBeNull();
+  });
+  it('Stils tre porträtt finns, och stilmallen pekar på dem', () => {
+    const css = readFileSync(new URL('../../src/stil.css', import.meta.url), 'utf8');
+    for (const u of ['ropar', 'forvirrad', 'yr']) {
+      expect(readFileSync(new URL(`../../assets/portratt/halmdockan_portratt_${u}.png`, import.meta.url)).length).toBeGreaterThan(100);
+      expect(css).toContain(`halmdockan_portratt_${u}.png`);
+    }
   });
 });

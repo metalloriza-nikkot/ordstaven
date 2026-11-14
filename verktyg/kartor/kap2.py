@@ -197,7 +197,8 @@ RUMMEN = {
             sak('fjader', 140, 290, 10, 10, sida='alla'),
             sak('udden', 604, 362, 30, 14),  # uddens spets, bortom lägerelden
             # 79.3, 80.2: kameran visar elden först när kvällen börjar, innan han ska hämta pinnar dit
-            sak('lagereld', 572, 326, 20, 16, sida='alla', visas_forst='kvall'),
+            # 93.5: utan visas_forst. Kvällen börjar med regin rosa_vid_lyktorna, som visar lyktorna och veden på udden
+            sak('lagereld', 572, 326, 20, 16, sida='alla'),
             # 78.4: tre vedpinnar på udden och ängen runt elden, bara på kvällen (innehållets syns_i). Han plockar upp
             # dem när han når dem (leta: true), och de ligger inte där han står när kvällen börjar
             sak('ved_1', 486, 290, 10, 6, sida='alla'), sak('ved_2', 618, 326, 10, 6, sida='alla'), sak('ved_3', 528, 366, 10, 6, sida='alla'),

@@ -26,6 +26,22 @@ async function sparadI(page, kap, scenId, steg = 0, extra = {}) {
 // regierna är spelets logik och Stils bilder, inte skärmens storlek: Chromium, Safari och iPad räcker (84.6)
 test.beforeEach(({}, info) => { test.skip(!['mac-helskarm', 'ipad-10', 'mac-safari'].includes(info.project.name), 'tre projekt räcker'); });
 const regi = (page, bild) => page.evaluate((b) => window.__ORDSTAVEN.regi(b), bild);
+/** Pinnarna till elden (k2_pinnarna, 92.9): han går fram till varje pinne i den ordning han vill och tar den. */
+async function taPinnar(page, ordning) {
+  const O = (f, a) => page.evaluate(f, a);
+  for (const id of ordning) {
+    const o = await O((id) => window.__ORDSTAVEN.ruta(id), id);
+    for (let i = 0; i < 80 && !(await O(() => window.__ORDSTAVEN.logg())).includes('[plockar upp] ' + id); i++) {
+      for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+      await O(([x, y]) => window.__ORDSTAVEN.gaMot(x, y), [o.x + o.b / 2, o.y + o.h + 6]);
+      if (i % 4 === 3) await page.keyboard.press('Space');
+      await page.waitForTimeout(250);
+    }
+    expect(await O(() => window.__ORDSTAVEN.logg())).toContain('[plockar upp] ' + id);
+    // pinnen han har tagit är borta från marken (93.5)
+    expect(await O((id) => window.__ORDSTAVEN.spel.scene.getScene('Rum').dolda.has(id), id), `${id} är borta`).toBe(true);
+  }
+}
 /** Vänta på en regi medan repliker och rutor klickas bort (berättelsen går vidare som när han spelar). */
 async function vantaPaRegi(page, namn) {
   for (let i = 0; i < 80; i++) {
@@ -198,12 +214,7 @@ test('kvällen i byn (71.5, 71.6, 78.4): tre vedpinnar, LJUS tänder lyktorna, e
   test.setTimeout(150000);
   const O = (f, a) => page.evaluate(f, a);
   const sc = las('kap-02').scener.find((s) => s.id === 'k2s10_elden');
-  const vedSteg = (id) => sc.steg.findIndex((s) => s.typ === 'ga_till' && s.mal === id);
-  // 78.4: en omstart efter två pinnar: de två han har plockat ligger inte kvar, den tredje gör det
-  await sparadI(page, 'kap-02', 'k2s10_elden', vedSteg('ved_3'), { rumstillstand: { byn: 'kvall' } });
-  await page.waitForTimeout(800);
-  expect(await O(() => window.__ORDSTAVEN.rumsobjekt())).toEqual(expect.arrayContaining(['ved_3']));
-  expect(await O(() => window.__ORDSTAVEN.rumsobjekt().filter((id) => id === 'ved_1' || id === 'ved_2'))).toEqual([]);
+  // 92.9: lyktorna först, sedan pinnarna (ett pussel där han tar dem i den ordning han vill)
   await sparadI(page, 'kap-02', 'k2s10_elden', 0, { visade: { byn: ['fjader', 'tant_rosa', 'brevram'] } });
   await page.waitForTimeout(800);
   const [eld, fisk] = await O(() => [window.__ORDSTAVEN.ruta('lagereld'), window.__ORDSTAVEN.ruta('fiskaren')]);
@@ -214,25 +225,22 @@ test('kvällen i byn (71.5, 71.6, 78.4): tre vedpinnar, LJUS tänder lyktorna, e
   expect(eld && fisk).toBeTruthy();
   expect(Math.hypot(fisk.x + fisk.b / 2 - (eld.x + eld.b / 2), fisk.y + fisk.h - (eld.y + eld.h / 2))).toBeLessThan(60);
   // 79.3, 80.2: kameran visar elden på udden när kvällen börjar, innan han ombeds hämta pinnar dit
-  await expect.poll(async () => { const k = await O(() => window.__ORDSTAVEN.kamera()); return eld.x >= k.x && eld.x + eld.b <= k.x + 320 && eld.y >= k.y && eld.y + eld.h <= k.y + 192; }, { timeout: 5000 }).toBe(true);
+  // 93.5: visas_forst är borta; kameran glider förbi elden när Tant Rosa går till lyktorna (rosa_vid_lyktorna)
+  let sagElden = false;
+  for (let i = 0; i < 80 && !sagElden; i++) {
+    if (i % 5 === 0) for (const v of await page.locator('#plattan:not([hidden]) .replik-ruta').all()) await v.click({ timeout: 300 }).catch(() => {});
+    const k = await O(() => window.__ORDSTAVEN.kamera());
+    sagElden = eld.x >= k.x && eld.x + eld.b <= k.x + 320 && eld.y >= k.y && eld.y + eld.h <= k.y + 192;
+    if (sagElden) await page.screenshot({ path: 'test-results/regi-kvall-kameran-vid-elden.png' });
+    await page.waitForTimeout(100);
+  }
+  expect(sagElden, 'kameran stannar vid elden under rosa_vid_lyktorna').toBe(true);
   // de tre vedpinnarna syns på kvällen, inte där han står, och han plockar upp dem en i taget
   const start = await O(() => window.__ORDSTAVEN.position());
   for (const id of ['ved_1', 'ved_2', 'ved_3']) {
     const o = await O((id) => window.__ORDSTAVEN.ruta(id), id);
     expect(o).toBeTruthy();
     expect(Math.hypot(o.x + o.b / 2 - start.x, o.y + o.h / 2 - start.y)).toBeGreaterThan(40);
-  }
-  for (const id of ['ved_1', 'ved_2', 'ved_3']) {
-    const o = await O((id) => window.__ORDSTAVEN.ruta(id), id);
-    for (let i = 0; i < 80 && !(await O(() => window.__ORDSTAVEN.logg())).includes('[plockar upp] ' + id); i++) {
-      for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
-      await O(([x, y]) => window.__ORDSTAVEN.gaMot(x, y), [o.x + o.b / 2, o.y + o.h + 6]);
-      if (i % 4 === 3 && (await O(() => window.__ORDSTAVEN.steg()))?.mal === id) await page.keyboard.press('Space');
-      await page.waitForTimeout(250);
-    }
-    expect(await O(() => window.__ORDSTAVEN.logg())).toContain('[plockar upp] ' + id);
-    // den han har plockat är borta, de andra ligger kvar
-    if (id === 'ved_1') { await page.waitForTimeout(400); await page.screenshot({ path: 'test-results/regi-vedpinnar.png' }); }
   }
   // LJUS skrivs som när han spelar: formelns effekt är regin (ljuset hoppar från staven till lyktorna)
   for (let i = 0; i < 60 && !(await page.locator('#plattan .formel-skriv').isVisible()); i++) {
@@ -246,6 +254,10 @@ test('kvällen i byn (71.5, 71.6, 78.4): tre vedpinnar, LJUS tänder lyktorna, e
   await expect.poll(async () => (await O(() => window.__ORDSTAVEN.grafik())).regi, { timeout: 10000 }).toContain('ljuset hoppar mellan lyktorna');
   await page.waitForTimeout(1600);
   await page.screenshot({ path: 'test-results/regi-lyktorna.png' }); // kameran följer ljuset ned mot udden
+  // pinnarna efter lyktorna (92.9): de syns i kvällens bild, och den han tar försvinner (93.5)
+  await taPinnar(page, ['ved_1']);
+  await page.waitForTimeout(400); await page.screenshot({ path: 'test-results/regi-vedpinnar.png' });
+  await taPinnar(page, ['ved_2', 'ved_3']);
   // Gå till elden: han går dit, och Fiskaren tänder elden (mellanscenen elden_tands)
   await gaTill(page, 566, 312, (p) => p.y > 300 && p.x > 540);
   // repliken "Gå till elden" kan komma efter att han redan står vid elden (långsammare webbläsare i CI): då
@@ -482,7 +494,7 @@ test('under bryggan (42.6, Stil del 3b): sidovyn med baronen som gräver, Herr S
   await page.waitForTimeout(500);
   const b = await O(() => window.__ORDSTAVEN.ruta('brygga'));
   const [baron, skata] = await fig();
-  expect(baron.ram).toBe('baronen_ga_ner_01'); expect(baron.synlig).toBe(true);
+  expect(baron.ram).toMatch(/^baronen_lera_ner_0[12]$/); expect(baron.synlig).toBe(true); // Stils baron i leran (93.7)
   expect(baron.x).toBeGreaterThan(b.x); expect(baron.x).toBeLessThan(b.x + b.b); expect(baron.y).toBeGreaterThan(b.y + b.h);
   expect(skata.ram).toBe('herr_skata_sitta_hoger_01');
   expect(skata.x).toBeGreaterThan(b.x); expect(skata.x).toBeLessThan(baron.x); expect(skata.y).toBeLessThanOrEqual(b.y);
@@ -542,4 +554,49 @@ test('trollsländan och de små grodorna i Stils bilder (13/11, 87.2): den surra
   expect((await O(() => window.__ORDSTAVEN.samtal())).unge).toMatch(/^unge1_trollslanda_ner_0[12]$/);
   await page.screenshot({ path: 'test-results/regi-trollslanda-nosen.png' });
   expect((await O(() => window.__ORDSTAVEN.grafik())).regi).toContain('trollsländan landar på ungens nos');
+});
+
+test('bryggan avslöjad (92.3, 93.5): byborna jublar, och fiskaren går ut på bryggan och fiskar', async ({ page }) => {
+  test.setTimeout(90000);
+  const O = (f, a) => page.evaluate(f, a);
+  const sc = kap2.scener.find((s) => s.id === 'k2s03_torget');
+  const efter = sc.steg.findIndex((st) => st.bild === 'bryggan_avslojad');
+  expect(efter).toBeGreaterThan(0);
+  await sparadI(page, 'kap-02', 'k2s03_torget', efter + 1);
+  // hjälten nära bryggan, som när han just har läst skylten om den
+  const s = await O(() => window.__ORDSTAVEN.ruta('brygga_fran_torget'));
+  expect(s).toBeTruthy();
+  for (let i = 0; i < 60; i++) { for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {}); await O(([x, y]) => window.__ORDSTAVEN.gaMot(x, y), [s.x - 30, s.y + s.h - 10]); await page.waitForTimeout(200); const p = await O(() => window.__ORDSTAVEN.position()); if (Math.hypot(p.x - (s.x - 30), p.y - (s.y + s.h - 10)) < 12) break; }
+  const ms = await regi(page, 'bryggan_avslojad');
+  expect(ms).toBeGreaterThanOrEqual(3000);
+  const fisk = () => O(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum').ritade.get('fiskaren'); return { ram: r.frame.name, x: r.x, y: r.y }; });
+  const sett = new Set();
+  for (let t = 0; t < ms + 600; t += 150) { await page.waitForTimeout(150); sett.add((await fisk()).ram); }
+  expect([...sett].some((r) => /^fiskaren_jubel_ner_0[12]$/.test(r))).toBe(true);
+  expect([...sett].some((r) => /^fiskaren_ga_(hoger|upp|ner|vanster)_0[1-4]$/.test(r))).toBe(true);
+  const f = await fisk();
+  expect(f.ram).toMatch(/^fiskaren_fiskar_hoger_0[12]$/);
+  const b = await O(() => window.__ORDSTAVEN.ruta('brygga_fran_torget'));
+  expect(Math.abs(f.x - (b.x + 8))).toBeLessThanOrEqual(1); expect(Math.abs(f.y - (b.y + b.h))).toBeLessThanOrEqual(1);
+  // han syns i bild, nära hjälten
+  const k = await O(() => window.__ORDSTAVEN.kamera());
+  expect(f.x).toBeGreaterThan(k.x); expect(f.x).toBeLessThan(k.x + 320);
+  expect((await O(() => window.__ORDSTAVEN.grafik())).regi).toContain('bryggan avslöjad');
+  await page.screenshot({ path: 'test-results/regi-bryggan-avslojad.png' });
+});
+
+test('pinnarna till elden (92.9, 93.5): han tar dem i den ordning han vill, och de försvinner från marken', async ({ page }) => {
+  test.setTimeout(120000);
+  const O = (f, a) => page.evaluate(f, a);
+  const sc = kap2.scener.find((s) => s.id === 'k2s10_elden');
+  const steg = sc.steg.findIndex((st) => st.pussel_id === 'k2_pinnarna');
+  expect(steg).toBeGreaterThan(0);
+  await sparadI(page, 'kap-02', 'k2s10_elden', steg, { rumstillstand: { byn: 'kvall' } });
+  await taPinnar(page, ['ved_3', 'ved_1', 'ved_2']);
+  expect(await O(() => window.__ORDSTAVEN.logg())).toMatch(/plockar upp.*ved_3[\s\S]*plockar upp.*ved_1[\s\S]*plockar upp.*ved_2/);
+  for (let i = 0; i < 40 && (await O(() => window.__ORDSTAVEN.steg()?.mal)) !== 'lagereld'; i++) {
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    await page.waitForTimeout(300);
+  }
+  expect(await O(() => window.__ORDSTAVEN.steg()?.mal)).toBe('lagereld');
 });

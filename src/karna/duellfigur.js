@@ -70,3 +70,13 @@ export function figurensBilder(figur, ramar) {
   for (const r of ramar) { const m = sakRe.exec(r); if (m) { saker.add(m[2]); sakPrefix = m[1]; } }
   return { lagen: [...lagen].sort(), utrustningar: [...utrustningar].sort(), saker: [...saker].sort(), sakPrefix };
 }
+
+/**
+ * Figurens ansikte i pratrutan efter vad den gör (93.5, Stils tre porträtt): förvirrad när den tappar sin sak och
+ * backar, yr när den har trillat eller snurrat, annars grundbilden (ropar). @param {string} lage @returns {string|null}
+ */
+export function portrattUttryck(lage) {
+  if (lage === 'forvirrad' || lage === 'backar') return 'forvirrad';
+  if (lage === 'trillar' || lage === 'snurrar' || lage === 'sitter') return 'yr';
+  return null;
+}

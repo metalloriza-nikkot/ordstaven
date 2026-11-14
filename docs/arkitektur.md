@@ -1122,3 +1122,10 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 ## 115. Världen vilar bakom startskärmen (0.84.0, beslut 92.15)
 - `spel.js` sätter `rum.vilar` och klassen `varld-vilar` på `body` medan startskärmen eller introt visas. I canvas-läget (golvdatorn) ritar `Rum.valjRitning` då inte duken alls, och CSS döljer duken, så att webbläsaren inte målar om skrivbordet ovanpå en duk som ingen ser. När han börjar ritas världen direkt.
 - Mätningen gjordes lokalt med Chromium utan grafikkort och processorn nedsaktad fyra gånger: på startskärmen gick webbläsarens målning av skärmen (`Display::DrawAndSwap`) från 3,8 gånger per sekund (ca 21 ms per sekund) till 0. Inne i spelet är det oförändrat.
+
+## 116. Kvällen, bryggan och halmdockans ansikte (0.85.0, beslut 93.5)
+- **`bryggan_avslojad`** (`Rum.brygganAvslojad`): byborna jublar, och fiskaren går med sin gång till `brygga_fran_torget` och fiskar där i två bilder. Står han utanför bilden kommer han in nedifrån.
+- **Pinnarna till elden** (`k2_pinnarna`, P26 med verbet `lyfta`): en sak som är det han hittar (`ved_1` med innehållet `ved`) göms med `gomForemal` när han tar den och loggas som `plockar upp`. Mossan och tången, som har något under sig, ligger kvar.
+- **Kvällen börjar utan `visas_forst`.** Kameran glider i stället med `rosa_vid_lyktorna` från den första lyktan till elden på udden, stannar där en stund och glider sedan tillbaka till hjälten. När elden tänds går hjälten till sin plats snett söder om den, också när han kommer österifrån.
+- **Baronen i leran** uppifrån vid bryggan växlar mellan Stils två bilder var 600 ms och går ur leran med sin vanliga gång.
+- **Duellfigurens ansikte** i pratrutan följer vad den gör: `portrattUttryck` i `karna/duellfigur.js` ger `forvirrad` när den tappar och backar och `yr` när den har trillat eller snurrat, annars grundbilden. `Rum.uttryck` frågar duellfiguren först.

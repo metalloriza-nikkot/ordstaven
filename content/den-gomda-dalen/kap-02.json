@@ -16,7 +16,7 @@
  },
  "meta": {
   "namn": "Träsket",
-  "version": "0.7.6",
+  "version": "0.7.8",
   "datum": "2026-11-13",
   "agare": "Innehåll",
   "kalla": "Manus 17-kapitel2-manus.md v0.4 (beslut 60–64). Ny fil.",
@@ -34,7 +34,9 @@
   "andrat_v073": "2026-11-12 (beslut 79.3): det han ska göra något med visas först. I k2s10 visar kameran elden på udden innan pinnarna (visas_forst på lagereld på kvällen), och mellanscenen före LJUS har regin rosa_vid_lyktorna: Tant Rosa vid den första släckta lyktan och kameran längs raden till hjälten. Ingen text som spelaren läser är ändrad.",
   "andrat_v074": "2026-11-12 (beslut 80.3): fjädern i k2s02 plockas upp (leta: true på ga_till fjader) och räknas som vila.",
   "andrat_v075": "2026-11-13 (beslut 86.8.1, Tekniks lista): bild på fem mellanscener, under_bryggan i k2s04 steg 0, brevram_nara i k2s04 steg 16, k2s05 steg 18 och k2s07 steg 0, och kartbit_unge i k2s09 steg 0. Ingen text är ändrad.",
-  "andrat_v076": "2026-11-13 (beslut 88.3): trollsländans mellanscen i träskkanten får bild trollslanda_landar (regin finns sedan 0.74.0). Ingen text ändrad."
+  "andrat_v076": "2026-11-13 (beslut 88.3): trollsländans mellanscen i träskkanten får bild trollslanda_landar (regin finns sedan 0.74.0). Ingen text ändrad.",
+  "andrat_v077": "2026-11-14 (beslut 92.3, 92.5, 92.6 och 92.9): byborna jublar och fiskaren går ut på bryggan när skylten är avslöjad, hjälten går till brevhalvan före läsningen, Tant Rosas replik om tavlan håller, och kvällen börjar med lyktorna och sedan pinnarna i fri ordning.",
+  "andrat_v078": "2026-11-14 (beslut 93.4): regierna skata_ramlar_av_palen och baronen_lyfter på två mellanscener i k2s04_bryggan. Ingen text ändrad."
  },
  "var_var_vi": [
   {
@@ -850,7 +852,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Byborna jublar. Fiskaren tar sitt spö och går mot bryggan, och tvätterskan hämtar vatten i brunnen."
+     "beskrivning": "Två bybor jublar. Fiskaren tar sitt spö, går ut på bryggan och kastar ut reven.",
+     "bild": "bryggan_avslojad"
     },
     {
      "typ": "replik",
@@ -896,7 +899,7 @@
      }
     }
    ],
-   "anteckning": "64.1: läsvalet börjar på torget, där pass 2 börjar, innan han har valt väg. Alla tre repen spärrar en väg han kan vilja ta (vassen, dammen förbi brunnen och bryggan), så att ingen skylt är den enda som står i vägen. Kontrollfrågan (09 §5): han vet att halvorna är vid bryggan och i vassen, så två av vägarna drar lika mycket, och dammen drar med grodorna. Gissning ger en på tre. När lögnen är avslöjad faller alla tre repen samtidigt, och sedan börjar navet. Grenarna kan tas i valfri ordning, och dammen (k2s06) är frivillig. mellan_grenar är steg (64.2): Tant Rosas replik, sparpunkten som slutar pass 2 (63.7) och molnets instruktion. Molnet och knuffen pekar mot närmaste gren som inte är klar."
+   "anteckning": "64.1: läsvalet börjar på torget, där pass 2 börjar, innan han har valt väg. Alla tre repen spärrar en väg han kan vilja ta (vassen, dammen förbi brunnen och bryggan), så att ingen skylt är den enda som står i vägen. Kontrollfrågan (09 §5): han vet att halvorna är vid bryggan och i vassen, så två av vägarna drar lika mycket, och dammen drar med grodorna. Gissning ger en på tre. När lögnen är avslöjad faller alla tre repen samtidigt, och sedan börjar navet. Grenarna kan tas i valfri ordning, och dammen (k2s06) är frivillig. mellan_grenar är steg (64.2): Tant Rosas replik, sparpunkten som slutar pass 2 (63.7) och molnets instruktion. Molnet och knuffen pekar mot närmaste gren som inte är klar. 92.3: när skylten är avslöjad syns lösningen i världen. Två bybor jublar, och fiskaren går ut på bryggan och använder den (regin bryggan_avslojad, ca 4 s, med jubel och gång som finns)."
   },
   {
    "id": "k2s04_bryggan",
@@ -950,13 +953,24 @@
      "foremal": "brev_halva_1"
     },
     {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Hämta halvan!",
+     "upplast": true
+    },
+    {
+     "typ": "ga_till",
+     "mal": "brev_halva_1"
+    },
+    {
      "typ": "pussel",
      "pussel_id": "k2_halvan"
     },
     {
      "typ": "mellanscen",
      "beskrivning": "Baronen tittar upp och tappar spaden. Herr Skata skrattar så att den ramlar av pålen.",
-     "ljud": "skata"
+     "ljud": "skata",
+     "bild": "skata_ramlar_av_palen"
     },
     {
      "typ": "replik",
@@ -976,7 +990,8 @@
     {
      "typ": "mellanscen",
      "beskrivning": "Baronen lossnar ur leran, lerig till knäna, och klättrar upp i luftskeppet. Det lyfter.",
-     "ljud": "luftskepp"
+     "ljud": "luftskepp",
+     "bild": "baronen_lyfter"
     },
     {
      "typ": "replik",
@@ -1002,7 +1017,7 @@
      "upplast": true
     }
    ],
-   "anteckning": "Spelarens regel (38.5) i spelet: baronen läser inget högt (63.6), så barnet läser raden först (las_skylt väntar tills han har läst). Sedan visas samma rad igen med INTE i guld (oppna_lasplatta med skylt och lys_ord, se meta.teknik), och det är därför baronen förstår. Farfars knep svarar på oron för baronens kartbit. Bit 7 planteras (06 §2). Halvan bärs till ramen i byn och sätts dit direkt (63.7): bara går här från bryggan till byn. Bilden brevram_halva är ramen med en eller två halvor, efter hur många som sitter där. 72.7: baronen står i lera, inte i vatten, och det blir ett skämt med INTE. Farfars skylt GÅ INTE I LERAN! står vid bryggans landände, och spelaren läser den en gång till utan val. Baronen har inte läst den heller (spelarens regel, 38.5): han sitter fast, och Herr Skata drar upp honom i hjälmen. 76.4 (B2, B3, B8): bryggan har ett läsval (k2_halvan), och spelaren väljer den mening som står på Farfars halva. Fem repliker är strukna (ta brevet, Farfars knep, baronen har också en kartbit, den som inte läser noga, och gå till Tant Rosa), och baronens två repliker är en. Farfar känner igen baronens bit på radion. Svaret på hur baronen fick den kommer i kapitel 3 (72.9). Högst fem passiva steg i rad (76.3)."
+   "anteckning": "Spelarens regel (38.5) i spelet: baronen läser inget högt (63.6), så barnet läser raden först (las_skylt väntar tills han har läst). Sedan visas samma rad igen med INTE i guld (oppna_lasplatta med skylt och lys_ord, se meta.teknik), och det är därför baronen förstår. Farfars knep svarar på oron för baronens kartbit. Bit 7 planteras (06 §2). Halvan bärs till ramen i byn och sätts dit direkt (63.7): bara går här från bryggan till byn. Bilden brevram_halva är ramen med en eller två halvor, efter hur många som sitter där. 72.7: baronen står i lera, inte i vatten, och det blir ett skämt med INTE. Farfars skylt GÅ INTE I LERAN! står vid bryggans landände, och spelaren läser den en gång till utan val. Baronen har inte läst den heller (spelarens regel, 38.5): han sitter fast, och Herr Skata drar upp honom i hjälmen. 76.4 (B2, B3, B8): bryggan har ett läsval (k2_halvan), och spelaren väljer den mening som står på Farfars halva. Fem repliker är strukna (ta brevet, Farfars knep, baronen har också en kartbit, den som inte läser noga, och gå till Tant Rosa), och baronens två repliker är en. Farfar känner igen baronens bit på radion. Svaret på hur baronen fick den kommer i kapitel 3 (72.9). Högst fem passiva steg i rad (76.3). 92.5: hjälten går fram till halvan på bryggan innan han läser den (val görs i världen). 93.4: Herr Skata ramlar av pålen (skata_ramlar_av_palen) och baronen far iväg i luftskeppet (baronen_lyfter), så att de inte står kvar vid bryggan."
   },
   {
    "id": "k2s05_vassen",
@@ -1269,7 +1284,7 @@
     {
      "typ": "replik",
      "talare": "tant_rosa",
-     "text": "Den tavlan har jag dammat i fyrtio år!",
+     "text": "Den tavlan har hängt där i fyrtio år!",
      "upplast": true
     },
     {
@@ -1312,7 +1327,7 @@
      "mal": "kartbit_3"
     }
    ],
-   "anteckning": "69.9: Tant Rosa räcker fram brevet, hjälten tar det själv och läser det på läsplattan. Sedan ligger det i ryggsäcken, så att knuffen och lappknappen kan öppna det igen. \"Fyrtio år\" kommer efter rätt tavla, som poäng: hon har dammat den tavlan i fyrtio år utan att titta bakom den. INTE avgör här i L4, bara om han har löst grodan i L4 (63.6). FLYG en tredje gång, och tavlan svävar ner själv (63.8). 71.4: tavlorna hänger högt, med tydlig luft under, så att det syns att ingen når dem. Tant Rosa dammar med en lång vippa men kan inte lyfta den. 76.2 och 76.4: \"Lyft den med staven!\" är struken, och LYFT godtas. Tant Rosa har aldrig läst brevet, eftersom hon inte fick öppna det förrän hans barnbarn kom (B9). Hon når inte \"med min långa vippa\"."
+   "anteckning": "69.9: Tant Rosa räcker fram brevet, hjälten tar det själv och läser det på läsplattan. Sedan ligger det i ryggsäcken, så att knuffen och lappknappen kan öppna det igen. \"Fyrtio år\" kommer efter rätt tavla, som poäng: hon har dammat den tavlan i fyrtio år utan att titta bakom den. INTE avgör här i L4, bara om han har löst grodan i L4 (63.6). FLYG en tredje gång, och tavlan svävar ner själv (63.8). 71.4: tavlorna hänger högt, med tydlig luft under, så att det syns att ingen når dem. Tant Rosa dammar med en lång vippa men kan inte lyfta den. 76.2 och 76.4: \"Lyft den med staven!\" är struken, och LYFT godtas. Tant Rosa har aldrig läst brevet, eftersom hon inte fick öppna det förrän hans barnbarn kom (B9). Hon når inte \"med min långa vippa\". 92.6: Tant Rosa har aldrig nått tavlan, så hon har inte dammat den. Den har hängt där i fyrtio år."
   },
   {
    "id": "k2s09_kartbiten",
@@ -1382,36 +1397,7 @@
    "steg": [
     {
      "typ": "mellanscen",
-     "beskrivning": "Kväll i byn. Byborna samlas på torget med ved i famnen, och Tant Rosa är med. Solen håller på att gå ner. Kameran glider ned till udden, där veden ligger i en hög till elden, och stannar där medan Tant Rosa talar. Den följer hjälten igen när han ska leta (kartans visas_forst på lagereld, bara på kvällen).",
-     "syns_redan": true
-    },
-    {
-     "typ": "replik",
-     "talare": "tant_rosa",
-     "text": "Hämta tre pinnar till elden på udden!",
-     "upplast": true
-    },
-    {
-     "typ": "ga_till",
-     "mal": "ved_1",
-     "bild": "vedpinne",
-     "leta": true
-    },
-    {
-     "typ": "ga_till",
-     "mal": "ved_2",
-     "bild": "vedpinne",
-     "leta": true
-    },
-    {
-     "typ": "ga_till",
-     "mal": "ved_3",
-     "bild": "vedpinne",
-     "leta": true
-    },
-    {
-     "typ": "mellanscen",
-     "beskrivning": "Nu har solen gått ner. Uppe på torget går Tant Rosa till den första lyktan vid stigen och lyfter på den. Den är släckt. Kameran glider från henne ned längs raden av släckta lyktor till hjälten på udden. Byborna står kvar i mörkret på torget.",
+     "beskrivning": "Kväll i byn. Solen har gått ner, och byborna samlas på torget med ved i famnen. Tant Rosa går till den första lyktan vid stigen och lyfter på den. Den är släckt. Kameran glider längs raden av släckta lyktor ned till udden, där veden till elden ligger i en hög, och sedan tillbaka till hjälten.",
      "bild": "rosa_vid_lyktorna"
     },
     {
@@ -1426,7 +1412,7 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Ljuset hoppar från lykta till lykta, hela vägen till torget. Byborna jublar och kommer med veden.",
+     "beskrivning": "Ljuset hoppar från lykta till lykta, hela vägen till torget. Byborna jublar.",
      "ljud": "glitter",
      "bild": "byborna_jublar"
     },
@@ -1435,6 +1421,10 @@
      "talare": "berattare",
      "text": "Ordkraft! Ljuset visar vägen.",
      "upplast": true
+    },
+    {
+     "typ": "pussel",
+     "pussel_id": "k2_pinnarna"
     },
     {
      "typ": "replik",
@@ -1494,7 +1484,7 @@
      "valfri": false
     }
    ],
-   "anteckning": "71.5: byn tänder elden för hjälten, som avslöjade baronens lögn och gav byn bryggan tillbaka. Tant Rosa följer med, och byborna står runt elden och jublar. 71.6: LJUS tänder lyktorna längs stigen till udden. Det är en formel han har lärt sig i prologen, och berättelsen behöver den: det är mörkt. Lägerelden (35.6): hjälten sätter sig själv, och ungen somnar mot honom. ORDSMED ges i berättelsen (09 §3). 76.4 (B7): mamma vid elden. Ungen tittar mot dalen och hör ett svagt rop, samma ljud som i slutet av kapitel 1, och svarar. Högst fem passiva steg i rad efter elden (76.3). Tant Rosas tack är struket (B3): byborna jublar för hjälten i mellanscenen. 78.4: en vila i pass 3. Före lyktorna hämtar han tre vedpinnar på udden (ved_1–ved_3, leta: true, ingen text). De syns bara i tillståndet kvall och plockas upp när han når dem, som fjädern. Hjälten står på udden, och ljuset från LJUS går längs stigen till torget, där byborna väntar. 79.3: det han ombeds göra något med har han sett först. Elden på udden visas när han kommer ut på kvällen (kartans visas_forst på lagereld, bara i tillståndet kvall), innan Tant Rosa ber honom hämta pinnar dit. Lyktorna visas innan han ska tända dem: regin rosa_vid_lyktorna låter Tant Rosa gå till den första släckta lyktan vid torget, och kameran glider från henne ned längs raden till hjälten på udden. Hjälten står på udden efter pinnarna (78.4), så kameran glider ned mot honom och inte från honom. Ingen ny scen, bara ordningen."
+   "anteckning": "71.5: byn tänder elden för hjälten, som avslöjade baronens lögn och gav byn bryggan tillbaka. Tant Rosa följer med, och byborna står runt elden och jublar. 71.6: LJUS tänder lyktorna längs stigen till udden. Det är en formel han har lärt sig i prologen, och berättelsen behöver den: det är mörkt. Lägerelden (35.6): hjälten sätter sig själv, och ungen somnar mot honom. ORDSMED ges i berättelsen (09 §3). 76.4 (B7): mamma vid elden. Ungen tittar mot dalen och hör ett svagt rop, samma ljud som i slutet av kapitel 1, och svarar. Högst fem passiva steg i rad efter elden (76.3). Tant Rosas tack är struket (B3): byborna jublar för hjälten i mellanscenen. 78.4: en vila i pass 3. Före lyktorna hämtar han tre vedpinnar på udden (ved_1–ved_3, leta: true, ingen text). De syns bara i tillståndet kvall och plockas upp när han når dem, som fjädern. Hjälten står på udden, och ljuset från LJUS går längs stigen till torget, där byborna väntar. 79.3: det han ombeds göra något med har han sett först. Elden på udden visas när han kommer ut på kvällen (kartans visas_forst på lagereld, bara i tillståndet kvall), innan Tant Rosa ber honom hämta pinnar dit. Lyktorna visas innan han ska tända dem: regin rosa_vid_lyktorna låter Tant Rosa gå till den första släckta lyktan vid torget, och kameran glider från henne ned längs raden till hjälten på udden. Hjälten står på udden efter pinnarna (78.4), så kameran glider ned mot honom och inte från honom. Ingen ny scen, bara ordningen. 92.9: kvällen börjar med lyktorna (LJUS, med lyktorna visade först, 79.3) och sedan pinnarna i fri ordning (k2_pinnarna). Uppdraget ELDEN har stegen i samma ordning."
   }
  ],
  "pussel": [
@@ -2937,6 +2927,30 @@
     "handling": "bilden i molnet glimtar, och barnet drar i snöret"
    },
    "anteckning": "76.4 (B10): frivillig formel i byn, FLYG en gång till på ett nytt ställe. Hindret visar på sitt utseende vad som behövs: något högt uppe som ska flyga. Ledbilden är fågeln från vassen."
+  },
+  {
+   "id": "k2_pinnarna",
+   "typ": "P26_krukorna",
+   "verb": "lyfta",
+   "instruktion": {
+    "talare": "tant_rosa",
+    "text": "Hämta tre pinnar till elden på udden!",
+    "upplast": true
+   },
+   "innehall": [
+    "ved",
+    "ved",
+    "ved"
+   ],
+   "foremal": [
+    "ved_1",
+    "ved_2",
+    "ved_3"
+   ],
+   "knuff": {
+    "handling": "ungen nosar vid närmaste pinne"
+   },
+   "anteckning": "92.9: pinnarna plockas i den ordning han själv vill. Han går fram och tar varje pinne med handen (verb lyfta), och pusslet är klart när alla tre är tagna. Ingen sak_i_sista, så ingen pinne är den sista. Vila i budgeten. Pinnen han tar ska försvinna från marken, som fjädern (80.3)."
   }
  ],
  "uppdrag": [
@@ -3080,17 +3094,17 @@
    "pass": 3,
    "steg": [
     {
-     "text": "SAMLA VED",
-     "klart": {
-      "scen": "k2s10_elden",
-      "ga_till": "ved_3"
-     }
-    },
-    {
      "text": "LYS UPP",
      "klart": {
       "scen": "k2s10_elden",
       "pussel": "k2_lyktorna"
+     }
+    },
+    {
+     "text": "SAMLA VED",
+     "klart": {
+      "scen": "k2s10_elden",
+      "pussel": "k2_pinnarna"
      }
     },
     {

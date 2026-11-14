@@ -85,6 +85,10 @@ test('kapitel 2 går att spela från träsket till elden (gråbox, del 5)', { ta
       const kvar = await ev((g) => g.map((id) => window.__ORDSTAVEN.ruta(id)).filter(Boolean).sort((a, b) => a.x - b.x || a.y - b.y), gang);
       if (kvar.length) { await ev(([x, y]) => window.__ORDSTAVEN.gaMot(x, y), [kvar[0].x - 8, kvar[0].y + kvar[0].h / 2]); await page.waitForTimeout(500); await page.keyboard.press('Space'); }
       else await ev(() => { const p = window.__ORDSTAVEN.position(); window.__ORDSTAVEN.gaMot(p.x + 60, p.y); });
+    } else if (typSt === 'pussel' && pussel.get(st.pussel_id)?.verb === 'lyfta') {
+      // pinnarna till elden (92.9): han tar dem en i taget, och den han har tagit är borta från marken (93.5)
+      const kvar = await ev((ids) => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); return ids.filter((id) => window.__ORDSTAVEN.ruta(id) && !r.dolda.has(id)); }, pussel.get(st.pussel_id).foremal);
+      if (kvar.length) await anvand(kvar[0]);
     } else if (typSt === 'pussel' && pussel.get(st.pussel_id)?.i_rummet) {
       const m = await rattObjekt(pussel.get(st.pussel_id));
       if (m) await anvand(m);
@@ -107,7 +111,9 @@ test('kapitel 2 går att spela från träsket till elden (gråbox, del 5)', { ta
     // beslut 71 (Teknik 34): stocken, Tant Rosa, lyktorna och elden
     'ungen hoppar på stocken', 'ungen piper på stocken', 'stocken flyger till stranden', 'ungen hoppar i land', 'Tant Rosa når inte', 'ljuset hoppar mellan lyktorna', 'elden tänds',
     // 79.3: Tant Rosa vid lyktorna innan han ska tända dem
-    'Tant Rosa vid lyktorna']) expect(regi, r).toContain(r);
+    'Tant Rosa vid lyktorna',
+    // 93.4 och 93.5: bryggan avslöjad, Herr Skata ramlar av pålen och baronen far iväg
+    'bryggan avslöjad', 'Herr Skata ramlar av pålen', 'baronen lyfter från bryggan']) expect(regi, r).toContain(r);
   // 80.3: fjädern plockas upp (leta: true) och ligger inte kvar, och vedpinnarna likaså (78.4)
   const loggen = await ev(() => window.__ORDSTAVEN.logg());
   for (const id of ['fjader', 'ved_1', 'ved_2', 'ved_3']) expect(loggen, id).toContain('[plockar upp] ' + id);
