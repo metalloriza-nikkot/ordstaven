@@ -2594,6 +2594,8 @@ test('navet i kapitel 2 (del 3): dammen lockar, bryggan först, halvan bärs til
     }
     if (await page.locator('#plattan').isVisible()) await vidare();
     else if (st?.typ === 'las_skylt') await gaMot(st.foremal);
+    // pass 92: "Hämta halvan!" och han går till brevhalvan före läsningen
+    else if (st?.typ === 'ga_till') { await gaMot(st.mal); if (i % 3 === 2) await page.keyboard.press('Space'); }
     else if (st?.typ === 'bara') {
       const har = await page.evaluate((m) => !!window.__ORDSTAVEN.ruta(m), st.till);
       if (!har) await gaMot('stig_byn_bryggan');
