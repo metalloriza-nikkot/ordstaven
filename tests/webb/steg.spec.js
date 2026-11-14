@@ -1622,7 +1622,7 @@ test('Pass 3 komplett: luftskeppet i trädgården, baronens porträtt, packlista
     await page.waitForTimeout(120);
   }
   // lägena i berättelsens ordning (Herr Skata landar två gånger: när han kommer flygande och i mellanscenen)
-  expect((await grafik()).regi.filter((x, i, a) => x !== a[i - 1])).toEqual(['glider', 'skata_landar', 'ser_hjalten', 'talar', 'ser_kartan', 'pose:hjalte_kartbit_upp_01', 'talar', 'skata_putsar', 'pose:-', 'trasslar', 'laser_skyltarna', 'flyger_fel']);
+  expect((await grafik()).regi.filter((x, i, a) => x !== a[i - 1])).toEqual(['glider', 'skata_landar', 'ser_hjalten', 'talar', 'ser_kartan', 'pose:hjalte_kartbit_upp_01', 'talar', 'skata_putsar', 'pose:-', 'trasslar', 'laser_skyltarna', 'flyger_fel', 'luftskeppet borta']); // 92.1: borta ur rummet när det har flugit ut ur bild
   expect(sett.has('luftskepp_trasslar_02')).toBe(true);
   expect(pose.stav).toBe(false); // staven syns inte medan han håller upp kartbiten
   expect([...pose.under].every((x) => /ser_kartan|talar/.test(x))).toBe(true);

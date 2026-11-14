@@ -147,6 +147,8 @@ export class Rum extends Phaser.Scene {
     this.bryggFig = null;
     /** världen är täckt av startskärmen eller introt och ritas inte (92.15) */
     this.vilar = false;
+    /** @type {any} sidovyn som kommer när luftskeppet har flugit åt fel håll */
+    this.sidovyVantar = null;
     /** @type {any} Farfar i dörren (regi, 67.2), tills han går ut eller rummet byts */
     this.farfarRegi = null;
     /** @type {Record<string, { x: number, y: number }>} kartans punkter för regin (regi_farfar) */
@@ -1011,7 +1013,8 @@ export class Rum extends Phaser.Scene {
     if (this.textures.exists(`sidovy_${bild}_bakgrund`)) {
       // luftskeppet flyger först iväg åt fel håll, mot SKOLAN (Stil 21:20), sedan kommer sidovyn
       const ms = this.luft && this.flygFel() ? 1600 : 0;
-      if (ms && this.luft) this.luft.tider.push(this.time.delayedCall(ms, () => this.visaSidovy(bild))); else this.visaSidovy(bild);
+      // inte bland luftskeppets timrar: skeppet tas bort när det har flugit ut ur bild (92.1), före sidovyn
+      if (ms) this.sidovyVantar = this.time.delayedCall(ms, () => { this.sidovyVantar = null; this.visaSidovy(bild); }); else this.visaSidovy(bild);
       return ms + 4200;
     }
     return 0;
@@ -1986,6 +1989,7 @@ export class Rum extends Phaser.Scene {
 
   /** Luftskeppet, hjälmen och sidovyn tas bort (nytt rum). */
   rensaRegi() {
+    this.sidovyVantar?.remove(false); this.sidovyVantar = null;
     this.duellFig?.taBort(); this.duellFig = null;
     this.bryggFig?.forEach((f) => { this.tweens.killTweensOf(f); f.destroy(); }); this.bryggFig = null;
     this.farfarRegi?.destroy(); this.farfarRegi = null;
