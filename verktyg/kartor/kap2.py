@@ -233,6 +233,8 @@ RUMMEN = {
         'objekt': [
             utg('stig_byn_bryggan', 0, 84, 40, 24, **STIG, riktning='vanster', till='byn'),
             punkt('start', 48, 96),
+            # 95.6: förtöjningsmasten i bryggans bild (mässingskulan). Luftskeppet är förtöjt här medan baronen är vid bryggan
+            punkt('regi_mast', 303, 36),
             vagg(120, 0, 200, 84, vatten=True), vagg(120, 112, 200, 80, vatten=True),
             sak('brygga', 120, 84, 200, 28, golv=True),
             sak('brev_halva_1', 256, 92, 10, 10, sida='alla'),

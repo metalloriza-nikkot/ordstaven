@@ -24,8 +24,8 @@ W = H = 32
 
 def ell(im, cx, cy, rx, ry, toner, ljus=(-0.5, -0.6)):
     """En ellips skuggad mot ljuset uppe till vänster, i tonerna (mörk till ljus, utan den mörkaste)."""
-    for y in range(H):
-        for x in range(W):
+    for y in range(im.height):
+        for x in range(im.width):
             dx, dy = (x + 0.5 - cx) / rx, (y + 0.5 - cy) / ry
             d = dx * dx + dy * dy
             if d <= 1:
@@ -178,6 +178,50 @@ def sak(namn, b):
         im = kontur(im)
     return im
 
+def portratt(uttryck):
+    """Porträttet i pratrutan, 48 x 48 som de andra: huvudet, hatten och halsduken. ropar, forvirrad eller yr."""
+    im = ny(48, 48); cx, cy = 24, 25
+    for x in range(8, 41):                                  # axlarna: västen och halmen
+        for y in range(40, 48):
+            if abs(x - 24) < 15 - (47 - y) // 2: pix(im, [(x, y, VAST[2] if x < 22 else VAST[1] if x > 27 else HALM[3] if y % 2 else HALM[2])])
+    for (x, y) in ((10, 44), (37, 43)): halmtofs(im, x, y, (-1 if x < 24 else 1, 0), 3)
+    for x in range(12, 37):                                 # halsduken med knut och snibb
+        pix(im, [(x, 38, DUK[3] if x % 4 == 0 else DUK[2]), (x, 39, DUK[2]), (x, 40, DUK[1])])
+    for y in range(40, 47): pix(im, [(30, y, DUK[2]), (31, y, DUK[1]), (32, y, DUK[1])])
+    ell(im, cx, cy, 14, 13, SACK)                           # huvudet av säckväv
+    for y in range(cy - 13, cy + 14):
+        for x in range(cx - 14, cx + 15):
+            if im.getpixel((x, y))[3] and (x * 2 + y * 3) % 9 == 0: pix(im, [(x, y, SACK[2])])
+    for x in range(cx - 8, cx + 9): pix(im, [(x, cy + 12, SACK[1])])                  # snöret
+    for (x, y, d) in ((cx - 13, cy - 6, (-1, 0)), (cx + 13, cy - 5, (1, 0))): halmtofs(im, x, y, d, 3)   # halm under hatten
+    # hatten: liten filthatt med lapp
+    for x in range(cx - 15, cx + 16): pix(im, [(x, cy - 10, HATT[1]), (x, cy - 9, HATT[0] if abs(x - cx) > 12 else HATT[1])])
+    for y in range(cy - 19, cy - 10):
+        for x in range(cx - 9, cx + 10): pix(im, [(x, y, HATT[3] if x < cx - 3 else HATT[2])])
+    for x in range(cx - 2, cx + 3): pix(im, [(x, cy - 19, HATT[1])])                 # bucklan
+    for y in range(cy - 16, cy - 12):
+        for x in range(cx + 3, cx + 7): pix(im, [(x, y, VAST[3] if y < cy - 14 else VAST[2])])   # lappen
+    # ögonen: knappar med fyra hål
+    def knapp(x, y, r):
+        for yy in range(y - r, y + r + 1):
+            for xx in range(x - r, x + r + 1):
+                if (xx - x) ** 2 + (yy - y) ** 2 <= r * r + 0.5: pix(im, [(xx, yy, OGA)])
+        pix(im, [(x - 1, y - 1, '#5a5a5a')])
+    if uttryck == 'ropar':
+        knapp(cx - 6, cy - 2, 3); knapp(cx + 6, cy - 2, 3)
+        for y in range(cy + 4, cy + 10):                          # munnen öppen, sydd kant
+            for x in range(cx - 4, cx + 5):
+                if ((x - cx) / 4.5) ** 2 + ((y - cy - 6.5) / 3) ** 2 <= 1: pix(im, [(x, y, '#3a1a14')])
+        for x in (cx - 3, cx, cx + 3): pix(im, [(x, cy + 3, SACK[0])])
+    elif uttryck == 'forvirrad':
+        knapp(cx - 6, cy - 2, 4); knapp(cx + 6, cy - 1, 2)
+        for i, x in enumerate(range(cx - 5, cx + 6)): pix(im, [(x, cy + 6 + (i // 2) % 2, SACK[0])])
+    else:  # yr: kryss i ögonen och ett snett leende
+        for (ex, ey) in ((cx - 6, cy - 2), (cx + 6, cy - 2)):
+            for k in range(-2, 3): pix(im, [(ex + k, ey + k, OGA), (ex + k, ey - k, OGA)])
+        for x in range(cx - 4, cx + 5): pix(im, [(x, cy + 6 + (1 if x > cx else 0), SACK[0])])
+    return kontur(im)
+
 UTRUSTNING = {'hel': dict(), 'utan_hatt': dict(hatt=False), 'utan_hatt_knapp': dict(hatt=False, knappar=1),
               'utan_halsduk': dict(duk=False), 'utan_halsduk_knapp': dict(duk=False, knappar=1)}
 
@@ -207,6 +251,7 @@ def alla():
             ut[f'figurer/halmdockan/halmdockan_{lage}_{u}.png'] = im
     for s in ('halmstra', 'knapp', 'hatt', 'halsduk'):
         for b in (1, 2): ut[f'figurer/halmdockan/halmdocka_sak_{s}_0{b}.png'] = sak(s, b)
+    for u in ('ropar', 'forvirrad', 'yr'): ut[f'figurer/halmdockan/halmdockan_portratt_{u}.png'] = portratt(u)
     return ut
 
 if __name__ == '__main__':

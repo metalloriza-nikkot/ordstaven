@@ -21,6 +21,10 @@ import { Livet } from './livet.js';
 import { Duellfigur } from './duellfigur.js';
 import { figurensBilder, portrattUttryck } from '../karna/duellfigur.js';
 
+/** Luftskeppets bild (112 × 96): repstegen hänger på x 74–83 från gondolen (y 60) till y 95, och aktern med propellern är på x 105, y 18 (95.6). */
+const STEGE = { x: 78, ovre: 62, nedre: 95 };
+const AKTER = { x: 104, y: 18 };
+
 const FARG = {
   golv: 0x8c8a86, rutnat: 0x7f7d79, kant: 0x5d5b58,
   sak: 0xb9b2a4, sakKant: 0x6e675c, utgang: 0x6d5a45, figur: 0xc9a27a, markerad: 0xf2c14e,
@@ -2188,6 +2192,7 @@ export class Rum extends Phaser.Scene {
     for (const t of l.tider) t.remove();
     l.gung.remove();
     this.tweens.killTweensOf(l.img);
+    l.rep?.destroy();
     l.img.destroy();
     this.luft = null;
     this.regiLogg.push('luftskeppet borta'); if (this.regiLogg.length > 160) this.regiLogg.shift();
@@ -2443,6 +2448,8 @@ export class Rum extends Phaser.Scene {
         /** @type {any} */ (skata).fot = skata.y; /** @type {any} */ (skata).skata = true;
         this.lagerFigurer.add(skata); this.bryggFig.push(skata);
       }
+      // 95.6: luftskeppet är förtöjt vid bryggans mast så länge baronen är här, med repstegen nere på däcket
+      this.luftskeppFortojt(b);
       this.smutsig = true;
       return 0;
     }
@@ -2457,18 +2464,105 @@ export class Rum extends Phaser.Scene {
       this.regiLogg.push('Herr Skata ramlar av pålen');
       return 900;
     }
-    // lyfter: mot bryggans ände (repstegen till luftskeppet), uppåt och borta
-    const ande = { x: b.x + b.b - 12, y: b.y - 40 };
-    for (const f of [baron, skata]) {
-      if (!f) continue;
-      if (f === skata && this.textures.get('herr_skata').has('herr_skata_flyga_hoger_01')) skata.setFrame('herr_skata_flyga_hoger_01');
-      // baronen går ur leran med sin vanliga gång (Stil 93.7)
-      if (f === baron) { baron.setCrop(); /** @type {any} */ (baron).iLeran = false; if (this.textures.get('baronen').has('baronen_ga_hoger_01')) baron.setFrame('baronen_ga_hoger_01'); }
-      this.tweens.add({ targets: f, x: ande.x, y: ande.y, alpha: 0, duration: 1400, ease: 'Sine.easeIn', onUpdate: () => { f.x = Math.round(f.x); f.y = Math.round(f.y); this.smutsig = true; }, onComplete: () => { f.destroy(); this.smutsig = true; } });
+    // lyfter (95.6): baronen går ur leran till repstegen, klättrar upp i gondolen, och Herr Skata flyger efter. Sedan
+    // lossnar skeppet från masten, lyfter och flyger ut ur bild, och först då tas det bort (92.1)
+    const l = this.luft, fortojt = l?.fortojt ? l : null;
+    const stege = fortojt ? { x: fortojt.img.x + STEGE.x, y: fortojt.img.y + STEGE.nedre } : { x: b.x + b.b - 12, y: b.y - 40 };
+    const gondol = fortojt ? { x: fortojt.img.x + STEGE.x, y: fortojt.img.y + STEGE.ovre } : stege;
+    const GA = 600, KLATTRA = 700, LYFT = 1400;
+    if (baron) {
+      /** @type {any} */ (baron).iLeran = false; baron.setCrop();
+      const ram = (/** @type {string} */ r) => { if (baron.active && this.textures.get('baronen').has(r)) { baron.setFrame(r); this.smutsig = true; } };
+      let n = 0;
+      const gang = this.time.addEvent({ delay: 150, loop: true, callback: () => { n++; ram(`baronen_ga_upp_0${(n % 4) + 1}`); } });
+      ram('baronen_ga_upp_01');
+      this.tweens.add({
+        targets: baron, x: stege.x, y: stege.y, duration: GA, ease: 'Linear',
+        onUpdate: () => { baron.x = Math.round(baron.x); baron.y = Math.round(baron.y); /** @type {any} */ (baron).fot = baron.y; this.smutsig = true; },
+        onComplete: () => {
+          if (!baron.active) { gang.remove(); return; }
+          // på repstegen: framför stegen, med ryggen mot kameran
+          if (fortojt) { this.lagerFigurer.remove(baron); this.lagerLuft.add(baron); }
+          this.tweens.add({
+            targets: baron, y: gondol.y, duration: KLATTRA, ease: 'Linear',
+            onUpdate: () => { baron.y = Math.round(baron.y / 2) * 2; this.smutsig = true; },
+            onComplete: () => { gang.remove(); baron.destroy(); if (fortojt && this.luft === fortojt) { fortojt.img.setTexture('baronen', 'luftskepp_glider_01'); this.smutsig = true; } },
+          });
+        },
+      });
     }
-    this.bryggFig = [];
+    if (skata) {
+      if (this.textures.get('herr_skata').has('herr_skata_flyga_hoger_01')) skata.setFrame('herr_skata_flyga_hoger_01');
+      const mot = fortojt ? { x: fortojt.img.x + 56, y: fortojt.img.y + 44 } : stege;
+      this.tweens.add({
+        targets: skata, x: mot.x, y: mot.y, duration: GA + KLATTRA, ease: 'Sine.easeInOut',
+        onUpdate: () => { skata.x = Math.round(skata.x); skata.y = Math.round(skata.y); this.smutsig = true; },
+        onComplete: () => { skata.destroy(); if (fortojt && this.luft === fortojt && this.textures.get('baronen').has('luftskepp_skata_landar')) { fortojt.img.setTexture('baronen', 'luftskepp_skata_landar'); this.smutsig = true; } else if (!fortojt) this.smutsig = true; },
+      });
+    }
+    // bryggFig står kvar tills figurerna är borta (de tas bort när de har klättrat upp eller flugit dit)
     this.regiLogg.push('baronen lyfter från bryggan');
-    return 1500;
+    if (!fortojt) return 1500;
+    // repet till masten släpps, och skeppet lyfter snett uppåt åt höger ut ur bild
+    const img = fortojt.img;
+    fortojt.tider.push(this.time.delayedCall(GA + KLATTRA + 100, () => {
+      if (this.luft !== fortojt) return;
+      fortojt.rep?.destroy(); fortojt.rep = null;
+      this.regiLogg.push('luftskeppet lossnar från masten');
+      const k = this.kamera;
+      this.tweens.add({
+        targets: img, x: img.x + 90, y: k.y - img.height - 8, duration: LYFT, ease: 'Sine.easeIn',
+        onUpdate: () => { img.x = Math.round(img.x); img.y = Math.round(img.y); this.smutsig = true; },
+        onComplete: () => this.luftskeppBort(fortojt),
+      });
+    }));
+    return GA + KLATTRA + 100 + LYFT + 100;
+  }
+
+  /**
+   * Luftskeppet förtöjt vid bryggans mast (95.6), med repstegen nere på däcket, medan baronen sitter i leran. Gondolen
+   * är tom: baronen är ju i leran. Stil har ingen bild av den tomma gondolen än, så den görs av skeppets bild med
+   * baronen borttagen (gråbox). Ett rep går från skeppets akter till mässingskulan på masten.
+   * @param {{ x: number, y: number, b: number, h: number }} b bryggans däck
+   */
+  luftskeppFortojt(b) {
+    if (!this.textures.exists('baronen') || !this.textures.get('baronen').has('luftskepp_glider_01')) return;
+    if (this.luft) this.luftskeppBort(this.luft);
+    const mast = this.regiPunkter?.mast ?? { x: b.x + b.b - 17, y: 36 };
+    const tom = this.tomGondol();
+    // repstegens fot mitt på däcket, och aktern en bit väster om masten (repet syns)
+    const x0 = Math.round(mast.x - 137), y0 = Math.round(b.y + b.h / 2 - STEGE.nedre);
+    const img = this.add.image(x0, y0, tom.nyckel, tom.ram).setOrigin(0, 0);
+    this.lagerLuft.add(img);
+    const rep = this.add.graphics();
+    rep.lineStyle(1, 0x5a4a32, 1);
+    rep.lineBetween(x0 + AKTER.x, y0 + AKTER.y, mast.x - 1, mast.y);
+    this.lagerLuft.add(rep);
+    // förtöjt: det svävar inte (gung gör inget så länge glider är sant)
+    const gung = this.time.addEvent({ delay: 100000, loop: true, callback: () => {} });
+    this.luft = { img, lage: 'fortojt', tider: /** @type {Phaser.Time.TimerEvent[]} */ ([]), gung, glider: true, mal: { x: x0, y: y0 }, fortojt: true, rep };
+    this.regiLogg.push('luftskeppet förtöjt vid bryggan'); if (this.regiLogg.length > 160) this.regiLogg.shift();
+    this.smutsig = true;
+  }
+
+  /**
+   * Skeppet med tom gondol: `luftskepp_tom` om Stil har ritat den, annars skeppets bild med baronen borttagen
+   * (rutan mellan repen ovanför gondolen). Görs en gång. @returns {{ nyckel: string, ram: string | undefined }}
+   */
+  tomGondol() {
+    if (this.textures.get('baronen').has('luftskepp_tom')) return { nyckel: 'baronen', ram: 'luftskepp_tom' };
+    const nyckel = 'luftskepp_tom_gondol';
+    if (!this.textures.exists(nyckel)) {
+      const fr = this.textures.getFrame('baronen', 'luftskepp_glider_01');
+      const ct = this.textures.createCanvas(nyckel, fr.cutWidth, fr.cutHeight);
+      const ctx = /** @type {CanvasRenderingContext2D} */ (ct?.getContext());
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(/** @type {any} */ (fr.source.image), fr.cutX, fr.cutY, fr.cutWidth, fr.cutHeight, 0, 0, fr.cutWidth, fr.cutHeight);
+      // baronen sitter mellan repen (x 41–71) ovanför gondolens kant (y 38–59)
+      ctx.clearRect(41, 38, 31, 22);
+      ct?.refresh();
+    }
+    return { nyckel, ram: undefined };
   }
 
   /** Sidovyn tonas bort när han ska röra sig i rummet igen (in i skogen i början av k1s01). */

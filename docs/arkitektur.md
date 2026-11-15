@@ -1129,3 +1129,14 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Kvällen börjar utan `visas_forst`.** Kameran glider i stället med `rosa_vid_lyktorna` från den första lyktan till elden på udden, stannar där en stund och glider sedan tillbaka till hjälten. När elden tänds går hjälten till sin plats snett söder om den, också när han kommer österifrån.
 - **Baronen i leran** uppifrån vid bryggan växlar mellan Stils två bilder var 600 ms och går ur leran med sin vanliga gång.
 - **Duellfigurens ansikte** i pratrutan följer vad den gör: `portrattUttryck` i `karna/duellfigur.js` ger `forvirrad` när den tappar och backar och `yr` när den har trillat eller snurrat, annars grundbilden. `Rum.uttryck` frågar duellfiguren först.
+
+## 117. Luftskeppet vid bryggan och det han tar (0.86.0, beslut 95.6–95.7)
+- **Luftskeppet förtöjt vid bryggan** (`Rum.luftskeppFortojt`): när baronen och Herr Skata står vid bryggan uppifrån (`bryggfigurer('sitter')`) är skeppet förtöjt vid mässingskulan på masten (kartans punkt `regi_mast`). Ett rep går från aktern till masten, och repstegen står på däcket väster om brevhalvan. Gondolen är tom: skeppets bild med baronen borttagen (`tomGondol`), tills Stil ritar `luftskepp_tom`.
+- **`baronen_lyfter`:** baronen går ur leran till repstegen och klättrar upp, och Herr Skata flyger efter. Sedan släpps repet, och skeppet lyfter snett uppåt ut ur bild och tas bort (`luftskeppBort`, 92.1).
+- **Efter en omstart mitt i scenen** står baronen, Herr Skata och skeppet där igen (`REGI_STAR_KVAR` i `spel.js`: efter `under_bryggan` och före `baronen_lyfter`).
+- **Det han tar ligger inte kvar** (`tasISteget` och `tagetIKapitlet` i `spel.js`), också efter en omstart och när han kommer tillbaka till rummet senare:
+  - ett mål med `leta: true` (fjädern);
+  - en sak som dalar ned till honom (`landar_nara`, kartbiten);
+  - ett mål som han sedan bär i scenen (brevhalvan på bryggan: `ga_till brev_halva_1` följt av `bara` med bilden `brev_halva`);
+  - det han lyfter i P26 med verbet `lyfta` när det är det han hittar (pinnarna);
+  - föremålet som en regi tar (`REGI_TAR`: halvan i vattnet som flyger till hans hand).

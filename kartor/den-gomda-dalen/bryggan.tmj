@@ -11,7 +11,7 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 13,
+ "nextobjectid": 14,
  "properties": [
   {
    "name": "bild",
@@ -83,6 +83,18 @@
     },
     {
      "id": 3,
+     "name": "regi_mast",
+     "type": "",
+     "x": 303,
+     "y": 36,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 4,
      "name": "",
      "type": "vagg",
      "x": 120,
@@ -100,7 +112,7 @@
      ]
     },
     {
-     "id": 4,
+     "id": 5,
      "name": "",
      "type": "vagg",
      "x": 120,
@@ -118,7 +130,7 @@
      ]
     },
     {
-     "id": 5,
+     "id": 6,
      "name": "brygga",
      "type": "sak",
      "x": 120,
@@ -141,7 +153,7 @@
      ]
     },
     {
-     "id": 6,
+     "id": 7,
      "name": "brev_halva_1",
      "type": "sak",
      "x": 256,
@@ -164,7 +176,7 @@
      ]
     },
     {
-     "id": 7,
+     "id": 8,
      "name": "fisk_hopp",
      "type": "sak",
      "x": 180,
@@ -187,7 +199,7 @@
      ]
     },
     {
-     "id": 8,
+     "id": 9,
      "name": "leran_brygga",
      "type": "sak",
      "x": 80,
@@ -215,7 +227,7 @@
      ]
     },
     {
-     "id": 9,
+     "id": 10,
      "name": "skylt_lera_brygga",
      "type": "sak",
      "x": 96,
@@ -238,7 +250,7 @@
      ]
     },
     {
-     "id": 10,
+     "id": 11,
      "name": "fagel_214_62",
      "type": "omgivning",
      "x": 214,
@@ -256,7 +268,7 @@
      ]
     },
     {
-     "id": 11,
+     "id": 12,
      "name": "",
      "type": "vagg",
      "x": 0,
@@ -267,7 +279,7 @@
      "visible": true
     },
     {
-     "id": 12,
+     "id": 13,
      "name": "",
      "type": "vagg",
      "x": 0,

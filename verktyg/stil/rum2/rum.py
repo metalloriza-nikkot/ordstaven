@@ -189,8 +189,29 @@ def tant_rosas_hus():
     d.rekt(258, 40, 26, 30, '#3A3A44'); d.rekt(258, 40, 26, 3, '#5A5A66'); d.ellips(271, 60, 5, 4, '#C23A2E', '#6A2420'); d.ellips(271, 60.5, 2.2, 1.6, '#E8D07A')   # spisen: glöd i rött med en blekgul kärna, inte orange (orange är baronens)
     for y in range(4, 40): d.satt(266, y, '#3A3A44'); d.satt(267, y, '#5A5A66')
     d.bild(INK + '/foremal/hus/fatolj_hoger.png', 230, 84)                  # gungstolen
+    d.bild(INK + '/foremal/hus/dorr_fram_ute.png', 160, 192)              # dörren ut i södra väggen, på utgången dorr_ut (92.8)
+    for y in range(160, 176):                                              # dagsljuset från dörren faller in på golvet, så att dörren syns
+        bredd = 12 + (y - 160) // 2
+        for x in range(160 - bredd, 160 + bredd):
+            if (x + y) % 2 == 0 and (y > 165 or (x + y) % 4 == 0): d.satt(x, y, '#E0B888')
     kras_ihop(d)
+    zonens_farger(d)
     return d
+
+def zonens_farger(d):
+    """Färger som inte redan finns i träskets zon byts mot den närmaste som finns (zonen har 254 av 256)."""
+    import glob
+    T = set()
+    for m in ['rum/kap-02/*', 'foremal/trask/*', 'figurer/tant_rosa/*', 'figurer/hjalte/*', 'figurer/unge/*']:
+        for f in glob.glob(INK + '/' + m):
+            if f.endswith('.png'):
+                T |= {c[1][:3] for c in Image.open(f).convert('RGBA').getcolors(1 << 20) if c[1][3]}
+    T = list(T); TS = set(T); px = d.im.load()
+    for y in range(d.im.height):
+        for x in range(d.im.width):
+            c = px[x, y]
+            if c[3] and c[:3] not in TS:
+                px[x, y] = min(T, key=lambda t: sum((a - b) ** 2 * w for a, b, w in zip(c, t, (3, 4, 2)))) + (255,)
 
 def kras_ihop_alfa(d):
     """Som kras_ihop, men det genomskinliga står kvar genomskinligt."""

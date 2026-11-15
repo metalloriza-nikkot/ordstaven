@@ -901,8 +901,12 @@ export function skapaSpel(d) {
       const p = b.pussel(o.forsvinnerEfter);
       if (losta.has(o.forsvinnerEfter) || (p?.typ === 'P11_formel' && !iFrivilligt(p.id) && formler.includes(p.svar)) || pusselForbi(o.forsvinnerEfter)) borta.add(o.id);
     }
-    // det han redan har plockat upp i scenen (ett mål med leta: true, vedpinnarna 78.4) ligger inte kvar, också efter en omstart
-    if (b.scen?.rum === r.id) for (const id of letatIScenen()) if (iRummet.has(id) && plockas((kartor[r.id]?.objekt || []).find((/** @type {any} */ o) => o.id === id))) borta.add(id);
+    // det han redan har tagit i kapitlet ligger inte kvar, också efter en omstart och när han kommer tillbaka till
+    // rummet senare (80.3, 95.7): fjädern, brevhalvorna, kartbiten och pinnarna
+    for (const [id, regi] of tagetIKapitlet()) {
+      if (!iRummet.has(id)) continue;
+      if (regi || plockas((kartor[r.id]?.objekt || []).find((/** @type {any} */ o) => o.id === id))) borta.add(id);
+    }
     return borta.size ? r.innehall.filter((/** @type {any} */ x) => !borta.has(typeof x === 'string' ? x : x.id)) : r.innehall;
   }
   /**
@@ -910,13 +914,43 @@ export function skapaSpel(d) {
    * kartans nas_nara) ligger kvar.
    */
   function plockas(/** @type {any} */ o) { return o?.sort === 'sak' && !o.nasNara; }
+  /** Regier där han tar något som inte går att nå (halvan ute i vattnet flyger till hans hand, 69.5). */
+  const REGI_TAR = /** @type {Record<string, string>} */ ({ halvan_flyger_till_handen: 'brev_halva_vatten' });
   /**
-   * Målen med leta: true som han redan har nått i scenen som pågår (stegen före det nuvarande). Under "Var var vi?"
-   * efter en omstart är stegIndex -1, och steget han fortsätter vid står i sparningen. @returns {string[]}
+   * Tar han det steget pekar på (95.7)? Ett mål med leta: true, en sak som dalade ned till honom (landar_nara), ett
+   * mål som han sedan bär i scenen (brevhalvan på bryggan: ga_till brev_halva_1, och senare bara med bilden
+   * brev_halva), och det han lyfter i ett P26 med verbet lyfta när det är det han hittar (pinnarna). Regierna i
+   * REGI_TAR tar sitt föremål. @param {any[]} steg scenens steg @param {number} ti @param {any[]} objekt kartornas föremål
+   * @returns {Array<[string, boolean]>} id och om det togs av en regi
    */
-  function letatIScenen() {
-    const i = b.stegIndex < 0 ? (av.steg ?? 0) : b.stegIndex;
-    return (b.scen?.steg || []).slice(0, i).filter((/** @type {any} */ st) => st.typ === 'ga_till' && st.leta && st.mal).map((/** @type {any} */ st) => st.mal);
+  function tasISteget(steg, ti, objekt) {
+    const st = steg[ti];
+    if (st.typ === 'ga_till' && st.mal) {
+      const o = objekt.find((/** @type {any} */ x) => x.id === st.mal);
+      const bars = steg.slice(ti + 1).some((/** @type {any} */ x) => x.typ === 'bara' && x.bild && (x.bild === st.mal || st.mal.startsWith(x.bild + '_')));
+      return st.leta || o?.landarNara || bars ? [[st.mal, false]] : [];
+    }
+    if (st.typ === 'mellanscen' && REGI_TAR[st.bild]) return [[REGI_TAR[st.bild], true]];
+    if (st.typ === 'pussel') {
+      const p = b.pussel(st.pussel_id);
+      if (p?.typ === 'P26_krukorna' && p.verb === 'lyfta') {
+        const fynd = (p.innehall || []).filter((/** @type {string} */ f) => f && f !== 'tom');
+        return (p.foremal || []).filter((/** @type {string} */ id) => fynd.some((/** @type {string} */ f) => id === f || id.startsWith(f + '_'))).map((/** @type {string} */ id) => [id, false]);
+      }
+    }
+    return [];
+  }
+  /** Det han har tagit med sig hittills i kapitlet (stegen som är gjorda, 95.7). @returns {Array<[string, boolean]>} */
+  function tagetIKapitlet() {
+    const sc = b?.kapitel?.scener || [], ut = /** @type {Array<[string, boolean]>} */ ([]);
+    const objekt = (b?.kapitel?.rum || []).flatMap((/** @type {any} */ r) => kartor[r.id]?.objekt || []);
+    sc.forEach((/** @type {any} */ s, si) => {
+      if (s.frivillig) return;
+      // som gjordaSteg: stegen före det han är vid är gjorda
+      const nu = b.scenIndex === si ? Math.max(b.stegIndex, av.scen === si ? (av.steg ?? -1) : -1) : -1;
+      (s.steg || []).forEach((/** @type {any} */ _, ti) => { if (b.scenIndex > si || nu > ti) ut.push(...tasISteget(s.steg, ti, objekt)); });
+    });
+    return ut;
   }
   /**
    * Det som har bytt bild (kartans bild_sedan och sedan, Teknik 3): häcken med hålet när hålet har visats, stubben med
@@ -1023,6 +1057,22 @@ export function skapaSpel(d) {
    * @param {any} [scen] scenen vars rum ska visas: berättelsens, eller en frivillig scen (buskarna)
    * @param {any} [steg] steget som ska utföras (annars berättelsens aktuella), för närbilden
    */
+  /**
+   * Regier vars figurer står kvar i rummet tills en senare regi i samma scen (95.6): efter en omstart mitt i scenen vid
+   * bryggan står baronen i leran, Herr Skata på pålen och luftskeppet vid masten igen, som efter sidovyn.
+   */
+  const REGI_STAR_KVAR = /** @type {Record<string, { tills: string, gor: () => any }>} */ ({ under_bryggan: { tills: 'baronen_lyfter', gor: () => rum.bryggfigurer('sitter') } });
+  /** @param {any} scen */
+  function regierSomStarKvar(scen) {
+    if (scen.id !== b?.scen?.id) return;
+    const nu = Math.max(b.stegIndex, av.scen === b.scenIndex ? (av.steg ?? -1) : -1);
+    const steg = b.scen.steg || [];
+    const vid = (/** @type {string} */ bild) => steg.findIndex((/** @type {any} */ st) => st.typ === 'mellanscen' && st.bild === bild);
+    for (const [bild, { tills, gor }] of Object.entries(REGI_STAR_KVAR)) {
+      const fore = vid(bild), efter = vid(tills);
+      if (fore >= 0 && fore < nu && (efter < 0 || efter >= nu)) gor();
+    }
+  }
   /** Scenen där hjälten senast sov (en gång per scen). */
   let sovitI = /** @type {string | null} */ (null);
   async function visaScen(scen = b.scen, steg = undefined) {
@@ -1051,6 +1101,7 @@ export function skapaSpel(d) {
       karta: scen.rum ? kartor[scen.rum] ?? null : null, franRum, delar: scen.rum ? delarIRummet(kartor[scen.rum]) : {}, visade: scen.rum ? b.visade(scen.rum) : [] });
     if (nytt) rullning.rumOppnat(); // rummet laddas: glapp nu säger inget om datorn (75.6)
     if (scen.rum) bildlagen();
+    if (scen.rum && nytt) regierSomStarKvar(scen);
     visaRumsskyltar();
     // hjälten sover i sängen när scenen börjar så (scenens hjalte: "sover"), tills han ska röra sig
     if (scen.hjalte === 'sover' && scen === b?.scen && b.stegIndex <= 0 && sovitI !== scen.id) { sovitI = scen.id; rum.sov(); }
@@ -1736,7 +1787,8 @@ export function skapaSpel(d) {
     // ett mål han letar efter (leta: true, vedpinnarna 78.4) plockar han upp: det ligger inte kvar
     const letat = rum.ruta(st.mal);
     // ...och så gör han med en sak som dalade ned till honom (landar_nara, 92.7): kartbiten tar han med sig
-    if ((st.leta || letat?.landarNara) && plockas(letat)) { rum.gomForemal(st.mal, true); logg.handelse('plockar upp', st.mal); }
+    // ...och en sak han sedan bär (brevhalvan på bryggan, 95.7): han tar den, och den ligger inte kvar på bryggan
+    if (b.scen && tasISteget(b.scen.steg, b.stegIndex, rum.objekt).length && plockas(letat)) { rum.gomForemal(st.mal, true); logg.handelse('plockar upp', st.mal); }
     const dorr = rum.ruta(st.mal);
     if (dorr?.sort === 'utgang' && !dorr.klattra && !dorr.golv) {
       const scener = b.kapitel.scener, sista = b.stegIndex === (b.scen?.steg?.length ?? 0) - 1;

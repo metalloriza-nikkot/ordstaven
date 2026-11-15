@@ -498,16 +498,43 @@ test('under bryggan (42.6, Stil del 3b): sidovyn med baronen som gräver, Herr S
   expect(baron.x).toBeGreaterThan(b.x); expect(baron.x).toBeLessThan(b.x + b.b); expect(baron.y).toBeGreaterThan(b.y + b.h);
   expect(skata.ram).toBe('herr_skata_sitta_hoger_01');
   expect(skata.x).toBeGreaterThan(b.x); expect(skata.x).toBeLessThan(baron.x); expect(skata.y).toBeLessThanOrEqual(b.y);
+  // 95.6: luftskeppet är förtöjt vid masten så länge baronen är här, med repstegen nere på däcket och ett rep till masten
+  const luft = () => O(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); const l = r.luft; return l ? { fortojt: !!l.fortojt, rep: !!l.rep?.active, x: l.img.x, y: l.img.y, b: l.img.width, h: l.img.height, ram: l.img.frame.name, nyckel: l.img.texture.key, synlig: l.img.visible } : null; });
+  const skepp = await luft();
+  expect(skepp).toMatchObject({ fortojt: true, rep: true, synlig: true });
+  const stegeFot = { x: skepp.x + 78, y: skepp.y + 95 };
+  expect(stegeFot.x).toBeGreaterThan(b.x); expect(stegeFot.x).toBeLessThan(b.x + b.b);
+  expect(stegeFot.y).toBeGreaterThanOrEqual(b.y); expect(stegeFot.y).toBeLessThanOrEqual(b.y + b.h);
+  expect(skepp.x + skepp.b).toBeLessThanOrEqual(320); expect(skepp.y).toBeGreaterThanOrEqual(0); // hela skeppet i bild
+  // gondolen är tom: ingen baron i den (han sitter ju i leran)
+  expect(skepp.ram === 'luftskepp_tom' || skepp.nyckel === 'luftskepp_tom_gondol').toBe(true);
+  const halva = await O(() => window.__ORDSTAVEN.ruta('brev_halva_1'));
+  if (halva) expect(stegeFot.x < halva.x - 4 || stegeFot.x > halva.x + halva.b + 4, 'stegen står inte på halvan').toBe(true);
   await page.screenshot({ path: 'test-results/regi-bryggan-uppifran.png' });
   // Herr Skata ramlar av pålen, och baronen lyfter: de är borta ur rummet
   expect(await O(() => window.__ORDSTAVEN.regi('skata_ramlar_av_palen'))).toBeGreaterThan(0);
   await page.waitForTimeout(200);
   expect((await fig())[1].ram).toMatch(/^herr_skata_krascha_hoger_0[1-4]$/);
   await page.waitForTimeout(900);
-  expect(await O(() => window.__ORDSTAVEN.regi('baronen_lyfter'))).toBeGreaterThan(0);
-  await page.waitForTimeout(1700);
+  const lyft = await O(() => window.__ORDSTAVEN.regi('baronen_lyfter'));
+  expect(lyft).toBeGreaterThan(2000);
+  // han går till repstegen och klättrar upp, och skeppet lyfter med honom ut ur bild (95.6)
+  const baronRamar = new Set(), skeppRamar = new Set();
+  let bildtagen = false, hogst = skepp.y;
+  for (let t = 0; t < lyft + 600; t += 100) {
+    await page.waitForTimeout(100);
+    for (const f of await fig()) if (f.ram.startsWith('baronen_')) baronRamar.add(f.ram);
+    const l = await luft();
+    if (l) { skeppRamar.add(l.ram); hogst = Math.min(hogst, l.y); }
+    if (!bildtagen && l && l.y < skepp.y - 20) { bildtagen = true; await page.screenshot({ path: 'test-results/regi-baronen-lyfter.png' }); }
+  }
+  expect([...baronRamar].some((r) => /^baronen_ga_upp_0[1-4]$/.test(r))).toBe(true);
+  expect([...skeppRamar].some((r) => r === 'luftskepp_glider_01' || r === 'luftskepp_skata_landar')).toBe(true);
+  expect(hogst).toBeLessThan(0); // ut ur bild uppåt
   expect(await fig()).toEqual([]);
-  expect((await O(() => window.__ORDSTAVEN.grafik())).regi).toContain('baronen lyfter från bryggan');
+  expect(await luft()).toBeNull();
+  const regiNu = (await O(() => window.__ORDSTAVEN.grafik())).regi;
+  for (const r of ['luftskeppet förtöjt vid bryggan', 'baronen lyfter från bryggan', 'luftskeppet lossnar från masten', 'luftskeppet borta']) expect(regiNu).toContain(r);
 });
 
 test('kartbiten från tavlan (92.7): den har sin bild, dalar ned nära hjälten och tas med ett tryck', async ({ page }) => {
@@ -599,4 +626,50 @@ test('pinnarna till elden (92.9, 93.5): han tar dem i den ordning han vill, och 
     await page.waitForTimeout(300);
   }
   expect(await O(() => window.__ORDSTAVEN.steg()?.mal)).toBe('lagereld');
+});
+
+test('det han tar i kapitel 2 ligger inte kvar (80.3, 95.7): före ligger det där, efteråt är det borta, också efter en omstart', async ({ page }) => {
+  test.setTimeout(240000);
+  const O = (f, a) => page.evaluate(f, a);
+  const steg = (scen, f) => kap2.scener.find((s) => s.id === scen).steg.findIndex(f);
+  const fall = [
+    { id: 'fjader', scen: 'k2s02_byn', rum: 'byn', i: steg('k2s02_byn', (st) => st.typ === 'ga_till' && st.mal === 'fjader') },
+    { id: 'brev_halva_1', scen: 'k2s04_bryggan', rum: 'bryggan', i: steg('k2s04_bryggan', (st) => st.typ === 'ga_till' && st.mal === 'brev_halva_1') },
+    { id: 'brev_halva_vatten', scen: 'k2s05_vassen', rum: 'vassen', i: steg('k2s05_vassen', (st) => st.bild === 'halvan_flyger_till_handen') },
+    { id: 'kartbit_3', scen: 'k2s08_huset', rum: 'tant_rosas_hus', i: steg('k2s08_huset', (st) => st.typ === 'ga_till' && st.mal === 'kartbit_3'), extra: { lappar: ['k2_tavlorna'] }, efter: ['k2s09_kartbiten', 0] },
+    { id: 'ved_2', scen: 'k2s10_elden', rum: 'byn', i: steg('k2s10_elden', (st) => st.pussel_id === 'k2_pinnarna'), extra: { rumstillstand: { byn: 'kvall' } } },
+  ];
+  const finns = (id) => O((id) => !!window.__ORDSTAVEN.ruta(id), id);
+  for (const f of fall) {
+    expect(f.i, f.id).toBeGreaterThanOrEqual(0);
+    await sparadI(page, 'kap-02', f.scen, f.i, { visade: { [f.rum]: [f.id] }, ...f.extra });
+    expect(await finns(f.id), `${f.id} ligger där innan han tar det`).toBe(true);
+    // steget efter (det sista steget i scenen: nästa scen i samma rum)
+    await sparadI(page, 'kap-02', f.efter?.[0] ?? f.scen, f.efter?.[1] ?? f.i + 1, { visade: { [f.rum]: [f.id] }, ...f.extra });
+    expect(await finns(f.id), `${f.id} är borta när han har tagit det`).toBe(false);
+  }
+  // och när han kommer tillbaka till rummet i en senare scen: fjädern på torget
+  await sparadI(page, 'kap-02', 'k2s03_torget', 0, { visade: { byn: ['fjader', 'tant_rosa', 'brevram'] } });
+  expect(await finns('fjader')).toBe(false);
+});
+
+test('brevhalvan på bryggan (95.7): han tar den, och den ligger inte kvar på bryggan', async ({ page }) => {
+  test.setTimeout(90000);
+  const O = (f, a) => page.evaluate(f, a);
+  const i = kap2.scener.find((s) => s.id === 'k2s04_bryggan').steg.findIndex((st) => st.typ === 'ga_till' && st.mal === 'brev_halva_1');
+  await sparadI(page, 'kap-02', 'k2s04_bryggan', i, { visade: { bryggan: ['brev_halva_1'] } });
+  const o = await O(() => window.__ORDSTAVEN.ruta('brev_halva_1'));
+  expect(o).toBeTruthy();
+  // efter en omstart mitt i scenen står baronen i leran och luftskeppet vid masten igen (95.6)
+  expect(await O(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); return { skepp: !!r.luft?.fortojt, figurer: (r.bryggFig || []).filter((f) => f.active).length }; })).toEqual({ skepp: true, figurer: 2 });
+  for (let n = 0; n < 60 && !(await O(() => window.__ORDSTAVEN.logg())).includes('[plockar upp] brev_halva_1'); n++) {
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    await O(([x, y]) => window.__ORDSTAVEN.gaMot(x, y), [o.x + o.b / 2, o.y + o.h + 6]);
+    if (n % 4 === 3) await page.keyboard.press('Space');
+    await page.waitForTimeout(250);
+  }
+  expect(await O(() => window.__ORDSTAVEN.logg())).toContain('[plockar upp] brev_halva_1');
+  expect(await O(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').dolda.has('brev_halva_1'))).toBe(true);
+  await page.waitForTimeout(600);
+  await page.screenshot({ path: 'test-results/regi-brevhalvan-tagen.png' });
 });

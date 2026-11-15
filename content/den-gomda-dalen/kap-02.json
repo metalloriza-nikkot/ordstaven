@@ -16,7 +16,7 @@
  },
  "meta": {
   "namn": "Träsket",
-  "version": "0.7.8",
+  "version": "0.7.9",
   "datum": "2026-11-13",
   "agare": "Innehåll",
   "kalla": "Manus 17-kapitel2-manus.md v0.4 (beslut 60–64). Ny fil.",
@@ -36,7 +36,8 @@
   "andrat_v075": "2026-11-13 (beslut 86.8.1, Tekniks lista): bild på fem mellanscener, under_bryggan i k2s04 steg 0, brevram_nara i k2s04 steg 16, k2s05 steg 18 och k2s07 steg 0, och kartbit_unge i k2s09 steg 0. Ingen text är ändrad.",
   "andrat_v076": "2026-11-13 (beslut 88.3): trollsländans mellanscen i träskkanten får bild trollslanda_landar (regin finns sedan 0.74.0). Ingen text ändrad.",
   "andrat_v077": "2026-11-14 (beslut 92.3, 92.5, 92.6 och 92.9): byborna jublar och fiskaren går ut på bryggan när skylten är avslöjad, hjälten går till brevhalvan före läsningen, Tant Rosas replik om tavlan håller, och kvällen börjar med lyktorna och sedan pinnarna i fri ordning.",
-  "andrat_v078": "2026-11-14 (beslut 93.4): regierna skata_ramlar_av_palen och baronen_lyfter på två mellanscener i k2s04_bryggan. Ingen text ändrad."
+  "andrat_v078": "2026-11-14 (beslut 93.4): regierna skata_ramlar_av_palen och baronen_lyfter på två mellanscener i k2s04_bryggan. Ingen text ändrad.",
+  "andrat_v079": "2026-11-15 (beslut 95.3–95.5): brevet syns som ett brev efter rivningen, och Tant Rosa säger att Herr Skata snappade hennes brev från Farfar. Det heter brevhalva i allt han hör och läser (id:n oförändrade), och vid bryggan sitter baronen fast. Inga nya repliker, och pass 2 är inte längre."
  },
  "var_var_vi": [
   {
@@ -83,7 +84,7 @@
    "kort": [
     {
      "talare": "farfar",
-     "text": "Var var vi? Hitta brevets två halvor!",
+     "text": "Var var vi? Hitta de två brevhalvorna!",
      "upplast": true,
      "via": "radio"
     }
@@ -97,7 +98,7 @@
     },
     {
      "talare": "farfar",
-     "text": "Herr Skata rev det i två halvor.",
+     "text": "Herr Skata snappade det, och det gick itu.",
      "upplast": true,
      "via": "radio"
     },
@@ -112,13 +113,13 @@
   {
    "pass": 3,
    "ord": {
-    "ord": "halva",
+    "ord": "brevhalva",
     "bild": "brev_halva"
    },
    "kort": [
     {
      "talare": "farfar",
-     "text": "Var var vi? En halva är kvar.",
+     "text": "Var var vi? En brevhalva är kvar.",
      "upplast": true,
      "via": "radio"
     }
@@ -132,7 +133,7 @@
     },
     {
      "talare": "farfar",
-     "text": "En halva sitter redan i ramen.",
+     "text": "En brevhalva sitter redan i ramen.",
      "upplast": true,
      "via": "radio"
     },
@@ -735,12 +736,12 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Brevet går mitt itu. Baronens halva stannar i hans hand, och luftskeppet sjunker mot bryggan.",
+     "beskrivning": "Brevet går mitt itu. Baronens brevhalva stannar i hans hand, och luftskeppet sjunker mot bryggan.",
      "ljud": "baron"
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Den andra halvan fladdrar ner mot vassen och landar i vattnet. En svartvit fjäder från Herr Skata dalar ner."
+     "beskrivning": "Den andra brevhalvan fladdrar ner mot vassen och landar i vattnet. En svartvit fjäder från Herr Skata dalar ner."
     },
     {
      "typ": "ljud",
@@ -750,7 +751,7 @@
     {
      "typ": "replik",
      "talare": "berattare",
-     "text": "En halva till bryggan och en i vassen!",
+     "text": "Baronen och Herr Skata rev ett brev!",
      "upplast": true
     },
     {
@@ -801,20 +802,20 @@
     {
      "typ": "replik",
      "talare": "tant_rosa",
-     "text": "Är du {hjalte}? Jag är Rosa, Farfars vän.",
+     "text": "Är du {hjalte}? Herr Skata snappade mitt brev!",
      "upplast": true
     },
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Hej, Rosa! Jag minns inte var biten är!",
+     "text": "Hej, Rosa! Var biten är står i det brevet.",
      "upplast": true,
      "via": "radio"
     },
     {
      "typ": "replik",
      "talare": "tant_rosa",
-     "text": "Han skrev var, för länge sen. Hämta halvorna!",
+     "text": "Baronen drog också. Hitta brevhalvorna!",
      "upplast": true
     },
     {
@@ -823,7 +824,7 @@
      "valfri": false
     }
    ],
-   "anteckning": "76.4 (B6): brevet rivs i tre steg. Herr Skata nafsar och baronen drar, RITS, baronens halva åker till bryggan, och den andra landar i vattnet vid vassen, PLASK. Berättaren pekar ut båda halvorna, och sedan landar fjädern (75.4: nära hjälten). Byn är i tillståndet morgon, utan rep: baronen spärrar vägarna efter landningen, och repen syns först i pass 2. Herr Skata har redan tagit brevet från Tant Rosas trappa, och Tant Rosa syns inte förrän hon öppnar sin dörr (77.4). Farfars tidslinje (B9, 06 §2): han gömde biten hos Rosa för länge sen och skrev var i ett brev, så att han inte skulle glömma. Rosa fick inte öppna det förrän hans barnbarn kom. Nu minns han inte var, och brevet behövs. Högst tre repliker i rad (76.3). 77.4: pass 1 har ett läsval i världen (k2_husen). Farfar säger på radion att brevet var hans och att det står på baksidan av hans lista var vännen bor. Spelaren läser listan och knackar på ett av fyra hus. Vid rätt dörr kommer Tant Rosa ut, och brevramen syns på dörren. HALLÅ!, ungen som springer mot torget och KOM HIT! är strukna, och närbilden av brevramen också, eftersom ramen syns på dörren när den går upp (vid_ratt). Efter läsvalet är det fem passiva steg i rad med Tekniks räkning (visa_foremal räknas) och tre repliker. 80.3: ga_till fjader har leta: true. Han hämtar fjädern och stoppar den i ryggsäcken, så den plockas upp och ligger inte kvar på marken, och steget räknas som vila."
+   "anteckning": "76.4 (B6): brevet rivs i tre steg. Herr Skata nafsar och baronen drar, RITS, baronens halva åker till bryggan, och den andra landar i vattnet vid vassen, PLASK. Berättaren pekar ut båda halvorna, och sedan landar fjädern (75.4: nära hjälten). Byn är i tillståndet morgon, utan rep: baronen spärrar vägarna efter landningen, och repen syns först i pass 2. Herr Skata har redan tagit brevet från Tant Rosas trappa, och Tant Rosa syns inte förrän hon öppnar sin dörr (77.4). Farfars tidslinje (B9, 06 §2): han gömde biten hos Rosa för länge sen och skrev var i ett brev, så att han inte skulle glömma. Rosa fick inte öppna det förrän hans barnbarn kom. Nu minns han inte var, och brevet behövs. Högst tre repliker i rad (76.3). 77.4: pass 1 har ett läsval i världen (k2_husen). Farfar säger på radion att brevet var hans och att det står på baksidan av hans lista var vännen bor. Spelaren läser listan och knackar på ett av fyra hus. Vid rätt dörr kommer Tant Rosa ut, och brevramen syns på dörren. HALLÅ!, ungen som springer mot torget och KOM HIT! är strukna, och närbilden av brevramen också, eftersom ramen syns på dörren när den går upp (vid_ratt). Efter läsvalet är det fem passiva steg i rad med Tekniks räkning (visa_foremal räknas) och tre repliker. 80.3: ga_till fjader har leta: true. Han hämtar fjädern och stoppar den i ryggsäcken, så den plockas upp och ligger inte kvar på marken, och steget räknas som vila. 95.3: brevet först och halvorna sedan. Efter rivningen läser han att baronen och Herr Skata rev ett brev, och Tant Rosa säger att det var hennes brev från Farfar, som Herr Skata snappade (skatan tar det som blänker, sigillet i mässing). Lika många repliker som förut."
   },
   {
    "id": "k2s03_torget",
@@ -858,13 +859,13 @@
     {
      "typ": "replik",
      "talare": "tant_rosa",
-     "text": "En halva är vid bryggan. En är i vassen.",
+     "text": "En brevhalva är vid bryggan. En är i vassen.",
      "upplast": true
     },
     {
      "typ": "replik",
      "talare": "berattare",
-     "text": "Hitta brevets två halvor!",
+     "text": "Hitta de två brevhalvorna!",
      "upplast": true
     },
     {
@@ -890,7 +891,7 @@
       {
        "typ": "replik",
        "talare": "berattare",
-       "text": "Hitta den andra halvan!",
+       "text": "Hitta den andra brevhalvan!",
        "upplast": true
       }
      ],
@@ -936,7 +937,7 @@
     {
      "typ": "replik",
      "talare": "berattare",
-     "text": "Baronen har inte läst den heller!",
+     "text": "Baronen läste inte heller. Han sitter fast!",
      "upplast": true
     },
     {
@@ -946,7 +947,7 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Baronen viftar med sin halva av brevet. Den glider ur handen och seglar upp på bryggan."
+     "beskrivning": "Baronen viftar med sin brevhalva. Den glider ur handen och seglar upp på bryggan."
     },
     {
      "typ": "visa_foremal",
@@ -955,7 +956,7 @@
     {
      "typ": "replik",
      "talare": "berattare",
-     "text": "Hämta halvan!",
+     "text": "Hämta brevhalvan!",
      "upplast": true
     },
     {
@@ -996,7 +997,7 @@
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Han har min gamla bit! Ta halvan till Rosa!",
+     "text": "Han har min gamla bit! Ta brevhalvan till Rosa!",
      "upplast": true,
      "via": "radio"
     },
@@ -1007,17 +1008,17 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Närbild: halvan sätts i ramen. Den passar i sin rivna kontur.",
+     "beskrivning": "Närbild: brevhalvan sätts i ramen. Den passar i sin rivna kontur.",
      "bild": "brevram_nara"
     },
     {
      "typ": "replik",
      "talare": "tant_rosa",
-     "text": "En halva i ramen!",
+     "text": "En brevhalva i ramen!",
      "upplast": true
     }
    ],
-   "anteckning": "Spelarens regel (38.5) i spelet: baronen läser inget högt (63.6), så barnet läser raden först (las_skylt väntar tills han har läst). Sedan visas samma rad igen med INTE i guld (oppna_lasplatta med skylt och lys_ord, se meta.teknik), och det är därför baronen förstår. Farfars knep svarar på oron för baronens kartbit. Bit 7 planteras (06 §2). Halvan bärs till ramen i byn och sätts dit direkt (63.7): bara går här från bryggan till byn. Bilden brevram_halva är ramen med en eller två halvor, efter hur många som sitter där. 72.7: baronen står i lera, inte i vatten, och det blir ett skämt med INTE. Farfars skylt GÅ INTE I LERAN! står vid bryggans landände, och spelaren läser den en gång till utan val. Baronen har inte läst den heller (spelarens regel, 38.5): han sitter fast, och Herr Skata drar upp honom i hjälmen. 76.4 (B2, B3, B8): bryggan har ett läsval (k2_halvan), och spelaren väljer den mening som står på Farfars halva. Fem repliker är strukna (ta brevet, Farfars knep, baronen har också en kartbit, den som inte läser noga, och gå till Tant Rosa), och baronens två repliker är en. Farfar känner igen baronens bit på radion. Svaret på hur baronen fick den kommer i kapitel 3 (72.9). Högst fem passiva steg i rad (76.3). 92.5: hjälten går fram till halvan på bryggan innan han läser den (val görs i världen). 93.4: Herr Skata ramlar av pålen (skata_ramlar_av_palen) och baronen far iväg i luftskeppet (baronen_lyfter), så att de inte står kvar vid bryggan."
+   "anteckning": "Spelarens regel (38.5) i spelet: baronen läser inget högt (63.6), så barnet läser raden först (las_skylt väntar tills han har läst). Sedan visas samma rad igen med INTE i guld (oppna_lasplatta med skylt och lys_ord, se meta.teknik), och det är därför baronen förstår. Farfars knep svarar på oron för baronens kartbit. Bit 7 planteras (06 §2). Halvan bärs till ramen i byn och sätts dit direkt (63.7): bara går här från bryggan till byn. Bilden brevram_halva är ramen med en eller två halvor, efter hur många som sitter där. 72.7: baronen står i lera, inte i vatten, och det blir ett skämt med INTE. Farfars skylt GÅ INTE I LERAN! står vid bryggans landände, och spelaren läser den en gång till utan val. Baronen har inte läst den heller (spelarens regel, 38.5): han sitter fast, och Herr Skata drar upp honom i hjälmen. 76.4 (B2, B3, B8): bryggan har ett läsval (k2_halvan), och spelaren väljer den mening som står på Farfars halva. Fem repliker är strukna (ta brevet, Farfars knep, baronen har också en kartbit, den som inte läser noga, och gå till Tant Rosa), och baronens två repliker är en. Farfar känner igen baronens bit på radion. Svaret på hur baronen fick den kommer i kapitel 3 (72.9). Högst fem passiva steg i rad (76.3). 92.5: hjälten går fram till halvan på bryggan innan han läser den (val görs i världen). 93.4: Herr Skata ramlar av pålen (skata_ramlar_av_palen) och baronen far iväg i luftskeppet (baronen_lyfter), så att de inte står kvar vid bryggan. 95.4–95.5: det heter brevhalva i allt han hör och läser, och spelet säger att baronen sitter fast i leran. Pass 2 blir inte längre (repliken vid skylten har ett ord till, och 'Hitta brevhalvan!' i vassen ett ord mindre)."
   },
   {
    "id": "k2s05_vassen",
@@ -1025,7 +1026,7 @@
    "rum": "vassen",
    "vid_omstart": {
     "talare": "farfar",
-    "text": "Var var vi? Hitta halvan i vassen!",
+    "text": "Var var vi? Hitta brevhalvan i vassen!",
     "upplast": true
    },
    "steg": [
@@ -1037,7 +1038,7 @@
     {
      "typ": "replik",
      "talare": "berattare",
-     "text": "Hitta brevets halva!",
+     "text": "Hitta brevhalvan!",
      "upplast": true
     },
     {
@@ -1115,7 +1116,7 @@
     {
      "typ": "replik",
      "talare": "berattare",
-     "text": "Gå till Tant Rosa med halvan!",
+     "text": "Gå till Tant Rosa med brevhalvan!",
      "upplast": true
     },
     {
@@ -1125,13 +1126,13 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Närbild: halvan sätts i ramen. Den passar i sin rivna kontur, och i ramen torkar den så att bokstäverna syns.",
+     "beskrivning": "Närbild: brevhalvan sätts i ramen. Den passar i sin rivna kontur, och i ramen torkar den så att bokstäverna syns.",
      "bild": "brevram_nara"
     },
     {
      "typ": "replik",
      "talare": "tant_rosa",
-     "text": "En halva i ramen!",
+     "text": "En brevhalva i ramen!",
      "upplast": true
     }
    ],
@@ -1232,7 +1233,7 @@
    "steg": [
     {
      "typ": "mellanscen",
-     "beskrivning": "Närbild: brevramen med båda halvorna. Farfars sigill med kompassrosen sitter ihop igen. Tant Rosa tar ner brevet.",
+     "beskrivning": "Närbild: brevramen med båda brevhalvorna. Farfars sigill med kompassrosen sitter ihop igen. Tant Rosa tar ner brevet.",
      "bild": "brevram_nara"
     },
     {
@@ -3013,7 +3014,7 @@
    "stampel": {
     "scen": "k2s02_byn",
     "efter": {
-     "replik": "Han skrev var, för länge sen. Hämta halvorna!"
+     "replik": "Baronen drog också. Hitta brevhalvorna!"
     }
    }
   },
@@ -3031,14 +3032,14 @@
      }
     },
     {
-     "text": "HALVAN VID BRYGGAN",
+     "text": "BREVHALVAN VID BRYGGAN",
      "klart": {
       "scen": "k2s04_bryggan",
       "bara": "brevram"
      }
     },
     {
-     "text": "HALVAN I VASSEN",
+     "text": "BREVHALVAN I VASSEN",
      "klart": {
       "scen": "k2s05_vassen",
       "bara": "brevram"
