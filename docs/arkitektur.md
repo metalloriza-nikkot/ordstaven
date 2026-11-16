@@ -1140,3 +1140,7 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
   - ett mål som han sedan bär i scenen (brevhalvan på bryggan: `ga_till brev_halva_1` följt av `bara` med bilden `brev_halva`);
   - det han lyfter i P26 med verbet `lyfta` när det är det han hittar (pinnarna);
   - föremålet som en regi tar (`REGI_TAR`: halvan i vattnet som flyger till hans hand).
+
+## 118. Tryck i resan och krockarna i loggen (0.88.0, beslut 97.5–97.6)
+- **Steget `tryck`** (resan i kapitel 3): kameran visar det han ska trycka på (`regiFokus` på föremålet), också när det står långt från hjälten. Han kan inte gå, så han behöver inte synas. En piltangent visar handen igen och får föremålet att glimta, och loggen skriver `[tryck] piltangent: <id> glimtar` (högst var tredje sekund).
+- **Krockarna** (`src/karna/krock.js`): när han håller en piltangent och kommer mindre än en fjärdedel av steget framåt räknas tiden mot hindret framför fötterna (`hinderFramfor`). Efter ca 1 s skriver loggen `[krock] <id>` med hans plats och rummet, en gång per hinder och försök. Väggar, vatten och hus utan id heter `vägg x,y`, `vatten x,y` och `väggen`, och rummets kant `kanten`. Hindren behåller sina id genom `skarIgenom`.

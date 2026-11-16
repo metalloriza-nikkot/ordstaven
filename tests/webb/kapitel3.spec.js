@@ -253,3 +253,52 @@ test('kapitel 3 pass 3: tången, SKÖLD, ordduellen, resan med två tryck och ka
   expect(t.spelare.hjalte.grad).toBe('Lögnavslöjare');
   await page.screenshot({ path: 'test-results/kap3-resan.png' });
 });
+
+test('resan (97.5): kameran visar skepparen, och en piltangent visar handen och får henne att glimta', async ({ page }) => {
+  test.setTimeout(90000);
+  const ev = (fn, arg) => page.evaluate(fn, arg);
+  const scen = kap.scener.findIndex((s) => s.id === 'k3s05_resan');
+  const i = kap.scener[scen].steg.findIndex((st) => st.typ === 'tryck' && st.foremal === 'skepparen');
+  await starta(page, 'k3s05_resan', scen, i);
+  for (let n = 0; n < 60 && (await ev(() => window.__ORDSTAVEN.steg()?.typ)) !== 'tryck'; n++) { for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {}); await page.waitForTimeout(250); }
+  expect(await ev(() => window.__ORDSTAVEN.steg())).toMatchObject({ typ: 'tryck', foremal: 'skepparen' });
+  await page.waitForTimeout(2500); // kameran glider dit
+  // skepparen och handen syns i fönstret, fast hjälten står långt bort
+  const o = await ev(() => window.__ORDSTAVEN.ruta('skepparen'));
+  const k = await ev(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').kamera);
+  expect(o.x).toBeGreaterThanOrEqual(k.x); expect(o.x + o.b).toBeLessThanOrEqual(k.x + 320);
+  const hand = page.locator('#handknapp');
+  await expect(hand).toBeVisible();
+  const r = await hand.boundingBox(), v = page.viewportSize();
+  expect(r.x).toBeGreaterThanOrEqual(0); expect(r.x + r.width).toBeLessThanOrEqual(v.width);
+  // en piltangent: hon glimtar, och loggen säger det
+  await page.keyboard.press('ArrowRight');
+  await page.waitForTimeout(300);
+  expect(await ev(() => window.__ORDSTAVEN.logg())).toContain('piltangent: skepparen glimtar');
+  await page.screenshot({ path: 'test-results/kap3-resan-skepparen.png' });
+  // och Mellanslag trycker på henne
+  await page.keyboard.press('Space');
+  await expect.poll(() => ev(() => window.__ORDSTAVEN.logg()), { timeout: 5000 }).toContain('[tryck] skepparen');
+});
+
+test('krockarna i loggen (97.6): går han mot ett hinder i mer än ca 1 s skriver loggen hindrets id', async ({ page }) => {
+  test.setTimeout(60000);
+  const ev = (fn, arg) => page.evaluate(fn, arg);
+  const scen = kap.scener.findIndex((s) => s.id === 'k3s03_sandbanken');
+  await starta(page, 'k3s03_sandbanken', scen, 1);
+  await expect.poll(() => ev(() => window.__ORDSTAVEN.scen()), { timeout: 20000 }).toBe('k3s03_sandbanken');
+  for (let n = 0; n < 10; n++) { for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {}); await page.waitForTimeout(200); }
+  // hjälten under en snäcka, och sedan uppåt mot den med piltangenten
+  const s = await ev(() => window.__ORDSTAVEN.ruta('snacka_2'));
+  const under = { x: s.x + s.b / 2, y: s.y + s.h + 10 };
+  for (let n = 0; n < 40; n++) { await ev(([x, y]) => window.__ORDSTAVEN.gaMot(x, y), [under.x, under.y]); await page.waitForTimeout(150); const p = await ev(() => window.__ORDSTAVEN.position()); if (Math.hypot(p.x - under.x, p.y - under.y) < 3) break; }
+  await page.keyboard.down('ArrowUp');
+  await page.waitForTimeout(1600);
+  await page.keyboard.up('ArrowUp');
+  // snäckorna står tätt: fötterna kan ta i grannen först
+  expect(await ev(() => window.__ORDSTAVEN.logg())).toMatch(/\[krock\] snacka_[123] .*"rum":"sandbanken"/);
+  // ett kort tryck mot hindret loggas inte
+  const fore = (await ev(() => window.__ORDSTAVEN.logg())).match(/\[krock\]/g).length;
+  await page.keyboard.down('ArrowUp'); await page.waitForTimeout(400); await page.keyboard.up('ArrowUp');
+  expect((await ev(() => window.__ORDSTAVEN.logg())).match(/\[krock\]/g).length).toBe(fore);
+});

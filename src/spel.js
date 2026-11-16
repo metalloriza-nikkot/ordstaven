@@ -3298,17 +3298,31 @@ export function skapaSpel(d) {
     const o = rum.ruta(st.foremal);
     if (!o) { logg.handelse('FEL', 'tryck: föremålet finns inte i rummet: ' + st.foremal); return; }
     rum.frys(true);
+    // 97.5: kameran visar det han ska trycka på, också när det står långt från hjälten (skepparen i resan). Han kan
+    // inte gå, så han behöver inte synas
+    rum.regiFokus = { x: o.x + o.b / 2, y: o.y + o.h / 2 };
     rum.visaOmrade([st.foremal]);
     rum.markera(st.foremal, true);
     await new Promise((klar) => {
-      const gjort = () => { ui.handknapp(null); rum.tryckFri = null; sluta(); k.stopp(); klar(null); };
+      const gjort = () => { ui.handknapp(null); rum.tryckFri = null; sluta(); k.stopp(); window.clearTimeout(blink); klar(null); };
       const [pt, plats] = skyltPlats(o);
       ui.handknapp(pt, gjort, plats);
       rum.tryckFri = (/** @type {string} */ id) => { if (id === st.foremal) gjort(); };
-      const sluta = lyssnaHandling((h) => { if (h.typ === 'interagera') gjort(); });
+      // 97.5: en piltangent visar handen igen och får saken att glimta, så att han ser var det händer något
+      let blink = 0, senast = -Infinity;
+      const glimta = () => {
+        const [p2, pl2] = skyltPlats(o); ui.handknapp(p2, gjort, pl2); ui.pulsera?.('#handknapp');
+        let n = 0;
+        const vaxla = () => { rum.markera(st.foremal, n % 2 === 1); if (++n <= 5) blink = window.setTimeout(vaxla, tid(160)); };
+        window.clearTimeout(blink); vaxla();
+        const nu = performance.now();
+        if (nu - senast > 3000) logg.handelse('tryck', `piltangent: ${st.foremal} glimtar`);
+        senast = nu;
+      };
+      const sluta = lyssnaHandling((h) => { if (h.typ === 'interagera') gjort(); else if (h.typ === 'ga') glimta(); });
       const k = knuffKlocka({ handling: '' }, () => { rum.markera(st.foremal, true); ui.pulsera?.('#handknapp'); });
     });
-    rum.markera(st.foremal, false); rum.visaOmrade(null);
+    rum.markera(st.foremal, false); rum.visaOmrade(null); rum.regiFokus = null;
     logg.handelse('tryck', st.foremal);
     ljud.spela('klick');
   }

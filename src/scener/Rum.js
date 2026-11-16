@@ -7,6 +7,7 @@ import { FIGUR, steg } from '../karna/rorelse.js';
 import { rumsObjekt, framfor, framforFran, vidObjekt, aktivSak, VAGG, objektFarg, lasplats, arSidodorr, stigStart, landningNara } from '../karna/rumslayout.js';
 import { synligaIds } from '../karna/karta.js';
 import { skapaHinder } from '../karna/vag.js';
+import { hinderFramfor, krockVakt } from '../karna/krock.js';
 import { rumsHinder } from '../karna/rumshinder.js';
 import { skapaNivaer } from '../karna/nivaer.js';
 import { KAMERA, centrera, folj, visaRuta, omradeFor, narmare, enSkarm } from '../karna/kamera.js';
@@ -2843,6 +2844,9 @@ export class Rum extends Phaser.Scene {
     this.nivaer = h.nivaer;
     this.hinderPer = h.per;
     this.hinderForbindelse = h.forbindelse;
+    // hindren med namn, för krockarna i loggen (97.6): föremålens id, och väggar, vatten och hus med sin plats
+    const namn = (/** @type {any} */ r, /** @type {string} */ sort) => r.id ? r : { ...r, id: `${r.vatten ? 'vatten' : sort} ${r.x},${r.y}` };
+    this.krockRutor = h.rutor.map((/** @type {any} */ r) => namn(r, this.massiv.includes(r) ? 'vägg' : this.overHinder.includes(r) ? 'över' : 'väggen'));
     if (!this.hinderPer.has(this.niva)) this.niva = 0;
     this.hinder = /** @type {ReturnType<typeof skapaHinder>} */ (this.hinderPer.get(this.niva));
     // en zon han redan har gått i (lerpölen, 72.8): vägen när han trycker någonstans går runt den, så att han inte
@@ -3792,6 +3796,15 @@ export class Rum extends Phaser.Scene {
     if (mal && !ny.framme && sista) this.malKors.setPosition(Math.round(sista.x), Math.round(sista.y)).setVisible(true);
     else { this.malKors.setVisible(false); if (ny.framme) { inm.rensaGaTill(); this.vag = []; this.vagMal = null; } }
     const flyttad = ny.x !== this.pos.x || ny.y !== this.pos.y;
+    // 97.6: går han mot ett hinder med piltangenterna i mer än ca 1 s, skriver loggen en rad med hindrets id
+    if (riktning.x || riktning.y) {
+      const tankt = Math.min(dtMs / 1000, 0.1) * FIGUR.fart, kom = Math.hypot(ny.x - this.pos.x, ny.y - this.pos.y);
+      const andel = tankt > 0 ? kom / tankt : 1;
+      const mot = andel <= 0.25 ? (hinderFramfor(this.pos, riktning, this.krockRutor || [], this.storlek) ?? (this.nivaer?.finns ? 'nivåns kant' : null)) : null;
+      this.krock = this.krock || krockVakt();
+      const id = this.krock.steg(dtMs, true, andel, mot);
+      if (id) this.b.logg?.handelse('krock', id, { x: Math.round(this.pos.x), y: Math.round(this.pos.y), rum: this.rumId });
+    } else this.krock?.steg(dtMs, false, 1, null);
     if (flyttad) { const vx = ny.x - this.pos.x, vy = ny.y - this.pos.y, l = Math.hypot(vx, vy); if (l > 0.01) this.vand = { x: vx / l, y: vy / l }; this.gang = (this.gang || 0) + l; }
     // gången: benen rör sig medan han går, och han står i första bilden när han stannar
     if (flyttad !== !!this.gar) { this.gar = flyttad; if (!flyttad) this.ritaHjalte(); }

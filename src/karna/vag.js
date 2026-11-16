@@ -19,17 +19,18 @@ const MIN = { x: FIGUR.bredd / 2, y: FIGUR.hojd };
  * @param {Ruta[]} hinder @param {Ruta[]} oppningar @returns {Ruta[]}
  */
 export function skarIgenom(hinder, oppningar) {
-  let ut = hinder.map((r) => ({ x: r.x, y: r.y, b: r.b, h: r.h }));
+  // id:t följer med (krockarna i loggen, 97.6)
+  let ut = hinder.map((r) => ({ x: r.x, y: r.y, b: r.b, h: r.h, ...(/** @type {any} */ (r).id ? { id: /** @type {any} */ (r).id } : {}) }));
   for (const o of oppningar) {
     /** @type {Ruta[]} */
     const nya = [];
     for (const r of ut) {
       const x0 = Math.max(r.x, o.x), x1 = Math.min(r.x + r.b, o.x + o.b), y0 = Math.max(r.y, o.y), y1 = Math.min(r.y + r.h, o.y + o.h);
       if (x0 >= x1 || y0 >= y1) { nya.push(r); continue; }
-      if (y0 > r.y) nya.push({ x: r.x, y: r.y, b: r.b, h: y0 - r.y }); // ovanför öppningen
-      if (y1 < r.y + r.h) nya.push({ x: r.x, y: y1, b: r.b, h: r.y + r.h - y1 }); // nedanför
-      if (x0 > r.x) nya.push({ x: r.x, y: y0, b: x0 - r.x, h: y1 - y0 }); // till vänster
-      if (x1 < r.x + r.b) nya.push({ x: x1, y: y0, b: r.x + r.b - x1, h: y1 - y0 }); // till höger
+      if (y0 > r.y) nya.push({ ...r, x: r.x, y: r.y, b: r.b, h: y0 - r.y }); // ovanför öppningen
+      if (y1 < r.y + r.h) nya.push({ ...r, x: r.x, y: y1, b: r.b, h: r.y + r.h - y1 }); // nedanför
+      if (x0 > r.x) nya.push({ ...r, x: r.x, y: y0, b: x0 - r.x, h: y1 - y0 }); // till vänster
+      if (x1 < r.x + r.b) nya.push({ ...r, x: x1, y: y0, b: r.x + r.b - x1, h: y1 - y0 }); // till höger
     }
     ut = nya;
   }
