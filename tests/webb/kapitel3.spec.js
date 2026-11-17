@@ -100,6 +100,8 @@ test('flodmannen säger ahoj! i gemener (87.7)', async ({ page }) => {
     await page.waitForTimeout(250);
   }
   await page.waitForFunction(() => !window.__ORDSTAVEN.fryst() && document.querySelector('#plattan').hidden);
+  // skepparen ropar AHOJ! i samma ruta var nionde sekund: vänta tills hans rop är borta
+  await expect(page.locator('#rop')).toBeHidden({ timeout: 8000 });
   const p = await ev(() => window.__ORDSTAVEN.objekt('flodman'));
   await page.mouse.click(p.x, p.y);
   await expect(page.locator('#rop')).toBeVisible();
