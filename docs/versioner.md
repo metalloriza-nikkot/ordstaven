@@ -2,6 +2,7 @@
 
 | Version | Datum | Vad |
 |---|---|---|
+| 0.89.0 | 2026-11-17 | **Farfar har glömt vägen** (Innehålls pass 99, beslut 99.5): i prologens s21 säger Farfar att han har glömt vägen och bara minns ungefär var han gömde bitarna. **Stils `luftskepp_tom`:** luftskeppet vid bryggan har en riktigt tom gondol, och stilskripten har 126 filer. |
 | 0.88.0 | 2026-11-16 | **Resan i kapitel 3 och krockarna i loggen** (beslut 97.5–97.6). I resan visar kameran det han ska trycka på, och en piltangent visar handen och får det att glimta. Loggen skriver en rad med hindrets id när hjälten har gått mot ett hinder i mer än ca en sekund. |
 | 0.87.0 | 2026-11-16 | **Tant Rosas och Farfars repliker** (Innehålls pass 95b och 95c, beslut 96). Tant Rosa säger "Är du {hjälte}? Herr Skata tog mitt brev!" och "Snälla, du måste hitta båda brevhalvorna.", och Farfar "Hej, Rosa! Var kartbiten är står i brevet.". |
 | 0.86.0 | 2026-11-15 | **Brevet, brevhalvorna och luftskeppet vid bryggan** (Innehålls pass 95, beslut 95.3–95.7). Efter rivningen står det att baronen och Herr Skata rev ett brev, och Tant Rosa berättar att Herr Skata snappade hennes brev. Det heter brevhalva i allt han hör och läser. Vid bryggan är luftskeppet förtöjt vid masten med repstegen nere, och när baronen far klättrar han upp på repstegen och skeppet flyger ut ur bild. Det han tar försvinner från marken, också brevhalvan på bryggan, och efter en omstart. Stils kartbit på golvet i Tant Rosas hus. |

@@ -780,7 +780,7 @@
     "h": 96
    }
   },
-  "luftskepp_trasslar_01": {
+  "luftskepp_tom": {
    "frame": {
     "x": 0,
     "y": 1254,
@@ -800,10 +800,30 @@
     "h": 96
    }
   },
+  "luftskepp_trasslar_01": {
+   "frame": {
+    "x": 0,
+    "y": 1351,
+    "w": 112,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 112,
+    "h": 96
+   }
+  },
   "luftskepp_trasslar_02": {
    "frame": {
     "x": 113,
-    "y": 1254,
+    "y": 1351,
     "w": 112,
     "h": 96
    },
@@ -826,7 +846,7 @@
   "format": "RGBA8888",
   "size": {
    "w": 226,
-   "h": 1351
+   "h": 1448
   },
   "scale": "1",
   "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."

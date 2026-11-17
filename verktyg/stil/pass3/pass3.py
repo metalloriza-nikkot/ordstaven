@@ -100,8 +100,8 @@ def luftskepp(baron='kikare_fel',prop=0,skata=None,mun=False,stege='hanger',hjal
     for (x0,x1) in [(36,40),(76,72)]:
         for y in range(38,62):
             x=int(x0+(x1-x0)*(y-38)/24); p[x,y]=hx2('#5A4A30')
-    # baronen (bakom gondolens kant)
-    bo=baron_overkropp(5)
+    # baronen (bakom gondolens kant). baron=None: tom gondol (beslut 96, luftskepp_tom)
+    bo=baron_overkropp(5) if baron else bild(24,24)
     bx,by=44,40
     if baron=='trasslar': bx,by=58,44
     if not hjalm:
@@ -142,6 +142,7 @@ def luftskepp(baron='kikare_fel',prop=0,skata=None,mun=False,stege='hanger',hjal
 LUFT={
  'luftskepp_glider_01':luftskepp('kikare_fel',0),
  'luftskepp_glider_02':luftskepp('kikare_fel',1),
+ 'luftskepp_tom':luftskepp(None,0),          # tom gondol, repstegen nere (beslut 96)
  'luftskepp_skata_landar':luftskepp('kikare_fel',0,skata='landar'),
  'luftskepp_ser_hjalten':luftskepp('kikare_ratt',0,skata='landar'),
  'luftskepp_talar_01':luftskepp('stolt',0,skata='landar',mun=False),
