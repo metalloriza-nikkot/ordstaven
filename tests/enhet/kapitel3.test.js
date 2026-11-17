@@ -80,36 +80,38 @@ describe('kapitel 3 i kontrollen och budgeten', () => {
   it('kap-03 går igenom kontrollen utan fel', () => {
     const r = kontrollera(alla());
     expect(r.fel).toEqual([]);
-    expect(r.pass.filter((p) => p.kapitel === 'kap-03').map((p) => p.lasuppgifter)).toEqual([4, 2, 2]);
+    expect(r.pass.filter((p) => p.kapitel === 'kap-03').map((p) => p.lasuppgifter)).toEqual([3, 4, 3]);
   });
   it('kontrollen fångar fel i de nya fälten', () => {
     const fel = (andra) => { const d = alla(); const k = d.kapitel[3]; andra(k); return kontrollera(d).fel.join('\n'); };
     expect(fel((k) => { pusselI(k, 'k3_hornet').foremal = 'trumman'; })).toMatch(/trycker på trumman/);
-    expect(fel((k) => { pusselI(k, 'k3_hornet').vid_antal = { 1: { reaktion: 'x' } }; })).toMatch(/vid_antal 1 är det rätta antalet/);
+    expect(fel((k) => { pusselI(k, 'k3_hornet').vid_antal = { 5: { reaktion: 'x' } }; })).toMatch(/vid_antal 5 är det rätta antalet/);
     expect(fel((k) => { pusselI(k, 'k3_mossan').sak_vid = 9; })).toMatch(/sak_vid 9/);
     expect(fel((k) => { pusselI(k, 'k3_chiffret').svar = 'under fena'; })).toMatch(/tecknen ger UNDER FENAN/);
     expect(fel((k) => { pusselI(k, 'k3_duellen').ronder[0].utfall[0].alternativ[1].ratt = true; })).toMatch(/exakt ett kort/);
-    expect(fel((k) => { k.scener.find((s) => s.id === 'k3s06_skalkant').startar_vid = 'tuva_1'; })).toMatch(/startar_vid tuva_1/);
-    expect(fel((k) => { k.scener.find((s) => s.id === 'k3s05_resan').steg.find((x) => x.typ === 'tryck').foremal = 'bryggan'; })).toMatch(/bryggan finns inte i rummet floden/);
-    expect(fel((k) => { k.scener[0].steg[13].tillstand_efter = 'natt'; })).toMatch(/tillstand_efter natt/);
+    expect(fel((k) => { k.scener.find((s) => s.id === 'k3s05_skalkant').startar_vid = 'tuva_1'; })).toMatch(/startar_vid tuva_1/);
+    expect(fel((k) => { k.scener.find((s) => s.id === 'k3s07_resan').steg.find((x) => x.typ === 'tryck').foremal = 'bryggan'; })).toMatch(/bryggan finns inte i rummet floden/);
+    expect(fel((k) => { k.scener.find((s) => s.id === 'k3s02_loftet').steg.find((x) => x.tillstand_efter).tillstand_efter = 'natt'; })).toMatch(/tillstand_efter natt/);
   });
   it('chiffret som meddelande är en skrivuppgift, och hornet och duellen är läsval (87.6)', () => {
     const tidigare = new Set(['farfar', 'berattare', 'baronen', 'herr_skata']);
     const k = kap3();
     expect(budgetVarningar(k, { tidigareTalare: tidigare })).toEqual([]);
-    // utan läget är chiffret vila som kodlåset, och då saknar pass 2 en skrivuppgift som budgeten kan räkna
+    // utan läget är chiffret vila som kodlåset, och då har pass 2 en läsuppgift mindre (hornet och skylten står kvar)
     const utan = kopia(k); delete pusselI(utan, 'k3_chiffret').lage;
     const r = kontrollera({ ...alla(), kapitel: [...alla().kapitel.slice(0, 3), utan] });
-    expect(r.pass.find((p) => p.kapitel === 'kap-03' && p.pass === 2).lasuppgifter).toBe(1);
+    expect(r.pass.find((p) => p.kapitel === 'kap-03' && p.pass === 2).lasuppgifter).toBe(3);
   });
 });
 
-describe('skepparens röst (87.9)', () => {
-  it('skepparen har en egen röst, mellan Farfar och Tant Rosa', () => {
+describe('skepparens röst (98.12.2)', () => {
+  it('skepparen är en ung man: mörkare än berättaren och Tant Rosa, ljusare och snabbare än Farfar', () => {
     expect(las('den-gomda-dalen/aventyr.json').talare.skepparen.rollrost).toBe('skeppare');
     const s = tonFor('skeppare', 'Ahoj! Ön?'), farfar = tonFor('gammal', 'Ahoj! Ön?'), tant = tonFor('tant', 'Ahoj! Ön?');
+    const berattare = tonFor('berattare', 'Ahoj! Ön?');
     expect(s.pitch).toBeGreaterThan(farfar.pitch);
-    expect(s.pitch).toBeLessThan(tant.pitch);
+    expect(s.pitch).toBeLessThan(Math.min(tant.pitch, berattare.pitch));
+    expect(s.rate).toBeGreaterThan(farfar.rate);
   });
 });
 
@@ -143,7 +145,7 @@ describe('chiffret som meddelande (steg 2)', () => {
   });
 });
 
-describe('skalkanten är öppen från pass 2 tills duellen börjar (88.6)', () => {
+describe('skalkanten är öppen från pass 3 tills duellen börjar (88.6, manus 19 v0.4.1)', () => {
   const nu = (scenId, steg) => {
     const k = kap3(); const t = nyttTillstand('t');
     const b = skapaBerattelse({ aventyr: {}, kapitel: k, tillstand: t, aventyrId: 'den-gomda-dalen' });
@@ -152,21 +154,22 @@ describe('skalkanten är öppen från pass 2 tills duellen börjar (88.6)', () =
     return b;
   };
   const oppen = (b) => b.frivilligaVid('sandbanken').map((s) => s.id);
-  it('stängd i pass 1, öppen i pass 2 och i början av pass 3, stängd när duellen börjar', () => {
+  it('stängd i pass 1 och 2, öppen i början av pass 3, stängd när duellen börjar (manus 19 v0.4.1)', () => {
     const k = kap3();
-    const ankaret = k.scener.find((s) => s.id === 'k3s04_ankaret');
+    const ankaret = k.scener.find((s) => s.id === 'k3s06_ankaret');
     const duell = ankaret.steg.findIndex((x) => x.pussel_id === 'k3_duellen');
-    expect(oppen(nu('k3s02_on', 1))).toEqual([]);
-    expect(oppen(nu('k3s03_sandbanken', 1))).toEqual(['k3s06_skalkant']);
-    expect(oppen(nu('k3s04_ankaret', 0))).toEqual(['k3s06_skalkant']);
-    expect(oppen(nu('k3s04_ankaret', duell - 1))).toEqual(['k3s06_skalkant']);
-    expect(oppen(nu('k3s04_ankaret', duell))).toEqual([]);
-    expect(oppen(nu('k3s05_resan', 0))).toEqual([]);
+    expect(oppen(nu('k3s02_kvarnen', 1))).toEqual([]);
+    expect(oppen(nu('k3s04_on', 1))).toEqual([]);
+    expect(oppen(nu('k3s05_sandbanken', 1))).toEqual(['k3s05_skalkant']);
+    expect(oppen(nu('k3s06_ankaret', 0))).toEqual(['k3s05_skalkant']);
+    expect(oppen(nu('k3s06_ankaret', duell - 1))).toEqual(['k3s05_skalkant']);
+    expect(oppen(nu('k3s06_ankaret', duell))).toEqual([]);
+    expect(oppen(nu('k3s07_resan', 0))).toEqual([]);
   });
   it('en gång: efter besöket är den stängd, och den startar inte när han går in i rummet', () => {
-    const b = nu('k3s03_sandbanken', 1);
+    const b = nu('k3s05_sandbanken', 1);
     expect(b.frivilligScen('sandbanken')).toBeNull();
-    b.frivilligtKlart('k3s06_skalkant');
+    b.frivilligtKlart('k3s05_skalkant');
     expect(oppen(b)).toEqual([]);
   });
 });

@@ -15,7 +15,7 @@
  },
  "meta": {
   "namn": "Prologen",
-  "version": "0.17.2",
+  "version": "0.17.3",
   "datum": "2026-11-17",
   "agare": "Innehåll",
   "kalla": "Manus 13-prolog-manus.md v1.10. Byggd på repots kap-00.json från 0.29.0.",
@@ -28,7 +28,8 @@
   "andrat_v016": "2026-11-08 (beslut 67.9): musik (natten till kläckningen och vid sängdags, lagerelden i sagan), ljud på mellanscener och reaktioner, syns_redan på mellanscenerna som redan syns (67.2). Titelbildens mellanscen och Farfar vid fönstret (s21) är strukna. Ingen text som spelaren läser är ändrad.",
   "andrat_v017": "2026-11-10 (beslut 68.9): syns_redan på alla reaktioner och knuffar som visade sin text (68.4), Farfar i dörren och i hallen, ungen som springer till grinden, och Stils regier farfar_skriver och farfar_gaspar (Teknik 31). Ingen text är ändrad.",
   "andrat_v0171": "2026-11-12 (beslut 83.3): kartan rivs i sex bitar, inte sju, eftersom äventyret blir fem kapitel med en bit var. Farfars replik i s21_uppdraget säger \"sex\". Ingen annan text är ändrad.",
-  "andrat_v0172": "2026-11-17 (beslut 99.5): Farfar säger i s21_uppdraget att han har glömt vägen och bara minns ungefär var han gömde bitarna. Därför behövs kartan, och därför kan han inte bara säga var en bit är. \"Då kan ingen annan hitta dalen.\" är struken. Inget annat är ändrat."
+  "andrat_v0172": "2026-11-17 (beslut 99.5): Farfar säger i s21_uppdraget att han har glömt vägen och bara minns ungefär var han gömde bitarna. Därför behövs kartan, och därför kan han inte bara säga var en bit är. \"Då kan ingen annan hitta dalen.\" är struken. Inget annat är ändrat.",
+  "andrat_v0173": "2026-11-17 (beslut 100.3): \"Varje bit visar vägen till nästa.\" är struken i s21_uppdraget, så att Farfar har sex repliker före packlistan, som före pass 99. Kartbitarna visar det själva."
  },
  "var_var_vi": [
   {
@@ -1318,12 +1319,6 @@
      "typ": "replik",
      "talare": "farfar",
      "text": "Men jag rev min karta i sex bitar och gömde dem.",
-     "upplast": true
-    },
-    {
-     "typ": "replik",
-     "talare": "farfar",
-     "text": "Varje bit visar vägen till nästa.",
      "upplast": true
     },
     {

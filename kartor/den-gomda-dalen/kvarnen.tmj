@@ -1,0 +1,271 @@
+{
+ "type": "map",
+ "version": "1.10",
+ "tiledversion": "1.11.0",
+ "orientation": "orthogonal",
+ "renderorder": "right-down",
+ "width": 20,
+ "height": 12,
+ "tilewidth": 16,
+ "tileheight": 16,
+ "infinite": false,
+ "compressionlevel": -1,
+ "nextlayerid": 2,
+ "nextobjectid": 14,
+ "properties": [
+  {
+   "name": "inomhus",
+   "type": "bool",
+   "value": true
+  },
+  {
+   "name": "rum",
+   "type": "string",
+   "value": "kvarnen"
+  }
+ ],
+ "tilesets": [],
+ "layers": [
+  {
+   "id": 1,
+   "name": "foremal",
+   "type": "objectgroup",
+   "draworder": "index",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 1,
+     "name": "dorr_ut_kvarn",
+     "type": "utgang",
+     "x": 146,
+     "y": 176,
+     "width": 28,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "riktning",
+       "type": "string",
+       "value": "ned"
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "over"
+      },
+      {
+       "name": "till",
+       "type": "string",
+       "value": "floden"
+      }
+     ]
+    },
+    {
+     "id": 2,
+     "name": "start",
+     "type": "",
+     "x": 160,
+     "y": 150,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 3,
+     "name": "tavla_kvarn",
+     "type": "sak",
+     "x": 128,
+     "y": 8,
+     "width": 64,
+     "height": 30,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "rackvidd",
+       "type": "int",
+       "value": 56
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      }
+     ]
+    },
+    {
+     "id": 4,
+     "name": "",
+     "type": "vagg",
+     "x": 32,
+     "y": 48,
+     "width": 16,
+     "height": 56,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vatten",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 5,
+     "name": "lucka_vatten",
+     "type": "sak",
+     "x": 48,
+     "y": 72,
+     "width": 14,
+     "height": 18,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "hoger"
+      }
+     ]
+    },
+    {
+     "id": 6,
+     "name": "lucka_dorr",
+     "type": "sak",
+     "x": 96,
+     "y": 152,
+     "width": 22,
+     "height": 14,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 7,
+     "name": "sackhiss",
+     "type": "sak",
+     "x": 248,
+     "y": 48,
+     "width": 40,
+     "height": 24,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      }
+     ]
+    },
+    {
+     "id": 8,
+     "name": "sack_stor",
+     "type": "sak",
+     "x": 240,
+     "y": 104,
+     "width": 32,
+     "height": 22,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 9,
+     "name": "pa_stora",
+     "type": "sak",
+     "x": 250,
+     "y": 92,
+     "width": 12,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 10,
+     "name": "vid_stora",
+     "type": "sak",
+     "x": 222,
+     "y": 110,
+     "width": 12,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 11,
+     "name": "sack_liten",
+     "type": "sak",
+     "x": 160,
+     "y": 104,
+     "width": 18,
+     "height": 14,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 12,
+     "name": "pa_lilla",
+     "type": "sak",
+     "x": 163,
+     "y": 94,
+     "width": 12,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 13,
+     "name": "vid_lilla",
+     "type": "sak",
+     "x": 142,
+     "y": 106,
+     "width": 12,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

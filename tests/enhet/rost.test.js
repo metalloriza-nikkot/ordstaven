@@ -143,6 +143,25 @@ describe('rullningens takt (beslut 21.2)', () => {
     expect(teckenTid(0)).toBe(0);
     expect(teckenTid(40, true)).toBe(teckenTid(40)); // ett ord i taget går i samma takt
   });
+  it('skepparen läses av en manlig röst när enheten har en (98.12.2), alla andra av den vanliga', async () => {
+    vi.useFakeTimers();
+    const s = falskSynt({ ms: 100 }); const roster = [];
+    s.getVoices = () => [{ lang: 'sv-SE', name: 'Alva', localService: true }, { lang: 'sv-SE', name: 'Oskar', localService: true }];
+    s.speak = (u) => { roster.push([u.voice.name, u.pitch]); u.onend?.(); };
+    installera(s);
+    const h = vi.fn();
+    const r = skapaRost({ logg: { handelse: h } });
+    expect(h).toHaveBeenCalledWith('röst', 'Alva, på enheten', { svenska: 2, pa_natet: 0, man: 'Oskar' });
+    r.saga('Ahoj!', 'skeppare'); await vi.advanceTimersByTimeAsync(500);
+    r.saga('Hej.', 'gammal'); await vi.advanceTimersByTimeAsync(500);
+    expect(roster.map((x) => x[0])).toEqual(['Oskar', 'Alva']);
+    // utan en manlig röst läser den vanliga rösten skepparen, med skepparens ton
+    s.getVoices = () => [{ lang: 'sv-SE', name: 'Alva', localService: true }];
+    const r2 = skapaRost({}); roster.length = 0;
+    r2.saga('Ahoj!', 'skeppare'); await vi.advanceTimersByTimeAsync(500);
+    expect(roster[0][0]).toBe('Alva');
+    vi.useRealTimers();
+  });
   it('väljer aldrig en röst på nätet: texten med namnen stannar på enheten (69.4)', async () => {
     vi.useFakeTimers();
     const s = falskSynt({ ms: 100 }); const sagt = [];

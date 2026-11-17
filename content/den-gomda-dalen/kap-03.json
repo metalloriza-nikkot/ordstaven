@@ -16,13 +16,14 @@
  },
  "meta": {
   "namn": "Floden",
-  "version": "0.2.1",
-  "datum": "2026-11-13",
+  "version": "0.3",
+  "datum": "2026-11-17",
   "agare": "Innehåll",
-  "kalla": "Manus 19 v0.3.3 (Ön som simmade), godkänt 13/11 med ledningens två ändringar (86.4 och 87.3).",
-  "teknik": "v0.2 följer manus 19 v0.3.3 och Tekniks fält i schema 2.47 (rapport-teknik 13/11 16:55, godkända i 87.4). Schemat är inte byggt än, så kontrollen säger fel på de nya fälten tills det finns. Fälten: P29_tryck (k3_hornet: foremal, ratt, tystnad_sek, vid_antal med 2 och 3+, lästexten i varianter); P9 med lage meddelande och skriv tangentbord (k3_chiffret: ett mellanslag mellan orden i tecken, nyckeln i den blandade ordningen, svar med mellanslag); P26 med verb lyfta (k3_mossan med sak_vid 4, där posten skylt står fjärde i innehall, och k3_tangtussarna med sak_i_sista); P16_ordduell (k3_duellen: motstandare, harmare, regel, skold, ronder med utfall, pekar_pa, ropar och alternativ med text och ratt, sköld|padda i rond 3, hjalp och vid_vinst); steget tryck (resan); och en frivillig scen som börjar vid ett föremål (k3s06_skalkant: startar_vid, till_scen och lockar.vid). Två förslag som inte stod i Tekniks tabell: en bubbla får vara {text, gemener} (ahoj! i gemener, 87.7), och tillstånden fena_uppe och luftskepp visar sköldpaddans fena uppe och tången under den. Byt gärna namnen, så skriver Innehåll om datan. Bilder som Stil inte har ritat än: kort_skold, kort_sol, kort_padda, kort_panna, kort_pil, kort_on och kort_flaska (uppdragen lånar over_vattnet och brev tills dess), tang_gardin, ankare_faller och morker_kant (i gråboxen visas ordlistornas 🌿, ⚓ och 🌑), platsbilderna i k3_fenan, skoldpadda_huvud och skoldpadda_fena i sina lägen, malning_skal, nyckelns fem nya tecken (vag, fisk, droppe, krabba och fjaril) och chiffernyckel_hel. Mellanscenerna har ingen bild än, utom kartbit_unge i k3s05. Teknik 13/11 (0.75.0, schema 2.47): mellanscenen där ön stiger (k3s01 steg 13) har tillstand_efter on, efter Innehålls anteckning i k3s01. Ingen text är ändrad.",
+  "kalla": "Manus 19 v0.4.1 (Ön som simmade), godkänt 17/11 (beslut 98–99).",
+  "teknik": "v0.3 skriver fälten som förut (schema 2.47), och inget nytt fält. Två frågor väntar på Teknik (99.6): loftet är ett litet rum i stället för en närbild, och vid_antal har en nyckel per antal och 6+. Säger Teknik något annat skriver Innehåll om datan. Det som behöver byggas eller ritas: rummen kvarnen och loftet, kvarnen ute i floden (hjul, tang_hjul, dorr_kvarn, brygga_kvarn), frukosthornet och flodborna med bubblor, hornet_skrift som syns i tillståndet rent, tillstand_efter på mellanscenen i k3s02_loftet, ungen som hoppar från loftet, och skepparens röst som en ung mans (98.12.2). Regierna som manuset nämner men som inte står i datan än (tills de finns i GRABOX_REGI): kartbit3_on, loftet_horn, skuggan_lyssnar, unge_simmar, skoldpadda_huvud, skylt_tecken, skoldpadda_visar_berget och resan_kvall. Bilder som Stil inte har ritat: som i v0.2, och dessutom tang_hjul och kort_kvarn.",
   "andrat_v02": "Beslut 87: Tekniks fält i stället för den billigaste formen (hornet som P29_tryck, chiffret som meddelande, mossan och tången som P26 med verb lyfta, duellen som P16_ordduell, tryck på resan och skalkanten som en frivillig scen med lockar), ahoj! i gemener i bubblan (87.7), och mammas skugga växer inte i kapitel 3 (87.4).",
-  "andrat_v021": "2026-11-13 (beslut 90.5 och 90.7): meta.namn är Floden, som Skogen och Träsket, och knuffen i k3_chiffret följer det som är byggt (89.3): rutan han står vid glimtar, tidigast efter ca 25 s."
+  "andrat_v021": "2026-11-13 (beslut 90.5 och 90.7): meta.namn är Floden, som Skogen och Träsket, och knuffen i k3_chiffret följer det som är byggt (89.3): rutan han står vid glimtar, tidigast efter ca 25 s.",
+  "andrat_v03": "2026-11-17 (beslut 98–99, manus 19 v0.4.1): floden och flodfolket först, skepparen som en ung man vars morfar kallade på ön, kvarnen som vägen upp till hornet (k3_hjulet med SVÄRD, k3_kvarn_1 och _2, säckhissen), och hornet två gånger: ett tryck i pass 1 som väcker skuggan, och FEM TUT. INTE TRE. i pass 2 (k3_hornet, ratt 5). Snäckorna och chiffret ligger på ön, och pass 2 slutar när UNDER FENAN lyser. Replikerna är provlästa (98.12.1). Nya rum: kvarnen och loftet. Nya scener: k3s02_kvarnen, k3s02_loftet, k3s03_hornet, k3s03_bryggan, k3s05_skalkant, k3s06_ankaret och k3s07_resan (förut k3s06_skalkant, k3s04_ankaret och k3s05_resan). k3_tangen heter k3_hjulet."
  },
  "var_var_vi": [
   {
@@ -47,7 +48,7 @@
     },
     {
      "talare": "farfar",
-     "text": "Biten är på ön.",
+     "text": "Biten är på en ö här.",
      "upplast": true,
      "via": "radio"
     },
@@ -62,12 +63,12 @@
   {
    "pass": 2,
    "ord": {
-    "ord": "sköldpadda"
+    "ord": "horn"
    },
    "kort": [
     {
      "talare": "farfar",
-     "text": "Var var vi? Ön är en sköldpadda!",
+     "text": "Var var vi? Något stort simmade under vattnet.",
      "upplast": true,
      "via": "radio"
     }
@@ -75,19 +76,19 @@
    "lang": [
     {
      "talare": "farfar",
-     "text": "Var var vi? Ön var en sköldpadda!",
+     "text": "Var var vi? Du tutade i det stora hornet.",
      "upplast": true,
      "via": "radio"
     },
     {
      "talare": "farfar",
-     "text": "På skylten finns tecken.",
+     "text": "Något stort simmade under vattnet.",
      "upplast": true,
      "via": "radio"
     },
     {
      "talare": "farfar",
-     "text": "Vad står det?",
+     "text": "Nu står det något på hornet.",
      "upplast": true,
      "via": "radio"
     }
@@ -101,7 +102,7 @@
    "kort": [
     {
      "talare": "farfar",
-     "text": "Var var vi? Något glänser under fenan.",
+     "text": "Var var vi? Du läste mina tecken.",
      "upplast": true,
      "via": "radio"
     }
@@ -109,19 +110,19 @@
    "lang": [
     {
      "talare": "farfar",
-     "text": "Var var vi? Du läste Farfars tecken.",
+     "text": "Var var vi? Ön var en sköldpadda.",
      "upplast": true,
      "via": "radio"
     },
     {
      "talare": "farfar",
-     "text": "Det stod under fenan.",
+     "text": "Mina tecken sa under fenan.",
      "upplast": true,
      "via": "radio"
     },
     {
      "talare": "farfar",
-     "text": "Där glänser något.",
+     "text": "Där ligger min flaska.",
      "upplast": true,
      "via": "radio"
     }
@@ -134,24 +135,41 @@
    "namn": "Floden",
    "tillstand": [
     "morgon",
+    "hjul",
     "on",
     "kvall"
    ],
    "innehall": [
     "stig_trasket",
     "pramarna",
-    "skepparen",
+    "frukosthorn",
+    "flodbo_frukost",
+    "flodbo_skrattar",
     "flodman",
-    "hornet",
-    "sten_horn",
+    "skepparen",
+    "hjul",
     {
-     "id": "on",
+     "id": "tang_hjul_1",
      "syns_i": [
-      "on"
+      "morgon"
      ]
     },
     {
-     "id": "tang_gardin",
+     "id": "tang_hjul_2",
+     "syns_i": [
+      "morgon"
+     ]
+    },
+    {
+     "id": "tang_hjul_3",
+     "syns_i": [
+      "morgon"
+     ]
+    },
+    "dorr_kvarn",
+    "brygga_kvarn",
+    {
+     "id": "on",
      "syns_i": [
       "on"
      ]
@@ -167,14 +185,6 @@
      ]
     }
    ],
-   "skyltar": {
-    "sten_horn": {
-     "text": [
-      "Ett tut.",
-      "Inte tre."
-     ]
-    }
-   },
    "bubblor": {
     "flodman": {
      "*": {
@@ -182,18 +192,83 @@
       "gemener": true
      }
     },
-    "skepparen": {
-     "morgon": {
+    "flodbo_frukost": {
+     "morgon": "Tre tut! Mat!",
+     "hjul": "Tre tut! Mat!",
+     "on": "Där!",
+     "kvall": {
       "text": "ahoj!",
       "gemener": true
-     },
+     }
+    },
+    "flodbo_skrattar": {
+     "morgon": "Ön? Ha ha!",
+     "hjul": "Ön? Ha ha!",
+     "on": "Där!",
+     "kvall": "Ön!"
+    },
+    "skepparen": {
      "kvall": {
       "text": "ahoj!",
       "gemener": true
      }
     }
    },
-   "anteckning": "2 × 1 skärmar (manus 19 v0.3.1, Rummen 1). Västra skärmen: stigen från träsket in från norr, sand och gräs, och vassbyns radiomast långt uppströms (förra regionens landmärke). Floden är bred och tom: ingen ö där kartbit 3 visar en. Östra skärmen: pråmarna i rad med plankor emellan och stånd med blå och vita ränder (vasskorgar med rosa band från vassbyn, svart glas och varma stenar från vulkanen). Skepparens pråm längst ut, med hornet av mässing i aktern och den målade stenen bredvid (ett horn och en ö är målade på den). Kameran glider över hornet och stenen när han kommer in (79.3, visas först). Tillståndet on: ön ligger vid pråmen med tången som en gardin från kanten, och planka_on syns när tången är huggen. kvall: resan i k3s05, där hjälten sitter på skalet ute på floden (flaska_i_handen är flaskan han håller), skepparen står vid hornet och ljusbåtarna flyter förbi. Liv: flodfolket på pråmarna med bubblan ahoj! i gemener (87.7), högst två som rör sig på samma skärm."
+   "anteckning": "2 × 1 skärmar (manus 19 v0.4.1, Rummen 1). Västra skärmen: stigen från träsket in från norr, pråmarna i rad med plankor emellan och stånd med blå och vita ränder (vasskorgar med rosa band från vassbyn, svart glas och varma stenar från vulkanen), frukosthornet på en pråm, och vassbyns radiomast långt uppströms. Floden är bred och tom: ingen ö där kartbit 3 visar en. Östra skärmen: skepparen sitter för sig själv på sin pråm närmast kvarnen. Kvarnen står på stenfot i vattnet, med vattenhjulet insnott i tjock tång (tre tussar, tang_hjul_1–3, som han hugger en i taget) och det stora hornet högst upp i en lucka mot floden. dorr_kvarn är kvarnens dörr (till rummet kvarnen), och brygga_kvarn är bryggan där ön lägger till. Kameran glider över kvarnen och hornet när han kommer in (79.3, visas först). Tillstånden: morgon (hjulet står), hjul (hjulet snurrar och dunkar), on (ön ligger vid kvarnens brygga, planka_on syns när scenen visar den) och kvall (resan: skepparen står vid hornet i kvarnens lucka, ljusbåtarna). Bubblorna: TRE TUT! MAT! och ÖN? HA HA! hos två flodbor, ahoj! i gemener (87.7). Högst två som rör sig på samma skärm."
+  },
+  {
+   "id": "kvarnen",
+   "namn": "Kvarnen",
+   "innehall": [
+    "tavla_kvarn",
+    "lucka_vatten",
+    "lucka_dorr",
+    "sack_stor",
+    "sack_liten",
+    "pa_stora",
+    "vid_stora",
+    "pa_lilla",
+    "vid_lilla",
+    "sackhiss",
+    "dorr_ut_kvarn"
+   ],
+   "skyltar": {
+    "tavla_kvarn": {
+     "text": [
+      "Lyft luckan vid vattnet.",
+      "Stå på den stora säcken."
+     ]
+    }
+   },
+   "anteckning": "1 skärm, inne (manus 19 v0.4.1, Rummen 2, ur 19b). Dammigt och fullt av mjöl, solstrimmor genom taket. Allt som tavlan talar om syns på samma skärm (79.3): två luckor (lucka_vatten vid vattenrännan och lucka_dorr i golvet vid dörren) och två säckar, en stor på säckhissen och en liten bredvid, med en markerad plats på och vid var och en (pa_stora, vid_stora, pa_lilla, vid_lilla). tavla_kvarn är morfars målade tavla, inte mässing, eftersom mässingsskyltarna med kompassrosen är Farfars (16 §9). Tavlan visar en rad åt gången. Säckhissen går upp genom ett hål i taket till loftet."
+  },
+  {
+   "id": "loftet",
+   "namn": "Loftet",
+   "tillstand": [
+    "mjol",
+    "rent"
+   ],
+   "innehall": [
+    "hornet",
+    {
+     "id": "hornet_skrift",
+     "syns_i": [
+      "rent"
+     ]
+    },
+    "lucka_floden",
+    "sackhiss"
+   ],
+   "skyltar": {
+    "hornet_skrift": {
+     "text": [
+      "Fem tut.",
+      "Inte tre."
+     ]
+    }
+   },
+   "anteckning": "Ett litet rum, 1 skärm (manus 19 v0.4.1: loftet som närbild). Datan gör det till ett rum tills Teknik har svarat (99.6), eftersom P29_tryck och tryck redan fungerar i ett rum. Hjälten står nästan stilla. En öppen lucka mot floden (lucka_floden), floden långt nedanför, och det stora hornet av mässing format som kammen på en dinosaurie. Tillståndet mjol: hornet är fullt av mjöl, och skriften syns inte. Tillståndet rent: mjölet har blåst bort, och på hornet står FEM TUT. INTE TRE. (hornet_skrift, målade bokstäver)."
   },
   {
    "id": "on",
@@ -208,14 +283,18 @@
     {
      "id": "skylt_skal",
      "dold": true
-    }
+    },
+    "snacka_1",
+    "snacka_2",
+    "snacka_3",
+    "snacka_4"
    ],
    "skyltar": {
     "skylt_skal": {
      "text": "Sköld padda"
     }
    },
-   "anteckning": "1 skärm: skalet ovanifrån, så stort att det ser ut som en ö, med gräs, fem tjocka tuvor av mossa och ett litet träd. Det gungar lite. skylt_skal är Farfars skylt av mässing med kompassrosen, under mossan vid en av tuvorna (dold tills han har lyft på den fjärde tuvan, k3_mossan). Ön gungar inte hela tiden, bara när han kliver upp och när huvudet lyfts (87.4). Ordet står med en spricka mellan SKÖLD och PADDA, och under det en rad små tecken täckt av snäckor. Ingen utgång: sköldpaddan simmar själv till sandbanken i slutet av pass 1."
+   "anteckning": "1 skärm: skalet ovanifrån, så stort att det ser ut som en ö, med gräs, fem tjocka tuvor av mossa och ett litet träd. Det gungar en gång när han kliver upp och en gång när huvudet lyfts (87.4). skylt_skal är Farfars skylt av mässing med kompassrosen, dold tills han har lyft den fjärde tuvan (k3_mossan). Ordet står med en spricka mellan SKÖLD och PADDA. Under ordet sitter fyra klumpar snäckor (snacka_1–4) över en rad med Farfars tecken. De syns när skylten syns. Ingen utgång: sköldpaddan simmar själv till sandbanken när pass 3 börjar."
   },
   {
    "id": "sandbanken",
@@ -230,10 +309,6 @@
     "skoldpadda_huvud",
     "skoldpadda_fena",
     "skylt_skal",
-    "snacka_1",
-    "snacka_2",
-    "snacka_3",
-    "snacka_4",
     "under_fenan",
     "bakom_fenan",
     "under_huvudet",
@@ -271,7 +346,7 @@
      ]
     }
    ],
-   "anteckning": "1 skärm (manus 19 v0.3.1, Rummen 3). En sandbank nära marknaden. Sköldpaddan vilar med framfenorna på sanden och huvudet framåt, och hjälten går runt framdelen på sanden och upp på skalet. De fyra platserna i k3_fenan är korsade (under och bakom × fenan och huvudet), och det ska synas på ett ögonblick vad som är under och vad som är bakom. skylt_skal syns på skalet, med snäckorna snacka_1–4 över raden med tecken. skoldpadda_huvud och skoldpadda_fena byter bild efter rummets tillstånd, som brevramen (Teknik 16:55, fråga 6): huvudet nere i dag, fenan uppe i fena_uppe och luftskepp. tang_1–3 är tussarna under fenan och syns när fenan är lyft. Flaskan ligger under den tredje (k3_tangtussarna, pass 3). skalkant är det mörka hålet baktill. fena_trappa är fenan som sköldpaddan lägger fram som en trappa efter duellen. Berget som ryker syns svagt långt borta (nästa regions landmärke). Tillståndet luftskepp: pass 3, med skuggan, repstegen och ankaret."
+   "anteckning": "1 skärm (manus 19 v0.3.1, Rummen 3). En sandbank nära marknaden. Sköldpaddan vilar med framfenorna på sanden och huvudet framåt, och hjälten går runt framdelen på sanden och upp på skalet. De fyra platserna i k3_fenan är korsade (under och bakom × fenan och huvudet), och det ska synas på ett ögonblick vad som är under och vad som är bakom. skylt_skal syns på skalet. skoldpadda_huvud och skoldpadda_fena byter bild efter rummets tillstånd, som brevramen (Teknik 16:55, fråga 6): huvudet nere i dag, fenan uppe i fena_uppe och luftskepp. tang_1–3 är tussarna under fenan och syns när fenan är lyft. Flaskan ligger under den tredje (k3_tangtussarna, pass 3). skalkant är det mörka hålet baktill. fena_trappa är fenan som sköldpaddan lägger fram som en trappa efter duellen. Berget som ryker syns svagt långt borta (nästa regions landmärke). Tillståndet luftskepp: pass 3, med skuggan, repstegen och ankaret."
   }
  ],
  "scener": [
@@ -285,15 +360,16 @@
     "text": "Var var vi? Ni kom till floden.",
     "upplast": true
    },
+   "anteckning": "Manus 19 v0.4.1, pass 1. Farfar säger var biten är, och det är skämtet: för en gångs skull minns han rätt, och ön finns inte (83.4). Frukosten visar tre tut = mat (79.3). Skepparen kallar med AHOJ! och säger sedan tre repliker: att han också letar, att hans morfar kallade på ön med hornet, och att hissen upp bara går när hjulet snurrar (99.2.2). Han säger alltid min morfar, aldrig farfar. Bilden kartbit3_on och regierna för frukosten och skepparen som pekar kommer när Stil har ritat.",
    "steg": [
     {
      "typ": "mellanscen",
-     "beskrivning": "Floden är bred och blå. Pråmar med blå och vita ränder ligger längs stranden. Långt uppströms syns vassbyns radiomast."
+     "beskrivning": "Floden är bred och blå. Pråmar med blå och vita ränder ligger längs stranden. Längst bort står en gammal kvarn med ett vattenhjul som inte snurrar, och högst upp på kvarnen blänker ett stort horn av mässing. Långt uppströms syns vassbyns radiomast."
     },
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Biten är på ön. Det minns jag!",
+     "text": "Kartbit fyra ligger på en ö här. Det minns jag!",
      "upplast": true,
      "via": "radio"
     },
@@ -302,39 +378,176 @@
      "beskrivning": "Kartbit 3 i närbild: floden, och mitt i den en liten ö. Sedan floden igen. Där är bara vatten."
     },
     {
-     "typ": "mellanscen",
-     "beskrivning": "På pråmarna blåser en flodman i ett stort horn av mässing: tre korta tut. Alla kommer med tallrikar. Frukost!"
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Va? Ön låg ju här!",
+     "upplast": true,
+     "via": "radio"
     },
     {
-     "typ": "replik",
-     "talare": "berattare",
-     "text": "Gå till pråmen med hornet!",
-     "upplast": true
+     "typ": "mellanscen",
+     "beskrivning": "På en pråm blåser en flodbo tre korta tut i ett litet horn. Alla kommer med tallrikar. Frukost!"
     },
     {
      "typ": "prata",
      "figur": "skepparen",
      "kalla": {
+      "typ": "replik",
       "talare": "skepparen",
-      "text": "Ahoj! Ön?",
+      "text": "Ahoj!",
       "upplast": true
      }
     },
     {
      "typ": "replik",
      "talare": "skepparen",
-     "text": "Den kom när jag var liten.",
+     "text": "Letar du också efter ön?",
      "upplast": true
     },
     {
      "typ": "replik",
      "talare": "skepparen",
-     "text": "Den tittade sig omkring. Sen sjönk den.",
+     "text": "Min morfar kallade på ön med hornet där uppe.",
+     "upplast": true
+    },
+    {
+     "typ": "replik",
+     "talare": "skepparen",
+     "text": "Men hissen dit upp går bara när hjulet snurrar.",
      "upplast": true
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Skepparen pekar på den målade stenen vid hornet. Ett horn och en ö är målade på den."
+     "beskrivning": "Skepparen pekar på kvarnhjulet. Tjock tång har snott sig runt det, och det rör sig inte. Uppe vid hornet hänger säckhissens rep stilla. En flodbo går förbi och skrattar. Skepparen tittar ner i däcket."
+    },
+    {
+     "typ": "pussel",
+     "pussel_id": "k3_hjulet"
+    },
+    {
+     "typ": "pussel",
+     "pussel_id": "k3_tangen_hjul"
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Ordkraft! Hjulet snurrar igen.",
+     "upplast": true
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Gå in i kvarnen!",
+     "upplast": true
+    },
+    {
+     "typ": "ga_till",
+     "mal": "dorr_kvarn"
+    }
+   ]
+  },
+  {
+   "id": "k3s02_kvarnen",
+   "pass": 1,
+   "rum": "kvarnen",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Ni är i kvarnen.",
+    "upplast": true
+   },
+   "anteckning": "Manus 19 v0.4.1, kvarnens tavla med två rader (ur 19b). Säckhissen tar honom upp till loftet.",
+   "steg": [
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Det är dammigt och fullt av mjöl. På väggen hänger en gammal målad tavla med två rader. Säckhissen står still vid hålet i taket."
+    },
+    {
+     "typ": "pussel",
+     "pussel_id": "k3_kvarn_1"
+    },
+    {
+     "typ": "pussel",
+     "pussel_id": "k3_kvarn_2"
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Hissen åker upp till hornet!",
+     "upplast": true
+    }
+   ]
+  },
+  {
+   "id": "k3s02_loftet",
+   "pass": 1,
+   "rum": "loftet",
+   "tillstand": "mjol",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Ni kom upp till hornet.",
+    "upplast": true
+   },
+   "anteckning": "Det första tutet är ett enda tryck utan pussel (17/11): det väcker skuggan och blåser bort mjölet, så att FEM TUT. INTE TRE. syns i pass 2. Det kan inte bli fel. Regierna loftet_horn och skuggan_lyssnar kommer när Stil har ritat. Passet slutar här, med skuggan som sjunker.",
+   "steg": [
+    {
+     "typ": "mellanscen",
+     "beskrivning": "En öppen lucka mot floden, och det stora hornet av mässing, format som kammen på en dinosaurie. Det är fullt av mjöl. Långt nere på sin pråm tittar skepparen upp."
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Tuta i hornet!",
+     "upplast": true
+    },
+    {
+     "typ": "tryck",
+     "foremal": "hornet"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Tutet är djupt och långt och rullar ut över floden. Mjölet blåser ut ur hornet i ett vitt moln. Långt ute bubblar det. En jättelik skugga glider fram under vattnet, stannar, som om den lyssnar, och sjunker igen.",
+     "tillstand_efter": "rent"
+    },
+    {
+     "typ": "replik",
+     "talare": "skepparen",
+     "text": "Såg du skuggan? Jag visste det!",
+     "upplast": true
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "{unge} står helt stilla. Tutet lät som mamma!",
+     "upplast": true
+    },
+    {
+     "typ": "sparpunkt",
+     "pass_slut": true,
+     "valfri": false
+    }
+   ]
+  },
+  {
+   "id": "k3s03_hornet",
+   "pass": 2,
+   "rum": "loftet",
+   "tillstand": "rent",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Något stort simmade under vattnet.",
+    "upplast": true
+   },
+   "anteckning": "Pass 2 börjar med det andra tutet, som han läser sig till (P29_tryck, ratt 5). Ungen tror att det är mamma och simmar för första gången. Skepparen får sitt: ön finns. Regin unge_simmar finns, och unge_ropar är ett av ungens inspelade läten, högre än när den svarar.",
+   "steg": [
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Mjölet är borta från hornet. På mässingen, där mjölet satt, syns målade bokstäver."
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Det står något på hornet!",
+     "upplast": true
     },
     {
      "typ": "pussel",
@@ -342,27 +555,38 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Långt ute bubblar det. En stor skugga rör sig under vattnet, vänder och börjar glida bort. Ungen står helt stilla med huvudet högt. Det lät som mamma!"
-    },
-    {
-     "typ": "mellanscen",
-     "beskrivning": "Ungen hoppar i floden, PLASK, och simmar rakt ut mot skuggan."
+     "beskrivning": "Långt ute bubblar det igen, närmare nu. Ungen spetsar öronen, tar sats och hoppar ut genom luckan, rakt ner i floden. PLASK! Den simmar ut mot bubblorna."
     },
     {
      "typ": "replik",
      "talare": "berattare",
-     "text": "För kallt? Inte nu. {unge} simmar!",
+     "text": "{unge} tror att det är mamma!",
      "upplast": true
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Ungen ropar, så högt den kan. Skuggan stannar och vänder tillbaka. Vattnet välver sig, och en ö stiger upp: gräs, mossa och ett litet träd. Ungen klättrar upp och skakar sig. Ön glider in mot pråmen, och från dess kant hänger tjock tång som en gardin. Skepparen står vid relingen och tar av sig hatten.",
-     "tillstand_efter": "on"
+     "beskrivning": "Ungen ropar, så högt den kan. Vattnet välver sig, och en ö stiger upp: gräs, mossa och ett litet träd. Ungen klättrar upp på ön och skakar sig. Ön glider in till kvarnens brygga. Skepparen tar av sig hatten. Säckhissen bär hjälten ner."
     },
     {
-     "typ": "pussel",
-     "pussel_id": "k3_tangen"
-    },
+     "typ": "replik",
+     "talare": "skepparen",
+     "text": "Ön finns! Min morfar hade rätt!",
+     "upplast": true
+    }
+   ]
+  },
+  {
+   "id": "k3s03_bryggan",
+   "pass": 2,
+   "rum": "floden",
+   "tillstand": "on",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Ön ligger vid kvarnen.",
+    "upplast": true
+   },
+   "anteckning": "Ön ligger vid kvarnens brygga, och plankan syns. Han går själv upp på ön.",
+   "steg": [
     {
      "typ": "visa_foremal",
      "foremal": "planka_on"
@@ -377,22 +601,22 @@
      "typ": "ga_till",
      "mal": "planka_on"
     }
-   ],
-   "anteckning": "Manus 19 v0.3.1, pass 1. Farfar säger var biten är, och det är skämtet: för en gångs skull minns han rätt, och ön finns inte (83.4). Frukosttuten visar tre tut = mat innan han läser stenen (79.3). Ungen simmar för första gången, och \"Brrr! Det är för kallt att simma dit.\" från kapitel 2 löses in. Rummets tillstånd byter till on när ön har stigit (mellanscenen). Ungens rop är ett av ungens inspelade läten, högre än när den svarar (fråga 10)."
+   ]
   },
   {
-   "id": "k3s02_on",
-   "pass": 1,
+   "id": "k3s04_on",
+   "pass": 2,
    "rum": "on",
    "vid_omstart": {
     "talare": "farfar",
     "text": "Var var vi? Ni är på ön.",
     "upplast": true
    },
+   "anteckning": "Hjälten hittar skylten själv (84.4). Mossan är P26 med verb lyfta, och skylten är alltid fjärde tuvan. Skylten läses i två steg (86.4.1), och huvudet lyfts först efter båda. Farfar minns flaskan (Farfar har glömt, 99.5). Snäckorna och chiffret ligger på ön (manus 19 v0.4.1), och passet slutar när UNDER FENAN lyser. Regierna skoldpadda_huvud och skylt_tecken kommer när Stil har ritat.",
    "steg": [
     {
      "typ": "mellanscen",
-     "beskrivning": "Ön gungar lite under fötterna. Gräs, tjock mossa och ett litet träd. Ungen springer runt och nosar i gräset."
+     "beskrivning": "Ön gungar till när han kliver upp. Gräs, tjock mossa och ett litet träd. Ungen springer runt och nosar i gräset."
     },
     {
      "typ": "pussel",
@@ -404,7 +628,7 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Under mossan sitter en skylt av mässing med Farfars kompassros. Ett långt ord står på den, med en spricka i mitten. Under ordet sitter en rad små tecken, täckt av snäckor."
+     "beskrivning": "Under mossan sitter en skylt av mässing med Farfars kompassros. Ett långt ord står på den, med en spricka i mitten. Under ordet sitter fyra klumpar med snäckor."
     },
     {
      "typ": "pussel",
@@ -421,35 +645,19 @@
     {
      "typ": "replik",
      "talare": "skepparen",
-     "text": "En sköldpadda! Hela tiden!",
+     "text": "En sköldpadda! Ön var en sköldpadda hela tiden!",
      "upplast": true
     },
     {
-     "typ": "mellanscen",
-     "beskrivning": "Sköldpaddan simmar långsamt till en sandbank nära marknaden och lägger framfenorna på sanden."
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Nu minns jag! Jag gömde biten i en flaska.",
+     "upplast": true,
+     "via": "radio"
     },
     {
-     "typ": "sparpunkt",
-     "pass_slut": true,
-     "valfri": false
-    }
-   ],
-   "anteckning": "Hjälten hittar skylten själv (84.4). Manuset vill att han lyfter på mossan med handen, inte med staven, eftersom han står på något levande (16 §3). Mossan är P26 med verb lyfta, och skylten är alltid fjärde tuvan (k3_mossan). Knuffen: ungen nosar i närheten, men det är hjälten som hittar. Skylten läses i två steg (86.4.1), och huvudet lyfts först efter båda."
-  },
-  {
-   "id": "k3s03_sandbanken",
-   "pass": 2,
-   "rum": "sandbanken",
-   "tillstand": "dag",
-   "vid_omstart": {
-    "talare": "farfar",
-    "text": "Var var vi? Ön är en sköldpadda!",
-    "upplast": true
-   },
-   "steg": [
-    {
      "typ": "mellanscen",
-     "beskrivning": "Sköldpaddan vilar vid sandbanken och blundar i solen. På skylten, under ordet, sitter snäckor över den lilla raden."
+     "beskrivning": "Under ordet på skylten sitter snäckorna kvar."
     },
     {
      "typ": "pussel",
@@ -462,12 +670,35 @@
     {
      "typ": "replik",
      "talare": "berattare",
-     "text": "Farfars tecken! Vad står det?",
+     "text": "Farfars hemliga tecken! Vad står det?",
      "upplast": true
     },
     {
      "typ": "pussel",
      "pussel_id": "k3_chiffret"
+    },
+    {
+     "typ": "sparpunkt",
+     "pass_slut": true,
+     "valfri": false
+    }
+   ]
+  },
+  {
+   "id": "k3s05_sandbanken",
+   "pass": 3,
+   "rum": "sandbanken",
+   "tillstand": "dag",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Du läste mina tecken.",
+    "upplast": true
+   },
+   "anteckning": "Pass 3 börjar med att gå dit det står. Sköldpaddans rop är inte mamma, och kramen är kapitlets omsorg. Det slutar i en vinst: sköldpaddan visar berget (99.2.5: repliken om att sköldpaddan ropar är struken, och KRAMA {UNGE}! säger varför han går dit, 99.2.6). Regin skoldpadda_visar_berget kommer när Stil har ritat.",
+   "steg": [
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Sköldpaddan simmar långsamt till en sandbank nära marknaden och lägger framfenorna på sanden. Hjälten och ungen hoppar ner i sanden."
     },
     {
      "typ": "pussel",
@@ -480,13 +711,13 @@
     {
      "typ": "replik",
      "talare": "berattare",
-     "text": "{unge} är ledsen.",
+     "text": "Men mamma svarar inte. {unge} är ledsen.",
      "upplast": true
     },
     {
      "typ": "replik",
      "talare": "berattare",
-     "text": "Gå till {unge}!",
+     "text": "Krama {unge}!",
      "upplast": true
     },
     {
@@ -498,25 +729,19 @@
      "beskrivning": "Hjälten kramar ungen. Sköldpaddan sträcker fram sitt gamla huvud och puffar försiktigt på ungen med nosen. Sedan vänder den huvudet nedströms, mot ett berg långt borta som ryker. Ungen tittar dit, reser sig och viftar med svansklubban."
     },
     {
-     "typ": "mellanscen",
-     "beskrivning": "Då hörs ett surr över floden. En orange skugga glider över sanden."
-    },
-    {
-     "typ": "sparpunkt",
-     "pass_slut": true,
-     "valfri": false
+     "typ": "pussel",
+     "pussel_id": "k3_tangtussarna"
     }
-   ],
-   "anteckning": "Pass 2: chiffret är passets stora uppgift (ledningen 13/11), med snäckorna som vila före och kramen som vila efter. Kramen är kapitlets omsorg och kan inte bli fel. \"Det var inte mamma\" slutar i en vinst: sköldpaddan visar berget."
+   ]
   },
   {
-   "id": "k3s06_skalkant",
-   "pass": 2,
+   "id": "k3s05_skalkant",
+   "pass": 3,
    "rum": "sandbanken",
    "frivillig": true,
    "startar_i_rum": "sandbanken",
    "startar_vid": "skalkant",
-   "till_scen": "k3s04_ankaret",
+   "till_scen": "k3s06_ankaret",
    "vid_omstart": {
     "talare": "farfar",
     "text": "Var var vi? Ni är vid skalets kant.",
@@ -526,6 +751,7 @@
     "vid": "skalkant",
     "beskrivning": "Ungen stannar vid skalets bakre kant, kikar in i mörkret och tittar sedan på hjälten."
    },
+   "anteckning": "Kapitlets hemlighet och frivilliga formel (08 §4). Den går från början av pass 3 tills duellen börjar. Draget är ungen som kikar in under kanten, utan replik. Klubbsvansen är mammas siluett (77.6), och de fem strecken vid hornet är sköldpaddans gamla rop. Ingen säger det. Samlarsaken är bilden.",
    "steg": [
     {
      "typ": "mellanscen",
@@ -537,7 +763,7 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Ljusbollen glider in under kanten. Där är skalet målat, mycket gammalt: en stor dinosaurie med klubbsvans, och tre små människor med ett horn."
+     "beskrivning": "Ljusbollen glider in under kanten. Där är skalet målat, mycket gammalt: en stor dinosaurie med klubbsvans, tre små människor med ett horn, och fem streck bredvid hornet."
     },
     {
      "typ": "replik",
@@ -552,27 +778,23 @@
       "bild": "malning_skal"
      }
     }
-   ],
-   "anteckning": "Kapitlets hemlighet och frivilliga formel (08 §4). En frivillig scen som börjar vid ett föremål (Teknik 16:55, fråga 9, förslag: startar_vid och lockar.vid med ett föremål). Den går från början av pass 2 tills duellen börjar (till_scen: k3s04_ankaret, före k3_duellen). Draget är ungen som kikar in under kanten, utan replik. Klubbsvansen är mammas siluett (77.6), men ingen säger det. Samlarsaken är bilden."
+   ]
   },
   {
-   "id": "k3s04_ankaret",
+   "id": "k3s06_ankaret",
    "pass": 3,
    "rum": "sandbanken",
    "tillstand": "luftskepp",
    "vid_omstart": {
     "talare": "farfar",
-    "text": "Var var vi? Något glänser under fenan.",
+    "text": "Var var vi? Baronen kom med sitt luftskepp.",
     "upplast": true
    },
+   "anteckning": "Baronen vill ha flaskan (85.1, fynd 6) och läser bara slutet av SKÖLDPADDA (spelarens regel, 38.5). SKÖLD skrivs med skylten som förebild, och bubblan rör aldrig baronen (86.4.2). Duellen är P16_ordduell, och Farfars regel och baronens rop står i den. Sköldpaddans nick och fenan som trappa är tacket, efter segern.",
    "steg": [
     {
-     "typ": "pussel",
-     "pussel_id": "k3_tangtussarna"
-    },
-    {
      "typ": "mellanscen",
-     "beskrivning": "Luftskeppet hänger över sandbanken. Baronen lutar sig ut med kikaren, åt rätt håll den här gången, och läser på skylten. Herr Skata sitter på tropikhjälmen. Sedan ser han flaskan i hjältens hand."
+     "beskrivning": "Ett surr hörs över floden, och en orange skugga glider över sanden. Luftskeppet hänger över sandbanken. Baronen lutar sig ut med kikaren, åt rätt håll den här gången, och läser på skylten. Herr Skata sitter på tropikhjälmen. Sedan ser han flaskan i hjältens hand."
     },
     {
      "typ": "replik",
@@ -583,12 +805,12 @@
     {
      "typ": "replik",
      "talare": "baronen",
-     "text": "Den vill jag ha!",
+     "text": "Ankaret, ner!",
      "upplast": true
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Han släpper sitt ankare. Det faller rakt mot hjälten och ungen och stannar i luften. På skylten lyser SKÖLD."
+     "beskrivning": "Ankaret faller rakt mot hjälten och ungen och stannar i luften. På skylten lyser SKÖLD."
     },
     {
      "typ": "pussel",
@@ -638,19 +860,19 @@
      "typ": "ga_till",
      "mal": "fena_trappa"
     }
-   ],
-   "anteckning": "Pass 3. Flaskan ligger i den tredje tussen tång under fenan, och han lyfter tussarna med handen (k3_tangtussarna). Baronen vill ha flaskan (85.1, fynd 6) och läser bara slutet av SKÖLDPADDA (spelarens regel, 38.5). SKÖLD skrivs med skylten som förebild, och bubblan rör aldrig baronen (86.4.2). Duellen är P16_ordduell, och Farfars regel och baronens rop står i den. Sköldpaddans nick och fenan som trappa är tacket, efter segern (granskning 8, fynd 1)."
+   ]
   },
   {
-   "id": "k3s05_resan",
+   "id": "k3s07_resan",
    "pass": 3,
    "rum": "floden",
    "tillstand": "kvall",
    "vid_omstart": {
     "talare": "farfar",
-    "text": "Var var vi? Ni har Farfars flaska.",
+    "text": "Var var vi? Ni har min flaska.",
     "upplast": true
    },
+   "anteckning": "Resan nedför floden är tacket och kapitlets slut. Hjälten sitter på skalet (97.5) och kan inte gå. De två trycken är flaskan och skepparen, som står i kvarnens lucka vid hornet. Farfars två repliker om baronens bit löser in löftet från kapitel 2 (72.9) och är reserven om pass 3 blir för långt (99.4). \"Bit fyra! Vägen går till berget.\" är struken (manus 19 v0.4). Regin resan_kvall kommer när Stil har ritat.",
    "steg": [
     {
      "typ": "mellanscen",
@@ -678,20 +900,20 @@
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Bit fyra! Vägen går till berget.",
+     "text": "Baronen har den sista kartbiten.",
      "upplast": true,
      "via": "radio"
     },
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Baronen har sista biten. Jag gömde den vid molnen.",
+     "text": "Jag gömde den uppe i molnen. Han hittade den!",
      "upplast": true,
      "via": "radio"
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "De glider förbi marknaden. Flodfolket sätter ut sina ljusbåtar på vattnet, och skepparen står vid hornet och vinkar."
+     "beskrivning": "De glider förbi marknaden. Flodfolket sätter ut sina ljusbåtar på vattnet. Uppe i kvarnens lucka står skepparen vid det stora hornet och vinkar."
     },
     {
      "typ": "replik",
@@ -705,12 +927,12 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Skepparen blåser ett tut, djupt och långt. Sköldpaddan svarar med sitt eget rop. Ljusbåtarna gungar. Kvällssolen värmer skalet, ungen torkar och somnar mot hjälten, och långt borta ryker berget. Två månar stiger."
+     "beskrivning": "Skepparen blåser fem tut, djupa och långa. Sköldpaddan svarar med sitt eget rop. På pråmarna står flodfolket alldeles tysta och tittar. Ljusbåtarna gungar. Kvällssolen värmer skalet, ungen torkar och somnar mot hjälten, och långt borta ryker berget. Två månar stiger."
     },
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Du såg vad som var sant. Nu är du lögnavslöjare!",
+     "text": "Du läste rätt. Nu är du lögnavslöjare!",
      "upplast": true,
      "via": "radio"
     },
@@ -722,7 +944,7 @@
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "God natt, mina simmare.",
+     "text": "God natt. Sov gott på sköldpaddan!",
      "upplast": true,
      "via": "radio"
     },
@@ -737,102 +959,52 @@
      "pass_slut": true,
      "valfri": false
     }
-   ],
-   "anteckning": "Resan nedför floden är tacket och kapitlets slut (85.1, fynd 10): ritualerna kvällen och god natt får upprepas, men bilden och orden är nya. Hjälten sitter på skalet ute på floden (fråga 11). Han kan inte gå, och de två trycken (steget tryck) är flaskan han håller och skepparen på sin pråm. Mammas skugga växer inte i kapitel 3 (87.4). Farfars rad om baronens bit löser in löftet från kapitel 2 (72.9) och är reserven om pass 3 mäts över 6 minuter (86.6)."
+   ]
   }
  ],
  "pussel": [
   {
-   "id": "k3_hornet",
-   "typ": "P29_tryck",
-   "instruktion": {
-    "talare": "berattare",
-    "text": "Tuta i hornet!",
-    "upplast": true
-   },
-   "foremal": "hornet",
-   "ratt": 1,
-   "tystnad_sek": 3,
-   "skylt": "sten_horn",
-   "hjalp": "ett_ord",
-   "varianter": {
-    "L4": {
-     "text": [
-      "Ett tut.",
-      "Inte tre."
-     ]
-    }
-   },
-   "vid_antal": {
-    "2": {
-     "reaktion": "alla på pråmarna tittar undrande upp",
-     "replik": {
-      "talare": "berattare",
-      "text": "Tut tut? Ingen förstår.",
-      "upplast": true
-     }
-    },
-    "3+": {
-     "reaktion": "flodfolket springer fram med sina tallrikar en gång till och tittar sig omkring",
-     "replik": {
-      "talare": "berattare",
-      "text": "Tre tut betyder mat!",
-      "upplast": true
-     }
-    }
-   },
-   "vid_ratt": {
-    "handling": "hornet tutar ett tut, djupt och långt, som ropet från ett stort djur. Det ekar över vattnet.",
-    "fest": "liten"
-   },
-   "knuff": {
-    "handling": "stenen glimtar"
-   },
-   "forenkla": {
-    "efter_fel": 2,
-    "andring": "ETT lyser på stenen"
-   },
-   "anteckning": "Manus 19, k3_hornet, med Tekniks P29_tryck (87.4). Varje tryck på hornet när hjälten står vid det är ett tut. När det har varit tyst i tystnad_sek räknas tuten, och ingen klocka går innan första trycket. Ett tut är rätt, och två och tre eller fler har var sin reaktion (vid_antal). Inget annat händer vid fel, och han kan tuta igen. Lästexten är flodfolkets målade sten. Han har sett tre tut till frukost i k3s01 (visas först, 79.3). INTE kommer igen från kapitel 2, nu som en instruktion att göra. Räknas som läsval i budgeten."
-  },
-  {
-   "id": "k3_tangen",
+   "id": "k3_hjulet",
    "typ": "P11_formel",
    "niva": "S3",
    "skriv": "tangentbord",
-   "bild": "tang_gardin",
+   "bild": "tang_hjul",
    "ledbild": "tankebubbla_svard",
    "svar": "SVÄRD",
    "formler": [
     {
      "ord": "SVÄRD",
-     "effekt": "svard_hugger_tangen"
+     "effekt": "svard_hugger_tangen_vid_hjulet"
     }
    ],
    "rimliga": [
     {
+     "ord": "SNURRA",
+     "reaktion": "hjulet knakar men står kvar",
+     "replik": {
+      "typ": "replik",
+      "talare": "berattare",
+      "text": "Bra ord! Men tången håller fast hjulet.",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "LOSS",
+     "reaktion": "tången rycker till men sitter kvar",
+     "replik": {
+      "typ": "replik",
+      "talare": "berattare",
+      "text": "Bra ord! Men tången håller fast hjulet.",
+      "upplast": true
+     }
+    },
+    {
      "ord": "STEGE",
-     "reaktion": "en stege ställer sig mot ön, men tången hänger framför den",
+     "reaktion": "en stege ställer sig mot kvarnen",
      "replik": {
+      "typ": "replik",
       "talare": "berattare",
-      "text": "Bra ord! Men tången är i vägen.",
-      "upplast": true
-     }
-    },
-    {
-     "ord": "BRO",
-     "reaktion": "en liten bro lägger sig mot ön, men tången hänger framför den",
-     "replik": {
-      "talare": "berattare",
-      "text": "Bra ord! Men tången är i vägen.",
-      "upplast": true
-     }
-    },
-    {
-     "ord": "PLANKA",
-     "reaktion": "en planka lägger sig mot ön, men tången hänger framför den",
-     "replik": {
-      "talare": "berattare",
-      "text": "Bra ord! Men tången är i vägen.",
+      "text": "Bra ord! Men du kommer inte in uppifrån.",
       "upplast": true
      }
     },
@@ -840,8 +1012,9 @@
      "ord": "LJUS",
      "reaktion": "tången lyser en stund",
      "replik": {
+      "typ": "replik",
       "talare": "berattare",
-      "text": "Nu ser du tången bättre. Den är kvar.",
+      "text": "Nu ser du tången bättre. Den sitter kvar.",
       "upplast": true
      }
     },
@@ -849,8 +1022,19 @@
      "ord": "FLYG",
      "reaktion": "tången fladdrar och lägger sig igen",
      "replik": {
+      "typ": "replik",
       "talare": "berattare",
-      "text": "Tången fladdrar. Men den hänger kvar.",
+      "text": "Tången fladdrar. Men den sitter kvar.",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "SAX",
+     "reaktion": "en pytteliten sax klipper ett enda strå",
+     "replik": {
+      "typ": "replik",
+      "talare": "berattare",
+      "text": "Bra ord! Men saxen är för liten.",
       "upplast": true
      }
     }
@@ -901,9 +1085,8 @@
     "upplast": true
    },
    "vid_ratt": {
-    "handling": "stavens ände blir ett svärd av guld, och han hugger själv tre tussar tång. Bakom den sista syns plankan till ön.",
-    "fest": "mellan",
-    "ljud": "hugg"
+    "handling": "stavens ände blir ett svärd av guld",
+    "fest": "mellan"
    },
    "vid_fel": {
     "reaktion": "staven fräser, pff",
@@ -915,16 +1098,308 @@
     "ljud": "fras"
    },
    "knuff": {
-    "handling": "bilden i molnet glimtar, och ungen tittar på tången från andra sidan"
+    "handling": "bilden i molnet glimtar, och ungen nafsar i tången vid hjulet"
    },
-   "anteckning": "71.6: den gamla formeln på huvudvägen gör det den alltid gör, kapar växter. Ingen säger vilken formel som passar (spelarens initiativ). Hugget som i kapitel 2 (77.1): tre tussar. Ledbilden efter första försöket, förebilden efter två (69.3). Tången hänger från öns kant, inte från sköldpaddan själv."
+   "anteckning": "Manus 19 v0.4.1, k3_hjulet (förut k3_tangen vid ön). 71.6: den gamla formeln gör det den alltid gör, kapar växter, och ingen säger vilken formel som passar (spelarens initiativ). Hugget som i kapitel 2 (77.1): tre tussar. Ledbilden efter första försöket, förebilden efter två (69.3, 89.3). Sedan hugger han själv de tre tussarna (k3_tangen_hjul, vila). Kedjan hjul → hiss → horn säger skepparen före pusslet (99.2.2)."
+  },
+  {
+   "id": "k3_tangen_hjul",
+   "typ": "P26_krukorna",
+   "verb": "hugga",
+   "instruktion": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "Hugg loss tången!",
+    "upplast": true
+   },
+   "innehall": [
+    "tom",
+    "bar",
+    "tom"
+   ],
+   "foremal": [
+    "tang_hjul_1",
+    "tang_hjul_2",
+    "tang_hjul_3"
+   ],
+   "tillstand_efter": "hjul",
+   "vid_ratt": {
+    "handling": "den sista tussen faller, och hjulet börjar snurra. Vattnet forsar, och det dunkar inne i kvarnen.",
+    "fest": "liten",
+    "syns_redan": true
+   },
+   "knuff": {
+    "handling": "ungen nafsar i närmaste tuss"
+   },
+   "anteckning": "Vila efter SVÄRD, som vassväggen i kapitel 2 (77.1): han hugger själv tre tussar tång runt hjulet, en i taget, och under en ligger ett bär. Rummet floden byter till tillståndet hjul."
+  },
+  {
+   "id": "k3_kvarn_1",
+   "typ": "P1_las_och_valj",
+   "i_rummet": true,
+   "instruktion": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "Läs tavlan och gör som det står!",
+    "upplast": true
+   },
+   "skylt": "tavla_kvarn",
+   "hjalp": "ett_ord",
+   "varianter": {
+    "L3": {
+     "text": "Lyft luckan vid vattnet.",
+     "alternativ": [
+      {
+       "id": "lucka_vatten",
+       "objekt": "lucka_vatten",
+       "bild": "lucka_vid_vattnet",
+       "ratt": true
+      },
+      {
+       "id": "lucka_dorr",
+       "objekt": "lucka_dorr",
+       "bild": "lucka_vid_dorren",
+       "vid_valj": {
+        "reaktion": "mjölet yr över hjälten och ungen, så att de blir vita",
+        "replik": {
+         "typ": "replik",
+         "talare": "berattare",
+         "text": "Det var luckan vid dörren!",
+         "upplast": true
+        }
+       }
+      }
+     ]
+    }
+   },
+   "vid_ratt": {
+    "handling": "vattnet forsar in i rännan, och kugghjulen i taket börjar snurra",
+    "fest": "liten"
+   },
+   "knuff": {
+    "handling": "raden på tavlan glimtar"
+   },
+   "forenkla": {
+    "efter_fel": 2,
+    "andring": "luckan han har prövat stängs"
+   },
+   "efter_3_fel": {
+    "handling": "ungen sätter sig vid luckan vid vattnet"
+   },
+   "anteckning": "Manus 19 v0.4.1, kvarnens tavla rad 1 (ur 19b, 82.3: läsval i rummet med samma skylt, ingen ny mekanik). VID avgör, och båda luckorna syns på skärmen. Raden läses aldrig upp, och nosen fungerar som vanligt. Samma ord i instruktionen som vid hornet: GÖR SOM DET STÅR (99.2.3)."
+  },
+  {
+   "id": "k3_kvarn_2",
+   "typ": "P1_las_och_valj",
+   "i_rummet": true,
+   "instruktion": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "Och nästa rad?",
+    "upplast": true
+   },
+   "skylt": "tavla_kvarn",
+   "hjalp": "ett_ord",
+   "redan_last": 1,
+   "varianter": {
+    "L3": {
+     "text": [
+      "Lyft luckan vid vattnet.",
+      "Stå på den stora säcken."
+     ],
+     "alternativ": [
+      {
+       "id": "pa_stora",
+       "objekt": "pa_stora",
+       "bild": "pa_stora_sacken",
+       "ratt": true
+      },
+      {
+       "id": "vid_stora",
+       "objekt": "vid_stora",
+       "bild": "vid_stora_sacken",
+       "vid_valj": {
+        "reaktion": "hissen åker upp med bara säcken och kommer ner igen",
+        "replik": {
+         "typ": "replik",
+         "talare": "berattare",
+         "text": "Hissen åkte utan dig!",
+         "upplast": true
+        }
+       }
+      },
+      {
+       "id": "pa_lilla",
+       "objekt": "pa_lilla",
+       "bild": "pa_lilla_sacken",
+       "vid_valj": {
+        "reaktion": "den lilla säcken sjunker ihop, PUFF",
+        "replik": {
+         "typ": "replik",
+         "talare": "berattare",
+         "text": "Den säcken var för liten!",
+         "upplast": true
+        }
+       }
+      },
+      {
+       "id": "vid_lilla",
+       "objekt": "vid_lilla",
+       "bild": "vid_lilla_sacken",
+       "vid_valj": {
+        "reaktion": "den lilla säcken sjunker ihop, PUFF",
+        "replik": {
+         "typ": "replik",
+         "talare": "berattare",
+         "text": "Den säcken var för liten!",
+         "upplast": true
+        }
+       }
+      }
+     ]
+    }
+   },
+   "vid_ratt": {
+    "handling": "säckhissen lyfter hjälten och ungen upp genom hålet i taket",
+    "fest": "mellan"
+   },
+   "knuff": {
+    "handling": "raden på tavlan glimtar"
+   },
+   "forenkla": {
+    "efter_fel": 2,
+    "andring": "platserna han har prövat tonas ut"
+   },
+   "efter_3_fel": {
+    "handling": "ungen sätter sig på den stora säcken"
+   },
+   "anteckning": "Manus 19 v0.4.1, kvarnens tavla rad 2. PÅ mot VID och STOR mot LITEN, korsade två och två: PÅ ensamt eller STORA ensamt ger två platser. Rad 1 står grå med en bock (redan_last). Raden med UNDER TRAPPAN ur 19b är struken, eftersom UNDER avgör vid fenan."
+  },
+  {
+   "id": "k3_hornet",
+   "typ": "P29_tryck",
+   "instruktion": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "Tuta som det står!",
+    "upplast": true
+   },
+   "foremal": "hornet",
+   "ratt": 5,
+   "tystnad_sek": 3,
+   "hjalp": "ett_ord",
+   "varianter": {
+    "L4": {
+     "text": [
+      "Fem tut.",
+      "Inte tre."
+     ]
+    }
+   },
+   "vid_antal": {
+    "1": {
+     "reaktion": "skuggan stiger en bit och stannar under vattnet",
+     "replik": {
+      "typ": "replik",
+      "talare": "berattare",
+      "text": "Skuggan stannade. Det var för få tut!",
+      "upplast": true
+     }
+    },
+    "2": {
+     "reaktion": "skuggan stiger en bit och stannar under vattnet",
+     "replik": {
+      "typ": "replik",
+      "talare": "berattare",
+      "text": "Skuggan stannade. Det var för få tut!",
+      "upplast": true
+     }
+    },
+    "3": {
+     "reaktion": "flodfolket springer fram med sina tallrikar en gång till och tittar sig omkring",
+     "replik": {
+      "typ": "replik",
+      "talare": "skepparen",
+      "text": "Nej, nej! Tre tut är frukost!",
+      "upplast": true
+     }
+    },
+    "4": {
+     "reaktion": "skuggan stiger en bit och stannar under vattnet",
+     "replik": {
+      "typ": "replik",
+      "talare": "berattare",
+      "text": "Skuggan stannade. Det var för få tut!",
+      "upplast": true
+     }
+    },
+    "6+": {
+     "reaktion": "skuggan dyker",
+     "replik": {
+      "typ": "replik",
+      "talare": "berattare",
+      "text": "Oj, för många! Skuggan dök.",
+      "upplast": true
+     }
+    }
+   },
+   "vid_ratt": {
+    "handling": "fem djupa, långa tut rullar ut över floden. Det ekar.",
+    "fest": "mellan"
+   },
+   "knuff": {
+    "handling": "texten på hornet glimtar"
+   },
+   "forenkla": {
+    "efter_fel": 2,
+    "andring": "FEM lyser på hornet"
+   },
+   "anteckning": "Manus 19 v0.4.1, k3_hornet (17/11: fem tut, beslut 99). P29_tryck: varje tryck på hornet är ett tut, och när det har varit tyst i tystnad_sek räknas tuten. Ingen klocka går innan första trycket. Det första tutet i pass 1 var ett enda tryck utan pussel (k3s02_loftet), som väckte skuggan och blåste bort mjölet så att texten syns. Fem är ett nytt antal, så det går inte att träffa rätt av en slump. Tre tut är frukost (visas först i k3s01). vid_antal har en nyckel per antal och 6+ för för många, tills Teknik säger om intervall går (99.6). Räknas som läsval i budgeten.",
+   "efter_3_fel": {
+    "handling": "ungen stampar fem gånger med foten"
+   },
+   "skylt": "hornet_skrift"
+  },
+  {
+   "id": "k3_mossan",
+   "typ": "P26_krukorna",
+   "verb": "lyfta",
+   "instruktion": {
+    "talare": "berattare",
+    "text": "Leta på ön!",
+    "upplast": true
+   },
+   "innehall": [
+    "snigel",
+    "bar",
+    "tom",
+    "skylt",
+    "fisk"
+   ],
+   "foremal": [
+    "tuva_1",
+    "tuva_2",
+    "tuva_3",
+    "tuva_4",
+    "tuva_5"
+   ],
+   "sak_vid": 4,
+   "vid_ratt": {
+    "handling": "under mossan glimtar ett hörn av mässing med kompassrosen"
+   },
+   "knuff": {
+    "handling": "ungen nosar vid närmaste tuva som inte är lyft",
+    "efter_sek": 15
+   },
+   "anteckning": "Vila, leta med handen (Teknik 16:55, fråga 5). Hjälten lyfter på mossan och använder inte staven, eftersom han står på något levande (16 §3). Under tuvorna finns en snigel, ett bär, ingenting och en liten fisk som sprattlar ner i vattnet. Posten skylt (den fjärde i innehall) hittas alltid som nummer fyra, oavsett vilken tuva han lyfter (sak_vid), så att han letar lite men aldrig behöver lyfta alla fem. Ungen nosar i närheten, men det är hjälten som hittar (84.4)."
   },
   {
    "id": "k3_skylten_1",
    "typ": "P1_las_och_valj",
    "instruktion": {
+    "typ": "replik",
     "talare": "berattare",
-    "text": "Vad står det?",
+    "text": "Vad står det på skylten?",
     "upplast": true
    },
    "skylt": "skylt_skal",
@@ -940,7 +1415,7 @@
       },
       {
        "id": "sko",
-       "bild": "sko",
+       "bild": "kort_sko",
        "vid_valj": {
         "reaktion": "ungen drar upp en gammal sko ur mossan och luktar på den",
         "syns_redan": true
@@ -977,8 +1452,9 @@
    "id": "k3_skylten_2",
    "typ": "P1_las_och_valj",
    "instruktion": {
+    "typ": "replik",
     "talare": "berattare",
-    "text": "Och sen?",
+    "text": "Och vad står det sen?",
     "upplast": true
    },
    "skylt": "skylt_skal",
@@ -1000,7 +1476,7 @@
        "id": "panna",
        "bild": "kort_panna",
        "vid_valj": {
-        "reaktion": "något skramlar på skepparens pråm",
+        "reaktion": "något skramlar inne i kvarnen",
         "syns_redan": true
        }
       },
@@ -1032,67 +1508,6 @@
    "anteckning": "86.4.1, steg 2: SKÖLD står grå med en bock (redan_last), och PADDA lyser. Tre bildkort som alla börjar på P, och PANNA börjar som PADDA och är lika lång. Efter rätt lyfter sköldpaddan huvudet (k3s02). Läsningen ger överraskningen (85.1)."
   },
   {
-   "id": "k3_mossan",
-   "typ": "P26_krukorna",
-   "verb": "lyfta",
-   "instruktion": {
-    "talare": "berattare",
-    "text": "Leta på ön!",
-    "upplast": true
-   },
-   "innehall": [
-    "snigel",
-    "bar",
-    "tom",
-    "skylt",
-    "fisk"
-   ],
-   "foremal": [
-    "tuva_1",
-    "tuva_2",
-    "tuva_3",
-    "tuva_4",
-    "tuva_5"
-   ],
-   "sak_vid": 4,
-   "vid_ratt": {
-    "handling": "under mossan glimtar ett hörn av mässing med kompassrosen"
-   },
-   "knuff": {
-    "handling": "ungen nosar vid närmaste tuva som inte är lyft",
-    "efter_sek": 15
-   },
-   "anteckning": "Vila, leta med handen (Teknik 16:55, fråga 5). Hjälten lyfter på mossan och använder inte staven, eftersom han står på något levande (16 §3). Under tuvorna finns en snigel, ett bär, ingenting och en liten fisk som sprattlar ner i vattnet. Posten skylt (den fjärde i innehall) hittas alltid som nummer fyra, oavsett vilken tuva han lyfter (sak_vid), så att han letar lite men aldrig behöver lyfta alla fem. Ungen nosar i närheten, men det är hjälten som hittar (84.4)."
-  },
-  {
-   "id": "k3_tangtussarna",
-   "typ": "P26_krukorna",
-   "verb": "lyfta",
-   "instruktion": {
-    "talare": "berattare",
-    "text": "Leta i tången!",
-    "upplast": true
-   },
-   "innehall": [
-    "raka",
-    "tom",
-    "flaska"
-   ],
-   "foremal": [
-    "tang_1",
-    "tang_2",
-    "tang_3"
-   ],
-   "sak_i_sista": "flaska",
-   "vid_ratt": {
-    "handling": "under den sista tussen ligger Farfars flaska av mässing med kompassrosen. Hjälten tar den."
-   },
-   "knuff": {
-    "handling": "ungen nosar vid närmaste tuss"
-   },
-   "anteckning": "Vila, leta med handen (fråga 5). Tre tussar tång under fenan: en räka, ingenting, och Farfars flaska i den sista (sak_i_sista). Han tar flaskan själv."
-  },
-  {
    "id": "k3_snackorna",
    "typ": "P26_krukorna",
    "instruktion": {
@@ -1116,7 +1531,7 @@
    "knuff": {
     "handling": "ungen tittar på närmaste klump med snäckor"
    },
-   "anteckning": "Vila före chiffret (ledningen 13/11). Snäckorna sitter på skylten, som är Farfars sak av mässing, så staven rör aldrig sköldpaddan (16 §3). Varje klump han knackar bort visar två eller tre tecken, och under en ligger ett bär."
+   "anteckning": "Vila före chiffret (ledningen 13/11), på ön i pass 2 (manus 19 v0.4.1). Snäckorna sitter på skylten, som är Farfars sak av mässing, så staven rör aldrig sköldpaddan (16 §3). Varje klump han knackar bort visar två eller tre tecken, och under en ligger ett bär."
   },
   {
    "id": "k3_chiffret",
@@ -1214,7 +1629,7 @@
    "efter_3_fel": {
     "handling": "ungen sätter nosen på rätt tecken på nyckeln"
    },
-   "anteckning": "Manus 19, Chiffret, med Tekniks lage: meddelande (87.4). Ett meddelande som ska läsas, inte ett lås (granskning 8, fynd 8): UNDER FENAN, två ord och tio tecken, med ett mellanslag mellan orden i tecken. Låset, bygeln och lådan ritas inte. En ruta i taget, och han skriver på tangentbordet (elva brickor tar för stor plats). Räknas som skrivuppgift i budgeten (87.6). Nyckeln är kapitel 3:s egen med elva tecken, hel från början och blandad: ordningen ovan är den som gäller, och inga två tecken som står bredvid varandra i meddelandet står bredvid varandra på nyckeln (13/11). De fem nya tecknen är vag, fisk, droppe, krabba och fjaril. Rätt bokstav står kvar direkt, och nästa tecken markeras. Spelet ber honom inte skriva i äventyrsboken (13/11). Ingen tidspress: det är passets stora uppgift, med vila före (snäckorna) och efter (kramen). Loggen per tecken: tid, antal fel och om hjälpen användes. 90.7: knuffen glimtar rutan han står vid, aldrig nyckeln, tidigast efter ca 25 s, och varje tangent startar om klockan (89.3)."
+   "anteckning": "Manus 19, Chiffret, med Tekniks lage: meddelande (87.4). Ett meddelande som ska läsas, inte ett lås (granskning 8, fynd 8): UNDER FENAN, två ord och tio tecken, med ett mellanslag mellan orden i tecken. Låset, bygeln och lådan ritas inte. En ruta i taget, och han skriver på tangentbordet (elva brickor tar för stor plats). Räknas som skrivuppgift i budgeten (87.6). Nyckeln är kapitel 3:s egen med elva tecken, hel från början och blandad: ordningen ovan är den som gäller, och inga två tecken som står bredvid varandra i meddelandet står bredvid varandra på nyckeln (13/11). De fem nya tecknen är vag, fisk, droppe, krabba och fjaril. Rätt bokstav står kvar direkt, och nästa tecken markeras. Spelet ber honom inte skriva i äventyrsboken (13/11). Ingen tidspress: det är passets stora uppgift, med vila före (mossan och snäckorna), och pass 2 slutar när det är löst. Loggen per tecken: tid, antal fel och om hjälpen användes. 90.7: knuffen glimtar rutan han står vid, aldrig nyckeln, tidigast efter ca 25 s, och varje tangent startar om klockan (89.3)."
   },
   {
    "id": "k3_fenan",
@@ -1222,8 +1637,9 @@
    "i_rummet": true,
    "tillstand_efter": "fena_uppe",
    "instruktion": {
+    "typ": "replik",
     "talare": "berattare",
-    "text": "Gå dit det står!",
+    "text": "Var är flaskan? Gå dit det står!",
     "upplast": true
    },
    "hjalp": "ett_ord",
@@ -1244,8 +1660,9 @@
        "vid_valj": {
         "reaktion": "en liten krabba springer iväg sidledes",
         "replik": {
+         "typ": "replik",
          "talare": "berattare",
-         "text": "Bakom fenan var en krabba!",
+         "text": "Bakom fenan satt en krabba!",
          "upplast": true
         }
        }
@@ -1257,8 +1674,9 @@
        "vid_valj": {
         "reaktion": "sköldpaddan blinkar långsamt och lyfter hakan",
         "replik": {
+         "typ": "replik",
          "talare": "berattare",
-         "text": "Under huvudet var bara hakan!",
+         "text": "Under huvudet fanns bara hakan!",
          "upplast": true
         }
        }
@@ -1270,8 +1688,9 @@
        "vid_valj": {
         "reaktion": "där finns bara mossa och en snigel",
         "replik": {
+         "typ": "replik",
          "talare": "berattare",
-         "text": "Bakom huvudet var en snigel!",
+         "text": "Bakom huvudet satt en snigel!",
          "upplast": true
         }
        }
@@ -1294,6 +1713,34 @@
     "handling": "fenan lyfter sig en bit"
    },
    "anteckning": "Lägesord om sköldpaddan (85.1, fynd 7), L5: två avkodade ord som måste läsas ihop. UNDER ensamt ger två platser, och FENAN ensamt ger två. Felet säger var han var. Lästexten är det han själv skrev i chiffret."
+  },
+  {
+   "id": "k3_tangtussarna",
+   "typ": "P26_krukorna",
+   "verb": "lyfta",
+   "instruktion": {
+    "talare": "berattare",
+    "text": "Leta i tången!",
+    "upplast": true
+   },
+   "innehall": [
+    "raka",
+    "tom",
+    "flaska"
+   ],
+   "foremal": [
+    "tang_1",
+    "tang_2",
+    "tang_3"
+   ],
+   "sak_i_sista": "flaska",
+   "vid_ratt": {
+    "handling": "under den sista tussen ligger Farfars flaska av mässing med kompassrosen. Hjälten tar den."
+   },
+   "knuff": {
+    "handling": "ungen nosar vid närmaste tuss"
+   },
+   "anteckning": "Vila, leta med handen (fråga 5). Tre tussar tång under fenan: en räka, ingenting, och Farfars flaska i den sista (sak_i_sista). Han tar flaskan själv."
   },
   {
    "id": "k3_skold",
@@ -1388,8 +1835,9 @@
    "motstandare": "baronen",
    "harmare": "herr_skata",
    "regel": {
+    "typ": "replik",
     "talare": "farfar",
-    "text": "Han ser fel. Läs du rätt!",
+    "text": "Lyssna inte på baronen. Läs vad det står!",
     "upplast": true,
     "via": "radio"
    },
@@ -1589,75 +2037,76 @@
  ],
  "uppdrag": [
   {
-   "id": "u3_on",
-   "rubrik": "ÖN",
+   "id": "u3_kvarnen",
+   "rubrik": "KVARNEN",
    "bild": "over_vattnet",
    "pass": 1,
    "steg": [
     {
-     "text": "TUTA",
+     "text": "LOSSA HJULET",
      "klart": {
       "scen": "k3s01_floden",
-      "pussel": "k3_hornet"
+      "pussel": "k3_tangen_hjul"
      }
     },
     {
-     "text": "GÅ UPP PÅ ÖN",
+     "text": "LÄS TAVLAN",
      "klart": {
-      "scen": "k3s01_floden",
-      "ga_till": "planka_on"
+      "scen": "k3s02_kvarnen",
+      "pussel": "k3_kvarn_1"
+     }
+    },
+    {
+     "text": "TILL HORNET",
+     "klart": {
+      "scen": "k3s02_kvarnen",
+      "pussel": "k3_kvarn_2"
+     }
+    }
+   ],
+   "stampel": {
+    "scen": "k3s02_loftet",
+    "efter": {
+     "replik": "{unge} står helt stilla. Tutet lät som mamma!"
+    }
+   },
+   "anteckning": "Inget steg säger formelns namn (69.3): LOSSA HJULET, inte SVÄRD. Bildkortet är lånat (over_vattnet) tills Stil ritar kvarnen (kort_kvarn)."
+  },
+  {
+   "id": "u3_on",
+   "rubrik": "ÖN",
+   "bild": "chiffernyckel",
+   "pass": 2,
+   "steg": [
+    {
+     "text": "TUTA RÄTT",
+     "klart": {
+      "scen": "k3s03_hornet",
+      "pussel": "k3_hornet"
      }
     },
     {
      "text": "HITTA SKYLTEN",
      "klart": {
-      "scen": "k3s02_on",
+      "scen": "k3s04_on",
       "pussel": "k3_mossan"
      }
-    }
-   ],
-   "stampel": {
-    "scen": "k3s02_on",
-    "efter": {
-     "pussel": "k3_skylten_2"
-    }
-   },
-   "anteckning": "Bildkortet är lånat från kapitel 2 tills Stil ritar ön (kort_on)."
-  },
-  {
-   "id": "u3_tecknen",
-   "rubrik": "TECKNEN",
-   "bild": "chiffernyckel",
-   "pass": 2,
-   "steg": [
-    {
-     "text": "SNÄCKORNA",
-     "klart": {
-      "scen": "k3s03_sandbanken",
-      "pussel": "k3_snackorna"
-     }
     },
     {
-     "text": "TECKNEN",
+     "text": "LÄS TECKNEN",
      "klart": {
-      "scen": "k3s03_sandbanken",
+      "scen": "k3s04_on",
       "pussel": "k3_chiffret"
      }
-    },
-    {
-     "text": "PLATSEN",
-     "klart": {
-      "scen": "k3s03_sandbanken",
-      "pussel": "k3_fenan"
-     }
     }
    ],
    "stampel": {
-    "scen": "k3s03_sandbanken",
+    "scen": "k3s04_on",
     "efter": {
-     "ga_till": "unge"
+     "pussel": "k3_chiffret"
     }
-   }
+   },
+   "anteckning": "Bildkortet är lånat (chiffernyckel) tills Stil ritar ön (kort_on)."
   },
   {
    "id": "u3_flaskan",
@@ -1666,29 +2115,29 @@
    "pass": 3,
    "steg": [
     {
-     "text": "TÅNGEN",
+     "text": "HITTA PLATSEN",
      "klart": {
-      "scen": "k3s04_ankaret",
+      "scen": "k3s05_sandbanken",
+      "pussel": "k3_fenan"
+     }
+    },
+    {
+     "text": "TA FLASKAN",
+     "klart": {
+      "scen": "k3s05_sandbanken",
       "pussel": "k3_tangtussarna"
      }
     },
     {
      "text": "SKYDDA ER",
      "klart": {
-      "scen": "k3s04_ankaret",
+      "scen": "k3s06_ankaret",
       "pussel": "k3_skold"
-     }
-    },
-    {
-     "text": "DUELLEN",
-     "klart": {
-      "scen": "k3s04_ankaret",
-      "pussel": "k3_duellen"
      }
     }
    ],
    "stampel": {
-    "scen": "k3s04_ankaret",
+    "scen": "k3s06_ankaret",
     "efter": {
      "ga_till": "fena_trappa"
     }

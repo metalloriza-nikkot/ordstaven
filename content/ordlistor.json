@@ -2,8 +2,8 @@
  "$schema": "schema/ordlistor.schema.json",
  "format": 1,
  "meta": {
-  "version": "0.17",
-  "datum": "2026-11-15",
+  "version": "0.18",
+  "datum": "2026-11-17",
   "agare": "Innehåll",
   "textform": "Orden lagras med små bokstäver, formler i versaler. Böjda former (skogen, bron) står med när de används som alternativ.",
   "beskrivning": "Ordlistor 1-6 for ORDSTAVEN. Bilderna ar platshallare (emoji) for grabox. Ett ord ligger i den hogsta lista som nagot av dess drag kraver.",
@@ -20,7 +20,8 @@
   "andrat_v014": "samla och ved (kapitel 2, beslut 78.4).",
   "andrat_v015": "Kapitel 3 (beslut 86.8): orden i lästexterna (tut, tre, padda, sköldpadda, fenan, stort, grönt, grått), Var var vi? (flod, fena), bubblorna (ahoj, där), Dinoboken (dino), uppdragslappens ord och skrivord vid tången och mörkret, och tre ord som ger bilderna i gråboxen (tång, ankare, mörker). Sköldpadda står i lista 5 (sj-ljud) som berättelseord, eftersom det är kapitlets ord och läses i två delar.",
   "andrat_v016": "2026-11-13 (beslut 90.7): orden i duellens testrum som saknades, snögubbe, gubbe, solros, ros och tom. Snögubbe och solros har bilder, eftersom halmdockan pekar på dem.",
-  "andrat_v017": "2026-11-15 (beslut 95.3–95.4): brevhalva, brevhalvan och brevhalvorna (berättelseord, sammansatt), och rev."
+  "andrat_v017": "2026-11-15 (beslut 95.3–95.4): brevhalva, brevhalvan och brevhalvorna (berättelseord, sammansatt), och rev.",
+  "andrat_v018": "2026-11-17 (kapitel 3 v0.3, manus 19 v0.4.1): luckan, vattnet, stå och säcken (kvarnens tavla), fem (hornet), ha (bubblan), horn (Var var vi?) och kvarnen, lossa, hjulet och hornet (uppdragslappen)."
  },
  "listor": {
   "1": "Korta ljudenliga ord, 2-3 bokstaver, ingen konsonantgrupp, ingen dubbelteckning",
@@ -2954,6 +2955,96 @@
    "tema": "lästext",
    "flaggor": [],
    "varfor": "Kapitel 2 (beslut 95.3): baronen och Herr Skata rev ett brev"
+  },
+  {
+   "ord": "luckan",
+   "lista": 4,
+   "bild": null,
+   "tema": "lästext",
+   "flaggor": [],
+   "varfor": "Kapitel 3 v0.3 (manus 19 v0.4.1): kvarnens tavla"
+  },
+  {
+   "ord": "vattnet",
+   "lista": 4,
+   "bild": null,
+   "tema": "lästext",
+   "flaggor": [],
+   "varfor": "Kapitel 3 v0.3 (manus 19 v0.4.1): kvarnens tavla"
+  },
+  {
+   "ord": "stå",
+   "lista": 3,
+   "bild": null,
+   "tema": "lästext",
+   "flaggor": [],
+   "varfor": "Kapitel 3 v0.3 (manus 19 v0.4.1): kvarnens tavla"
+  },
+  {
+   "ord": "säcken",
+   "lista": 4,
+   "bild": null,
+   "tema": "lästext",
+   "flaggor": [],
+   "varfor": "Kapitel 3 v0.3 (manus 19 v0.4.1): kvarnens tavla"
+  },
+  {
+   "ord": "fem",
+   "lista": 1,
+   "bild": null,
+   "tema": "lästext",
+   "flaggor": [],
+   "varfor": "Kapitel 3 v0.3 (manus 19 v0.4.1): FEM TUT. INTE TRE."
+  },
+  {
+   "ord": "ha",
+   "lista": 1,
+   "bild": null,
+   "tema": "bubbla",
+   "flaggor": [],
+   "varfor": "Kapitel 3 v0.3 (manus 19 v0.4.1): bubblan ÖN? HA HA!"
+  },
+  {
+   "ord": "kvarnen",
+   "lista": 3,
+   "bild": null,
+   "tema": "uppdrag",
+   "flaggor": [],
+   "varfor": "Kapitel 3 v0.3 (manus 19 v0.4.1): uppdragslappen"
+  },
+  {
+   "ord": "lossa",
+   "lista": 4,
+   "bild": null,
+   "tema": "uppdrag",
+   "flaggor": [],
+   "varfor": "Kapitel 3 v0.3 (manus 19 v0.4.1): uppdragslappen"
+  },
+  {
+   "ord": "hjulet",
+   "lista": 5,
+   "bild": null,
+   "tema": "uppdrag",
+   "flaggor": [
+    "berattelseord"
+   ],
+   "varfor": "Kapitel 3 v0.3 (manus 19 v0.4.1): uppdragslappen (stumt H)"
+  },
+  {
+   "ord": "hornet",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdrag",
+   "flaggor": [],
+   "varfor": "Kapitel 3 v0.3 (manus 19 v0.4.1): uppdragslappen"
+  },
+  {
+   "ord": "horn",
+   "lista": 2,
+   "bild": "📯",
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 3 v0.3 (manus 19 v0.4.1): Var var vi? i pass 2"
   }
  ]
 }

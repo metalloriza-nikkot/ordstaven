@@ -174,6 +174,10 @@ export class Rum extends Phaser.Scene {
     this.ramTimrar = new Map();
     /** @type {string[]} luftskeppets lägen i den ordning de visades (för testerna) */
     this.regiLogg = [];
+    // kapitel 3 i gråbox (100.4): ungen är i floden (unge_simmar), sköldpaddans huvud och mjölet i hornet
+    /** @type {boolean} */ this.k3UngeIVattnet = false;
+    /** @type {any} */ this.k3Huvud = null;
+    /** @type {any} */ this.k3Mjol = null;
     /** @type {string | null} en hel bild av hjälten i stället för gången (kartbiten upp mot luftskeppet, s22) */
     this.hjaltePose = null;
     /** @type {{ talare: string, riktning: string } | null} det senaste samtalet (testkroken) */
@@ -959,7 +963,9 @@ export class Rum extends Phaser.Scene {
    * - kapitel 2:s gråbox (69.1): `unge_sjunker` (i mellanscenens `unge_till`), `unge_dras_upp`,
    *   `luftskepp_river_brevet`, och i vassen `bubblor_fran_blommorna` och `halvan_flyger_till_handen` (69.5);
    * - kapitel 2 efter beslut 71 (Teknik 34): formlernas effekter (svärdet i vassen, stocken, lyktorna) och
-   *   mellanscenerna med stocken, Tant Rosa och elden, se tabellen `k2` nedan.
+   *   mellanscenerna med stocken, Tant Rosa och elden, se tabellen `k2` nedan;
+   * - kapitel 3 i gråbox (100.4): kartbiten, hornet, skuggan, ungen som simmar, sköldpaddans huvud, tecknen,
+   *   berget och kvällen på floden, också i tabellen `k2`.
    * @param {string} bild @param {string} [mal] mellanscenens unge_till, om den har ett
    * @returns {number} hur länge mellanscenen visas (ms), 0 = ingen bild
    */
@@ -1005,6 +1011,15 @@ export class Rum extends Phaser.Scene {
       // 92.4: baronen och Herr Skata vid bryggan uppifrån, som i sidovyn, och när de ger sig iväg
       skata_ramlar_av_palen: () => this.bryggfigurer('skata_ramlar'),
       baronen_lyfter: () => this.bryggfigurer('lyfter'),
+      // kapitel 3 i gråbox (100.4, manus 19 v0.4.1): gråboxens former tills Stil har ritat
+      kartbit3_on: () => this.kartbit3On(),
+      loftet_horn: () => this.loftetHorn(),
+      skuggan_lyssnar: () => this.skugganLyssnar(),
+      unge_simmar: () => this.ungeSimmar(),
+      skoldpadda_huvud: () => this.skoldpaddaHuvud(),
+      skylt_tecken: () => this.skyltTecken(),
+      skoldpadda_visar_berget: () => this.skoldpaddaVisarBerget(),
+      resan_kvall: () => this.resanKvall(),
     });
     if (k2[bild]) return k2[bild]();
     if (bild.startsWith('luftskepp_')) {
@@ -1950,6 +1965,210 @@ export class Rum extends Phaser.Scene {
     return Math.max(4000, fore + ga + 900);
   }
 
+  // ------------------------------------------------------------------ kapitel 3 i gråbox (beslut 100.4, manus 19 v0.4.1)
+
+  /**
+   * En ring som växer och tonas bort: ett tut, ett rop eller ett plask. @param {number} x @param {number} y
+   * @param {number} r0 @param {number} r1 @param {number} farg @param {number} ms @param {number} [sen] @param {any} [lager]
+   */
+  k3Ring(x, y, r0, r1, farg, ms, sen = 0, lager = this.lagerLjust) {
+    const g = this.add.graphics(); lager.add(g);
+    const t = { p: 0 };
+    this.tweens.add({ targets: t, p: 1, duration: ms, delay: sen, onUpdate: () => {
+      if (!g.active) return;
+      g.clear().lineStyle(1, farg, 1 - t.p).strokeCircle(Math.round(x), Math.round(y), r0 + (r1 - r0) * t.p); this.smutsig = true;
+    }, onComplete: () => { g.destroy(); this.smutsig = true; } });
+  }
+
+  /**
+   * Kartbit 3 i närbild (k3s01): ett papper mitt i bilden med floden och en liten ö som ringas in. Sedan floden igen:
+   * på vattnet där ön borde ligga sprider sig bara två tomma ringar. @returns {number}
+   */
+  kartbit3On() {
+    const k = this.kamera, mx = Math.round(k.x + RUM.bredd / 2), my = Math.round(k.y + RUM.hojd / 2);
+    const smuts = () => { this.smutsig = true; };
+    const c = this.add.container(mx, my).setAlpha(0); this.lagerLuft.add(c);
+    const g = this.add.graphics();
+    g.fillStyle(0xe8d9b0, 1).fillRect(-66, -42, 132, 84).lineStyle(1, 0x8a6a48, 1).strokeRect(-66, -42, 132, 84);
+    g.fillStyle(0x6f9fc8, 1).fillRect(-66, -12, 132, 24).fillStyle(0x5f9a4a, 1).fillCircle(0, 0, 7);
+    const ring = this.add.graphics();
+    c.add([g, ring]);
+    const t = { p: 0 };
+    this.tweens.add({ targets: c, alpha: 1, duration: 300, onUpdate: smuts });
+    this.tweens.add({ targets: t, p: 1, duration: 1600, delay: 300, onUpdate: () => { if (ring.active) ring.clear().lineStyle(1, 0xc0392b, 1).strokeCircle(0, 0, 11 + Math.sin(t.p * Math.PI * 4) * 2); smuts(); } });
+    this.tweens.add({ targets: c, alpha: 0, duration: 300, delay: 2100, onUpdate: smuts, onComplete: () => { c.destroy(); smuts(); } });
+    const vatten = { x: mx, y: Math.round(Math.min(this.storlek.hojd - 28, k.y + RUM.hojd - 32)) };
+    this.k3Ring(vatten.x, vatten.y, 3, 24, 0xf2fbff, 900, 2500);
+    this.k3Ring(vatten.x, vatten.y, 3, 24, 0xf2fbff, 900, 2950);
+    this.regiLogg.push('kartbit 3 visar ön');
+    return 3900;
+  }
+
+  /** Loftet (k3s02_loftet): kameran på hornet, som är fullt av mjöl, och mässingen blänker en gång. @returns {number} */
+  loftetHorn() {
+    const h = this.ruta('hornet');
+    if (!h) return 0;
+    const smuts = () => { this.smutsig = true; };
+    this.regiFokus = { x: h.x + h.b / 2, y: h.y + h.h / 2 };
+    this.k3Mjol?.destroy();
+    const g = this.add.graphics(); this.lagerLjust.add(g); this.k3Mjol = g;
+    g.fillStyle(0xf4f1e8, 1);
+    for (let i = 0; i < 14; i++) g.fillRect(h.x + 4 + ((i * 7) % (h.b - 8)), h.y + 4 + ((i * 5) % (h.h - 8)), 2, 2);
+    const b = this.add.rectangle(h.x + 2, h.y + 2, 3, h.h - 4, 0xfff6c8, 0.9).setOrigin(0, 0); this.lagerLjust.add(b);
+    this.tweens.add({ targets: b, x: h.x + h.b - 5, alpha: 0, duration: 900, delay: 300, onUpdate: smuts, onComplete: () => b.destroy() });
+    this.time.delayedCall(1700, () => { this.regiFokus = null; });
+    this.regiLogg.push('hornet fullt av mjöl');
+    return 1800;
+  }
+
+  /**
+   * Det första tutet (k3s02_loftet): ringar från hornet, mjölet blåser ut genom luckan i ett vitt moln, det bubblar
+   * långt ute, och en jättelik skugga glider fram under vattnet i luckan, stannar och sjunker. @returns {number}
+   */
+  skugganLyssnar() {
+    const h = this.ruta('hornet'), l = this.ruta('lucka_floden');
+    if (!h || !l) return 0;
+    const smuts = () => { this.smutsig = true; };
+    this.k3Mjol?.destroy(); this.k3Mjol = null;
+    const hx = h.x + h.b / 2, hy = h.y + h.h / 2;
+    for (let i = 0; i < 3; i++) this.k3Ring(hx, hy, 6, 44, 0xfff2a8, 900, i * 260);
+    for (let i = 0; i < 16; i++) {
+      const d = this.add.rectangle(hx + (i % 4) * 3 - 6, hy + Math.floor(i / 4) * 3 - 6, 2, 2, 0xf4f1e8); this.lagerLuft.add(d);
+      this.tweens.add({ targets: d, x: l.x + 8 + ((i * 13) % (l.b - 16)), y: l.y + 6 + ((i * 7) % 16), alpha: 0, duration: 900 + (i % 5) * 80, delay: 150 + i * 20, onUpdate: smuts, onComplete: () => d.destroy() });
+    }
+    const vy = l.y + l.h - 14;
+    for (let i = 0; i < 4; i++) this.k3Ring(l.x + l.b * 0.7 + (i % 2) * 5, vy - (i % 2) * 3, 1, 4, 0xf2fbff, 500, 1300 + i * 220);
+    const s = this.add.ellipse(l.x + 8, vy, 30, 9, 0x1b2b3a, 0); this.lagerLjust.add(s);
+    this.tweens.add({ targets: s, x: l.x + l.b / 2, fillAlpha: 0.75, duration: 1400, delay: 1900, ease: 'Sine.easeOut', onUpdate: smuts });
+    this.tweens.add({ targets: s, fillAlpha: 0, scaleX: 0.6, scaleY: 0.6, duration: 900, delay: 4200, onUpdate: smuts, onComplete: () => { s.destroy(); smuts(); } });
+    this.regiLogg.push('skuggan lyssnar');
+    return 5200;
+  }
+
+  /**
+   * Ungen tror att det är mamma (k3s03_hornet): den spetsar öronen, tar sats och hoppar ut genom luckan, PLASK, och ett
+   * litet huvud simmar ut mot bubblorna. Ungen syns inte i loftet efteråt (den är i floden) tills rummet byts.
+   * @returns {number}
+   */
+  ungeSimmar() {
+    const l = this.ruta('lucka_floden');
+    if (!l || !this.ungeBild || !this.unge.visible) return 0;
+    const kant = { x: Math.round(l.x + l.b / 2), y: Math.round(l.y + l.h + 2) }, vy = l.y + l.h - 12;
+    this.hallUngen(this.ungePos.x, this.ungePos.y);
+    this.ungeReagerar(true);
+    this.time.delayedCall(600, () => {
+      this.ungeLage('hopp', kant.x >= this.ungePos.x ? 'hoger' : 'vanster', 217, 1);
+      this.ungeBage(kant, 600, 22, () => {
+        this.k3UngeIVattnet = true; this.unge.setVisible(false);
+        this.k3Ring(kant.x, vy, 2, 10, 0xf2fbff, 500); this.k3Ring(kant.x, vy, 2, 15, 0xf2fbff, 600, 120);
+        const u = this.add.circle(kant.x, vy, 3, 0x7fbf5a); this.lagerLjust.add(u);
+        this.tweens.add({ targets: u, x: l.x + l.b - 10, duration: 1800, delay: 400, ease: 'Sine.easeInOut', onUpdate: () => { u.y = vy + Math.round(Math.sin(u.x / 4)); this.smutsig = true; } });
+      });
+    });
+    this.regiLogg.push('ungen simmar');
+    return 3200;
+  }
+
+  /**
+   * Sköldpaddans huvud (k3s04_on): vattnet forsar, och ett stort rynkigt huvud lyfts upp ur floden vid öns södra kant.
+   * Det vänder sig långsamt mot ungen och står kvar tills rummet byts. @returns {number}
+   */
+  skoldpaddaHuvud() {
+    const smuts = () => { this.smutsig = true; };
+    const x = Math.round(Math.min(this.storlek.bredd - 40, Math.max(40, this.pos.x + 30))), y0 = this.storlek.hojd + 22, y1 = this.storlek.hojd - 14;
+    this.k3Huvud?.destroy();
+    const c = this.add.container(x, y0); this.lagerLuft.add(c); this.k3Huvud = c;
+    const g = this.add.graphics();
+    g.fillStyle(0x6b7a4a, 1).fillEllipse(0, 0, 46, 30).fillStyle(0x4f5c36, 1).fillEllipse(-10, -7, 12, 6).fillEllipse(11, 5, 9, 5);
+    const ogon = this.add.graphics(); ogon.fillStyle(0x111111, 1).fillCircle(-9, -5, 2).fillCircle(9, -5, 2);
+    c.add([g, ogon]);
+    for (let i = 0; i < 3; i++) this.k3Ring(x, y1 + 6, 6, 40, 0xf2fbff, 800, i * 250);
+    this.regiFokus = { x, y: y1 - 30 };
+    this.tweens.add({ targets: c, y: y1, duration: 1300, ease: 'Sine.easeOut', onUpdate: smuts });
+    const mot = Math.sign(this.ungePos.x - x) || 1;
+    this.tweens.add({ targets: c, x: x + mot * 6, duration: 1000, delay: 1600, ease: 'Sine.easeInOut', onUpdate: smuts });
+    this.tweens.add({ targets: ogon, x: mot * 2, duration: 600, delay: 1700, onUpdate: smuts });
+    this.time.delayedCall(3300, () => { this.regiFokus = null; });
+    this.regiLogg.push('sköldpaddans huvud');
+    return 3400;
+  }
+
+  /** Farfars tecken under snäckorna (k3s04_on): en rad med elva tecken som syns ett i taget, kompassrosen först. @returns {number} */
+  skyltTecken() {
+    // under snäckorna, eller under skylten om snäckorna inte står i rummet
+    const sn = ['snacka_1', 'snacka_2', 'snacka_3', 'snacka_4'].map((id) => this.ruta(id)).filter(Boolean);
+    const s = sn.length ? { x: Math.min(...sn.map((o) => o.x)), y: Math.min(...sn.map((o) => o.y)), b: 0, h: 0 } : this.ruta('skylt_skal');
+    if (!s) return 0;
+    if (sn.length) { s.b = Math.max(...sn.map((o) => o.x + o.b)) - s.x; s.h = Math.max(...sn.map((o) => o.y + o.h)) - s.y; }
+    const y = Math.round(s.y + s.h + 4);
+    const platser = [0, 7, 13, 19, 25, 31, 40, 46, 52, 58, 64], x0 = Math.round(s.x + s.b / 2 - 34);
+    const g = this.add.graphics(); this.lagerLjust.add(g);
+    const t = { n: 0 };
+    this.regiFokus = { x: s.x + s.b / 2, y };
+    this.tweens.add({ targets: t, n: platser.length, duration: 1400, onUpdate: () => {
+      if (!g.active) return;
+      g.clear();
+      for (let i = 0; i < Math.floor(t.n); i++) {
+        const px = x0 + platser[i];
+        if (i === 0) g.lineStyle(1, 0xb8862b, 1).strokeCircle(px + 2, y + 2, 3).lineBetween(px + 2, y - 2, px + 2, y + 6).lineBetween(px - 2, y + 2, px + 6, y + 2);
+        else g.fillStyle(0x3a3129, 1).fillRect(px, y, 4, 5);
+      }
+      this.smutsig = true;
+    } });
+    this.time.delayedCall(1800, () => { this.regiFokus = null; });
+    this.regiLogg.push('Farfars tecken');
+    return 1900;
+  }
+
+  /**
+   * Sköldpaddan visar berget (k3s05_sandbanken): huvudet puffar försiktigt på ungen, vänder sig sedan nedströms, och
+   * långt borta syns ett berg som ryker. Ungen reser sig och viftar. @returns {number}
+   */
+  skoldpaddaVisarBerget() {
+    const { o, r } = this.foremalOchBild('skoldpadda_huvud');
+    if (!o || !r?.active) return 0;
+    const smuts = () => { this.smutsig = true; };
+    const hem = { x: r.x, y: r.y };
+    const dx = Math.sign(this.ungePos.x - (o.x + o.b / 2)) * 6, dy = Math.sign(this.ungePos.y - (o.y + o.h / 2)) * 4;
+    this.tweens.add({ targets: r, x: hem.x + dx, y: hem.y + dy, duration: 400, yoyo: true, hold: 250, onUpdate: smuts });
+    this.tweens.add({ targets: r, x: hem.x - 6, duration: 700, delay: 1400, onUpdate: smuts });
+    const k = this.kamera, bx = Math.round(k.x + 26), by = Math.round(k.y + 34);
+    const berg = this.add.graphics().setAlpha(0); this.lagerLuft.add(berg);
+    berg.fillStyle(0x6d6a72, 1).fillTriangle(bx - 16, by + 12, bx + 16, by + 12, bx, by - 8).fillStyle(0x3a3129, 1).fillRect(bx - 3, by - 8, 6, 2);
+    this.tweens.add({ targets: berg, alpha: 1, duration: 600, delay: 1600, onUpdate: smuts });
+    for (let i = 0; i < 6; i++) {
+      const d = this.add.circle(bx, by - 10, 3, 0x9a979e).setAlpha(0); this.lagerLuft.add(d);
+      this.tweens.add({ targets: d, y: by - 30, x: bx + 4 + (i % 2) * 3, alpha: { from: 0.8, to: 0 }, duration: 1200, delay: 1900 + i * 300, onUpdate: smuts, onComplete: () => d.destroy() });
+    }
+    this.time.delayedCall(2700, () => this.ungeReagerar(true));
+    this.time.delayedCall(3300, () => this.ungeReagerar(true));
+    this.regiLogg.push('sköldpaddan visar berget');
+    return 4000;
+  }
+
+  /**
+   * Kvällen på floden (k3s07_resan): skepparen blåser fem långa tut vid hornet, sköldpaddan svarar under hjälten,
+   * ljusbåtarna tänds och gungar på vattnet, och två månar stiger. @returns {number}
+   */
+  resanKvall() {
+    const smuts = () => { this.smutsig = true; };
+    const s = this.ruta('skepparen'), k = this.kamera;
+    if (s) for (let i = 0; i < 5; i++) this.k3Ring(s.x + s.b / 2, s.y - 4, 4, 34, 0xfff2a8, 700, i * 420);
+    for (let i = 0; i < 2; i++) this.k3Ring(this.pos.x, this.pos.y, 6, 56, 0xb8e0c8, 1200, 2300 + i * 320);
+    for (let i = 0; i < 6; i++) {
+      const lx = Math.round(k.x + 30 + i * 48), ly = Math.round(Math.min(this.storlek.hojd - 10, k.y + 150 + (i % 2) * 14));
+      const d = this.add.circle(lx, ly, 2, 0xffd27a).setAlpha(0); this.lagerLuft.add(d);
+      this.tweens.add({ targets: d, alpha: 1, duration: 400, delay: 2000 + i * 150, onUpdate: smuts });
+      this.tweens.add({ targets: d, y: ly - 2, duration: 500, delay: 2000 + i * 150, yoyo: true, repeat: 4, onUpdate: smuts });
+    }
+    [k.x + 248, k.x + 276].forEach((mx, i) => {
+      const m = this.add.circle(Math.round(mx), Math.round(k.y + 34), 5 - i, 0xf4f1e8).setAlpha(0); this.lagerLuft.add(m);
+      this.tweens.add({ targets: m, y: Math.round(k.y + 16 - i * 4), alpha: 1, duration: 1600, delay: 3600 + i * 400, onUpdate: smuts });
+    });
+    this.regiLogg.push('kvällen på floden');
+    return 5600;
+  }
+
   /** Byborna (och Tant Rosa) skuttar och jublar där de står. @param {number} [fore] */
   byborJublar(fore = 0) {
     for (const id of ['fiskaren', 'tvatterskan', 'barnet_drake', 'tant_rosa']) {
@@ -2721,7 +2940,7 @@ export class Rum extends Phaser.Scene {
     this.harRum = !!v.rum;
     if (v.nyttRum || !this.harRum) { this.rumsbild = (this.harRum && v.karta?.bild) || null; this.falt = faltFor(this.rumsbild); this.mark = (this.harRum && v.karta?.mark) || null; this.rumId = v.rum; this.markObjekt = v.karta?.objekt || []; }
     this.visaUnge = v.unge;
-    if (v.nyttRum) { for (const id of [...this.ramSlinga.keys(), ...this.ramTimrar.keys()]) this.stoppaRamar(id); this.ramFor.clear(); this.dolda.clear(); this.ungeMal = null; this.ungeTittarPa = null; this.ungeKlattrar = null; this.stegeNu = null; this.ungeSang = null; this.ungeLyft = 0; this.ungeFast = null; this.hjalteFast = null; this.lerig = 0; this.undvik = []; this.hinderUndvik = null; this.regiFokus = null; this.forstFokus = false; if (this.ungeSvavar) { this.ungeSvavar.g.destroy(); this.ungeSvavar = null; } for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas?.remove(); this.sover = null; } this.vaknar = null; this.rensaRegi(); }
+    if (v.nyttRum) { for (const id of [...this.ramSlinga.keys(), ...this.ramTimrar.keys()]) this.stoppaRamar(id); this.ramFor.clear(); this.dolda.clear(); this.ungeMal = null; this.ungeTittarPa = null; this.ungeKlattrar = null; this.stegeNu = null; this.ungeSang = null; this.ungeLyft = 0; this.ungeFast = null; this.hjalteFast = null; this.lerig = 0; this.undvik = []; this.hinderUndvik = null; this.regiFokus = null; this.forstFokus = false; if (this.ungeSvavar) { this.ungeSvavar.g.destroy(); this.ungeSvavar = null; } for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas?.remove(); this.sover = null; } this.vaknar = null; this.rensaRegi(); this.k3UngeIVattnet = false; this.k3Huvud = null; this.k3Mjol = null; }
     this.tillstand = v.tillstand;
     // figurerna på kvällen (84.2): bilderna byggs första gången, sedan byts bara atlasens källa
     sattKvall(this, this.harRum && v.tillstand === 'kvall' ? KVALL_TABELL : null);
@@ -2798,7 +3017,7 @@ export class Rum extends Phaser.Scene {
     }
     if (!this.harRum && (this.kamera.x || this.kamera.y)) this.sattKamera({ x: 0, y: 0 });
     this.hjalte.setVisible(this.harRum && !this.sover && !this.vaknar);
-    this.unge.setVisible(this.harRum && this.visaUnge && !this.sover?.ungeGomd);
+    this.unge.setVisible(this.harRum && this.visaUnge && !this.sover?.ungeGomd && !this.k3UngeIVattnet);
     // han sitter kvar i fåtöljen när rummet ritas om, men inte i ett nytt rum
     if (this.sitter) { const id = this.sitter.id; this.sitter = null; if (!v.nyttRum) this.sattSig(id); }
     this.ritaLjus();

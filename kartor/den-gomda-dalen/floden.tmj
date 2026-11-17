@@ -11,7 +11,7 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 16,
+ "nextobjectid": 23,
  "properties": [
   {
    "name": "rum",
@@ -68,6 +68,18 @@
     },
     {
      "id": 3,
+     "name": "in_loftet",
+     "type": "",
+     "x": 580,
+     "y": 100,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 4,
      "name": "",
      "type": "vagg",
      "x": 0,
@@ -85,31 +97,13 @@
      ]
     },
     {
-     "id": 4,
-     "name": "",
-     "type": "vagg",
-     "x": 344,
-     "y": 152,
-     "width": 296,
-     "height": 40,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "vatten",
-       "type": "bool",
-       "value": true
-      }
-     ]
-    },
-    {
      "id": 5,
      "name": "",
      "type": "vagg",
-     "x": 600,
-     "y": 104,
-     "width": 40,
-     "height": 48,
+     "x": 344,
+     "y": 132,
+     "width": 296,
+     "height": 60,
      "rotation": 0,
      "visible": true,
      "properties": [
@@ -124,8 +118,8 @@
      "id": 6,
      "name": "pramarna",
      "type": "sak",
-     "x": 344,
-     "y": 140,
+     "x": 352,
+     "y": 116,
      "width": 24,
      "height": 10,
      "rotation": 0,
@@ -133,10 +127,28 @@
     },
     {
      "id": 7,
-     "name": "flodman",
+     "name": "frukosthorn",
+     "type": "sak",
+     "x": 226,
+     "y": 82,
+     "width": 12,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 8,
+     "name": "flodbo_frukost",
      "type": "figur",
-     "x": 396,
-     "y": 108,
+     "x": 196,
+     "y": 58,
      "width": 16,
      "height": 24,
      "rotation": 0,
@@ -150,11 +162,47 @@
      ]
     },
     {
-     "id": 8,
+     "id": 9,
+     "name": "flodbo_skrattar",
+     "type": "figur",
+     "x": 268,
+     "y": 50,
+     "width": 16,
+     "height": 24,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 10,
+     "name": "flodman",
+     "type": "figur",
+     "x": 120,
+     "y": 64,
+     "width": 16,
+     "height": 24,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 11,
      "name": "skepparen",
      "type": "figur",
-     "x": 548,
-     "y": 104,
+     "x": 420,
+     "y": 92,
      "width": 16,
      "height": 24,
      "rotation": 0,
@@ -173,20 +221,59 @@
      ]
     },
     {
-     "id": 9,
-     "name": "hornet",
+     "id": 12,
+     "name": "",
+     "type": "vagg",
+     "x": 512,
+     "y": 0,
+     "width": 112,
+     "height": 72,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 13,
+     "name": "dorr_kvarn",
+     "type": "utgang",
+     "x": 556,
+     "y": 72,
+     "width": 24,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "riktning",
+       "type": "string",
+       "value": "upp"
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      },
+      {
+       "name": "till",
+       "type": "string",
+       "value": "kvarnen"
+      }
+     ]
+    },
+    {
+     "id": 14,
+     "name": "hjul",
      "type": "sak",
-     "x": 576,
-     "y": 112,
-     "width": 14,
-     "height": 12,
+     "x": 488,
+     "y": 16,
+     "width": 24,
+     "height": 56,
      "rotation": 0,
      "visible": true,
      "properties": [
       {
        "name": "sida",
        "type": "string",
-       "value": "alla"
+       "value": "vanster"
       },
       {
        "name": "visas_forst",
@@ -196,11 +283,11 @@
      ]
     },
     {
-     "id": 10,
-     "name": "sten_horn",
+     "id": 15,
+     "name": "tang_hjul_1",
      "type": "sak",
-     "x": 520,
-     "y": 92,
+     "x": 470,
+     "y": 20,
      "width": 14,
      "height": 12,
      "rotation": 0,
@@ -209,18 +296,72 @@
       {
        "name": "sida",
        "type": "string",
-       "value": "alla"
+       "value": "vanster"
       }
      ]
     },
     {
-     "id": 11,
+     "id": 16,
+     "name": "tang_hjul_2",
+     "type": "sak",
+     "x": 470,
+     "y": 38,
+     "width": 14,
+     "height": 12,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "vanster"
+      }
+     ]
+    },
+    {
+     "id": 17,
+     "name": "tang_hjul_3",
+     "type": "sak",
+     "x": 470,
+     "y": 56,
+     "width": 14,
+     "height": 12,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "vanster"
+      }
+     ]
+    },
+    {
+     "id": 18,
+     "name": "brygga_kvarn",
+     "type": "sak",
+     "x": 560,
+     "y": 100,
+     "width": 48,
+     "height": 24,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 19,
      "name": "on",
      "type": "sak",
-     "x": 472,
-     "y": 160,
-     "width": 120,
-     "height": 32,
+     "x": 528,
+     "y": 148,
+     "width": 112,
+     "height": 40,
      "rotation": 0,
      "visible": true,
      "properties": [
@@ -232,36 +373,18 @@
      ]
     },
     {
-     "id": 12,
-     "name": "tang_gardin",
-     "type": "sak",
-     "x": 512,
-     "y": 152,
-     "width": 56,
-     "height": 8,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "sida",
-       "type": "string",
-       "value": "over"
-      }
-     ]
-    },
-    {
-     "id": 13,
+     "id": 20,
      "name": "planka_on",
      "type": "sak",
-     "x": 532,
-     "y": 144,
+     "x": 576,
+     "y": 124,
      "width": 16,
      "height": 8,
      "rotation": 0,
      "visible": true
     },
     {
-     "id": 14,
+     "id": 21,
      "name": "flaska_i_handen",
      "type": "sak",
      "x": 300,
@@ -279,10 +402,10 @@
      ]
     },
     {
-     "id": 15,
-     "name": "fagel_210_132",
+     "id": 22,
+     "name": "fagel_150_132",
      "type": "omgivning",
-     "x": 210,
+     "x": 150,
      "y": 132,
      "width": 12,
      "height": 12,

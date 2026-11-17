@@ -6,7 +6,8 @@
 /**
  * Tonhöjd och tempo per rollröst (aventyr.json: talare.rollrost). levande = hur mycket tonen får skifta mellan
  * repliker, så att rösten inte låter som en maskin (fågeln är levande, beslut 18.3).
- * @type {Record<string, { pitch: number, rate: number, levande?: number }>}
+ * man = rollen läses av en manlig röst om enheten har en (Oskar på Mac), annars av den vanliga med tonen.
+ * @type {Record<string, { pitch: number, rate: number, levande?: number, man?: boolean }>}
  */
 const ROLLER = {
   berattare: { pitch: 1.05, rate: 0.95 },
@@ -14,9 +15,9 @@ const ROLLER = {
   // Tant Rosa: ljusare än Farfar och lite långsam. Bo: ljus och snabb (beslut 67.5)
   tant: { pitch: 1.15, rate: 0.9 },
   barn: { pitch: 1.5, rate: 1.1 },
-  // skepparen i kapitel 3 (87.9, Teknik väljer): en gammal kvinna på floden. Mörkare än Tant Rosa och lugnare än
-  // berättaren, men ljusare än Farfar, och lite levande, så att hon inte låter som någon av dem
-  skeppare: { pitch: 0.98, rate: 0.9, levande: 0.06 },
+  // skepparen i kapitel 3 (98.12.2, manus 19 v0.4.1): en ung man vars morfar kallade på ön. Mörkare än berättaren
+  // och Tant Rosa, ljusare och snabbare än Farfar (han är ung), och lite levande, så att han inte låter som någon av dem
+  skeppare: { pitch: 0.9, rate: 1.0, levande: 0.06, man: true },
   fanig: { pitch: 1.35, rate: 1.05 },
   metall: { pitch: 1.6, rate: 1.15 },
   fagel: { pitch: 1.45, rate: 1.12, levande: 0.15 },
@@ -52,6 +53,8 @@ export function skapaRost({ logg, tyst = () => false, tempo = () => 1, volym = (
   const synt = typeof window !== 'undefined' && 'speechSynthesis' in window ? window.speechSynthesis : null;
   /** @type {SpeechSynthesisVoice | null} */
   let rost = null;
+  /** @type {SpeechSynthesisVoice | null} en manlig svensk röst på enheten, för rollerna med man (skepparen) */
+  let mansrost = null;
   let token = 0;
   /**
    * Yttranden som pågår. Chrome släpper annars yttrandet när funktionen har returnerat, och då kommer aldrig
@@ -68,10 +71,11 @@ export function skapaRost({ logg, tyst = () => false, tempo = () => 1, volym = (
     // på nätet (Edge "Online (Natural)") skulle skicka dem från enheten. Finns ingen egen svensk röst är det tyst.
     const forut = rost;
     rost = sv.find((v) => v.localService && /alva|klara|oskar/i.test(v.name)) || sv.find((v) => v.localService) || null;
+    mansrost = sv.find((v) => v.localService && /oskar/i.test(v.name)) || null;
     // loggen säger vilken röst som läser, så att en tyst röst går att förstå (70.4). Bara röstens namn, aldrig text.
     if (rost !== forut || !loggad) {
       loggad = true;
-      if (rost) logg?.handelse('röst', `${rost.name}, på enheten`, { svenska: sv.length, pa_natet: sv.filter((v) => !v.localService).length });
+      if (rost) logg?.handelse('röst', `${rost.name}, på enheten`, { svenska: sv.length, pa_natet: sv.filter((v) => !v.localService).length, ...(mansrost ? { man: mansrost.name } : {}) });
       else if (sv.length) logg?.handelse('röst', 'ingen egen svensk röst, tyst', { pa_natet: sv.length });
     }
   }
@@ -110,7 +114,9 @@ export function skapaRost({ logg, tyst = () => false, tempo = () => 1, volym = (
       /** Ett yttrande med texten. Ett nytt görs om det första inte startar. */
       const nytt = () => {
         const x = new SpeechSynthesisUtterance(text);
-        x.lang = 'sv-SE'; x.voice = rost; x.pitch = rr.pitch; x.rate = rr.rate * tempo(); x.volume = Math.max(0, Math.min(1, volym()));
+        // en manlig röst är redan mörk: skepparen är ung, så tonen går upp lite i stället för ned
+        const man = !!(ROLLER[roll]?.man && mansrost);
+        x.lang = 'sv-SE'; x.voice = man ? mansrost : rost; x.pitch = man ? Math.min(2, rr.pitch + 0.12) : rr.pitch; x.rate = rr.rate * tempo(); x.volume = Math.max(0, Math.min(1, volym()));
         x.onstart = () => { startad = true; };
         x.onend = () => sluta('klar'); x.onerror = () => sluta('avbruten');
         if (vidOrd) x.onboundary = (e) => { if (!klar && min === token && (!e.name || e.name === 'word')) { startad = true; try { vidOrd(e.charIndex); } catch (fel) { /* får inte stoppa rösten */ } } };

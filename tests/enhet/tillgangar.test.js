@@ -208,7 +208,10 @@ describe('mellanscenernas bilder och bildkorten', () => {
     // 93.5: byborna och fiskaren när skylten om bryggan är avslöjad, med jubel och gång som finns
     'bryggan_avslojad',
     // 93.4 (pass 93): Herr Skata ramlar av pålen och baronen far iväg, med Stils figurer uppifrån vid bryggan
-    'skata_ramlar_av_palen', 'baronen_lyfter']);
+    'skata_ramlar_av_palen', 'baronen_lyfter',
+    // 100.4: kapitel 3:s gråbox (manus 19 v0.4.1), med gråboxens former tills Stil har ritat (Rum.js, kapitel 3 i gråbox)
+    'kartbit3_on', 'loftet_horn', 'skuggan_lyssnar', 'unge_simmar', 'skoldpadda_huvud', 'skylt_tecken', 'skoldpadda_visar_berget',
+    'resan_kvall']);
   it('varje mellanscen med bild har grafik (morgonen i sängen, luftskeppets lägen, sidovyerna, ungen på kartbiten, ägget)', () => {
     const saknas = [];
     for (const k of kapitel) for (const sc of k.scener) for (const st of sc.steg) {

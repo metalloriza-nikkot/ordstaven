@@ -11,7 +11,7 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 23,
+ "nextobjectid": 19,
  "properties": [
   {
    "name": "rum",
@@ -128,78 +128,6 @@
     },
     {
      "id": 7,
-     "name": "snacka_1",
-     "type": "sak",
-     "x": 210,
-     "y": 66,
-     "width": 6,
-     "height": 6,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "sida",
-       "type": "string",
-       "value": "alla"
-      }
-     ]
-    },
-    {
-     "id": 8,
-     "name": "snacka_2",
-     "type": "sak",
-     "x": 218,
-     "y": 66,
-     "width": 6,
-     "height": 6,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "sida",
-       "type": "string",
-       "value": "alla"
-      }
-     ]
-    },
-    {
-     "id": 9,
-     "name": "snacka_3",
-     "type": "sak",
-     "x": 226,
-     "y": 66,
-     "width": 6,
-     "height": 6,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "sida",
-       "type": "string",
-       "value": "alla"
-      }
-     ]
-    },
-    {
-     "id": 10,
-     "name": "snacka_4",
-     "type": "sak",
-     "x": 234,
-     "y": 66,
-     "width": 6,
-     "height": 6,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "sida",
-       "type": "string",
-       "value": "alla"
-      }
-     ]
-    },
-    {
-     "id": 11,
      "name": "skoldpadda_huvud",
      "type": "sak",
      "x": 120,
@@ -217,7 +145,7 @@
      ]
     },
     {
-     "id": 12,
+     "id": 8,
      "name": "skoldpadda_fena",
      "type": "sak",
      "x": 150,
@@ -235,7 +163,7 @@
      ]
     },
     {
-     "id": 13,
+     "id": 9,
      "name": "under_fenan",
      "type": "sak",
      "x": 156,
@@ -253,7 +181,7 @@
      ]
     },
     {
-     "id": 14,
+     "id": 10,
      "name": "bakom_fenan",
      "type": "sak",
      "x": 186,
@@ -271,7 +199,7 @@
      ]
     },
     {
-     "id": 15,
+     "id": 11,
      "name": "under_huvudet",
      "type": "sak",
      "x": 126,
@@ -289,7 +217,7 @@
      ]
     },
     {
-     "id": 16,
+     "id": 12,
      "name": "bakom_huvudet",
      "type": "sak",
      "x": 140,
@@ -307,7 +235,7 @@
      ]
     },
     {
-     "id": 17,
+     "id": 13,
      "name": "tang_1",
      "type": "sak",
      "x": 140,
@@ -325,7 +253,7 @@
      ]
     },
     {
-     "id": 18,
+     "id": 14,
      "name": "tang_2",
      "type": "sak",
      "x": 158,
@@ -343,7 +271,7 @@
      ]
     },
     {
-     "id": 19,
+     "id": 15,
      "name": "tang_3",
      "type": "sak",
      "x": 176,
@@ -361,7 +289,7 @@
      ]
     },
     {
-     "id": 20,
+     "id": 16,
      "name": "skalkant",
      "type": "sak",
      "x": 284,
@@ -379,7 +307,7 @@
      ]
     },
     {
-     "id": 21,
+     "id": 17,
      "name": "fena_trappa",
      "type": "sak",
      "x": 182,
@@ -397,7 +325,7 @@
      ]
     },
     {
-     "id": 22,
+     "id": 18,
      "name": "ankare",
      "type": "sak",
      "x": 84,

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Kapitel 3:s kartor i gråbox (beslut 87.9.3, steg 1), efter Innehålls anteckningar i kap-03.json (rummens `anteckning`).
 
-Skriver tre Tiled-kartor i kartor/den-gomda-dalen/: floden (2 × 1 skärmar), on (ön, en skärm) och sandbanken (en
-skärm). Kartorna har bara id:n, aldrig text som spelaren läser. Hjälparna (utg, sak, figur, vagg, punkt, liv och
+Skriver fem Tiled-kartor i kartor/den-gomda-dalen/: floden (2 × 1 skärmar), kvarnen och loftet (inne, en skärm
+var), on (ön, en skärm) och sandbanken (en skärm). Kartorna följer kap-03 v0.3 (manus 19 v0.4.1, beslut 100.4). Kartorna har bara id:n, aldrig text som spelaren läser. Hjälparna (utg, sak, figur, vagg, punkt, liv och
 karta) är desamma som i kap2.py. Stil skissar ovanpå skärmdumparna när gråboxen är spelad (kedjan i 07, steg 4).
 
     python3 verktyg/kartor/kap3.py [--prova]
@@ -26,34 +26,80 @@ def figur(namn, x, y, **e):
 
 
 RUMMEN = {
-    # Västra skärmen: stigen från träsket in från norr, sand och gräs, och floden bred och tom i söder. Östra skärmen:
-    # pråmarna i rad ute i vattnet med plankor emellan (golv), skepparens pråm längst ut med hornet i aktern och den
-    # målade stenen bredvid. I tillståndet on ligger ön vid pråmen med tången som en gardin från kanten, och plankan
-    # till ön syns när tången är huggen. Kameran glider över hornet och stenen när han kommer in (79.3).
+    # Manus 19 v0.4.1 (kap-03 v0.3). Västra skärmen: stigen från träsket in från norr, pråmarna med stånden längs
+    # stranden, frukosthornet på en pråm och två flodbor, och floden bred och tom i söder. Östra skärmen: skepparen på
+    # sin pråm närmast kvarnen, och kvarnen på stenfot i nordost med vattenhjulet på västra sidan, tre tussar tång runt
+    # hjulet (morgon), dörren i söder och bryggan där ön lägger till. Kameran glider över hjulet när han kommer in (79.3).
+    # Hornet sitter högt uppe på kvarnen och står i loftet. Från loftet kommer han ned vid bryggan (in_loftet).
     'floden': {
         'storlek': (40, 12),
         'objekt': [
             utg('stig_trasket', 40, 0, 28, 36, **STIG, riktning='upp'),
             punkt('start', 54, 56),
-            # floden: hela södra halvan, utom pråmarna
+            punkt('in_loftet', 580, 100),
+            # floden: hela södra delen
             vagg(0, 104, 344, 88, vatten=True),
-            vagg(344, 152, 296, 40, vatten=True),
-            vagg(600, 104, 40, 48, vatten=True),
-            # pråmarna i rad med plankor emellan ute i vattnet, från stranden: vattnet runt dem är väggar, så han går på dem
-            # pråmarna är marken mellan vattnet: i gråboxen en liten markör i hörnet, så att inget står i vägen för sakerna
-            # på dem (kartkontrollen). Stil ritar pråmarna i skissen
-            sak('pramarna', 344, 140, 24, 10),
-            figur('flodman', 396, 108, sida='alla'),
-            figur('skepparen', 548, 104, sida='alla', talare='skepparen'),
-            sak('hornet', 576, 112, 14, 12, sida='alla', visas_forst='morgon'),
-            sak('sten_horn', 520, 92, 14, 12, sida='alla'),
-            # ön stiger söder om skepparens pråm (tillståndet on): i vattnet, och tången hänger från kanten mot pråmen
-            sak('on', 472, 160, 120, 32, sida='over'),
-            sak('tang_gardin', 512, 152, 56, 8, sida='over'),
-            sak('planka_on', 532, 144, 16, 8),
+            vagg(344, 132, 296, 60, vatten=True),
+            # pråmarna längs stranden, en liten markör så att inget står i vägen (Stil ritar dem i skissen)
+            sak('pramarna', 352, 116, 24, 10),
+            sak('frukosthorn', 226, 82, 12, 10, sida='alla'),
+            figur('flodbo_frukost', 196, 58, sida='alla'),
+            figur('flodbo_skrattar', 268, 50, sida='alla'),
+            figur('flodman', 120, 64, sida='alla'),
+            figur('skepparen', 420, 92, sida='alla', talare='skepparen'),
+            # kvarnen på stenfot, med dörren i söder och hjulet på västra sidan
+            vagg(512, 0, 112, 72),
+            utg('dorr_kvarn', 556, 72, 24, 16, riktning='upp', sida='under', till='kvarnen'),
+            sak('hjul', 488, 16, 24, 56, sida='vanster', visas_forst='morgon'),
+            sak('tang_hjul_1', 470, 20, 14, 12, sida='vanster'),
+            sak('tang_hjul_2', 470, 38, 14, 12, sida='vanster'),
+            sak('tang_hjul_3', 470, 56, 14, 12, sida='vanster'),
+            sak('brygga_kvarn', 560, 100, 48, 24, golv=True),
+            # ön lägger till vid bryggan (tillståndet on), och plankan syns när scenen visar den
+            sak('on', 528, 148, 112, 40, sida='over'),
+            sak('planka_on', 576, 124, 16, 8),
             # resan (kvall, pass 3): flaskan han håller när han sitter på skalet ute på floden
             sak('flaska_i_handen', 300, 160, 10, 10, sida='alla'),
-            liv('fagel', 210, 132, 12, 12),
+            liv('fagel', 150, 132, 12, 12),
+        ],
+    },
+    # En skärm, inne (Rummen 2): tavlan på bakväggen, luckan vid vattenrännan i väster och luckan i golvet vid dörren,
+    # den stora säcken under säckhissen och den lilla i mitten, med en plats på (ovanpå säcken) och vid (väster om
+    # den) var och en. Platserna är små markeringar, och Stil ritar dem i skissen. Säckhissen går upp till loftet (scenbytet).
+    'kvarnen': {
+        'storlek': (20, 12),
+        'inomhus': True,
+        'objekt': [
+            utg('dorr_ut_kvarn', 146, 176, 28, 16, riktning='ned', sida='over', till='floden'),
+            punkt('start', 160, 150),
+            sak('tavla_kvarn', 128, 8, 64, 30, sida='under', rackvidd=56),
+            vagg(32, 48, 16, 56, vatten=True),
+            sak('lucka_vatten', 48, 72, 14, 18, sida='hoger'),
+            sak('lucka_dorr', 96, 152, 22, 14, sida='alla'),
+            sak('sackhiss', 248, 48, 40, 24, sida='under'),
+            sak('sack_stor', 240, 104, 32, 22),
+            sak('pa_stora', 250, 92, 12, 10, sida='alla'),
+            sak('vid_stora', 222, 110, 12, 10, sida='alla'),
+            sak('sack_liten', 160, 104, 18, 14),
+            sak('pa_lilla', 163, 94, 12, 8, sida='alla'),
+            sak('vid_lilla', 142, 106, 12, 10, sida='alla'),
+        ],
+    },
+    # Ett litet rum (99.6): luckan mot floden i bakväggen, med floden långt nedanför (där syns skuggan och ungen som
+    # simmar), det stora hornet framför den och den målade skriften bredvid, och säckhissen i väster där han kommer
+    # upp. Tjocka väggar, så att han står nästan stilla. hornet_skrift syns i tillståndet rent.
+    'loftet': {
+        'storlek': (20, 12),
+        'inomhus': True,
+        'vagg_bak': 64,
+        'vagg_sida': 64,
+        'objekt': [
+            punkt('start', 120, 120),
+            punkt('in_kvarnen', 104, 120),
+            sak('sackhiss', 64, 96, 24, 40, sida='hoger'),
+            sak('lucka_floden', 168, 6, 80, 54, sida='under', rackvidd=56),
+            sak('hornet', 192, 66, 40, 26, sida='under'),
+            sak('hornet_skrift', 156, 72, 28, 12, sida='alla'),
         ],
     },
     # En skärm: skalet ovanifrån, med gräs, fem tuvor av mossa och ett litet träd. Vatten runt om, och ingen utgång.
@@ -68,9 +114,12 @@ RUMMEN = {
             sak('tuva_2', 220, 44, 24, 16, sida='alla'),
             sak('tuva_3', 76, 128, 24, 16, sida='alla'),
             sak('tuva_4', 232, 120, 24, 16, sida='alla'),
-            sak('tuva_5', 148, 96, 24, 16, sida='alla'),
+            sak('tuva_5', 148, 132, 24, 16, sida='alla'),
             sak('litet_trad', 148, 30, 24, 28, sida='under'),
             sak('skylt_skal', 152, 64, 18, 12, sida='alla'),
+            # snäckorna under ordet på skylten (manus 19 v0.4.1: på ön i pass 2)
+            sak('snacka_1', 146, 80, 6, 6, sida='alla'), sak('snacka_2', 154, 80, 6, 6, sida='alla'),
+            sak('snacka_3', 162, 80, 6, 6, sida='alla'), sak('snacka_4', 170, 80, 6, 6, sida='alla'),
         ],
     },
     # En skärm: sandbanken i söder och väster, och sköldpaddan som vilar i nordost med framfenan på sanden och huvudet
@@ -85,8 +134,6 @@ RUMMEN = {
             # skalet är marken han går på: i gråboxen en liten markör baktill, så att skylten och snäckorna går att nå
             sak('skoldpadda', 262, 24, 30, 14),
             sak('skylt_skal', 214, 52, 18, 12, sida='alla'),
-            sak('snacka_1', 210, 66, 6, 6, sida='alla'), sak('snacka_2', 218, 66, 6, 6, sida='alla'),
-            sak('snacka_3', 226, 66, 6, 6, sida='alla'), sak('snacka_4', 234, 66, 6, 6, sida='alla'),
             sak('skoldpadda_huvud', 120, 52, 36, 28, sida='alla'),
             sak('skoldpadda_fena', 150, 120, 32, 18, sida='alla'),
             sak('under_fenan', 156, 140, 16, 10, sida='alla'),

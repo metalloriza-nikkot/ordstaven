@@ -1,0 +1,148 @@
+{
+ "type": "map",
+ "version": "1.10",
+ "tiledversion": "1.11.0",
+ "orientation": "orthogonal",
+ "renderorder": "right-down",
+ "width": 20,
+ "height": 12,
+ "tilewidth": 16,
+ "tileheight": 16,
+ "infinite": false,
+ "compressionlevel": -1,
+ "nextlayerid": 2,
+ "nextobjectid": 7,
+ "properties": [
+  {
+   "name": "inomhus",
+   "type": "bool",
+   "value": true
+  },
+  {
+   "name": "rum",
+   "type": "string",
+   "value": "loftet"
+  },
+  {
+   "name": "vagg_bak",
+   "type": "int",
+   "value": 64
+  }
+ ],
+ "tilesets": [],
+ "layers": [
+  {
+   "id": 1,
+   "name": "foremal",
+   "type": "objectgroup",
+   "draworder": "index",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 1,
+     "name": "start",
+     "type": "",
+     "x": 120,
+     "y": 120,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 2,
+     "name": "in_kvarnen",
+     "type": "",
+     "x": 104,
+     "y": 120,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 3,
+     "name": "sackhiss",
+     "type": "sak",
+     "x": 64,
+     "y": 96,
+     "width": 24,
+     "height": 40,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "hoger"
+      }
+     ]
+    },
+    {
+     "id": 4,
+     "name": "lucka_floden",
+     "type": "sak",
+     "x": 168,
+     "y": 6,
+     "width": 80,
+     "height": 54,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "rackvidd",
+       "type": "int",
+       "value": 56
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      }
+     ]
+    },
+    {
+     "id": 5,
+     "name": "hornet",
+     "type": "sak",
+     "x": 192,
+     "y": 66,
+     "width": 40,
+     "height": 26,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      }
+     ]
+    },
+    {
+     "id": 6,
+     "name": "hornet_skrift",
+     "type": "sak",
+     "x": 156,
+     "y": 72,
+     "width": 28,
+     "height": 12,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
