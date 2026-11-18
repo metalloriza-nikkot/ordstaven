@@ -969,7 +969,10 @@ test('kameran visar hela valet när frågan ställs: alla alternativ, deras skyl
     rum: { provdalen: { innehall: ['skylt_fraga', 'stig_a', 'stig_b', 'stig_c'] } },
     kartor: { provdalen: storKarta([{ name: 'skylt_fraga', type: 'sak', x: 470, y: 140, width: 48, height: 12 }, stig('stig_a', 420), stig('stig_b', 490), stig('stig_c', 560)], { x: 360, y: 190 }) },
   });
-  // innan frågan: stigen längst till höger syns inte
+  // han har just kommit in: frågans skylt öppnas först (101.5), och han läser och stänger den
+  await expect(page.locator('#plattan .lapp.p-traskylt')).toHaveText('GÅ MOT SOLEN.', { timeout: 8000 });
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('[skylt] skylt_fraga: öppnas när han kommer in');
+  await vidare(page);
   await expect(page.locator('#skyltar .skylt')).toHaveCount(3, { timeout: 8000 });
   const allt = async () => {
     for (const id of ['stig_a', 'stig_b', 'stig_c', 'skylt_fraga']) if (!(await iBild(page, await page.evaluate((i) => window.__ORDSTAVEN.rutaPaSkarm(i), id)))) return id;
