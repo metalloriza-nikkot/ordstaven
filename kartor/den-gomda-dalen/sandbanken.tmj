@@ -11,7 +11,7 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 62,
+ "nextobjectid": 49,
  "properties": [
   {
    "name": "bild",
@@ -54,7 +54,7 @@
      "type": "vagg",
      "x": 0,
      "y": 0,
-     "width": 40,
+     "width": 24,
      "height": 8,
      "rotation": 0,
      "visible": true,
@@ -90,7 +90,7 @@
      "type": "vagg",
      "x": 0,
      "y": 16,
-     "width": 16,
+     "width": 8,
      "height": 8,
      "rotation": 0,
      "visible": true,
@@ -125,7 +125,7 @@
      "name": "",
      "type": "vagg",
      "x": 0,
-     "y": 32,
+     "y": 136,
      "width": 8,
      "height": 8,
      "rotation": 0,
@@ -143,223 +143,7 @@
      "name": "",
      "type": "vagg",
      "x": 0,
-     "y": 40,
-     "width": 8,
-     "height": 8,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "vatten",
-       "type": "bool",
-       "value": true
-      }
-     ]
-    },
-    {
-     "id": 8,
-     "name": "",
-     "type": "vagg",
-     "x": 0,
-     "y": 48,
-     "width": 8,
-     "height": 8,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "vatten",
-       "type": "bool",
-       "value": true
-      }
-     ]
-    },
-    {
-     "id": 9,
-     "name": "",
-     "type": "vagg",
-     "x": 0,
-     "y": 56,
-     "width": 8,
-     "height": 8,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "vatten",
-       "type": "bool",
-       "value": true
-      }
-     ]
-    },
-    {
-     "id": 10,
-     "name": "",
-     "type": "vagg",
-     "x": 0,
-     "y": 64,
-     "width": 8,
-     "height": 8,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "vatten",
-       "type": "bool",
-       "value": true
-      }
-     ]
-    },
-    {
-     "id": 11,
-     "name": "",
-     "type": "vagg",
-     "x": 0,
-     "y": 72,
-     "width": 8,
-     "height": 8,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "vatten",
-       "type": "bool",
-       "value": true
-      }
-     ]
-    },
-    {
-     "id": 12,
-     "name": "",
-     "type": "vagg",
-     "x": 0,
-     "y": 80,
-     "width": 8,
-     "height": 8,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "vatten",
-       "type": "bool",
-       "value": true
-      }
-     ]
-    },
-    {
-     "id": 13,
-     "name": "",
-     "type": "vagg",
-     "x": 0,
-     "y": 88,
-     "width": 8,
-     "height": 8,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "vatten",
-       "type": "bool",
-       "value": true
-      }
-     ]
-    },
-    {
-     "id": 14,
-     "name": "",
-     "type": "vagg",
-     "x": 0,
-     "y": 96,
-     "width": 8,
-     "height": 8,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "vatten",
-       "type": "bool",
-       "value": true
-      }
-     ]
-    },
-    {
-     "id": 15,
-     "name": "",
-     "type": "vagg",
-     "x": 0,
-     "y": 104,
-     "width": 8,
-     "height": 8,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "vatten",
-       "type": "bool",
-       "value": true
-      }
-     ]
-    },
-    {
-     "id": 16,
-     "name": "",
-     "type": "vagg",
-     "x": 0,
-     "y": 112,
-     "width": 8,
-     "height": 8,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "vatten",
-       "type": "bool",
-       "value": true
-      }
-     ]
-    },
-    {
-     "id": 17,
-     "name": "",
-     "type": "vagg",
-     "x": 0,
-     "y": 120,
-     "width": 8,
-     "height": 8,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "vatten",
-       "type": "bool",
-       "value": true
-      }
-     ]
-    },
-    {
-     "id": 18,
-     "name": "",
-     "type": "vagg",
-     "x": 0,
-     "y": 128,
-     "width": 8,
-     "height": 8,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "vatten",
-       "type": "bool",
-       "value": true
-      }
-     ]
-    },
-    {
-     "id": 19,
-     "name": "",
-     "type": "vagg",
-     "x": 0,
-     "y": 136,
+     "y": 144,
      "width": 16,
      "height": 8,
      "rotation": 0,
@@ -373,25 +157,7 @@
      ]
     },
     {
-     "id": 20,
-     "name": "",
-     "type": "vagg",
-     "x": 0,
-     "y": 144,
-     "width": 24,
-     "height": 8,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "vatten",
-       "type": "bool",
-       "value": true
-      }
-     ]
-    },
-    {
-     "id": 21,
+     "id": 8,
      "name": "",
      "type": "vagg",
      "x": 0,
@@ -409,7 +175,7 @@
      ]
     },
     {
-     "id": 22,
+     "id": 9,
      "name": "",
      "type": "vagg",
      "x": 0,
@@ -427,12 +193,12 @@
      ]
     },
     {
-     "id": 23,
+     "id": 10,
      "name": "",
      "type": "vagg",
      "x": 0,
      "y": 168,
-     "width": 56,
+     "width": 64,
      "height": 8,
      "rotation": 0,
      "visible": true,
@@ -445,12 +211,12 @@
      ]
     },
     {
-     "id": 24,
+     "id": 11,
      "name": "",
      "type": "vagg",
      "x": 0,
      "y": 176,
-     "width": 80,
+     "width": 96,
      "height": 8,
      "rotation": 0,
      "visible": true,
@@ -463,12 +229,12 @@
      ]
     },
     {
-     "id": 25,
+     "id": 12,
      "name": "",
      "type": "vagg",
-     "x": 304,
+     "x": 288,
      "y": 176,
-     "width": 16,
+     "width": 24,
      "height": 8,
      "rotation": 0,
      "visible": true,
@@ -481,7 +247,7 @@
      ]
     },
     {
-     "id": 26,
+     "id": 13,
      "name": "",
      "type": "vagg",
      "x": 0,
@@ -499,7 +265,7 @@
      ]
     },
     {
-     "id": 27,
+     "id": 14,
      "name": "",
      "type": "vagg",
      "x": 288,
@@ -517,7 +283,7 @@
      ]
     },
     {
-     "id": 28,
+     "id": 15,
      "name": "",
      "type": "vagg",
      "x": 100,
@@ -535,7 +301,7 @@
      ]
     },
     {
-     "id": 29,
+     "id": 16,
      "name": "",
      "type": "vagg",
      "x": 200,
@@ -546,7 +312,7 @@
      "visible": true
     },
     {
-     "id": 30,
+     "id": 17,
      "name": "",
      "type": "vagg",
      "x": 208,
@@ -557,7 +323,7 @@
      "visible": true
     },
     {
-     "id": 31,
+     "id": 18,
      "name": "",
      "type": "vagg",
      "x": 216,
@@ -568,7 +334,7 @@
      "visible": true
     },
     {
-     "id": 32,
+     "id": 19,
      "name": "",
      "type": "vagg",
      "x": 224,
@@ -579,7 +345,7 @@
      "visible": true
     },
     {
-     "id": 33,
+     "id": 20,
      "name": "",
      "type": "vagg",
      "x": 232,
@@ -590,7 +356,7 @@
      "visible": true
     },
     {
-     "id": 34,
+     "id": 21,
      "name": "",
      "type": "vagg",
      "x": 240,
@@ -601,7 +367,7 @@
      "visible": true
     },
     {
-     "id": 35,
+     "id": 22,
      "name": "",
      "type": "vagg",
      "x": 248,
@@ -612,7 +378,7 @@
      "visible": true
     },
     {
-     "id": 36,
+     "id": 23,
      "name": "",
      "type": "vagg",
      "x": 256,
@@ -623,7 +389,7 @@
      "visible": true
     },
     {
-     "id": 37,
+     "id": 24,
      "name": "",
      "type": "vagg",
      "x": 264,
@@ -634,7 +400,7 @@
      "visible": true
     },
     {
-     "id": 38,
+     "id": 25,
      "name": "",
      "type": "vagg",
      "x": 272,
@@ -645,7 +411,7 @@
      "visible": true
     },
     {
-     "id": 39,
+     "id": 26,
      "name": "",
      "type": "vagg",
      "x": 280,
@@ -656,7 +422,7 @@
      "visible": true
     },
     {
-     "id": 40,
+     "id": 27,
      "name": "",
      "type": "vagg",
      "x": 288,
@@ -667,7 +433,7 @@
      "visible": true
     },
     {
-     "id": 41,
+     "id": 28,
      "name": "",
      "type": "vagg",
      "x": 296,
@@ -678,7 +444,7 @@
      "visible": true
     },
     {
-     "id": 42,
+     "id": 29,
      "name": "",
      "type": "vagg",
      "x": 304,
@@ -689,7 +455,7 @@
      "visible": true
     },
     {
-     "id": 43,
+     "id": 30,
      "name": "",
      "type": "vagg",
      "x": 312,
@@ -700,7 +466,7 @@
      "visible": true
     },
     {
-     "id": 44,
+     "id": 31,
      "name": "",
      "type": "vagg",
      "x": 186,
@@ -711,7 +477,7 @@
      "visible": true
     },
     {
-     "id": 45,
+     "id": 32,
      "name": "",
      "type": "vagg",
      "x": 288,
@@ -722,7 +488,7 @@
      "visible": true
     },
     {
-     "id": 46,
+     "id": 33,
      "name": "skoldpadda",
      "type": "sak",
      "x": 262,
@@ -740,11 +506,11 @@
      ]
     },
     {
-     "id": 47,
+     "id": 34,
      "name": "huvud_plats",
      "type": "sak",
      "x": 98,
-     "y": 65,
+     "y": 64,
      "width": 96,
      "height": 64,
      "rotation": 0,
@@ -763,11 +529,11 @@
      ]
     },
     {
-     "id": 48,
+     "id": 35,
      "name": "fena_plats",
      "type": "sak",
      "x": 186,
-     "y": 128,
+     "y": 132,
      "width": 72,
      "height": 36,
      "rotation": 0,
@@ -786,7 +552,7 @@
      ]
     },
     {
-     "id": 49,
+     "id": 36,
      "name": "skylt_skal",
      "type": "sak",
      "x": 262,
@@ -809,7 +575,7 @@
      ]
     },
     {
-     "id": 50,
+     "id": 37,
      "name": "skoldpadda_huvud",
      "type": "sak",
      "x": 114,
@@ -837,7 +603,7 @@
      ]
     },
     {
-     "id": 51,
+     "id": 38,
      "name": "skoldpadda_fena",
      "type": "sak",
      "x": 192,
@@ -870,7 +636,7 @@
      ]
     },
     {
-     "id": 52,
+     "id": 39,
      "name": "under_fenan",
      "type": "sak",
      "x": 215,
@@ -886,6 +652,11 @@
        "value": true
       },
       {
+       "name": "ring",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"
@@ -893,7 +664,7 @@
      ]
     },
     {
-     "id": 53,
+     "id": 40,
      "name": "bakom_fenan",
      "type": "sak",
      "x": 229,
@@ -909,6 +680,11 @@
        "value": true
       },
       {
+       "name": "ring",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"
@@ -916,7 +692,7 @@
      ]
     },
     {
-     "id": 54,
+     "id": 41,
      "name": "under_huvudet",
      "type": "sak",
      "x": 141,
@@ -932,6 +708,11 @@
        "value": true
       },
       {
+       "name": "ring",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"
@@ -939,7 +720,7 @@
      ]
     },
     {
-     "id": 55,
+     "id": 42,
      "name": "bakom_huvudet",
      "type": "sak",
      "x": 153,
@@ -955,6 +736,11 @@
        "value": true
       },
       {
+       "name": "ring",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"
@@ -962,7 +748,7 @@
      ]
     },
     {
-     "id": 56,
+     "id": 43,
      "name": "tang_1",
      "type": "sak",
      "x": 176,
@@ -995,7 +781,7 @@
      ]
     },
     {
-     "id": 57,
+     "id": 44,
      "name": "tang_2",
      "type": "sak",
      "x": 244,
@@ -1028,7 +814,7 @@
      ]
     },
     {
-     "id": 58,
+     "id": 45,
      "name": "tang_3",
      "type": "sak",
      "x": 268,
@@ -1061,7 +847,7 @@
      ]
     },
     {
-     "id": 59,
+     "id": 46,
      "name": "skalkant",
      "type": "sak",
      "x": 250,
@@ -1084,7 +870,7 @@
      ]
     },
     {
-     "id": 60,
+     "id": 47,
      "name": "fena_trappa",
      "type": "sak",
      "x": 248,
@@ -1112,7 +898,7 @@
      ]
     },
     {
-     "id": 61,
+     "id": 48,
      "name": "ankare",
      "type": "sak",
      "x": 76,

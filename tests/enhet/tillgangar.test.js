@@ -217,7 +217,9 @@ describe('mellanscenernas bilder och bildkorten', () => {
     // 102.3: ön stiger vid kvarnens brygga, sedd från avsatsen
     'on_stiger',
     // 103.3.1: frukosten med tre korta tut och tallrikarna
-    'frukost']);
+    'frukost',
+    // 105.4: skepparen pekar på det stora hornet och hjulet
+    'skepparen_pekar']);
   it('varje mellanscen med bild har grafik (morgonen i sängen, luftskeppets lägen, sidovyerna, ungen på kartbiten, ägget)', () => {
     const saknas = [];
     for (const k of kapitel) for (const sc of k.scener) for (const st of sc.steg) {

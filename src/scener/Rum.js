@@ -119,6 +119,10 @@ export class Rum extends Phaser.Scene {
     /** @type {Set<string>} ljudslingorna som går i rummet (103.3.4) */
     this.ljudSlingor = new Set();
     this.livKlocka = 0;
+    /** @type {string | null} platserna som har en ring nu (104.7) */
+    this.ringarNu = null;
+    /** @type {any} */
+    this.ringSlinga = null;
     /** piltangenter medan världen stod still (104.5), och om en hålls nu */
     this.pilarFrysta = 0;
     this.pilFryst = false;
@@ -263,6 +267,8 @@ export class Rum extends Phaser.Scene {
     // trädridån (rutlagret over), ritad en gång per rum till en egen bild (Teknik 3). Den ligger under figurerna,
     // och fötterna står aldrig i den (kartans overHinder), så en figur framför ridån skyms aldrig av den (56.3)
     this.overBild = this.add.image(0, 0, '__DEFAULT').setOrigin(0, 0).setVisible(false);
+    // platsernas ringar (104.7): ovanpå föremålen och under figurerna
+    this.lagerRingar = this.add.container(0, 0);
     this.ljusboll = this.add.graphics().setVisible(false);
     this.lagerFigurer = this.add.container(0, 0);
     // liv i skogen (fåglar, löv, fjärilen, ekorren) i världens pixlar
@@ -1061,6 +1067,7 @@ export class Rum extends Phaser.Scene {
       resan_kvall: () => this.resanKvall(),
       // säckhissen (101.3): upp genom hålet i taket i kvarnen, och ned genom golvet i loftet
       frukost: () => this.frukost(),
+      skepparen_pekar: () => this.skepparenPekar(),
       tallrikar: () => this.tallrikar(),
       skuggan_stiger: () => this.skugganStiger(),
       skuggan_dyker: () => this.skugganDyker(),
@@ -2488,6 +2495,28 @@ export class Rum extends Phaser.Scene {
   }
 
   /**
+   * Skepparen pekar (105.4): kameran glider till det stora hornet på avsatsen, stannar, glider ned till hjulet med
+   * tången, stannar, och tillbaka till hjälten. Skepparen pekar upp mot kvarnen under tiden. @returns {number}
+   */
+  skepparenPekar() {
+    const ruta = (/** @type {string} */ id) => { const o = this.ruta(id); const b = (o?.bildPa && this.ruta(o.bildPa)) || o; return b ? { x: b.x + b.b / 2, y: b.y + b.h / 2 } : null; };
+    const horn = ruta('hornet'), hjul = ruta('hjul');
+    if (!horn || !hjul) return 0;
+    const s = this.ruta('skepparen');
+    if (s) {
+      const hall = horn.x >= s.x + s.b / 2 ? 'hoger' : 'vanster';
+      const ramar = [`skepparen_pekar_upp_${hall}_01`, `skepparen_pekar_upp_${hall}_02`];
+      if (ramar.every((r) => foremalsbild(this, r))) this.regiRamar('skepparen', [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1].map((i) => ramar[i]), 400);
+    }
+    this.regiFokus = horn;
+    this.regiLogg.push('kameran visar hornet');
+    this.time.delayedCall(2600, () => { this.regiFokus = hjul; this.regiLogg.push('kameran visar hjulet'); });
+    this.time.delayedCall(4800, () => { this.regiFokus = null; });
+    this.regiLogg.push('skepparen pekar');
+    return 5600;
+  }
+
+  /**
    * Ett ljud i en regi (103.3.4), om ms, och raden i regiloggen direkt (testerna hör inget, och snabbläget väntar
    * inte). @param {string} id @param {number} [om] ms
    */
@@ -3470,6 +3499,7 @@ export class Rum extends Phaser.Scene {
       for (const g of this.hogaBilder) g.destroy(); this.hogaBilder.clear(); this.animerade = []; this.figurSkuggor = [];
       this.lagerObjekt.removeAll(true); this.lagerLjust.removeAll(true); this.ritade.clear(); this.markerade.clear(); this.ritadeDelar.clear(); this.markramar?.clear();
       this.sysslaNu = null; // sysslorna startas igen med de nya bilderna (livTick)
+      this.ringarNu = null; this.ringSlinga?.remove(); this.ringSlinga = null; this.lagerRingar.removeAll(true);
       this.delar = { ...(v.delar || {}) };
       for (const o of [...this.objekt.filter((x) => x.sort === 'yta'), ...this.objekt.filter((x) => x.sort !== 'yta')]) this.ritaObjekt(o);
       for (const id of this.dolda) /** @type {any} */ (this.ritade.get(id))?.setVisible?.(false);
@@ -3530,6 +3560,7 @@ export class Rum extends Phaser.Scene {
   /** Föremålen som går att använda just nu får en glimt. @param {string[]} ids */
   sattInteraktiva(ids) {
     this.interaktiva = ids; this.smutsig = true;
+    this.platsRingar(ids.filter((id) => this.ruta(id)?.ring));
     const g = this.glimtar; g.clear();
     for (const id of ids) {
       const o = this.ruta(id); if (!o || o.sort === 'utgang') continue;
@@ -3537,6 +3568,26 @@ export class Rum extends Phaser.Scene {
       const x = o.x + o.b - 2, y = o.y + 1;
       g.fillStyle(FARG.markerad, 1).fillRect(x - 1, y - 3, 2, 6).fillRect(x - 3, y - 1, 6, 2);
     }
+  }
+
+  /**
+   * Stils vita ring (plats_ring_01–02, 104.7) mitt på varje plats han kan välja i läsvalet, likadan vid varje plats så
+   * att den inte avslöjar något. Den växlar mellan sina två bilder (600 ms, golvet) och tas bort när läsvalet slutar
+   * eller platsen har prövats. @param {string[]} ids
+   */
+  platsRingar(ids) {
+    const nyckel = ids.join(',');
+    if (nyckel === this.ringarNu) return;
+    this.ringarNu = nyckel;
+    this.ringSlinga?.remove(); this.ringSlinga = null;
+    this.lagerRingar.removeAll(true);
+    const ramar = ['plats_ring_01', 'plats_ring_02'].map((r) => foremalsbild(this, r));
+    if (!ids.length || !ramar.every(Boolean)) return;
+    const bilder = ids.map((id) => { const o = /** @type {any} */ (this.ruta(id)); const fb = /** @type {any} */ (ramar[0]); return this.add.image(o.x + o.b / 2, o.y + o.h / 2, fb.nyckel, fb.ram); });
+    this.lagerRingar.add(bilder);
+    let i = 0;
+    this.ringSlinga = this.time.addEvent({ delay: 600, loop: true, callback: () => { i = 1 - i; const fb = /** @type {any} */ (ramar[i]); for (const b of bilder) if (b.active) b.setTexture(fb.nyckel, fb.ram); this.smutsig = true; } });
+    this.b.logg?.handelse('ringar', nyckel);
   }
 
   /** Hjälten står vid ett föremål som går att använda: ljus ram och locket på glänt. @param {string | null} id */

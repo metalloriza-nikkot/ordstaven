@@ -181,6 +181,8 @@ export function lasKarta(tmj) {
       // en figurs syssla (103.3.6): bilderna som växlar (minst 400 ms per bild), och att den vinkar när han kommer nära
       if (egen.syssla) { ut.syssla = String(egen.syssla).split(',').map((x) => x.trim()).filter(Boolean); ut.sysslaMs = Math.max(400, Number(egen.syssla_ms) || 500); }
       if (egen.nara) ut.nara = true;
+      // ring (104.7) = en plats han kan välja i ett läsval i rummet: Stils vita ring syns där medan läsvalet pågår
+      if (egen.ring) ut.ring = true;
       // en ljudslinga vid föremålet (103.3.4: vattenhjulet, kvarnens dunk), som hörs svagare ju längre bort han står
       if (egen.ljud_slinga) { ut.ljudSlinga = String(egen.ljud_slinga); ut.ljudRadie = Number(egen.ljud_radie) || 260; }
       if (egen.bild_del) ut.bildDel = String(egen.bild_del);

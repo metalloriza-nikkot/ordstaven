@@ -102,6 +102,8 @@ test('kapitel 3 pass 1: SVÄRD vid hjulet, tussarna, kvarnens tavla, hissen och 
   expect(loggen.indexOf('[skylt] tavla_kvarn: öppnas när han kommer in')).toBeLessThan(loggen.indexOf('[val] k3_kvarn_1'));
   // tavlan: rad 2 med ett fel först
   expect(loggen).toMatch(/k3_kvarn_2.*vid_stora/);
+  // 104.7: Stils ringar vid säckarnas fyra platser medan läsvalet pågår (likadana, de avslöjar inget)
+  expect(loggen).toMatch(/\[ringar\] (?=.*pa_stora)(?=.*vid_stora)(?=.*pa_lilla)(?=.*vid_lilla)/);
   // det första tutet blåser bort mjölet
   expect(loggen).toContain('[tryck] hornet');
   expect(loggen).toContain('[rummet] floden: rent');
@@ -328,6 +330,8 @@ test('kapitel 3 pass 3: fenan, kramen, tången med skalkanten mitt i, SKÖLD, or
   expect(loggen).toContain('[frivilligt] scen k3s05_skalkant klar, tillbaka till pussel');
   expect(loggen).toMatch(/\[val\] k3_duellen rond 1: fel/);
   for (const n of [1, 2, 3]) expect(loggen).toContain(`[rond] k3_duellen ${n}:`);
+  // 104.7: ringarna vid fenans och huvudets platser medan läsvalet pågår
+  expect(loggen).toMatch(/\[ringar\] (?=.*under_fenan)(?=.*bakom_fenan)(?=.*under_huvudet)(?=.*bakom_huvudet)/);
   expect(loggen).toContain('[tryck] flaska_i_handen');
   expect(loggen).toContain('[tryck] skepparen');
   const t = await ev(() => window.__ORDSTAVEN.tillstand());
@@ -392,7 +396,7 @@ test('regierna i kapitel 3 (100.4, 101.3, 102.3 och 103.3.1): var och en går i 
   test.skip(!['mac-helskarm', 'ipad-10', 'mac-safari'].includes(info.project.name), 'tre projekt räcker, som kapitel 2 (84.6)');
   test.setTimeout(180000);
   const ev = (fn, arg) => page.evaluate(fn, arg);
-  const REGIER = [['k3s01_floden', ['frukost', 'kartbit3_on']], ['k3s02_kvarnen', ['sackhiss_upp']], ['k3s02_loftet', ['loftet_horn', 'skuggan_lyssnar']], ['k3s03_hornet', ['tallrikar', 'skuggan_stiger', 'skuggan_dyker', 'unge_simmar', 'sackhiss_ner']],
+  const REGIER = [['k3s01_floden', ['frukost', 'skepparen_pekar', 'kartbit3_on']], ['k3s02_kvarnen', ['sackhiss_upp']], ['k3s02_loftet', ['loftet_horn', 'skuggan_lyssnar']], ['k3s03_hornet', ['tallrikar', 'skuggan_stiger', 'skuggan_dyker', 'unge_simmar', 'sackhiss_ner']],
     ['k3s04_on', ['skoldpadda_huvud', 'skylt_tecken']], ['k3s05_sandbanken', ['skoldpadda_visar_berget']], ['k3s07_resan', ['resan_kvall']]];
   for (const [scenId, regier] of REGIER) {
     // på ön börjar den där skylten syns (efter mossan), så att tecknen har sin skylt
@@ -410,6 +414,8 @@ test('regierna i kapitel 3 (100.4, 101.3, 102.3 och 103.3.1): var och en går i 
     // frukosten (103.3.1): flodbon blåser i frukosthornet, och tallrikarna kommer fram
     // frukosthornet ligger inte på däcket medan hon blåser (104.6), och tre korta tut hörs
     if (scenId === 'k3s01_floden') expect((await ev(() => window.__ORDSTAVEN.grafik())).regi).toEqual(expect.arrayContaining(['frukosten', 'frukosthornet i hennes hand', 'ljud:frukosthorn']));
+    // skepparen pekar (105.4): kameran visar det stora hornet och sedan hjulet
+    if (scenId === 'k3s01_floden') expect((await ev(() => window.__ORDSTAVEN.grafik())).regi).toEqual(expect.arrayContaining(['skepparen pekar', 'kameran visar hornet', 'kameran visar hjulet']));
     if (scenId === 'k3s03_hornet') expect(await ev(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').unge.visible)).toBe(false);
     // 102.3: ön steg vid bryggan innan hissen bar honom ned, och han kom ut genom kvarnens dörr på kajen
     if (scenId === 'k3s03_hornet') {

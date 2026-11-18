@@ -610,10 +610,10 @@
  },
  "on_stiger": {
   "grupp": "Kapitel 3",
-  "vad": "Ön stiger: vattnet välver sig, forsar av skalet och rinner ut (4,5 s, följer bilderna 1–4)",
+  "vad": "Ön stiger: vattnet välver sig, forsar av skalet och rinner ut (3,9 s, följer bilderna 1–4)",
   "signatur": false,
   "styrka_db": -8,
-  "sekunder": 4.85
+  "sekunder": 3.85
  },
  "droppar": {
   "grupp": "Kapitel 3",
