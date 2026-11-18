@@ -120,6 +120,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "bild",
+       "type": "string",
+       "value": "skylt_skal"
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"
@@ -238,13 +243,28 @@
      "id": 13,
      "name": "tang_1",
      "type": "sak",
-     "x": 140,
-     "y": 156,
-     "width": 10,
-     "height": 10,
+     "x": 126,
+     "y": 158,
+     "width": 16,
+     "height": 14,
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "tang_tuss_hel"
+      },
+      {
+       "name": "bild_hugg",
+       "type": "string",
+       "value": "tang_tuss_huggen"
+      },
+      {
+       "name": "bild_kvar",
+       "type": "string",
+       "value": "tang_tuss_huggen"
+      },
       {
        "name": "sida",
        "type": "string",
@@ -256,13 +276,28 @@
      "id": 14,
      "name": "tang_2",
      "type": "sak",
-     "x": 158,
-     "y": 158,
-     "width": 10,
-     "height": 10,
+     "x": 154,
+     "y": 160,
+     "width": 16,
+     "height": 14,
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "tang_tuss_hel"
+      },
+      {
+       "name": "bild_hugg",
+       "type": "string",
+       "value": "tang_tuss_huggen"
+      },
+      {
+       "name": "bild_kvar",
+       "type": "string",
+       "value": "tang_tuss_huggen"
+      },
       {
        "name": "sida",
        "type": "string",
@@ -274,13 +309,28 @@
      "id": 15,
      "name": "tang_3",
      "type": "sak",
-     "x": 176,
-     "y": 156,
-     "width": 10,
-     "height": 10,
+     "x": 182,
+     "y": 158,
+     "width": 16,
+     "height": 14,
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "tang_tuss_hel"
+      },
+      {
+       "name": "bild_hugg",
+       "type": "string",
+       "value": "tang_tuss_huggen"
+      },
+      {
+       "name": "bild_kvar",
+       "type": "string",
+       "value": "tang_tuss_huggen"
+      },
       {
        "name": "sida",
        "type": "string",
@@ -328,13 +378,18 @@
      "id": 18,
      "name": "ankare",
      "type": "sak",
-     "x": 84,
-     "y": 120,
-     "width": 14,
-     "height": 14,
+     "x": 80,
+     "y": 112,
+     "width": 24,
+     "height": 22,
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "ankare_sand"
+      },
       {
        "name": "sida",
        "type": "string",

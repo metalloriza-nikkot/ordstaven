@@ -211,7 +211,9 @@ describe('mellanscenernas bilder och bildkorten', () => {
     'skata_ramlar_av_palen', 'baronen_lyfter',
     // 100.4: kapitel 3:s gråbox (manus 19 v0.4.1), med gråboxens former tills Stil har ritat (Rum.js, kapitel 3 i gråbox)
     'kartbit3_on', 'loftet_horn', 'skuggan_lyssnar', 'unge_simmar', 'skoldpadda_huvud', 'skylt_tecken', 'skoldpadda_visar_berget',
-    'resan_kvall']);
+    'resan_kvall',
+    // 101.3: säckhissen upp genom taket i kvarnen och ned genom golvet i loftet
+    'sackhiss_upp', 'sackhiss_ner']);
   it('varje mellanscen med bild har grafik (morgonen i sängen, luftskeppets lägen, sidovyerna, ungen på kartbiten, ägget)', () => {
     const saknas = [];
     for (const k of kapitel) for (const sc of k.scener) for (const st of sc.steg) {
@@ -284,7 +286,10 @@ describe('mellanscenernas bilder och bildkorten', () => {
     // alla andra 48 × 48
     const BOKBILDER = ['dal_i_moln', 'ordtradet', 'unge_farfar_med_dino', 'unge_farfar_far_agg'];
     const stor = (f) => BOKBILDER.some((b) => f.endsWith(`/${b}.png`)) || /\/brevram_nara_[a-z_]+\.png$/.test(f);
-    for (const f of filer('assets/bildkort/', '.png')) expect(storlek(f), f).toEqual(stor(f) ? [110, 70] : [48, 48]);
+    // raden med Farfars tecken på skylten (10h v0.1) är en närbild i mellanscenen skylt_tecken: 152 × 24
+    const EGNA = /** @type {Record<string, number[]>} */ ({ skylt_tecken: [152, 24] });
+    const egen = (f) => EGNA[f.split('/').pop().replace(/\.png$/, '')];
+    for (const f of filer('assets/bildkort/', '.png')) expect(storlek(f), f).toEqual(egen(f) ?? (stor(f) ? [110, 70] : [48, 48]));
     for (const b of BOKBILDER) expect(existsSync(new URL(`assets/bildkort/${b}.png`, rot)), b).toBe(true);
     for (const f of filer('assets/sidovyer/', '_bakgrund.png')) expect(storlek(f), f).toEqual([320, 192]);
     expect(existsSync(new URL('assets/bildkort/filt_rod.png', rot))).toBe(true);

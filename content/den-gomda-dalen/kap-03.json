@@ -16,14 +16,15 @@
  },
  "meta": {
   "namn": "Floden",
-  "version": "0.3",
-  "datum": "2026-11-17",
+  "version": "0.3.1",
+  "datum": "2026-11-18",
   "agare": "Innehåll",
   "kalla": "Manus 19 v0.4.1 (Ön som simmade), godkänt 17/11 (beslut 98–99).",
   "teknik": "v0.3 skriver fälten som förut (schema 2.47), och inget nytt fält. Två frågor väntar på Teknik (99.6): loftet är ett litet rum i stället för en närbild, och vid_antal har en nyckel per antal och 6+. Säger Teknik något annat skriver Innehåll om datan. Det som behöver byggas eller ritas: rummen kvarnen och loftet, kvarnen ute i floden (hjul, tang_hjul, dorr_kvarn, brygga_kvarn), frukosthornet och flodborna med bubblor, hornet_skrift som syns i tillståndet rent, tillstand_efter på mellanscenen i k3s02_loftet, ungen som hoppar från loftet, och skepparens röst som en ung mans (98.12.2). Regierna som manuset nämner men som inte står i datan än (tills de finns i GRABOX_REGI): kartbit3_on, loftet_horn, skuggan_lyssnar, unge_simmar, skoldpadda_huvud, skylt_tecken, skoldpadda_visar_berget och resan_kvall. Bilder som Stil inte har ritat: som i v0.2, och dessutom tang_hjul och kort_kvarn.",
   "andrat_v02": "Beslut 87: Tekniks fält i stället för den billigaste formen (hornet som P29_tryck, chiffret som meddelande, mossan och tången som P26 med verb lyfta, duellen som P16_ordduell, tryck på resan och skalkanten som en frivillig scen med lockar), ahoj! i gemener i bubblan (87.7), och mammas skugga växer inte i kapitel 3 (87.4).",
   "andrat_v021": "2026-11-13 (beslut 90.5 och 90.7): meta.namn är Floden, som Skogen och Träsket, och knuffen i k3_chiffret följer det som är byggt (89.3): rutan han står vid glimtar, tidigast efter ca 25 s.",
-  "andrat_v03": "2026-11-17 (beslut 98–99, manus 19 v0.4.1): floden och flodfolket först, skepparen som en ung man vars morfar kallade på ön, kvarnen som vägen upp till hornet (k3_hjulet med SVÄRD, k3_kvarn_1 och _2, säckhissen), och hornet två gånger: ett tryck i pass 1 som väcker skuggan, och FEM TUT. INTE TRE. i pass 2 (k3_hornet, ratt 5). Snäckorna och chiffret ligger på ön, och pass 2 slutar när UNDER FENAN lyser. Replikerna är provlästa (98.12.1). Nya rum: kvarnen och loftet. Nya scener: k3s02_kvarnen, k3s02_loftet, k3s03_hornet, k3s03_bryggan, k3s05_skalkant, k3s06_ankaret och k3s07_resan (förut k3s06_skalkant, k3s04_ankaret och k3s05_resan). k3_tangen heter k3_hjulet."
+  "andrat_v03": "2026-11-17 (beslut 98–99, manus 19 v0.4.1): floden och flodfolket först, skepparen som en ung man vars morfar kallade på ön, kvarnen som vägen upp till hornet (k3_hjulet med SVÄRD, k3_kvarn_1 och _2, säckhissen), och hornet två gånger: ett tryck i pass 1 som väcker skuggan, och FEM TUT. INTE TRE. i pass 2 (k3_hornet, ratt 5). Snäckorna och chiffret ligger på ön, och pass 2 slutar när UNDER FENAN lyser. Replikerna är provlästa (98.12.1). Nya rum: kvarnen och loftet. Nya scener: k3s02_kvarnen, k3s02_loftet, k3s03_hornet, k3s03_bryggan, k3s05_skalkant, k3s06_ankaret och k3s07_resan (förut k3s06_skalkant, k3s04_ankaret och k3s05_resan). k3_tangen heter k3_hjulet.",
+  "andrat_v031": "2026-11-18 (beslut 101.7): bild på åtta mellanscener (kartbit3_on, loftet_horn, skuggan_lyssnar, unge_simmar, skoldpadda_huvud, skylt_tecken, skoldpadda_visar_berget och resan_kvall), och uppdragens egna kort (kort_kvarn, kort_on och kort_flaska). Ingen text är ändrad."
  },
  "var_var_vi": [
   {
@@ -375,7 +376,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Kartbit 3 i närbild: floden, och mitt i den en liten ö. Sedan floden igen. Där är bara vatten."
+     "beskrivning": "Kartbit 3 i närbild: floden, och mitt i den en liten ö. Sedan floden igen. Där är bara vatten.",
+     "bild": "kartbit3_on"
     },
     {
      "typ": "replik",
@@ -491,7 +493,8 @@
    "steg": [
     {
      "typ": "mellanscen",
-     "beskrivning": "En öppen lucka mot floden, och det stora hornet av mässing, format som kammen på en dinosaurie. Det är fullt av mjöl. Långt nere på sin pråm tittar skepparen upp."
+     "beskrivning": "En öppen lucka mot floden, och det stora hornet av mässing, format som kammen på en dinosaurie. Det är fullt av mjöl. Långt nere på sin pråm tittar skepparen upp.",
+     "bild": "loftet_horn"
     },
     {
      "typ": "replik",
@@ -506,7 +509,8 @@
     {
      "typ": "mellanscen",
      "beskrivning": "Tutet är djupt och långt och rullar ut över floden. Mjölet blåser ut ur hornet i ett vitt moln. Långt ute bubblar det. En jättelik skugga glider fram under vattnet, stannar, som om den lyssnar, och sjunker igen.",
-     "tillstand_efter": "rent"
+     "tillstand_efter": "rent",
+     "bild": "skuggan_lyssnar"
     },
     {
      "typ": "replik",
@@ -555,7 +559,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Långt ute bubblar det igen, närmare nu. Ungen spetsar öronen, tar sats och hoppar ut genom luckan, rakt ner i floden. PLASK! Den simmar ut mot bubblorna."
+     "beskrivning": "Långt ute bubblar det igen, närmare nu. Ungen spetsar öronen, tar sats och hoppar ut genom luckan, rakt ner i floden. PLASK! Den simmar ut mot bubblorna.",
+     "bild": "unge_simmar"
     },
     {
      "typ": "replik",
@@ -640,7 +645,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Vattnet forsar. Framför dem lyfts ett enormt gammalt huvud upp ur floden, rynkigt och mossigt. Det vänder sig långsamt och tittar länge på ungen, som om det har sett en sådan förut. Ungen tittar tillbaka."
+     "beskrivning": "Vattnet forsar. Framför dem lyfts ett enormt gammalt huvud upp ur floden, rynkigt och mossigt. Det vänder sig långsamt och tittar länge på ungen, som om det har sett en sådan förut. Ungen tittar tillbaka.",
+     "bild": "skoldpadda_huvud"
     },
     {
      "typ": "replik",
@@ -665,7 +671,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Under snäckorna står en rad med Farfars bildtecken, två ord, och kompassrosen först."
+     "beskrivning": "Under snäckorna står en rad med Farfars bildtecken, två ord, och kompassrosen först.",
+     "bild": "skylt_tecken"
     },
     {
      "typ": "replik",
@@ -726,7 +733,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Hjälten kramar ungen. Sköldpaddan sträcker fram sitt gamla huvud och puffar försiktigt på ungen med nosen. Sedan vänder den huvudet nedströms, mot ett berg långt borta som ryker. Ungen tittar dit, reser sig och viftar med svansklubban."
+     "beskrivning": "Hjälten kramar ungen. Sköldpaddan sträcker fram sitt gamla huvud och puffar försiktigt på ungen med nosen. Sedan vänder den huvudet nedströms, mot ett berg långt borta som ryker. Ungen tittar dit, reser sig och viftar med svansklubban.",
+     "bild": "skoldpadda_visar_berget"
     },
     {
      "typ": "pussel",
@@ -927,7 +935,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Skepparen blåser fem tut, djupa och långa. Sköldpaddan svarar med sitt eget rop. På pråmarna står flodfolket alldeles tysta och tittar. Ljusbåtarna gungar. Kvällssolen värmer skalet, ungen torkar och somnar mot hjälten, och långt borta ryker berget. Två månar stiger."
+     "beskrivning": "Skepparen blåser fem tut, djupa och långa. Sköldpaddan svarar med sitt eget rop. På pråmarna står flodfolket alldeles tysta och tittar. Ljusbåtarna gungar. Kvällssolen värmer skalet, ungen torkar och somnar mot hjälten, och långt borta ryker berget. Två månar stiger.",
+     "bild": "resan_kvall"
     },
     {
      "typ": "replik",
@@ -2039,7 +2048,7 @@
   {
    "id": "u3_kvarnen",
    "rubrik": "KVARNEN",
-   "bild": "over_vattnet",
+   "bild": "kort_kvarn",
    "pass": 1,
    "steg": [
     {
@@ -2070,12 +2079,12 @@
      "replik": "{unge} står helt stilla. Tutet lät som mamma!"
     }
    },
-   "anteckning": "Inget steg säger formelns namn (69.3): LOSSA HJULET, inte SVÄRD. Bildkortet är lånat (over_vattnet) tills Stil ritar kvarnen (kort_kvarn)."
+   "anteckning": "Inget steg säger formelns namn (69.3): LOSSA HJULET, inte SVÄRD."
   },
   {
    "id": "u3_on",
    "rubrik": "ÖN",
-   "bild": "chiffernyckel",
+   "bild": "kort_on",
    "pass": 2,
    "steg": [
     {
@@ -2111,7 +2120,7 @@
   {
    "id": "u3_flaskan",
    "rubrik": "FLASKAN",
-   "bild": "brev",
+   "bild": "kort_flaska",
    "pass": 3,
    "steg": [
     {
@@ -2142,7 +2151,7 @@
      "ga_till": "fena_trappa"
     }
    },
-   "anteckning": "Inget steg säger formelns namn (69.3): SKYDDA ER, inte SKÖLD. Bildkortet är lånat (brev) tills Stil ritar flaskan (kort_flaska)."
+   "anteckning": "Inget steg säger formelns namn (69.3): SKYDDA ER, inte SKÖLD."
   }
  ]
 }

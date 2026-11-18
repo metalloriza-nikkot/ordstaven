@@ -274,6 +274,10 @@ test('kodlåset: ungen visar första tecknet, låset kontrolleras när hela orde
   await page.click('#plattan .replik-ruta');
   await expect(page.locator('#plattan .kod-las')).toBeVisible({ timeout: 8000 });
   expect(await page.locator('#plattan .kod-nyckel .kod-par').count()).toBe(6); // nyckeln på samma skärm
+  // Stils tecken (101.6): bilderna tecken_<namn>, inga emoji, i låset och på nyckeln
+  expect(await page.locator('#plattan .kod-las img.bildkort[data-bild^="tecken_"]').count()).toBe(3);
+  expect(await page.locator('#plattan .kod-nyckel img.bildkort[data-bild^="tecken_"]').count()).toBe(6);
+  await page.screenshot({ path: 'test-results/kodlas-tecken.png' });
   expect(await page.locator('#plattan .kod-tecken-ruta.visar').count()).toBe(1);
   expect(await page.locator('#plattan .bricka[data-id]').allTextContents()).toEqual(['A', 'E', 'H', 'M', 'S']);
   await bricka(page, 'H').click(); await bricka(page, 'A').click();
@@ -657,6 +661,31 @@ test('stigarna: frågan står på skylten, valet räknas vid kurvan, felet händ
   await tryckPa(page, 'stig_a');
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('RÄTT STIG.', { timeout: 10000 });
   expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toMatch(/t_stigar: a .*"resultat":"klar"/);
+});
+
+test('läsval i rummet: ett rätt alternativ med effekt gör det i rummet (101.3, säckhissen på den stora säcken)', async ({ page }) => {
+  test.setTimeout(60000);
+  const pussel = {
+    id: 't_effekt', typ: 'P1_las_och_valj', i_rummet: true, hjalp: 'ett_ord',
+    varianter: { L2: { text: 'Stå på den stora säcken.', alternativ: [
+      { id: 'a', objekt: 'lada_a', bild: 'stor', ratt: true, effekt: 'kartbit3_on' },
+      { id: 'b', objekt: 'lada_b', bild: 'liten', vid_valj: { reaktion: 'puff' } },
+    ] } },
+    vid_ratt: { handling: 'hissen åker' },
+  };
+  await provscen(page, { id: 't_eff', pass: 1, rum: 'provsackar', steg: [{ typ: 'pussel', pussel_id: 't_effekt' }, R('Rätt.')] }, null, {
+    pussel: [pussel],
+    rum: { provsackar: { innehall: ['lada_a', 'lada_b'] } },
+    kartor: { provsackar: provkarta([{ name: 'lada_a', type: 'sak', x: 90, y: 90, width: 22, height: 22, properties: { sida: 'alla' } }, { name: 'lada_b', type: 'sak', x: 210, y: 94, width: 14, height: 14, properties: { sida: 'alla' } }], { x: 160, y: 160 }) },
+  });
+  await tryckPa(page, 'lada_a');
+  // framme vid den: ett tryck till väljer
+  let fore = null;
+  for (let t = 0; t < 25; t++) { await page.waitForTimeout(200); const q = await page.evaluate(() => window.__ORDSTAVEN.position()); if (fore && Math.hypot(q.x - fore.x, q.y - fore.y) < 0.5) break; fore = q; }
+  await page.keyboard.press('Space');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 8000 }).toContain('[val] t_effekt: kartbit3_on');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.grafik().regi)).toContain('kartbit 3 visar ön');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('RÄTT.', { timeout: 15000 });
 });
 
 test('påminnelsen: egen text efter en stund, och har han inga bär trillar ett ner först', async ({ page }) => {

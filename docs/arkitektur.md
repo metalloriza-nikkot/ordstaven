@@ -1151,3 +1151,14 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Skepparens röst** (rollrösten `skeppare`): en ung man, mörkare än berättaren och ljusare och snabbare än Farfar. Finns en manlig svensk röst på enheten (Oskar) läser den skepparen, med tonen lite uppåt. Annars läser den vanliga rösten med skepparens ton. Loggen säger vilken manlig röst som finns (`man`).
 - **Regierna i gråbox** (`Rum.js`, kapitel 3 i gråbox): `kartbit3_on`, `loftet_horn`, `skuggan_lyssnar`, `unge_simmar`, `skoldpadda_huvud`, `skylt_tecken`, `skoldpadda_visar_berget` och `resan_kvall`. De ritas med gråboxens former (ringar, prickar och ellipser) tills Stil har ritat. Efter `unge_simmar` syns ungen inte i loftet (den är i floden) förrän rummet byts. Alla står i `GRABOX_REGI`.
 
+## 120. Säckhissen, tavlan som öppnas, Stils tecken och kapitel 3:s bilder (0.91.0, beslut 101.3–101.9)
+- **Säckhissen** (`sackhiss_upp` och `sackhiss_ner` i `Rum.sackhiss`): hjälten och ungen kliver upp på plattformen och åker upp genom taket eller ned genom golvet, ca 2 s. De tonas bort och syns igen i nästa rum (`k3IHissen`). Regin kan stå på en mellanscens `bild` eller som `effekt` på ett rätt alternativ.
+- **`effekt` i läsval i rummet:** ett rätt alternativ med `effekt` (2.43) gör regin i rummet också när läsvalet står i rummet (`valjIRummet`), som på läsplattan. Då visar reaktionen inte sin text för den vuxne.
+- **Skylten öppnas när han kommer in** (`justKommitIn` i `spel.js`): i ett läsval i rummet med `skylt` öppnas skylten direkt om inget steg före pusslet i scenen har låtit honom gå. Det gäller kvarnens tavla. Kapitel 1:s skyltar kommer efter ett `ga_till` och öppnas som förut, när han är framme.
+- **Farfars tecken** (`teckenBild` i `spel.js`): kodlåset och chiffret visar Stils `tecken_<namn>` (bildkort) i stället för emoji, när bilden finns (`bilder.harKort`).
+- **Kartornas nya egenskaper:**
+  - `bild_tillstand` = en bild per rumstillstånd (`rent=hornet_rent`);
+  - `i_bild_av` = föremålet är en del av ett annat föremåls bild (skriften på hornet) och ritas inte som en ruta när det föremålet har Stils bild.
+- **`verktyg/kartor/kap3.py`:** `FOREMALSBILDER` och flodfolkets bilder sätts redan i gråboxens rum, eftersom rummen ritas först efter skissen. Rutorna har Stils storlekar där bilderna står. Sköldpaddan på sandbanken och ön väntar på skissen.
+- **Inkorgen:** när bara några bilder i en figurs mapp är nya, plockas de andra ur repots atlas, så att atlasen byggs hel (`ur_atlas` i teknikchatten). Alla gamla bilder prövas mot den gamla atlasen, pixel för pixel.
+

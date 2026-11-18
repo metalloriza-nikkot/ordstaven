@@ -43,7 +43,19 @@ test('kapitel 3 pass 1: SVÄRD vid hjulet, tussarna, kvarnens tavla och det för
   const vidare = async () => { for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta), .pass-slut .fortsatt').all()) await v.click({ timeout: 300 }).catch(() => {}); };
   const gaMot = (id) => ev(gaMotSida, id);
   const typ = async (ord) => { for (const c of ord) { if ('ÅÄÖ'.includes(c)) await ev((k) => window.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true })), c.toLowerCase()); else await page.keyboard.type(c); } };
-  const anvand = async (id) => { await gaMot(id); await page.waitForTimeout(500); if (await page.locator('#plattan').isVisible()) return; await page.keyboard.press('Space'); };
+  const anvand = async (id) => {
+    await gaMot(id);
+    // vänta tills han står still (högst 5 s): en lång väg tar mer än en halv sekund
+    let fore = null;
+    for (let t = 0; t < 25; t++) {
+      await page.waitForTimeout(200);
+      const q = await ev(() => window.__ORDSTAVEN.position());
+      if (fore && Math.hypot(q.x - fore.x, q.y - fore.y) < 0.5) break;
+      fore = q;
+    }
+    if (await page.locator('#plattan').isVisible()) return;
+    await page.keyboard.press('Space');
+  };
   const scener = [], bilder = new Set();
   let felValt = false;
   for (let i = 0; i < 500; i++) {
@@ -81,6 +93,9 @@ test('kapitel 3 pass 1: SVÄRD vid hjulet, tussarna, kvarnens tavla och det för
   // tussarna högg han själv, en i taget, och hjulet snurrar
   expect(loggen.split('\n').filter((r) => r.includes('[hugga] tang_hjul_'))).toHaveLength(3);
   // (hjulet snurrar: rummets tillstånd står i sparningen nedan)
+  // tavlan öppnas på läsplattan när han kommer in i kvarnen, innan han går förbi något val (101.5)
+  expect(loggen).toContain('[skylt] tavla_kvarn: öppnas när han kommer in');
+  expect(loggen.indexOf('[skylt] tavla_kvarn: öppnas när han kommer in')).toBeLessThan(loggen.indexOf('[val] k3_kvarn_1'));
   // tavlan: rad 2 med ett fel först
   expect(loggen).toMatch(/k3_kvarn_2.*vid_stora/);
   // det första tutet blåser bort mjölet
@@ -118,7 +133,19 @@ test('kapitel 3 pass 2: FEM TUT. INTE TRE., ön vid bryggan, mossan, skylten, sn
   const vidare = async () => { for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta), .pass-slut .fortsatt').all()) await v.click({ timeout: 300 }).catch(() => {}); };
   const gaMot = (id) => ev(gaMotSida, id);
   const typ = async (ord) => { for (const c of ord) { if ('ÅÄÖ'.includes(c)) await ev((k) => window.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true })), c.toLowerCase()); else await page.keyboard.type(c); } };
-  const anvand = async (id) => { await gaMot(id); await page.waitForTimeout(500); if (await page.locator('#plattan').isVisible()) return; await page.keyboard.press('Space'); };
+  const anvand = async (id) => {
+    await gaMot(id);
+    // vänta tills han står still (högst 5 s): en lång väg tar mer än en halv sekund
+    let fore = null;
+    for (let t = 0; t < 25; t++) {
+      await page.waitForTimeout(200);
+      const q = await ev(() => window.__ORDSTAVEN.position());
+      if (fore && Math.hypot(q.x - fore.x, q.y - fore.y) < 0.5) break;
+      fore = q;
+    }
+    if (await page.locator('#plattan').isVisible()) return;
+    await page.keyboard.press('Space');
+  };
   const chiffer = pussel.get('k3_chiffret').chiffer;
   const nyckel = new Map(chiffer.nyckel.map((n) => [n.tecken, n.bokstav]));
   const scener = [];
@@ -129,7 +156,12 @@ test('kapitel 3 pass 2: FEM TUT. INTE TRE., ön vid bryggan, mossan, skylten, sn
     if (await page.locator('.pass-slut .fortsatt').isVisible()) break;
     if (!onSedd && scen === 'k3s03_bryggan' && !(await page.locator('#plattan').isVisible())) { onSedd = true; await page.screenshot({ path: 'test-results/kap3-floden-on.png' }); }
     if (await page.locator('#plattan .meddelande-ruta').isVisible()) {
-      if (!chifferBild) { chifferBild = true; await page.screenshot({ path: 'test-results/kap3-chiffret.png' }); }
+      if (!chifferBild) {
+        chifferBild = true; await page.screenshot({ path: 'test-results/kap3-chiffret.png' });
+        // Stils tecken (101.6) i raden och på nyckeln, inga emoji
+        expect(await page.locator('#plattan .med-tecken img.bildkort[data-bild^="tecken_"]').count()).toBe(10);
+        expect(await page.locator('#plattan .kod-nyckel img.bildkort[data-bild^="tecken_"]').count()).toBe(11);
+      }
       // ett fel först (rutan skakar), sedan hela meddelandet
       if (!felSkrivet) { felSkrivet = true; await typ('Q'); await page.waitForTimeout(800); }
       await typ(chiffer.tecken.filter((t) => t !== ' ').map((t) => nyckel.get(t)).join(''));
@@ -208,7 +240,19 @@ test('kapitel 3 pass 3: fenan, kramen, tången med skalkanten mitt i, SKÖLD, or
   const vidare = async () => { for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {}); };
   const gaMot = (id) => ev(gaMotSida, id);
   const typ = async (ord) => { for (const c of ord) { if ('ÅÄÖ'.includes(c)) await ev((k) => window.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true })), c.toLowerCase()); else await page.keyboard.type(c); } };
-  const anvand = async (id) => { await gaMot(id); await page.waitForTimeout(500); if (await page.locator('#plattan').isVisible()) return; await page.keyboard.press('Space'); };
+  const anvand = async (id) => {
+    await gaMot(id);
+    // vänta tills han står still (högst 5 s): en lång väg tar mer än en halv sekund
+    let fore = null;
+    for (let t = 0; t < 25; t++) {
+      await page.waitForTimeout(200);
+      const q = await ev(() => window.__ORDSTAVEN.position());
+      if (fore && Math.hypot(q.x - fore.x, q.y - fore.y) < 0.5) break;
+      fore = q;
+    }
+    if (await page.locator('#plattan').isVisible()) return;
+    await page.keyboard.press('Space');
+  };
   const duell = pussel.get('k3_duellen');
   const norm = (s) => s.replace(/\|/g, '').replace(/\s+/g, ' ').trim().toLocaleUpperCase('sv-SE');
   let rond = 0, felValt = false, duellBild = false, slut = false, skalkant = false;
@@ -245,8 +289,9 @@ test('kapitel 3 pass 3: fenan, kramen, tången med skalkanten mitt i, SKÖLD, or
       const loggen = await ev(() => window.__ORDSTAVEN.logg());
       // efter första tussen går han till skalets kant: den frivilliga scenen börjar där
       if (!skalkant && loggen.includes('[lyfta] tang_')) {
-        skalkant = true; await gaMot('skalkant');
-        await expect.poll(() => ev(() => window.__ORDSTAVEN.logg().includes('[frivilligt] scen k3s05_skalkant vid')), { timeout: 10000 }).toBe(true);
+        // lyftet har Stils bilder och en kort paus: vänta, och gå igen om kommandot kom medan rummet stod still
+        skalkant = true; await page.waitForTimeout(1200);
+        await expect.poll(async () => { await gaMot('skalkant'); return ev(() => window.__ORDSTAVEN.logg().includes('[frivilligt] scen k3s05_skalkant vid')); }, { timeout: 15000, intervals: [1500] }).toBe(true);
         continue;
       }
       const kvar = p.foremal.filter((id) => !loggen.includes(`[lyfta] ${id}:`));
@@ -326,11 +371,11 @@ test('krockarna i loggen (97.6): går han mot ett hinder i mer än ca 1 s skrive
   expect((await ev(() => window.__ORDSTAVEN.logg())).match(/\[krock\]/g).length).toBe(fore);
 });
 
-test('regierna i kapitel 3:s gråbox (100.4): var och en går i sitt rum och syns', async ({ page }, info) => {
+test('regierna i kapitel 3:s gråbox (100.4 och 101.3): var och en går i sitt rum och syns', async ({ page }, info) => {
   test.skip(!['mac-helskarm', 'ipad-10', 'mac-safari'].includes(info.project.name), 'tre projekt räcker, som kapitel 2 (84.6)');
   test.setTimeout(180000);
   const ev = (fn, arg) => page.evaluate(fn, arg);
-  const REGIER = [['k3s01_floden', ['kartbit3_on']], ['k3s02_loftet', ['loftet_horn', 'skuggan_lyssnar']], ['k3s03_hornet', ['unge_simmar']],
+  const REGIER = [['k3s01_floden', ['kartbit3_on']], ['k3s02_kvarnen', ['sackhiss_upp']], ['k3s02_loftet', ['loftet_horn', 'skuggan_lyssnar']], ['k3s03_hornet', ['unge_simmar', 'sackhiss_ner']],
     ['k3s04_on', ['skoldpadda_huvud', 'skylt_tecken']], ['k3s05_sandbanken', ['skoldpadda_visar_berget']], ['k3s07_resan', ['resan_kvall']]];
   for (const [scenId, regier] of REGIER) {
     // på ön börjar den där skylten syns (efter mossan), så att tecknen har sin skylt
@@ -346,6 +391,8 @@ test('regierna i kapitel 3:s gråbox (100.4): var och en går i sitt rum och syn
       await page.waitForTimeout(Math.max(0, ms - 2600) + 300);
     }
     if (scenId === 'k3s03_hornet') expect(await ev(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').unge.visible)).toBe(false);
+    // säckhissen: hjälten har åkt ut ur rummet och syns inte (han syns igen i nästa rum)
+    if (scenId === 'k3s02_kvarnen') expect(await ev(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').hjalte.alpha)).toBe(0);
   }
   // den sista sidan: regin står i regiloggen
   expect(await ev(() => window.__ORDSTAVEN.grafik().regi)).toContain('kvällen på floden');

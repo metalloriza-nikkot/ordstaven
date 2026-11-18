@@ -71,11 +71,16 @@
      "type": "sak",
      "x": 64,
      "y": 96,
-     "width": 24,
+     "width": 28,
      "height": 40,
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "sackhiss"
+      },
       {
        "name": "sida",
        "type": "string",
@@ -110,13 +115,23 @@
      "id": 5,
      "name": "hornet",
      "type": "sak",
-     "x": 192,
-     "y": 66,
-     "width": 40,
-     "height": 26,
+     "x": 164,
+     "y": 98,
+     "width": 88,
+     "height": 22,
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "hornet_mjol"
+      },
+      {
+       "name": "bild_tillstand",
+       "type": "string",
+       "value": "rent=hornet_rent"
+      },
       {
        "name": "sida",
        "type": "string",
@@ -128,17 +143,27 @@
      "id": 6,
      "name": "hornet_skrift",
      "type": "sak",
-     "x": 156,
-     "y": 72,
-     "width": 28,
-     "height": 12,
+     "x": 184,
+     "y": 75,
+     "width": 31,
+     "height": 8,
      "rotation": 0,
      "visible": true,
      "properties": [
       {
+       "name": "i_bild_av",
+       "type": "string",
+       "value": "hornet"
+      },
+      {
+       "name": "rackvidd",
+       "type": "int",
+       "value": 56
+      },
+      {
        "name": "sida",
        "type": "string",
-       "value": "alla"
+       "value": "under"
       }
      ]
     }

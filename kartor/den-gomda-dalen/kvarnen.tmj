@@ -83,10 +83,15 @@
      "x": 128,
      "y": 8,
      "width": 64,
-     "height": 30,
+     "height": 34,
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "tavla_kvarn"
+      },
       {
        "name": "rackvidd",
        "type": "int",
@@ -123,11 +128,26 @@
      "type": "sak",
      "x": 48,
      "y": 72,
-     "width": 14,
-     "height": 18,
+     "width": 20,
+     "height": 14,
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "lucka_stangd"
+      },
+      {
+       "name": "bild_sedan",
+       "type": "string",
+       "value": "lucka_oppen"
+      },
+      {
+       "name": "sedan",
+       "type": "string",
+       "value": "k3_kvarn_1"
+      },
       {
        "name": "sida",
        "type": "string",
@@ -141,11 +161,16 @@
      "type": "sak",
      "x": 96,
      "y": 152,
-     "width": 22,
+     "width": 20,
      "height": 14,
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "lucka_stangd"
+      },
       {
        "name": "sida",
        "type": "string",
@@ -157,17 +182,22 @@
      "id": 7,
      "name": "sackhiss",
      "type": "sak",
-     "x": 248,
+     "x": 256,
      "y": 48,
-     "width": 40,
-     "height": 24,
+     "width": 28,
+     "height": 40,
      "rotation": 0,
      "visible": true,
      "properties": [
       {
+       "name": "bild",
+       "type": "string",
+       "value": "sackhiss"
+      },
+      {
        "name": "sida",
        "type": "string",
-       "value": "under"
+       "value": "vanster"
       }
      ]
     },
@@ -175,18 +205,25 @@
      "id": 8,
      "name": "sack_stor",
      "type": "sak",
-     "x": 240,
+     "x": 244,
      "y": 104,
-     "width": 32,
+     "width": 22,
      "height": 22,
      "rotation": 0,
-     "visible": true
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "sack_stor"
+      }
+     ]
     },
     {
      "id": 9,
      "name": "pa_stora",
      "type": "sak",
-     "x": 250,
+     "x": 249,
      "y": 92,
      "width": 12,
      "height": 10,
@@ -222,12 +259,19 @@
      "id": 11,
      "name": "sack_liten",
      "type": "sak",
-     "x": 160,
+     "x": 162,
      "y": 104,
-     "width": 18,
+     "width": 14,
      "height": 14,
      "rotation": 0,
-     "visible": true
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "sack_liten"
+      }
+     ]
     },
     {
      "id": 12,

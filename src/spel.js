@@ -2351,6 +2351,16 @@ export function skapaSpel(d) {
    * ungens pekning som i P1. Glimten är lika för alla alternativ.
    * @param {any} p
    */
+  /**
+   * Har han just kommit in i rummet: inget steg före det nu i scenen har låtit honom gå (ett mål, en figur, en
+   * skylt eller ett pussel)? Mellanscener och repliker räknas inte (101.5).
+   * @returns {boolean}
+   */
+  function justKommitIn() {
+    const fore = (b?.scen?.steg || []).slice(0, Math.max(0, b?.stegIndex ?? 0));
+    return !fore.some((/** @type {any} */ x) => ['ga_till', 'prata', 'las_skylt', 'pussel', 'tryck', 'fritt'].includes(x.typ));
+  }
+
   async function valjIRummet(p) {
     const niva = nivaFor(p);
     const v = skapaValj(p, { niva });
@@ -2410,9 +2420,14 @@ export function skapaSpel(d) {
       : v.s.bild ? bilder.html(v.s.bild) : v.s.text ? `<span class="moln-text">${lasText(p, v.s.text)}</span>` : null, p.instruktion ?? null);
     if (skylt) {
       skyltStyrs.add(skylt.id); skyltSpar = spar; skyltPusselNu = skylt.id;
-      // han har just gått fram till skylten: den öppnas direkt
+      // han har just gått fram till skylten: den öppnas direkt. Den öppnas också direkt när han just har kommit in i
+      // rummet (inget steg före pusslet i scenen har låtit honom gå), så att han läser innan han går förbi något av
+      // valen (101.5, kvarnens tavla): läsningen är den snabbaste vägen
       const so = rum.ruta(skylt.id);
-      if (so && vidObjekt(rum.pos, so)) await lasSkyltText(skylt);
+      if (so && (vidObjekt(rum.pos, so) || justKommitIn())) {
+        if (!vidObjekt(rum.pos, so)) logg.handelse('skylt', `${skylt.id}: öppnas när han kommer in`);
+        await lasSkyltText(skylt);
+      }
     }
     const avst = (/** @type {{ x: number, y: number }} */ a, /** @type {{ x: number, y: number }} */ b2) => Math.hypot(a.x - b2.x, a.y - b2.y);
     /** Står hjälten nära utgången (inom ungefär en ruta från dörren, läsplatsen eller skylten)? @param {any} o */
@@ -2594,7 +2609,14 @@ export function skapaSpel(d) {
         visaMoln(null);
         for (const a of v.s.alternativ) if (a.objekt) rum.markera(a.objekt, false);
         rum.frys(true);
-        await Promise.all([rattHandelse(alt?.objekt ?? null), reaktion(r.reaktion, alt?.objekt ?? null)]);
+        // ett rätt alternativ med effekt (2.43) gör det i rummet också här (101.3, säckhissen på den stora säcken),
+        // och då visar reaktionen inte sin text för den vuxne
+        const effektMs = alt?.effekt ? rum.regi(alt.effekt) : 0;
+        if (effektMs) {
+          logg.handelse('val', `${p.id}: ${alt.effekt}`);
+          await Promise.all([rattHandelse(alt?.objekt ?? null), vanta(tid(effektMs))]);
+          await reaktion(r.reaktion ? { ...r.reaktion, syns_redan: true } : null, alt?.objekt ?? null);
+        } else await Promise.all([rattHandelse(alt?.objekt ?? null), reaktion(r.reaktion, alt?.objekt ?? null)]);
         klar({ niva: v.s.variantNyckel, forstaForsoket: v.forstaForsoket, forsok: v.s.forsok, hjalp: spar.hjalp, knuffFore: hjalpSpar.fore().knuff_fore });
       };
     });
@@ -3052,6 +3074,12 @@ export function skapaSpel(d) {
   }
 
   /**
+   * Farfars tecken i kodlåset och chiffret: Stils bild (`tecken_<namn>`, bläck som på kodnyckeln), så att tecknen ser
+   * likadana ut i båda kapitlen och på papperet. Emoji bara om Stil inte har ritat tecknet (101.6). @param {string} t
+   */
+  const teckenBild = (t) => (bilder.harKort(`tecken_${t}`) ? bilder.html(`tecken_${t}`) : bilder.html(t));
+
+  /**
    * Kodlåset (P9): låset med tecken och chiffernyckeln står på samma skärm, och han lägger bokstäverna med brickor.
    * Låset kontrolleras först när alla fälten är fyllda (kontroll: hela_ordet). Rätta bokstäver stannar, och varje rätt
    * avkodat tecken lyser på låset. Med visa_forsta visar ungen det första tecknet: det lyser på låset och på nyckeln,
@@ -3073,10 +3101,10 @@ export function skapaSpel(d) {
       const tipsBokstav = () => (f.s.tips === null ? null : f.s.brickor.find((x) => x.id === f.s.tips)?.bokstav ?? null);
       const rita = () => {
         const bokstav = (/** @type {number | null} */ id) => (id === null ? '' : f.s.brickor.find((x) => x.id === id)?.bokstav ?? '');
-        const las = `<div class="kod-kort kod-las"><span class="kod-bygel" aria-hidden="true"></span><div class="kod-tecken">${c.tecken.map((t, i) => `<span class="kod-tecken-ruta ${f.s.last[i] ? 'ratt' : ''} ${i === visar ? 'visar' : ''}">${bilder.html(t)}</span>`).join('')}</div>
+        const las = `<div class="kod-kort kod-las"><span class="kod-bygel" aria-hidden="true"></span><div class="kod-tecken">${c.tecken.map((t, i) => `<span class="kod-tecken-ruta ${f.s.last[i] ? 'ratt' : ''} ${i === visar ? 'visar' : ''}">${teckenBild(t)}</span>`).join('')}</div>
           <div class="platser">${f.s.platser.map((id, i) => `<span class="plats ${f.s.last[i] ? 'last' : ''} ${id !== null && !f.s.last[i] ? 'flyttbar' : ''}" data-plats="${i}">${ui.esc(bokstav(id))}</span>`).join('')}</div></div>`;
         const tb = tipsBokstav();
-        const nyckel = `<div class="kod-kort kod-nyckel">${c.nyckel.map((n) => `<span class="kod-par ${visar >= 0 && n.tecken === c.tecken[visar] ? 'visar' : ''} ${tb && n.bokstav === tb ? 'tips' : ''}">${bilder.html(n.tecken)}<span class="kod-bokstav">${ui.esc(n.bokstav)}</span></span>`).join('')}</div>`;
+        const nyckel = `<div class="kod-kort kod-nyckel">${c.nyckel.map((n) => `<span class="kod-par ${visar >= 0 && n.tecken === c.tecken[visar] ? 'visar' : ''} ${tb && n.bokstav === tb ? 'tips' : ''}">${teckenBild(n.tecken)}<span class="kod-bokstav">${ui.esc(n.bokstav)}</span></span>`).join('')}</div>`;
         const brickor = `<div class="brickor">${f.s.brickor.map((x) => `<button type="button" class="bricka ${f.s.platser.includes(x.id) ? 'anvand' : ''}" data-id="${x.id}">${ui.esc(x.bokstav)}</button>`).join('')}<button type="button" class="bricka sudda" aria-label="Ta tillbaka">⌫</button></div>`;
         ui.visaPlatta(`<div class="pussel-ruta kod-ruta"><div class="kod-rad">${las}${nyckel}</div>${brickor}</div>`, 'pussel P9_kodlas');
         tillatNos(p, spar);
@@ -3136,8 +3164,8 @@ export function skapaSpel(d) {
       const rita = (/** @type {{ plats: number, bokstav: string } | null} */ fel = null) => {
         const tecknet = m.tecknetNu, lys = m.forenklad, nos = m.s.felNu >= 3;
         const rad = c.tecken.map((/** @type {string} */ t, /** @type {number} */ i) => (t === ' ' ? '<span class="med-mellanrum" aria-hidden="true"></span>'
-          : `<span class="med-ruta ${i === m.s.nu ? 'nu' : ''} ${i === m.s.nu && glimt ? 'glimt' : ''} ${m.s.skrivet[i] ? 'ratt' : ''} ${fel?.plats === i ? 'skakar' : ''}" data-plats="${i}"><span class="med-tecken">${bilder.html(t)}</span><span class="plats ${m.s.skrivet[i] ? 'last' : ''}">${ui.esc(fel?.plats === i ? fel.bokstav : m.s.skrivet[i])}</span></span>`)).join('');
-        const nyckel = `<div class="kod-kort kod-nyckel">${c.nyckel.map((/** @type {any} */ n) => `<span class="kod-par ${n.tecken === tecknet && lys ? 'tips' : ''} ${n.tecken === tecknet && nos ? 'nosar' : ''}" data-tecken="${ui.esc(n.tecken)}">${bilder.html(n.tecken)}<span class="kod-bokstav">${ui.esc(n.bokstav)}</span></span>`).join('')}</div>`;
+          : `<span class="med-ruta ${i === m.s.nu ? 'nu' : ''} ${i === m.s.nu && glimt ? 'glimt' : ''} ${m.s.skrivet[i] ? 'ratt' : ''} ${fel?.plats === i ? 'skakar' : ''}" data-plats="${i}"><span class="med-tecken">${teckenBild(t)}</span><span class="plats ${m.s.skrivet[i] ? 'last' : ''}">${ui.esc(fel?.plats === i ? fel.bokstav : m.s.skrivet[i])}</span></span>`)).join('');
+        const nyckel = `<div class="kod-kort kod-nyckel">${c.nyckel.map((/** @type {any} */ n) => `<span class="kod-par ${n.tecken === tecknet && lys ? 'tips' : ''} ${n.tecken === tecknet && nos ? 'nosar' : ''}" data-tecken="${ui.esc(n.tecken)}">${teckenBild(n.tecken)}<span class="kod-bokstav">${ui.esc(n.bokstav)}</span></span>`).join('')}</div>`;
         const fraga = p.instruktion ? fragaRadHtml(p.instruktion, '', true) : '';
         const knappar = d.pek() ? '' : '<div class="dop-knappar"><button type="button" class="knapp visa-tb" aria-label="Visa tangentbordet">⌨</button></div>';
         ui.visaPlatta(`<div class="pussel-ruta kod-ruta meddelande-ruta">${fraga}<div class="med-rad">${rad}</div>${nyckel}${knappar}</div>`, 'pussel P9_kodlas meddelande');

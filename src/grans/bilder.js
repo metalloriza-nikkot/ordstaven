@@ -92,5 +92,7 @@ export function skapaBilder(ordlistor, platshallare = {}) {
     }
     return `<span class="bild emoji" data-bild="${id}">${e || '❔'}</span>`;
   }
-  return { html, emoji: hitta };
+  /** Har Stil ritat bildkortet? (tecknen i kodlåset och chiffret, 101.6) @param {string} id */
+  const harKort = (id) => !!KORT[id];
+  return { html, emoji: hitta, harKort };
 }

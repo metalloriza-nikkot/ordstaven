@@ -164,6 +164,12 @@ export function lasKarta(tmj) {
       if (egen.bild_natt) ut.bildNatt = String(egen.bild_natt);
       // bild_kvall (kapitel 2, Stil del 1) = bilden i rummets tillstånd kvall (lägerelden, vedpinnarna)
       if (egen.bild_kvall) ut.bildKvall = String(egen.bild_kvall);
+      // bild_tillstand (101.6, kapitel 3) = en bild per rumstillstånd, "rent=hornet_rent,fena_uppe=…" (hornet med
+      // mjöl och rent). Tillståndet utan bild här har föremålets vanliga bild
+      if (egen.bild_tillstand) ut.bildTillstand = Object.fromEntries(String(egen.bild_tillstand).split(',').map((t) => t.split('=').map((x) => x.trim())).filter((x) => x.length === 2 && x[0] && x[1]));
+      // i_bild_av (101.6) = föremålet är en del av ett annat föremåls bild (skriften på hornet): när det föremålet har
+      // Stils bild ritas det här inte som en ruta, men id:t och platsen står kvar
+      if (egen.i_bild_av) ut.iBildAv = String(egen.i_bild_av);
       // bild_lagen (brevramen) = en bild per läge: den första tills något har lämnats här (bara till föremålet), sedan
       // en bild till per sak som har lämnats. bild_ord (övergången) = bilden efter ordet han skrev i pusslet:
       // <id>_<ordet med gemener>, t.ex. overgang_stege
