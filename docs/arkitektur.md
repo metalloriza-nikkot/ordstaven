@@ -1173,3 +1173,14 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Reaktioner med regi** (schema 2.48): `bild` på en reaktion spelar en regi i rummet (`tallrikar`, `skuggan_stiger`, `skuggan_dyker`, listan `REAKTION_REGI` i `karna/mellanscen.js`). Texten för den vuxne visas som förut.
 - **Regierna i floden:** `loftet_horn` visar Stils horn från sidan som närbild ovanför avsatsen, `skuggan_lyssnar` och `unge_simmar` spelas ut över floden (`skugganIFloden`, `ungeHopparFranAvsatsen`), och `on_stiger` lyfter skalet ur vattnet vid kvarnens brygga. `sackhiss_ner` på avsatsen börjar med att ön stiger när ungen simmar, eftersom mellanscenen har båda.
 - **Säckhissen i ett snabbt test:** hissens tweens slutar flytta hjälten när rummet har bytts, och flaggan att han åkte hiss sätts när regin börjar.
+
+## Stils rum i kapitel 3 (0.93.0, beslut 103.2–103.5)
+- **Rummen är bilder** (`assets/rum/kap-03/<rum>.png`, `floden_kvall`, `floden_over`), som i kapitel 2. `floden_over` är Teknikens utsnitt ur Stils floden (pråmen, bryggan och kajkanten) och ritas ovanför ön och under figurerna, så att ön ligger under bryggan.
+- **`verktyg/kartor/kap3.py`** följer Stils bilder: kvarnens hinder och vattnet i kvarnen och på sandbanken läses ur bilden (`vattenmask`: 8-px-rutor där minst hälften är blå, `strackor` gör rader av dem), öns gångyta är en ellips (`ellipsvagg`), och avsatsen är 20 px djup. Där kartan har flyttat något för att han ska kunna gå gäller kartan (beslut 103.2): dörrnischen i kvarnens fasad, och tången, trappan och vattnet i söder på sandbanken. `kap2.karta()` tar rummets bildmapp, `i_bilden` och föremålsbilderna som argument.
+- **Platshållare:** dekor med `i_bilden` är osynlig i ett rum med bild. `bildplats` och `skalplats` lägger ut rutor som föremålens bilder ritas på (`bild_pa`), skalet i den gemensamma skalan 480 × 320. Platserna i kvarnen och vid fenan är osynliga markeringar.
+- **Kartans nya egenskaper:**
+  - `anim_i` = föremålets `bild_anim` spelas bara i de rumstillstånden (hjulet snurrar när tången är borta, `hjul,rent,on,kvall`);
+  - `under` = bilden ritas alltid under figurerna, också när den är högre än rutan (ön, skalet på kvällen).
+- **Ön stiger** (`onStiger`): Stils `on_stiger_01–04` (300 ms var), `05/06` tre gånger (200 ms) och sedan `on_floden`. Skuggan under vattnet är `on_stiger_01` (`k3NySkugga`). `k3Skalbild` ritar en bild i skalets skala med skalets mitt i punkten. Utan bilderna ritas ellipsen som förut.
+- **Regin `frukost`** (103.3.1): kameran går till pråmarna, flodbon blåser tre tut (`flodbo_frukost_blaser_ner_01/02`, 300 ms) med en ring från munnen per tut, och efter 2,2 s kommer tallrikarna (`tallrikar`). 4,3 s.
+- **Skylten öppnas när han stannar vid den:** i ett läsval med `skylt` öppnas skylten igen bara när han står still vid den och den är saken han står närmast (`aktivSak` bland skylten och alternativen). Han går förbi kvarnens tavla till säckarna utan att den öppnas.

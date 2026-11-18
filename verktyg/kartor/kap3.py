@@ -17,16 +17,26 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from kap2 import KARTOR, STIG, karta, liv, punkt, sak, utg, vagg  # noqa: E402
+from kap2 import KARTOR, ROT, STIG, karta, liv, punkt, sak, utg, vagg  # noqa: E402
 
 # Flodfolket (16 × 24) i Stils bilder (10h v0.1, 101.6): stillbilden är <namn>_ner_01, och figuren vänder sig mot den
 # som pratar med <namn>_<riktning>_01. De har en skugga under sig, som byborna i kapitel 2.
 FIGUR_B, FIGUR_H = 16, 24
 FLODFOLKET = {'skepparen', 'flodbo_frukost', 'flodbo_skrattar', 'flodman'}
 
-# Skalets mitt i floden (skissen version 2, 102.3): där ön stiger vid kvarnens brygga, och där den simmar i resan
-ON = (500, 302)
-KVALL = (210, 262)
+# Skalets mitt i floden (Stils rum, 10h v0.4, 103.2): där ön stiger vid kvarnens brygga, och där den simmar i resan.
+# Sköldpaddans bilder är 480 × 320 med skalets mitt i (250, 150).
+ON = (500, 292)
+KVALL = (230, 270)
+SKALBILD = (480, 320, 250, 150)
+
+# Kapitel 3:s rum som Stils bilder (103.2). Rummets _over-bild ligger ovanför föremålen men under figurerna: i floden är
+# det kvarnens brygga, skepparens pråm och strandkanten, så att ön ligger under dem (103.2). Den är inga väggar.
+RUMSBILDER = ROT / 'assets' / 'rum' / 'kap-03'
+# Det som står i rummets bild: de går man på eller till, men de ritas inte
+# Platserna i kvarnens och sandbankens läsval är ställen han går till vid säckarna, fenan och huvudet, utan egen bild.
+I_BILDEN = {'pramarna', 'brygga_kvarn', 'skoldpadda', 'skalkant', 'litet_trad',
+            'pa_stora', 'vid_stora', 'pa_lilla', 'vid_lilla', 'under_fenan', 'bakom_fenan', 'under_huvudet', 'bakom_huvudet'}
 
 # Stils föremål för kapitel 3 (10h v0.1, 101.6): kartans id → bildens egenskaper. Bilden står på föremålets nederkant,
 # mitt i. Rummen är gråbox tills skissen är klar, så bilderna sätts här och inte bara i rum som är bilder (som i kap2.py).
@@ -43,9 +53,21 @@ FOREMALSBILDER = {
     'sack_stor': {'bild': 'sack_stor'},
     'sack_liten': {'bild': 'sack_liten'},
     'sackhiss': {'bild': 'sackhiss'},
-    # hornet med mjöl, och rent med det målade bandet där skriften står (hornet_skrift är en del av bilden)
-    'hornet': {'bild': 'hornet_mjol', 'bild_tillstand': 'rent=hornet_rent'},
+    # hornet på avsatsen uppifrån (103.2), med mjöl och rent med det målade bandet där skriften står (hornet_skrift är
+    # en del av bilden). Bilden står där Stil ritade den (hornet_plats), och hornet självt är det han står vid
+    'hornet': {'bild': 'hornet_avsats_mjol', 'bild_tillstand': 'rent=hornet_avsats_rent,on=hornet_avsats_rent,kvall=hornet_avsats_rent',
+               'bild_pa': 'hornet_plats'},
     'hornet_skrift': {'i_bild_av': 'hornet'},
+    # vattenhjulet (103.2): stilla på morgonen, och sedan ett varv i sex bilder, 250 ms per bild (golvets gräns, 45)
+    'hjul': {'bild': 'vattenhjul_01', 'bild_tillstand': 'morgon=vattenhjul_stilla', 'bild_pa': 'hjul_plats',
+             'bild_anim': ','.join(f'vattenhjul_0{i}' for i in range(1, 7)), 'anim_ms': 250, 'anim_i': 'hjul,rent,on,kvall'},
+    # ön vid kvarnens brygga (103.2), under bryggan och figurerna
+    'on': {'bild': 'on_floden', 'bild_pa': 'on_plats', 'under': True},
+    # sköldpaddans huvud och fena på sandbanken, där Stil ritade dem (halsen står i rummets bild)
+    'skoldpadda_huvud': {'bild': 'skoldpadda_huvud_vilar', 'bild_pa': 'huvud_plats'},
+    'skoldpadda_fena': {'bild': 'skoldpadda_fena_sanden', 'bild_tillstand': 'fena_uppe=skoldpadda_fena_lyft,luftskepp=skoldpadda_fena_lyft',
+                        'bild_pa': 'fena_plats'},
+    'fena_trappa': {'bild': 'skoldpadda_fena_trappa', 'bild_pa': 'fena_plats'},
     **{f'tuva_{i}': {'bild': 'tuva_hel', 'bild_hugg': 'tuva_lyft', 'bild_kvar': 'tuva_lyft'} for i in range(1, 6)},
     'skylt_skal': {'bild': 'skylt_skal'},
     **{f'snacka_{i}': {'bild': 'snacka_klump', 'bild_hugg': 'snacka_bort_01,snacka_bort_02', 'bild_kvar': 'snacka_bort_02'} for i in range(1, 5)},
@@ -61,9 +83,74 @@ def figur(namn, x, y, **e):
     return ('figur', namn, x, y, FIGUR_B, FIGUR_H, e)
 
 
-# Föremål som inte har Stils bild i ett visst rum: hornet på avsatsen ritas ovanifrån (102.3), och Stils horn från
-# sidan är närbilden (regin loftet_horn)
-UTAN_BILD = {'floden': {'hornet', 'hornet_skrift'}}
+# Föremål som inte har Stils bild i ett visst rum
+UTAN_BILD = {}
+
+
+def bildplats(namn, x, y, b, h, **e):
+    """Var en bild står som inte ryms i föremålets ruta (bild_pa): en osynlig dekor i rummets bild."""
+    return sak(namn, x, y, b, h, dekor=True, i_bilden=True, **e)
+
+
+def skalplats(namn, mitt, **e):
+    """Sköldpaddans bild (480 × 320) med skalets mitt i `mitt`. Den får gå ut ur bild (rund)."""
+    b, h, mx, my = SKALBILD
+    return sak(namn, mitt[0] - mx, mitt[1] - my, b, h, rund=True, **e)
+
+
+def vattenmask(rum, ruta=8):
+    """Vattnet i Stils bild av rummet, i rutor om 8 × 8 där minst halva rutan är vatten (blått), som rader av sträckor."""
+    from PIL import Image
+    im = Image.open(RUMSBILDER / f'{rum}.png').convert('RGBA')
+    W, H = im.size
+    px = im.load()
+    rader = []
+    for y0 in range(0, H, ruta):
+        rad = []
+        for x0 in range(0, W, ruta):
+            n = sum(1 for x in range(x0, min(W, x0 + ruta)) for y in range(y0, min(H, y0 + ruta))
+                    if px[x, y][3] > 0 and px[x, y][2] > px[x, y][0] + 25 and px[x, y][2] >= px[x, y][1])
+            rad.append(n * 2 >= ruta * ruta)
+        rader.append(rad)
+    return rader
+
+
+def strackor(rader, ruta=8, undantag=lambda x, y: False):
+    """Väggar av vatten ur en mask: sträckor i varje rad, utom rutor där undantag(x, y) säger att han ska kunna gå."""
+    ut = []
+    for j, rad in enumerate(rader):
+        i = 0
+        while i < len(rad):
+            if rad[i] and not undantag(i * ruta, j * ruta):
+                k = i
+                while k < len(rad) and rad[k] and not undantag(k * ruta, j * ruta):
+                    k += 1
+                ut.append(vagg(i * ruta, j * ruta, (k - i) * ruta, ruta, vatten=True))
+                i = k
+            else:
+                i += 1
+    return ut
+
+
+def ellipsvagg(cx, cy, rx, ry, bredd, hojd, steg=8, oppning=None):
+    """Vatten runt en ellips man går på (skalet ovanifrån på ön), som trappsteg rad för rad. oppning = (x0, x1, y0)
+    är plankan in, där vattnet inte når."""
+    ut = []
+    for y0 in range(0, hojd, steg):
+        y1 = min(hojd, y0 + steg)
+        dy = max(abs(y0 - cy), abs(y1 - cy))
+        k = max(0.0, 1 - (dy / ry) ** 2) ** 0.5 if dy < ry else 0.0
+        x0, x1 = round(cx - rx * k), round(cx + rx * k)
+        if k == 0:
+            x0 = x1 = cx
+        if oppning and y0 >= oppning[2]:
+            ut += [vagg(0, y0, oppning[0], y1 - y0, vatten=True), vagg(oppning[1], y0, bredd - oppning[1], y1 - y0, vatten=True)]
+            continue
+        if x0 > 0:
+            ut.append(vagg(0, y0, x0, y1 - y0, vatten=True))
+        if x1 < bredd:
+            ut.append(vagg(x1, y0, bredd - x1, y1 - y0, vatten=True))
+    return ut
 
 
 def med_bilder(rum, spec):
@@ -83,23 +170,6 @@ SB = {'skal': (340, 36)}
 def plats(namn, x, y):
     """En av de fyra platserna i k3_fenan, med mitten där Stil har ritat den."""
     return sak(namn, x - 7, y - 5, 14, 10, sida='alla')
-
-
-def sandens_kant(steg=10):
-    """Vattnet runt sanden som trappsteg: sanden är ellipsen i skissen (mitt 190, 80, radier 204 och 120), och vattnet
-    börjar vid y 188 i söder, så att det går att gå runt tången under fenan."""
-    ut = []
-    for y0 in range(0, 188, steg):
-        y1 = min(188, y0 + steg)
-        dy = max(abs(y0 - 80), abs(y1 - 80))
-        k = max(0.0, 1 - (dy / 120) ** 2) ** 0.5
-        x0 = max(8, round(190 - 204 * k))
-        ut.append(vagg(0, y0, x0, y1 - y0, vatten=True))
-        x1 = min(320, round(190 + 204 * k))
-        if x1 < 320:
-            ut.append(vagg(x1, y0, 320 - x1, y1 - y0, vatten=True))
-    ut.append(vagg(0, 188, 320, 4, vatten=True))
-    return ut
 
 
 def skalets_kant(steg=8):
@@ -134,7 +204,7 @@ RUMMEN = {
             punkt('regi_pramar', 215, 84),
             punkt('regi_hjalte_k3s02_loftet', 520, 98),
             punkt('regi_hjalte_k3s03_hornet', 566, 98),
-            punkt('regi_hjalte_k3s07_resan', 206, 214),
+            punkt('regi_hjalte_k3s07_resan', KVALL[0] + 6, KVALL[1] - 8),
             punkt('regi_skepparen_kvall', 566, 102),
             punkt('regi_skepparen_on', 532, 192),
             # vattnet: väster om bryggan, under pråmarna (plankorna emellan går att gå på), och söder om kajen
@@ -145,19 +215,16 @@ RUMMEN = {
             vagg(344, 196, 204, 188, vatten=True), vagg(548, 218, 44, 166, vatten=True), vagg(592, 196, 48, 188, vatten=True),
             # rännan ned längs kvarnens västra sida
             vagg(418, 0, 20, 160, vatten=True),
-            # kvarnen: väggarna runt avsatsen, så att den bara nås med hissen
+            # kvarnen: väggarna runt avsatsen (Stils golv, 150 × 20), så att den bara nås med hissen
             vagg(440, 0, 200, 88), vagg(440, 88, 28, 62), vagg(618, 88, 22, 62),
             # fasaden under avsatsen, med en nisch för dörren (så att vägen längs kajen inte går genom den)
-            vagg(468, 104, 60, 46), vagg(552, 104, 66, 46), vagg(528, 104, 24, 34),
-            # bryggorna, däcken och avsatsen ritas i gråboxen (dekor), och man går på dem där inget vatten är
-            sak('brygga_lang', 84, 50, 262, 16, dekor=True),
-            sak('pram_1', 90, 68, 76, 32, dekor=True),
-            sak('pram_2', 174, 68, 76, 32, dekor=True),
-            sak('pram_3', 258, 68, 82, 32, dekor=True),
-            sak('planka_pram_1', 166, 76, 8, 16, dekor=True),
-            sak('planka_pram_2', 250, 76, 8, 16, dekor=True),
-            sak('brygga_skepparen', 350, 178, 60, 10, dekor=True),
-            sak('avsats', 468, 88, 150, 16, dekor=True),
+            vagg(468, 108, 60, 42), vagg(552, 108, 66, 42), vagg(528, 108, 24, 30),
+            # bilderna som inte ryms i föremålens rutor (bild_pa): ön vid bryggan, hjulet och hornet, där Stil ritade dem
+            skalplats('on_plats', ON, dekor=True, i_bilden=True),
+            bildplats('hjul_plats', 433, 124, 58, 56),
+            bildplats('hornet_plats', 572, 87, 24, 36),
+            # ön ligger under bryggan, figurerna och plankan (103.2), så den ritas först
+            sak('on', 360, 220, 280, 164, sida='over'),
             # pråmarna (rummets innehåll): västra pråmens däck, där ingen står
             sak('pramarna', 92, 70, 30, 28, golv=True),
             sak('frukosthorn', 222, 84, 16, 12, sida='alla'),
@@ -173,18 +240,17 @@ RUMMEN = {
             sak('tang_hjul_3', 470, 158, 16, 14, sida='under'),
             # hornet på avsatsen: han står väster om det, och skriften står på det. Kameran glider ut över floden när han
             # tutar (utsikt), så att han ser verkan
-            sak('hornet', 580, 88, 16, 14, sida='vanster', utsikt='on'),
+            sak('hornet', 572, 88, 24, 16, sida='vanster', utsikt='on'),
             # där hissen kommer upp: dörren ut till avsatsen (hissen själv står inne i kvarnen)
             sak('sackhiss', 500, 74, 20, 14, sida='under'),
-            sak('hornet_skrift', 580, 88, 16, 8, sida='vanster', rackvidd=56),
-            # ön vid kvarnens brygga (tillståndet on): skalet i den gemensamma skalan (280 × 192, myt.SKALSKALA), och
-            # plankan från bryggan
-            sak('on', ON[0] - 140, ON[1] - 82, 280, 164, sida='over', rund=True),
+            sak('hornet_skrift', 572, 88, 24, 8, sida='vanster', rackvidd=56),
+            # kvarnens brygga, och plankan från bryggan upp på ön (tillståndet on)
             sak('brygga_kvarn', 548, 196, 44, 22, golv=True),
             sak('planka_on', 560, 218, 24, 10, sida='over'),
             # resan (kvall, pass 3): ön simmar ute på floden, och flaskan han håller när han sitter på skalet
-            sak('skal_kvall', KVALL[0] - 140, KVALL[1] - 96, 280, 192, rund=True, dekor=True, bara_i='kvall'),
-            sak('flaska_i_handen', 214, 200, 10, 10, sida='alla'),
+            skalplats('skal_kvall', KVALL, dekor=True, bara_i='kvall', under=True, bild='skoldpadda_simmar_01',
+                      bild_anim='skoldpadda_simmar_01,skoldpadda_simmar_02', anim_ms=600),
+            sak('flaska_i_handen', KVALL[0] + 12, KVALL[1] - 24, 10, 10, sida='alla'),
             liv('fagel', 150, 132, 12, 12),
             liv('fagel', 300, 250, 12, 12),
         ],
@@ -198,8 +264,13 @@ RUMMEN = {
         'objekt': [
             utg('dorr_ut_kvarn', 146, 176, 28, 16, riktning='ned', sida='over', till='floden'),
             punkt('start', 160, 150),
-            sak('tavla_kvarn', 128, 8, 64, 34, sida='under', rackvidd=56),
-            vagg(32, 48, 16, 56, vatten=True),
+            # tavlan på vägen in (101.5, Stil 18/11), öster om gången från dörren. Bilden (64 × 34) står på stödet, och
+            # bara stödet är ett hinder, så att han kan gå bakom tavlan till säckarna
+            sak('tavla_kvarn', 180, 148, 56, 12, sida='under'),
+            # Stils kvarn (103.2): vattenrännan i väster med stenkanten, kvarnstenen, säckarna i nordost och tunnorna i
+            # sydost. Hissens schakt står i norra väggen
+            *strackor(vattenmask('kvarnen')), vagg(32, 44, 16, 96),
+            vagg(76, 54, 58, 36), vagg(288, 40, 32, 52), vagg(286, 136, 34, 38),
             sak('lucka_vatten', 48, 72, 20, 14, sida='hoger'),
             sak('lucka_dorr', 96, 152, 20, 14, sida='alla'),
             sak('sackhiss', 256, 48, 28, 40, sida='vanster'),
@@ -217,8 +288,8 @@ RUMMEN = {
         'storlek': (20, 12),
         'objekt': [
             punkt('start', 160, 160),
-            vagg(0, 0, 320, 24, vatten=True), vagg(0, 24, 40, 168, vatten=True),
-            vagg(280, 24, 40, 168, vatten=True), vagg(40, 176, 104, 16, vatten=True), vagg(176, 176, 104, 16, vatten=True),
+            # gräset innanför skalets kant i Stils bild (skalet 280 × 192, mitt 160, 98), och plankan in från söder
+            *ellipsvagg(161, 98, 122, 74, 320, 192, oppning=(144, 176, 168)),
             sak('tuva_1', 60, 50, 24, 18, sida='alla'),
             sak('tuva_2', 236, 72, 24, 18, sida='alla'),
             sak('tuva_3', 76, 128, 24, 18, sida='alla'),
@@ -242,13 +313,16 @@ RUMMEN = {
         'storlek': (20, 12),
         'objekt': [
             punkt('start', 96, 166),
-            *sandens_kant(),
+            # vattnet i Stils bild, utom i söder under fenan, där sanden går ned till y 188 så att han kommer runt tången
+            *strackor(vattenmask('sandbanken'), undantag=lambda x, y: 100 <= x < 288), vagg(100, 188, 188, 4, vatten=True),
             *skalets_kant(),
             vagg(186, 80, 46, 34),                      # nacken, från huvudet in under skalet
             vagg(288, 150, 32, 14),                     # den andra framfenan, delvis utanför bild
-            # skalet i gråboxen (dekor), och sköldpaddan (rummets innehåll) som en markör baktill på skalet
-            sak('skal', SB['skal'][0] - 140, SB['skal'][1] - 96, 280, 192, rund=True, dekor=True),
+            # skalet och halsen står i rummets bild, och sköldpaddan (rummets innehåll) är en markör baktill på skalet
             sak('skoldpadda', 262, 24, 30, 14),
+            # huvudet och fenan där Stil ritade dem (mitt 150, 92 och 222, 150)
+            bildplats('huvud_plats', 98, 64, 96, 64),
+            bildplats('fena_plats', 186, 132, 72, 36),
             sak('skylt_skal', 262, 60, 36, 18, sida='alla'),
             sak('skoldpadda_huvud', 114, 72, 72, 42, sida='alla'),
             sak('skoldpadda_fena', 192, 138, 60, 16, sida='alla'),
@@ -271,7 +345,7 @@ def main():
     a = ap.parse_args()
     andrade = []
     for rum, spec in RUMMEN.items():
-        text = json.dumps(karta(rum, med_bilder(rum, spec)), ensure_ascii=False, indent=1) + '\n'
+        text = json.dumps(karta(rum, med_bilder(rum, spec), rumsbilder=RUMSBILDER, i_bilden=I_BILDEN, foremalsbilder={}, over_som_vagg=False), ensure_ascii=False, indent=1) + '\n'
         f = KARTOR / f'{rum}.tmj'
         if f.exists() and f.read_text(encoding='utf-8') == text:
             continue

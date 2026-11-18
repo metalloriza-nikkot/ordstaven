@@ -384,11 +384,11 @@ test('krockarna i loggen (97.6): går han mot ett hinder i mer än ca 1 s skrive
   expect((await ev(() => window.__ORDSTAVEN.logg())).match(/\[krock\]/g).length).toBe(fore);
 });
 
-test('regierna i kapitel 3:s gråbox (100.4, 101.3 och 102.3): var och en går i sitt rum och syns', async ({ page }, info) => {
+test('regierna i kapitel 3 (100.4, 101.3, 102.3 och 103.3.1): var och en går i sitt rum och syns', async ({ page }, info) => {
   test.skip(!['mac-helskarm', 'ipad-10', 'mac-safari'].includes(info.project.name), 'tre projekt räcker, som kapitel 2 (84.6)');
   test.setTimeout(180000);
   const ev = (fn, arg) => page.evaluate(fn, arg);
-  const REGIER = [['k3s01_floden', ['kartbit3_on']], ['k3s02_kvarnen', ['sackhiss_upp']], ['k3s02_loftet', ['loftet_horn', 'skuggan_lyssnar']], ['k3s03_hornet', ['tallrikar', 'skuggan_stiger', 'skuggan_dyker', 'unge_simmar', 'sackhiss_ner']],
+  const REGIER = [['k3s01_floden', ['frukost', 'kartbit3_on']], ['k3s02_kvarnen', ['sackhiss_upp']], ['k3s02_loftet', ['loftet_horn', 'skuggan_lyssnar']], ['k3s03_hornet', ['tallrikar', 'skuggan_stiger', 'skuggan_dyker', 'unge_simmar', 'sackhiss_ner']],
     ['k3s04_on', ['skoldpadda_huvud', 'skylt_tecken']], ['k3s05_sandbanken', ['skoldpadda_visar_berget']], ['k3s07_resan', ['resan_kvall']]];
   for (const [scenId, regier] of REGIER) {
     // på ön börjar den där skylten syns (efter mossan), så att tecknen har sin skylt
@@ -403,6 +403,8 @@ test('regierna i kapitel 3:s gråbox (100.4, 101.3 och 102.3): var och en går i
       await page.screenshot({ path: `test-results/kap3-regi-${r}.png` });
       await page.waitForTimeout(Math.max(0, ms - 2600) + 300);
     }
+    // frukosten (103.3.1): flodbon blåser i frukosthornet, och tallrikarna kommer fram
+    if (scenId === 'k3s01_floden') expect((await ev(() => window.__ORDSTAVEN.grafik())).regi).toEqual(expect.arrayContaining(['frukosten']));
     if (scenId === 'k3s03_hornet') expect(await ev(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').unge.visible)).toBe(false);
     // 102.3: ön steg vid bryggan innan hissen bar honom ned, och han kom ut genom kvarnens dörr på kajen
     if (scenId === 'k3s03_hornet') {

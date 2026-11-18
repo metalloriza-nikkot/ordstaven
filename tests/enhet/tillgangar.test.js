@@ -215,7 +215,9 @@ describe('mellanscenernas bilder och bildkorten', () => {
     // 101.3: säckhissen upp genom taket i kvarnen och ned genom golvet i loftet
     'sackhiss_upp', 'sackhiss_ner',
     // 102.3: ön stiger vid kvarnens brygga, sedd från avsatsen
-    'on_stiger']);
+    'on_stiger',
+    // 103.3.1: frukosten med tre korta tut och tallrikarna
+    'frukost']);
   it('varje mellanscen med bild har grafik (morgonen i sängen, luftskeppets lägen, sidovyerna, ungen på kartbiten, ägget)', () => {
     const saknas = [];
     for (const k of kapitel) for (const sc of k.scener) for (const st of sc.steg) {

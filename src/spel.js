@@ -9,7 +9,7 @@ import { egenskaper, egetForemal, synligaEgenskaper, PALETT } from './karna/egen
 import { skapaValj, skapaFormel, skapaDop, skapaKrukor, skapaRaddning, skapaTryck, skapaMeddelande } from './karna/pussel.js';
 import { forSkarm, versaler } from './karna/text.js';
 import { rumTillSkarm, varldTillSkarm, RUM, textskala } from './karna/skalning.js';
-import { framfor, lasplats, vidObjekt, genom, stigStart, RACKVIDD } from './karna/rumslayout.js';
+import { framfor, lasplats, vidObjekt, aktivSak, genom, stigStart, RACKVIDD } from './karna/rumslayout.js';
 import { aventyrFor, spelareAttVisa } from './karna/sparning.js';
 import { varVarVi, senastSpelad } from './karna/varvarvi.js';
 import { musikFor } from './karna/musik.js';
@@ -2429,7 +2429,7 @@ export function skapaSpel(d) {
       // valen (101.5, kvarnens tavla): läsningen är den snabbaste vägen
       const so = rum.ruta(skylt.id);
       if (so && (vidObjekt(rum.pos, so) || justKommitIn())) {
-        if (!vidObjekt(rum.pos, so)) logg.handelse('skylt', `${skylt.id}: öppnas när han kommer in`);
+        if (justKommitIn()) logg.handelse('skylt', `${skylt.id}: öppnas när han kommer in`);
         await lasSkyltText(skylt);
       }
     }
@@ -2525,7 +2525,9 @@ export function skapaSpel(d) {
         if (skylt) {
           const so = rum.ruta(skylt.id);
           if (so && !vidObjekt(rum.pos, so)) skyltVapnad = true;
-          else if (so && skyltVapnad && ui.plattan.hidden) { skyltVapnad = false; lasSkyltText(skylt); return; }
+          // bara när han har stannat vid skylten och den är saken han står vid: går han förbi den (kvarnens tavla mitt på
+          // golvet, 103.2) eller står ett val närmare (säckarna bakom tavlan), är det dit han är på väg (grind A)
+          else if (so && skyltVapnad && ui.plattan.hidden && !rum.gar && aktivSak(rum.pos, [so, ...kvarSaker().map((id) => rum.ruta(id)).filter(Boolean)], rum.vand)?.id === so.id) { skyltVapnad = false; lasSkyltText(skylt); return; }
         }
         for (const id of kvarUtgangar()) { const o = rum.ruta(id); if (o && !genom(o, rum.pos)) vapnade.add(id); }
         for (const a of provadeStigar()) {

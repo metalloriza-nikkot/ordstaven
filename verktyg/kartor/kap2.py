@@ -319,17 +319,22 @@ def egenskaper(e):
     return ut
 
 
-def karta(rum, spec):
+def karta(rum, spec, rumsbilder=None, i_bilden=None, foremalsbilder=None, over_som_vagg=True):
+    """En Tiled-karta. Kapitel 3 (kap3.py) skickar sina egna rumsbilder, sin lista över det som står i rummets bild
+    och sina föremålsbilder, och rummets _over-bild är där bara en bild ovanför föremålen, inga väggar."""
+    rumsbilder = RUMSBILDER if rumsbilder is None else rumsbilder
+    i_bilden = I_BILDEN if i_bilden is None else i_bilden
+    foremalsbilder = FOREMALSBILDER if foremalsbilder is None else foremalsbilder
     bredd, hojd = spec['storlek']
     objekt = []
-    bild = (RUMSBILDER / f'{rum}.png').is_file()
-    lista = list(spec['objekt']) + (over_vaggar(rum) if bild else [])
+    bild = (rumsbilder / f'{rum}.png').is_file()
+    lista = list(spec['objekt']) + (over_vaggar(rum) if bild and over_som_vagg else [])
     for i, (typ, namn, x, y, b, h, e) in enumerate(lista, start=1):
         # det som är en del av rummets bild: Stils lista, och utgångarna (stigarna och dörrarna står i bilden)
-        if bild and (namn in I_BILDEN or typ == 'utgang'):
+        if bild and (namn in i_bilden or typ == 'utgang'):
             e = {**e, 'i_bilden': True}
-        if bild and namn in FOREMALSBILDER:
-            e = {**e, **FOREMALSBILDER[namn]}
+        if bild and namn in foremalsbilder:
+            e = {**e, **foremalsbilder[namn]}
         o = {'id': i, 'name': namn, 'type': '' if typ == 'punkt' else typ, 'x': x, 'y': y, 'width': b, 'height': h,
              'rotation': 0, 'visible': True}
         if typ == 'punkt':

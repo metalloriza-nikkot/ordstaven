@@ -1024,6 +1024,7 @@ export class Rum extends Phaser.Scene {
       skoldpadda_visar_berget: () => this.skoldpaddaVisarBerget(),
       resan_kvall: () => this.resanKvall(),
       // säckhissen (101.3): upp genom hålet i taket i kvarnen, och ned genom golvet i loftet
+      frukost: () => this.frukost(),
       tallrikar: () => this.tallrikar(),
       skuggan_stiger: () => this.skugganStiger(),
       skuggan_dyker: () => this.skugganDyker(),
@@ -2313,14 +2314,30 @@ export class Rum extends Phaser.Scene {
   }
 
   /**
-   * En skugga under vattnet vid ön (102.3), i skalets storlek. Den ligger kvar tills rummet ritas om eller en regi tar
-   * bort den. @param {number} alfa @returns {Phaser.GameObjects.Ellipse | null}
+   * Sköldpaddans bild i floden (103.2): Stils bilder är 480 × 320 med skalets mitt i (250, 150), som läggs på punkten.
+   * @param {string} ram @param {{ x: number, y: number }} p @returns {Phaser.GameObjects.Image | null}
+   */
+  k3Skalbild(ram, p) {
+    const fb = foremalsbild(this, ram);
+    if (!fb) return null;
+    const img = this.add.image(p.x, p.y, fb.nyckel, fb.ram);
+    img.setOrigin(250 / img.width, 150 / img.height);
+    this.lagerObjekt.add(img);
+    return img;
+  }
+
+  /**
+   * En skugga under vattnet vid ön (102.3), i skalets storlek: Stils första bild av ön som stiger (det mörka skalet
+   * under ytan, 103.2), annars gråboxens ellips. Den ligger kvar tills rummet ritas om eller en regi tar bort den.
+   * @param {number} alfa @returns {any}
    */
   k3NySkugga(alfa) {
     const p = this.utsiktsPunkt('hornet');
     if (!p) return null;
     this.k3Skugga?.destroy();
-    const sk = this.add.ellipse(p.x, p.y, 264, 168, 0x0a1830, 1).setAlpha(alfa); this.lagerObjekt.add(sk);
+    const sk = this.k3Skalbild('on_stiger_01', p) ?? this.add.ellipse(p.x, p.y, 264, 168, 0x0a1830, 1);
+    if (!sk.parentContainer) this.lagerObjekt.add(sk);
+    sk.setAlpha(alfa);
     this.k3Skugga = sk;
     return sk;
   }
@@ -2411,6 +2428,27 @@ export class Rum extends Phaser.Scene {
     return 2000;
   }
 
+  /**
+   * Frukosten i början av kapitlet (103.3.1): kvinnan på pråmen blåser tre korta tut i frukosthornet, ett i taget med
+   * en ring från hornet, och sedan springer flodborna fram med tallrikarna (som tallrikar). Kameran visar pråmarna.
+   * @returns {number}
+   */
+  frukost() {
+    const p = this.regiPunkter.pramar;
+    if (p) this.regiFokus = { x: p.x, y: p.y };
+    // ringarna kommer från hornet hon blåser i (i hennes bild, vid munnen), inte från frukosthornet på däcket
+    const f = this.ruta('flodbo_frukost'), h = this.ruta('frukosthorn');
+    const blas = ['flodbo_frukost_blaser_ner_01', 'flodbo_frukost_blaser_ner_02'];
+    const kan = blas.every((r) => foremalsbild(this, r));
+    // tre korta tut: bild 2 är tutet, med en ring från hornet
+    if (kan) this.regiRamar('flodbo_frukost', ['flodbo_frukost_blaser_ner_01', 'flodbo_frukost_blaser_ner_02', 'flodbo_frukost_blaser_ner_01', 'flodbo_frukost_blaser_ner_02', 'flodbo_frukost_blaser_ner_01', 'flodbo_frukost_blaser_ner_02', 'flodbo_frukost_blaser_ner_01'], 300);
+    const ut = kan && f ? { x: f.x + f.b / 2 + 8, y: f.y + 8 } : h ? { x: h.x + h.b / 2, y: h.y + h.h / 2 } : null;
+    if (ut) for (let i = 0; i < 3; i++) this.k3Ring(ut.x, ut.y, 3, 16, 0xfff2a8, 400, 300 + i * 600);
+    this.time.delayedCall(2200, () => { this.tallrikar(); });
+    this.regiLogg.push('frukosten');
+    return 4300;
+  }
+
   /** För få tut (k3_hornet, 102.3): skuggan stiger en bit och stannar under vattnet. @returns {number} */
   skugganStiger() {
     const smuts = () => { this.smutsig = true; };
@@ -2448,25 +2486,27 @@ export class Rum extends Phaser.Scene {
     if (!p) return 0;
     this.regiFokus = { x: p.x, y: p.y - 20 };
     this.k3Skugga?.destroy(); this.k3Skugga = null;
+    const u = this.k3Simmar;
+    // Stils sex bilder (103.2): skuggan, vattnet som välver sig, ryggen som bryter ytan och forsar, strömmar som rinner
+    // av (1–4, 300 ms var), och droppbilderna 5 och 6 tre gånger, sedan ön som den ligger
+    const ramar = ['on_stiger_01', 'on_stiger_02', 'on_stiger_03', 'on_stiger_04', 'on_stiger_05', 'on_stiger_06', 'on_stiger_05', 'on_stiger_06', 'on_stiger_05', 'on_stiger_06', 'on_floden'];
+    const img = ramar.every((r) => foremalsbild(this, r)) ? this.k3Skalbild(ramar[0], p) : null;
+    if (img) {
+      this.k3Skugga = img;
+      let t = 0;
+      ramar.forEach((r, i) => {
+        if (i > 0) this.time.delayedCall(t, () => { const fb = foremalsbild(this, r); if (img.active && fb) { img.setTexture(fb.nyckel, fb.ram); smuts(); } });
+        t += i < 4 ? 300 : 200;
+      });
+      if (u?.active) this.tweens.add({ targets: u, x: p.x - 30, y: p.y - 60, duration: 700, delay: 900, onUpdate: smuts, onComplete: () => { u.destroy(); smuts(); } });
+      this.time.delayedCall(t + 300, () => { this.regiFokus = null; });
+      this.regiLogg.push('ön stiger');
+      return t + 400;
+    }
     for (let i = 0; i < 3; i++) this.k3Ring(p.x, p.y, 120, 190, 0xf2fbff, 1400, i * 350);
     const on = this.add.ellipse(p.x, p.y + 10, 280, 192, 0x6f8a4a, 1).setStrokeStyle(3, 0x4a3a28, 1).setAlpha(0).setScale(0.9); this.lagerObjekt.add(on);
     this.k3Skugga = on;
     this.tweens.add({ targets: on, alpha: 1, y: p.y, scaleX: 1, scaleY: 1, duration: 1600, delay: 300, ease: 'Sine.easeOut', onUpdate: smuts });
-    // vattnet som forsar av kanten, och skummet runt
-    const g = this.add.graphics(); this.lagerLjust.add(g);
-    const t = { p: 0 };
-    this.tweens.add({ targets: t, p: 1, duration: 2400, delay: 900, onUpdate: () => {
-      if (!g.active) return;
-      g.clear();
-      for (let a = 0; a < 360; a += 12) {
-        const r = (a * Math.PI) / 180, x = Math.round(p.x + 140 * Math.cos(r)), y = Math.round(p.y + 96 * Math.sin(r));
-        if (Math.sin(r) > -0.3) g.fillStyle(0xffffff, 1 - t.p).fillRect(x, y + Math.round(t.p * 8), 1, 4);
-        g.fillStyle(0xdce0e4, 1 - t.p).fillRect(x + 1, y + 12, 2, 1);
-      }
-      smuts();
-    }, onComplete: () => { g.destroy(); smuts(); } });
-    // ungen klättrar upp på ön
-    const u = this.k3Simmar;
     if (u?.active) this.tweens.add({ targets: u, x: p.x - 30, y: p.y - 50, duration: 900, delay: 1600, onUpdate: smuts, onComplete: () => { u.destroy(); smuts(); } });
     this.time.delayedCall(3600, () => { this.regiFokus = null; });
     this.regiLogg.push('ön stiger');
@@ -3504,12 +3544,12 @@ export class Rum extends Phaser.Scene {
         this.figurSkuggor.push({ img, skugga: sk });
       }
       // en hög bild (en trädkrona som sticker upp) ritas bland figurerna, så att hjälten kan gå bakom den
-      const hog = !o.lyser && !o.skataFonster && o.sort !== 'yta' && img.height > o.h + 6;
+      const hog = !o.lyser && !o.skataFonster && !o.under && o.sort !== 'yta' && img.height > o.h + 6;
       if (hog) { /** @type {any} */ (img).fot = pa.y + pa.h; this.lagerFigurer.add(img); this.hogaBilder.add(img); this.sorteraFigurer(); }
       else (o.lyser || o.skataFonster ? this.lagerLjust : this.lagerObjekt).add(img);
       // tomgång (bild_anim): bilderna byts var animMs, med ett litet slumpat avstånd mellan figurerna
       const ramar = (o.bildAnim || []).filter((r) => foremalsbild(this, r)?.nyckel === fb.nyckel);
-      if (ramar.length > 1 && !this.bytta?.has(o.id)) this.animerade.push({ img, ramar, ms: o.animMs || 500, i: 0, senast: performance.now() + Math.random() * 300 });
+      if (ramar.length > 1 && !this.bytta?.has(o.id) && (!o.animI || (!!this.tillstand && o.animI.includes(this.tillstand)))) this.animerade.push({ img, ramar, ms: o.animMs || 500, i: 0, senast: performance.now() + Math.random() * 300 });
       this.ritade.set(o.id, /** @type {any} */ (img));
       return;
     }

@@ -16,7 +16,7 @@
  },
  "meta": {
   "namn": "Floden",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "datum": "2026-11-18",
   "agare": "Innehåll",
   "kalla": "Manus 19 v0.4.1 (Ön som simmade), godkänt 17/11 (beslut 98–99).",
@@ -25,7 +25,8 @@
   "andrat_v021": "2026-11-13 (beslut 90.5 och 90.7): meta.namn är Floden, som Skogen och Träsket, och knuffen i k3_chiffret följer det som är byggt (89.3): rutan han står vid glimtar, tidigast efter ca 25 s.",
   "andrat_v03": "2026-11-17 (beslut 98–99, manus 19 v0.4.1): floden och flodfolket först, skepparen som en ung man vars morfar kallade på ön, kvarnen som vägen upp till hornet (k3_hjulet med SVÄRD, k3_kvarn_1 och _2, säckhissen), och hornet två gånger: ett tryck i pass 1 som väcker skuggan, och FEM TUT. INTE TRE. i pass 2 (k3_hornet, ratt 5). Snäckorna och chiffret ligger på ön, och pass 2 slutar när UNDER FENAN lyser. Replikerna är provlästa (98.12.1). Nya rum: kvarnen och loftet. Nya scener: k3s02_kvarnen, k3s02_loftet, k3s03_hornet, k3s03_bryggan, k3s05_skalkant, k3s06_ankaret och k3s07_resan (förut k3s06_skalkant, k3s04_ankaret och k3s05_resan). k3_tangen heter k3_hjulet.",
   "andrat_v031": "2026-11-18 (beslut 101.7): bild på åtta mellanscener (kartbit3_on, loftet_horn, skuggan_lyssnar, unge_simmar, skoldpadda_huvud, skylt_tecken, skoldpadda_visar_berget och resan_kvall), och uppdragens egna kort (kort_kvarn, kort_on och kort_flaska). Ingen text är ändrad.",
-  "andrat_v032": "2026-11-18 (beslut 102.2–102.3): säckhissen (effekt sackhiss_upp på pa_stora i k3_kvarn_2, och bild sackhiss_ner), och hornet på en avsats i floden. Loftet har utgått som rum: k3s02_loftet och k3s03_hornet spelas i floden, som får tillståndet rent och föremålen hornet, hornet_skrift och sackhiss. Inga repliker är ändrade."
+  "andrat_v032": "2026-11-18 (beslut 102.2–102.3): säckhissen (effekt sackhiss_upp på pa_stora i k3_kvarn_2, och bild sackhiss_ner), och hornet på en avsats i floden. Loftet har utgått som rum: k3s02_loftet och k3s03_hornet spelas i floden, som får tillståndet rent och föremålen hornet, hornet_skrift och sackhiss. Inga repliker är ändrade.",
+  "andrat_v033": "2026-11-18 (beslut 103.5): bild frukost på frukostens mellanscen i k3s01, och bild på reaktionerna i k3_hornet (tallrikar på 3, skuggan_stiger på 1, 2 och 4, skuggan_dyker på 6+). Ingen text är ändrad."
  },
  "var_var_vi": [
   {
@@ -382,7 +383,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "På en pråm blåser en flodbo tre korta tut i ett litet horn. Alla kommer med tallrikar. Frukost!"
+     "beskrivning": "På en pråm blåser en flodbo tre korta tut i ett litet horn. Alla kommer med tallrikar. Frukost!",
+     "bild": "frukost"
     },
     {
      "typ": "prata",
@@ -1309,7 +1311,8 @@
       "talare": "berattare",
       "text": "Skuggan stannade. Det var för få tut!",
       "upplast": true
-     }
+     },
+     "bild": "skuggan_stiger"
     },
     "2": {
      "reaktion": "skuggan stiger en bit och stannar under vattnet",
@@ -1318,7 +1321,8 @@
       "talare": "berattare",
       "text": "Skuggan stannade. Det var för få tut!",
       "upplast": true
-     }
+     },
+     "bild": "skuggan_stiger"
     },
     "3": {
      "reaktion": "flodfolket springer fram med sina tallrikar en gång till och tittar sig omkring",
@@ -1327,7 +1331,8 @@
       "talare": "skepparen",
       "text": "Nej, nej! Tre tut är frukost!",
       "upplast": true
-     }
+     },
+     "bild": "tallrikar"
     },
     "4": {
      "reaktion": "skuggan stiger en bit och stannar under vattnet",
@@ -1336,7 +1341,8 @@
       "talare": "berattare",
       "text": "Skuggan stannade. Det var för få tut!",
       "upplast": true
-     }
+     },
+     "bild": "skuggan_stiger"
     },
     "6+": {
      "reaktion": "skuggan dyker",
@@ -1345,7 +1351,8 @@
       "talare": "berattare",
       "text": "Oj, för många! Skuggan dök.",
       "upplast": true
-     }
+     },
+     "bild": "skuggan_dyker"
     }
    },
    "vid_ratt": {

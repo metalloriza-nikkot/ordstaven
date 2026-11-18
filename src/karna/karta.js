@@ -219,6 +219,10 @@ export function lasKarta(tmj) {
       else if (typeof egen.visas_forst === 'string' && egen.visas_forst) ut.visasForst = egen.visas_forst;
       if (egen.bild_vinka) ut.bildVinka = String(egen.bild_vinka).split(',').map((t) => t.trim()).filter(Boolean);
       if (egen.bild_anim) { ut.bildAnim = String(egen.bild_anim).split(',').map((t) => t.trim()).filter(Boolean); ut.animMs = Math.max(250, tal(egen.anim_ms, 500)); }
+      // anim_i (103.2) = tomgången går bara i de tillstånden (hjulet står stilla på morgonen)
+      if (egen.anim_i) ut.animI = String(egen.anim_i).split(',').map((t) => t.trim()).filter(Boolean);
+      // under (103.2) = en stor bild som alltid ligger under figurerna (ön i floden), också när den är högre än föremålet
+      if (egen.under) ut.under = true;
       if (egen.rutor) ut.rutor = true;
       // nas_nara (Teknik 34, 71.2) = han når den aldrig (halvan ute i vattnet): ett ga_till dit är klart när han är nära
       if (egen.nas_nara) ut.nasNara = true;

@@ -11,8 +11,13 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 58,
+ "nextobjectid": 53,
  "properties": [
+  {
+   "name": "bild",
+   "type": "string",
+   "value": "floden"
+  },
   {
    "name": "rum",
    "type": "string",
@@ -44,6 +49,11 @@
      "properties": [
       {
        "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "i_bilden",
        "type": "bool",
        "value": true
       },
@@ -83,7 +93,7 @@
      "name": "regi_on",
      "type": "",
      "x": 500,
-     "y": 302,
+     "y": 292,
      "width": 0,
      "height": 0,
      "rotation": 0,
@@ -130,8 +140,8 @@
      "id": 8,
      "name": "regi_hjalte_k3s07_resan",
      "type": "",
-     "x": 206,
-     "y": 214,
+     "x": 236,
+     "y": 262,
      "width": 0,
      "height": 0,
      "rotation": 0,
@@ -416,9 +426,9 @@
      "name": "",
      "type": "vagg",
      "x": 468,
-     "y": 104,
+     "y": 108,
      "width": 60,
-     "height": 46,
+     "height": 42,
      "rotation": 0,
      "visible": true
     },
@@ -427,9 +437,9 @@
      "name": "",
      "type": "vagg",
      "x": 552,
-     "y": 104,
+     "y": 108,
      "width": 66,
-     "height": 46,
+     "height": 42,
      "rotation": 0,
      "visible": true
     },
@@ -438,25 +448,35 @@
      "name": "",
      "type": "vagg",
      "x": 528,
-     "y": 104,
+     "y": 108,
      "width": 24,
-     "height": 34,
+     "height": 30,
      "rotation": 0,
      "visible": true
     },
     {
      "id": 29,
-     "name": "brygga_lang",
+     "name": "on_plats",
      "type": "sak",
-     "x": 84,
-     "y": 50,
-     "width": 262,
-     "height": 16,
+     "x": 250,
+     "y": 142,
+     "width": 480,
+     "height": 320,
      "rotation": 0,
      "visible": true,
      "properties": [
       {
        "name": "dekor",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "rund",
        "type": "bool",
        "value": true
       }
@@ -464,17 +484,22 @@
     },
     {
      "id": 30,
-     "name": "pram_1",
+     "name": "hjul_plats",
      "type": "sak",
-     "x": 90,
-     "y": 68,
-     "width": 76,
-     "height": 32,
+     "x": 433,
+     "y": 124,
+     "width": 58,
+     "height": 56,
      "rotation": 0,
      "visible": true,
      "properties": [
       {
        "name": "dekor",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "i_bilden",
        "type": "bool",
        "value": true
       }
@@ -482,17 +507,22 @@
     },
     {
      "id": 31,
-     "name": "pram_2",
+     "name": "hornet_plats",
      "type": "sak",
-     "x": 174,
-     "y": 68,
-     "width": 76,
-     "height": 32,
+     "x": 572,
+     "y": 87,
+     "width": 24,
+     "height": 36,
      "rotation": 0,
      "visible": true,
      "properties": [
       {
        "name": "dekor",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "i_bilden",
        "type": "bool",
        "value": true
       }
@@ -500,17 +530,32 @@
     },
     {
      "id": 32,
-     "name": "pram_3",
+     "name": "on",
      "type": "sak",
-     "x": 258,
-     "y": 68,
-     "width": 82,
-     "height": 32,
+     "x": 360,
+     "y": 220,
+     "width": 280,
+     "height": 164,
      "rotation": 0,
      "visible": true,
      "properties": [
       {
-       "name": "dekor",
+       "name": "bild",
+       "type": "string",
+       "value": "on_floden"
+      },
+      {
+       "name": "bild_pa",
+       "type": "string",
+       "value": "on_plats"
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "over"
+      },
+      {
+       "name": "under",
        "type": "bool",
        "value": true
       }
@@ -518,78 +563,6 @@
     },
     {
      "id": 33,
-     "name": "planka_pram_1",
-     "type": "sak",
-     "x": 166,
-     "y": 76,
-     "width": 8,
-     "height": 16,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "dekor",
-       "type": "bool",
-       "value": true
-      }
-     ]
-    },
-    {
-     "id": 34,
-     "name": "planka_pram_2",
-     "type": "sak",
-     "x": 250,
-     "y": 76,
-     "width": 8,
-     "height": 16,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "dekor",
-       "type": "bool",
-       "value": true
-      }
-     ]
-    },
-    {
-     "id": 35,
-     "name": "brygga_skepparen",
-     "type": "sak",
-     "x": 350,
-     "y": 178,
-     "width": 60,
-     "height": 10,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "dekor",
-       "type": "bool",
-       "value": true
-      }
-     ]
-    },
-    {
-     "id": 36,
-     "name": "avsats",
-     "type": "sak",
-     "x": 468,
-     "y": 88,
-     "width": 150,
-     "height": 16,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "dekor",
-       "type": "bool",
-       "value": true
-      }
-     ]
-    },
-    {
-     "id": 37,
      "name": "pramarna",
      "type": "sak",
      "x": 92,
@@ -603,11 +576,16 @@
        "name": "golv",
        "type": "bool",
        "value": true
+      },
+      {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
       }
      ]
     },
     {
-     "id": 38,
+     "id": 34,
      "name": "frukosthorn",
      "type": "sak",
      "x": 222,
@@ -630,7 +608,7 @@
      ]
     },
     {
-     "id": 39,
+     "id": 35,
      "name": "flodman",
      "type": "figur",
      "x": 128,
@@ -658,7 +636,7 @@
      ]
     },
     {
-     "id": 40,
+     "id": 36,
      "name": "flodbo_frukost",
      "type": "figur",
      "x": 204,
@@ -686,7 +664,7 @@
      ]
     },
     {
-     "id": 41,
+     "id": 37,
      "name": "flodbo_skrattar",
      "type": "figur",
      "x": 276,
@@ -714,7 +692,7 @@
      ]
     },
     {
-     "id": 42,
+     "id": 38,
      "name": "skepparen",
      "type": "figur",
      "x": 384,
@@ -747,7 +725,7 @@
      ]
     },
     {
-     "id": 43,
+     "id": 39,
      "name": "dorr_kvarn",
      "type": "utgang",
      "x": 528,
@@ -757,6 +735,11 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
       {
        "name": "riktning",
        "type": "string",
@@ -775,7 +758,7 @@
      ]
     },
     {
-     "id": 44,
+     "id": 40,
      "name": "hjul",
      "type": "sak",
      "x": 440,
@@ -785,6 +768,36 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "anim_i",
+       "type": "string",
+       "value": "hjul,rent,on,kvall"
+      },
+      {
+       "name": "anim_ms",
+       "type": "int",
+       "value": 250
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "vattenhjul_01"
+      },
+      {
+       "name": "bild_anim",
+       "type": "string",
+       "value": "vattenhjul_01,vattenhjul_02,vattenhjul_03,vattenhjul_04,vattenhjul_05,vattenhjul_06"
+      },
+      {
+       "name": "bild_pa",
+       "type": "string",
+       "value": "hjul_plats"
+      },
+      {
+       "name": "bild_tillstand",
+       "type": "string",
+       "value": "morgon=vattenhjul_stilla"
+      },
       {
        "name": "sida",
        "type": "string",
@@ -798,7 +811,7 @@
      ]
     },
     {
-     "id": 45,
+     "id": 41,
      "name": "tang_hjul_1",
      "type": "sak",
      "x": 438,
@@ -831,7 +844,7 @@
      ]
     },
     {
-     "id": 46,
+     "id": 42,
      "name": "tang_hjul_2",
      "type": "sak",
      "x": 454,
@@ -864,7 +877,7 @@
      ]
     },
     {
-     "id": 47,
+     "id": 43,
      "name": "tang_hjul_3",
      "type": "sak",
      "x": 470,
@@ -897,16 +910,31 @@
      ]
     },
     {
-     "id": 48,
+     "id": 44,
      "name": "hornet",
      "type": "sak",
-     "x": 580,
+     "x": 572,
      "y": 88,
-     "width": 16,
-     "height": 14,
+     "width": 24,
+     "height": 16,
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "hornet_avsats_mjol"
+      },
+      {
+       "name": "bild_pa",
+       "type": "string",
+       "value": "hornet_plats"
+      },
+      {
+       "name": "bild_tillstand",
+       "type": "string",
+       "value": "rent=hornet_avsats_rent,on=hornet_avsats_rent,kvall=hornet_avsats_rent"
+      },
       {
        "name": "sida",
        "type": "string",
@@ -920,7 +948,7 @@
      ]
     },
     {
-     "id": 49,
+     "id": 45,
      "name": "sackhiss",
      "type": "sak",
      "x": 500,
@@ -943,16 +971,21 @@
      ]
     },
     {
-     "id": 50,
+     "id": 46,
      "name": "hornet_skrift",
      "type": "sak",
-     "x": 580,
+     "x": 572,
      "y": 88,
-     "width": 16,
+     "width": 24,
      "height": 8,
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "i_bild_av",
+       "type": "string",
+       "value": "hornet"
+      },
       {
        "name": "rackvidd",
        "type": "int",
@@ -966,30 +999,7 @@
      ]
     },
     {
-     "id": 51,
-     "name": "on",
-     "type": "sak",
-     "x": 360,
-     "y": 220,
-     "width": 280,
-     "height": 164,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "rund",
-       "type": "bool",
-       "value": true
-      },
-      {
-       "name": "sida",
-       "type": "string",
-       "value": "over"
-      }
-     ]
-    },
-    {
-     "id": 52,
+     "id": 47,
      "name": "brygga_kvarn",
      "type": "sak",
      "x": 548,
@@ -1003,11 +1013,16 @@
        "name": "golv",
        "type": "bool",
        "value": true
+      },
+      {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
       }
      ]
     },
     {
-     "id": 53,
+     "id": 48,
      "name": "planka_on",
      "type": "sak",
      "x": 560,
@@ -1030,20 +1045,35 @@
      ]
     },
     {
-     "id": 54,
+     "id": 49,
      "name": "skal_kvall",
      "type": "sak",
-     "x": 70,
-     "y": 166,
-     "width": 280,
-     "height": 192,
+     "x": -20,
+     "y": 120,
+     "width": 480,
+     "height": 320,
      "rotation": 0,
      "visible": true,
      "properties": [
       {
+       "name": "anim_ms",
+       "type": "int",
+       "value": 600
+      },
+      {
        "name": "bara_i",
        "type": "string",
        "value": "kvall"
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "skoldpadda_simmar_01"
+      },
+      {
+       "name": "bild_anim",
+       "type": "string",
+       "value": "skoldpadda_simmar_01,skoldpadda_simmar_02"
       },
       {
        "name": "dekor",
@@ -1054,15 +1084,20 @@
        "name": "rund",
        "type": "bool",
        "value": true
+      },
+      {
+       "name": "under",
+       "type": "bool",
+       "value": true
       }
      ]
     },
     {
-     "id": 55,
+     "id": 50,
      "name": "flaska_i_handen",
      "type": "sak",
-     "x": 214,
-     "y": 200,
+     "x": 242,
+     "y": 246,
      "width": 10,
      "height": 10,
      "rotation": 0,
@@ -1081,7 +1116,7 @@
      ]
     },
     {
-     "id": 56,
+     "id": 51,
      "name": "fagel_150_132",
      "type": "omgivning",
      "x": 150,
@@ -1099,7 +1134,7 @@
      ]
     },
     {
-     "id": 57,
+     "id": 52,
      "name": "fagel_300_250",
      "type": "omgivning",
      "x": 300,

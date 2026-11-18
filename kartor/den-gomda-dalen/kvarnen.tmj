@@ -11,8 +11,13 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 14,
+ "nextobjectid": 30,
  "properties": [
+  {
+   "name": "bild",
+   "type": "string",
+   "value": "kvarnen"
+  },
   {
    "name": "inomhus",
    "type": "bool",
@@ -48,6 +53,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "riktning",
        "type": "string",
        "value": "ned"
@@ -80,10 +90,10 @@
      "id": 3,
      "name": "tavla_kvarn",
      "type": "sak",
-     "x": 128,
-     "y": 8,
-     "width": 64,
-     "height": 34,
+     "x": 180,
+     "y": 148,
+     "width": 56,
+     "height": 12,
      "rotation": 0,
      "visible": true,
      "properties": [
@@ -91,11 +101,6 @@
        "name": "bild",
        "type": "string",
        "value": "tavla_kvarn"
-      },
-      {
-       "name": "rackvidd",
-       "type": "int",
-       "value": 56
       },
       {
        "name": "sida",
@@ -108,10 +113,10 @@
      "id": 4,
      "name": "",
      "type": "vagg",
-     "x": 32,
-     "y": 48,
-     "width": 16,
-     "height": 56,
+     "x": 0,
+     "y": 40,
+     "width": 32,
+     "height": 8,
      "rotation": 0,
      "visible": true,
      "properties": [
@@ -124,6 +129,266 @@
     },
     {
      "id": 5,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 48,
+     "width": 32,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vatten",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 6,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 56,
+     "width": 32,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vatten",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 7,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 64,
+     "width": 32,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vatten",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 8,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 72,
+     "width": 32,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vatten",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 9,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 80,
+     "width": 32,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vatten",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 10,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 88,
+     "width": 32,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vatten",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 11,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 96,
+     "width": 32,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vatten",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 12,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 104,
+     "width": 32,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vatten",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 13,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 112,
+     "width": 32,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vatten",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 14,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 120,
+     "width": 32,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vatten",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 15,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 128,
+     "width": 32,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vatten",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 16,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 136,
+     "width": 32,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vatten",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 17,
+     "name": "",
+     "type": "vagg",
+     "x": 32,
+     "y": 44,
+     "width": 16,
+     "height": 96,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 18,
+     "name": "",
+     "type": "vagg",
+     "x": 76,
+     "y": 54,
+     "width": 58,
+     "height": 36,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 19,
+     "name": "",
+     "type": "vagg",
+     "x": 288,
+     "y": 40,
+     "width": 32,
+     "height": 52,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 20,
+     "name": "",
+     "type": "vagg",
+     "x": 286,
+     "y": 136,
+     "width": 34,
+     "height": 38,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 21,
      "name": "lucka_vatten",
      "type": "sak",
      "x": 48,
@@ -156,7 +421,7 @@
      ]
     },
     {
-     "id": 6,
+     "id": 22,
      "name": "lucka_dorr",
      "type": "sak",
      "x": 96,
@@ -179,7 +444,7 @@
      ]
     },
     {
-     "id": 7,
+     "id": 23,
      "name": "sackhiss",
      "type": "sak",
      "x": 256,
@@ -202,7 +467,7 @@
      ]
     },
     {
-     "id": 8,
+     "id": 24,
      "name": "sack_stor",
      "type": "sak",
      "x": 244,
@@ -220,7 +485,7 @@
      ]
     },
     {
-     "id": 9,
+     "id": 25,
      "name": "pa_stora",
      "type": "sak",
      "x": 249,
@@ -231,6 +496,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"
@@ -238,7 +508,7 @@
      ]
     },
     {
-     "id": 10,
+     "id": 26,
      "name": "vid_stora",
      "type": "sak",
      "x": 222,
@@ -249,6 +519,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"
@@ -256,7 +531,7 @@
      ]
     },
     {
-     "id": 11,
+     "id": 27,
      "name": "sack_liten",
      "type": "sak",
      "x": 162,
@@ -274,7 +549,7 @@
      ]
     },
     {
-     "id": 12,
+     "id": 28,
      "name": "pa_lilla",
      "type": "sak",
      "x": 163,
@@ -285,6 +560,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"
@@ -292,7 +572,7 @@
      ]
     },
     {
-     "id": 13,
+     "id": 29,
      "name": "vid_lilla",
      "type": "sak",
      "x": 142,
@@ -302,6 +582,11 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
       {
        "name": "sida",
        "type": "string",
