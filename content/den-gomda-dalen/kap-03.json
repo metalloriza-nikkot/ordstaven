@@ -3,7 +3,7 @@
  "format": 2,
  "id": "kap-03",
  "kapitel": 3,
- "musik": "skogen",
+ "musik": "floden",
  "nivaer": {
   "lasning": [
    "L3",
@@ -16,7 +16,7 @@
  },
  "meta": {
   "namn": "Floden",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "datum": "2026-11-18",
   "agare": "Innehåll",
   "kalla": "Manus 19 v0.4.1 (Ön som simmade), godkänt 17/11 (beslut 98–99).",
@@ -26,7 +26,8 @@
   "andrat_v03": "2026-11-17 (beslut 98–99, manus 19 v0.4.1): floden och flodfolket först, skepparen som en ung man vars morfar kallade på ön, kvarnen som vägen upp till hornet (k3_hjulet med SVÄRD, k3_kvarn_1 och _2, säckhissen), och hornet två gånger: ett tryck i pass 1 som väcker skuggan, och FEM TUT. INTE TRE. i pass 2 (k3_hornet, ratt 5). Snäckorna och chiffret ligger på ön, och pass 2 slutar när UNDER FENAN lyser. Replikerna är provlästa (98.12.1). Nya rum: kvarnen och loftet. Nya scener: k3s02_kvarnen, k3s02_loftet, k3s03_hornet, k3s03_bryggan, k3s05_skalkant, k3s06_ankaret och k3s07_resan (förut k3s06_skalkant, k3s04_ankaret och k3s05_resan). k3_tangen heter k3_hjulet.",
   "andrat_v031": "2026-11-18 (beslut 101.7): bild på åtta mellanscener (kartbit3_on, loftet_horn, skuggan_lyssnar, unge_simmar, skoldpadda_huvud, skylt_tecken, skoldpadda_visar_berget och resan_kvall), och uppdragens egna kort (kort_kvarn, kort_on och kort_flaska). Ingen text är ändrad.",
   "andrat_v032": "2026-11-18 (beslut 102.2–102.3): säckhissen (effekt sackhiss_upp på pa_stora i k3_kvarn_2, och bild sackhiss_ner), och hornet på en avsats i floden. Loftet har utgått som rum: k3s02_loftet och k3s03_hornet spelas i floden, som får tillståndet rent och föremålen hornet, hornet_skrift och sackhiss. Inga repliker är ändrade.",
-  "andrat_v033": "2026-11-18 (beslut 103.5): bild frukost på frukostens mellanscen i k3s01, och bild på reaktionerna i k3_hornet (tallrikar på 3, skuggan_stiger på 1, 2 och 4, skuggan_dyker på 6+). Ingen text är ändrad."
+  "andrat_v033": "2026-11-18 (beslut 103.5): bild frukost på frukostens mellanscen i k3s01, och bild på reaktionerna i k3_hornet (tallrikar på 3, skuggan_stiger på 1, 2 och 4, skuggan_dyker på 6+). Ingen text är ändrad.",
+  "andrat_v034": "2026-11-18 (beslut 105.3 och 106): instruktionerna efter trappan i 104.3, skepparen_pekar efter repliken om morfar, musiken floden, ankomsten, snäckornas verb, simturen, utmaningen och ORDDUELL!, segern med \"Du vann ordduellen!\", kartbit 4 med Farfars replik om vägen hem, och slutbilden. Farfars två repliker om baronens bit väntar till kapitel 4 (99.4). Inga id:n är ändrade."
  },
  "var_var_vi": [
   {
@@ -360,7 +361,8 @@
    "steg": [
     {
      "typ": "mellanscen",
-     "beskrivning": "Floden är bred och blå. Pråmar med blå och vita ränder ligger längs stranden. Längst bort står en gammal kvarn med ett vattenhjul som inte snurrar, och högst upp på kvarnen blänker ett stort horn av mässing. Långt uppströms syns vassbyns radiomast."
+     "beskrivning": "Hjälten och ungen kommer gående på stigen och stannar vid floden. Floden är bred och blå. Pråmar med blå och vita ränder ligger längs stranden. Längst bort står en gammal kvarn med ett vattenhjul som inte snurrar, och högst upp på kvarnen blänker ett stort horn av mässing. Långt uppströms syns vassbyns radiomast.",
+     "bild": "ankomst_floden"
     },
     {
      "typ": "replik",
@@ -409,14 +411,15 @@
      "upplast": true
     },
     {
+     "typ": "mellanscen",
+     "beskrivning": "Skepparen pekar upp mot det stora hornet på kvarnens avsats. Säckhissens rep hänger stilla. Sedan pekar han på kvarnhjulet: tjock tång har snott sig runt det, och det rör sig inte. En flodbo går förbi och skrattar, och skepparen tittar ner i däcket.",
+     "bild": "skepparen_pekar"
+    },
+    {
      "typ": "replik",
      "talare": "skepparen",
      "text": "Men hissen dit upp går bara när hjulet snurrar.",
      "upplast": true
-    },
-    {
-     "typ": "mellanscen",
-     "beskrivning": "Skepparen pekar på kvarnhjulet. Tjock tång har snott sig runt det, och det rör sig inte. Uppe vid hornet hänger säckhissens rep stilla. En flodbo går förbi och skrattar. Skepparen tittar ner i däcket."
     },
     {
      "typ": "pussel",
@@ -702,7 +705,8 @@
    "steg": [
     {
      "typ": "mellanscen",
-     "beskrivning": "Sköldpaddan simmar långsamt till en sandbank nära marknaden och lägger framfenorna på sanden. Hjälten och ungen hoppar ner i sanden."
+     "beskrivning": "Sköldpaddan simmar långsamt till en sandbank nära marknaden och lägger framfenorna på sanden. Hjälten och ungen hoppar ner i sanden.",
+     "bild": "skoldpadda_simmar"
     },
     {
      "typ": "pussel",
@@ -828,14 +832,15 @@
      "upplast": true
     },
     {
-     "typ": "mellanscen",
-     "beskrivning": "Bubblan står kvar. Baronen klättrar halvvägs ned för repstegen, och Herr Skata hoppar efter."
-    },
-    {
      "typ": "replik",
      "talare": "baronen",
-     "text": "Ön är min. Flaskan också!",
+     "text": "Ön och flaskan är mina! Jag utmanar dig!",
      "upplast": true
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Bubblan står kvar. Baronen klättrar halvvägs ned för repstegen, och Herr Skata hoppar efter. ORDDUELL! står stort över bilden, och baronen och hjälten står mittemot varandra.",
+     "bild": "ordduell_start"
     },
     {
      "typ": "pussel",
@@ -849,7 +854,18 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Luftskeppet stiger och surrar iväg, med Herr Skata efter. Ankarrepet släpper, och ankaret blir kvar i sanden. Sköldpaddan lyfter huvudet och tittar på hjälten. Den nickar långsamt och lägger fenan framför honom som en trappa."
+     "beskrivning": "Luftskeppet stiger och surrar iväg, med Herr Skata efter. Ankarrepet släpper, och ankaret blir kvar i sanden. Ungen jublar.",
+     "bild": "ordduell_seger"
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Du vann ordduellen!",
+     "upplast": true
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Sköldpaddan lyfter huvudet och tittar på hjälten. Den nickar långsamt och lägger fenan framför honom som en trappa."
     },
     {
      "typ": "visa_foremal",
@@ -877,7 +893,7 @@
     "text": "Var var vi? Ni har min flaska.",
     "upplast": true
    },
-   "anteckning": "Resan nedför floden är tacket och kapitlets slut. Hjälten sitter på skalet (97.5) och kan inte gå. De två trycken är flaskan och skepparen, som står vid hornet på avsatsen. Farfars två repliker om baronens bit löser in löftet från kapitel 2 (72.9) och är reserven om pass 3 blir för långt (99.4). \"Bit fyra! Vägen går till berget.\" är struken (manus 19 v0.4). Regin resan_kvall kommer när Stil har ritat.",
+   "anteckning": "Resan nedför floden är tacket och kapitlets slut. Hjälten sitter på skalet (97.5) och kan inte gå. De två trycken är flaskan och skepparen, som står vid hornet på avsatsen. Farfars två repliker om baronens bit löser in löftet från kapitel 2 (72.9) och är reserven om pass 3 blir för långt (99.4). \"Bit fyra! Vägen går till berget.\" är struken (manus 19 v0.4). Regin resan_kvall kommer när Stil har ritat. 106.6–106.7: kartbit 4 i närbild (kartbit4_berget) och Farfars replik om vägen hem till mamma. Hans repliker om baronens bit flyttar till kapitel 4 (reserven i 99.4). Slutbilden resan_slut kommer före \"Fortsättning följer.\", och ett tryck hoppar över den.",
    "steg": [
     {
      "typ": "mellanscen",
@@ -899,20 +915,13 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Kartbit 4 passar mot bit 3: floden, ön och ett berg som ryker. Ungen sätter nosen på mammas skugga på bit 1.",
-     "bild": "kartbit_unge"
+     "beskrivning": "Kartbit 4 i närbild: floden går vidare till ett berg som ryker. Ungen sätter nosen på berget.",
+     "bild": "kartbit4_berget"
     },
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Baronen har den sista kartbiten.",
-     "upplast": true,
-     "via": "radio"
-    },
-    {
-     "typ": "replik",
-     "talare": "farfar",
-     "text": "Jag gömde den uppe i molnen. Han hittade den!",
+     "text": "Vägen hem till mamma går över berget!",
      "upplast": true,
      "via": "radio"
     },
@@ -932,7 +941,7 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Skepparen blåser fem tut, djupa och långa. Sköldpaddan svarar med sitt eget rop. På pråmarna står flodfolket alldeles tysta och tittar. Ljusbåtarna gungar. Kvällssolen värmer skalet, ungen torkar och somnar mot hjälten, och långt borta ryker berget. Två månar stiger.",
+     "beskrivning": "Skepparen blåser fem tut, djupa och långa. Sköldpaddan svarar med sitt eget rop. På pråmarna står flodfolket alldeles tysta och tittar. Ljusbåtarna gungar. Kvällssolen värmer skalet, ungen torkar och somnar mot hjälten, och långt borta ryker berget.",
      "bild": "resan_kvall"
     },
     {
@@ -953,6 +962,11 @@
      "text": "God natt. Sov gott på sköldpaddan!",
      "upplast": true,
      "via": "radio"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "De tre solarna går ned en i taget. Sköldpaddan simmar vidare nedför floden med hjälten och ungen på skalet, mot berget som ryker. Två månar stiger.",
+     "bild": "resan_slut"
     },
     {
      "typ": "replik",
@@ -1087,7 +1101,7 @@
    "hjalp": "ett_ord",
    "instruktion": {
     "talare": "berattare",
-    "text": "Skriv ett ord som hjälper!",
+    "text": "Hugg loss tången! Skriv en formel!",
     "upplast": true
    },
    "vid_ratt": {
@@ -1106,7 +1120,7 @@
    "knuff": {
     "handling": "bilden i molnet glimtar, och ungen nafsar i tången vid hjulet"
    },
-   "anteckning": "Manus 19 v0.4.1, k3_hjulet (förut k3_tangen vid ön). 71.6: den gamla formeln gör det den alltid gör, kapar växter, och ingen säger vilken formel som passar (spelarens initiativ). Hugget som i kapitel 2 (77.1): tre tussar. Ledbilden efter första försöket, förebilden efter två (69.3, 89.3). Sedan hugger han själv de tre tussarna (k3_tangen_hjul, vila). Kedjan hjul → hiss → horn säger skepparen före pusslet (99.2.2)."
+   "anteckning": "Manus 19 v0.4.1, k3_hjulet (förut k3_tangen vid ön). 71.6: den gamla formeln gör det den alltid gör, kapar växter, och ingen säger vilken formel som passar (spelarens initiativ). Hugget som i kapitel 2 (77.1): tre tussar. Ledbilden efter första försöket, förebilden efter två (69.3, 89.3). Sedan hugger han själv de tre tussarna (k3_tangen_hjul, vila). Kedjan hjul → hiss → horn säger skepparen före pusslet (99.2.2). 105.3 (trappan, steg 2): kapitlets första skrivpussel, så behovet sägs före. HUGG är ett rimligt ord."
   },
   {
    "id": "k3_tangen_hjul",
@@ -1115,7 +1129,7 @@
    "instruktion": {
     "typ": "replik",
     "talare": "berattare",
-    "text": "Hugg loss tången!",
+    "text": "Hugg nu!",
     "upplast": true
    },
    "innehall": [
@@ -1137,7 +1151,7 @@
    "knuff": {
     "handling": "ungen nafsar i närmaste tuss"
    },
-   "anteckning": "Vila efter SVÄRD, som vassväggen i kapitel 2 (77.1): han hugger själv tre tussar tång runt hjulet, en i taget, och under en ligger ett bär. Rummet floden byter till tillståndet hjul."
+   "anteckning": "Vila efter SVÄRD, som vassväggen i kapitel 2 (77.1): han hugger själv tre tussar tång runt hjulet, en i taget, och under en ligger ett bär. Rummet floden byter till tillståndet hjul. 105.3: behovet sägs före SVÄRD, så instruktionen här är kort."
   },
   {
    "id": "k3_kvarn_1",
@@ -1524,7 +1538,7 @@
    "typ": "P26_krukorna",
    "instruktion": {
     "talare": "berattare",
-    "text": "Vifta med staven mot snäckorna!",
+    "text": "Vifta bort snäckorna med staven!",
     "upplast": true
    },
    "innehall": [
@@ -1543,7 +1557,7 @@
    "knuff": {
     "handling": "ungen tittar på närmaste klump med snäckor"
    },
-   "anteckning": "Vila före chiffret (ledningen 13/11), på ön i pass 2 (manus 19 v0.4.1). Snäckorna sitter på skylten, som är Farfars sak av mässing, så staven rör aldrig sköldpaddan (16 §3). Varje klump han knackar bort visar två eller tre tecken, och under en ligger ett bär."
+   "anteckning": "Vila före chiffret (ledningen 13/11), på ön i pass 2 (manus 19 v0.4.1). Snäckorna sitter på skylten, som är Farfars sak av mässing, så staven rör aldrig sköldpaddan (16 §3). Varje klump han knackar bort visar två eller tre tecken, och under en ligger ett bär. 106.9: instruktionen säger vad han gör och vad det ger, innan han står vid den första klumpen."
   },
   {
    "id": "k3_chiffret",
@@ -1825,7 +1839,7 @@
    "ratt_bokstav_stannar": true,
    "instruktion": {
     "talare": "berattare",
-    "text": "Skriv SKÖLD, som på skylten!",
+    "text": "Skriv SKÖLD, som på skylten! Den skyddar er.",
     "upplast": true
    },
    "vid_ratt": {
@@ -1839,7 +1853,7 @@
    "knuff": {
     "handling": "förebilden tänds igen"
    },
-   "anteckning": "Den nya formeln (06 §5). Förebilden är skylten: SKÖLD-delen visas från början och täcks när första brickan läggs (titta–täck, 08 §2), eftersom SK låter som sj-ljud och LD inte hörs. Brickor i bokstavsordning, med distraktorerna J (sj-ljudet stavas ibland SJ), O (Ö och O) och T (D och T i slutet) ur hans förväxlingar (76.2). SJÖLD får förklaringen och förebilden tänds igen med SK markerat. Ankaret står stilla i luften medan han skriver. Bubblan står kvar hela duellen och rör aldrig baronen (86.4.2)."
+   "anteckning": "Den nya formeln (06 §5). Förebilden är skylten: SKÖLD-delen visas från början och täcks när första brickan läggs (titta–täck, 08 §2), eftersom SK låter som sj-ljud och LD inte hörs. Brickor i bokstavsordning, med distraktorerna J (sj-ljudet stavas ibland SJ), O (Ö och O) och T (D och T i slutet) ur hans förväxlingar (76.2). SJÖLD får förklaringen och förebilden tänds igen med SK markerat. Ankaret står stilla i luften medan han skriver. Bubblan står kvar hela duellen och rör aldrig baronen (86.4.2). 105.3 (trappan, steg 1): namnet och vad formeln gör."
   },
   {
    "id": "k3_duellen",
@@ -1972,7 +1986,7 @@
     "handling": "repstegen rullar upp sig med baronen hängande i den, ända upp i gondolen, och han landar på huvudet. Medaljerna regnar ner i floden.",
     "fest": "stor"
    },
-   "anteckning": "Ordduellen, övning (manus 19, Tekniks P16_ordduell, 87.4). Reglerna ligger utanför Phaser, så att testrummet kör samma kod med halmdockan (61.1). Det baronen ropar om syns hela tiden: sköldpaddan ligger där (pekar_pa), och det han ser är sanningen. Korten läses aldrig upp. Regeln sägs av Farfar före rond 1. Bubblan från k3_skold (skrivs i steget före, skold) står kvar hela duellen och rör aldrig baronen (86.4.2): vid rätt kort blir han förvirrad, något trillar av honom och han klättrar själv ett steg upp. Vid fel klättrar han ett steg ned. Herr Skata (harmare) ropar efter med en egen pratbubbla. I rond 3 delar strecket i sköld|padda ordet för nosen, och det rätta kortet är det längre (78.6). Vinsten är hjältens sista kort (granskning 8, fynd 1). Räknas som läsval i budgeten."
+   "anteckning": "Ordduellen, övning (manus 19, Tekniks P16_ordduell, 87.4). Reglerna ligger utanför Phaser, så att testrummet kör samma kod med halmdockan (61.1). Det baronen ropar om syns hela tiden: sköldpaddan ligger där (pekar_pa), och det han ser är sanningen. Korten läses aldrig upp. Regeln sägs av Farfar före rond 1. Bubblan från k3_skold (skrivs i steget före, skold) står kvar hela duellen och rör aldrig baronen (86.4.2): vid rätt kort blir han förvirrad, något trillar av honom och han klättrar själv ett steg upp. Vid fel klättrar han ett steg ned. Herr Skata (harmare) ropar efter med en egen pratbubbla. I rond 3 delar strecket i sköld|padda ordet för nosen, och det rätta kortet är det längre (78.6). Vinsten är hjältens sista kort (granskning 8, fynd 1). Räknas som läsval i budgeten. 106.5: baronen utmanar, ORDDUELL! (ordduell_start), och sedan Farfars regel direkt före första kortet. Segern är ordduell_seger och \"Du vann ordduellen!\"."
   },
   {
    "id": "k3_morkret",
@@ -2025,7 +2039,7 @@
    "hjalp": "ett_ord",
    "instruktion": {
     "talare": "berattare",
-    "text": "Skriv ett ord med staven!",
+    "text": "Skriv en formel med staven!",
     "upplast": true
    },
    "vid_ratt": {
@@ -2044,7 +2058,7 @@
    "knuff": {
     "handling": "mörkret under kanten glimtar till"
    },
-   "anteckning": "Kapitlets frivilliga formel (08 §4). Mörker visar att LJUS passar, och ingen säger vilken formel (spelarens initiativ)."
+   "anteckning": "Kapitlets frivilliga formel (08 §4). Mörker visar att LJUS passar, och ingen säger vilken formel (spelarens initiativ). 105.3 (trappan, steg 3): tredje gången med LJUS och inte kapitlets första, så initiativet står kvar."
   }
  ],
  "uppdrag": [

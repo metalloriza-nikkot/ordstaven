@@ -132,6 +132,13 @@ test('flodmannen säger ahoj! i gemener (87.7)', async ({ page }) => {
     await page.waitForTimeout(250);
   }
   await page.waitForFunction(() => !window.__ORDSTAVEN.fryst() && document.querySelector('#plattan').hidden);
+  // ankomsten (106.8) går i världens tid, som testläget inte kortar: vänta tills kameran är tillbaka hos hjälten
+  await page.waitForFunction(() => !window.__ORDSTAVEN.spel.scene.getScene('Rum').ankomstPagar, null, { timeout: 10000 });
+  for (let i = 0, fore = ''; i < 40; i++) {
+    const nu = JSON.stringify(await ev(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').kamera));
+    if (nu === fore) break;
+    fore = nu; await page.waitForTimeout(150);
+  }
   // skepparen ropar AHOJ! i samma ruta var nionde sekund: vänta tills hans rop är borta
   await expect(page.locator('#rop')).toBeHidden({ timeout: 8000 });
   const p = await ev(() => window.__ORDSTAVEN.objekt('flodman'));
@@ -396,8 +403,8 @@ test('regierna i kapitel 3 (100.4, 101.3, 102.3 och 103.3.1): var och en går i 
   test.skip(!['mac-helskarm', 'ipad-10', 'mac-safari'].includes(info.project.name), 'tre projekt räcker, som kapitel 2 (84.6)');
   test.setTimeout(180000);
   const ev = (fn, arg) => page.evaluate(fn, arg);
-  const REGIER = [['k3s01_floden', ['frukost', 'skepparen_pekar', 'kartbit3_on']], ['k3s02_kvarnen', ['sackhiss_upp']], ['k3s02_loftet', ['loftet_horn', 'skuggan_lyssnar']], ['k3s03_hornet', ['tallrikar', 'skuggan_stiger', 'skuggan_dyker', 'unge_simmar', 'sackhiss_ner']],
-    ['k3s04_on', ['skoldpadda_huvud', 'skylt_tecken']], ['k3s05_sandbanken', ['skoldpadda_visar_berget']], ['k3s07_resan', ['resan_kvall']]];
+  const REGIER = [['k3s01_floden', ['ankomst_floden', 'frukost', 'skepparen_pekar', 'kartbit3_on']], ['k3s02_kvarnen', ['sackhiss_upp']], ['k3s02_loftet', ['loftet_horn', 'skuggan_lyssnar']], ['k3s03_hornet', ['tallrikar', 'skuggan_stiger', 'skuggan_dyker', 'unge_simmar', 'sackhiss_ner']],
+    ['k3s04_on', ['skoldpadda_huvud', 'skylt_tecken']], ['k3s05_sandbanken', ['skoldpadda_simmar', 'skoldpadda_visar_berget']], ['k3s06_ankaret', ['ordduell_start', 'ordduell_seger']], ['k3s07_resan', ['kartbit4_berget', 'resan_kvall', 'resan_slut']]];
   for (const [scenId, regier] of REGIER) {
     // på ön börjar den där skylten syns (efter mossan), så att tecknen har sin skylt
     const sc = kap.scener.findIndex((x) => x.id === scenId);
@@ -417,6 +424,11 @@ test('regierna i kapitel 3 (100.4, 101.3, 102.3 och 103.3.1): var och en går i 
     // skepparen pekar (105.4): kameran visar det stora hornet och sedan hjulet
     if (scenId === 'k3s01_floden') expect((await ev(() => window.__ORDSTAVEN.grafik())).regi).toEqual(expect.arrayContaining(['skepparen pekar', 'kameran visar hornet', 'kameran visar hjulet']));
     if (scenId === 'k3s03_hornet') expect(await ev(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').unge.visible)).toBe(false);
+    // 106: början, duellens ram och slutet (gråbox tills Stils bilder finns)
+    if (scenId === 'k3s01_floden') expect((await ev(() => window.__ORDSTAVEN.grafik())).regi).toContain('ankomsten till floden');
+    if (scenId === 'k3s05_sandbanken') expect((await ev(() => window.__ORDSTAVEN.grafik())).regi).toContain('sköldpaddan simmar');
+    if (scenId === 'k3s06_ankaret') expect((await ev(() => window.__ORDSTAVEN.grafik())).regi).toEqual(expect.arrayContaining(['ordduellen börjar', 'ordduellen är vunnen', 'ljud:kapitel', 'ljud:fest_stor']));
+    if (scenId === 'k3s07_resan') expect((await ev(() => window.__ORDSTAVEN.grafik())).regi).toEqual(expect.arrayContaining(['kartbit 4 visar berget', 'slutbilden mot solnedgången']));
     // 102.3: ön steg vid bryggan innan hissen bar honom ned, och han kom ut genom kvarnens dörr på kajen
     if (scenId === 'k3s03_hornet') {
       const regi = (await ev(() => window.__ORDSTAVEN.grafik())).regi;

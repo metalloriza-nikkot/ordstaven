@@ -201,6 +201,11 @@
           "type": "string",
           "minLength": 1
         },
+        "ordduell": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Rubriken som står stort över bilden när en ordduell börjar (2.50, beslut 106.5), samma i varje duell. Saknas ordet står bara bilden."
+        },
         "fortsatt": {
           "type": "string",
           "minLength": 1,

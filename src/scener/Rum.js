@@ -45,6 +45,11 @@ export const HJALTE_FAST = Object.freeze({ hjalm: 0xc9ccd2, skor: 0x1e4fa0 });
 /** Gången: en ny bild var femte pixel han går (stå, steg, stå, steg). */
 const GANG_STEG = 5;
 /**
+ * Ordduellens ljud (106.5): startljudet och segerstycket. Gråboxens ljud (kapitelfanfaren och den stora festen) tills
+ * Stils egna finns, och då byts id:t här.
+ */
+const DUELL_LJUD = { start: 'kapitel', seger: 'fest_stor' };
+/**
  * Gråboxens bild av sakerna han kan ha på sig (lager): en färg per sak. Okända saker ritas i en neutral färg.
  * Riktig grafik kommer med Stil (stilguiden §5).
  */
@@ -1065,6 +1070,13 @@ export class Rum extends Phaser.Scene {
       skylt_tecken: () => this.skyltTecken(),
       skoldpadda_visar_berget: () => this.skoldpaddaVisarBerget(),
       resan_kvall: () => this.resanKvall(),
+      // 106: början, duellens ram och slutet (gråbox tills Stils bilder finns)
+      ankomst_floden: () => this.ankomstFloden(),
+      skoldpadda_simmar: () => this.skoldpaddaSimmar(),
+      ordduell_start: () => this.ordduellStart(),
+      ordduell_seger: () => this.ordduellSeger(),
+      kartbit4_berget: () => this.kartbit4Berget(),
+      resan_slut: () => this.resanSlut(),
       // säckhissen (101.3): upp genom hålet i taket i kvarnen, och ned genom golvet i loftet
       frukost: () => this.frukost(),
       skepparen_pekar: () => this.skepparenPekar(),
@@ -2691,6 +2703,239 @@ export class Rum extends Phaser.Scene {
     return 5600;
   }
 
+  // ---- 106: kapitel 3 får en början, en duell som syns och ett slut (gråbox tills Stils bilder finns) ----
+
+  /** Har regin spelats för mindre än ms sedan? Ordduellens ram spelas en gång också om både motorn och en mellanscen ber om den. @param {string} namn @param {number} [ms] */
+  regiNyss(namn, ms = 5000) { const t = this.regiSenast?.get(namn); return t !== undefined && this.time.now - t < ms; }
+
+  /** @param {string} namn */
+  regiSpelas(namn) { (this.regiSenast ??= new Map()).set(namn, this.time.now); }
+
+  /**
+   * Ankomsten (106.8): hjälten och ungen kommer gående på stigen in i rummet, stannar, och kameran visar floden och
+   * glider tillbaka. Ingen text, och bara bilder som redan finns. @returns {number}
+   */
+  ankomstFloden() {
+    const mal = { ...this.pos }, fran = { x: mal.x, y: Math.max(6, mal.y - 48) };
+    const ga = 1500, vila = 300, glid = 1200, se = 1300, tillbaka = 700;
+    this.pos = { ...fran }; this.vand = { x: 0, y: 1 };
+    this.ungePos = { x: fran.x + 14, y: fran.y - 12 };
+    this.placera(); this.ritaHjalte();
+    const p = { ...fran };
+    this.tweens.add({ targets: p, y: mal.y, duration: ga, onUpdate: () => {
+      this.pos = { x: Math.round(p.x), y: Math.round(p.y) };
+      this.ungePos = { x: this.pos.x + 14, y: this.pos.y - 12 };
+      this.gar = true; this.gang = (this.gang || 0) + 2; this.ritaHjalte(); this.placera(); this.smutsig = true;
+    }, onComplete: () => { this.pos = { ...mal }; this.ungePos = { x: mal.x + 14, y: mal.y - 4 }; this.gar = false; this.ritaHjalte(); this.placera(); } });
+    // floden: där ön stiger (kartans regipunkt), annars mitt i rummets nedre del
+    const f = this.regiPunkter?.on ?? { x: Math.round(this.storlek.bredd / 2), y: Math.round(this.storlek.hojd - 80) };
+    const fokus = (/** @type {{x:number,y:number}} */ a, /** @type {{x:number,y:number}} */ b, /** @type {number} */ ms, /** @type {number} */ sen, /** @type {() => void} */ klar = () => {}) => {
+      const g = { p: 0 };
+      this.tweens.add({ targets: g, p: 1, duration: ms, delay: sen, ease: 'Sine.easeInOut', onUpdate: () => { this.regiFokus = { x: a.x + (b.x - a.x) * g.p, y: a.y + (b.y - a.y) * g.p }; }, onComplete: klar });
+    };
+    const slut = ga + vila + glid + se + tillbaka;
+    this.ankomstPagar = true;
+    // kameran släpps när den är tillbaka hos hjälten (i tweenens slut, så att ingen sen uppdatering låser den)
+    this.time.delayedCall(ga + vila, () => { this.regiFokus = { x: mal.x, y: mal.y }; fokus(mal, f, glid, 0); fokus(f, mal, tillbaka, glid + se, () => { this.regiFokus = null; this.ankomstPagar = false; }); });
+    this.regiLogg.push('ankomsten till floden');
+    return slut;
+  }
+
+  /**
+   * Sköldpaddan simmar till sandbanken (106.4): floden i en egen bild över rummet, sköldpaddan med hjälten och
+   * ungen på skalet (Stils `skoldpadda_simmar_01–02`, som i resan), och ön glider ut ur bild. Högst ca 4 s.
+   * @returns {number}
+   */
+  skoldpaddaSimmar() {
+    const smuts = () => { this.smutsig = true; };
+    this.rensaSidovy();
+    const k = this.kamera, c = this.sidovy, B = RUM.bredd, H = RUM.hojd;
+    c.setPosition(k.x, k.y).setVisible(true).setAlpha(0);
+    const vatten = this.add.graphics();
+    vatten.fillStyle(0x4f86b0, 1).fillRect(0, 0, B, H).fillStyle(0x6f9fc8, 1);
+    for (let i = 0; i < 9; i++) vatten.fillRect((i * 53) % B, 14 + i * 20, 22, 1);
+    c.add(vatten);
+    const skal = this.add.container(Math.round(B / 2 + 30), Math.round(H / 2 + 6));
+    const fb = foremalsbild(this, 'skoldpadda_simmar_01'), fb2 = foremalsbild(this, 'skoldpadda_simmar_02');
+    if (fb) {
+      // bilden är 480 × 320 med skalets mitt ca (250, 160): skalet hamnar mitt i bild
+      const img = this.add.image(-250 + 240, -160 + 160, fb.nyckel, fb.ram).setOrigin(0.5, 0.5);
+      skal.add(img);
+      if (fb2) { let n = 0; const t = this.time.addEvent({ delay: 600, loop: true, callback: () => { if (!img.active) { t.remove(); return; } n++; img.setTexture((n % 2 ? fb2 : fb).nyckel, (n % 2 ? fb2 : fb).ram); smuts(); } }); }
+    } else {
+      const g = this.add.graphics();
+      g.fillStyle(0x5f7a4a, 1).fillEllipse(0, 0, 150, 96).fillStyle(0x6f9a4a, 1).fillEllipse(0, -4, 126, 76).fillStyle(0x4f6a5a, 1).fillEllipse(-92, -2, 30, 22);
+      skal.add(g);
+    }
+    // hjälten och ungen sitter på skalet
+    const hj = this.hjalteTextur && this.textures.exists(this.hjalteTextur) && this.textures.get(this.hjalteTextur).has('hjalte_ga_vanster_01')
+      ? this.add.image(-8, -6, this.hjalteTextur, 'hjalte_ga_vanster_01').setOrigin(0.5, 1) : this.add.rectangle(-8, -6, 10, 18, 0x3a5fa0).setOrigin(0.5, 1);
+    const un = this.textures.exists('unge') && this.textures.get('unge').has('unge1_glad_vanster_01')
+      ? this.add.image(10, -4, 'unge', 'unge1_glad_vanster_01').setOrigin(0.5, 1) : this.add.rectangle(10, -4, 10, 10, 0x5fae6a).setOrigin(0.5, 1);
+    skal.add([hj, un]);
+    c.add(skal);
+    this.tweens.add({ targets: c, alpha: 1, duration: 250, onUpdate: smuts });
+    // sköldpaddan simmar åt vänster (huvudet först), och ön glider ut ur bild
+    this.tweens.add({ targets: skal, x: -260, duration: 2900, delay: 500, ease: 'Sine.easeIn', onUpdate: () => { skal.x = Math.round(skal.x); smuts(); } });
+    this.regiLjud('plask', 300);
+    const ms = 3700;
+    this.time.delayedCall(ms - 250, () => this.tweens.add({ targets: c, alpha: 0, duration: 250, onUpdate: smuts, onComplete: () => { if (c.alpha === 0) this.rensaSidovy(); smuts(); } }));
+    this.regiLogg.push('sköldpaddan simmar');
+    return ms;
+  }
+
+  /**
+   * Baronen i gråboxen (106.5, tills Stils baron på repstegen finns): luftskeppet uppe i bild, repstegen ned och
+   * baronen längst ned på den, mittemot hjälten. Står kvar under duellen. @returns {{ x: number, y: number }}
+   */
+  duellGrabox() {
+    this.duellGra?.destroy(); this.duellGra = null;
+    const k = this.kamera, x = Math.round(this.pos.x), topp = Math.round(Math.max(k.y + 10, this.pos.y - 150));
+    const y = Math.round(Math.max(topp + 30, this.pos.y - 56));
+    const c = this.add.container(0, 0); this.lagerLuft.add(c);
+    const skepp = this.add.ellipse(x + 10, topp, 64, 18, 0xd9822b).setStrokeStyle(1, 0x7a3f12);
+    const stege = this.add.graphics();
+    const baron = this.add.container(x, y);
+    baron.add([this.add.rectangle(0, 0, 12, 18, 0x5a3a6a).setOrigin(0.5, 1), this.add.rectangle(0, -18, 14, 4, 0x2b2230).setOrigin(0.5, 1), this.add.circle(0, -12, 2, 0xe8c070)]);
+    c.add([skepp, stege, baron]);
+    const rita = () => { if (!stege.active) return; stege.clear().lineStyle(1, 0x8a6a48, 1).lineBetween(x - 4, topp + 8, x - 4, baron.y - 4).lineBetween(x + 4, topp + 8, x + 4, baron.y - 4); for (let yy = topp + 12; yy < baron.y - 4; yy += 6) stege.lineBetween(x - 4, yy, x + 4, yy); };
+    rita();
+    this.duellGra = Object.assign(c, { skepp, baron, rita, topp });
+    this.smutsig = true;
+    return { x, y: y - 9 };
+  }
+
+  /**
+   * Ordduellens början (106.5): samma ram i varje duell (kapitel 3, finalen i kapitel 5 och testrummet). Hjälten och
+   * motståndaren står mittemot varandra, kameran mellan dem, och startljudet. Rubriken ORDDUELL! står i textlagret
+   * (spel.js). Motståndaren är figuren med Stils bilder, annars gråboxens baron på repstegen. @returns {number}
+   */
+  ordduellStart() {
+    if (this.regiNyss('ordduell_start')) return 0;
+    this.regiSpelas('ordduell_start');
+    const smuts = () => { this.smutsig = true; };
+    const fig = /** @type {any} */ (this.duellFig);
+    const mot = fig?.img?.active ? { x: fig.img.x, y: fig.img.y - 12 } : this.duellGrabox();
+    this.vand = { x: 0, y: -1 }; this.ritaHjalte();
+    const mitt = { x: Math.round((this.pos.x + mot.x) / 2), y: Math.round((this.pos.y - 12 + mot.y) / 2) };
+    this.regiFokus = mitt;
+    // två gnistor mellan dem, som när två svärd möts
+    const g = this.add.graphics(); this.lagerLuft.add(g);
+    const t = { p: 0 };
+    this.tweens.add({ targets: t, p: 1, duration: 900, delay: 400, onUpdate: () => {
+      if (!g.active) return;
+      const r = Math.round(3 + Math.sin(t.p * Math.PI) * 7);
+      g.clear().lineStyle(1, 0xfff2a8, 1 - t.p * 0.6).lineBetween(mitt.x - r, mitt.y - r, mitt.x + r, mitt.y + r).lineBetween(mitt.x - r, mitt.y + r, mitt.x + r, mitt.y - r);
+      smuts();
+    }, onComplete: () => { g.destroy(); smuts(); } });
+    this.regiLjud(DUELL_LJUD.start);
+    const ms = 2200;
+    this.time.delayedCall(ms, () => { this.regiFokus = null; });
+    this.regiLogg.push('ordduellen börjar');
+    return ms;
+  }
+
+  /**
+   * Segern (106.5): baronen tappar greppet, repstegen rullar upp honom i gondolen, luftskeppet far och Herr Skata
+   * flaxar efter (gråboxen, eller figurens egen vinst med Stils bilder), ungen jublar och segerstycket spelas.
+   * Raden "Du vann ordduellen!" är Innehålls och kommer efter. @returns {number}
+   */
+  ordduellSeger() {
+    if (this.regiNyss('ordduell_seger')) return 0;
+    this.regiSpelas('ordduell_seger');
+    const smuts = () => { this.smutsig = true; };
+    const gb = /** @type {any} */ (this.duellGra);
+    if (gb?.active) {
+      const k = this.kamera;
+      this.regiFokus = { x: gb.skepp.x, y: Math.round((gb.skepp.y + this.pos.y) / 2) };
+      this.tweens.add({ targets: gb.baron, angle: 20, duration: 120, yoyo: true, repeat: 1 });
+      this.tweens.add({ targets: gb.baron, y: gb.topp + 10, duration: 900, delay: 400, ease: 'Quad.easeIn', onUpdate: () => { gb.rita(); smuts(); }, onComplete: () => { gb.baron.setVisible(false); gb.rita(); } });
+      this.tweens.add({ targets: gb.skepp, x: k.x + RUM.bredd + 50, duration: 1300, delay: 1400, ease: 'Sine.easeIn', onUpdate: smuts });
+      const skata = this.add.circle(gb.skepp.x - 30, gb.topp + 6, 3, 0x2b2b2b); gb.add(skata);
+      this.tweens.add({ targets: skata, x: k.x + RUM.bredd + 20, y: gb.topp - 4, duration: 1300, delay: 1700, onUpdate: smuts });
+      this.regiLjud('rull', 400); this.regiLjud('luftskepp', 1400);
+      this.time.delayedCall(2800, () => { gb.destroy(); if (this.duellGra === gb) this.duellGra = null; this.regiFokus = null; smuts(); });
+    }
+    this.time.delayedCall(500, () => this.ungeReagerar(true));
+    this.time.delayedCall(1300, () => this.ungeReagerar(true));
+    this.time.delayedCall(2100, () => this.ungeReagerar(true));
+    this.regiLjud(DUELL_LJUD.seger, 200);
+    this.regiLogg.push('ordduellen är vunnen');
+    return 2800;
+  }
+
+  /**
+   * Kartbit 4 i närbild (106.6), som kartbit 3: bilden visas i textlagret (spel.js, Stils kartbit 4), och i rummet ryker
+   * det inget. Regin säger bara hur länge. @returns {number}
+   */
+  kartbit4Berget() {
+    this.regiLogg.push('kartbit 4 visar berget');
+    return 3600;
+  }
+
+  /**
+   * Slutbilden (106.7): hjälten och ungen på sköldpaddans skal nedför floden mot solnedgången. De tre solarna går
+   * ned en i taget, skepparens fem tut hörs bakom dem, ljusbåtarna tänds och de två månarna stiger. Högst ca 8 s, och
+   * ett tryck hoppar över den (spel.js, `slutbildSlut`). Gråbox tills Stils slutbild finns, med bara bildbyten och
+   * enkla rörelser. @returns {number}
+   */
+  resanSlut() {
+    const smuts = () => { this.smutsig = true; };
+    this.rensaSidovy();
+    const k = this.kamera, c = this.sidovy, B = RUM.bredd, H = RUM.hojd, hav = Math.round(H * 0.58);
+    c.setPosition(k.x, k.y).setVisible(true).setAlpha(0);
+    const himmel = this.add.graphics();
+    const band = [0xf4b860, 0xe8945a, 0xc8665a, 0x8a4a6a, 0x4a3a6a];
+    band.forEach((f, i) => himmel.fillStyle(f, 1).fillRect(0, Math.round((hav * i) / band.length), B, Math.ceil(hav / band.length) + 1));
+    c.add(himmel);
+    // solarna bakom horisonten (vattnet ritas ovanpå), en i taget
+    const solar = [['sol_stor', 70, 9, 0xffd27a], ['sol_mellan', 160, 6, 0xffe6a0], ['sol_liten', 240, 4, 0xfff2c8]].map(([namn, x, r, f], i) => {
+      const sb = foremalsbild(this, /** @type {string} */ (namn));
+      const s = sb ? this.add.image(/** @type {number} */ (x), hav - 30, sb.nyckel, sb.ram).setOrigin(0.5, 0.5) : this.add.circle(/** @type {number} */ (x), hav - 30, /** @type {number} */ (r), /** @type {number} */ (f));
+      c.add(s);
+      this.tweens.add({ targets: s, y: hav + 14, duration: 1400, delay: 500 + i * 1100, ease: 'Sine.easeIn', onUpdate: () => { s.y = Math.round(s.y); smuts(); } });
+      return s;
+    });
+    const vatten = this.add.graphics();
+    vatten.fillStyle(0x3a4f7a, 1).fillRect(0, hav, B, H - hav).fillStyle(0x5a6f9a, 1);
+    for (let i = 0; i < 8; i++) vatten.fillRect((i * 47) % B, hav + 8 + i * 9, 18, 1);
+    c.add(vatten);
+    // sköldpaddan simmar bort från oss, med hjälten och ungen på skalet
+    const skal = this.add.container(Math.round(B / 2), H - 22);
+    skal.add([this.add.ellipse(0, 0, 70, 22, 0x4f5a3a), this.add.ellipse(0, -3, 56, 14, 0x5f7a4a),
+      this.add.rectangle(-6, -6, 6, 12, 0x2b2b3a).setOrigin(0.5, 1), this.add.rectangle(6, -5, 6, 7, 0x2b3a2b).setOrigin(0.5, 1)]);
+    c.add(skal);
+    this.tweens.add({ targets: skal, y: hav + 24, scaleX: 0.55, scaleY: 0.55, duration: 6500, delay: 300, onUpdate: () => { skal.y = Math.round(skal.y); smuts(); } });
+    // ljusbåtarna tänds längs vattnet
+    for (let i = 0; i < 6; i++) {
+      const lb = foremalsbild(this, i % 2 ? 'ljusbat_02' : 'ljusbat_01');
+      const x = 26 + i * 54, y = hav + 18 + (i % 2) * 10;
+      const d = (lb ? this.add.image(x, y, lb.nyckel, lb.ram).setOrigin(0.5, 1) : this.add.circle(x, y, 2, 0xffd27a)).setAlpha(0);
+      c.add(d);
+      this.tweens.add({ targets: d, alpha: 1, duration: 300, delay: 3600 + i * 180, onUpdate: smuts });
+    }
+    // de två månarna stiger
+    [[250, 6], [280, 4]].forEach(([x, r], i) => {
+      const m = this.add.circle(x, hav + 6, r, 0xf4f1e8).setAlpha(0); c.add(m);
+      this.tweens.add({ targets: m, y: 30 - i * 8, alpha: 1, duration: 2200, delay: 4800 + i * 400, ease: 'Sine.easeOut', onUpdate: () => { m.y = Math.round(m.y); smuts(); } });
+    });
+    this.tweens.add({ targets: c, alpha: 1, duration: 400, onUpdate: smuts });
+    // skepparens fem tut bakom dem, långa och djupa
+    for (let i = 0; i < 5; i++) this.regiLjud('horn_tut', 600 + i * 700);
+    const ms = 7800;
+    this.slutbild = { c, solar, slut: this.time.delayedCall(ms - 400, () => this.tweens.add({ targets: c, alpha: 0, duration: 400, onUpdate: smuts, onComplete: () => { if (c.alpha === 0) this.rensaSidovy(); this.slutbild = null; smuts(); } })) };
+    this.regiLogg.push('slutbilden mot solnedgången');
+    return ms;
+  }
+
+  /** Ett tryck hoppar över slutbilden (106.7): den tonas bort direkt. */
+  slutbildSlut() {
+    const s = this.slutbild; if (!s) return;
+    s.slut.remove(); this.slutbild = null;
+    this.rensaSidovy(); this.smutsig = true;
+    this.regiLogg.push('slutbilden hoppades över');
+  }
+
   /** Byborna (och Tant Rosa) skuttar och jublar där de står. @param {number} [fore] */
   byborJublar(fore = 0) {
     for (const id of ['fiskaren', 'tvatterskan', 'barnet_drake', 'tant_rosa']) {
@@ -2776,6 +3021,8 @@ export class Rum extends Phaser.Scene {
     if (!fb || !info) return null;
     const maxY = Math.round(this.pos.y - 30), minY = 36;
     const y = Math.max(minY + 20, Math.min(maxY - 20, this.pos.y - 56));
+    // gråboxens baron (106.5) behövs inte när figuren har Stils bilder
+    this.duellGra?.destroy(); this.duellGra = null;
     this.duellFig = new Duellfigur(this, fb.nyckel, figur, info, { x: this.pos.x, y, minY, maxY });
     return this.duellFig;
   }
@@ -2784,6 +3031,7 @@ export class Rum extends Phaser.Scene {
   rensaRegi() {
     this.sidovyVantar?.remove(false); this.sidovyVantar = null;
     this.duellFig?.taBort(); this.duellFig = null;
+    this.duellGra?.destroy(); this.duellGra = null; this.slutbild = null;
     this.bryggFig?.forEach((f) => { this.tweens.killTweensOf(f); f.destroy(); }); this.bryggFig = null;
     this.farfarRegi?.destroy(); this.farfarRegi = null;
     this.blomBubblor?.remove(); this.blomBubblor = null;

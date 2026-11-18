@@ -1456,6 +1456,7 @@ export function skapaSpel(d) {
           ui.visaPlatta(`<div class="formel-i-luften">${ui.esc(ord)}</div>`, 'formel-luft ristas');
           await vanta(tid(regiMs)); ui.doljPlatta(); return;
         }
+        if (regiMs && await regiMedText(st.bild, regiMs)) return;
         if (regiMs) { logg.handelse('mellanscen', st.bild); await vanta(tid(regiMs)); return; }
         if (ungen) { await vanta(tid(UNGE_TILL_MS)); return; }
         // det som händer syns redan (rummet, en animation eller nästa steg, beslut 65): ingen ruta, bara en stund
@@ -3316,6 +3317,45 @@ export function skapaSpel(d) {
    * kommer hjälpen. Det sista rätta kortet vinner. Varje rond registreras som ett läsval på sin nivå, och loggen har
    * form, nivå, försök och orden han nosade på per rond. @param {any} p
    */
+  /**
+   * Regier med något i textlagret (106): rubriken ORDDUELL! (aventyr.json: gransnitt.ordduell, saknas ordet står bara
+   * bilden), kartbit 4 i närbild med en ring kring berget, och slutbilden som ett tryck hoppar över. true när regin är
+   * spelad här. @param {string} bild @param {number} ms
+   */
+  async function regiMedText(bild, ms) {
+    if (bild === 'ordduell_start') {
+      logg.handelse('mellanscen', bild);
+      const ord = gransnittsOrd('ordduell');
+      if (ord) ui.visaPlatta(`<div class="duell-rubrik">${ui.rader(ord, varden(), 'duell-ord')}</div>`, 'formel-luft duell-start');
+      await vanta(tid(ms)); if (ord) ui.doljPlatta();
+      return true;
+    }
+    if (bild === 'kartbit4_berget') {
+      logg.handelse('mellanscen', bild);
+      const html = kartbitarHtml([4], { hojd: layout.skala.cssHojd * 0.6, bredd: layout.skala.cssBredd * 0.8 });
+      // ringen kring berget som ryker (kartbit 4 är 120 × 50, berget ca (104, 24))
+      if (html) ui.visaPlatta(`<div class="bok-bild narbild-kort kartbit4">${html.slice(0, -'</span>'.length)}<span class="berg-ring" aria-hidden="true"></span></span></div>`, 'narbild-platta');
+      await vanta(tid(ms)); if (html) ui.doljPlatta();
+      return true;
+    }
+    if (bild === 'resan_slut') {
+      logg.handelse('mellanscen', bild);
+      let sluta = () => {};
+      const tryck = new Promise((klar) => {
+        const av = lyssnaHandling((/** @type {any} */ h) => { if (h.typ === 'interagera') klar('tryck'); });
+        const pek = () => klar('tryck');
+        // ett tryck var som helst hoppar över (ett ögonblick efter starten, så att trycket som ledde hit inte räknas)
+        const t = window.setTimeout(() => document.addEventListener('pointerdown', pek, true), 300);
+        sluta = () => { av(); window.clearTimeout(t); document.removeEventListener('pointerdown', pek, true); };
+      });
+      const hur = await Promise.race([vanta(tid(ms)).then(() => 'klar'), tryck]);
+      sluta();
+      if (hur === 'tryck') { rum.slutbildSlut?.(); logg.handelse('mellanscen', 'slutbilden hoppades över'); }
+      return true;
+    }
+    return false;
+  }
+
   async function ordduell(p) {
     const d2 = skapaOrdduell(p);
     // motståndaren som figur (91.5, Stils halmdocka), om den har bilderna: då syns det som händer, och texten för den
@@ -3323,6 +3363,10 @@ export function skapaSpel(d) {
     const fig = rum.duellfigur?.(p.motstandare) ?? null;
     const syns = (/** @type {any} */ h) => (fig && h ? { ...h, syns_redan: true } : h);
     const medFigur = (/** @type {any} */ h, /** @type {number} */ ms) => Promise.all([reaktion(syns(h)), vanta(tid(ms))]);
+    // 106.5: duellens början, samma i varje duell (kapitel 3, finalen och testrummet). Har en mellanscen med
+    // ordduell_start just spelat den, spelas den inte igen
+    const startMs = rum.regi?.('ordduell_start') ?? 0;
+    if (startMs) await regiMedText('ordduell_start', startMs);
     if (p.regel) await replik(p.regel);
     const hjalpSpar = skapaHjalpSpar(() => performance.now());
     let rondStart = performance.now();
@@ -3362,6 +3406,10 @@ export function skapaSpel(d) {
     rum.visaOmrade(null);
     if (p.vid_vinst && fig) await medFigur(p.vid_vinst, fig.vinst(p.vid_vinst.handling));
     else if (p.vid_vinst) await reaktion(p.vid_vinst);
+    // 106.5: segern, om scenen inte har en egen mellanscen med ordduell_seger efter duellen (testrummet)
+    const egenSeger = (b.scen?.steg || []).slice(b.stegIndex + 1).some((/** @type {any} */ st) => st.typ === 'mellanscen' && st.bild === 'ordduell_seger');
+    const segerMs = egenSeger ? 0 : rum.regi?.('ordduell_seger') ?? 0;
+    if (segerMs) { logg.handelse('mellanscen', 'ordduell_seger'); await vanta(tid(segerMs)); }
     // ronderna är redan registrerade: pusslet registreras inte en gång till
     return { duell: d2.s.logg };
   }

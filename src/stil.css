@@ -980,3 +980,11 @@ html, body {
 .sammansatt { white-space: nowrap; }
 .glipa { width: .12em; }
 .med-ruta.glimt { animation: puls .5s ease 3; }
+
+/* 106.5: ordduellens rubrik, stor över bilden i Lexend (samma i varje duell) */
+#plattan.duell-start { top: calc(var(--rum-topp) + var(--rum-hojd) * .28); }
+.duell-rubrik { font-size: calc(84px * var(--t)); font-weight: 700; color: #fff4d0; letter-spacing: .06em; text-shadow: 0 5px 0 #7a3f12, 4px 0 0 rgba(192, 57, 43, .85), -4px 0 0 rgba(192, 57, 43, .85); animation: luft .5s ease; white-space: nowrap; }
+/* 106.6: kartbit 4 i närbild med en ring kring berget som ryker */
+.kartbit4 .karta-bitar { position: relative; display: inline-block; }
+.kartbit4 .berg-ring { position: absolute; left: 86.7%; top: 46%; width: 22%; aspect-ratio: 1; transform: translate(-50%, -50%); border: 4px solid #c0392b; border-radius: 50%; animation: berg-ring 1s ease-in-out infinite alternate; pointer-events: none; }
+@keyframes berg-ring { from { transform: translate(-50%, -50%) scale(.9); } to { transform: translate(-50%, -50%) scale(1.1); } }

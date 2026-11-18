@@ -159,6 +159,10 @@ test('duellens testrum med Innehålls fil (90.7): knappen i INSTÄLLNINGAR, halm
   const loggen = await page.evaluate(() => window.__ORDSTAVEN.logg());
   expect(loggen).toContain('[rond] tr_duell_1 3:');
   expect(loggen).not.toMatch(/\[val\] tr_duell_\d rond \d: fel/);
+  // 106.5: duellens ram är densamma som i kapitel 3: början och segern spelas av motorn i båda duellerna
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.grafik().regi.filter((r) => r === 'ordduellen är vunnen').length), { timeout: 15000 }).toBe(2);
+  expect((await page.evaluate(() => window.__ORDSTAVEN.grafik())).regi.filter((r) => r === 'ordduellen börjar').length).toBe(2);
+  expect((await page.evaluate(() => window.__ORDSTAVEN.logg())).match(/\[mellanscen\] ordduell_seger/g)?.length).toBe(2);
 });
 
 test('halmdockan i duellens testrum (91.5): ropar, blir förvirrad och tappar sin sak, backar, hoppar närmare vid fel och trillar i höet', async ({ page }) => {

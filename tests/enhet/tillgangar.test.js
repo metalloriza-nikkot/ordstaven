@@ -214,6 +214,8 @@ describe('mellanscenernas bilder och bildkorten', () => {
     'resan_kvall',
     // 101.3: säckhissen upp genom taket i kvarnen och ned genom golvet i loftet
     'sackhiss_upp', 'sackhiss_ner',
+    // 106: kapitel 3:s början, ordduellens ram (samma i varje duell), kartbit 4 och slutbilden
+    'ankomst_floden', 'skoldpadda_simmar', 'ordduell_start', 'ordduell_seger', 'kartbit4_berget', 'resan_slut',
     // 102.3: ön stiger vid kvarnens brygga, sedd från avsatsen
     'on_stiger',
     // 103.3.1: frukosten med tre korta tut och tallrikarna
