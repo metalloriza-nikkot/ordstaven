@@ -22,7 +22,7 @@
  },
  "meta": {
   "namn": "Skogen",
-  "version": "0.7.15",
+  "version": "0.7.16",
   "datum": "2026-11-18",
   "agare": "Innehåll",
   "kalla": "Manus 15-kapitel1-manus.md v0.18. Byggd på repots kap-01.json från 0.29.0.",
@@ -44,7 +44,8 @@
   "teknik_72_2": "Teknik 0.57.0 (beslut 72.2): forebild.visas är andra_felet på k1_svard och k1_svard_igen, som i kapitel 2 (69.3). Förebilden kommer efter två fel och täcks vid nästa bricka. Ingen text är ändrad.",
   "andrat_v0713": "2026-11-11 (beslut 73.2): felrepliken i k1_svard och k1_svard_igen är \"Nästan!\", och reaktionen säger inte längre att ordet tänds, eftersom förebilden kommer efter två fel (72.2). Rättelser av text som inte längre stämde. Ingen ledbild i kapitel 1.",
   "andrat_v0714": "2026-11-11 (beslut 76.6): återblicken säger att stegen räddade apan, inte SVÄRD. En rättelse av text som inte stämde (brief §4).",
-  "andrat_v0715": "2026-11-18 (beslut 102.5–102.6): 9 repliker efter provläsningen, valda av spelaren. k1s01_brynet: Läs skylten vid stenarna! -> Där är en skylt till. Läs den! k1s02_lianerna: Jag gjorde en bild i trädet. Du skriver ordet. -> Gå till trädet! Jag ritade en bild där. k1s02_lianerna: Gå till trädet! Där finns formeln. -> Skriv vad bilden visar. Det är formeln! k1s06_present: Den kommer du att behöva. -> Spara nyckeln. Du kommer att behöva den. k1s09_luckorna: Bara dinos från dalen vet svaret. -> {unge} är från dalen. {unge} vet svaret! k1s09_luckorna: Vilken lucka passar {unge}? -> Vilken lucka stämmer med {unge}? k1s10_koden: Hem. Dit ska ni. -> Ordet var hem! Dit ska ni. k1s12_klaffen: Där gömmer sig baronen! -> Där väntar baronen! k1s13_slutet: Det var mamma! Långt borta. Men hon hör dig. -> Det var mamma, långt borta! Hon hörde {unge}. Lika många repliker, och inga id:n är ändrade."
+  "andrat_v0715": "2026-11-18 (beslut 102.5–102.6): 9 repliker efter provläsningen, valda av spelaren. k1s01_brynet: Läs skylten vid stenarna! -> Där är en skylt till. Läs den! k1s02_lianerna: Jag gjorde en bild i trädet. Du skriver ordet. -> Gå till trädet! Jag ritade en bild där. k1s02_lianerna: Gå till trädet! Där finns formeln. -> Skriv vad bilden visar. Det är formeln! k1s06_present: Den kommer du att behöva. -> Spara nyckeln. Du kommer att behöva den. k1s09_luckorna: Bara dinos från dalen vet svaret. -> {unge} är från dalen. {unge} vet svaret! k1s09_luckorna: Vilken lucka passar {unge}? -> Vilken lucka stämmer med {unge}? k1s10_koden: Hem. Dit ska ni. -> Ordet var hem! Dit ska ni. k1s12_klaffen: Där gömmer sig baronen! -> Där väntar baronen! k1s13_slutet: Det var mamma! Långt borta. Men hon hör dig. -> Det var mamma, långt borta! Hon hörde {unge}. Lika många repliker, och inga id:n är ändrade.",
+  "andrat_v0716": "2026-11-18 (beslut 105.3–105.5): skrivpusslen med ordkraft efter trappan i 104.3. k1_svard: Vad är det? Skriv ordet! -> En ny formel! Med den kan du hugga. Skriv den! k1_svard_igen: (ingen) -> Hugg bort lianen! Skriv en formel! Inga nya steg, och inga id:n är ändrade."
  },
  "var_var_vi": [
   {
@@ -1254,10 +1255,10 @@
     "efter_fel": 2,
     "andring": "nästa rätta bokstav blinkar"
    },
-   "anteckning": "SVÄRD skrivs utifrån Farfars bild (beslut 18.5, 08 §2 regel 1): ordet går att ljuda fram, så ingen förebild syns från början. I trädet syns bara den ristade bilden av ett svärd. Brickorna (D R S V Ä, bokstavsordning) kommer direkt. Vid första fel tänds förebilden SVÄRD bredvid bilden (titta), och den tonas bort när han lägger nästa bricka (täck, ungen håller för ögonen). Vid nästa fel tänds den igen och står kvar resten av försöket, och försöket loggas med förebild. Kolla: vid rätt lyser ordet en sekund ovanför bilden. Svärdet är av guld, som formlerna på staven (stilguiden §2). v0.7.7 (39.3): svärdet sveper inte av sig självt. Lianerna faller först när spelaren hugger (k1_lianerna).",
+   "anteckning": "SVÄRD skrivs utifrån Farfars bild (beslut 18.5, 08 §2 regel 1): ordet går att ljuda fram, så ingen förebild syns från början. I trädet syns bara den ristade bilden av ett svärd. Brickorna (D R S V Ä, bokstavsordning) kommer direkt. Vid första fel tänds förebilden SVÄRD bredvid bilden (titta), och den tonas bort när han lägger nästa bricka (täck, ungen håller för ögonen). Vid nästa fel tänds den igen och står kvar resten av försöket, och försöket loggas med förebild. Kolla: vid rätt lyser ordet en sekund ovanför bilden. Svärdet är av guld, som formlerna på staven (stilguiden §2). v0.7.7 (39.3): svärdet sveper inte av sig självt. Lianerna faller först när spelaren hugger (k1_lianerna). 105.3 (trappan i 104.3, steg 1): instruktionen säger att det är en ny formel och vad den gör. Namnet kommer ur bilden.",
    "instruktion": {
     "talare": "berattare",
-    "text": "Vad är det? Skriv ordet!",
+    "text": "En ny formel! Med den kan du hugga. Skriv den!",
     "upplast": true
    }
   },
@@ -1337,7 +1338,12 @@
     "handling": "SVÄRD lyser på staven",
     "syns_redan": true
    },
-   "anteckning": "Frivilligt i skogsbrynet (rum.frivilligt): startar när han använder liten_lian, och bara när SVÄRD finns på staven. Den andra trygga gången med formeln (tumregeln). Han skriver ur minnet: ingen förebild från början. Vid fel lyser SVÄRD på staven och står kvar resten av försöket. Ger 2 bär. FÖRSLAG (schemat): \"forebild\": {\"text\": \"SVÄRD\", \"placering\": \"staven\", \"visas\": \"vid_fel\"}. v0.7.7 (39.3): sedan hugger han själv (k1_liten_lian)."
+   "anteckning": "Frivilligt i skogsbrynet (rum.frivilligt): startar när han använder liten_lian, och bara när SVÄRD finns på staven. Den andra trygga gången med formeln (tumregeln). Han skriver ur minnet: ingen förebild från början. Vid fel lyser SVÄRD på staven och står kvar resten av försöket. Ger 2 bär. FÖRSLAG (schemat): \"forebild\": {\"text\": \"SVÄRD\", \"placering\": \"staven\", \"visas\": \"vid_fel\"}. v0.7.7 (39.3): sedan hugger han själv (k1_liten_lian). 105.3 (trappan, steg 2): instruktionen säger vad som måste hända, och han väljer formeln själv.",
+   "instruktion": {
+    "talare": "berattare",
+    "text": "Hugg bort lianen! Skriv en formel!",
+    "upplast": true
+   }
   },
   {
    "id": "k1_liten_lian",

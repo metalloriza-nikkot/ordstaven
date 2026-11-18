@@ -16,7 +16,7 @@
  },
  "meta": {
   "namn": "Träsket",
-  "version": "0.7.12",
+  "version": "0.7.13",
   "datum": "2026-11-18",
   "agare": "Innehåll",
   "kalla": "Manus 17-kapitel2-manus.md v0.4 (beslut 60–64). Ny fil.",
@@ -40,7 +40,8 @@
   "andrat_v079": "2026-11-15 (beslut 95.3–95.5): brevet syns som ett brev efter rivningen, och Tant Rosa säger att Herr Skata snappade hennes brev från Farfar. Det heter brevhalva i allt han hör och läser (id:n oförändrade), och vid bryggan sitter baronen fast. Inga nya repliker, och pass 2 är inte längre.",
   "andrat_v0710": "2026-11-15 (pass 95b): Tant Rosa säger \"Herr Skata tog mitt brev!\" och \"Snälla, du måste hitta båda brevhalvorna.\", och Farfar \"Hej, Rosa! Var kartbiten är står i brevet.\".",
   "andrat_v0711": "2026-11-16 (beslut 96.4): Tant Rosa säger \"Är du {hjalte}? Herr Skata tog mitt brev!\".",
-  "andrat_v0712": "2026-11-18 (beslut 102.5–102.6): 8 repliker efter provläsningen, valda av spelaren. k2s01_kanten: Skriv en formel med staven! -> Skriv ett ord från din stav! k2s01_kanten: Ordkraft! Ditt ord bar er över. -> Ordkraft! Ni kom över vattnet! k2s02_byn: Är du {hjalte}? Herr Skata tog mitt brev! -> Är du {hjalte}? Herr Skata tog brevet! k2s02_byn: Snälla, du måste hitta båda brevhalvorna. -> Hitta båda halvorna! Jag sätter dem i ramen. k2s04_bryggan: Han har min gamla bit! Ta brevhalvan till Rosa! -> Det är en av mina kartbitar! Gå till Rosa! k2s05_vassen: Vilket hopp! Hur kommer {unge} i land? -> {unge} hoppade ut på en stock! k2s09_kartbiten: Tack! Jag flätade den av vass, med rosa band. -> Tack för hjälpen! Här är en ryggsäck av vass. k2s10_elden: Bra ord! Men byn tänder elden i kväll. -> Bra ord! Men först måste byn se stigen. Lika många repliker, och inga id:n är ändrade."
+  "andrat_v0712": "2026-11-18 (beslut 102.5–102.6): 8 repliker efter provläsningen, valda av spelaren. k2s01_kanten: Skriv en formel med staven! -> Skriv ett ord från din stav! k2s01_kanten: Ordkraft! Ditt ord bar er över. -> Ordkraft! Ni kom över vattnet! k2s02_byn: Är du {hjalte}? Herr Skata tog mitt brev! -> Är du {hjalte}? Herr Skata tog brevet! k2s02_byn: Snälla, du måste hitta båda brevhalvorna. -> Hitta båda halvorna! Jag sätter dem i ramen. k2s04_bryggan: Han har min gamla bit! Ta brevhalvan till Rosa! -> Det är en av mina kartbitar! Gå till Rosa! k2s05_vassen: Vilket hopp! Hur kommer {unge} i land? -> {unge} hoppade ut på en stock! k2s09_kartbiten: Tack! Jag flätade den av vass, med rosa band. -> Tack för hjälpen! Här är en ryggsäck av vass. k2s10_elden: Bra ord! Men byn tänder elden i kväll. -> Bra ord! Men först måste byn se stigen. Lika många repliker, och inga id:n är ändrade.",
+  "andrat_v0713": "2026-11-18 (beslut 105.3–105.5): skrivpusslen med ordkraft efter trappan i 104.3. k2s01_kanten: Vassen är för tät. Ni kommer inte fram! -> Vassen är för tät. Hugg er igenom den! k2_svard: Skriv ett ord från din stav! -> Skriv en formel från din stav! k2_vassvaggen: Hugg dig igenom vassen! -> Hugg nu! k2s01_kanten: Hur kommer ni över vattnet? -> Ni måste ta er över vattnet! k2_flyg: Säg åt brevet vad det ska göra! -> En ny formel! Få brevhalvan att flyga hit! k2_lyft: Säg åt tavlan vad den ska göra! -> Tavlan måste ner! Skriv en formel! k2_draken: Skriv ett ord som hjälper draken! -> Draken måste flyga igen! Skriv en formel! k2_lyktorna: Det är mörkt. Skriv ett ord som hjälper! -> Lyktorna måste lysa! Skriv en formel! Inga nya steg, och inga id:n är ändrade."
  },
  "var_var_vi": [
   {
@@ -598,7 +599,7 @@
     {
      "typ": "replik",
      "talare": "berattare",
-     "text": "Vassen är för tät. Ni kommer inte fram!",
+     "text": "Vassen är för tät. Hugg er igenom den!",
      "upplast": true
     },
     {
@@ -677,7 +678,7 @@
     {
      "typ": "replik",
      "talare": "berattare",
-     "text": "Hur kommer ni över vattnet?",
+     "text": "Ni måste ta er över vattnet!",
      "upplast": true
     },
     {
@@ -1595,7 +1596,7 @@
    "hjalp": "ett_ord",
    "instruktion": {
     "talare": "berattare",
-    "text": "Skriv ett ord från din stav!",
+    "text": "Skriv en formel från din stav!",
     "upplast": true
    },
    "vid_ratt": {
@@ -1615,7 +1616,7 @@
    "knuff": {
     "handling": "bilden i molnet glimtar, och ungen nafsar på vassen"
    },
-   "anteckning": "71.6: en formel han har lärt sig är ett verktyg resten av äventyret (brief §4, 08 §4). SVÄRD lärdes i kapitel 1 och kommer tillbaka här, där berättelsen behöver det: vassen stänger vägen ut ur skogen. Han skriver det själv på tangentbordet. Ledbilden efter första felet visar ett svärd i ett moln, aldrig ordet. Förebilden efter två fel (69.3). Felrepliken påminner om skogen och pekar inte på staven, eftersom ordet står där. SAX och KNIV är rimliga och för små, HUGG frågar med vad, och LJUS är en formel han kan som inte hjälper här (09 §5). 72.3: ungen biter i vassen och drar innan han skriver, som den bet i lianerna (en bild, inga ord). Sedan hugger han själv (k2_vassvaggen), och vassen faller först då. 76.2: YXA är rimligt, eftersom ett barn troligen skriver det här."
+   "anteckning": "71.6: en formel han har lärt sig är ett verktyg resten av äventyret (brief §4, 08 §4). SVÄRD lärdes i kapitel 1 och kommer tillbaka här, där berättelsen behöver det: vassen stänger vägen ut ur skogen. Han skriver det själv på tangentbordet. Ledbilden efter första felet visar ett svärd i ett moln, aldrig ordet. Förebilden efter två fel (69.3). Felrepliken påminner om skogen och pekar inte på staven, eftersom ordet står där. SAX och KNIV är rimliga och för små, HUGG frågar med vad, och LJUS är en formel han kan som inte hjälper här (09 §5). 72.3: ungen biter i vassen och drar innan han skriver, som den bet i lianerna (en bild, inga ord). Sedan hugger han själv (k2_vassvaggen), och vassen faller först då. 76.2: YXA är rimligt, eftersom ett barn troligen skriver det här. 105.3 (trappan, steg 2): berättaren säger vad som måste hända (Hugg er igenom den!), och instruktionen ber om en formel. HUGG är ett rimligt ord med ett vänligt svar."
   },
   {
    "id": "k2_vassvaggen",
@@ -1623,7 +1624,7 @@
    "verb": "hugga",
    "instruktion": {
     "talare": "berattare",
-    "text": "Hugg dig igenom vassen!",
+    "text": "Hugg nu!",
     "upplast": true
    },
    "innehall": [
@@ -1653,7 +1654,7 @@
     "handling": "ungen nosar mot vassen där stigen går"
    },
    "tillstand_efter": "oppen",
-   "anteckning": "75.3: vassväggen är ett fält av 15 tussar, en ruta var, i tre rader tvärs över stigen (väster till öster, fem tussar i varje rad från norr till söder, i den ordningen i innehall). Varje hugg fäller den närmaste tussen inom handens räckvidd, åt det håll han står. Inga missar och ingen tid. Pusslet är löst, och rummet går till oppen, när alla tussar som heter gang har fallit: en gång genom fältet, sex hugg (falt.klar_nar). Resten är frivilligt, och tre tussar har ett bär under sig (bar), som gräset i Zelda. Huggen växlar som i liangången. Den som hugger allt är klar på ca 20 s. Varför inte hugg allt: den sista tussen är svår att hitta för ett barn, och då blir leken en syssla. Uppdragets steg HUGG VASSEN är klart när gången är öppen.",
+   "anteckning": "75.3: vassväggen är ett fält av 15 tussar, en ruta var, i tre rader tvärs över stigen (väster till öster, fem tussar i varje rad från norr till söder, i den ordningen i innehall). Varje hugg fäller den närmaste tussen inom handens räckvidd, åt det håll han står. Inga missar och ingen tid. Pusslet är löst, och rummet går till oppen, när alla tussar som heter gang har fallit: en gång genom fältet, sex hugg (falt.klar_nar). Resten är frivilligt, och tre tussar har ett bär under sig (bar), som gräset i Zelda. Huggen växlar som i liangången. Den som hugger allt är klar på ca 20 s. Varför inte hugg allt: den sista tussen är svår att hitta för ett barn, och då blir leken en syssla. Uppdragets steg HUGG VASSEN är klart när gången är öppen. 105.3: behovet sägs före SVÄRD, så instruktionen här är kort.",
    "falt": {
     "rader": 3,
     "per_rad": 5,
@@ -2088,7 +2089,7 @@
    "hjalp": "ett_ord",
    "instruktion": {
     "talare": "berattare",
-    "text": "Säg åt brevet vad det ska göra!",
+    "text": "En ny formel! Få brevhalvan att flyga hit!",
     "upplast": true
    },
    "vid_ratt": {
@@ -2107,7 +2108,7 @@
    "knuff": {
     "handling": "fjädern i molnet glimtar"
    },
-   "anteckning": "Ny formel utifrån en bild (08 §2, regel 1): Herr Skatas fjäder som svävar (63.8). Han har hittat halvan själv (71.2). Den flyter utom räckhåll (69.5), och FLYG får den att flyga till hans hand. FLYGER och FLYGA godtas, och staven ristar in FLYG (63.3). SVÄVA och SVÄVAR får nästan, men ingen bokstav (69.3). Förebilden kommer efter två fel och täcks när han skriver. Frågan är en uppmaning, så att svaret blir formeln. 72.6: ledbilden efter första felet är en fågel som flyger, aldrig ordet. 76.2: HIT och UPP är rimliga, eftersom ett barn troligen skriver det här.",
+   "anteckning": "Ny formel utifrån en bild (08 §2, regel 1): Herr Skatas fjäder som svävar (63.8). Han har hittat halvan själv (71.2). Den flyter utom räckhåll (69.5), och FLYG får den att flyga till hans hand. FLYGER och FLYGA godtas, och staven ristar in FLYG (63.3). SVÄVA och SVÄVAR får nästan, men ingen bokstav (69.3). Förebilden kommer efter två fel och täcks när han skriver. Frågan är en uppmaning, så att svaret blir formeln. 72.6: ledbilden efter första felet är en fågel som flyger, aldrig ordet. 76.2: HIT och UPP är rimliga, eftersom ett barn troligen skriver det här. 105.3 (trappan, steg 1): instruktionen säger att det är en ny formel och vad den gör, och verbet flyga ger ordet utan att stava det. FLYGA godtas.",
    "ledbild": "tankebubbla_fagel"
   },
   {
@@ -2587,7 +2588,7 @@
    "hjalp": "ett_ord",
    "instruktion": {
     "talare": "berattare",
-    "text": "Säg åt tavlan vad den ska göra!",
+    "text": "Tavlan måste ner! Skriv en formel!",
     "upplast": true
    },
    "vid_ratt": {
@@ -2606,7 +2607,7 @@
    "knuff": {
     "handling": "bilden i molnet glimtar"
    },
-   "anteckning": "FLYG en tredje gång (visa, gör tryggt, en gång till). Han kan formeln, och den står på staven. STEGE och NER är rimliga ord, och LJUS och SVÄRD (formler han kan) får vänliga reaktioner. Tavlan svävar ner själv (63.8). 72.6: ledbilden efter första felet är brevet som flög ur vattnet i vassen, samma som felrepliken påminner om. 76.2: LYFT, LYFTA och NER godtas, med samma effekt men utan att ristas in. Det berättelsen ber honom göra ska alltid fungera, och \"Lyft den med staven!\" är struken. FLYG är fortfarande formeln. UPP är rimligt.",
+   "anteckning": "FLYG en tredje gång (visa, gör tryggt, en gång till). Han kan formeln, och den står på staven. STEGE och NER är rimliga ord, och LJUS och SVÄRD (formler han kan) får vänliga reaktioner. Tavlan svävar ner själv (63.8). 72.6: ledbilden efter första felet är brevet som flög ur vattnet i vassen, samma som felrepliken påminner om. 76.2: LYFT, LYFTA och NER godtas, med samma effekt men utan att ristas in. Det berättelsen ber honom göra ska alltid fungera, och \"Lyft den med staven!\" är struken. FLYG är fortfarande formeln. UPP är rimligt. 105.3 (trappan, steg 2): resultatet sägs, och han väljer formeln. NER och LYFT godtas.",
    "ledbild": "tankebubbla_brev_flyger"
   },
   {
@@ -2622,7 +2623,8 @@
      "ord": "LJUS",
      "godtas": [
       "LYS",
-      "LYSA"
+      "LYSA",
+      "LYSER"
      ],
      "effekt": "ljuset_hoppar_mellan_lyktorna"
     }
@@ -2734,7 +2736,7 @@
    "hjalp": "ett_ord",
    "instruktion": {
     "talare": "berattare",
-    "text": "Det är mörkt. Skriv ett ord som hjälper!",
+    "text": "Lyktorna måste lysa! Skriv en formel!",
     "upplast": true
    },
    "vid_ratt": {
@@ -2754,7 +2756,7 @@
    "knuff": {
     "handling": "bilden i molnet glimtar, och ungen tittar upp mot lyktorna"
    },
-   "anteckning": "71.6: en formel han har lärt sig är ett verktyg resten av äventyret (brief §4, 08 §4). LJUS lärdes i prologen och kommer tillbaka när det blir kväll, där berättelsen behöver det. Han skriver det själv på tangentbordet. LYS och LYSA godtas. JUS, LJU och LUS ger en liten ljusprick (nästan, LJ låter som J). Ledbilden efter första felet visar en ljusboll i ett moln, aldrig ordet. Förebilden efter två fel (69.3). Felrepliken påminner om prologen och säger inte ordet. ELD får en replik som planterar byns eld. 76.2: TÄND och LYKTA är rimliga, eftersom ett barn troligen skriver det här."
+   "anteckning": "71.6: en formel han har lärt sig är ett verktyg resten av äventyret (brief §4, 08 §4). LJUS lärdes i prologen och kommer tillbaka när det blir kväll, där berättelsen behöver det. Han skriver det själv på tangentbordet. LYS och LYSA godtas. JUS, LJU och LUS ger en liten ljusprick (nästan, LJ låter som J). Ledbilden efter första felet visar en ljusboll i ett moln, aldrig ordet. Förebilden efter två fel (69.3). Felrepliken påminner om prologen och säger inte ordet. ELD får en replik som planterar byns eld. 76.2: TÄND och LYKTA är rimliga, eftersom ett barn troligen skriver det här. 105.3 (trappan, steg 2): resultatet sägs. LYS, LYSA och LYSER godtas, så att lysa aldrig ger pff."
   },
   {
    "id": "k2_halvan",
@@ -2911,7 +2913,7 @@
    "hjalp": "ett_ord",
    "instruktion": {
     "talare": "berattare",
-    "text": "Skriv ett ord som hjälper draken!",
+    "text": "Draken måste flyga igen! Skriv en formel!",
     "upplast": true
    },
    "vid_ratt": {
@@ -2930,7 +2932,7 @@
    "knuff": {
     "handling": "bilden i molnet glimtar, och barnet drar i snöret"
    },
-   "anteckning": "76.4 (B10): frivillig formel i byn, FLYG en gång till på ett nytt ställe. Hindret visar på sitt utseende vad som behövs: något högt uppe som ska flyga. Ledbilden är fågeln från vassen."
+   "anteckning": "76.4 (B10): frivillig formel i byn, FLYG en gång till på ett nytt ställe. Hindret visar på sitt utseende vad som behövs: något högt uppe som ska flyga. Ledbilden är fågeln från vassen. 105.3 (trappan, steg 2): draken kan komma före tavlan, alltså FLYG andra gången, så behovet sägs."
   },
   {
    "id": "k2_pinnarna",
