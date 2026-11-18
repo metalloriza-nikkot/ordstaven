@@ -254,6 +254,8 @@ test('ytterdörren på morgonen: ett tryck går ut i trädgården', async ({ pag
 import { readFileSync } from 'node:fs';
 const kap01 = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-01.json', import.meta.url), 'utf8'));
 const P1 = (id) => JSON.parse(JSON.stringify(kap01.pussel.find((p) => p.id === id)));
+// instruktionen i k1_svard, som Innehåll äger (pass 105: "En ny formel! Med den kan du hugga. Skriv den!"), i versaler
+const SVARD_INSTR = P1('k1_svard').instruktion.text.toLocaleUpperCase('sv-SE');
 const bricka = (page, b) => page.locator('#plattan .bricka[data-id]', { hasText: new RegExp(`^${b}$`) });
 
 test('räddningen (apan, v0.7.4): ingen kasta-knapp, ett pinnsteg per fyllt fält, apan blundar vid fel och knuffen kommer efter första felet', async ({ page }) => {
@@ -323,7 +325,7 @@ test('SVÄRD med brickor (72.2 och 74.3): bilden, ledbilden efter första felet,
   const svard = { ...P1('k1_svard'), ledbild: 'tankebubbla_svard' };
   expect(svard.forebild.visas).toBe('andra_felet');
   await provscen(page, { id: 't_svardbild', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'pussel', pussel_id: 'k1_svard' }, R('Svärdet!')] }, null, { pussel: [svard] });
-  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('VAD ÄR DET? SKRIV ORDET!', { timeout: 8000 });
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText(SVARD_INSTR, { timeout: 8000 });
   await page.click('#plattan .vidare');
   // bilden ställer frågan, brickorna kommer direkt, och ordet syns ingenstans
   await expect(page.locator('#plattan .formel-bild')).toBeVisible({ timeout: 8000 });
@@ -379,7 +381,7 @@ test('samma fel ord två gånger i en formel: andra gången bara ljudet och unge
 
 test('SVÄRD utifrån bilden, rätt på en gång: förebilden syns aldrig', async ({ page }) => {
   await provscen(page, { id: 't_svardratt', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'pussel', pussel_id: 'k1_svard' }, R('Svärdet!')] }, null, { pussel: [P1('k1_svard')] });
-  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('VAD ÄR DET? SKRIV ORDET!', { timeout: 8000 });
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText(SVARD_INSTR, { timeout: 8000 });
   await page.click('#plattan .vidare');
   await expect(page.locator('#plattan .formel-bild')).toBeVisible({ timeout: 8000 });
   for (const b of 'SVÄRD') { await bricka(page, b).click(); expect(await page.locator('#plattan .formel-ruta .forebild').count()).toBe(0); }
@@ -392,7 +394,7 @@ test('titta–täck: förebilden tonas bort vid första brickan och tänds igen 
   // titta–täck från början (som SKÖLD och SNABB): förebilden syns innan brickorna kommer
   const svard = P1('k1_svard'); delete svard.bild; svard.forebild = { ...svard.forebild, visas: 'fran_start', brickor_efter_sek: 2 };
   await provscen(page, { id: 't_svard', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'pussel', pussel_id: 'k1_svard' }, R('Svärdet!')] }, null, { pussel: [svard] });
-  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('VAD ÄR DET? SKRIV ORDET!', { timeout: 8000 });
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText(SVARD_INSTR, { timeout: 8000 });
   await page.click('#plattan .vidare');
   await expect(page.locator('#plattan .forebild')).toBeVisible({ timeout: 8000 });
   await expect(page.locator('#plattan .brickor')).not.toHaveClass(/vantar/, { timeout: 5000 });
@@ -1150,7 +1152,7 @@ test('SVÄRD gör staven till ett svärd, och spelaren hugger sig igenom liangå
   await tryckPa(page, 'trad_med_formel');
   await expect(page.locator('#handknapp')).toBeVisible({ timeout: 8000 });
   await page.keyboard.press('Space');
-  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('VAD ÄR DET? SKRIV ORDET!', { timeout: 10000 });
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText(SVARD_INSTR, { timeout: 10000 });
   await page.click('#plattan .vidare');
   await expect(page.locator('#plattan .formel-bild')).toBeVisible({ timeout: 8000 });
   for (const b of 'SVÄRD') await bricka(page, b).click();
@@ -1221,7 +1223,9 @@ test('den lilla lianen: SVÄRD ur minnet, sedan hugger han den, och den är bort
   // Stils ljusa lian i gångens grön (28 × 38) hänger ned ur snåret framför stubben (18, F6)
   await page.screenshot({ path: 'test-results/skogsbrynet-liten-lian.png' });
   await page.keyboard.press('Space');
-  await expect(page.locator('#plattan .formel-ruta')).toBeVisible({ timeout: 8000 });
+  // pass 105: k1_svard_igen har en instruktion ("Hugg bort lianen! Skriv en formel!") som läses först
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText(P1('k1_svard_igen').instruktion.text.toLocaleUpperCase('sv-SE'), { timeout: 8000 });
+  await expect.poll(async () => { if (await page.locator('#plattan .formel-ruta').isVisible()) return true; await page.locator('#plattan .vidare').click({ timeout: 300 }).catch(() => {}); return false; }, { timeout: 8000 }).toBe(true);
   for (const b of 'SVÄRD') await bricka(page, b).click();
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('HUGG LIANEN!', { timeout: 10000 });
   await page.click('#plattan .vidare');

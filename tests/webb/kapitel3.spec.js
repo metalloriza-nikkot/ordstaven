@@ -401,7 +401,7 @@ test('krockarna i loggen (97.6): går han mot ett hinder i mer än ca 1 s skrive
 
 test('regierna i kapitel 3 (100.4, 101.3, 102.3 och 103.3.1): var och en går i sitt rum och syns', async ({ page }, info) => {
   test.skip(!['mac-helskarm', 'ipad-10', 'mac-safari'].includes(info.project.name), 'tre projekt räcker, som kapitel 2 (84.6)');
-  test.setTimeout(180000);
+  test.setTimeout(300000); // 106: sex regier till
   const ev = (fn, arg) => page.evaluate(fn, arg);
   const REGIER = [['k3s01_floden', ['ankomst_floden', 'frukost', 'skepparen_pekar', 'kartbit3_on']], ['k3s02_kvarnen', ['sackhiss_upp']], ['k3s02_loftet', ['loftet_horn', 'skuggan_lyssnar']], ['k3s03_hornet', ['tallrikar', 'skuggan_stiger', 'skuggan_dyker', 'unge_simmar', 'sackhiss_ner']],
     ['k3s04_on', ['skoldpadda_huvud', 'skylt_tecken']], ['k3s05_sandbanken', ['skoldpadda_simmar', 'skoldpadda_visar_berget']], ['k3s06_ankaret', ['ordduell_start', 'ordduell_seger']], ['k3s07_resan', ['kartbit4_berget', 'resan_kvall', 'resan_slut']]];
