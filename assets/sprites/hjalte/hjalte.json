@@ -780,10 +780,50 @@
     "h": 24
    }
   },
-  "hjalte_lera_ner_01": {
+  "hjalte_kramar_unge_ner_01": {
    "frame": {
     "x": 0,
     "y": 500,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "hjalte_kramar_unge_ner_02": {
+   "frame": {
+    "x": 25,
+    "y": 500,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "hjalte_lera_ner_01": {
+   "frame": {
+    "x": 0,
+    "y": 529,
     "w": 24,
     "h": 24
    },
@@ -803,7 +843,7 @@
   "hjalte_lera_ner_02": {
    "frame": {
     "x": 25,
-    "y": 500,
+    "y": 529,
     "w": 24,
     "h": 24
    },
@@ -820,10 +860,30 @@
     "h": 24
    }
   },
+  "hjalte_oron_unge_ner_01": {
+   "frame": {
+    "x": 0,
+    "y": 554,
+    "w": 24,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 32
+   }
+  },
   "hjalte_sang_01": {
    "frame": {
     "x": 0,
-    "y": 525,
+    "y": 587,
     "w": 64,
     "h": 44
    },
@@ -843,7 +903,7 @@
   "hjalte_sang_02": {
    "frame": {
     "x": 65,
-    "y": 525,
+    "y": 587,
     "w": 64,
     "h": 44
    },
@@ -863,7 +923,7 @@
   "hjalte_sang_03": {
    "frame": {
     "x": 130,
-    "y": 525,
+    "y": 587,
     "w": 64,
     "h": 44
    },
@@ -883,7 +943,7 @@
   "hjalte_sang_04": {
    "frame": {
     "x": 195,
-    "y": 525,
+    "y": 587,
     "w": 64,
     "h": 44
    },
@@ -903,7 +963,7 @@
   "hjalte_sang_morgon_01": {
    "frame": {
     "x": 0,
-    "y": 570,
+    "y": 632,
     "w": 64,
     "h": 44
    },
@@ -923,7 +983,7 @@
   "hjalte_sang_morgon_02": {
    "frame": {
     "x": 65,
-    "y": 570,
+    "y": 632,
     "w": 64,
     "h": 44
    },
@@ -940,10 +1000,70 @@
     "h": 44
    }
   },
+  "hjalte_sitter_flaska_ner_01": {
+   "frame": {
+    "x": 0,
+    "y": 677,
+    "w": 16,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 24
+   }
+  },
+  "hjalte_sitter_flaska_ner_02": {
+   "frame": {
+    "x": 17,
+    "y": 677,
+    "w": 16,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 24
+   }
+  },
+  "hjalte_sitter_ner_01": {
+   "frame": {
+    "x": 0,
+    "y": 702,
+    "w": 16,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 24
+   }
+  },
   "hjalte_sjunker_ner_01": {
    "frame": {
     "x": 0,
-    "y": 615,
+    "y": 727,
     "w": 24,
     "h": 24
    },
@@ -963,7 +1083,7 @@
   "hjalte_sjunker_ner_02": {
    "frame": {
     "x": 25,
-    "y": 615,
+    "y": 727,
     "w": 24,
     "h": 24
    },
@@ -983,7 +1103,7 @@
   "hjalte_sjunker_ner_03": {
    "frame": {
     "x": 50,
-    "y": 615,
+    "y": 727,
     "w": 24,
     "h": 24
    },
@@ -1003,7 +1123,7 @@
   "hjalte_stol_ner": {
    "frame": {
     "x": 0,
-    "y": 640,
+    "y": 752,
     "w": 16,
     "h": 26
    },
@@ -1023,7 +1143,7 @@
   "hjalte_svinga_hoger_01": {
    "frame": {
     "x": 0,
-    "y": 667,
+    "y": 779,
     "w": 32,
     "h": 40
    },
@@ -1043,7 +1163,7 @@
   "hjalte_svinga_hoger_02": {
    "frame": {
     "x": 33,
-    "y": 667,
+    "y": 779,
     "w": 32,
     "h": 40
    },
@@ -1063,7 +1183,7 @@
   "hjalte_svinga_hoger_03": {
    "frame": {
     "x": 66,
-    "y": 667,
+    "y": 779,
     "w": 32,
     "h": 40
    },
@@ -1083,7 +1203,7 @@
   "hjalte_svinga_ner_01": {
    "frame": {
     "x": 0,
-    "y": 708,
+    "y": 820,
     "w": 32,
     "h": 40
    },
@@ -1103,7 +1223,7 @@
   "hjalte_svinga_ner_02": {
    "frame": {
     "x": 33,
-    "y": 708,
+    "y": 820,
     "w": 32,
     "h": 40
    },
@@ -1123,7 +1243,7 @@
   "hjalte_svinga_ner_03": {
    "frame": {
     "x": 66,
-    "y": 708,
+    "y": 820,
     "w": 32,
     "h": 40
    },
@@ -1143,7 +1263,7 @@
   "hjalte_svinga_upp_01": {
    "frame": {
     "x": 0,
-    "y": 749,
+    "y": 861,
     "w": 32,
     "h": 40
    },
@@ -1163,7 +1283,7 @@
   "hjalte_svinga_upp_02": {
    "frame": {
     "x": 33,
-    "y": 749,
+    "y": 861,
     "w": 32,
     "h": 40
    },
@@ -1183,7 +1303,7 @@
   "hjalte_svinga_upp_03": {
    "frame": {
     "x": 66,
-    "y": 749,
+    "y": 861,
     "w": 32,
     "h": 40
    },
@@ -1203,7 +1323,7 @@
   "hjalte_svinga_vanster_01": {
    "frame": {
     "x": 0,
-    "y": 790,
+    "y": 902,
     "w": 32,
     "h": 40
    },
@@ -1223,7 +1343,7 @@
   "hjalte_svinga_vanster_02": {
    "frame": {
     "x": 33,
-    "y": 790,
+    "y": 902,
     "w": 32,
     "h": 40
    },
@@ -1243,7 +1363,7 @@
   "hjalte_svinga_vanster_03": {
    "frame": {
     "x": 66,
-    "y": 790,
+    "y": 902,
     "w": 32,
     "h": 40
    },
@@ -1263,7 +1383,7 @@
   "hjalte_trolla_ner_01": {
    "frame": {
     "x": 0,
-    "y": 831,
+    "y": 943,
     "w": 32,
     "h": 40
    },
@@ -1283,7 +1403,7 @@
   "hjalte_trolla_ner_02": {
    "frame": {
     "x": 33,
-    "y": 831,
+    "y": 943,
     "w": 32,
     "h": 40
    },
@@ -1303,7 +1423,7 @@
   "hjalte_trolla_ner_03": {
    "frame": {
     "x": 66,
-    "y": 831,
+    "y": 943,
     "w": 32,
     "h": 40
    },
@@ -1323,7 +1443,7 @@
   "hjalte_trolla_ner_04": {
    "frame": {
     "x": 99,
-    "y": 831,
+    "y": 943,
     "w": 32,
     "h": 40
    },
@@ -1343,7 +1463,7 @@
   "hjalte_vinka_hoger_01": {
    "frame": {
     "x": 0,
-    "y": 872,
+    "y": 984,
     "w": 16,
     "h": 24
    },
@@ -1363,7 +1483,7 @@
   "hjalte_vinka_hoger_02": {
    "frame": {
     "x": 17,
-    "y": 872,
+    "y": 984,
     "w": 16,
     "h": 24
    },
@@ -1383,7 +1503,7 @@
   "hjalte_vinka_ner_01": {
    "frame": {
     "x": 0,
-    "y": 897,
+    "y": 1009,
     "w": 16,
     "h": 24
    },
@@ -1403,7 +1523,7 @@
   "hjalte_vinka_ner_02": {
    "frame": {
     "x": 17,
-    "y": 897,
+    "y": 1009,
     "w": 16,
     "h": 24
    },
@@ -1423,7 +1543,7 @@
   "hjalte_vinka_upp_01": {
    "frame": {
     "x": 0,
-    "y": 922,
+    "y": 1034,
     "w": 16,
     "h": 24
    },
@@ -1443,7 +1563,7 @@
   "hjalte_vinka_upp_02": {
    "frame": {
     "x": 17,
-    "y": 922,
+    "y": 1034,
     "w": 16,
     "h": 24
    },
@@ -1463,7 +1583,7 @@
   "hjalte_vinka_vanster_01": {
    "frame": {
     "x": 0,
-    "y": 947,
+    "y": 1059,
     "w": 16,
     "h": 24
    },
@@ -1483,7 +1603,7 @@
   "hjalte_vinka_vanster_02": {
    "frame": {
     "x": 17,
-    "y": 947,
+    "y": 1059,
     "w": 16,
     "h": 24
    },
@@ -1503,7 +1623,7 @@
   "ryggsack_hoger_01": {
    "frame": {
     "x": 0,
-    "y": 972,
+    "y": 1084,
     "w": 16,
     "h": 24
    },
@@ -1523,7 +1643,7 @@
   "ryggsack_ner_01": {
    "frame": {
     "x": 0,
-    "y": 997,
+    "y": 1109,
     "w": 16,
     "h": 24
    },
@@ -1543,7 +1663,7 @@
   "ryggsack_rosa_hoger_01": {
    "frame": {
     "x": 0,
-    "y": 1022,
+    "y": 1134,
     "w": 16,
     "h": 24
    },
@@ -1563,7 +1683,7 @@
   "ryggsack_rosa_ner_01": {
    "frame": {
     "x": 0,
-    "y": 1047,
+    "y": 1159,
     "w": 16,
     "h": 24
    },
@@ -1583,7 +1703,7 @@
   "ryggsack_rosa_upp_01": {
    "frame": {
     "x": 0,
-    "y": 1072,
+    "y": 1184,
     "w": 16,
     "h": 24
    },
@@ -1603,7 +1723,7 @@
   "ryggsack_rosa_vanster_01": {
    "frame": {
     "x": 0,
-    "y": 1097,
+    "y": 1209,
     "w": 16,
     "h": 24
    },
@@ -1623,7 +1743,7 @@
   "ryggsack_upp_01": {
    "frame": {
     "x": 0,
-    "y": 1122,
+    "y": 1234,
     "w": 16,
     "h": 24
    },
@@ -1643,7 +1763,7 @@
   "ryggsack_vanster_01": {
    "frame": {
     "x": 0,
-    "y": 1147,
+    "y": 1259,
     "w": 16,
     "h": 24
    },
@@ -1663,7 +1783,7 @@
   "taggkam_hoger_01": {
    "frame": {
     "x": 0,
-    "y": 1172,
+    "y": 1284,
     "w": 16,
     "h": 24
    },
@@ -1683,7 +1803,7 @@
   "taggkam_ner_01": {
    "frame": {
     "x": 0,
-    "y": 1197,
+    "y": 1309,
     "w": 16,
     "h": 24
    },
@@ -1703,7 +1823,7 @@
   "taggkam_upp_01": {
    "frame": {
     "x": 0,
-    "y": 1222,
+    "y": 1334,
     "w": 16,
     "h": 24
    },
@@ -1723,7 +1843,7 @@
   "taggkam_vanster_01": {
    "frame": {
     "x": 0,
-    "y": 1247,
+    "y": 1359,
     "w": 16,
     "h": 24
    },
@@ -1746,7 +1866,7 @@
   "format": "RGBA8888",
   "size": {
    "w": 260,
-   "h": 1272
+   "h": 1384
   },
   "scale": "1",
   "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."

@@ -4,7 +4,7 @@
 # Bit 1: berg, en dal full av moln och mammas stora skugga, som liknar ungen (13, s14). Fryst.
 # Bit 2: Farfars hus, skogen, stenen, bron och träsket (15, k1s11, granskningen A 1). Fryst.
 # Bit 3: vassbyn, vassen och vägen fram till en bred flod med en ö (17, k2s09, och manus 19 v0.3 k3s01). Färdig.
-# Bit 4–6 är skisser som ändras när kapitlen skrivs.
+# Bit 1–4 är färdiga. Bit 5–6 är skisser som ändras när kapitlen skrivs.
 # Bit 1 och 2 ritas exakt som förut: de ritas med den gamla teckningen (sju bitar) och klistras in pixel för pixel.
 # Allt ritas ur masterpaletten (palett/palett.json): färgerna väljs med pf(), som tar palettens närmaste.
 import os, sys, math, random
@@ -256,6 +256,32 @@ def isberg_ny(x, y, h, grotta=True):
         for dy in range(0, 4):
             for dx in range(-2, 3):
                 if abs(dx) + max(0, dy - 1) < 4 and not (dy == 3 and abs(dx) == 2): satt(x + dx, y - dy, SKUGGA[0])
+def vulkan_fjarran(x, y):
+    """Berget som ryker, litet och blekt långt borta (bit 4): samma form som på bit 5, så att han känner igen det."""
+    for i in range(8):
+        w = 7 - i * 6 // 8
+        satt(x - w, y - i, BLACK2); satt(x + w, y - i, BLACK2)
+        for j in range(1, w, 2): satt(x + j, y - i, BLACK3)
+    for dx in range(-1, 2): satt(x + dx, y - 8, BLACK2)
+    for (ox, oy, r) in [(1, -11, 1.4), (3, -13, 1.8), (6, -16, 2.0)]:
+        ellips(x + ox, y + oy, r, r * 0.8, MOLN[2], STEN[1])
+def kvarn(x, y):
+    """Flodfolkets kvarn i bläck: ett stenhus med spetsigt tak, hjulet i vattnet och hornet högst upp."""
+    for yy in range(y - 7, y + 1):
+        for xx in range(x - 4, x + 5): satt(xx, yy, STEN[1] if (xx + yy) % 3 else STEN[0])
+    for xx in range(x - 4, x + 5): satt(xx, y - 7, BLACK); satt(xx, y + 1, BLACK)
+    for yy in range(y - 7, y + 2): satt(x - 5, yy, BLACK); satt(x + 5, yy, BLACK)
+    for i in range(5):
+        satt(x - 5 + i, y - 8 - i, BLACK); satt(x + 5 - i, y - 8 - i, BLACK)
+        for xx in range(x - 4 + i, x + 5 - i): satt(xx, y - 8 - i, TRA[0])
+    satt(x, y - 13, BLACK)
+    for (dx, dy) in ((1, -11), (2, -11), (3, -12), (3, -11)): satt(x + dx, y + dy, rgb('#C8963E'))   # hornet i luckan
+    ellips(x - 7, y, 3.0, 3.0, TRA[1], BLACK)                                                       # hjulet
+    satt(x - 7, y, BLACK); satt(x - 7, y - 2, BLACK); satt(x - 9, y, BLACK)
+def pram(x, y):
+    """En pråm på floden, med flodfolkets blå och vita ränder på taket."""
+    for xx in range(x - 3, x + 4): satt(xx, y, BLACK); satt(xx, y - 1, TRA[1])
+    for xx in range(x - 2, x + 3): satt(xx, y - 2, rgb('#2A52C8') if xx % 2 else rgb('#FFFFFF'))
 def molntapp(cx, cy, rx):
     ellips(cx, cy, rx, rx * 0.45, MOLN[0], MOLN[1])
 
@@ -269,9 +295,12 @@ def ny_teckning():
     # den breda floden, som börjar i bit 3 och går genom bit 4 mot berget
     FLOD = [(-2, 62), (12, 58), (26, 51), (40, 42), (54, 36), (68, 34), (84, 30), (100, 31), (114, 35), (126, 38), (138, 40)]
     flod_bred(FLOD, lambda x: 6 if 4 <= x <= 26 else (4 if x < 44 else 3))   # floden vidgar sig runt ön
-    # ---------- bit 4: floden (kapitel 3, skiss) ----------
+    # ---------- bit 4: floden (kapitel 3, färdig efter manus 19 v0.4.1) ----------
+    kvarn(42, 33)                                 # kvarnen vid floden, med hjulet i vattnet och hornet högst upp
+    for (x, y) in [(66, 33), (77, 31), (88, 30)]: pram(x, y)   # pråmarna där flodfolket möts
+    vulkan_fjarran(104, 26)                       # berget som ryker, långt borta åt det håll floden går
     on(14, 57, k=0.8)        # ön ligger på bit 3, i floden där biten tar slut (manus 19 v0.3, k3s01: kartbit 3 i närbild visar ön)
-    for (x, y) in [(10, 22), (22, 14), (8, 36), (90, 16), (104, 22), (40, 22), (98, 10)]: trad(x, y)
+    for (x, y) in [(10, 22), (22, 14), (8, 36), (86, 14), (40, 22)]: trad(x, y)
     for (x, y) in [(30, 32), (76, 44), (110, 44)]: vass(x, y, 2)
     # ---------- bit 5: berget (kapitel 4, skiss): vulkanen och isgrottorna ----------
     vulkan_ny(152, 44)
@@ -356,7 +385,8 @@ if __name__ == '__main__':
     hel.save('ut/karta/karta_hel.png')
     for n in (1, 2): bitbild(n).save(f'ut/karta/kartbit_{n}.png')
     bitbild(3).save('ut/karta/kartbit_3.png')
-    for n in (4, 5, 6): bitbild(n).save(f'ut/karta/skiss_kartbit_{n}.png')
+    bitbild(4).save('ut/karta/kartbit_4.png')                        # färdig (kapitel 3, beslut 100.6)
+    for n in (5, 6): bitbild(n).save(f'ut/karta/skiss_kartbit_{n}.png')
     import json
     json.dump({'om': 'Var varje bit ligger i hela kartan (224 x 144), övre vänstra hörnet. Bitarna läggs ihop med 1 pixels glipa (rivna kanter).',
                'storlek': [W, H], 'bitar': POS}, open('ut/karta/karta.json', 'w'), ensure_ascii=False, indent=1)

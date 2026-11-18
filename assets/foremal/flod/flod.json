@@ -1,0 +1,1134 @@
+{
+ "frames": {
+  "ankare": {
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "ankare_sand": {
+   "frame": {
+    "x": 25,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "bar_litet": {
+   "frame": {
+    "x": 0,
+    "y": 29,
+    "w": 8,
+    "h": 8
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 8,
+    "h": 8
+   },
+   "sourceSize": {
+    "w": 8,
+    "h": 8
+   }
+  },
+  "fisk_liten_01": {
+   "frame": {
+    "x": 0,
+    "y": 38,
+    "w": 12,
+    "h": 8
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 12,
+    "h": 8
+   },
+   "sourceSize": {
+    "w": 12,
+    "h": 8
+   }
+  },
+  "fisk_liten_02": {
+   "frame": {
+    "x": 13,
+    "y": 38,
+    "w": 12,
+    "h": 8
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 12,
+    "h": 8
+   },
+   "sourceSize": {
+    "w": 12,
+    "h": 8
+   }
+  },
+  "flaska": {
+   "frame": {
+    "x": 0,
+    "y": 47,
+    "w": 10,
+    "h": 14
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 10,
+    "h": 14
+   },
+   "sourceSize": {
+    "w": 10,
+    "h": 14
+   }
+  },
+  "frukosthorn": {
+   "frame": {
+    "x": 0,
+    "y": 62,
+    "w": 16,
+    "h": 12
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 12
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 12
+   }
+  },
+  "hornet_mjol": {
+   "frame": {
+    "x": 0,
+    "y": 75,
+    "w": 88,
+    "h": 56
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 88,
+    "h": 56
+   },
+   "sourceSize": {
+    "w": 88,
+    "h": 56
+   }
+  },
+  "hornet_rent": {
+   "frame": {
+    "x": 89,
+    "y": 75,
+    "w": 88,
+    "h": 56
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 88,
+    "h": 56
+   },
+   "sourceSize": {
+    "w": 88,
+    "h": 56
+   }
+  },
+  "krabba_01": {
+   "frame": {
+    "x": 0,
+    "y": 132,
+    "w": 16,
+    "h": 10
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 10
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 10
+   }
+  },
+  "krabba_02": {
+   "frame": {
+    "x": 17,
+    "y": 132,
+    "w": 16,
+    "h": 10
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 10
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 10
+   }
+  },
+  "ljusbat_01": {
+   "frame": {
+    "x": 0,
+    "y": 143,
+    "w": 12,
+    "h": 12
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 12,
+    "h": 12
+   },
+   "sourceSize": {
+    "w": 12,
+    "h": 12
+   }
+  },
+  "ljusbat_02": {
+   "frame": {
+    "x": 13,
+    "y": 143,
+    "w": 12,
+    "h": 12
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 12,
+    "h": 12
+   },
+   "sourceSize": {
+    "w": 12,
+    "h": 12
+   }
+  },
+  "lucka_oppen": {
+   "frame": {
+    "x": 0,
+    "y": 156,
+    "w": 20,
+    "h": 14
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 14
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 14
+   }
+  },
+  "lucka_stangd": {
+   "frame": {
+    "x": 21,
+    "y": 156,
+    "w": 20,
+    "h": 14
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 14
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 14
+   }
+  },
+  "mjolmoln_01": {
+   "frame": {
+    "x": 0,
+    "y": 171,
+    "w": 40,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 40,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 40,
+    "h": 32
+   }
+  },
+  "mjolmoln_02": {
+   "frame": {
+    "x": 41,
+    "y": 171,
+    "w": 40,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 40,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 40,
+    "h": 32
+   }
+  },
+  "mjolmoln_03": {
+   "frame": {
+    "x": 82,
+    "y": 171,
+    "w": 40,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 40,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 40,
+    "h": 32
+   }
+  },
+  "on_floden": {
+   "frame": {
+    "x": 0,
+    "y": 204,
+    "w": 104,
+    "h": 72
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 104,
+    "h": 72
+   },
+   "sourceSize": {
+    "w": 104,
+    "h": 72
+   }
+  },
+  "on_stiger_01": {
+   "frame": {
+    "x": 0,
+    "y": 277,
+    "w": 104,
+    "h": 76
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 104,
+    "h": 76
+   },
+   "sourceSize": {
+    "w": 104,
+    "h": 76
+   }
+  },
+  "on_stiger_02": {
+   "frame": {
+    "x": 105,
+    "y": 277,
+    "w": 104,
+    "h": 76
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 104,
+    "h": 76
+   },
+   "sourceSize": {
+    "w": 104,
+    "h": 76
+   }
+  },
+  "on_stiger_03": {
+   "frame": {
+    "x": 210,
+    "y": 277,
+    "w": 104,
+    "h": 76
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 104,
+    "h": 76
+   },
+   "sourceSize": {
+    "w": 104,
+    "h": 76
+   }
+  },
+  "planka_on": {
+   "frame": {
+    "x": 0,
+    "y": 354,
+    "w": 40,
+    "h": 10
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 40,
+    "h": 10
+   },
+   "sourceSize": {
+    "w": 40,
+    "h": 10
+   }
+  },
+  "raka": {
+   "frame": {
+    "x": 0,
+    "y": 365,
+    "w": 12,
+    "h": 8
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 12,
+    "h": 8
+   },
+   "sourceSize": {
+    "w": 12,
+    "h": 8
+   }
+  },
+  "sack_liten": {
+   "frame": {
+    "x": 0,
+    "y": 374,
+    "w": 14,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 14,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 14,
+    "h": 16
+   }
+  },
+  "sack_liten_puff": {
+   "frame": {
+    "x": 0,
+    "y": 391,
+    "w": 14,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 14,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 14,
+    "h": 16
+   }
+  },
+  "sack_stor": {
+   "frame": {
+    "x": 0,
+    "y": 408,
+    "w": 22,
+    "h": 26
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 22,
+    "h": 26
+   },
+   "sourceSize": {
+    "w": 22,
+    "h": 26
+   }
+  },
+  "sackhiss": {
+   "frame": {
+    "x": 0,
+    "y": 435,
+    "w": 28,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 28,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 28,
+    "h": 40
+   }
+  },
+  "skalkant": {
+   "frame": {
+    "x": 0,
+    "y": 476,
+    "w": 40,
+    "h": 14
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 40,
+    "h": 14
+   },
+   "sourceSize": {
+    "w": 40,
+    "h": 14
+   }
+  },
+  "skoldpadda_fena_lyft": {
+   "frame": {
+    "x": 0,
+    "y": 491,
+    "w": 44,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 44,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 44,
+    "h": 28
+   }
+  },
+  "skoldpadda_fena_sanden": {
+   "frame": {
+    "x": 45,
+    "y": 491,
+    "w": 44,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 44,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 44,
+    "h": 28
+   }
+  },
+  "skoldpadda_fena_trappa": {
+   "frame": {
+    "x": 90,
+    "y": 491,
+    "w": 44,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 44,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 44,
+    "h": 28
+   }
+  },
+  "skoldpadda_huvud_lyft": {
+   "frame": {
+    "x": 0,
+    "y": 520,
+    "w": 44,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 44,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 44,
+    "h": 40
+   }
+  },
+  "skoldpadda_huvud_nickar": {
+   "frame": {
+    "x": 45,
+    "y": 520,
+    "w": 44,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 44,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 44,
+    "h": 40
+   }
+  },
+  "skoldpadda_huvud_puffar": {
+   "frame": {
+    "x": 90,
+    "y": 520,
+    "w": 44,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 44,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 44,
+    "h": 40
+   }
+  },
+  "skoldpadda_huvud_ropar": {
+   "frame": {
+    "x": 135,
+    "y": 520,
+    "w": 44,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 44,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 44,
+    "h": 40
+   }
+  },
+  "skoldpadda_huvud_tittar": {
+   "frame": {
+    "x": 180,
+    "y": 520,
+    "w": 44,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 44,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 44,
+    "h": 40
+   }
+  },
+  "skoldpadda_huvud_vatten_01": {
+   "frame": {
+    "x": 0,
+    "y": 561,
+    "w": 44,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 44,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 44,
+    "h": 40
+   }
+  },
+  "skoldpadda_huvud_vatten_02": {
+   "frame": {
+    "x": 45,
+    "y": 561,
+    "w": 44,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 44,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 44,
+    "h": 40
+   }
+  },
+  "skoldpadda_huvud_vilar": {
+   "frame": {
+    "x": 0,
+    "y": 602,
+    "w": 44,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 44,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 44,
+    "h": 40
+   }
+  },
+  "skoldpadda_sandbanken": {
+   "frame": {
+    "x": 0,
+    "y": 643,
+    "w": 176,
+    "h": 128
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 176,
+    "h": 128
+   },
+   "sourceSize": {
+    "w": 176,
+    "h": 128
+   }
+  },
+  "skoldpadda_simmar_01": {
+   "frame": {
+    "x": 0,
+    "y": 772,
+    "w": 128,
+    "h": 102
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 102
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 102
+   }
+  },
+  "skoldpadda_simmar_02": {
+   "frame": {
+    "x": 129,
+    "y": 772,
+    "w": 128,
+    "h": 102
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 102
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 102
+   }
+  },
+  "skuggan_01": {
+   "frame": {
+    "x": 0,
+    "y": 875,
+    "w": 136,
+    "h": 64
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 136,
+    "h": 64
+   },
+   "sourceSize": {
+    "w": 136,
+    "h": 64
+   }
+  },
+  "skuggan_02": {
+   "frame": {
+    "x": 137,
+    "y": 875,
+    "w": 136,
+    "h": 64
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 136,
+    "h": 64
+   },
+   "sourceSize": {
+    "w": 136,
+    "h": 64
+   }
+  },
+  "skuggan_03": {
+   "frame": {
+    "x": 274,
+    "y": 875,
+    "w": 136,
+    "h": 64
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 136,
+    "h": 64
+   },
+   "sourceSize": {
+    "w": 136,
+    "h": 64
+   }
+  },
+  "skylt_skal": {
+   "frame": {
+    "x": 0,
+    "y": 940,
+    "w": 72,
+    "h": 36
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 72,
+    "h": 36
+   },
+   "sourceSize": {
+    "w": 72,
+    "h": 36
+   }
+  },
+  "snacka_bort_01": {
+   "frame": {
+    "x": 0,
+    "y": 977,
+    "w": 20,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 16
+   }
+  },
+  "snacka_bort_02": {
+   "frame": {
+    "x": 21,
+    "y": 977,
+    "w": 20,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 16
+   }
+  },
+  "snacka_klump": {
+   "frame": {
+    "x": 0,
+    "y": 994,
+    "w": 16,
+    "h": 12
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 12
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 12
+   }
+  },
+  "snigel": {
+   "frame": {
+    "x": 0,
+    "y": 1007,
+    "w": 12,
+    "h": 8
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 12,
+    "h": 8
+   },
+   "sourceSize": {
+    "w": 12,
+    "h": 8
+   }
+  },
+  "tang_tuss_hel": {
+   "frame": {
+    "x": 0,
+    "y": 1016,
+    "w": 16,
+    "h": 22
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 22
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 22
+   }
+  },
+  "tang_tuss_huggen": {
+   "frame": {
+    "x": 17,
+    "y": 1016,
+    "w": 16,
+    "h": 22
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 22
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 22
+   }
+  },
+  "tavla_kvarn": {
+   "frame": {
+    "x": 0,
+    "y": 1039,
+    "w": 64,
+    "h": 34
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 34
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 34
+   }
+  },
+  "tuva_hel": {
+   "frame": {
+    "x": 0,
+    "y": 1074,
+    "w": 24,
+    "h": 18
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 18
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 18
+   }
+  },
+  "tuva_lyft": {
+   "frame": {
+    "x": 25,
+    "y": 1074,
+    "w": 24,
+    "h": 18
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 18
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 18
+   }
+  }
+ },
+ "meta": {
+  "image": "flod.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 411,
+   "h": 1093
+  },
+  "scale": "1",
+  "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."
+ }
+}
