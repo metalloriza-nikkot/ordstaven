@@ -207,6 +207,31 @@ test('passets slut läser äventyrets fråga (sparpunkt_fraga)', async ({ page }
   await page.click('.pass-slut .fortsatt');
 });
 
+test('loggens tider räknas utan pausad tid och tid utan fokus (106.9)', async ({ page }) => {
+  await provscen(page, { id: 't_tid', pass: 1, rum: 'koket', tillstand: 'natt', steg: [R('Hej.'), { typ: 'sparpunkt', pass_slut: true, valfri: false }, R('Igen.')] });
+  await expect(page.locator('#plattan .replik-ruta')).toBeVisible({ timeout: 8000 });
+  // menyn för vuxna pausar: pausen står i loggen med sin längd
+  await page.keyboard.press('Control+Shift+KeyM');
+  await expect(page.locator('#vuxenmeny .meny')).toBeVisible();
+  await page.waitForTimeout(1500);
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#vuxenmeny')).toBeHidden();
+  // fönstret utan fokus pausar inte världen, men räknas bort
+  await page.evaluate(() => window.dispatchEvent(new Event('blur')));
+  expect(await page.evaluate(() => window.__ORDSTAVEN.pausad())).toBe(false);
+  await page.waitForTimeout(1200);
+  await page.evaluate(() => window.dispatchEvent(new Event('focus')));
+  await page.click('#plattan .replik-ruta');
+  await expect(page.locator('.pass-slut')).toBeVisible({ timeout: 8000 });
+  const loggen = await page.evaluate(() => window.__ORDSTAVEN.logg());
+  expect(Number(/\[paus\] slut\s+\{"sek":([\d.]+)\}/.exec(loggen)?.[1])).toBeGreaterThanOrEqual(1);
+  expect(Number(/\[fokus\] tillbaka\s+\{"sek":([\d.]+)\}/.exec(loggen)?.[1])).toBeGreaterThanOrEqual(1);
+  const [, utan, bort] = /\[speltid\] kap-00 pass 1: (\d+) s utan paus \((\d+) s pausat eller utan fokus\)/.exec(loggen) ?? [];
+  expect(Number(bort)).toBeGreaterThanOrEqual(2);
+  expect(Number(utan)).toBeGreaterThanOrEqual(0);
+  await page.click('.pass-slut .fortsatt');
+});
+
 test('ytterdörren i hallen är låst på natten: hjälten känner på handtaget, ingen dunk; stegen nås snett från sidan', async ({ page }) => {
   await provscen(page, { id: 't_ut', pass: 1, rum: 'hallen', tillstand: 'natt', steg: [{ typ: 'ga_till', mal: 'stege_upp', vid_annan_utgang: { ljud: 'dunk' } }, R('Uppe.')] });
   await tryckPa(page, 'dorr_ut');

@@ -110,8 +110,33 @@ export function skapaSpel(d) {
    * allt annat ligger kvar som det var, så att spelet fortsätter exakt där det stod.
    * @param {string} orsak
    */
+  /**
+   * Speltiden (106.9): loggens tider (sek i [val], [framme] och [vägval], läsvalens tid och passets speltid) räknas utan
+   * den tid spelet stod pausat eller fönstret saknade fokus, t.ex. när den vuxne skriver i ett annat fönster. Fönstret
+   * utan fokus pausar inte världen, det räknas bara bort.
+   */
+  let bortaMs = 0, bortaSedan = /** @type {number | null} */ (null);
+  /** @type {Set<string>} */
+  const borta = new Set();
+  const speltid = () => performance.now() - bortaMs - (bortaSedan !== null ? performance.now() - bortaSedan : 0);
+  /** @param {string} orsak */
+  const bortaBorjar = (orsak) => { if (!borta.size) bortaSedan = performance.now(); borta.add(orsak); };
+  /** @param {string} orsak @returns {number} ms borta, när den sista orsaken är slut (annars 0) */
+  const bortaSlutar = (orsak) => {
+    if (!borta.delete(orsak) || borta.size || bortaSedan === null) return 0;
+    const ms = performance.now() - bortaSedan; bortaMs += ms; bortaSedan = null; return ms;
+  };
+  /** När passet började, och hur mycket som var bortaräknat då (passets speltid). */
+  let bortaVidPassStart = 0, passStartMs = performance.now();
+  const passBorjar = () => { passStartMs = performance.now(); bortaVidPassStart = bortaMs + (bortaSedan !== null ? performance.now() - bortaSedan : 0); };
+  /** Passets speltid som text, och klockan startar om för nästa pass. */
+  const passSpeltid = () => {
+    const nu = performance.now(), bort = bortaMs + (bortaSedan !== null ? nu - bortaSedan : 0) - bortaVidPassStart, vagg = nu - passStartMs;
+    passBorjar();
+    return `${Math.round((vagg - bort) / 1000)} s utan paus (${Math.round(bort / 1000)} s pausat eller utan fokus)`;
+  };
   function pausa(orsak) {
-    if (!pausorsaker.size) { rum.sattPaus(true); rost.tyst(); ui.avbrytLjudning(); spara(); }
+    if (!pausorsaker.size) { rum.sattPaus(true); rost.tyst(); ui.avbrytLjudning(); spara(); bortaBorjar('paus'); }
     pausorsaker.add(orsak); pausad = true;
     logg.handelse('paus', orsak);
   }
@@ -120,9 +145,13 @@ export function skapaSpel(d) {
     if (!pausorsaker.delete(orsak) || pausorsaker.size) return;
     // världen står som stegen vill: ett steg som släppte den under pausen gäller (förut kom frysningen från före pausen tillbaka)
     pausad = false; rum.sattPaus(false);
-    logg.handelse('paus', 'slut');
+    const ms = bortaSlutar('paus');
+    logg.handelse('paus', 'slut', { sek: Math.round(ms / 100) / 10 });
   }
   document.addEventListener('visibilitychange', () => { if (document.hidden) pausa('dold'); else fortsatt('dold'); });
+  // fönstret utan fokus (106.9): räknas bort ur tiderna, men världen går som förut
+  window.addEventListener('blur', () => { bortaBorjar('fokus'); logg.handelse('fokus', 'borta'); });
+  window.addEventListener('focus', () => { const ms = bortaSlutar('fokus'); if (ms) logg.handelse('fokus', 'tillbaka', { sek: Math.round(ms / 100) / 10 }); });
   /** Bokstavsbrickan nr n i ordet: tonen stiger för varje bokstav (bricka_1–8, 10c). @param {number} n */
   const brickljud = (n) => ljud.spela(`bricka_${Math.max(1, Math.min(8, n))}`);
   /** Orden som räknas som riktiga ord när han skriver en formel (P11 med tangentbordet): räknas en gång. */
@@ -1500,6 +1529,8 @@ export function skapaSpel(d) {
         // medan världen stod still (repliker, mellanscener och läsplattan)
         if (st.pass_slut) {
           const pilar = (rum.pilarFrysta ?? 0) - styrning.pilar;
+          // 106.9: passets speltid utan pausad tid och tid utan fokus, och hur mycket som räknades bort
+          logg.handelse('speltid', `${b.kapitel.id} pass ${b.scen?.pass ?? '?'}: ${passSpeltid()}`);
           logg.handelse('styrning', `${b.kapitel.id} pass ${b.scen?.pass ?? '?'}: lappen och stämpeln släppte världen ${styrning.lappen + styrning.stampeln} gånger (lappen ${styrning.lappen}, stämpeln ${styrning.stampeln}, ${Math.round(styrning.ms / 100) / 10} s), piltangent medan världen stod still ${pilar} gånger`);
           Object.assign(styrning, { lappen: 0, stampeln: 0, ms: 0, pilar: rum.pilarFrysta ?? 0 });
         }
@@ -1762,7 +1793,7 @@ export function skapaSpel(d) {
     const visaMal = () => { if (!iMolnet) return; visaMoln(st.bild ? bilder.html(st.bild) : malBild(st.mal), instr); placeraMoln([]); };
     // molnet flyttar undan när kameran eller hjälten rör sig, så att det aldrig täcker målet, hjälten eller ungen
     const omplacera = window.setInterval(() => { if (iMolnet && !ui.$('#tanke').hidden && ui.plattan.hidden) placeraMoln([]); }, 250);
-    const start = performance.now();
+    const start = speltid();
     if (iMolnet) logg.handelse('mål', 'i molnet: ' + st.mal);
     const k = knuffKlocka(st.knuff ?? { handling: '' }, () => {
       rum.markera(st.mal, true); ui.pulseraSkylt(st.mal);
@@ -1776,7 +1807,7 @@ export function skapaSpel(d) {
       if (iMolnet) visaMoln(null);
       // instruktionen följer med bara om målet var en utgång till ett annat rum (36.5)
       molnKedja = instr ? { r: instr, rum: aktuelltRum } : null;
-      logg.handelse('framme', st.mal, { sek: Math.round((performance.now() - start) / 100) / 10, efter_dialog: iMolnet });
+      logg.handelse('framme', st.mal, { sek: Math.round((speltid() - start) / 100) / 10, efter_dialog: iMolnet });
     };
     // en yta (krönet på kullen): framme när han står på den, på dess nivå (han går upp för trappan själv)
     const yta = rum.ruta(st.mal);
@@ -1860,7 +1891,7 @@ export function skapaSpel(d) {
     rum.frys(false);
     const instr = instruktionFore(st);
     if (instr) { visaMoln(bilder.html('unge'), instr); placeraMoln([]); logg.handelse('mål', 'i molnet: unge'); }
-    const start = performance.now();
+    const start = speltid();
     const k = knuffKlocka(st.knuff ?? { handling: '' }, () => { rum.ungeReagerar?.(true); if (instr) ui.pulseraTanke(); logg.handelse('knuff', 'ungen hoppar till'); }, undefined, MAL_KNUFF_MS);
     const omplacera = window.setInterval(() => { if (instr && !ui.$('#tanke').hidden && ui.plattan.hidden) placeraMoln([]); }, 250);
     await new Promise((klar) => {
@@ -1872,7 +1903,7 @@ export function skapaSpel(d) {
     window.clearInterval(omplacera); k.stopp();
     if (instr) visaMoln(null);
     rum.ungePekar(null);
-    logg.handelse('framme', 'unge', { sek: Math.round((performance.now() - start) / 100) / 10, efter_dialog: !!instr });
+    logg.handelse('framme', 'unge', { sek: Math.round((speltid() - start) / 100) / 10, efter_dialog: !!instr });
   }
 
   /**
@@ -1903,7 +1934,7 @@ export function skapaSpel(d) {
     }, undefined, MAL_KNUFF_MS);
     malNu = malen[0];
     if (instr) logg.handelse('mål', 'i molnet: ' + malen.join(', '));
-    const start = performance.now();
+    const start = speltid();
     /** @type {string} */
     let id;
     try {
@@ -1928,7 +1959,7 @@ export function skapaSpel(d) {
     rum.ungePekar(null);
     if (instr) visaMoln(null);
     const g = kvar.find((/** @type {any} */ x) => x.mal === id);
-    logg.handelse('vägval', `gren ${g.scen}${lage?.klara.length ? ` (efter ${lage.klara.join(', ')})` : ' först'}`, { sek: Math.round((performance.now() - start) / 100) / 10 });
+    logg.handelse('vägval', `gren ${g.scen}${lage?.klara.length ? ` (efter ${lage.klara.join(', ')})` : ' först'}`, { sek: Math.round((speltid() - start) / 100) / 10 });
     return { gren: g.scen };
   }
 
@@ -2223,7 +2254,7 @@ export function skapaSpel(d) {
     if (!p) return;
     rum.frys(true);
     pusselPagar = true; visaEtiketter();
-    const start = performance.now();
+    const start = speltid();
     logg.handelse('pussel', p.id);
     let res;
     switch (p.typ) {
@@ -2256,7 +2287,7 @@ export function skapaSpel(d) {
     if (res && aktuelltRum && (kartor[aktuelltRum]?.objekt || []).some((/** @type {any} */ o) => o.sedan === p.id)) { losta.add(p.id); await visaScen(visadScen); }
     if (res && res.niva) {
       // en knuff före valet räknas som hjälp för nivån, men valet är rätt i föräldravyn (beslut 62.2)
-      lasmotor.registrera({ pussel_id: p.id, typ: LASNIVA_TYP[p.typ] ?? p.typ, niva: res.niva, ratt: res.forstaForsoket, antal_forsok: res.forsok, hjalp_anvand: res.hjalp, knuff_fore: !!res.knuffFore, tid: performance.now() - start });
+      lasmotor.registrera({ pussel_id: p.id, typ: LASNIVA_TYP[p.typ] ?? p.typ, niva: res.niva, ratt: res.forstaForsoket, antal_forsok: res.forsok, hjalp_anvand: res.hjalp, knuff_fore: !!res.knuffFore, tid: speltid() - start });
     }
     spara();
     return res;
@@ -2289,7 +2320,7 @@ export function skapaSpel(d) {
     rum.frys(true);
     return new Promise((klar) => {
       let upptagen = false;
-      const hjalpSpar = skapaHjalpSpar(() => performance.now());
+      const hjalpSpar = skapaHjalpSpar(() => speltid());
       const vakt = { spar: hjalpSpar, pekOmMs: () => pekningOmMs({ antalAlternativ: v.s.alternativ.length, antalFel: v.s.fel, sedanStartMs: hjalpSpar.sedanStart() }) };
       // knufftiden på läsplattan följer textmängden: ca 11 s per mening (granskningen av kapitel 1)
       const k = knuffKlocka(p.knuff, () => plattan().querySelector('.fraga, .lapp')?.classList.add('puls'), vakt, knufftidMs({ text: v.s.text, alternativ: v.s.alternativ }));
@@ -2509,7 +2540,7 @@ export function skapaSpel(d) {
       let upptagen = false;
       /** @type {string | null} föremålet eller utgången hjälten står vid och vars lapp syns */
       let vid = null;
-      const hjalpSpar = skapaHjalpSpar(() => performance.now());
+      const hjalpSpar = skapaHjalpSpar(() => speltid());
       const peka = () => { const r = kvarAlt().find((a) => a.ratt); return !!r?.objekt && rum.ungePekar(r.objekt); };
       const vakt = { spar: hjalpSpar, pekOmMs: () => pekningOmMs({ antalAlternativ: kvarAlt().length, antalFel: v.s.fel, sedanStartMs: hjalpSpar.sedanStart() }), peka };
       // knuffen upprepar frågan: tankebubblan blinkar, eller lappen lyser om frågan står på en lapp
@@ -3368,8 +3399,8 @@ export function skapaSpel(d) {
     const startMs = rum.regi?.('ordduell_start') ?? 0;
     if (startMs) await regiMedText('ordduell_start', startMs);
     if (p.regel) await replik(p.regel);
-    const hjalpSpar = skapaHjalpSpar(() => performance.now());
-    let rondStart = performance.now();
+    const hjalpSpar = skapaHjalpSpar(() => speltid());
+    let rondStart = speltid();
     for (;;) {
       const r = d2.rond, u = d2.utfall;
       const spar = { hjalp: false };
@@ -3397,8 +3428,8 @@ export function skapaSpel(d) {
       // ronden är klar: ett läsval på sin nivå
       const x = d2.s.logg[d2.s.logg.length - 1];
       logg.handelse('rond', `${p.id} ${x.rond}: ${x.form ?? ''} ${x.niva ?? ''}`, { forsok: x.forsok, fel: x.fel, hjalp: spar.hjalp });
-      if (r.niva) lasmotor.registrera({ pussel_id: p.id, typ: 'P1_las_och_valj', niva: r.niva, ratt: x.forsok === 1, antal_forsok: x.forsok, hjalp_anvand: spar.hjalp, knuff_fore: false, tid: performance.now() - rondStart });
-      rondStart = performance.now();
+      if (r.niva) lasmotor.registrera({ pussel_id: p.id, typ: 'P1_las_och_valj', niva: r.niva, ratt: x.forsok === 1, antal_forsok: x.forsok, hjalp_anvand: spar.hjalp, knuff_fore: false, tid: speltid() - rondStart });
+      rondStart = speltid();
       ljud.spela('ratt');
       if (fig) await medFigur(res.reaktion, fig.ratt(res.reaktion?.handling)); else await reaktion(res.reaktion);
       if (res.resultat === 'vinst') break;
@@ -3456,7 +3487,7 @@ export function skapaSpel(d) {
     const r = skapaTryck(p);
     const [variantNyckel, vari] = valjVariant(p.varianter, nivaFor(p));
     const spar = { hjalp: false };
-    const hjalpSpar = skapaHjalpSpar(() => performance.now());
+    const hjalpSpar = skapaHjalpSpar(() => speltid());
     const tystMs = (p.tystnad_sek ?? 3) * 1000;
     const skylt = p.skylt && rum.ruta(p.skylt) ? { id: p.skylt, text: vari.text, papper: p.papper || 'skylt', mening: true, pussel: p } : null;
     if (p.skylt && !skylt) logg.handelse('FEL', `${p.id}: skylten ${p.skylt} finns inte i rummet`);
@@ -4368,6 +4399,7 @@ export function skapaSpel(d) {
       const iNavet = !!navNu && navNu.scen === b.scen?.id;
       let vvv = forstaKapitlet ? varVarVi({ kapitel, scenIndex: b.scenIndex, steg: av.steg ?? 0, senast, nu: Date.now(), pass: navNu ? b.pass : null, borjar: navNu ? iNavet : null, klara: navNu?.klara ?? [] }) : null;
       forstaKapitlet = false;
+      passBorjar(); // speltiden räknas från spelets början, inte från startskärmen (106.9)
       while (!b.slut) {
         await visaScen();
         oppnaIris();
@@ -4379,6 +4411,7 @@ export function skapaSpel(d) {
         const passNyckel = `${kapitel.id}/${b.scenIndex}`;
         if (passbildFor !== passNyckel && (av.steg ?? 0) === 0 && forstaIPasset(kapitel, b.scenIndex)) {
           passbildFor = passNyckel;
+          passBorjar();
           sparaPassbild({ tillstand, aventyrId: AVENTYR, kapitelOrdning: aventyr.kapitel, kapitelId: kapitel.id, pass: b.scen.pass, nu: Date.now() });
           logg.handelse('lärandet', `bild vid ${kapitel.id} pass ${b.scen.pass}`, { niva: lasNivaNu() });
           spara();
