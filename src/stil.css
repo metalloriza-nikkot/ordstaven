@@ -208,6 +208,8 @@ html, body {
 /* Tant Rosas porträtt (Stil, steg 5 del 1): stråhatten med rosa band. Den fundersamma minen väntar på en regi. */
 .p-tant_rosa { background: #f2d8de url('../assets/portratt/tant_rosa_portratt_glad.png') center / cover no-repeat; image-rendering: pixelated; }
 /* halmdockan i duellens testrum (Stil, 93.5): ropar som grund, förvirrad och yr med uttrycket */
+/* skepparen i kapitel 3 (Stil 10h v0.1): det glada ansiktet; ivrig och ledsen finns för när datan säger vilket */
+.p-skepparen { background: #dfe7ee url('../assets/portratt/skepparen_portratt_glad.png') center / cover no-repeat; image-rendering: pixelated; }
 .p-halmdockan { background: #e8dcae url('../assets/portratt/halmdockan_portratt_ropar.png') center / cover no-repeat; image-rendering: pixelated; }
 .p-halmdockan.u-forvirrad { background-image: url('../assets/portratt/halmdockan_portratt_forvirrad.png'); }
 .p-halmdockan.u-yr { background-image: url('../assets/portratt/halmdockan_portratt_yr.png'); }
