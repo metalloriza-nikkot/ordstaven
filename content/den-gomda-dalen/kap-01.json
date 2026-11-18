@@ -22,8 +22,8 @@
  },
  "meta": {
   "namn": "Skogen",
-  "version": "0.7.14",
-  "datum": "2026-11-11",
+  "version": "0.7.15",
+  "datum": "2026-11-18",
   "agare": "Innehåll",
   "kalla": "Manus 15-kapitel1-manus.md v0.18. Byggd på repots kap-01.json från 0.29.0.",
   "nya_pusseltyper": [
@@ -43,7 +43,8 @@
   "andrat_v0712": "2026-11-10 (beslut 68.9): syns_redan på alla reaktioner och knuffar som visade sin text (68.4), ungen som springer mot stigen i k1s03, Stils regier på tolv mellanscener och ekorre_skakar på felen vid baronens lapp (Teknik 31). Ingen text är ändrad.",
   "teknik_72_2": "Teknik 0.57.0 (beslut 72.2): forebild.visas är andra_felet på k1_svard och k1_svard_igen, som i kapitel 2 (69.3). Förebilden kommer efter två fel och täcks vid nästa bricka. Ingen text är ändrad.",
   "andrat_v0713": "2026-11-11 (beslut 73.2): felrepliken i k1_svard och k1_svard_igen är \"Nästan!\", och reaktionen säger inte längre att ordet tänds, eftersom förebilden kommer efter två fel (72.2). Rättelser av text som inte längre stämde. Ingen ledbild i kapitel 1.",
-  "andrat_v0714": "2026-11-11 (beslut 76.6): återblicken säger att stegen räddade apan, inte SVÄRD. En rättelse av text som inte stämde (brief §4)."
+  "andrat_v0714": "2026-11-11 (beslut 76.6): återblicken säger att stegen räddade apan, inte SVÄRD. En rättelse av text som inte stämde (brief §4).",
+  "andrat_v0715": "2026-11-18 (beslut 102.5–102.6): 9 repliker efter provläsningen, valda av spelaren. k1s01_brynet: Läs skylten vid stenarna! -> Där är en skylt till. Läs den! k1s02_lianerna: Jag gjorde en bild i trädet. Du skriver ordet. -> Gå till trädet! Jag ritade en bild där. k1s02_lianerna: Gå till trädet! Där finns formeln. -> Skriv vad bilden visar. Det är formeln! k1s06_present: Den kommer du att behöva. -> Spara nyckeln. Du kommer att behöva den. k1s09_luckorna: Bara dinos från dalen vet svaret. -> {unge} är från dalen. {unge} vet svaret! k1s09_luckorna: Vilken lucka passar {unge}? -> Vilken lucka stämmer med {unge}? k1s10_koden: Hem. Dit ska ni. -> Ordet var hem! Dit ska ni. k1s12_klaffen: Där gömmer sig baronen! -> Där väntar baronen! k1s13_slutet: Det var mamma! Långt borta. Men hon hör dig. -> Det var mamma, långt borta! Hon hörde {unge}. Lika många repliker, och inga id:n är ändrade."
  },
  "var_var_vi": [
   {
@@ -393,7 +394,7 @@
     {
      "typ": "replik",
      "talare": "berattare",
-     "text": "Läs skylten vid stenarna!",
+     "text": "Där är en skylt till. Läs den!",
      "upplast": true
     },
     {
@@ -451,14 +452,14 @@
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Jag gjorde en bild i trädet. Du skriver ordet.",
+     "text": "Gå till trädet! Jag ritade en bild där.",
      "upplast": true,
      "via": "radio"
     },
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Gå till trädet! Där finns formeln.",
+     "text": "Skriv vad bilden visar. Det är formeln!",
      "upplast": true,
      "via": "radio"
     },
@@ -674,7 +675,7 @@
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Den kommer du att behöva.",
+     "text": "Spara nyckeln. Du kommer att behöva den.",
      "upplast": true,
      "via": "radio"
     },
@@ -822,7 +823,7 @@
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Bara dinos från dalen vet svaret.",
+     "text": "{unge} är från dalen. {unge} vet svaret!",
      "upplast": true,
      "via": "radio"
     },
@@ -856,7 +857,7 @@
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Hem. Dit ska ni.",
+     "text": "Ordet var hem! Dit ska ni.",
      "upplast": true,
      "via": "radio"
     }
@@ -1059,7 +1060,7 @@
     {
      "typ": "replik",
      "talare": "berattare",
-     "text": "Det var mamma! Långt borta. Men hon hör dig.",
+     "text": "Det var mamma, långt borta! Hon hörde {unge}.",
      "upplast": true
     },
     {
@@ -1586,7 +1587,7 @@
    "instruktion": {
     "typ": "replik",
     "talare": "berattare",
-    "text": "Vilken lucka passar {unge}?",
+    "text": "Vilken lucka stämmer med {unge}?",
     "upplast": true
    },
    "varianter": {
@@ -1833,7 +1834,7 @@
     "fest": "liten",
     "replik": {
      "talare": "berattare",
-     "text": "Där gömmer sig baronen!",
+     "text": "Där väntar baronen!",
      "upplast": true
     },
     "ljud": "nys",
@@ -1949,7 +1950,7 @@
    "stampel": {
     "scen": "k1s06_present",
     "efter": {
-     "replik": "Den kommer du att behöva."
+     "replik": "Spara nyckeln. Du kommer att behöva den."
     }
    }
   },
@@ -2090,7 +2091,7 @@
    "stampel": {
     "scen": "k1s13_slutet",
     "efter": {
-     "replik": "Det var mamma! Långt borta. Men hon hör dig."
+     "replik": "Det var mamma, långt borta! Hon hörde {unge}."
     }
    }
   }
