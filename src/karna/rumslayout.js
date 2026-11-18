@@ -13,7 +13,7 @@ const FIGUR_HOJD = 24;
  *             riktning?: 'vanster' | 'hoger' | 'upp' | 'ned', klattra?: 'upp' | 'ned', ute?: boolean, lapp?: string,
  *             talare?: string, lastI?: string[], storlek?: { bredd: number, hojd: number }, forsvinnerEfter?: string, oppning?: boolean,
  *             bildSitter?: string, bildSedan?: string, sedan?: string, bildAnim?: string[], animMs?: number, rutor?: boolean, nasNara?: boolean, landarNara?: boolean, rackvidd?: number,
- *             bild?: string, bildNatt?: string, bildKvall?: string, bildTillstand?: Record<string, string>, iBildAv?: string, bildLagen?: string[], bildOrd?: string, bildPa?: string, bildDel?: string, skugga?: boolean, iBilden?: boolean, sovplats?: boolean, skataFonster?: boolean, lyser?: boolean, delasHela?: boolean, delasDjup?: boolean, dekor?: boolean, ovanpa?: boolean, delar?: number, bildTaEmot?: string[], bildLas?: string[], kommerFran?: string, klattrarFran?: string, visasForst?: boolean | string, bildVinka?: string[],
+ *             bild?: string, bildNatt?: string, bildKvall?: string, bildTillstand?: Record<string, string>, iBildAv?: string, bildLagen?: string[], bildOrd?: string, bildPa?: string, bildDel?: string, skugga?: boolean, iBilden?: boolean, sovplats?: boolean, skataFonster?: boolean, lyser?: boolean, delasHela?: boolean, delasDjup?: boolean, dekor?: boolean, ovanpa?: boolean, delar?: number, bildTaEmot?: string[], bildLas?: string[], kommerFran?: string, klattrarFran?: string, visasForst?: boolean | string, rund?: boolean, baraI?: string[], utsikt?: string, bildVinka?: string[],
  *             bildRad?: string[], bildHugg?: string[], bildKvar?: string }} Objekt
  * till = rummet en utgång leder till, sida = var hjälten ställer sig, golv = man går på det (stig, grind).
  * sida 'alla' = föremålet har ingen framsida (krukor, buskar, en låda mitt på golvet): det går att använda från alla håll.
@@ -250,7 +250,7 @@ export function rumsObjekt(innehall, tillstand, karta, visade = []) {
     const p = tillstand ? karta.regi?.[`${o.id}_${tillstand}`] : null;
     return p ? { ...o, x: Math.round(p.x - o.b / 2), y: Math.round(p.y - o.h) } : o;
   };
-  const iKartan = karta.objekt.filter((o) => ids.includes(o.id) || o.dekor).map((o) => ({ ...flytt(o), ...storlek }));
+  const iKartan = karta.objekt.filter((o) => ids.includes(o.id) || (o.dekor && (!o.baraI || (!!tillstand && o.baraI.includes(tillstand))))).map((o) => ({ ...flytt(o), ...storlek }));
   const saknas = ids.filter((id) => !iKartan.some((o) => o.id === id));
   return [...iKartan, ...placeraObjekt(saknas).map((o) => ({ ...o, ...storlek }))];
 }

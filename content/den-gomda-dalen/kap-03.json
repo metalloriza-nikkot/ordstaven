@@ -16,7 +16,7 @@
  },
  "meta": {
   "namn": "Floden",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "datum": "2026-11-18",
   "agare": "Innehåll",
   "kalla": "Manus 19 v0.4.1 (Ön som simmade), godkänt 17/11 (beslut 98–99).",
@@ -24,7 +24,8 @@
   "andrat_v02": "Beslut 87: Tekniks fält i stället för den billigaste formen (hornet som P29_tryck, chiffret som meddelande, mossan och tången som P26 med verb lyfta, duellen som P16_ordduell, tryck på resan och skalkanten som en frivillig scen med lockar), ahoj! i gemener i bubblan (87.7), och mammas skugga växer inte i kapitel 3 (87.4).",
   "andrat_v021": "2026-11-13 (beslut 90.5 och 90.7): meta.namn är Floden, som Skogen och Träsket, och knuffen i k3_chiffret följer det som är byggt (89.3): rutan han står vid glimtar, tidigast efter ca 25 s.",
   "andrat_v03": "2026-11-17 (beslut 98–99, manus 19 v0.4.1): floden och flodfolket först, skepparen som en ung man vars morfar kallade på ön, kvarnen som vägen upp till hornet (k3_hjulet med SVÄRD, k3_kvarn_1 och _2, säckhissen), och hornet två gånger: ett tryck i pass 1 som väcker skuggan, och FEM TUT. INTE TRE. i pass 2 (k3_hornet, ratt 5). Snäckorna och chiffret ligger på ön, och pass 2 slutar när UNDER FENAN lyser. Replikerna är provlästa (98.12.1). Nya rum: kvarnen och loftet. Nya scener: k3s02_kvarnen, k3s02_loftet, k3s03_hornet, k3s03_bryggan, k3s05_skalkant, k3s06_ankaret och k3s07_resan (förut k3s06_skalkant, k3s04_ankaret och k3s05_resan). k3_tangen heter k3_hjulet.",
-  "andrat_v031": "2026-11-18 (beslut 101.7): bild på åtta mellanscener (kartbit3_on, loftet_horn, skuggan_lyssnar, unge_simmar, skoldpadda_huvud, skylt_tecken, skoldpadda_visar_berget och resan_kvall), och uppdragens egna kort (kort_kvarn, kort_on och kort_flaska). Ingen text är ändrad."
+  "andrat_v031": "2026-11-18 (beslut 101.7): bild på åtta mellanscener (kartbit3_on, loftet_horn, skuggan_lyssnar, unge_simmar, skoldpadda_huvud, skylt_tecken, skoldpadda_visar_berget och resan_kvall), och uppdragens egna kort (kort_kvarn, kort_on och kort_flaska). Ingen text är ändrad.",
+  "andrat_v032": "2026-11-18 (beslut 102.2–102.3): säckhissen (effekt sackhiss_upp på pa_stora i k3_kvarn_2, och bild sackhiss_ner), och hornet på en avsats i floden. Loftet har utgått som rum: k3s02_loftet och k3s03_hornet spelas i floden, som får tillståndet rent och föremålen hornet, hornet_skrift och sackhiss. Inga repliker är ändrade."
  },
  "var_var_vi": [
   {
@@ -137,6 +138,7 @@
    "tillstand": [
     "morgon",
     "hjul",
+    "rent",
     "on",
     "kvall"
    ],
@@ -169,6 +171,16 @@
     },
     "dorr_kvarn",
     "brygga_kvarn",
+    "hornet",
+    {
+     "id": "hornet_skrift",
+     "syns_i": [
+      "rent",
+      "on",
+      "kvall"
+     ]
+    },
+    "sackhiss",
     {
      "id": "on",
      "syns_i": [
@@ -196,6 +208,7 @@
     "flodbo_frukost": {
      "morgon": "Tre tut! Mat!",
      "hjul": "Tre tut! Mat!",
+     "rent": "Tre tut! Mat!",
      "on": "Där!",
      "kvall": {
       "text": "ahoj!",
@@ -205,6 +218,7 @@
     "flodbo_skrattar": {
      "morgon": "Ön? Ha ha!",
      "hjul": "Ön? Ha ha!",
+     "rent": "Ön? Ha ha!",
      "on": "Där!",
      "kvall": "Ön!"
     },
@@ -215,7 +229,15 @@
      }
     }
    },
-   "anteckning": "2 × 1 skärmar (manus 19 v0.4.1, Rummen 1). Västra skärmen: stigen från träsket in från norr, pråmarna i rad med plankor emellan och stånd med blå och vita ränder (vasskorgar med rosa band från vassbyn, svart glas och varma stenar från vulkanen), frukosthornet på en pråm, och vassbyns radiomast långt uppströms. Floden är bred och tom: ingen ö där kartbit 3 visar en. Östra skärmen: skepparen sitter för sig själv på sin pråm närmast kvarnen. Kvarnen står på stenfot i vattnet, med vattenhjulet insnott i tjock tång (tre tussar, tang_hjul_1–3, som han hugger en i taget) och det stora hornet högst upp i en lucka mot floden. dorr_kvarn är kvarnens dörr (till rummet kvarnen), och brygga_kvarn är bryggan där ön lägger till. Kameran glider över kvarnen och hornet när han kommer in (79.3, visas först). Tillstånden: morgon (hjulet står), hjul (hjulet snurrar och dunkar), on (ön ligger vid kvarnens brygga, planka_on syns när scenen visar den) och kvall (resan: skepparen står vid hornet i kvarnens lucka, ljusbåtarna). Bubblorna: TRE TUT! MAT! och ÖN? HA HA! hos två flodbor, ahoj! i gemener (87.7). Högst två som rör sig på samma skärm."
+   "anteckning": "2 × 2 skärmar (beslut 102.3, Stils skiss version 2). Stigen från träsket, pråmarna i vattnet i rad med plankor emellan och stånd med blå och vita ränder (vasskorgar med rosa band från vassbyn, svart glas och varma stenar från vulkanen), frukosthornet på en pråm, och vassbyns radiomast långt uppströms. Floden är bred och tom: ingen ö där kartbit 3 visar en. Skepparen sitter för sig själv på sin pråm närmast kvarnen. Kvarnen står på stenfot i vattnet, med vattenhjulet framför den västra delen, insnott i tjock tång (tre tussar, tang_hjul_1–3, som han hugger en i taget). dorr_kvarn är kvarnens dörr (till rummet kvarnen), och brygga_kvarn är bryggan där ön lägger till. Avsatsen: på kvarnens övervåning står det stora hornet av mässing, format som kammen på en dinosaurie, på en avsats ut mot floden. Dit kommer man bara med säckhissen (sackhiss, där hissen kommer upp). Därifrån ser han vad hans tut gör: flodborna med tallrikarna, skuggan och ön som stiger. Kameran glider ut över floden när han tutar och tillbaka efteråt (102.3). hornet_skrift är FEM TUT. INTE TRE. (målade bokstäver), som syns när mjölet har blåst bort. Kameran glider över kvarnen och hornet när han kommer in (79.3, visas först). Tillstånden: morgon (hjulet står, hornet fullt av mjöl), hjul (hjulet snurrar och dunkar, hornet fullt av mjöl), rent (hjulet snurrar, mjölet har blåst bort och skriften syns), on (ön ligger vid kvarnens brygga, planka_on syns när scenen visar den) och kvall (resan: skepparen står vid hornet på avsatsen, ljusbåtarna). Bubblorna: TRE TUT! MAT! och ÖN? HA HA! hos två flodbor, ahoj! i gemener (87.7). Högst två som rör sig på samma skärm.",
+   "skyltar": {
+    "hornet_skrift": {
+     "text": [
+      "Fem tut.",
+      "Inte tre."
+     ]
+    }
+   }
   },
   {
    "id": "kvarnen",
@@ -241,35 +263,7 @@
      ]
     }
    },
-   "anteckning": "1 skärm, inne (manus 19 v0.4.1, Rummen 2, ur 19b). Dammigt och fullt av mjöl, solstrimmor genom taket. Allt som tavlan talar om syns på samma skärm (79.3): två luckor (lucka_vatten vid vattenrännan och lucka_dorr i golvet vid dörren) och två säckar, en stor på säckhissen och en liten bredvid, med en markerad plats på och vid var och en (pa_stora, vid_stora, pa_lilla, vid_lilla). tavla_kvarn är morfars målade tavla, inte mässing, eftersom mässingsskyltarna med kompassrosen är Farfars (16 §9). Tavlan visar en rad åt gången. Säckhissen går upp genom ett hål i taket till loftet."
-  },
-  {
-   "id": "loftet",
-   "namn": "Loftet",
-   "tillstand": [
-    "mjol",
-    "rent"
-   ],
-   "innehall": [
-    "hornet",
-    {
-     "id": "hornet_skrift",
-     "syns_i": [
-      "rent"
-     ]
-    },
-    "lucka_floden",
-    "sackhiss"
-   ],
-   "skyltar": {
-    "hornet_skrift": {
-     "text": [
-      "Fem tut.",
-      "Inte tre."
-     ]
-    }
-   },
-   "anteckning": "Ett litet rum, 1 skärm (manus 19 v0.4.1: loftet som närbild). Datan gör det till ett rum tills Teknik har svarat (99.6), eftersom P29_tryck och tryck redan fungerar i ett rum. Hjälten står nästan stilla. En öppen lucka mot floden (lucka_floden), floden långt nedanför, och det stora hornet av mässing format som kammen på en dinosaurie. Tillståndet mjol: hornet är fullt av mjöl, och skriften syns inte. Tillståndet rent: mjölet har blåst bort, och på hornet står FEM TUT. INTE TRE. (hornet_skrift, målade bokstäver)."
+   "anteckning": "1 skärm, inne (manus 19 v0.4.1, Rummen 2, ur 19b). Dammigt och fullt av mjöl, solstrimmor genom taket. Allt som tavlan talar om syns på samma skärm (79.3): två luckor (lucka_vatten vid vattenrännan och lucka_dorr i golvet vid dörren) och två säckar, en stor på säckhissen och en liten bredvid, med en markerad plats på och vid var och en (pa_stora, vid_stora, pa_lilla, vid_lilla). tavla_kvarn är morfars målade tavla, inte mässing, eftersom mässingsskyltarna med kompassrosen är Farfars (16 §9). Tavlan visar en rad åt gången. Säckhissen går upp genom ett hål i taket till avsatsen med hornet (rummet floden, 102.3)."
   },
   {
    "id": "on",
@@ -457,7 +451,7 @@
     "text": "Var var vi? Ni är i kvarnen.",
     "upplast": true
    },
-   "anteckning": "Manus 19 v0.4.1, kvarnens tavla med två rader (ur 19b). Säckhissen tar honom upp till loftet.",
+   "anteckning": "Manus 19 v0.4.1, kvarnens tavla med två rader (ur 19b). Säckhissen tar honom upp till avsatsen med hornet (102.3, sackhiss_upp på pa_stora).",
    "steg": [
     {
      "typ": "mellanscen",
@@ -482,18 +476,18 @@
   {
    "id": "k3s02_loftet",
    "pass": 1,
-   "rum": "loftet",
-   "tillstand": "mjol",
+   "rum": "floden",
+   "tillstand": "hjul",
    "vid_omstart": {
     "talare": "farfar",
     "text": "Var var vi? Ni kom upp till hornet.",
     "upplast": true
    },
-   "anteckning": "Det första tutet är ett enda tryck utan pussel (17/11): det väcker skuggan och blåser bort mjölet, så att FEM TUT. INTE TRE. syns i pass 2. Det kan inte bli fel. Regierna loftet_horn och skuggan_lyssnar kommer när Stil har ritat. Passet slutar här, med skuggan som sjunker.",
+   "anteckning": "Hornet står på avsatsen på kvarnens övervåning (102.3). Han kommer upp med säckhissen. Det första tutet är ett enda tryck utan pussel (17/11): det väcker skuggan och blåser bort mjölet, så att FEM TUT. INTE TRE. syns i pass 2 (tillstand_efter rent). Det kan inte bli fel. Passet slutar här, med skuggan som sjunker. Scen-id:t står kvar fast loftet har utgått.",
    "steg": [
     {
      "typ": "mellanscen",
-     "beskrivning": "En öppen lucka mot floden, och det stora hornet av mässing, format som kammen på en dinosaurie. Det är fullt av mjöl. Långt nere på sin pråm tittar skepparen upp.",
+     "beskrivning": "Hissen stannar uppe på kvarnen. Ute på avsatsen står det stora hornet av mässing, format som kammen på en dinosaurie. Det är fullt av mjöl. Långt nere på sin pråm tittar skepparen upp.",
      "bild": "loftet_horn"
     },
     {
@@ -534,14 +528,14 @@
   {
    "id": "k3s03_hornet",
    "pass": 2,
-   "rum": "loftet",
+   "rum": "floden",
    "tillstand": "rent",
    "vid_omstart": {
     "talare": "farfar",
     "text": "Var var vi? Något stort simmade under vattnet.",
     "upplast": true
    },
-   "anteckning": "Pass 2 börjar med det andra tutet, som han läser sig till (P29_tryck, ratt 5). Ungen tror att det är mamma och simmar för första gången. Skepparen får sitt: ön finns. Regin unge_simmar finns, och unge_ropar är ett av ungens inspelade läten, högre än när den svarar.",
+   "anteckning": "Hornet står på avsatsen i floden (102.3). Pass 2 börjar med det andra tutet, som han läser sig till (P29_tryck, ratt 5). Ungen tror att det är mamma och simmar för första gången. Skepparen får sitt: ön finns. Regin unge_simmar finns, och unge_ropar är ett av ungens inspelade läten, högre än när den svarar.",
    "steg": [
     {
      "typ": "mellanscen",
@@ -559,7 +553,7 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Långt ute bubblar det igen, närmare nu. Ungen spetsar öronen, tar sats och hoppar ut genom luckan, rakt ner i floden. PLASK! Den simmar ut mot bubblorna.",
+     "beskrivning": "Långt ute bubblar det igen, närmare nu. Ungen spetsar öronen, tar sats och hoppar från avsatsen, rakt ner i floden. PLASK! Den simmar ut mot bubblorna.",
      "bild": "unge_simmar"
     },
     {
@@ -570,7 +564,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Ungen ropar, så högt den kan. Vattnet välver sig, och en ö stiger upp: gräs, mossa och ett litet träd. Ungen klättrar upp på ön och skakar sig. Ön glider in till kvarnens brygga. Skepparen tar av sig hatten. Säckhissen bär hjälten ner."
+     "beskrivning": "Ungen ropar, så högt den kan. Vattnet välver sig, och en ö stiger upp: gräs, mossa och ett litet träd. Ungen klättrar upp på ön och skakar sig. Ön glider in till kvarnens brygga. Skepparen tar av sig hatten. Säckhissen bär hjälten ner.",
+     "bild": "sackhiss_ner"
     },
     {
      "typ": "replik",
@@ -880,7 +875,7 @@
     "text": "Var var vi? Ni har min flaska.",
     "upplast": true
    },
-   "anteckning": "Resan nedför floden är tacket och kapitlets slut. Hjälten sitter på skalet (97.5) och kan inte gå. De två trycken är flaskan och skepparen, som står i kvarnens lucka vid hornet. Farfars två repliker om baronens bit löser in löftet från kapitel 2 (72.9) och är reserven om pass 3 blir för långt (99.4). \"Bit fyra! Vägen går till berget.\" är struken (manus 19 v0.4). Regin resan_kvall kommer när Stil har ritat.",
+   "anteckning": "Resan nedför floden är tacket och kapitlets slut. Hjälten sitter på skalet (97.5) och kan inte gå. De två trycken är flaskan och skepparen, som står vid hornet på avsatsen. Farfars två repliker om baronens bit löser in löftet från kapitel 2 (72.9) och är reserven om pass 3 blir för långt (99.4). \"Bit fyra! Vägen går till berget.\" är struken (manus 19 v0.4). Regin resan_kvall kommer när Stil har ritat.",
    "steg": [
     {
      "typ": "mellanscen",
@@ -921,7 +916,7 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "De glider förbi marknaden. Flodfolket sätter ut sina ljusbåtar på vattnet. Uppe i kvarnens lucka står skepparen vid det stora hornet och vinkar."
+     "beskrivning": "De glider förbi marknaden. Flodfolket sätter ut sina ljusbåtar på vattnet. Uppe på kvarnens avsats står skepparen vid det stora hornet och vinkar."
     },
     {
      "typ": "replik",
@@ -1221,7 +1216,8 @@
        "id": "pa_stora",
        "objekt": "pa_stora",
        "bild": "pa_stora_sacken",
-       "ratt": true
+       "ratt": true,
+       "effekt": "sackhiss_upp"
       },
       {
        "id": "vid_stora",
@@ -2115,7 +2111,7 @@
      "pussel": "k3_chiffret"
     }
    },
-   "anteckning": "Bildkortet är lånat (chiffernyckel) tills Stil ritar ön (kort_on)."
+   "anteckning": "Kortet är Stils kort_on (101.7)."
   },
   {
    "id": "u3_flaskan",

@@ -14,7 +14,7 @@ import { aventyrFor, spelareAttVisa } from './karna/sparning.js';
 import { varVarVi, senastSpelad } from './karna/varvarvi.js';
 import { musikFor } from './karna/musik.js';
 import { ljudLista } from './karna/ljudid.js';
-import { SYNS_REDAN_MS, UNGE_TILL_MS, visarRegi, lockarVisarBeskrivning, NARBILDER, narbildFor, NARBILD_MS, BLOT_MS } from './karna/mellanscen.js';
+import { SYNS_REDAN_MS, UNGE_TILL_MS, visarRegi, lockarVisarBeskrivning, NARBILDER, narbildFor, NARBILD_MS, BLOT_MS, BILD_PA_KORTET } from './karna/mellanscen.js';
 import { bubblaFor, bubblaText, BUBBLA_MS } from './karna/bubblor.js';
 import { sparaPassbild, aterstallLarande, forstaIPasset } from './karna/larandebild.js';
 import { pekningOmMs, skapaHjalpSpar, knufftidMs } from './karna/hjalp.js';
@@ -697,10 +697,14 @@ export function skapaSpel(d) {
     const regi = visarRegi(h) ? h.handling || h.reaktion : null;
     if (regi) ui.visaRegi(regi, 0);
     if (h.fest) { ljud.spela('fest_mellan'); ui.visaFest('✨', tid(900)); }
+    // reaktionens regi i rummet (102.3, kapitel 3:s horn: tallrikarna, skuggan som stiger eller dyker), som en
+    // mellanscens bild
+    const regiMs = h.bild && !BILD_PA_KORTET.has(h.bild) ? rum.regi(h.bild) : 0;
+    if (h.bild && !BILD_PA_KORTET.has(h.bild) && !regiMs) logg.handelse('FEL', `reaktionen har en bild som inte finns som regi: ${h.bild}`);
     const ruta = ui.plattan.hidden ? null : ui.plattan.querySelector('.pussel-ruta, .formel-ruta');
     if (h.replik && ruta) { const rad = document.createElement('div'); rad.className = 'svar-rad'; rad.innerHTML = portratt(h.replik.talare) + `<div class="text">${ui.rader(h.replik.text, varden())}</div>`; ruta.prepend(rad); }
-    if (h.replik && !ruta) { await replik(h.replik); if (regi) ui.doljRegi(); return; }
-    if (h.replik) await Promise.all([sag(h.replik), vanta(tid(1200))]); else await vanta(tid(1400));
+    if (h.replik && !ruta) { await Promise.all([replik(h.replik), vanta(tid(regiMs))]); if (regi) ui.doljRegi(); return; }
+    if (h.replik) await Promise.all([sag(h.replik), vanta(tid(1200)), vanta(tid(regiMs))]); else await Promise.all([vanta(tid(1400)), vanta(tid(regiMs))]);
     if (regi) await vanta(tid(500));
     ui.doljRegi();
   }
@@ -1097,7 +1101,7 @@ export function skapaSpel(d) {
     let forra = null;
     if (glida) { rum.frys(true); forra = await rum.bild(); }
     if (tonas) { rum.frys(true); await ui.tona(true, tid(300)); }
-    rum.visa({ rum: scen.rum, tillstand: b.rumsTillstand(scen.rum), innehall: r ? innehallNu(r) : [], kvar: r ? kvarNu(r) : [], bytta: r ? byttaNu(r) : [], unge: tillstand.spelare.unge?.folj ?? !!tillstand.spelare.unge?.namn, nyttRum: nytt,
+    rum.visa({ rum: scen.rum, scen: scen.id, tillstand: b.rumsTillstand(scen.rum), innehall: r ? innehallNu(r) : [], kvar: r ? kvarNu(r) : [], bytta: r ? byttaNu(r) : [], unge: tillstand.spelare.unge?.folj ?? !!tillstand.spelare.unge?.namn, nyttRum: nytt,
       karta: scen.rum ? kartor[scen.rum] ?? null : null, franRum, delar: scen.rum ? delarIRummet(kartor[scen.rum]) : {}, visade: scen.rum ? b.visade(scen.rum) : [] });
     if (nytt) rullning.rumOppnat(); // rummet laddas: glapp nu säger inget om datorn (75.6)
     if (scen.rum) bildlagen();
@@ -3403,7 +3407,10 @@ export function skapaSpel(d) {
         if (res.resultat !== 'fel') continue;
         rum.frys(true);
         felljud(res.reaktion);
+        // 102.3: kameran glider ut över floden från hornet på avsatsen, så att han ser vad tuten gjorde, och tillbaka
+        if (rum.utsikt?.(p.foremal)) await vanta(tid(900));
         await reaktion(res.reaktion, p.foremal);
+        rum.utsiktSlut?.();
         // förenklingen (ETT lyser på stenen): texten för den vuxne i gråboxen, en gång
         if (p.forenkla && !forenklad && r.s.fel >= p.forenkla.efter_fel) { forenklad = true; logg.handelse('förenkla', p.forenkla.andring); await ui.visaRegi(p.forenkla.andring, tid(1500)); ui.doljRegi(); }
         fraga(); rum.frys(false); k.nollstall();
@@ -3415,7 +3422,10 @@ export function skapaSpel(d) {
     }
     ljud.spela('ratt');
     rum.frys(true);
+    const ut = rum.utsikt?.(p.foremal);
+    if (ut) await vanta(tid(900));
     if (p.vid_ratt) await reaktion(p.vid_ratt, p.foremal);
+    if (ut) rum.utsiktSlut?.();
     return { niva: variantNyckel, forstaForsoket: r.s.fel === 0, forsok: r.s.forsok, hjalp: spar.hjalp, knuffFore: false };
   }
 

@@ -213,7 +213,9 @@ describe('mellanscenernas bilder och bildkorten', () => {
     'kartbit3_on', 'loftet_horn', 'skuggan_lyssnar', 'unge_simmar', 'skoldpadda_huvud', 'skylt_tecken', 'skoldpadda_visar_berget',
     'resan_kvall',
     // 101.3: säckhissen upp genom taket i kvarnen och ned genom golvet i loftet
-    'sackhiss_upp', 'sackhiss_ner']);
+    'sackhiss_upp', 'sackhiss_ner',
+    // 102.3: ön stiger vid kvarnens brygga, sedd från avsatsen
+    'on_stiger']);
   it('varje mellanscen med bild har grafik (morgonen i sängen, luftskeppets lägen, sidovyerna, ungen på kartbiten, ägget)', () => {
     const saknas = [];
     for (const k of kapitel) for (const sc of k.scener) for (const st of sc.steg) {

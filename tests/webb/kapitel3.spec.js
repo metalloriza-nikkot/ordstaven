@@ -1,6 +1,6 @@
 // Kapitel 3 i gråbox (beslut 87.9.3, ombyggd efter kap-03 v0.3 och manus 19 v0.4.1, beslut 100.4): de tre passen
 // spelas som en spelare med tryck på marken och tangentbordet. Pass 1: SVÄRD vid hjulet, de tre tussarna, kvarnens
-// tavla och det första tutet i loftet. Pass 2: FEM TUT. INTE TRE., ön vid bryggan, mossan, skylten, snäckorna och
+// tavla, säckhissen upp och det första tutet på avsatsen (102.3). Pass 2: FEM TUT. INTE TRE., ön vid bryggan, mossan, skylten, snäckorna och
 // chiffret. Pass 3: fenan, kramen, tången med skalkanten mitt i, SKÖLD, ordduellen och resan. Kapitlet står inte i
 // listan än, så det öppnas med ?kapitel=kap-03 (för den vuxne).
 import { test, expect } from './hjalp/klocka.js';
@@ -16,6 +16,10 @@ const pussel = new Map(kap.pussel.map((p) => [p.id, p]));
 function gaMotSida(id) {
   const o = window.__ORDSTAVEN.ruta(id); if (!o) return false;
   const p = o.sida === 'vanster' ? [o.x - 9, o.y + o.h - 1] : o.sida === 'hoger' ? [o.x + o.b + 9, o.y + o.h - 1] : o.sida === 'over' ? [o.x + o.b / 2, o.y - 2] : [o.x + o.b / 2, o.y + o.h + 6];
+  // från alla håll, när han inte når saken nedifrån (tången vid vattnet på sandbanken): dit spelet går när man trycker
+  // på saken, den närmaste sidan han når
+  const r = window.__ORDSTAVEN.spel.scene.getScene('Rum');
+  if (o.sida === 'alla' && !r.hinder.vag(r.pos, { x: p[0], y: p[1] }).length) { const f = r.standplats(r.ruta(id)); window.__ORDSTAVEN.gaMot(f.x, f.y); return true; }
   window.__ORDSTAVEN.gaMot(p[0], p[1]); return true;
 }
 
@@ -35,7 +39,7 @@ async function starta(page, scenId, scen = kap.scener.findIndex((s) => s.id === 
   await page.click('.start-knapp');
 }
 
-test('kapitel 3 pass 1: SVÄRD vid hjulet, tussarna, kvarnens tavla och det första tutet i loftet', { tag: '@rok-mac' }, async ({ page }, info) => {
+test('kapitel 3 pass 1: SVÄRD vid hjulet, tussarna, kvarnens tavla, hissen och det första tutet på avsatsen', { tag: '@rok-mac' }, async ({ page }, info) => {
   test.skip(!['mac-helskarm', 'ipad-10', 'mac-safari'].includes(info.project.name), 'tre projekt räcker, som kapitel 2 (84.6)');
   test.setTimeout(240000);
   await starta(page, 'k3s01_floden');
@@ -100,9 +104,18 @@ test('kapitel 3 pass 1: SVÄRD vid hjulet, tussarna, kvarnens tavla och det för
   expect(loggen).toMatch(/k3_kvarn_2.*vid_stora/);
   // det första tutet blåser bort mjölet
   expect(loggen).toContain('[tryck] hornet');
-  expect(loggen).toContain('[rummet] loftet: rent');
+  expect(loggen).toContain('[rummet] floden: rent');
   const av = (await ev(() => window.__ORDSTAVEN.tillstand())).aventyr['den-gomda-dalen'];
-  expect(av.rumstillstand).toMatchObject({ floden: 'hjul', loftet: 'rent' });
+  expect(av.rumstillstand).toMatchObject({ floden: 'rent' });
+  // hissen upp till avsatsen (102.3): han står uppe vid hornet, och kameran gled ut över floden vid tutet
+  const regi = (await ev(() => window.__ORDSTAVEN.grafik())).regi;
+  expect(loggen).toContain('[val] k3_kvarn_2: sackhiss_upp');
+  expect(regi).toContain('skuggan lyssnar');
+  expect(regi).toContain('kameran ut över floden');
+  const pos = await ev(() => window.__ORDSTAVEN.position());
+  const avsats = await ev(() => window.__ORDSTAVEN.ruta('hornet'));
+  expect(pos.y).toBeLessThan(avsats.y + 20);
+  expect(pos.x).toBeGreaterThan(460);
 });
 
 test('flodmannen säger ahoj! i gemener (87.7)', async ({ page }) => {
@@ -178,7 +191,7 @@ test('kapitel 3 pass 2: FEM TUT. INTE TRE., ön vid bryggan, mossan, skylten, sn
     if (st?.typ === 'ga_till') await anvand(st.mal);
     else if (p?.typ === 'P29_tryck') {
       // fram till hornet först: på vägen öppnas skriften på läsplattan (han läser den och stänger), sedan igen
-      const h = await ev(() => { const o = window.__ORDSTAVEN.ruta('hornet'), q = window.__ORDSTAVEN.position(); return Math.hypot(q.x - (o.x + o.b / 2), q.y - (o.y + o.h + 6)); });
+      const h = await ev(() => { const o = window.__ORDSTAVEN.ruta('hornet'), q = window.__ORDSTAVEN.position(); const m = o.sida === 'vanster' ? [o.x - 9, o.y + o.h - 1] : [o.x + o.b / 2, o.y + o.h + 6]; return Math.hypot(q.x - m[0], q.y - m[1]); });
       if (h > 14) { await gaMot(p.foremal); await page.waitForTimeout(1200); continue; }
       // först tre tut (frukost: flodfolket springer fram), sedan fem
       if (hornet === 0) await page.screenshot({ path: 'test-results/kap3-hornet.png' });
@@ -371,11 +384,11 @@ test('krockarna i loggen (97.6): går han mot ett hinder i mer än ca 1 s skrive
   expect((await ev(() => window.__ORDSTAVEN.logg())).match(/\[krock\]/g).length).toBe(fore);
 });
 
-test('regierna i kapitel 3:s gråbox (100.4 och 101.3): var och en går i sitt rum och syns', async ({ page }, info) => {
+test('regierna i kapitel 3:s gråbox (100.4, 101.3 och 102.3): var och en går i sitt rum och syns', async ({ page }, info) => {
   test.skip(!['mac-helskarm', 'ipad-10', 'mac-safari'].includes(info.project.name), 'tre projekt räcker, som kapitel 2 (84.6)');
   test.setTimeout(180000);
   const ev = (fn, arg) => page.evaluate(fn, arg);
-  const REGIER = [['k3s01_floden', ['kartbit3_on']], ['k3s02_kvarnen', ['sackhiss_upp']], ['k3s02_loftet', ['loftet_horn', 'skuggan_lyssnar']], ['k3s03_hornet', ['unge_simmar', 'sackhiss_ner']],
+  const REGIER = [['k3s01_floden', ['kartbit3_on']], ['k3s02_kvarnen', ['sackhiss_upp']], ['k3s02_loftet', ['loftet_horn', 'skuggan_lyssnar']], ['k3s03_hornet', ['tallrikar', 'skuggan_stiger', 'skuggan_dyker', 'unge_simmar', 'sackhiss_ner']],
     ['k3s04_on', ['skoldpadda_huvud', 'skylt_tecken']], ['k3s05_sandbanken', ['skoldpadda_visar_berget']], ['k3s07_resan', ['resan_kvall']]];
   for (const [scenId, regier] of REGIER) {
     // på ön börjar den där skylten syns (efter mossan), så att tecknen har sin skylt
@@ -391,6 +404,13 @@ test('regierna i kapitel 3:s gråbox (100.4 och 101.3): var och en går i sitt r
       await page.waitForTimeout(Math.max(0, ms - 2600) + 300);
     }
     if (scenId === 'k3s03_hornet') expect(await ev(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').unge.visible)).toBe(false);
+    // 102.3: ön steg vid bryggan innan hissen bar honom ned, och han kom ut genom kvarnens dörr på kajen
+    if (scenId === 'k3s03_hornet') {
+      const regi = (await ev(() => window.__ORDSTAVEN.grafik())).regi;
+      expect(regi).toEqual(expect.arrayContaining(['tallrikarna', 'skuggan stiger en bit', 'skuggan dyker', 'ungen simmar', 'ön stiger', 'säckhissen ner']));
+      expect((await ev(() => window.__ORDSTAVEN.position())).y).toBeGreaterThan(140);
+      expect(await ev(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').hjalte.alpha)).toBe(1);
+    }
     // säckhissen: hjälten har åkt ut ur rummet och syns inte (han syns igen i nästa rum)
     if (scenId === 'k3s02_kvarnen') expect(await ev(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').hjalte.alpha)).toBe(0);
   }

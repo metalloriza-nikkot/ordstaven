@@ -226,6 +226,13 @@ export function lasKarta(tmj) {
       if (egen.landar_nara) ut.landarNara = true;
       // rackvidd (Teknik 34) = han når den på längre håll än vanligt: tavlorna högt på väggen (71.4), halvan i vattnet
       if (egen.rackvidd) ut.rackvidd = Math.max(1, tal(egen.rackvidd, 0));
+      // rund (102.3) = gråboxen ritar föremålet som en ellips (sköldpaddans skal i den gemensamma skalan)
+      if (egen.rund) ut.rund = true;
+      // bara_i (102.3) = dekor som bara syns i vissa tillstånd, med komma emellan (skalet ute på floden på kvällen)
+      if (egen.bara_i) ut.baraI = String(egen.bara_i).split(',').map((t) => t.trim()).filter(Boolean);
+      // utsikt (102.3) = regipunkten kameran glider till när han använder föremålet (hornet på avsatsen: regi_on), så
+      // att han ser vad det gör, och tillbaka efteråt
+      if (egen.utsikt) ut.utsikt = String(egen.utsikt);
       objekt.push(ut);
     }
   }

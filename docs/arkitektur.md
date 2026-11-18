@@ -1162,3 +1162,14 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **`verktyg/kartor/kap3.py`:** `FOREMALSBILDER` och flodfolkets bilder sätts redan i gråboxens rum, eftersom rummen ritas först efter skissen. Rutorna har Stils storlekar där bilderna står. Sköldpaddan på sandbanken och ön väntar på skissen.
 - **Inkorgen:** när bara några bilder i en figurs mapp är nya, plockas de andra ur repots atlas, så att atlasen byggs hel (`ur_atlas` i teknikchatten). Alla gamla bilder prövas mot den gamla atlasen, pixel för pixel.
 
+## Avsatsen i floden (0.92.0, beslut 102.3)
+- **Floden är 2 × 2 skärmar** (640 × 384) efter Stils skiss version 2 med avsatsen. Loftet har utgått som rum: hornet står på avsatsen på kvarnens övervåning, och väggarna runt avsatsen gör att den bara nås med säckhissen.
+- **Kartans nya egenskaper:**
+  - `utsikt` på ett föremål = regipunkten kameran glider till när han använder det (hornet: `regi_on`, där ön ligger). `Rum.utsikt(id)` och `utsiktSlut()`; `tryckRakna` glider ut före reaktionen och tillbaka efteråt;
+  - `rund` = gråboxen ritar föremålet som en ellips (skalet i den gemensamma skalan, 280 × 192). Ett runt föremål får gå ut ur bild (kontrollen);
+  - `bara_i` på dekor = den ritas bara i de tillstånden (skalet ute på floden på kvällen);
+  - punkten `regi_hiss` = dörren ut till avsatsen, där han kommer ut med hissen upp och går in med hissen ner (`hissGenomDorren`: in genom dörren, ut genom kvarnens dörr på kajen);
+  - punkten `regi_hjalte_<scen>` = där han står när scenen börjar i rummet (avsatsen i k3s02_loftet och k3s03_hornet, skalet i resan). Platsen är exakt och flyttas inte till närmaste fria punkt. `Rum.visa` får därför scenens id.
+- **Reaktioner med regi** (schema 2.48): `bild` på en reaktion spelar en regi i rummet (`tallrikar`, `skuggan_stiger`, `skuggan_dyker`, listan `REAKTION_REGI` i `karna/mellanscen.js`). Texten för den vuxne visas som förut.
+- **Regierna i floden:** `loftet_horn` visar Stils horn från sidan som närbild ovanför avsatsen, `skuggan_lyssnar` och `unge_simmar` spelas ut över floden (`skugganIFloden`, `ungeHopparFranAvsatsen`), och `on_stiger` lyfter skalet ur vattnet vid kvarnens brygga. `sackhiss_ner` på avsatsen börjar med att ön stiger när ungen simmar, eftersom mellanscenen har båda.
+- **Säckhissen i ett snabbt test:** hissens tweens slutar flytta hjälten när rummet har bytts, och flaggan att han åkte hiss sätts när regin börjar.

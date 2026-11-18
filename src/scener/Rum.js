@@ -179,6 +179,8 @@ export class Rum extends Phaser.Scene {
     /** @type {any} */ this.k3Huvud = null;
     /** @type {any} */ this.k3Mjol = null;
     /** @type {boolean} hjälten och ungen har åkt säckhissen ut ur rummet (101.3) */ this.k3IHissen = false;
+    /** @type {any} skuggan eller ön i floden (102.3) */ this.k3Skugga = null;
+    /** @type {any} ungen som simmar i floden (102.3) */ this.k3Simmar = null;
     /** @type {string | null} en hel bild av hjälten i stället för gången (kartbiten upp mot luftskeppet, s22) */
     this.hjaltePose = null;
     /** @type {{ talare: string, riktning: string } | null} det senaste samtalet (testkroken) */
@@ -1022,6 +1024,10 @@ export class Rum extends Phaser.Scene {
       skoldpadda_visar_berget: () => this.skoldpaddaVisarBerget(),
       resan_kvall: () => this.resanKvall(),
       // säckhissen (101.3): upp genom hålet i taket i kvarnen, och ned genom golvet i loftet
+      tallrikar: () => this.tallrikar(),
+      skuggan_stiger: () => this.skugganStiger(),
+      skuggan_dyker: () => this.skugganDyker(),
+      on_stiger: () => this.onStiger(),
       sackhiss_upp: () => this.sackhiss(-1),
       sackhiss_ner: () => this.sackhiss(1),
     });
@@ -2029,6 +2035,7 @@ export class Rum extends Phaser.Scene {
   loftetHorn() {
     const h = this.ruta('hornet');
     if (!h) return 0;
+    if (!this.ruta('lucka_floden')) return this.hornetNarbild(h);
     const smuts = () => { this.smutsig = true; };
     this.regiFokus = { x: h.x + h.b / 2, y: h.y + h.h / 2 };
     this.k3Mjol?.destroy();
@@ -2048,6 +2055,7 @@ export class Rum extends Phaser.Scene {
    */
   skugganLyssnar() {
     const h = this.ruta('hornet'), l = this.ruta('lucka_floden');
+    if (h && !l && this.utsiktsPunkt('hornet')) return this.skugganIFloden(h);
     if (!h || !l) return 0;
     const smuts = () => { this.smutsig = true; };
     this.k3Mjol?.destroy(); this.k3Mjol = null;
@@ -2074,6 +2082,7 @@ export class Rum extends Phaser.Scene {
    * @returns {number}
    */
   ungeSimmar() {
+    if (!this.ruta('lucka_floden') && this.utsiktsPunkt('hornet')) return this.ungeHopparFranAvsatsen();
     const l = this.ruta('lucka_floden');
     if (!l || !this.ungeBild || !this.unge.visible) return 0;
     const kant = { x: Math.round(l.x + l.b / 2), y: Math.round(l.y + l.h + 2) }, vy = l.y + l.h - 12;
@@ -2210,16 +2219,21 @@ export class Rum extends Phaser.Scene {
    * @returns {number}
    */
   sackhiss(riktning) {
+    // på avsatsen i flodrummet (102.3) står hissen inne i kvarnen bakom dörren ut till avsatsen (regi_hiss)
+    if (riktning > 0 && this.regiPunkter.hiss) return this.hissGenomDorren(this.regiPunkter.hiss);
     const h = this.ruta('sackhiss');
     if (!h) return 0;
     const smuts = () => { this.placera(); this.smutsig = true; };
     const mitt = { x: Math.round(h.x + h.b / 2), y: Math.round(h.y + h.h - 3) };
     const fran = { ...this.pos }, ufran = { ...this.ungePos };
+    // nästa scen kan vara i ett annat rum innan hissen är framme (snabbläget i testerna): då flyttas han inte mer
+    const rummet = this.rumId, kvar = () => this.rumId === rummet;
     const visas = this.unge.visible;
     if (visas) this.hallUngen(this.ungePos.x, this.ungePos.y);
     // 1. de kliver upp på plattformen (0,6 s)
     const t1 = { p: 0 };
     this.tweens.add({ targets: t1, p: 1, duration: 600, ease: 'Sine.easeInOut', onUpdate: () => {
+      if (!kvar()) return;
       this.pos = { x: fran.x + (mitt.x - 5 - fran.x) * t1.p, y: fran.y + (mitt.y - fran.y) * t1.p };
       if (visas) this.ungePos = { x: ufran.x + (mitt.x + 8 - ufran.x) * t1.p, y: ufran.y + (mitt.y - ufran.y) * t1.p };
       smuts();
@@ -2237,15 +2251,260 @@ export class Rum extends Phaser.Scene {
     // 2. hissen åker (1,4 s), och de tonas bort sista halvan
     const t2 = { p: 0 };
     this.tweens.add({ targets: t2, p: 1, duration: 1400, delay: 650, ease: 'Sine.easeIn', onUpdate: () => {
+      if (!kvar()) { g.destroy(); return; }
       const dy = vag * t2.p;
       this.pos = { x: mitt.x - 5, y: mitt.y + dy };
       if (visas) this.ungePos = { x: mitt.x + 8, y: mitt.y + dy };
       const a = t2.p < 0.5 ? 1 : Math.max(0, 1 - (t2.p - 0.5) * 2);
       this.hjalte.setAlpha(a); this.unge.setAlpha(a); g.setAlpha(a);
       rita(dy); smuts();
-    }, onComplete: () => { this.k3IHissen = true; } });
+    } });
+    // han åker med hissen ut ur rummet: i nästa rum kommer han ut där hissen kommer upp (regi_hiss)
+    this.k3IHissen = true;
     this.regiLogg.push(riktning < 0 ? 'säckhissen upp' : 'säckhissen ner');
     return 2100;
+  }
+
+  /**
+   * Punkten kameran glider till när föremålet används (kartans utsikt, 102.3: hornet på avsatsen ser ut över floden
+   * där ön ligger). @param {string} id @returns {{ x: number, y: number } | null}
+   */
+  utsiktsPunkt(id) {
+    const o = this.objekt.find((x) => x.id === id);
+    return (o?.utsikt && this.regiPunkter[o.utsikt]) || null;
+  }
+
+  /**
+   * Kameran glider ut över floden när han tutar (102.3), så att han ser verkan. Den står kvar tills utsiktSlut eller
+   * en regi tar den. @param {string} id @returns {boolean} om föremålet har en utsikt
+   */
+  utsikt(id) {
+    const p = this.utsiktsPunkt(id);
+    if (!p) return false;
+    this.regiFokus = { x: p.x, y: p.y - 20 };
+    this.regiLogg.push('kameran ut över floden');
+    return true;
+  }
+
+  /** Kameran tillbaka till hjälten efter utsikten. */
+  utsiktSlut() { this.regiFokus = null; }
+
+  /**
+   * Hornet i närbild (102.3): på avsatsen ritas hornet ovanifrån, och Stils horn från sidan (hornet_mjol eller
+   * hornet_rent efter tillståndet) visas en stund ovanför det, i en ram. @param {{ x: number, y: number, b: number, h: number }} h
+   * @returns {number}
+   */
+  hornetNarbild(h) {
+    const smuts = () => { this.smutsig = true; };
+    this.regiFokus = { x: h.x + h.b / 2, y: h.y + 20 };
+    const namn = this.tillstand === 'rent' || this.tillstand === 'on' || this.tillstand === 'kvall' ? 'hornet_rent' : 'hornet_mjol';
+    const fb = foremalsbild(this, namn);
+    const cx = Math.round(Math.min(this.storlek.bredd - 54, h.x + h.b / 2)), y1 = Math.round(h.y - 6);
+    const c = this.add.container(0, 0).setAlpha(0); this.lagerLuft.add(c);
+    const bild = fb ? this.add.image(cx, y1 - 4, fb.nyckel, fb.ram).setOrigin(0.5, 1) : null;
+    const bb = bild ? bild.width : 60, bh = bild ? bild.height : 30;
+    c.add(this.add.rectangle(cx - bb / 2 - 4, y1 - bh - 8, bb + 8, bh + 8, 0xf6ead0, 1).setOrigin(0, 0).setStrokeStyle(2, 0x6b4f2a, 1));
+    if (bild) c.add(bild); else c.add(this.add.rectangle(cx - 26, y1 - 24, 52, 14, 0xc89b3c, 1).setOrigin(0, 0));
+    this.tweens.add({ targets: c, alpha: 1, duration: 250, onUpdate: smuts });
+    this.tweens.add({ targets: c, alpha: 0, duration: 300, delay: 1500, onUpdate: smuts, onComplete: () => { c.destroy(); smuts(); } });
+    this.time.delayedCall(1800, () => { this.regiFokus = null; });
+    this.regiLogg.push('hornet i närbild');
+    return 1900;
+  }
+
+  /**
+   * En skugga under vattnet vid ön (102.3), i skalets storlek. Den ligger kvar tills rummet ritas om eller en regi tar
+   * bort den. @param {number} alfa @returns {Phaser.GameObjects.Ellipse | null}
+   */
+  k3NySkugga(alfa) {
+    const p = this.utsiktsPunkt('hornet');
+    if (!p) return null;
+    this.k3Skugga?.destroy();
+    const sk = this.add.ellipse(p.x, p.y, 264, 168, 0x0a1830, 1).setAlpha(alfa); this.lagerObjekt.add(sk);
+    this.k3Skugga = sk;
+    return sk;
+  }
+
+  /**
+   * Det första tutet på avsatsen (102.3): ringar från hornet och mjölmolnet, kameran glider ut över floden, det
+   * bubblar, och en jättelik skugga glider fram under vattnet, stannar som om den lyssnar och sjunker. Sedan tillbaka
+   * till hjälten. @param {{ x: number, y: number, b: number, h: number }} h @returns {number}
+   */
+  skugganIFloden(h) {
+    const smuts = () => { this.smutsig = true; };
+    const p = /** @type {{ x: number, y: number }} */ (this.utsiktsPunkt('hornet'));
+    this.k3Mjol?.destroy(); this.k3Mjol = null;
+    const hx = h.x + h.b / 2, hy = h.y + h.h / 2;
+    this.k3Ramar(h.x + h.b, h.y + h.h + 6, ['mjolmoln_01', 'mjolmoln_02', 'mjolmoln_03'], 220, { lager: this.lagerLuft });
+    for (let i = 0; i < 3; i++) this.k3Ring(hx, hy + 12, 6, 44, 0xfff2a8, 900, i * 260);
+    this.time.delayedCall(700, () => this.utsikt('hornet'));
+    for (let i = 0; i < 5; i++) this.k3Ring(p.x - 30 + (i % 3) * 24, p.y - 10 + (i % 2) * 12, 1, 6, 0xf2fbff, 500, 1500 + i * 200);
+    const sk = this.k3NySkugga(0);
+    if (sk) {
+      sk.x = p.x - 70;
+      this.tweens.add({ targets: sk, x: p.x, alpha: 0.45, duration: 1600, delay: 1800, ease: 'Sine.easeOut', onUpdate: smuts });
+      this.tweens.add({ targets: sk, alpha: 0, scaleX: 0.7, scaleY: 0.7, duration: 1000, delay: 4300, onUpdate: smuts, onComplete: () => { sk.destroy(); if (this.k3Skugga === sk) this.k3Skugga = null; smuts(); } });
+    }
+    this.time.delayedCall(5400, () => { this.regiFokus = null; });
+    this.regiLogg.push('skuggan lyssnar');
+    return 5600;
+  }
+
+  /**
+   * Ungen tror att det är mamma (k3s03_hornet, 102.3): den tar sats på avsatsen, hoppar över räcket och kajen rakt ner
+   * i floden, PLASK, och simmar ut mot bubblorna där ön ligger. Kameran följer ungen. @returns {number}
+   */
+  ungeHopparFranAvsatsen() {
+    if (!this.ungeBild || !this.unge.visible) return 0;
+    const smuts = () => { this.smutsig = true; };
+    const p = /** @type {{ x: number, y: number }} */ (this.utsiktsPunkt('hornet'));
+    const vatten = { x: Math.round(Math.max(360, Math.min(this.storlek.bredd - 30, this.ungePos.x - 30))), y: 214 };
+    this.hallUngen(this.ungePos.x, this.ungePos.y);
+    this.ungeReagerar(true);
+    this.regiFokus = { x: this.ungePos.x, y: this.ungePos.y };
+    this.time.delayedCall(600, () => {
+      this.ungeLage('hopp', vatten.x >= this.ungePos.x ? 'hoger' : 'vanster', 217, 1);
+      const fran = { ...this.ungePos }, t = { p: 0 };
+      this.tweens.add({ targets: t, p: 1, duration: 900, onUpdate: () => { this.regiFokus = { x: fran.x + (vatten.x - fran.x) * t.p, y: fran.y + (vatten.y - fran.y) * t.p }; } });
+      this.ungeBage(vatten, 900, 34, () => {
+        this.k3UngeIVattnet = true; this.unge.setVisible(false);
+        if (!this.k3Ramar(vatten.x, vatten.y + 6, ['effekt_plask_01', 'effekt_plask_02', 'effekt_plask_03'], 140)) { this.k3Ring(vatten.x, vatten.y, 2, 10, 0xf2fbff, 500); this.k3Ring(vatten.x, vatten.y, 2, 15, 0xf2fbff, 600, 120); }
+        const sim = ['unge1_simmar_hoger_01', 'unge1_simmar_hoger_02', 'unge1_simmar_vanster_01', 'unge1_simmar_vanster_02'].map((r) => foremalsbild(this, r));
+        const mal = { x: p.x - 40, y: p.y - 40 };
+        const at = mal.x >= vatten.x ? 0 : 2;
+        const u = sim.every(Boolean)
+          ? this.add.image(vatten.x, vatten.y + 8, /** @type {any} */ (sim[at]).nyckel, /** @type {any} */ (sim[at]).ram).setOrigin(0.5, 1).setVisible(false)
+          : this.add.circle(vatten.x, vatten.y, 3, 0x7fbf5a);
+        this.lagerLjust.add(u); this.k3Simmar = u;
+        this.time.delayedCall(400, () => { if (u.active) u.setVisible(true); });
+        const t2 = { p: 0 };
+        this.tweens.add({ targets: t2, p: 1, duration: 2000, delay: 400, ease: 'Sine.easeInOut', onUpdate: () => {
+          if (!u.active) return;
+          u.x = vatten.x + (mal.x - vatten.x) * t2.p; u.y = vatten.y + 8 + (mal.y - vatten.y) * t2.p + Math.round(Math.sin(u.x / 4));
+          const f = sim[at + (Math.floor(this.time.now / 250) % 2)];
+          if (f && /** @type {any} */ (u).setTexture) /** @type {any} */ (u).setTexture(f.nyckel, f.ram);
+          this.regiFokus = { x: u.x, y: u.y };
+          smuts();
+        } });
+      });
+    });
+    this.time.delayedCall(3600, () => { this.regiFokus = { x: p.x, y: p.y - 20 }; });
+    this.regiLogg.push('ungen simmar');
+    return 3700;
+  }
+
+  /**
+   * Tre tut är frukost (k3_hornet, 102.3): flodfolket springer fram med tallrikarna en gång till och tittar sig
+   * omkring. Kameran visar pråmarna (regi_pramar). @returns {number}
+   */
+  tallrikar() {
+    const p = this.regiPunkter.pramar;
+    if (p) this.regiFokus = { x: p.x, y: p.y };
+    for (const id of ['flodman', 'flodbo_frukost', 'flodbo_skrattar']) {
+      if (foremalsbild(this, `${id}_tallrik_ner_01`) && foremalsbild(this, `${id}_tallrik_ner_02`)) this.regiRamar(id, [1, 2, 1, 2, 1, 2, 1, 2].map((n) => `${id}_tallrik_ner_0${n}`), 220);
+      else { const r = /** @type {any} */ (this.ritade.get(id)); if (r?.active) { const y0 = r.y; this.tweens.add({ targets: r, y: y0 - 3, duration: 150, yoyo: true, repeat: 3, onUpdate: () => { this.smutsig = true; }, onComplete: () => { r.y = y0; this.smutsig = true; } }); } }
+    }
+    this.time.delayedCall(2200, () => { this.regiFokus = null; });
+    this.regiLogg.push('tallrikarna');
+    return 2000;
+  }
+
+  /** För få tut (k3_hornet, 102.3): skuggan stiger en bit och stannar under vattnet. @returns {number} */
+  skugganStiger() {
+    const smuts = () => { this.smutsig = true; };
+    this.utsikt('hornet');
+    const sk = this.k3NySkugga(0);
+    if (!sk) return 0;
+    sk.setScale(0.75);
+    this.tweens.add({ targets: sk, alpha: 0.5, scaleX: 0.85, scaleY: 0.85, duration: 1400, delay: 600, ease: 'Sine.easeOut', onUpdate: smuts });
+    this.tweens.add({ targets: sk, alpha: 0, duration: 800, delay: 3200, onUpdate: smuts, onComplete: () => { sk.destroy(); if (this.k3Skugga === sk) this.k3Skugga = null; smuts(); } });
+    this.regiLogg.push('skuggan stiger en bit');
+    return 2200;
+  }
+
+  /** För många tut (k3_hornet, 102.3): skuggan dyker. @returns {number} */
+  skugganDyker() {
+    const smuts = () => { this.smutsig = true; };
+    this.utsikt('hornet');
+    const p = this.utsiktsPunkt('hornet');
+    const sk = this.k3NySkugga(0.45);
+    if (!sk || !p) return 0;
+    for (let i = 0; i < 3; i++) this.k3Ring(p.x, p.y, 10, 70, 0xf2fbff, 800, 300 + i * 200);
+    this.tweens.add({ targets: sk, alpha: 0, scaleX: 0.4, scaleY: 0.4, duration: 1400, delay: 500, ease: 'Sine.easeIn', onUpdate: smuts, onComplete: () => { sk.destroy(); if (this.k3Skugga === sk) this.k3Skugga = null; smuts(); } });
+    this.regiLogg.push('skuggan dyker');
+    return 2000;
+  }
+
+  /**
+   * Ön stiger (k3s03_hornet, 102.3): ringar sprider sig, och skalet stiger ur floden vid kvarnens brygga med vatten
+   * som forsar av kanten och skum runt. Ungen som simmar klättrar upp. Gråboxens ellips tills Stils 4–6 bilder
+   * finns. Ön ligger kvar tills rummet ritas om. @returns {number}
+   */
+  onStiger() {
+    const smuts = () => { this.smutsig = true; };
+    const p = this.utsiktsPunkt('hornet') ?? this.regiPunkter.on;
+    if (!p) return 0;
+    this.regiFokus = { x: p.x, y: p.y - 20 };
+    this.k3Skugga?.destroy(); this.k3Skugga = null;
+    for (let i = 0; i < 3; i++) this.k3Ring(p.x, p.y, 120, 190, 0xf2fbff, 1400, i * 350);
+    const on = this.add.ellipse(p.x, p.y + 10, 280, 192, 0x6f8a4a, 1).setStrokeStyle(3, 0x4a3a28, 1).setAlpha(0).setScale(0.9); this.lagerObjekt.add(on);
+    this.k3Skugga = on;
+    this.tweens.add({ targets: on, alpha: 1, y: p.y, scaleX: 1, scaleY: 1, duration: 1600, delay: 300, ease: 'Sine.easeOut', onUpdate: smuts });
+    // vattnet som forsar av kanten, och skummet runt
+    const g = this.add.graphics(); this.lagerLjust.add(g);
+    const t = { p: 0 };
+    this.tweens.add({ targets: t, p: 1, duration: 2400, delay: 900, onUpdate: () => {
+      if (!g.active) return;
+      g.clear();
+      for (let a = 0; a < 360; a += 12) {
+        const r = (a * Math.PI) / 180, x = Math.round(p.x + 140 * Math.cos(r)), y = Math.round(p.y + 96 * Math.sin(r));
+        if (Math.sin(r) > -0.3) g.fillStyle(0xffffff, 1 - t.p).fillRect(x, y + Math.round(t.p * 8), 1, 4);
+        g.fillStyle(0xdce0e4, 1 - t.p).fillRect(x + 1, y + 12, 2, 1);
+      }
+      smuts();
+    }, onComplete: () => { g.destroy(); smuts(); } });
+    // ungen klättrar upp på ön
+    const u = this.k3Simmar;
+    if (u?.active) this.tweens.add({ targets: u, x: p.x - 30, y: p.y - 50, duration: 900, delay: 1600, onUpdate: smuts, onComplete: () => { u.destroy(); smuts(); } });
+    this.time.delayedCall(3600, () => { this.regiFokus = null; });
+    this.regiLogg.push('ön stiger');
+    return 3800;
+  }
+
+  /**
+   * Säckhissen ned från avsatsen (102.3): hjälten och ungen går in genom dörren där hissen står (regi_hiss) och tonas
+   * bort, och efter hissens tid kommer de ut genom kvarnens dörr på bottenvåningen (utgången till kvarnen).
+   * @param {{ x: number, y: number }} p dörren ut till avsatsen @returns {number}
+   */
+  hissGenomDorren(p) {
+    // mellanscenen med hissen ner (k3s03_hornet) börjar med att ön stiger, där ungen simmar: det som händer i floden
+    // före hissen (102.3), så att han ser det från avsatsen
+    const forst = this.k3Simmar?.active ? this.onStiger() : 0;
+    if (forst) { this.time.delayedCall(forst, () => this.hissGenomDorren(p)); return forst + 2200; }
+    const smuts = () => { this.placera(); this.smutsig = true; };
+    const fran = { ...this.pos }, ufran = { ...this.ungePos };
+    const visas = this.unge.visible;
+    if (visas) this.hallUngen(this.ungePos.x, this.ungePos.y);
+    const ut = this.objekt.find((o) => o.sort === 'utgang' && o.till === 'kvarnen');
+    const t1 = { p: 0 };
+    this.tweens.add({ targets: t1, p: 1, duration: 700, ease: 'Sine.easeInOut', onUpdate: () => {
+      this.pos = { x: fran.x + (p.x - fran.x) * t1.p, y: fran.y + (p.y - 6 - fran.y) * t1.p };
+      if (visas) this.ungePos = { x: ufran.x + (p.x + 6 - ufran.x) * t1.p, y: ufran.y + (p.y - 6 - ufran.y) * t1.p };
+      const a = t1.p < 0.6 ? 1 : 1 - (t1.p - 0.6) / 0.4;
+      this.hjalte.setAlpha(a); this.unge.setAlpha(a); smuts();
+    } });
+    // hissen åker ned inne i kvarnen (1 s), och de kommer ut genom dörren nere vid kajen
+    this.time.delayedCall(1700, () => {
+      if (!ut) { this.hjalte.setAlpha(1); this.unge.setAlpha(1); return; }
+      const f = framfor(ut);
+      this.pos = this.hinder.narmasteFria({ x: f.x, y: f.y });
+      this.ungePos = { x: this.pos.x - 14, y: this.pos.y };
+      this.vand = { x: 0, y: 1 };
+      const t2 = { a: 0 };
+      this.tweens.add({ targets: t2, a: 1, duration: 400, onUpdate: () => { this.hjalte.setAlpha(t2.a); this.unge.setAlpha(t2.a); smuts(); } });
+    });
+    this.regiLogg.push('säckhissen ner');
+    return 2200;
   }
 
   /**
@@ -2254,7 +2513,8 @@ export class Rum extends Phaser.Scene {
    */
   resanKvall() {
     const smuts = () => { this.smutsig = true; };
-    const s = this.ruta('skepparen'), k = this.kamera;
+    // skepparen blåser i hornet på avsatsen (102.3), eller där han står
+    const s = this.ruta('hornet') ?? this.ruta('skepparen'), k = this.kamera;
     if (s) for (let i = 0; i < 5; i++) this.k3Ring(s.x + s.b / 2, s.y - 4, 4, 34, 0xfff2a8, 700, i * 420);
     for (let i = 0; i < 2; i++) this.k3Ring(this.pos.x, this.pos.y, 6, 56, 0xb8e0c8, 1200, 2300 + i * 320);
     for (let i = 0; i < 6; i++) {
@@ -3033,7 +3293,7 @@ export class Rum extends Phaser.Scene {
 
   /**
    * Visa ett rum (eller inget rum, för scener utan rum).
-   * @param {{ rum: string | null, tillstand: string | null, innehall: (string | { id: string, syns_i?: string[] })[], unge: boolean, nyttRum: boolean,
+   * @param {{ rum: string | null, scen?: string, tillstand: string | null, innehall: (string | { id: string, syns_i?: string[] })[], unge: boolean, nyttRum: boolean,
    *           karta?: import('../karna/karta.js').Karta | null, franRum?: string | null,
    *           delar?: Record<string, { farg: number | null, storlek: string | null }[]>, visade?: string[],
    *           kvar?: import('../karna/rumslayout.js').Objekt[] }} v
@@ -3041,9 +3301,10 @@ export class Rum extends Phaser.Scene {
    */
   visa(v) {
     this.harRum = !!v.rum;
+    let viaHissen = false;
     if (v.nyttRum || !this.harRum) { this.rumsbild = (this.harRum && v.karta?.bild) || null; this.falt = faltFor(this.rumsbild); this.mark = (this.harRum && v.karta?.mark) || null; this.rumId = v.rum; this.markObjekt = v.karta?.objekt || []; }
     this.visaUnge = v.unge;
-    if (v.nyttRum) { for (const id of [...this.ramSlinga.keys(), ...this.ramTimrar.keys()]) this.stoppaRamar(id); this.ramFor.clear(); this.dolda.clear(); this.ungeMal = null; this.ungeTittarPa = null; this.ungeKlattrar = null; this.stegeNu = null; this.ungeSang = null; this.ungeLyft = 0; this.ungeFast = null; this.hjalteFast = null; this.lerig = 0; this.undvik = []; this.hinderUndvik = null; this.regiFokus = null; this.forstFokus = false; if (this.ungeSvavar) { this.ungeSvavar.g.destroy(); this.ungeSvavar = null; } for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas?.remove(); this.sover = null; } this.vaknar = null; this.rensaRegi(); this.k3UngeIVattnet = false; this.k3Huvud = null; this.k3Mjol = null; if (this.k3IHissen) { this.k3IHissen = false; this.hjalte.setAlpha(1); this.unge.setAlpha(1); } }
+    if (v.nyttRum) { for (const id of [...this.ramSlinga.keys(), ...this.ramTimrar.keys()]) this.stoppaRamar(id); this.ramFor.clear(); this.dolda.clear(); this.ungeMal = null; this.ungeTittarPa = null; this.ungeKlattrar = null; this.stegeNu = null; this.ungeSang = null; this.ungeLyft = 0; this.ungeFast = null; this.hjalteFast = null; this.lerig = 0; this.undvik = []; this.hinderUndvik = null; this.regiFokus = null; this.forstFokus = false; if (this.ungeSvavar) { this.ungeSvavar.g.destroy(); this.ungeSvavar = null; } for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas?.remove(); this.sover = null; } this.vaknar = null; this.rensaRegi(); this.k3UngeIVattnet = false; this.k3Huvud = null; this.k3Mjol = null; this.k3Skugga = null; this.k3Simmar = null; viaHissen = this.k3IHissen; this.k3IHissen = false; this.hjalte.setAlpha(1); this.unge.setAlpha(1); }
     this.tillstand = v.tillstand;
     // figurerna på kvällen (84.2): bilderna byggs första gången, sedan byts bara atlasens källa
     sattKvall(this, this.harRum && v.tillstand === 'kvall' ? KVALL_TABELL : null);
@@ -3096,12 +3357,19 @@ export class Rum extends Phaser.Scene {
       this.sattInteraktiva(this.interaktiva.filter((id) => this.ruta(id))); this.nara(null);
       if (v.nyttRum || !this.harRum) {
         // hjälten kommer in genom utgången från förra rummet, annars vid kartans startpunkt
-        const dorr = v.franRum ? this.objekt.find((o) => o.till === v.franRum) : null;
+        // med säckhissen (102.3) kommer han ut där hissen kommer upp (regi_hiss, dörren ut till avsatsen), inte genom
+        // dörren på bottenvåningen
+        const hiss = viaHissen && v.karta?.regi?.hiss;
+        const dorr = v.franRum && !hiss ? this.objekt.find((o) => o.till === v.franRum) : null;
         /** @type {import('../karna/rumslayout.js').Objekt | null} utgången hjälten kom in genom */
         this.inkom = dorr ?? null;
-        const start = dorr ? framfor(dorr) : (v.franRum && v.karta?.in?.[v.franRum]) || v.karta?.start || { x: this.storlek.bredd / 2, y: this.storlek.hojd - 12 };
+        // där han står när en viss scen börjar i rummet (102.3, kartans regi_hjalte_<scen>): på avsatsen vid hornet,
+        // som bara nås med hissen, och på skalet ute på floden i resan. Platsen är exakt och flyttas inte till närmaste
+        // fria punkt (på skalet kan han inte gå)
+        const plats = v.scen ? this.regiPunkter?.[`hjalte_${v.scen}`] : null;
+        const start = plats || hiss || (dorr ? framfor(dorr) : (v.franRum && v.karta?.in?.[v.franRum]) || v.karta?.start || { x: this.storlek.bredd / 2, y: this.storlek.hojd - 12 });
         this.niva = 0; this.paStege = false; this.byggHinder(); this.sattNivaVid(start);
-        this.pos = this.hinder.narmasteFria(start);
+        this.pos = plats ? { ...plats } : this.hinder.narmasteFria(start);
         this.ungePos = { x: this.pos.x - 18, y: this.pos.y };
         this.b.inmatning.rensaGaTill();
         // kameran hoppar till hjälten när han kommer in (rummet glider eller tonas in)
@@ -3275,7 +3543,10 @@ export class Rum extends Phaser.Scene {
     const sidodorr = arSidodorr(o);
     const fyll = sidodorr ? 0x2b241e : objektFarg(o);
     const delar = this.delar[o.id];
-    const r = this.add.rectangle(o.x, o.y, o.b, o.h, fyll, delar ? 0 : 1).setOrigin(0, 0).setStrokeStyle(1, sidodorr ? 0x3a3129 : FARG.sakKant, delar ? 0 : 1);
+    // rund (102.3): sköldpaddans skal i gråboxen är en ellips, mossgrönt med en mörk kant
+    const r = o.rund
+      ? this.add.ellipse(o.x + o.b / 2, o.y + o.h / 2, o.b, o.h, 0x6f8a4a, 1).setStrokeStyle(3, 0x4a3a28, 1)
+      : this.add.rectangle(o.x, o.y, o.b, o.h, fyll, delar ? 0 : 1).setOrigin(0, 0).setStrokeStyle(1, sidodorr ? 0x3a3129 : FARG.sakKant, delar ? 0 : 1);
     this.lagerObjekt.add(r);
     this.ritade.set(o.id, r);
     if (o.ute || o.klattra || (o.sort === 'utgang' && !o.golv) || o.sort === 'yta') this.ritaDetaljer(o);
