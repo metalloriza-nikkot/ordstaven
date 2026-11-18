@@ -11,7 +11,7 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 30,
+ "nextobjectid": 31,
  "properties": [
   {
    "name": "bild",
@@ -90,10 +90,10 @@
      "id": 3,
      "name": "tavla_kvarn",
      "type": "sak",
-     "x": 180,
-     "y": 148,
-     "width": 56,
-     "height": 12,
+     "x": 128,
+     "y": 8,
+     "width": 64,
+     "height": 34,
      "rotation": 0,
      "visible": true,
      "properties": [
@@ -101,6 +101,11 @@
        "name": "bild",
        "type": "string",
        "value": "tavla_kvarn"
+      },
+      {
+       "name": "rackvidd",
+       "type": "int",
+       "value": 56
       },
       {
        "name": "sida",
@@ -389,6 +394,39 @@
     },
     {
      "id": 21,
+     "name": "kvarnsten",
+     "type": "sak",
+     "x": 76,
+     "y": 54,
+     "width": 58,
+     "height": 36,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "ljud_radie",
+       "type": "int",
+       "value": 420
+      },
+      {
+       "name": "ljud_slinga",
+       "type": "string",
+       "value": "kvarn_dunk"
+      }
+     ]
+    },
+    {
+     "id": 22,
      "name": "lucka_vatten",
      "type": "sak",
      "x": 48,
@@ -421,7 +459,7 @@
      ]
     },
     {
-     "id": 22,
+     "id": 23,
      "name": "lucka_dorr",
      "type": "sak",
      "x": 96,
@@ -444,7 +482,7 @@
      ]
     },
     {
-     "id": 23,
+     "id": 24,
      "name": "sackhiss",
      "type": "sak",
      "x": 256,
@@ -467,7 +505,7 @@
      ]
     },
     {
-     "id": 24,
+     "id": 25,
      "name": "sack_stor",
      "type": "sak",
      "x": 244,
@@ -485,7 +523,7 @@
      ]
     },
     {
-     "id": 25,
+     "id": 26,
      "name": "pa_stora",
      "type": "sak",
      "x": 249,
@@ -508,7 +546,7 @@
      ]
     },
     {
-     "id": 26,
+     "id": 27,
      "name": "vid_stora",
      "type": "sak",
      "x": 222,
@@ -531,7 +569,7 @@
      ]
     },
     {
-     "id": 27,
+     "id": 28,
      "name": "sack_liten",
      "type": "sak",
      "x": 162,
@@ -549,7 +587,7 @@
      ]
     },
     {
-     "id": 28,
+     "id": 29,
      "name": "pa_lilla",
      "type": "sak",
      "x": 163,
@@ -572,7 +610,7 @@
      ]
     },
     {
-     "id": 29,
+     "id": 30,
      "name": "vid_lilla",
      "type": "sak",
      "x": 142,

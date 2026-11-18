@@ -21,6 +21,12 @@ import lagereldenM4a from '../../assets/ljud/musik/lagerelden.m4a?url';
 import lagereldenOgg from '../../assets/ljud/musik/lagerelden.ogg?url';
 import bynM4a from '../../assets/ljud/musik/byn.m4a?url';
 import bynOgg from '../../assets/ljud/musik/byn.ogg?url';
+import flodenM4a from '../../assets/ljud/musik/floden.m4a?url';
+import flodenOgg from '../../assets/ljud/musik/floden.ogg?url';
+import styckeSkugganM4a from '../../assets/ljud/musik/stycke_skuggan.m4a?url';
+import styckeSkugganOgg from '../../assets/ljud/musik/stycke_skuggan.ogg?url';
+import styckeOnM4a from '../../assets/ljud/musik/stycke_on.m4a?url';
+import styckeOnOgg from '../../assets/ljud/musik/stycke_on.ogg?url';
 import { pausPlan } from '../karna/musik.js';
 import { EFFEKT_FOR, INSPELAT_FOR, INSPELAT_SPELAS, ljudLista } from '../karna/ljudid.js';
 
@@ -48,8 +54,18 @@ export const MUSIK = /** @type {Record<string, { m4a: string, ogg: string, loopS
   lagerelden: { m4a: lagereldenM4a, ogg: lagereldenOgg, loopStart: 0.5, loopEnd: 0.5 + (16 * 8 * 60) / (72 * 2) },
   // byn (Stil 12, 70.7) 16 takter à 8 åttondelar i 96 BPM, 40,000 s
   byn: { m4a: bynM4a, ogg: bynOgg, loopStart: 0.5, loopEnd: 0.5 + (16 * 8 * 60) / (96 * 2) },
+  // floden (103.3.5, Stil 10h v0.5): en vals i 3/4 med dragspel. Slutpunkten är Stils (41,739138 s efter starten)
+  floden: { m4a: flodenM4a, ogg: flodenOgg, loopStart: 0.5, loopEnd: 42.239138 },
 });
 /** Byte mellan slingor: den gamla tonas ut och den nya in på ca 1 s (Stil, 10c). Efter pausen tonas den in mjukare. */
+/**
+ * Kapitel 3:s korta stycken (103.3.5): inga slingor, de spelas en gång efter rätt svar (aldrig medan han läser eller
+ * trycker). Slingan tonas ut medan stycket spelar och kommer tillbaka efteråt.
+ */
+export const STYCKEN = /** @type {Record<string, { m4a: string, ogg: string }>} */ ({
+  stycke_skuggan: { m4a: styckeSkugganM4a, ogg: styckeSkugganOgg },
+  stycke_on: { m4a: styckeOnM4a, ogg: styckeOnOgg },
+});
 export const MUSIK_BYTE_S = 1;
 export const MUSIK_EFTER_PAUS_S = 2;
 /** Högst så många avkodade slingor i minnet (en slinga är ca 16–19 MB avkodad). Menyns stannar alltid. */
@@ -118,7 +134,7 @@ export function skapaLjud({ tyst = () => false } = {}) {
   function laddaMusik(namn) {
     const finns = musikBuf.get(namn);
     if (finns) { musikBuf.delete(namn); musikBuf.set(namn, finns); return finns; }
-    const m = MUSIK[namn];
+    const m = MUSIK[namn] ?? STYCKEN[namn];
     const prova = async (/** @type {string[]} */ f) => {
       for (const x of f) {
         try { const r = await fetch(/** @type {any} */ (m)[x]); return await avkodaData(await r.arrayBuffer()); } catch (e) { /* nästa format */ }
@@ -183,6 +199,7 @@ export function skapaLjud({ tyst = () => false } = {}) {
   function musik(namn) {
     onskad = namn;
     if (!ac || tyst()) return;
+    if (stycket) return; // slingan kommer efter stycket
     if (spelar?.namn === namn || vilar?.namn === namn) return;
     if (vilar) { clearTimeout(vilar.timer); vilar = null; }
     if (!namn || !MUSIK[namn]) { if (spelar) { tonaUt(spelar, MUSIK_BYTE_S); spelar = null; } return; }
@@ -192,6 +209,59 @@ export function skapaLjud({ tyst = () => false } = {}) {
       startaSlinga(namn, buf, MUSIK_BYTE_S);
     }).catch(() => { /* ingen musik, spelet går ändå */ });
   }
+  /** @type {{ namn: string, kalla: AudioBufferSourceNode, g: GainNode } | null} stycket som spelar (STYCKEN) */
+  let stycket = null;
+  /**
+   * Spela ett av kapitlets korta stycken (STYCKEN) en gång: slingan tonas ut, och efter stycket kommer den önskade
+   * slingan tillbaka. @param {string} namn @returns {Promise<number>} styckets längd i ms (0 = tyst eller saknas)
+   */
+  async function stycke(namn) {
+    if (!ac || tyst() || !STYCKEN[namn]) return 0;
+    if (!musikUt) { musikUt = ac.createGain(); musikUt.gain.value = nivaNu(); musikUt.connect(ac.destination); }
+    const buf = await laddaMusik(namn).catch(() => null);
+    if (!buf || !ac || !musikUt) return 0;
+    if (stycket) tonaUt(stycket, 0.3);
+    if (spelar) { tonaUt(spelar, 0.4); spelar = null; }
+    if (vilar) { clearTimeout(vilar.timer); vilar = null; }
+    const kalla = ac.createBufferSource(), g = ac.createGain();
+    kalla.buffer = buf; g.gain.value = 1;
+    kalla.connect(g); g.connect(musikUt); kalla.start();
+    const x = { namn, kalla, g };
+    stycket = x;
+    kalla.onended = () => {
+      if (stycket !== x) return;
+      stycket = null;
+      const n = onskad; onskad = null; if (n) musik(n);
+    };
+    return Math.round(buf.duration * 1000);
+  }
+
+  // ---------------------------------------------------------------- ljudslingor i rummet (103.3.4)
+  /** @type {Map<string, { kalla: AudioBufferSourceNode, g: GainNode }>} vattenhjulet och kvarnens dunk som går */
+  const effektSlingor = new Map();
+  /**
+   * En ljudeffekt som går i slinga så länge rummet vill (vattenhjulet, kvarnens dunk), på nivån 0–1 (avståndet till
+   * hjälten). 0 eller null tonar ut och stoppar den. @param {string} id @param {number | null} niva
+   */
+  function effektSlinga(id, niva) {
+    const x = effektSlingor.get(id);
+    if (!ac || tyst() || !niva || niva <= 0) {
+      if (x && ac) { tonaUt(x, 0.4); }
+      effektSlingor.delete(id);
+      return;
+    }
+    const n = Math.min(1, niva);
+    if (x) { x.g.gain.setTargetAtTime(n, ac.currentTime, 0.25); return; }
+    const buf = effektBuf.get(id);
+    if (!buf) return;
+    if (!effektUt) { effektUt = ac.createGain(); effektUt.gain.value = EFFEKT_NIVA; effektUt.connect(ac.destination); }
+    const kalla = ac.createBufferSource(), g = ac.createGain();
+    kalla.buffer = buf; kalla.loop = true;
+    g.gain.setValueAtTime(0.0001, ac.currentTime); g.gain.linearRampToValueAtTime(n, ac.currentTime + 0.6);
+    kalla.connect(g); g.connect(effektUt); kalla.start();
+    effektSlingor.set(id, { kalla, g });
+  }
+
   /** Sänk musiken ca 12 dB medan något läses, och höj den igen efteråt. @param {boolean} pa */
   function sank(pa) {
     if (pa === sankt) return;
@@ -369,9 +439,13 @@ export function skapaLjud({ tyst = () => false } = {}) {
       try { ton({ f, t: 0.05, v: 0.06, typ: 'sine' }); } catch (e) { /* ljud får aldrig krascha spelet */ }
     },
     musik,
+    stycke,
+    effektSlinga,
+    /** För testerna och loggen: ljudslingorna som går i rummet. */
+    get slingorNu() { return [...effektSlingor.keys()]; },
     sank,
     /** För testerna och loggen: vilken slinga som ska spela, vilken som spelar och om den är sänkt. */
-    get musikLage() { return { onskad, spelar: spelar?.namn ?? null, vilar: vilar?.namn ?? null, sankt }; },
+    get musikLage() { return { onskad, spelar: spelar?.namn ?? null, vilar: vilar?.namn ?? null, stycke: stycket?.namn ?? null, sankt }; },
     spela,
     /**
      * En reaktions ljud (64.6): ett id eller upp till tre, efter varandra med ett litet glapp (`["badanka", "spolning"]`).

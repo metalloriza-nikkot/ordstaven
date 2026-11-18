@@ -112,6 +112,8 @@ test('kapitel 3 pass 1: SVÄRD vid hjulet, tussarna, kvarnens tavla, hissen och 
   expect(loggen).toContain('[val] k3_kvarn_2: sackhiss_upp');
   expect(regi).toContain('skuggan lyssnar');
   expect(regi).toContain('kameran ut över floden');
+  // 103.3: det första tutet hörs och syns (hjälten blåser i hornet), och skuggan har sitt ljud och sitt stycke
+  expect(regi).toEqual(expect.arrayContaining(['pose:hjalte_blaser_hoger_02', 'ljud:skuggan', 'stycke:stycke_skuggan']));
   const pos = await ev(() => window.__ORDSTAVEN.position());
   const avsats = await ev(() => window.__ORDSTAVEN.ruta('hornet'));
   expect(pos.y).toBeLessThan(avsats.y + 20);
@@ -212,6 +214,8 @@ test('kapitel 3 pass 2: FEM TUT. INTE TRE., ön vid bryggan, mossan, skylten, sn
   // hornet: tre tut var frukost, fem löste pusslet
   expect(loggen).toContain('k3_hornet: 3 tryck');
   expect(loggen).toContain('k3_hornet: 5 tryck');
+  // varje tut syns: hjälten blåser (103.3.2)
+  expect((await ev(() => window.__ORDSTAVEN.grafik())).regi.filter((r) => r === 'pose:hjalte_blaser_hoger_02').length).toBeGreaterThanOrEqual(1);
   // mossan: han lyfte med handen (inget sving), och skylten låg under den fjärde
   const lyft = loggen.split('\n').filter((r) => r.includes('[lyfta] tuva_'));
   expect(lyft).toHaveLength(4);
@@ -404,12 +408,15 @@ test('regierna i kapitel 3 (100.4, 101.3, 102.3 och 103.3.1): var och en går i 
       await page.waitForTimeout(Math.max(0, ms - 2600) + 300);
     }
     // frukosten (103.3.1): flodbon blåser i frukosthornet, och tallrikarna kommer fram
-    if (scenId === 'k3s01_floden') expect((await ev(() => window.__ORDSTAVEN.grafik())).regi).toEqual(expect.arrayContaining(['frukosten']));
+    // frukosthornet ligger inte på däcket medan hon blåser (104.6), och tre korta tut hörs
+    if (scenId === 'k3s01_floden') expect((await ev(() => window.__ORDSTAVEN.grafik())).regi).toEqual(expect.arrayContaining(['frukosten', 'frukosthornet i hennes hand', 'ljud:frukosthorn']));
     if (scenId === 'k3s03_hornet') expect(await ev(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').unge.visible)).toBe(false);
     // 102.3: ön steg vid bryggan innan hissen bar honom ned, och han kom ut genom kvarnens dörr på kajen
     if (scenId === 'k3s03_hornet') {
       const regi = (await ev(() => window.__ORDSTAVEN.grafik())).regi;
       expect(regi).toEqual(expect.arrayContaining(['tallrikarna', 'skuggan stiger en bit', 'skuggan dyker', 'ungen simmar', 'ön stiger', 'säckhissen ner']));
+      // 103.3.4–5: plasket, ön som stiger i takt med stycke_on, dropparna och hissen
+      expect(regi).toEqual(expect.arrayContaining(['ljud:plask', 'stycke:stycke_on', 'ljud:on_stiger', 'ljud:droppar', 'ljud:sackhiss']));
       expect((await ev(() => window.__ORDSTAVEN.position())).y).toBeGreaterThan(140);
       expect(await ev(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').hjalte.alpha)).toBe(1);
     }
@@ -418,4 +425,41 @@ test('regierna i kapitel 3 (100.4, 101.3, 102.3 och 103.3.1): var och en går i 
   }
   // den sista sidan: regin står i regiloggen
   expect(await ev(() => window.__ORDSTAVEN.grafik().regi)).toContain('kvällen på floden');
+});
+
+test('flodfolket lever (103.3.6), och kameran visar det stora hornet när skepparen talar om det (104.6)', async ({ page }) => {
+  const ev = (fn, arg) => page.evaluate(fn, arg);
+  // vid målet efter hjulet (ga_till dörren), där han går fritt
+  const sc = kap.scener.findIndex((x) => x.id === 'k3s01_floden');
+  await starta(page, 'k3s01_floden', sc, kap.scener[sc].steg.findIndex((x) => x.typ === 'ga_till'));
+  await expect.poll(() => ev(() => window.__ORDSTAVEN.scen()), { timeout: 20000 }).toBe('k3s01_floden');
+  await page.waitForTimeout(1500);
+  const rum = () => ev(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); return { regi: [...r.regiLogg], ramar: ['flodman', 'flodbo_frukost', 'flodbo_skrattar'].map((id) => r.ritade.get(id)?.frame?.name), kamera: { ...r.kamera } }; });
+  // sysslorna: alla tre står i sin syssla, och högst två rör sig på skärmen. Den tredje står i sysslans första bild
+  await ev(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'), o = r.ruta('flodbo_frukost'); r.frys(false); r.pos = { x: o.x + 8, y: o.y + 70 }; r.placera(); });
+  await page.waitForTimeout(1200);
+  const r1 = await rum();
+  expect(r1.ramar[0]).toMatch(/^flodman_lastar_hoger_0[12]$/);
+  expect(r1.ramar[1]).toMatch(/^flodbo_frukost_ror_vanster_0[12]$/);
+  expect(r1.ramar[2]).toMatch(/^flodbo_skrattar_fiskar_hoger_0[12]$/);
+  const valda = /** @type {string} */ (r1.regi.filter((x) => x.startsWith('sysslor:')).pop()).slice(9).split(', ');
+  expect(valda.length).toBeLessThanOrEqual(2);
+  for (const [i, id] of ['flodman', 'flodbo_frukost', 'flodbo_skrattar'].entries()) if (!valda.includes(id)) expect(r1.ramar[i]).toMatch(/_01$/);
+  // en syssla byter bild med minst 400 ms (golvet): efter 600 ms har en av dem som rör sig bytt
+  const i0 = ['flodman', 'flodbo_frukost', 'flodbo_skrattar'].indexOf(valda[0]);
+  await page.waitForTimeout(600);
+  expect((await rum()).ramar[i0]).not.toBe(r1.ramar[i0]);
+  await page.screenshot({ path: 'test-results/kap3-sysslor.png' });
+  // nära: han ställer sig vid flodmannen, som vänder sig mot honom och vinkar en gång
+  await ev(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'), o = r.ruta('flodman'); r.frys(false); r.pos = { x: o.x + o.b / 2 + 4, y: o.y + o.h + 10 }; r.placera(); });
+  await expect.poll(async () => (await rum()).regi.includes('nära: flodman vinkar'), { timeout: 5000 }).toBe(true);
+  await page.waitForTimeout(1500);
+  expect((await rum()).regi.filter((x) => x === 'nära: flodman vinkar')).toHaveLength(1);
+  // kameran glider till det stora hornet på avsatsen (replikens visar), och tillbaka
+  expect(await ev(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').visaForemal('hornet'))).toBe(true);
+  await expect.poll(async () => (await rum()).kamera.x, { timeout: 5000 }).toBeGreaterThan(300);
+  expect((await rum()).regi).toContain('kameran visar hornet');
+  await page.screenshot({ path: 'test-results/kap3-visar-hornet.png' });
+  await ev(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').visaForemalSlut());
+  await expect.poll(async () => (await rum()).kamera.x, { timeout: 5000 }).toBeLessThan(200);
 });

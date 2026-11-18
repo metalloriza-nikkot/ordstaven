@@ -26,8 +26,8 @@ FLODFOLKET = {'skepparen', 'flodbo_frukost', 'flodbo_skrattar', 'flodman'}
 
 # Skalets mitt i floden (Stils rum, 10h v0.4, 103.2): där ön stiger vid kvarnens brygga, och där den simmar i resan.
 # Sköldpaddans bilder är 480 × 320 med skalets mitt i (250, 150).
-ON = (500, 292)
-KVALL = (230, 270)
+ON = (500, 302)
+KVALL = (210, 262)
 SKALBILD = (480, 320, 250, 150)
 
 # Kapitel 3:s rum som Stils bilder (103.2). Rummets _over-bild ligger ovanför föremålen men under figurerna: i floden är
@@ -215,35 +215,37 @@ RUMMEN = {
             vagg(344, 196, 204, 188, vatten=True), vagg(548, 218, 44, 166, vatten=True), vagg(592, 196, 48, 188, vatten=True),
             # rännan ned längs kvarnens västra sida
             vagg(418, 0, 20, 160, vatten=True),
-            # kvarnen: väggarna runt avsatsen (Stils golv, 150 × 20), så att den bara nås med hissen
+            # kvarnen: väggarna runt avsatsen (150 × 16, som Stils bild i 10h v0.5), så att den bara nås med hissen
             vagg(440, 0, 200, 88), vagg(440, 88, 28, 62), vagg(618, 88, 22, 62),
             # fasaden under avsatsen, med en nisch för dörren (så att vägen längs kajen inte går genom den)
-            vagg(468, 108, 60, 42), vagg(552, 108, 66, 42), vagg(528, 108, 24, 30),
+            vagg(468, 104, 60, 46), vagg(552, 104, 66, 46), vagg(528, 104, 24, 34),
             # bilderna som inte ryms i föremålens rutor (bild_pa): ön vid bryggan, hjulet och hornet, där Stil ritade dem
             skalplats('on_plats', ON, dekor=True, i_bilden=True),
             bildplats('hjul_plats', 433, 124, 58, 56),
-            bildplats('hornet_plats', 572, 87, 24, 36),
+            bildplats('hornet_plats', 576, 86, 24, 32),
             # ön ligger under bryggan, figurerna och plankan (103.2), så den ritas först
-            sak('on', 360, 220, 280, 164, sida='over'),
+            sak('on', 360, 230, 280, 154, sida='over'),
             # pråmarna (rummets innehåll): västra pråmens däck, där ingen står
             sak('pramarna', 92, 70, 30, 28, golv=True),
             sak('frukosthorn', 222, 84, 16, 12, sida='alla'),
-            figur('flodman', 128, 70, sida='alla'),
-            figur('flodbo_frukost', 204, 66, sida='alla'),
-            figur('flodbo_skrattar', 276, 66, sida='alla'),
+            # flodfolket lever (103.3.6): var och en har en syssla i två bilder (500 ms per bild, högst två rör sig på
+            # skärmen), och vinkar när han kommer nära. Kvinnan står vid grytan, så att sleven hamnar i den (Stil 10h v0.5)
+            figur('flodman', 128, 70, sida='alla', syssla='flodman_lastar_hoger_01,flodman_lastar_hoger_02', nara=True),
+            figur('flodbo_frukost', 188, 66, sida='alla', syssla='flodbo_frukost_ror_vanster_01,flodbo_frukost_ror_vanster_02', nara=True),
+            figur('flodbo_skrattar', 276, 66, sida='alla', syssla='flodbo_skrattar_fiskar_hoger_01,flodbo_skrattar_fiskar_hoger_02', nara=True),
             figur('skepparen', 384, 170, sida='alla', talare='skepparen'),
             utg('dorr_kvarn', 528, 128, 24, 10, riktning='upp', sida='under', till='kvarnen'),
             # hjulet står i rännan framför kvarnens västra del, med tången på framsidan (han hugger från stigen nedanför)
-            sak('hjul', 440, 128, 44, 44, sida='under', visas_forst='morgon'),
+            sak('hjul', 440, 128, 44, 44, sida='under', visas_forst='morgon', ljud_slinga='vattenhjul'),
             sak('tang_hjul_1', 438, 158, 16, 14, sida='under'),
             sak('tang_hjul_2', 454, 160, 16, 14, sida='under'),
             sak('tang_hjul_3', 470, 158, 16, 14, sida='under'),
             # hornet på avsatsen: han står väster om det, och skriften står på det. Kameran glider ut över floden när han
             # tutar (utsikt), så att han ser verkan
-            sak('hornet', 572, 88, 24, 16, sida='vanster', utsikt='on'),
+            sak('hornet', 578, 88, 18, 14, sida='vanster', utsikt='on', blas=True),
             # där hissen kommer upp: dörren ut till avsatsen (hissen själv står inne i kvarnen)
             sak('sackhiss', 500, 74, 20, 14, sida='under'),
-            sak('hornet_skrift', 572, 88, 24, 8, sida='vanster', rackvidd=56),
+            sak('hornet_skrift', 578, 88, 18, 8, sida='vanster', rackvidd=56),
             # kvarnens brygga, och plankan från bryggan upp på ön (tillståndet on)
             sak('brygga_kvarn', 548, 196, 44, 22, golv=True),
             sak('planka_on', 560, 218, 24, 10, sida='over'),
@@ -264,13 +266,14 @@ RUMMEN = {
         'objekt': [
             utg('dorr_ut_kvarn', 146, 176, 28, 16, riktning='ned', sida='over', till='floden'),
             punkt('start', 160, 150),
-            # tavlan på vägen in (101.5, Stil 18/11), öster om gången från dörren. Bilden (64 × 34) står på stödet, och
-            # bara stödet är ett hinder, så att han kan gå bakom tavlan till säckarna
-            sak('tavla_kvarn', 180, 148, 56, 12, sida='under'),
+            # tavlan på norra väggen, under axeln (Stils kvarn i 10h v0.5 följer kartan). Den öppnas när han kommer in (101.5)
+            sak('tavla_kvarn', 128, 8, 64, 34, sida='under', rackvidd=56),
             # Stils kvarn (103.2): vattenrännan i väster med stenkanten, kvarnstenen, säckarna i nordost och tunnorna i
             # sydost. Hissens schakt står i norra väggen
             *strackor(vattenmask('kvarnen')), vagg(32, 44, 16, 96),
             vagg(76, 54, 58, 36), vagg(288, 40, 32, 52), vagg(286, 136, 34, 38),
+            # kvarnstenen maler och axeln dunkar (103.3.4), i hela rummet
+            bildplats('kvarnsten', 76, 54, 58, 36, ljud_slinga='kvarn_dunk', ljud_radie=420),
             sak('lucka_vatten', 48, 72, 20, 14, sida='hoger'),
             sak('lucka_dorr', 96, 152, 20, 14, sida='alla'),
             sak('sackhiss', 256, 48, 28, 40, sida='vanster'),
@@ -321,8 +324,8 @@ RUMMEN = {
             # skalet och halsen står i rummets bild, och sköldpaddan (rummets innehåll) är en markör baktill på skalet
             sak('skoldpadda', 262, 24, 30, 14),
             # huvudet och fenan där Stil ritade dem (mitt 150, 92 och 222, 150)
-            bildplats('huvud_plats', 98, 64, 96, 64),
-            bildplats('fena_plats', 186, 132, 72, 36),
+            bildplats('huvud_plats', 98, 65, 96, 64),
+            bildplats('fena_plats', 186, 128, 72, 36),
             sak('skylt_skal', 262, 60, 36, 18, sida='alla'),
             sak('skoldpadda_huvud', 114, 72, 72, 42, sida='alla'),
             sak('skoldpadda_fena', 192, 138, 60, 16, sida='alla'),

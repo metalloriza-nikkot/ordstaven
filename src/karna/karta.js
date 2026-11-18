@@ -176,6 +176,13 @@ export function lasKarta(tmj) {
       if (egen.bild_lagen) ut.bildLagen = String(egen.bild_lagen).split(',').map((t) => t.trim()).filter(Boolean);
       if (egen.bild_ord) ut.bildOrd = String(egen.bild_ord);
       if (egen.bild_pa) ut.bildPa = String(egen.bild_pa);
+      // det stora hornet (103.3.2): hjälten blåser i det vid varje tryck
+      if (egen.blas) ut.blas = true;
+      // en figurs syssla (103.3.6): bilderna som växlar (minst 400 ms per bild), och att den vinkar när han kommer nära
+      if (egen.syssla) { ut.syssla = String(egen.syssla).split(',').map((x) => x.trim()).filter(Boolean); ut.sysslaMs = Math.max(400, Number(egen.syssla_ms) || 500); }
+      if (egen.nara) ut.nara = true;
+      // en ljudslinga vid föremålet (103.3.4: vattenhjulet, kvarnens dunk), som hörs svagare ju längre bort han står
+      if (egen.ljud_slinga) { ut.ljudSlinga = String(egen.ljud_slinga); ut.ljudRadie = Number(egen.ljud_radie) || 260; }
       if (egen.bild_del) ut.bildDel = String(egen.bild_del);
       // skugga (kapitel 2, Stil del 1) = figuren har en skugga under sig i sin rutstorlek (skugga_16x24, skugga_24x24)
       if (egen.skugga) ut.skugga = true;

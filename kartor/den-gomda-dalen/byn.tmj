@@ -284,6 +284,11 @@
        "value": "fiskaren_ner_01"
       },
       {
+       "name": "nara",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"
@@ -310,6 +315,11 @@
        "name": "bild",
        "type": "string",
        "value": "tvatterskan_ner_01"
+      },
+      {
+       "name": "nara",
+       "type": "bool",
+       "value": true
       },
       {
        "name": "sida",
@@ -343,6 +353,11 @@
        "name": "bild_sedan",
        "type": "string",
        "value": "barnet_drake_ner_01"
+      },
+      {
+       "name": "nara",
+       "type": "bool",
+       "value": true
       },
       {
        "name": "sedan",

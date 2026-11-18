@@ -230,11 +230,37 @@ export function skapaSpel(d) {
     logg.handelse('lappen', `framme: ${l.k.u.id}`);
     const las = lasLappen(l).catch(() => {});
     if (vantaPa) {
+      // 104.5: lappen fryser aldrig styrningen. Han kan gå medan den står framme (världen släpps, och står sedan som
+      // steget lämnade den), uppläsningen fortsätter medan han går, och när han börjar gå eller trycker på lappen
+      // flyger den till sin knapp direkt. Annars fälls den ihop efter ca 3 s, när rubriken är läst
       lappVantar = true;
-      try { await Promise.all([las, vanta(tid(3000))]); } finally { lappVantar = false; }
+      const slapp = slappStyrningen('lappen');
+      try {
+        await Promise.race([Promise.all([las, vanta(tid(3000))]), new Promise((klar) => { lappKlar = klar; }), rum.vantaPaGang?.() ?? new Promise(() => {})]);
+      } finally { lappVantar = false; lappKlar = null; slapp(); }
       lappIhop();
       await vanta(tid(LAPP_IHOP_MS));
     } else lappTimer = setTimeout(() => { lappTimer = null; lappIhop(); }, 4000);
+  }
+  /** @type {((x?: any) => void) | null} ett tryck på lappen medan berättelsen väntar på den fäller ihop den (104.5) */
+  let lappKlar = null;
+  /** Hur många gånger styrningen hade varit fryst av lappen eller stämpeln i passet, och hur länge (104.5). */
+  const styrning = { lappen: 0, stampeln: 0, ms: 0, pilar: 0 };
+  /**
+   * Lappen och stämpeln visas medan han kan gå (104.5): stod världen still (en replik före) släpps den medan de visas,
+   * och sedan står den som steget lämnade den. Loggen räknar hur ofta det hade frusit styrningen.
+   * @param {'lappen' | 'stampeln'} vad @returns {() => void} återställ
+   */
+  function slappStyrningen(vad) {
+    const fryst = !!rum.frysSteg, t0 = performance.now();
+    if (!fryst) return () => {};
+    styrning[vad]++;
+    rum.frys(false);
+    return () => {
+      styrning.ms += performance.now() - t0;
+      // har nästa steg redan släppt eller frusit världen gäller det; annars står den still igen som före
+      rum.frys(true);
+    };
   }
   /** Lappen fälls ihop och flyger till sin knapp: ett papperssus (10c `pappersus`). */
   function lappIhop() { if (lappen.framme) ljud.spela('pappersus'); lappen.fallIhop(); }
@@ -242,7 +268,11 @@ export function skapaSpel(d) {
   ui.vidPapper?.(() => ljud.spela('papper'));
   // remsan kommer och går med fönstret: lappen likaså
   layout.vidAndring(() => { if (b) { if (!lappAktiv()) lappen.visa(null); sattLappknapp(); } });
-  lappen.vidTryck(() => { const l = lappNu(); if (!l || pausad) return; logg.handelse('lappen', 'läs igen'); lasLappen(l); });
+  lappen.vidTryck(() => {
+    // medan berättelsen väntar på lappen: ett tryck fäller ihop den direkt (104.5)
+    if (lappKlar) { logg.handelse('lappen', 'ihop med ett tryck'); lappKlar(); return; }
+    const l = lappNu(); if (!l || pausad) return; logg.handelse('lappen', 'läs igen'); lasLappen(l);
+  });
   /** @type {{ id: string, gjorda: number } | null} lappens bockar senast (en ny bock låter som ett penndrag) */
   let lappBockar = null;
   /** Lappens innehåll efter var berättelsen är. En ny bock i samma uppdrag: ett kort penndrag (10c). @param {any} l */
@@ -290,7 +320,9 @@ export function skapaSpel(d) {
     const ord = gransnittsOrd('klart');
     if (ord) sag({ talare: 'berattare', text: ord, upplast: true });
     st.nedslag.then(() => { rum.ungeReagerar(true); ljud.spela('unge'); });
-    await st.klar;
+    // stämpeln står på spelytan medan han kan gå (104.5)
+    const slapp = slappStyrningen('stampeln');
+    try { await st.klar; } finally { slapp(); }
     document.documentElement.classList.remove('stampel-pagar');
     visaPausknapp();
     ui.glimta('#hud-lapp');
@@ -380,6 +412,8 @@ export function skapaSpel(d) {
   /** Visa en replik på läsplattan och vänta tills spelaren går vidare. @param {any} r */
   async function replik(r) {
     rum.frys(true);
+    // kameran glider till det repliken talar om (2.49, 104.6: det stora hornet på avsatsen), och tillbaka efteråt
+    const visar = r.visar ? rum.visaForemal?.(r.visar) : false;
     if (r.upplast && r.talare && aventyr.talare[r.talare]) senaste.set(r.talare, r);
     if (r.via === 'radio' && r.upplast) senaste.set(RADIO, r);
     if (r.via === 'radio') { ui.pulsera('#hud-radio'); ljud.spela('radio'); }
@@ -401,6 +435,7 @@ export function skapaSpel(d) {
     rost.tyst();
     rum.talar?.(r.talare, false);
     ui.doljPlatta();
+    if (visar) rum.visaForemalSlut?.();
   }
 
   /** @type {Map<string, any>} senaste upplästa repliken per talare i scenen: ett tryck på figuren upprepar den */
@@ -1460,6 +1495,13 @@ export function skapaSpel(d) {
       case 'skapa_hjalte': return skapaHjalte(st);
       case 'sparpunkt': {
         spara();
+        // 104.5: hur ofta styrningen hade frusit av lappen och stämpeln i passet, och hur ofta han höll en piltangent
+        // medan världen stod still (repliker, mellanscener och läsplattan)
+        if (st.pass_slut) {
+          const pilar = (rum.pilarFrysta ?? 0) - styrning.pilar;
+          logg.handelse('styrning', `${b.kapitel.id} pass ${b.scen?.pass ?? '?'}: lappen och stämpeln släppte världen ${styrning.lappen + styrning.stampeln} gånger (lappen ${styrning.lappen}, stämpeln ${styrning.stampeln}, ${Math.round(styrning.ms / 100) / 10} s), piltangent medan världen stod still ${pilar} gånger`);
+          Object.assign(styrning, { lappen: 0, stampeln: 0, ms: 0, pilar: rum.pilarFrysta ?? 0 });
+        }
         // kapitlets sista sparpunkt före ett låst kapitel: slutrutan (kapitel_last) kommer i stället för frågan
         const sista = b.scenIndex === b.kapitel.scener.length - 1 && b.stegIndex === b.kapitel.scener[b.scenIndex].steg.length - 1;
         if (st.pass_slut && sista && nastaKapitelLast(b.kapitel.id)) return;
@@ -3358,7 +3400,8 @@ export function skapaSpel(d) {
     });
     rum.markera(st.foremal, false); rum.visaOmrade(null); rum.regiFokus = null;
     logg.handelse('tryck', st.foremal);
-    ljud.spela('klick');
+    // det första tutet i hornet (k3s02_loftet) hörs och syns som de andra (103.3)
+    if (rum.blas?.(st.foremal)) { ljud.spela('horn_tut'); visaLjudord('tut', '', st.foremal); } else ljud.spela('klick');
   }
 
   async function tryckRakna(p) {
@@ -3399,7 +3442,8 @@ export function skapaSpel(d) {
           k.nollstall(); if (skylt) rum.markera(skylt.id, false);
           const n = r.tryck();
           styrGjort('anvand'); rum.vandMot?.(p.foremal);
-          ljud.spela('tut'); visaLjudord('tut', '', p.foremal);
+          // 103.3: varje tut hörs och syns för sig: hjälten blåser i det stora hornet (horn_tut, tydlig början och slut)
+          ljud.spela(rum.blas?.(p.foremal) ? 'horn_tut' : 'tut'); visaLjudord('tut', '', p.foremal);
           logg.handelse('tryck', `${p.id}: ${n}`);
           continue;
         }

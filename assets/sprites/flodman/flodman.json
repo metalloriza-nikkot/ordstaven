@@ -380,7 +380,7 @@
     "h": 24
    }
   },
-  "flodman_ner_01": {
+  "flodman_lastar_hoger_01": {
    "frame": {
     "x": 0,
     "y": 150,
@@ -400,7 +400,27 @@
     "h": 24
    }
   },
-  "flodman_tallrik_ner_01": {
+  "flodman_lastar_hoger_02": {
+   "frame": {
+    "x": 17,
+    "y": 150,
+    "w": 16,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 24
+   }
+  },
+  "flodman_lastar_vanster_01": {
    "frame": {
     "x": 0,
     "y": 175,
@@ -420,7 +440,7 @@
     "h": 24
    }
   },
-  "flodman_tallrik_ner_02": {
+  "flodman_lastar_vanster_02": {
    "frame": {
     "x": 17,
     "y": 175,
@@ -440,7 +460,7 @@
     "h": 24
    }
   },
-  "flodman_upp_01": {
+  "flodman_ner_01": {
    "frame": {
     "x": 0,
     "y": 200,
@@ -460,7 +480,7 @@
     "h": 24
    }
   },
-  "flodman_vanster_01": {
+  "flodman_tallrik_ner_01": {
    "frame": {
     "x": 0,
     "y": 225,
@@ -480,10 +500,70 @@
     "h": 24
    }
   },
-  "flodman_vinka_hoger_01": {
+  "flodman_tallrik_ner_02": {
+   "frame": {
+    "x": 17,
+    "y": 225,
+    "w": 16,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 24
+   }
+  },
+  "flodman_upp_01": {
    "frame": {
     "x": 0,
     "y": 250,
+    "w": 16,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 24
+   }
+  },
+  "flodman_vanster_01": {
+   "frame": {
+    "x": 0,
+    "y": 275,
+    "w": 16,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 24
+   }
+  },
+  "flodman_vinka_hoger_01": {
+   "frame": {
+    "x": 0,
+    "y": 300,
     "w": 16,
     "h": 24
    },
@@ -503,7 +583,7 @@
   "flodman_vinka_hoger_02": {
    "frame": {
     "x": 17,
-    "y": 250,
+    "y": 300,
     "w": 16,
     "h": 24
    },
@@ -523,7 +603,7 @@
   "flodman_vinka_ner_01": {
    "frame": {
     "x": 0,
-    "y": 275,
+    "y": 325,
     "w": 16,
     "h": 24
    },
@@ -543,7 +623,7 @@
   "flodman_vinka_ner_02": {
    "frame": {
     "x": 17,
-    "y": 275,
+    "y": 325,
     "w": 16,
     "h": 24
    },
@@ -563,7 +643,7 @@
   "flodman_vinka_vanster_01": {
    "frame": {
     "x": 0,
-    "y": 300,
+    "y": 350,
     "w": 16,
     "h": 24
    },
@@ -583,7 +663,7 @@
   "flodman_vinka_vanster_02": {
    "frame": {
     "x": 17,
-    "y": 300,
+    "y": 350,
     "w": 16,
     "h": 24
    },
@@ -606,7 +686,7 @@
   "format": "RGBA8888",
   "size": {
    "w": 68,
-   "h": 325
+   "h": 375
   },
   "scale": "1",
   "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."

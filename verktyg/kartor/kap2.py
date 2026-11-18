@@ -122,6 +122,9 @@ def figur(namn, x, y, **e):
     if namn in BYBOR:
         e.setdefault('bild', f'{BYBOR[namn]}_ner_01')
         e.setdefault('skugga', True)
+        # byborna vinkar när han kommer nära (103.3.6), som flodfolket. Inte Tant Rosa, som går med honom
+        if namn != 'tant_rosa':
+            e.setdefault('nara', True)
     return ('figur', namn, x, y, 16, 24, e)
 
 

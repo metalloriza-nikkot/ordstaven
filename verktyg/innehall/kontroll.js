@@ -313,6 +313,8 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
       switch (st.typ) {
         case 'replik':
         replikKontroll(st, sp); pp.sek += 1.5 + ord(rader(st.text).join(' ')).length * 0.45;
+        // kameran visar det repliken talar om (2.49, 104.6): det ska finnas i rummet
+        if (st.visar && (!s.rum || !rum.get(s.rum)?.innehall.map(objId).includes(st.visar))) fel.push(var_(`${sp}: repliken visar ${st.visar}, men det finns inte i rummet ${s.rum}`));
         if (st.paminnelse) { replikKontroll(st.paminnelse.replik, `${sp} paminnelse`); if (!st.vantar_pa) fel.push(var_(`${sp}: paminnelse gäller bara en replik med vantar_pa`)); }
         break;
         case 'mellanscen':

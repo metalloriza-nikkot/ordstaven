@@ -365,3 +365,25 @@ test('apan klättrar ned för stegen när den är räddad, och vinkar sedan (56.
   await expect.poll(async () => (await apan())?.bild, { timeout: 3000 }).toMatch(/^apa_vinka_0[12]$/);
   await page.screenshot({ path: 'test-results/apan-nere.png' });
 });
+
+test('lappen fryser aldrig styrningen (104.5): han kan gå medan den står framme, och den flyger till knappen när han går', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(60000);
+  // uppdraget börjar efter en mellanscen, som håller världen still. Utan snabbläget, så att lappen står framme i ca 3 s
+  const scen = { id: 't_lapp2', pass: 1, rum: 'hallen', tillstand: 'natt', steg: [{ typ: 'mellanscen', beskrivning: 'Hallen.', syns_redan: true }, { typ: 'ga_till', mal: 'dorr_bok' }, R('Slut.')] };
+  const uppdrag = [{ id: 't_u2', rubrik: 'HITTA BOKEN', bild: 'uppdrag_stegen', pass: 1, steg: [{ text: 'GÅ TILL BOK', klart: { scen: 't_lapp2', ga_till: 'dorr_bok' } }], stampel: { scen: 't_lapp2', efter: { ga_till: 'dorr_bok' } } }];
+  await provscen(page, scen, { uppdrag }, '?test&testscen&kapitel=kap-00');
+  const lapp = page.locator('#uppdragslapp');
+  await expect.poll(() => logg(page), { timeout: 8000 }).toContain('[lappen] framme: t_u2');
+  await expect(lapp).toBeVisible();
+  // världen är släppt medan lappen står framme
+  expect(await page.evaluate(() => window.__ORDSTAVEN.fryst())).toBe(false);
+  // han går: lappen flyger till knappen direkt, långt före sina 3 s
+  const fore = await page.evaluate(() => window.__ORDSTAVEN.position());
+  await page.keyboard.down('ArrowDown'); await page.waitForTimeout(400); await page.keyboard.up('ArrowDown');
+  await expect(lapp).toBeHidden({ timeout: 1000 });
+  const efter = await page.evaluate(() => window.__ORDSTAVEN.position());
+  expect(Math.abs(efter.y - fore.y) + Math.abs(efter.x - fore.x)).toBeGreaterThan(2);
+  // och berättelsen går vidare till målet
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.steg()?.typ), { timeout: 8000 }).toBe('ga_till');
+});
