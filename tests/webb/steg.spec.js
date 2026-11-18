@@ -1329,7 +1329,7 @@ test('luckorna: frågan och bilden överst, tre rader i hela bredden som är luc
   await provscen(page, { id: 't_luckor', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'pussel', pussel_id: 't_luckorna' }] }, null, { pussel: [{ ...luckor, id: 't_luckorna' }] });
   await page.click('#plattan .replik-ruta');
   await expect(page.locator('#plattan .pussel-ruta.luckor')).toBeVisible({ timeout: 5000 });
-  await expect(page.locator('#plattan .fraga-rad .text')).toHaveText('VILKEN LUCKA PASSAR KNOPP?');
+  await expect(page.locator('#plattan .fraga-rad .text')).toHaveText('VILKEN LUCKA STÄMMER MED KNOPP?');
   await expect(page.locator('#plattan .fraga-rad .fraga-bild')).toBeVisible();
   const rader = page.locator('#plattan .kort.lucka');
   await expect(rader).toHaveCount(3);
