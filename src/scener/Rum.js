@@ -2337,7 +2337,9 @@ export class Rum extends Phaser.Scene {
     const hx = h.x + h.b / 2, hy = h.y + h.h / 2;
     this.k3Ramar(h.x + h.b, h.y + h.h + 6, ['mjolmoln_01', 'mjolmoln_02', 'mjolmoln_03'], 220, { lager: this.lagerLuft });
     for (let i = 0; i < 3; i++) this.k3Ring(hx, hy + 12, 6, 44, 0xfff2a8, 900, i * 260);
-    this.time.delayedCall(700, () => this.utsikt('hornet'));
+    // kameran glider ut över floden när mjölet har blåst (loggen säger det direkt, så att snabbläget ser det)
+    this.time.delayedCall(700, () => { const q = this.utsiktsPunkt('hornet'); if (q) this.regiFokus = { x: q.x, y: q.y - 20 }; });
+    this.regiLogg.push('kameran ut över floden');
     for (let i = 0; i < 5; i++) this.k3Ring(p.x - 30 + (i % 3) * 24, p.y - 10 + (i % 2) * 12, 1, 6, 0xf2fbff, 500, 1500 + i * 200);
     const sk = this.k3NySkugga(0);
     if (sk) {
