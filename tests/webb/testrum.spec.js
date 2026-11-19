@@ -5,6 +5,18 @@ import { readFileSync } from 'node:fs';
 
 const tr = JSON.parse(readFileSync(new URL('../../content/testrum-skriv.json', import.meta.url), 'utf8'));
 
+/**
+ * Rubrikerna ORDDUELL! som har visats (106.5). I testläget (?snabb) står regin bara ca 30 ms, så testet ser efter i
+ * DOM:en när den visas i stället för att hinna se den på skärmen. Körs före sidan. @param {any} page
+ */
+const raknaRubriker = (page) => page.addInitScript(() => {
+  /** @type {any} */ (window).__rubriker = [];
+  const se = () => new MutationObserver(() => {
+    for (const r of document.querySelectorAll('#plattan .duell-rubrik')) { const t = /** @type {HTMLElement} */ (r).innerText.trim(); const l = /** @type {any} */ (window).__rubriker; if (l.at(-1) !== t) l.push(t); }
+  }).observe(document.body, { childList: true, subtree: true, characterData: true });
+  if (document.body) se(); else document.addEventListener('DOMContentLoaded', se);
+});
+
 test('testrummet: skrivuppgifterna en i taget, orden i loggen, och äventyrets sparning rörs inte (41)', async ({ page }) => {
   test.setTimeout(120000);
   // en sparning i äventyret, med ett märke att känna igen
@@ -87,6 +99,7 @@ test('testrummet för ordduellen (61.1): samma regler som i kapitel 3, påhittad
     localStorage.setItem('ordstaven_testrum_duell', JSON.stringify(prov));
     return localStorage.getItem('ordstaven_spar');
   }, prov);
+  await raknaRubriker(page);
   await page.goto('./?snabb&testrum=duell');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   // äventyrets sparning när testrummet öppnas (äventyrets sida sparade när den lämnades)
@@ -95,7 +108,7 @@ test('testrummet för ordduellen (61.1): samma regler som i kapitel 3, påhittad
   await page.click('.start-knapp');
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 15000 }).toBe('tr_duell');
   // 106.5 och 107.3: duellen börjar med rubriken ORDDUELL! stort över bilden (gransnitt.ordduell)
-  await expect(page.locator('#plattan .duell-rubrik')).toHaveText('ORDDUELL!', { timeout: 10000 });
+  await expect.poll(() => page.evaluate(() => /** @type {any} */ (window).__rubriker), { timeout: 10000 }).toContain('ORDDUELL!');
   const norm = (s) => s.replace(/\|/g, '').replace(/\s+/g, ' ').trim().toLocaleUpperCase('sv-SE');
   const ronder = prov.dueller[0].ronder;
   let rond = 0, felValt = false;
@@ -134,13 +147,13 @@ test('duellens testrum med Innehålls fil (90.7): knappen i INSTÄLLNINGAR, halm
   await page.click('#vuxenmeny .del[data-del="pass"]');
   await expect(page.locator('#vuxenmeny .testrum-duell-in')).toBeVisible();
   await Promise.all([page.waitForURL(/\?testrum=duell$/), page.click('#vuxenmeny .testrum-duell-in')]);
+  await raknaRubriker(page);
   await page.goto('./?snabb&testrum=duell');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.click('.start-knapp');
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 15000 }).toBe('tr_duell');
   // 106.5 och 107.3: duellen börjar med rubriken ORDDUELL! stort över bilden (gransnitt.ordduell)
-  await expect(page.locator('#plattan .duell-rubrik')).toHaveText('ORDDUELL!', { timeout: 10000 });
-  await page.screenshot({ path: 'test-results/testrum-ordduell-rubrik.png' });
+  await expect.poll(() => page.evaluate(() => /** @type {any} */ (window).__rubriker), { timeout: 10000 }).toContain('ORDDUELL!');
   // det som står i replikrutan, med hur många segrar som har spelats när det visas (för raden efter segern)
   await page.evaluate(() => {
     const w = /** @type {any} */ (window); w.__sagt = [];
