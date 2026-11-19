@@ -92,6 +92,10 @@ som trillar av och luftskeppet vid sandbanken; kapitel 3:s slutbild mot solnedg�
 och zonen floden under taket (kör efter rum3.py och sprites3.py). `fas4/ljud_k3.py` gör också `duell_start`, och
 `fas4/stycken_k3.py <ut> stycke_seger` gör segerstycket.
 
+bybor/testrum_kort.py (beslut 107.6): testrummens bildkort i stället för emoji: de nio `tr_*` och ledbilderna i
+bubblan i testrummet för fritt skrivande, och det halmdockan pekar på i duellens testrum (svamp, snögubbe, hund, kopp
+och solros). Läser bildkortens färger ur inkorgen, så att inga nya kommer till: `python3 bybor/testrum_kort.py <inkorg> <ut>`.
+
 kvall/ (kapitel 2, 12/11): `kvall.py` skriver `figurer/kvall.json`, en tabell som byter varje palettfärg mot sin
 kvällsfärg, så att figurerna blir mörkare på kvällen utan egna bilder. Målfärgerna tas bara bland färger som redan
 finns i träskets zon.

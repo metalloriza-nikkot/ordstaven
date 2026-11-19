@@ -31,6 +31,6 @@ describe('bilderna i formlerna', () => {
     expect(bilder.html('tankebubbla_svard')).toMatch(/<img[^>]*data-bild="tankebubbla_svard"/);
     expect(bilder.html('tankebubbla_svard')).not.toContain('bubbla-ytter');
     // utan Stils bild ritas bubblan runt platshållaren
-    expect(bilder.html('tankebubbla_matskal')).toContain('bubbla-ytter');
+    expect(bilder.html('tankebubbla_bil')).toContain('bubbla-ytter');
   });
 });

@@ -17,18 +17,11 @@ const FILER = [
 ];
 
 /**
- * Det som Stil inte har ritat än och som ledningen vet om (107.6): testrummens bilder. Listan får bara krympa.
+ * Det som Stil inte har ritat än (testrummens 22 kort kom i 0.96.1, 107.6). Listan får bara krympa.
  * Står ett id här som inte längre är en emoji, faller testet också, så att listan hålls kort.
  */
 const VANTAR_PA_STIL = new Set([
-  // testrummet för fritt skrivande: de nio bildkorten och deras ledbilder
-  'tr_barn_i_regnet', 'tr_bat_som_lacker', 'tr_boll_pa_taket', 'tr_cykel_utan_luft', 'tr_fagelunge_pa_marken',
-  'tr_hund_tom_skal', 'tr_morkt_skap', 'tr_snogubbe_utan_nasa', 'tr_vissen_blomma',
-  'tankebubbla_hand_lyfter', 'tankebubbla_matskal', 'tankebubbla_morot', 'tankebubbla_paraply', 'tankebubbla_pump',
-  'tankebubbla_stege', 'tankebubbla_vattendroppe',
-  // duellens testrum: det halmdockan pekar på (bilen är redan Stils ikon)
-  'svamp', 'snogubbe', 'hund', 'kopp', 'solros',
-  // hittat av testet (0.96.0): "Var var vi?" på startskärmen (mat, sol, apa) och Farfars lista i prologen
+  // hittat av testet (0.96.0): "Var var vi?" på startskärmen (mat, sol, apa) och Farfars lista i prologens skylt
   'mat', 'sol', 'apa', 'farfars_lista_sista_raden',
 ]);
 
