@@ -526,13 +526,13 @@ const provkarta = (objekt, start = { x: 160, y: 180 }) => ({
 });
 const vidare = (page) => page.locator('#plattan .vidare.synlig').click();
 
-test('skyltar i rummet: ett ord syns i världen, en mening öppnas på läsplattan när han går dit (las_skylt väntar)', async ({ page }) => {
+test('skyltar i rummet: ett ord syns i världen, en mening öppnas på läsplattan när han trycker på den (las_skylt väntar)', async ({ page }) => {
   await provscen(page, { id: 't_skylt', pass: 1, rum: 'provskogen', steg: [{ typ: 'las_skylt', foremal: 'skylt_mening' }, R('Läst.')] }, null,
     { rum: { provskogen: { innehall: ['skylt_ord', 'skylt_mening', 'sten'], skyltar: { skylt_ord: { text: 'bär' }, skylt_mening: { text: 'Följ mina skyltar.', papper: 'traskylt' } } } } });
   await expect(page.locator('#rumsskyltar .skylt[data-objekt="skylt_ord"] .kort')).toHaveText('BÄR');
   await expect(page.locator('#rumsskyltar .skylt[data-objekt="skylt_mening"] .mening-skylt')).toBeVisible();
   expect(await page.locator('#plattan').isHidden()).toBe(true);
-  await page.click('#rumsskyltar .skylt[data-objekt="skylt_mening"] .kort'); // går dit
+  await page.click('#rumsskyltar .skylt[data-objekt="skylt_mening"] .kort'); // ett tryck: han går dit, och den öppnas när han är framme
   await expect(page.locator('#plattan .lapp.p-traskylt')).toHaveText('FÖLJ MINA SKYLTAR.', { timeout: 8000 });
   await vidare(page);
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('LÄST.', { timeout: 8000 });
@@ -657,7 +657,7 @@ test('stigarna: frågan står på skylten, valet räknas vid kurvan, felet händ
     rum: { provstigar: { innehall: ['skylt_fraga', 'stig_a', 'stig_b', 'stig_c'] } },
     kartor: { provstigar: provkarta([{ name: 'skylt_fraga', type: 'sak', x: 136, y: 150, width: 48, height: 12 }, stig('stig_a', 30), stig('stig_b', 146), stig('stig_c', 262)], { x: 60, y: 180 }) },
   });
-  // skylten med frågan syns som ett papper; han går dit, och den öppnas
+  // skylten med frågan syns som ett papper; han trycker på den, går dit, och den öppnas
   await page.click('#rumsskyltar .skylt[data-objekt="skylt_fraga"] .kort');
   await expect(page.locator('#plattan .lapp.p-traskylt')).toHaveText('GÅ MOT DEN HÖGA STENEN.', { timeout: 8000 });
   await vidare(page);
@@ -996,10 +996,9 @@ test('kameran visar hela valet när frågan ställs: alla alternativ, deras skyl
     rum: { provdalen: { innehall: ['skylt_fraga', 'stig_a', 'stig_b', 'stig_c'] } },
     kartor: { provdalen: storKarta([{ name: 'skylt_fraga', type: 'sak', x: 470, y: 140, width: 48, height: 12 }, stig('stig_a', 420), stig('stig_b', 490), stig('stig_c', 560)], { x: 360, y: 190 }) },
   });
-  // han har just kommit in: frågans skylt öppnas först (101.5), och han läser och stänger den
-  await expect(page.locator('#plattan .lapp.p-traskylt')).toHaveText('GÅ MOT SOLEN.', { timeout: 8000 });
-  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('[skylt] skylt_fraga: öppnas när han kommer in');
-  await vidare(page);
+  // han har just kommit in: frågans skylt glimtar men öppnas inte av sig själv (109.2)
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 8000 }).toContain('[skylt] skylt_fraga: glimtar när han kommer in');
+  expect(await page.locator('#plattan').isHidden()).toBe(true);
   await expect(page.locator('#skyltar .skylt')).toHaveCount(3, { timeout: 8000 });
   const allt = async () => {
     for (const id of ['stig_a', 'stig_b', 'stig_c', 'skylt_fraga']) if (!(await iBild(page, await page.evaluate((i) => window.__ORDSTAVEN.rutaPaSkarm(i), id)))) return id;
@@ -1053,11 +1052,13 @@ test('kapitel 1 med kartorna (T5): bara varianten syns, den rätta stenen öppna
   await expect(page.locator('#plattan .lapp')).toBeVisible({ timeout: 10000 });
   await fram(() => page.evaluate(() => window.__ORDSTAVEN.steg()?.typ === 'ga_till'));
   await tryckPa(page, 'skylt_farfar_1');
-  // frågan står på Farfars skylt: den öppnas när han är där
+  // frågan står på Farfars skylt: trycket på den öppnar den när han är där (109.2)
   await expect(page.locator('#plattan .lapp.p-traskylt')).toBeVisible({ timeout: 10000 });
   await page.locator('#plattan .vidare.synlig').click();
   expect(await page.evaluate(() => window.__ORDSTAVEN.rumsobjekt())).not.toContain('stig_genom_hacken');
   await tryckPa(page, ratt);
+  // handen kan stå på skylten när han står vid den (109.2): vänta tills den står på stenen
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.nara()), { timeout: 8000 }).toBe(ratt);
   await expect(page.locator('#handknapp')).toBeVisible({ timeout: 8000 });
   await page.keyboard.press('Space');
   // hålet i häcken kommer fram, och han går igenom det till östra skärmen
@@ -2570,7 +2571,8 @@ test('kapitel 2 går att gå in i (del 2): SVÄRD och vassväggen, skylten, vatt
     const [scen, st] = await page.evaluate(() => [window.__ORDSTAVEN.scen(), window.__ORDSTAVEN.steg()]);
     if (scen !== 'k2s01_kanten') break;
     const nyckel = `${st?.typ}:${st?.mal || st?.foremal || st?.pussel_id || ''}`;
-    if (st?.typ === 'las_skylt' && !gjort.has(nyckel)) { gjort.add(nyckel); await gaTill(139, 90); continue; }
+    // skylten öppnas när han trycker (109.2)
+    if (st?.typ === 'las_skylt') { if (!gjort.has(nyckel)) { gjort.add(nyckel); await gaTill(139, 90); } await page.keyboard.press('Space'); await page.waitForTimeout(400); continue; }
     // vassväggen (75.3): han hugger tussarna i gången med Mellanslag, och går sedan genom gången
     if (st?.typ === 'pussel' && st.pussel_id === 'k2_vassvaggen' && !(await page.locator('#plattan').isVisible())) {
       const p = kap2data.pussel.find((x) => x.id === 'k2_vassvaggen');
@@ -2654,7 +2656,7 @@ test('navet i kapitel 2 (del 3): dammen lockar, bryggan först, halvan bärs til
       continue;
     }
     if (await page.locator('#plattan').isVisible()) await vidare();
-    else if (st?.typ === 'las_skylt') await gaMot(st.foremal);
+    else if (st?.typ === 'las_skylt') { await gaMot(st.foremal); await page.keyboard.press('Space'); } // 109.2: han trycker
     // pass 92: "Hämta halvan!" och han går till brevhalvan före läsningen
     else if (st?.typ === 'ga_till') { await gaMot(st.mal); if (i % 3 === 2) await page.keyboard.press('Space'); }
     else if (st?.typ === 'bara') {

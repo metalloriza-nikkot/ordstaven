@@ -1388,28 +1388,43 @@ export function skapaSpel(d) {
           lasSkyltText(sk); return;
         }
         const f = rum.standplats(o); inmatning.sattGaTill(f.x, f.y);
+        // ett klick är ett tryck (109.2): skylten öppnas när han är framme
+        if (sk.mening) skyltPaVag = sk.id;
       } };
     }));
   }
+  // 109.2: en skylt, tavla eller lapp i rummet öppnas bara när han trycker (Enter, mellanslag, ett klick eller
+  // touch) när han står vid den och handen syns. Ingen text öppnas av att han går förbi. Handen på skylten går in
+  // bara när inget steg visar sin egen hand, och ett tryck på skylten går före ett tryck i luften (vidMiss).
+  /** @type {{ id: string, tryck: () => void } | null} skylten som handen står på just nu */
+  let skyltHand = null;
+  /** @type {string | null} skylten han klickade på på avstånd: den öppnas när han är framme */
+  let skyltPaVag = null;
+  /** Står handen på en skylt i rummet just nu? */
+  const skyltHandNu = () => !!skyltHand && ui.handVisas() && ui.handTryckNu() === skyltHand.tryck;
   {
-    // en skylt med en mening öppnas när han går dit (men inte när han redan står där när rummet visas)
-    const vapnade = new Set();
-    /** @type {any} */
-    let rummet = null;
     window.setInterval(() => {
-      if (!b || !rum.harRum || rum.klattrar || pausad || skyltOppen) return;
-      if (rummet !== rum.objekt) { vapnade.clear(); rummet = rum.objekt; }
-      for (const sk of skyltarIRummet()) {
-        if (!sk.mening) continue;
-        const o = rum.ruta(sk.id); if (!o) continue;
-        if (skyltStyrs.has(sk.id)) { vapnade.delete(sk.id); continue; }
-        if (!vidObjekt(rum.pos, o)) { vapnade.add(sk.id); continue; }
-        if (rum.fryst || !ui.plattan.hidden || !vapnade.has(sk.id)) continue;
-        vapnade.delete(sk.id);
-        lasSkyltText(sk);
-        return;
-      }
+      const bort = () => { if (skyltHandNu()) ui.handknapp(null); skyltHand = null; };
+      if (!b || !rum.harRum || rum.klattrar || pausad || skyltOppen || rum.fryst || !ui.plattan.hidden) { bort(); return; }
+      const sk = skyltarIRummet().filter((x) => x.mening && !skyltStyrs.has(x.id));
+      const rutor = sk.map((x) => rum.ruta(x.id)).filter(Boolean);
+      const o = /** @type {any} */ (aktivSak(rum.pos, rutor, rum.vand));
+      const nu = o ? sk.find((x) => x.id === o.id) ?? null : null;
+      if (nu && skyltPaVag === nu.id) { skyltPaVag = null; bort(); lasSkyltText(nu); return; }
+      if (skyltHand && (!nu || nu.id !== skyltHand.id || !skyltHandNu())) bort();
+      if (!nu || skyltHand || ui.handVisas()) return;
+      const tryck = () => { if (!rum.fryst && !skyltOppen) { bort(); lasSkyltText(nu); } };
+      skyltHand = { id: nu.id, tryck };
+      ljud.spela('klick'); logg.handelse('hand', nu.id, { avstand: Math.round(avstandTill(rum.pos, /** @type {any} */ (o))), skylt: true });
+      const [pt, plats] = skyltPlats(/** @type {any} */ (o));
+      ui.handknapp(pt, tryck, plats);
     }, 80);
+    // går han själv med piltangenterna eller trycker någon annanstans gäller klicket på skylten inte längre
+    lyssnaHandling((/** @type {any} */ h) => { if (h.typ === 'ga' || (h.typ === 'tryck' && rum.traff?.(h)?.id !== skyltPaVag)) skyltPaVag = null; });
+    // ett klick i världen på en skylt långt bort
+    rum.tryckPaVag = (/** @type {string} */ id) => { if (skyltarIRummet().some((x) => x.id === id && x.mening)) skyltPaVag = id; };
+    // (efter tangenttrycket: samma Enter ska inte också stänga läsplattan som just öppnades)
+    lyssnaHandling((/** @type {any} */ h) => { if (h.typ === 'interagera' && skyltHandNu() && !rum.fryst && ui.plattan.hidden) { const t = skyltHand?.tryck; window.setTimeout(() => t?.(), 0); } });
   }
   /**
    * Läs en skylt (las_skylt): scenen väntar tills han har gått dit och läst den. Skylten glimtar efter en stund.
@@ -1423,7 +1438,8 @@ export function skapaSpel(d) {
     rum.frys(false);
     const k = knuffKlocka({ handling: '' }, () => { rum.markera(sk.id, true); ui.pulseraSkylt(sk.id); });
     const bort = visaUtgangsSkyltar();
-    await rum.vantaPa([sk.id]);
+    // 109.2: han går dit och trycker (handen på skylten), eller klickar på den
+    await anvand([sk.id], { klickRaknas: true });
     bort(); k.stopp(); rum.markera(sk.id, false);
     await lasSkyltText(sk);
     skyltStyrs.delete(sk.id);
@@ -1691,7 +1707,7 @@ export function skapaSpel(d) {
    * tidig = målet i molnet: handen syns redan på ca två rutors avstånd (beslut 34.3), också på en dörr, och ett tryck
    * på den räknas. Hjälten går själv sista biten.
    */
-  function anvand(ids, { verb = 'anvand', last, framme: narFramme = [], tidig = /** @type {string | null} */ (null), vidMiss = /** @type {(() => void) | null} */ (null) } = {}) {
+  function anvand(ids, { verb = 'anvand', last, framme: narFramme = [], tidig = /** @type {string | null} */ (null), vidMiss = /** @type {(() => void) | null} */ (null), klickRaknas = false } = {}) {
     let avbryt = () => {};
     const lova = /** @type {Promise<string> & { avbryt(): void }} */ (new Promise((klar) => {
       const utgangar = ids.filter((id) => rum.ruta(id)?.sort === 'utgang' || narFramme.includes(id));
@@ -1749,12 +1765,14 @@ export function skapaSpel(d) {
           else if (vapnadeAndra.has(id) && !lastUpptagen) { vapnadeAndra.delete(id); lastDorr(id); }
         }
         visaNara(rum.starVid(saker) ?? tidigNara());
+        // han klickade på skylten på avstånd (109.2): klicket var trycket, så den öppnas när han är framme
+        if (klickRaknas && nara && nara === skyltPaVag) { skyltPaVag = null; gor(nara); return; }
         const ut = utgangar.find((id) => vapnade.has(id) && framme(id));
         if (ut) gor(ut);
       }, 60);
       const sluta = lyssnaHandling((h) => {
         if (h.typ !== 'interagera' || rum.fryst) return;
-        if (nara) gor(nara); else { const ut = utgangar.find(framme); if (ut) gor(ut); else vidMiss?.(); }
+        if (nara) gor(nara); else { const ut = utgangar.find(framme); if (ut) gor(ut); else if (!skyltHandNu()) vidMiss?.(); }
       });
       rum.tryckPa = (id) => { if (id === nara || (utgangar.includes(id) && framme(id))) { gor(id); return true; } return false; };
       let gjort = false;
@@ -2498,14 +2516,9 @@ export function skapaSpel(d) {
       : v.s.bild ? bilder.html(v.s.bild) : v.s.text ? `<span class="moln-text">${lasText(p, v.s.text)}</span>` : null, p.instruktion ?? null);
     if (skylt) {
       skyltStyrs.add(skylt.id); skyltSpar = spar; skyltPusselNu = skylt.id;
-      // han har just gått fram till skylten: den öppnas direkt. Den öppnas också direkt när han just har kommit in i
-      // rummet (inget steg före pusslet i scenen har låtit honom gå), så att han läser innan han går förbi något av
-      // valen (101.5, kvarnens tavla): läsningen är den snabbaste vägen
-      const so = rum.ruta(skylt.id);
-      if (so && (vidObjekt(rum.pos, so) || justKommitIn())) {
-        if (justKommitIn()) logg.handelse('skylt', `${skylt.id}: öppnas när han kommer in`);
-        await lasSkyltText(skylt);
-      }
+      // 109.2 (ersätter 101.5): skylten öppnas bara när han trycker. Har han just kommit in i rummet glimtar den, så
+      // att han ser var han ska läsa (kvarnens tavla), och handen syns när han står vid den
+      if (justKommitIn()) { logg.handelse('skylt', `${skylt.id}: glimtar när han kommer in`); ui.pulseraSkylt(skylt.id); rum.markera(skylt.id, true); window.setTimeout(() => rum.markera(skylt.id, false), tid(2500)); }
     }
     const avst = (/** @type {{ x: number, y: number }} */ a, /** @type {{ x: number, y: number }} */ b2) => Math.hypot(a.x - b2.x, a.y - b2.y);
     /** Står hjälten nära utgången (inom ungefär en ruta från dörren, läsplatsen eller skylten)? @param {any} o */
@@ -2545,8 +2558,7 @@ export function skapaSpel(d) {
       const vakt = { spar: hjalpSpar, pekOmMs: () => pekningOmMs({ antalAlternativ: kvarAlt().length, antalFel: v.s.fel, sedanStartMs: hjalpSpar.sedanStart() }), peka };
       // knuffen upprepar frågan: tankebubblan blinkar, eller lappen lyser om frågan står på en lapp
       const k = knuffKlocka(p.knuff ?? (harLapp ? { handling: '' } : undefined), () => { ui.pulseraTanke(); if (harLapp) ui.pulsera('#hud-lapp'); if (skylt) ui.pulseraSkylt(skylt.id); if (rum.aggKnuff?.()) logg.handelse('ägget', 'hackar tänder'); }, vakt);
-      // skylten öppnas när han går dit (efter att ha gått därifrån), och ett tryck på papperet i bubblan öppnar den
-      let skyltVapnad = false;
+      // skylten öppnas när han trycker vid den (109.2), och ett tryck på papperet i bubblan öppnar den
       const tankeTryck = (/** @type {Event} */ e) => { if (skylt && !upptagen && !rum.fryst && /** @type {HTMLElement} */ (e.target).closest('.tanke-skylt')) lasSkyltText(skylt); };
       ui.$('#tanke').addEventListener('click', tankeTryck);
       /** stigar han har prövat som inte är spärrade än: går han dit igen händer samma sak bakom kurvan, utan att räknas */
@@ -2576,6 +2588,10 @@ export function skapaSpel(d) {
         const a = id ? altFor(id) : null;
         const o = id ? rum.ruta(id) : null;
         ui.ordskylt(null); ui.handknapp(null); styrAnvand('anvand', null);
+        if (skylt && id === skylt.id && o) {
+          ljud.spela('klick'); logg.handelse('hand', o.id, { avstand: Math.round(avstandTill(rum.pos, o)), skylt: true });
+          const [pt, plats] = skyltPlats(o); ui.handknapp(pt, () => { if (!upptagen && !rum.fryst) lasSkyltText(skylt); }, plats); styrAnvand('anvand', pt); return;
+        }
         if (!a || !o) return;
         ljud.spela('klick');
         if (arUtgang(o.id)) return; // dörrar och stigar har sin skylt hela tiden
@@ -2596,28 +2612,28 @@ export function skapaSpel(d) {
       const vapnade = new Set();
       const tick = window.setInterval(() => {
         if (upptagen || rum.fryst) return;
-        if (skylt) {
-          const so = rum.ruta(skylt.id);
-          if (so && !vidObjekt(rum.pos, so)) skyltVapnad = true;
-          // bara när han har stannat vid skylten och den är saken han står vid: går han förbi den (kvarnens tavla mitt på
-          // golvet, 103.2) eller står ett val närmare (säckarna bakom tavlan), är det dit han är på väg (grind A)
-          else if (so && skyltVapnad && ui.plattan.hidden && !rum.gar && aktivSak(rum.pos, [so, ...kvarSaker().map((id) => rum.ruta(id)).filter(Boolean)], rum.vand)?.id === so.id) { skyltVapnad = false; lasSkyltText(skylt); return; }
-        }
         for (const id of kvarUtgangar()) { const o = rum.ruta(id); if (o && !genom(o, rum.pos)) vapnade.add(id); }
         for (const a of provadeStigar()) {
           const o = rum.ruta(a.objekt); if (!o) continue;
           if (!genom(o, rum.pos)) { vapnade.add(o.id); continue; }
           if (vapnade.has(o.id)) { vapnade.delete(o.id); igen(a, o); return; }
         }
-        const sak = rum.starVid(kvarSaker());
+        // skylten med frågan är en sak bland valen: står han vid den är det den handen visar (109.2)
+        const sak = rum.starVid(skylt ? [skylt.id, ...kvarSaker()] : kvarSaker());
         const nara = kvarUtgangar().map((id) => rum.ruta(id)).find((o) => o && naraUtgang(o)) ?? null;
-        visaLappen(sak ?? nara?.id ?? null);
+        // steget före (ga_till) räknar honom framme lite längre bort än räckvidden: där syns handen på skylten också
+        const skyltRuta = skylt ? rum.ruta(skylt.id) : null;
+        const vidSkylten = skyltRuta && avstandTill(rum.pos, skyltRuta) <= TIDIG_HAND + 8 ? skyltRuta.id : null;
+        visaLappen(sak ?? nara?.id ?? vidSkylten);
+        // han klickade på skylten på avstånd (eller i steget före): klicket var trycket, så den öppnas när han är framme
+        if (skylt && vid === skylt.id && skyltPaVag === skylt.id && ui.plattan.hidden) { skyltPaVag = null; lasSkyltText(skylt); return; }
         // att gå igenom utgången är valet: skylten har syntes hela tiden, så han går rakt igenom
         const ut = kvarUtgangar().map((id) => rum.ruta(id)).find((o) => o && vapnade.has(o.id) && genom(o, rum.pos));
         if (ut) { const a = altFor(ut.id); if (a) valj(a.id); }
       }, 60);
-      const sluta = lyssnaHandling((h) => { if (h.typ === 'interagera' && vid) { const a = altFor(vid); if (a) anvandAlt(a); } });
-      rum.tryckPa = (/** @type {string} */ id) => { if (id !== vid) return false; const a = altFor(id); if (a) anvandAlt(a); return true; };
+      const lasSkylten = () => { if (skylt && !upptagen && !rum.fryst && ui.plattan.hidden) window.setTimeout(() => { if (ui.plattan.hidden) lasSkyltText(skylt); }, 0); }; // efter trycket (samma Enter stänger den inte)
+      const sluta = lyssnaHandling((h) => { if (h.typ === 'interagera' && vid) { if (skylt && vid === skylt.id) { lasSkylten(); return; } const a = altFor(vid); if (a) anvandAlt(a); } });
+      rum.tryckPa = (/** @type {string} */ id) => { if (id !== vid) return false; if (skylt && id === skylt.id) { lasSkylten(); return true; } const a = altFor(id); if (a) anvandAlt(a); return true; };
       // ett tryck på en dörr i valet går igenom den (skylten syns redan)
       rum.malFor = (/** @type {any} */ o) => (o.sort === 'utgang' && altFor(o.id) ? framfor(o) : null);
       ritaSkyltar();
@@ -3503,23 +3519,17 @@ export function skapaSpel(d) {
     if (p.instruktion) sag(p.instruktion);
     tillatNos(p, spar);
     rum.frys(false);
-    // skylten öppnas när han går dit (efter att ha gått därifrån)
-    let skyltVapnad = false;
-    const skyltTick = window.setInterval(() => {
-      if (!skylt || rum.fryst || pausad || !ui.plattan.hidden) return;
-      const so = rum.ruta(skylt.id);
-      if (so && !vidObjekt(rum.pos, so)) skyltVapnad = true;
-      else if (so && skyltVapnad) { skyltVapnad = false; lasSkyltText(skylt); }
-    }, 80);
+    // skylten (skriften på hornet) öppnas när han trycker vid den (109.2): den är en av sakerna han kan använda här
     const k = knuffKlocka(p.knuff, () => { ui.pulseraTanke(); if (skylt) { ui.pulseraSkylt(skylt.id); rum.markera(skylt.id, true); } }, { spar: hjalpSpar, pekOmMs: () => 0 });
     let forenklad = false;
     try {
       while (!r.s.klar) {
-        const val = anvand([p.foremal], { verb: 'anvand' });
+        const val = anvand(skylt ? [p.foremal, skylt.id] : [p.foremal], { verb: 'anvand' });
         // tystnaden räknas från senaste trycket, och bara när han har tryckt (ingen klocka före första). Den är en del
         // av regeln och kortas inte i testläget, som knuffen (spelets klocka)
         const tyst = r.s.antal ? vanta(tystMs).then(() => null) : new Promise(() => {});
         const id = await Promise.race([val, tyst]);
+        if (id && skylt && id === skylt.id) { await lasSkyltText(skylt); continue; }
         if (id) {
           k.nollstall(); if (skylt) rum.markera(skylt.id, false);
           const n = r.tryck();
@@ -3544,7 +3554,7 @@ export function skapaSpel(d) {
         fraga(); rum.frys(false); k.nollstall();
       }
     } finally {
-      window.clearInterval(skyltTick); k.stopp(); visaMoln(null);
+      k.stopp(); visaMoln(null);
       ui.$('#tanke').removeEventListener('click', tankeTryck);
       if (skylt) { rum.markera(skylt.id, false); skyltStyrs.delete(skylt.id); skyltSpar = null; skyltPusselNu = null; }
     }

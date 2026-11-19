@@ -225,6 +225,8 @@ export class Rum extends Phaser.Scene {
     this.vand = { x: 0, y: 1 };
     /** @type {((o: any) => { x: number, y: number } | null) | null} var ett tryck på ett föremål leder (val med dörrar) */
     this.malFor = null;
+    /** @type {((id: string) => void) | null} ett tryck på ett föremål långt bort: han går dit (109.2, skyltar) */
+    this.tryckPaVag = null;
     /** @type {((o: any) => boolean) | null} ett tryck på en figur: upprepa dess senaste instruktion */
     this.fragaIgen = null;
     /** @type {((id: string) => void) | null} steget tryck: ett tryck på ett föremål, och han går inte (2.47) */
@@ -342,6 +344,8 @@ export class Rum extends Phaser.Scene {
     // dialogregeln: ett tryck på en figur upprepar dess senaste instruktion (fråga igen)
     if (o.sort === 'figur' && this.fragaIgen?.(o)) return;
     const f = this.malFor?.(o) ?? this.standplats(o); this.b.inmatning.sattGaTill(f.x, f.y);
+    // ett tryck på en skylt på avstånd räknas när han är framme (109.2)
+    this.tryckPaVag?.(o.id);
   }
 
 
@@ -2674,9 +2678,11 @@ export class Rum extends Phaser.Scene {
     // hissen åker ned inne i kvarnen (1 s), och de kommer ut genom dörren nere vid kajen
     this.time.delayedCall(1700, () => {
       if (!ut) { this.hjalte.setAlpha(1); this.unge.setAlpha(1); return; }
+      // 109.4: han kommer ut en bit ut på kajen, inte på tröskeln i dörröppningen (där han stod kvar i dörren medan
+      // molnet sa "Gå upp på ön!"), och ungen bredvid honom på kajen, inte inne i kvarnens vägg
       const f = framfor(ut);
-      this.pos = this.hinder.narmasteFria({ x: f.x, y: f.y });
-      this.ungePos = { x: this.pos.x - 14, y: this.pos.y };
+      this.pos = this.hinder.narmasteFria({ x: f.x, y: f.y + 10 });
+      this.ungePos = this.hinder.narmasteFria({ x: this.pos.x + 16, y: this.pos.y });
       this.vand = { x: 0, y: 1 };
       const t2 = { a: 0 };
       this.tweens.add({ targets: t2, a: 1, duration: 400, onUpdate: () => { this.hjalte.setAlpha(t2.a); this.unge.setAlpha(t2.a); smuts(); } });

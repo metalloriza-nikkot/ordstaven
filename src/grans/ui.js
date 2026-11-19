@@ -822,6 +822,9 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     styrhjalp,
     flygBar,
     handknapp,
+    /** Visas handen, och med vilket tryck (109.2: skyltarnas hand går bara in när ingen annan hand syns). */
+    handVisas: () => !hand.hidden,
+    handTryckNu: () => handTryck,
     ljudord, visaTanke, placeraTanke, pulseraTanke, tankeRyms, passaTanke, ordskylt, skyltar, rumsskyltar, skyltHjalte, sattDorrRutor, ordnaSkyltar, skyltStor, pulseraSkylt, skyltNara, ropa,
     ui, $, plattan, rader, esc, visaPlatta, doljPlatta, vidPapper, vantaFortsatt, visaRegi, doljRegi, visaFest,
     uppdateraHud, sattLappknapp, glimta, pulsera, ikonKnappar, visaSkarm, doljSkarm, iris, visaMeny, doljMeny, visaPausmeny, doljPausmeny, etiketter, sattNos, vaxlaNos, ljuda, arHelord,

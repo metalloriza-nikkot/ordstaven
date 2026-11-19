@@ -69,7 +69,8 @@ test('kapitel 2 går att spela från träsket till elden (gråbox, del 5)', { ta
     const typSt = st?.typ;
     if (typSt === 'ga_till' && st.mal === 'unge') await gaTillUngen();
     else if (typSt === 'ga_till') { const o = await ev((m) => window.__ORDSTAVEN.ruta(m), st.mal); if (o?.sort === 'utgang') await gaUt(st.mal); else await anvand(st.mal); }
-    else if (typSt === 'las_skylt' || typSt === 'prata') await gaMot(st.foremal || st.figur);
+    else if (typSt === 'las_skylt') await anvand(st.foremal); // skylten öppnas när han trycker (109.2)
+    else if (typSt === 'prata') await gaMot(st.figur);
     else if (typSt === 'ta_emot') await anvand(st.fran); // Tant Rosa räcker fram brevet (69.9)
     else if (typSt === 'nav') {
       const klara = (await ev(() => window.__ORDSTAVEN.tillstand().aventyr['den-gomda-dalen'].nav?.klara)) || [];

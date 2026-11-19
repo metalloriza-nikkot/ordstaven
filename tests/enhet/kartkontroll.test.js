@@ -386,3 +386,26 @@ describe('byborna i kapitel 2 (42.2)', () => {
     }
   });
 });
+
+// h) en sak som ritas på en bildplats (bild_pa) står inne i bilden: dit han går är där bilden visar saken. Fenan som
+//    trappa stod vid handleden bakom skalkanten medan bilden visade fenan, och han fick gå runt (den vuxnes spelning 19/11).
+//    Figurer får sticka upp ur sin plats (Farfar i fåtöljen).
+describe('h) en sak på en bildplats står där bilden är', () => {
+  for (const f of readdirSync(new URL(`../../kartor/${AVENTYR}/`, import.meta.url)).filter((n) => n.endsWith('.tmj'))) {
+    it(f, () => {
+      const d = las(`kartor/${AVENTYR}/${f}`);
+      const objs = d.layers.filter((l) => l.type === 'objectgroup').flatMap((l) => l.objects);
+      const namn = new Map(objs.map((o) => [o.name, o]));
+      const utanfor = [];
+      for (const o of objs) {
+        if (o.type === 'figur') continue;
+        const pa = (o.properties || []).find((p) => p.name === 'bild_pa')?.value;
+        const p = pa && namn.get(pa);
+        if (!p) continue;
+        const inne = o.x >= p.x && o.y >= p.y && o.x + o.width <= p.x + p.width && o.y + o.height <= p.y + p.height;
+        if (!inne) utanfor.push(`${o.name} utanför ${pa}`);
+      }
+      expect(utanfor).toEqual([]);
+    });
+  }
+});

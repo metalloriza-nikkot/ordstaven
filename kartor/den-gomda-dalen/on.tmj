@@ -1117,6 +1117,11 @@
        "value": "skylt_skal"
       },
       {
+       "name": "rackvidd",
+       "type": "int",
+       "value": 40
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "under"

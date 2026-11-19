@@ -1213,3 +1213,17 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Sköldpaddans huvud på ön** ligger i Stils läge (−40, 64) vid skalets västra kant och stiger de sista 16 px ur vattnet. **Slutbilden** är Stils `k3_slut_01–08`, 950 ms per bild, och ett tryck hoppar över den som förut.
 - **Vinstens replik efter segern:** när motorn spelar `ordduell_seger` själv (testrummet) spelas `vid_vinst.replik` efter segern, så att "Du vann ordduellen!" kommer sist, som i kapitel 3.
 - **Inga emoji i kapitlen och testrummen** (107.6, `tests/enhet/emoji.test.js`): varje bild som läsplattan kan visa ur innehållet (`bild`, `ledbild`, `pekar_pa`, utom mellanscenernas och reaktionernas regier, alternativen i läsval i rummet och det han bär) ritas med `bilder.html` som i spelet, och testet faller om det blir en emoji. Det som väntar på Stil står i en lista som bara får krympa.
+
+## Skyltar öppnas när han trycker (0.97.0, beslut 109.2–109.4)
+- **En skylt, tavla eller lapp i rummet öppnas bara av ett tryck** (Enter, mellanslag, ett klick eller touch) när han står vid den och handen syns (109.2). Ingen text öppnas av att han går förbi eller kommer in. Det ersätter 101.5 (`justKommitIn` öppnar inte längre tavlan, den glimtar i stället: `[skylt] <id>: glimtar när han kommer in`).
+  - **Rummets skyltar** (`skyltHand` i `spel.js`): handen ställer sig på den närmaste skylten med en mening, när inget steg visar sin egen hand. Ett tryck i luften (`vidMiss`) går inte före handen på skylten.
+  - **`las_skylt`** väntar med `anvand` tills han trycker. **Ett läsval i rummet med `skylt`** har skylten som en sak bland valen: handen står på den när han är närmast den, också på det avstånd där `ga_till` räknade honom framme (`TIDIG_HAND` + 8). **Hornet (P29)** har skriften som en egen sak bredvid hornet.
+  - **Ett klick på en skylt på avstånd** är ett tryck (`skyltPaVag`, `rum.tryckPaVag`): han går dit, och den öppnas när han är framme. En piltangent eller ett tryck någon annanstans glömmer det.
+  - **Läsplattan öppnas efter tangenttrycket** (`setTimeout` 0): samma Enter når annars också läsplattans väntan på ▶, som läggs till i samma utskick, och stänger den direkt.
+  - **Felsökning:** `window.__ORDSTAVEN.nara()` ger saken handen står på i ett steg.
+- **Räckvidden i kapitel 3** (109.3, `verktyg/kartor/kap3.py`):
+  - hornet och skriften var samma ruta, så ett tryck tutade alltid och skriften gick bara att öppna med musen. Nu är de två saker, hornet (572, 88, 12 × 6) och skriften (584, 88, 12 × 6, `sida='under'`), och han går under hornet på avsatsen till skriften;
+  - skylten på ön har `rackvidd` 40: snäckorna under den står i vägen nedifrån;
+  - ett enhetstest säger fel om en sak med `bild_pa` inte står inom sin bildplats.
+- **Hissen ned** (109.4, `hissGenomDorren`): han kommer ut 10 px framför kvarnens dörr, och ungen bredvid honom, så att han inte står i dörröppningen.
+- **Fenan** (`fena_trappa`) ligger där han når den från sanden.

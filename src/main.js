@@ -288,6 +288,8 @@ redo.then(() => { startKlar = true; window.clearTimeout(startVakt); window.remov
   /** Skärmpunkt mitt på ett objekt i rummet (för att trycka på det). @param {string} id */
   objekt: (id) => { const o = rum.ruta(id); if (!o) return null; return varldTillSkarm(layout.skala, rum.kamera, o.x + o.b / 2, o.y + o.h / 2); },
   rumsobjekt: () => rum.objekt.map((o) => o.id),
+  /** Saken handen står på (den aktiva), eller null. */
+  nara: () => rum.naraId ?? null,
   /** Gå mot en punkt i rummet, som ett tryck på marken (vägen runt det som står i vägen). @param {number} x @param {number} y */
   gaMot: (x, y) => inmatning.sattGaTill(x, y),
   /** Spela en regi i rummet (Stils mellanscener) och få hur länge den tar (ms, 0 = går inte). @param {string} bild @param {string} [mal] */

@@ -249,10 +249,13 @@ RUMMEN = {
             sak('tang_hjul_3', 470, 158, 16, 14, sida='under'),
             # hornet på avsatsen: han står väster om det, och skriften står på det. Kameran glider ut över floden när han
             # tutar (utsikt), så att han ser verkan
-            sak('hornet', 572, 88, 24, 16, sida='vanster', utsikt='on', blas=True),
+            # 109.3: hornet (där han blåser, västra änden) och skriften (bandet på hornets östra del) är två saker bredvid
+            # varandra, så att ett tryck vid skriften läser den och ett tryck vid hornet tutar. Förut låg de på samma
+            # ruta, och ett tryck gick alltid till hornet: skriften gick bara att öppna med musen
+            sak('hornet', 572, 88, 12, 6, sida='vanster', utsikt='on', blas=True),
             # där hissen kommer upp: dörren ut till avsatsen (hissen själv står inne i kvarnen)
             sak('sackhiss', 500, 74, 20, 14, sida='under'),
-            sak('hornet_skrift', 572, 88, 24, 8, sida='vanster', rackvidd=56),
+            sak('hornet_skrift', 584, 88, 12, 6, sida='under'),
             # kvarnens brygga, och plankan från bryggan upp på ön (tillståndet on)
             sak('brygga_kvarn', 548, 196, 44, 22, golv=True),
             sak('planka_on', 560, 218, 24, 10, sida='over'),
@@ -309,7 +312,9 @@ RUMMEN = {
             sak('tuva_5', 150, 136, 24, 18, sida='alla'),
             sak('litet_trad', 240, 30, 24, 28, sida='under'),
             # Stils skylt är 72 × 36 och står på rutans nederkant
-            sak('skylt_skal', 124, 56, 72, 24, sida='under'),
+            # 109.3: snäckorna ligger under skylten, så underifrån når han den inte med vanlig räckvidd. Räckvidden
+            # räcker förbi snäckorna, och handen syns lika långt bort
+            sak('skylt_skal', 124, 56, 72, 24, sida='under', rackvidd=40),
             # snäckorna under skylten, glest så att de inte blir en vägg (manus 19 v0.4.1: på ön i pass 2)
             sak('snacka_1', 126, 88, 16, 12, sida='alla'), sak('snacka_2', 146, 88, 16, 12, sida='alla'),
             sak('snacka_3', 166, 88, 16, 12, sida='alla'), sak('snacka_4', 186, 88, 16, 12, sida='alla'),
@@ -344,7 +349,10 @@ RUMMEN = {
             sak('tang_1', 176, 172, 16, 14, sida='alla'), sak('tang_2', 244, 172, 16, 14, sida='alla'),
             sak('tang_3', 268, 170, 16, 14, sida='alla'),
             sak('skalkant', 250, 128, 34, 12, sida='under'),
-            sak('fena_trappa', 248, 118, 16, 10, sida='under'),
+            # fenan som trappa: målet står vid fenans framkant, där Stils bild visar den (fena_plats 186, 132, 72 × 36).
+            # Förut stod det vid handleden bakom skalkanten, och han fick gå runt för att nå det (den vuxnes spelning 19/11). Hindren
+            # är desamma: rutan ligger inne i fenan, som redan är ett hinder.
+            sak('fena_trappa', 206, 146, 32, 10, sida='under'),
             sak('ankare', 76, 142, 24, 22, sida='alla'),
         ],
     },

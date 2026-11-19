@@ -97,9 +97,10 @@ test('kapitel 3 pass 1: SVÄRD vid hjulet, tussarna, kvarnens tavla, hissen och 
   // tussarna högg han själv, en i taget, och hjulet snurrar
   expect(loggen.split('\n').filter((r) => r.includes('[hugga] tang_hjul_'))).toHaveLength(3);
   // (hjulet snurrar: rummets tillstånd står i sparningen nedan)
-  // tavlan öppnas på läsplattan när han kommer in i kvarnen, innan han går förbi något val (101.5)
-  expect(loggen).toContain('[skylt] tavla_kvarn: öppnas när han kommer in');
-  expect(loggen.indexOf('[skylt] tavla_kvarn: öppnas när han kommer in')).toBeLessThan(loggen.indexOf('[val] k3_kvarn_1'));
+  // tavlan glimtar när han kommer in i kvarnen, före det första valet, men öppnas bara när han trycker (109.2)
+  expect(loggen).toContain('[skylt] tavla_kvarn: glimtar när han kommer in');
+  expect(loggen.indexOf('[skylt] tavla_kvarn: glimtar när han kommer in')).toBeLessThan(loggen.indexOf('[val] k3_kvarn_1'));
+  expect(loggen).not.toContain('öppnas när han kommer in');
   // tavlan: rad 2 med ett fel först
   expect(loggen).toMatch(/k3_kvarn_2.*vid_stora/);
   // 104.7: Stils ringar vid säckarnas fyra platser medan läsvalet pågår (likadana, de avslöjar inget)
@@ -481,3 +482,42 @@ test('flodfolket lever (103.3.6), och kameran visar det stora hornet när skeppa
   await ev(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').visaForemalSlut());
   await expect.poll(async () => (await rum()).kamera.x, { timeout: 5000 }).toBeLessThan(200);
 });
+
+// 109.2 och 109.3: varje skylt, tavla och skrift i kapitel 3 som han läser i rummet går att läsa med tangentbordet.
+// Han går fram till den, handen syns på den, inget öppnas av sig självt, och Enter öppnar den på läsplattan.
+// (Skylten på ön läses i pusslen k3_skylten_1 och _2 på läsplattan; i rummet läses den när snäckorna är framme.)
+for (const [scenId, stegNr, skylt, extra, sida] of [
+  ['k3s02_kvarnen', 1, 'tavla_kvarn', {}, null],
+  ['k3s03_hornet', 2, 'hornet_skrift', { rumstillstand: { floden: 'rent' } }, null],
+  // under skylten står snäckorna i pusslet: han läser den från sidan
+  ['k3s04_on', 10, 'skylt_skal', { visade: { on: ['skylt_skal'] } }, [112, 68]],
+]) {
+  test(`skylten ${skylt} öppnas när han går fram och trycker (109.3)`, async ({ page }) => {
+    test.setTimeout(90000);
+    const ev = (fn, arg) => page.evaluate(fn, arg);
+    const sc = kap.scener.findIndex((x) => x.id === scenId);
+    // det som redan har hänt i rummet (mjölet borta från hornet, skylten under mossan) står i sparningen
+    await page.addInitScript((x) => {
+      const s = JSON.parse(localStorage.getItem('ordstaven_spar') || 'null'); const av = s?.aventyr?.['den-gomda-dalen'];
+      if (!av || av.kapitelId !== 'kap-03') return;
+      for (const [k, v] of Object.entries(x)) av[k] = { ...(av[k] || {}), ...v };
+      localStorage.setItem('ordstaven_spar', JSON.stringify(s));
+    }, extra);
+    await starta(page, scenId, sc, stegNr);
+    await expect.poll(() => ev(() => window.__ORDSTAVEN.scen()), { timeout: 20000 }).toBe(scenId);
+    // fram till steget (mellanscener och repliker före), där världen går
+    await expect.poll(async () => {
+      for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+      return ev(() => window.__ORDSTAVEN.steg()?.typ === 'pussel' && document.querySelector('#plattan').hidden && !window.__ORDSTAVEN.fryst());
+    }, { timeout: 30000, intervals: [400] }).toBe(true);
+    expect(await ev((id) => !!window.__ORDSTAVEN.ruta(id), skylt)).toBe(true);
+    // han går fram, och handen står på skylten (i ett steg som visar sin egen hand, eller rummets hand på skylten)
+    await expect.poll(async () => { if (sida) await ev(([x, y]) => window.__ORDSTAVEN.gaMot(x, y), sida); else await ev(gaMotSida, skylt); return ev((id) => window.__ORDSTAVEN.nara() ?? (window.__ORDSTAVEN.logg().split('== SENASTE')[0].trim().split('\n').filter((r) => r.includes('[hand] ')).pop()?.includes(`[hand] ${id} `) && !document.querySelector('#handknapp').hidden ? id : null), skylt); }, { timeout: 20000, intervals: [1500] }).toBe(skylt);
+    await expect(page.locator('#handknapp')).toBeVisible();
+    await page.waitForTimeout(800);
+    expect(await page.locator('#plattan').isHidden()).toBe(true);
+    await page.screenshot({ path: `test-results/kap3-skylt-${skylt}.png` });
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#plattan .lapp')).toBeVisible({ timeout: 5000 }).catch(async (e) => { console.log((await ev(() => window.__ORDSTAVEN.logg())).split('== SENASTE')[0].split('\n').slice(-15).join('\n')); throw e; });
+  });
+}
