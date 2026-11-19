@@ -1210,7 +1210,7 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **lev106 är inne** efter avstämningen mot kartan i 0.95.0 (107.5). Rummen stämmer med kartan: i floden är bara färger sammanslagna, i kvarnen och på ön har mjöldammet och glittret mörkare färger efter Stils ihopslagning, och på sandbanken är sköldpaddan omritad (halsen, armen och fenan) och drivveden borta. Inget hinder, vatten eller ställe han går på har flyttats, och kartan är oförändrad.
 - **Baronen på repstegen** (`src/scener/baronstege.js`) har samma gränssnitt som halmdockan (`ropar`, `ratt`, `fel`, `vinst`, `taBort`). `Rum.duellfigur('baronen')` ger honom när Stils bilder finns, och en mellanscen med `ordduell_start` före pusslet ställer dit honom redan då. Luftskeppet utan stege, den långa stegen i (72, 74) i skeppets bild, och baronen i x = stegens x − 5 med 6 px per steg. Rätt kort: förvirrad, en medalj faller och han klättrar ett steg upp (utrustningen hel → medalj → medalj_fjader). Fel kort: ett steg ned. Vinsten: han tappar greppet, stegen rullas upp nedifrån och han landar på huvudet i gondolen. `ordduell_seger` låter skeppet fara med Herr Skata efter (och tappar greppet först om han hänger kvar). Gråboxens baron används bara utan Stils bilder.
 - **Ljuden:** `duell_start` (effekt) när duellen börjar och `stycke_seger` (ett av STYCKEN) vid segern.
-- **Sköldpaddans huvud på ön** ligger i Stils läge (−40, 64) vid skalets västra kant och stiger de sista 16 px ur vattnet. **Slutbilden** är Stils `k3_slut_01–08`, 950 ms per bild, och ett tryck hoppar över den som förut.
+- **Sköldpaddans huvud på ön** ligger i Stils läge (−40, 64) vid skalets västra kant och stiger de sista 16 px ur vattnet. **Slutbilden** var Stils `k3_slut_01–08` (950 ms per bild) och är ersatt i 0.98.0, se nedan. Ett tryck hoppar över den som förut.
 - **Vinstens replik efter segern:** när motorn spelar `ordduell_seger` själv (testrummet) spelas `vid_vinst.replik` efter segern, så att "Du vann ordduellen!" kommer sist, som i kapitel 3.
 - **Inga emoji i kapitlen och testrummen** (107.6, `tests/enhet/emoji.test.js`): varje bild som läsplattan kan visa ur innehållet (`bild`, `ledbild`, `pekar_pa`, utom mellanscenernas och reaktionernas regier, alternativen i läsval i rummet och det han bär) ritas med `bilder.html` som i spelet, och testet faller om det blir en emoji. Det som väntar på Stil står i en lista som bara får krympa.
 
@@ -1222,8 +1222,21 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
   - **Läsplattan öppnas efter tangenttrycket** (`setTimeout` 0): samma Enter når annars också läsplattans väntan på ▶, som läggs till i samma utskick, och stänger den direkt.
   - **Felsökning:** `window.__ORDSTAVEN.nara()` ger saken handen står på i ett steg.
 - **Räckvidden i kapitel 3** (109.3, `verktyg/kartor/kap3.py`):
-  - hornet och skriften var samma ruta, så ett tryck tutade alltid och skriften gick bara att öppna med musen. Nu är de två saker, hornet (572, 88, 12 × 6) och skriften (584, 88, 12 × 6, `sida='under'`), och han går under hornet på avsatsen till skriften;
+  - hornet och skriften var samma ruta, så ett tryck tutade alltid och skriften gick bara att öppna med musen. Nu är de två saker (läget efter Stils horn står i nästa avsnitt);
   - skylten på ön har `rackvidd` 40: snäckorna under den står i vägen nedifrån;
   - ett enhetstest säger fel om en sak med `bild_pa` inte står inom sin bildplats.
 - **Hissen ned** (109.4, `hissGenomDorren`): han kommer ut 10 px framför kvarnens dörr, och ungen bredvid honom, så att han inte står i dörröppningen.
 - **Fenan** (`fena_trappa`) ligger där han når den från sanden.
+
+## Stils bilder för 108–109 (0.98.0)
+- **Hornet med munstycket mot väster** (109.1): hornet i kartan är hornets fot (578, 96, 8 × 9), det enda som stänger på avsatsen. Kartans `blas_vid` (564, 107) är platsen vid munstycket: när han blåser (`Rum.blas`) och står inom 24 px ställer han sig där, vänd åt höger, med munnen vid munstycket. Skriften (572, 88, 6 × 5) läses norr om munstycket, där han står när scenen börjar, och hornet från platsen vid munstycket.
+- **Fenan är bara en** (109.8): kartans `ersatts_av` (ny egenskap) gör att `skoldpadda_fena` inte ritas när `fena_trappa` syns. Den står kvar som hinder och id. `skoldpadda_fena_lyft` är Stils nya bild.
+- **Berget som ryker** (109.8): `skoldpaddaVisarBerget` visar Stils `berget_ryker_01–03` (400 ms per bild) där gråboxens triangel stod. Berget står kvar tills rummet byts (`lagda`).
+- **Ankaret och SKÖLD** (109.5), två regier i `GRABOX_REGI`:
+  - `ankaret_faller`: ankaret faller från bildens överkant och stannar 34 px ovanför hjälten och ungen. Kartans ankare i sanden döljs tills det har borrat ned sig;
+  - `skold_ankaret`: `skold_tands_01–03` mitt mellan hjälten och ungen, sedan står `skold_bubbla_01–02` kvar (450 ms per bild). Ankaret slår i bubblan (`skold_pang`), studsar i en båge till kartans `ankare` och borrar ned sig. Bubblan tonas bort i `ordduell_seger`.
+  - `Rum.regibild` och `Rum.regiram` lägger en följd av Stils bilder i världen, också ur effekternas atlas.
+  - Regierna spelas när datan pekar på dem: `bild` på mellanscenen "Ankaret faller …" och `bild` på `vid_ratt` i `k3_skold` (Innehålls fält).
+- **Paraplyet i duellen** (109.7, `baronstege.js`): när baronen har ropat petar han en gång med paraplyet (`petar_01–02`). Vid rätt kort parerar SKÖLD (`Rum.skoldParerar`), och paraplyet vänds ut och in (`utochin_01`). Vid sista kortet hänger han i paraplyet (`baronen_paraply_fallskarm_01–02`) medan stegen rullas upp. Utan bilderna är det som förut.
+- **Den nya slutbilden** (109.10): `k3_slut_bakgrund_01–02` (640 × 192, 600 ms) och `k3_slut_skoldpadda_01–02` (500 ms). Bakgrunden glider från x 0 till −320 på 7,5 s, och sköldpaddan simmar från x 40 till 380 i bildens koordinater. `k3_slut_01–08` är borttagna.
+- **Bildkorten** `mat`, `sol`, `apa` och `farfars_lista_sista_raden` (108.2): listan i testet mot emoji är tom.

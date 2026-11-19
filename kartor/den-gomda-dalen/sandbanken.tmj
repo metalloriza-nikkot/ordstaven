@@ -629,6 +629,11 @@
        "value": "fena_uppe=skoldpadda_fena_lyft,luftskepp=skoldpadda_fena_lyft"
       },
       {
+       "name": "ersatts_av",
+       "type": "string",
+       "value": "fena_trappa"
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"

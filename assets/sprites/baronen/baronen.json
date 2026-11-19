@@ -380,10 +380,50 @@
     "h": 24
    }
   },
-  "baronen_portratt_forvanad": {
+  "baronen_paraply_fallskarm_01": {
    "frame": {
     "x": 0,
     "y": 138,
+    "w": 32,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 48
+   }
+  },
+  "baronen_paraply_fallskarm_02": {
+   "frame": {
+    "x": 33,
+    "y": 138,
+    "w": 32,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 48
+   }
+  },
+  "baronen_portratt_forvanad": {
+   "frame": {
+    "x": 0,
+    "y": 187,
     "w": 48,
     "h": 48
    },
@@ -403,7 +443,7 @@
   "baronen_portratt_stolt": {
    "frame": {
     "x": 49,
-    "y": 138,
+    "y": 187,
     "w": 48,
     "h": 48
    },
@@ -423,7 +463,7 @@
   "baronen_portratt_sur": {
    "frame": {
     "x": 98,
-    "y": 138,
+    "y": 187,
     "w": 48,
     "h": 48
    },
@@ -443,7 +483,7 @@
   "baronen_stege_forvirrad_hel_01": {
    "frame": {
     "x": 0,
-    "y": 187,
+    "y": 236,
     "w": 24,
     "h": 28
    },
@@ -463,7 +503,7 @@
   "baronen_stege_forvirrad_hel_02": {
    "frame": {
     "x": 25,
-    "y": 187,
+    "y": 236,
     "w": 24,
     "h": 28
    },
@@ -483,7 +523,7 @@
   "baronen_stege_forvirrad_medalj_01": {
    "frame": {
     "x": 0,
-    "y": 216,
+    "y": 265,
     "w": 24,
     "h": 28
    },
@@ -503,7 +543,7 @@
   "baronen_stege_forvirrad_medalj_02": {
    "frame": {
     "x": 25,
-    "y": 216,
+    "y": 265,
     "w": 24,
     "h": 28
    },
@@ -523,7 +563,7 @@
   "baronen_stege_forvirrad_medalj_fjader_01": {
    "frame": {
     "x": 0,
-    "y": 245,
+    "y": 294,
     "w": 24,
     "h": 28
    },
@@ -543,7 +583,7 @@
   "baronen_stege_forvirrad_medalj_fjader_02": {
    "frame": {
     "x": 25,
-    "y": 245,
+    "y": 294,
     "w": 24,
     "h": 28
    },
@@ -563,7 +603,7 @@
   "baronen_stege_grund_hel_01": {
    "frame": {
     "x": 0,
-    "y": 274,
+    "y": 323,
     "w": 24,
     "h": 28
    },
@@ -583,7 +623,7 @@
   "baronen_stege_grund_hel_02": {
    "frame": {
     "x": 25,
-    "y": 274,
+    "y": 323,
     "w": 24,
     "h": 28
    },
@@ -603,7 +643,7 @@
   "baronen_stege_grund_medalj_01": {
    "frame": {
     "x": 0,
-    "y": 303,
+    "y": 352,
     "w": 24,
     "h": 28
    },
@@ -623,7 +663,7 @@
   "baronen_stege_grund_medalj_02": {
    "frame": {
     "x": 25,
-    "y": 303,
+    "y": 352,
     "w": 24,
     "h": 28
    },
@@ -643,7 +683,7 @@
   "baronen_stege_grund_medalj_fjader_01": {
    "frame": {
     "x": 0,
-    "y": 332,
+    "y": 381,
     "w": 24,
     "h": 28
    },
@@ -663,7 +703,7 @@
   "baronen_stege_grund_medalj_fjader_02": {
    "frame": {
     "x": 25,
-    "y": 332,
+    "y": 381,
     "w": 24,
     "h": 28
    },
@@ -683,7 +723,7 @@
   "baronen_stege_klattrar_hel_01": {
    "frame": {
     "x": 0,
-    "y": 361,
+    "y": 410,
     "w": 24,
     "h": 28
    },
@@ -703,7 +743,7 @@
   "baronen_stege_klattrar_hel_02": {
    "frame": {
     "x": 25,
-    "y": 361,
+    "y": 410,
     "w": 24,
     "h": 28
    },
@@ -723,7 +763,7 @@
   "baronen_stege_klattrar_medalj_01": {
    "frame": {
     "x": 0,
-    "y": 390,
+    "y": 439,
     "w": 24,
     "h": 28
    },
@@ -743,7 +783,7 @@
   "baronen_stege_klattrar_medalj_02": {
    "frame": {
     "x": 25,
-    "y": 390,
+    "y": 439,
     "w": 24,
     "h": 28
    },
@@ -763,7 +803,7 @@
   "baronen_stege_klattrar_medalj_fjader_01": {
    "frame": {
     "x": 0,
-    "y": 419,
+    "y": 468,
     "w": 24,
     "h": 28
    },
@@ -783,7 +823,7 @@
   "baronen_stege_klattrar_medalj_fjader_02": {
    "frame": {
     "x": 25,
-    "y": 419,
+    "y": 468,
     "w": 24,
     "h": 28
    },
@@ -800,10 +840,130 @@
     "h": 28
    }
   },
+  "baronen_stege_petar_hel_01": {
+   "frame": {
+    "x": 0,
+    "y": 497,
+    "w": 32,
+    "h": 52
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 52
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 52
+   }
+  },
+  "baronen_stege_petar_hel_02": {
+   "frame": {
+    "x": 33,
+    "y": 497,
+    "w": 32,
+    "h": 52
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 52
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 52
+   }
+  },
+  "baronen_stege_petar_medalj_01": {
+   "frame": {
+    "x": 0,
+    "y": 550,
+    "w": 32,
+    "h": 52
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 52
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 52
+   }
+  },
+  "baronen_stege_petar_medalj_02": {
+   "frame": {
+    "x": 33,
+    "y": 550,
+    "w": 32,
+    "h": 52
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 52
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 52
+   }
+  },
+  "baronen_stege_petar_medalj_fjader_01": {
+   "frame": {
+    "x": 0,
+    "y": 603,
+    "w": 32,
+    "h": 52
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 52
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 52
+   }
+  },
+  "baronen_stege_petar_medalj_fjader_02": {
+   "frame": {
+    "x": 33,
+    "y": 603,
+    "w": 32,
+    "h": 52
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 52
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 52
+   }
+  },
   "baronen_stege_ropar_hel_01": {
    "frame": {
     "x": 0,
-    "y": 448,
+    "y": 656,
     "w": 24,
     "h": 28
    },
@@ -823,7 +983,7 @@
   "baronen_stege_ropar_hel_02": {
    "frame": {
     "x": 25,
-    "y": 448,
+    "y": 656,
     "w": 24,
     "h": 28
    },
@@ -843,7 +1003,7 @@
   "baronen_stege_ropar_medalj_01": {
    "frame": {
     "x": 0,
-    "y": 477,
+    "y": 685,
     "w": 24,
     "h": 28
    },
@@ -863,7 +1023,7 @@
   "baronen_stege_ropar_medalj_02": {
    "frame": {
     "x": 25,
-    "y": 477,
+    "y": 685,
     "w": 24,
     "h": 28
    },
@@ -883,7 +1043,7 @@
   "baronen_stege_ropar_medalj_fjader_01": {
    "frame": {
     "x": 0,
-    "y": 506,
+    "y": 714,
     "w": 24,
     "h": 28
    },
@@ -903,7 +1063,7 @@
   "baronen_stege_ropar_medalj_fjader_02": {
    "frame": {
     "x": 25,
-    "y": 506,
+    "y": 714,
     "w": 24,
     "h": 28
    },
@@ -923,7 +1083,7 @@
   "baronen_stege_tappar_hel_01": {
    "frame": {
     "x": 0,
-    "y": 535,
+    "y": 743,
     "w": 24,
     "h": 28
    },
@@ -943,7 +1103,7 @@
   "baronen_stege_tappar_hel_02": {
    "frame": {
     "x": 25,
-    "y": 535,
+    "y": 743,
     "w": 24,
     "h": 28
    },
@@ -963,7 +1123,7 @@
   "baronen_stege_tappar_hel_03": {
    "frame": {
     "x": 50,
-    "y": 535,
+    "y": 743,
     "w": 24,
     "h": 28
    },
@@ -983,7 +1143,7 @@
   "baronen_stege_tappar_medalj_01": {
    "frame": {
     "x": 0,
-    "y": 564,
+    "y": 772,
     "w": 24,
     "h": 28
    },
@@ -1003,7 +1163,7 @@
   "baronen_stege_tappar_medalj_02": {
    "frame": {
     "x": 25,
-    "y": 564,
+    "y": 772,
     "w": 24,
     "h": 28
    },
@@ -1023,7 +1183,7 @@
   "baronen_stege_tappar_medalj_03": {
    "frame": {
     "x": 50,
-    "y": 564,
+    "y": 772,
     "w": 24,
     "h": 28
    },
@@ -1043,7 +1203,7 @@
   "baronen_stege_tappar_medalj_fjader_01": {
    "frame": {
     "x": 0,
-    "y": 593,
+    "y": 801,
     "w": 24,
     "h": 28
    },
@@ -1063,7 +1223,7 @@
   "baronen_stege_tappar_medalj_fjader_02": {
    "frame": {
     "x": 25,
-    "y": 593,
+    "y": 801,
     "w": 24,
     "h": 28
    },
@@ -1083,7 +1243,7 @@
   "baronen_stege_tappar_medalj_fjader_03": {
    "frame": {
     "x": 50,
-    "y": 593,
+    "y": 801,
     "w": 24,
     "h": 28
    },
@@ -1100,10 +1260,70 @@
     "h": 28
    }
   },
+  "baronen_stege_utochin_hel_01": {
+   "frame": {
+    "x": 0,
+    "y": 830,
+    "w": 32,
+    "h": 52
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 52
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 52
+   }
+  },
+  "baronen_stege_utochin_medalj_01": {
+   "frame": {
+    "x": 0,
+    "y": 883,
+    "w": 32,
+    "h": 52
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 52
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 52
+   }
+  },
+  "baronen_stege_utochin_medalj_fjader_01": {
+   "frame": {
+    "x": 0,
+    "y": 936,
+    "w": 32,
+    "h": 52
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 52
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 52
+   }
+  },
   "luftskepp_baron_landar_01": {
    "frame": {
     "x": 0,
-    "y": 622,
+    "y": 989,
     "w": 112,
     "h": 96
    },
@@ -1123,7 +1343,7 @@
   "luftskepp_baron_landar_02": {
    "frame": {
     "x": 113,
-    "y": 622,
+    "y": 989,
     "w": 112,
     "h": 96
    },
@@ -1143,7 +1363,7 @@
   "luftskepp_brevet_rivet": {
    "frame": {
     "x": 0,
-    "y": 719,
+    "y": 1086,
     "w": 112,
     "h": 96
    },
@@ -1163,7 +1383,7 @@
   "luftskepp_flyger_fel_01": {
    "frame": {
     "x": 0,
-    "y": 816,
+    "y": 1183,
     "w": 112,
     "h": 96
    },
@@ -1183,7 +1403,7 @@
   "luftskepp_flyger_fel_02": {
    "frame": {
     "x": 113,
-    "y": 816,
+    "y": 1183,
     "w": 112,
     "h": 96
    },
@@ -1203,7 +1423,7 @@
   "luftskepp_glider_01": {
    "frame": {
     "x": 0,
-    "y": 913,
+    "y": 1280,
     "w": 112,
     "h": 96
    },
@@ -1223,7 +1443,7 @@
   "luftskepp_glider_02": {
    "frame": {
     "x": 113,
-    "y": 913,
+    "y": 1280,
     "w": 112,
     "h": 96
    },
@@ -1243,7 +1463,7 @@
   "luftskepp_laser_skyltarna": {
    "frame": {
     "x": 0,
-    "y": 1010,
+    "y": 1377,
     "w": 112,
     "h": 96
    },
@@ -1263,7 +1483,7 @@
   "luftskepp_laser_skyltarna_talar": {
    "frame": {
     "x": 0,
-    "y": 1107,
+    "y": 1474,
     "w": 112,
     "h": 96
    },
@@ -1283,7 +1503,7 @@
   "luftskepp_river_brevet_01": {
    "frame": {
     "x": 0,
-    "y": 1204,
+    "y": 1571,
     "w": 112,
     "h": 96
    },
@@ -1303,7 +1523,7 @@
   "luftskepp_river_brevet_02": {
    "frame": {
     "x": 113,
-    "y": 1204,
+    "y": 1571,
     "w": 112,
     "h": 96
    },
@@ -1323,7 +1543,7 @@
   "luftskepp_ser_hjalten": {
    "frame": {
     "x": 0,
-    "y": 1301,
+    "y": 1668,
     "w": 112,
     "h": 96
    },
@@ -1343,7 +1563,7 @@
   "luftskepp_ser_kartan": {
    "frame": {
     "x": 113,
-    "y": 1301,
+    "y": 1668,
     "w": 112,
     "h": 96
    },
@@ -1363,7 +1583,7 @@
   "luftskepp_skata_landar": {
    "frame": {
     "x": 0,
-    "y": 1398,
+    "y": 1765,
     "w": 112,
     "h": 96
    },
@@ -1383,7 +1603,7 @@
   "luftskepp_skata_putsar_01": {
    "frame": {
     "x": 0,
-    "y": 1495,
+    "y": 1862,
     "w": 112,
     "h": 96
    },
@@ -1403,7 +1623,7 @@
   "luftskepp_skata_putsar_02": {
    "frame": {
     "x": 113,
-    "y": 1495,
+    "y": 1862,
     "w": 112,
     "h": 96
    },
@@ -1423,7 +1643,7 @@
   "luftskepp_skata_snor": {
    "frame": {
     "x": 0,
-    "y": 1592,
+    "y": 1959,
     "w": 112,
     "h": 96
    },
@@ -1443,7 +1663,7 @@
   "luftskepp_talar_01": {
    "frame": {
     "x": 0,
-    "y": 1689,
+    "y": 2056,
     "w": 112,
     "h": 96
    },
@@ -1463,7 +1683,7 @@
   "luftskepp_talar_02": {
    "frame": {
     "x": 113,
-    "y": 1689,
+    "y": 2056,
     "w": 112,
     "h": 96
    },
@@ -1483,7 +1703,7 @@
   "luftskepp_tom": {
    "frame": {
     "x": 0,
-    "y": 1786,
+    "y": 2153,
     "w": 112,
     "h": 96
    },
@@ -1503,7 +1723,7 @@
   "luftskepp_trasslar_01": {
    "frame": {
     "x": 0,
-    "y": 1883,
+    "y": 2250,
     "w": 112,
     "h": 96
    },
@@ -1523,7 +1743,7 @@
   "luftskepp_trasslar_02": {
    "frame": {
     "x": 113,
-    "y": 1883,
+    "y": 2250,
     "w": 112,
     "h": 96
    },
@@ -1543,7 +1763,7 @@
   "luftskepp_utan_stege": {
    "frame": {
     "x": 0,
-    "y": 1980,
+    "y": 2347,
     "w": 112,
     "h": 96
    },
@@ -1563,7 +1783,7 @@
   "repstege_lang": {
    "frame": {
     "x": 0,
-    "y": 2077,
+    "y": 2444,
     "w": 14,
     "h": 96
    },
@@ -1586,7 +1806,7 @@
   "format": "RGBA8888",
   "size": {
    "w": 226,
-   "h": 2174
+   "h": 2541
   },
   "scale": "1",
   "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."

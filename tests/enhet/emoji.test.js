@@ -20,10 +20,9 @@ const FILER = [
  * Det som Stil inte har ritat än (testrummens 22 kort kom i 0.96.1, 107.6). Listan får bara krympa.
  * Står ett id här som inte längre är en emoji, faller testet också, så att listan hålls kort.
  */
-const VANTAR_PA_STIL = new Set([
-  // hittat av testet (0.96.0): "Var var vi?" på startskärmen (mat, sol, apa) och Farfars lista i prologens skylt
-  'mat', 'sol', 'apa', 'farfars_lista_sista_raden',
-]);
+// Tom sedan 0.98.0: Stils fyra kort (108.2) ersatte de sista (mat, sol, apa och Farfars lista). Nytt som väntar
+// på Stil skrivs in här, och listan får bara krympa.
+const VANTAR_PA_STIL = new Set([]);
 
 /** Fält vars värde är en bild på läsplattan. En mellanscens och en reaktions `bild` är en regi i rummet, inte en bild. */
 const BILDFALT = new Set(['bild', 'ledbild', 'pekar_pa']);

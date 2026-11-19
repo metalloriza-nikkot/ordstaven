@@ -204,7 +204,8 @@ test('kapitel 3 pass 2: FEM TUT. INTE TRE., ön vid bryggan, mossan, skylten, sn
     else if (p?.typ === 'P29_tryck') {
       // fram till hornet först: på vägen öppnas skriften på läsplattan (han läser den och stänger), sedan igen
       const h = await ev(() => { const o = window.__ORDSTAVEN.ruta('hornet'), q = window.__ORDSTAVEN.position(); const m = o.sida === 'vanster' ? [o.x - 9, o.y + o.h - 1] : [o.x + o.b / 2, o.y + o.h + 6]; return Math.hypot(q.x - m[0], q.y - m[1]); });
-      if (h > 14) { await gaMot(p.foremal); await page.waitForTimeout(1200); continue; }
+      // 109.1 och 109.3: skriften läses norr om munstycket, och hornet blåses från platsen vid munstycket
+      if (h > 4) { await gaMot(p.foremal); await page.waitForTimeout(1200); continue; }
       // först tre tut (frukost: flodfolket springer fram), sedan fem
       if (hornet === 0) await page.screenshot({ path: 'test-results/kap3-hornet.png' });
       const tut = hornet === 0 ? 3 : 5;
@@ -405,7 +406,7 @@ test('regierna i kapitel 3 (100.4, 101.3, 102.3 och 103.3.1): var och en går i 
   test.setTimeout(300000); // 106: sex regier till
   const ev = (fn, arg) => page.evaluate(fn, arg);
   const REGIER = [['k3s01_floden', ['ankomst_floden', 'frukost', 'skepparen_pekar', 'kartbit3_on']], ['k3s02_kvarnen', ['sackhiss_upp']], ['k3s02_loftet', ['loftet_horn', 'skuggan_lyssnar']], ['k3s03_hornet', ['tallrikar', 'skuggan_stiger', 'skuggan_dyker', 'unge_simmar', 'sackhiss_ner']],
-    ['k3s04_on', ['skoldpadda_huvud', 'skylt_tecken']], ['k3s05_sandbanken', ['skoldpadda_simmar', 'skoldpadda_visar_berget']], ['k3s06_ankaret', ['ordduell_start', 'ordduell_seger']], ['k3s07_resan', ['kartbit4_berget', 'resan_kvall', 'resan_slut']]];
+    ['k3s04_on', ['skoldpadda_huvud', 'skylt_tecken']], ['k3s05_sandbanken', ['skoldpadda_simmar', 'skoldpadda_visar_berget']], ['k3s06_ankaret', ['ankaret_faller', 'skold_ankaret', 'ordduell_start', 'ordduell_seger']], ['k3s07_resan', ['kartbit4_berget', 'resan_kvall', 'resan_slut']]];
   for (const [scenId, regier] of REGIER) {
     // på ön börjar den där skylten syns (efter mossan), så att tecknen har sin skylt
     const sc = kap.scener.findIndex((x) => x.id === scenId);
@@ -429,7 +430,12 @@ test('regierna i kapitel 3 (100.4, 101.3, 102.3 och 103.3.1): var och en går i 
     if (scenId === 'k3s01_floden') expect((await ev(() => window.__ORDSTAVEN.grafik())).regi).toContain('ankomsten till floden');
     if (scenId === 'k3s05_sandbanken') expect((await ev(() => window.__ORDSTAVEN.grafik())).regi).toContain('sköldpaddan simmar');
     if (scenId === 'k3s06_ankaret') expect((await ev(() => window.__ORDSTAVEN.grafik())).regi).toEqual(expect.arrayContaining(['ordduellen börjar', 'ordduellen är vunnen', 'ljud:duell_start', 'stycke:stycke_seger']));
-    if (scenId === 'k3s07_resan') expect((await ev(() => window.__ORDSTAVEN.grafik())).regi).toEqual(expect.arrayContaining(['kartbit 4 visar berget', 'slutbilden mot solnedgången']));
+    // 109.5: ankaret faller och stannar, SKÖLD tänds, och ankaret studsar och borrar ned sig (Stils bilder)
+    if (scenId === 'k3s06_ankaret') expect((await ev(() => window.__ORDSTAVEN.grafik())).regi).toEqual(expect.arrayContaining(['ankaret faller och stannar', 'SKÖLD tänds, och ankaret studsar och borrar ned sig']));
+    // 109.8: Stils berg i stället för gråboxens triangel
+    if (scenId === 'k3s05_sandbanken') expect((await ev(() => window.__ORDSTAVEN.grafik())).regi).toContain('berget: Stils bild');
+    // 109.10: den nya slutbilden, där kameran glider längs floden mot berget
+    if (scenId === 'k3s07_resan') expect((await ev(() => window.__ORDSTAVEN.grafik())).regi).toEqual(expect.arrayContaining(['kartbit 4 visar berget', 'slutbilden: kameran glider mot berget']));
     // 102.3: ön steg vid bryggan innan hissen bar honom ned, och han kom ut genom kvarnens dörr på kajen
     if (scenId === 'k3s03_hornet') {
       const regi = (await ev(() => window.__ORDSTAVEN.grafik())).regi;

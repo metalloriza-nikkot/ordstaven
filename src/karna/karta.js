@@ -170,6 +170,9 @@ export function lasKarta(tmj) {
       // i_bild_av (101.6) = föremålet är en del av ett annat föremåls bild (skriften på hornet): när det föremålet har
       // Stils bild ritas det här inte som en ruta, men id:t och platsen står kvar
       if (egen.i_bild_av) ut.iBildAv = String(egen.i_bild_av);
+      // ersatts_av (109.8) = föremålet ritas inte när det föremålet syns (fenan, när fenan som trappa har visats):
+      // det står kvar som hinder och id, bara bilden byts
+      if (egen.ersatts_av) ut.ersattsAv = String(egen.ersatts_av);
       // bild_lagen (brevramen) = en bild per läge: den första tills något har lämnats här (bara till föremålet), sedan
       // en bild till per sak som har lämnats. bild_ord (övergången) = bilden efter ordet han skrev i pusslet:
       // <id>_<ordet med gemener>, t.ex. overgang_stege
@@ -178,6 +181,8 @@ export function lasKarta(tmj) {
       if (egen.bild_pa) ut.bildPa = String(egen.bild_pa);
       // det stora hornet (103.3.2): hjälten blåser i det vid varje tryck
       if (egen.blas) ut.blas = true;
+      // blas_vid (109.1) = platsen vid munstycket där han står när han blåser, "x,y" (fötterna)
+      if (egen.blas_vid) { const [bx, by] = String(egen.blas_vid).split(',').map(Number); if (Number.isFinite(bx) && Number.isFinite(by)) ut.blasVid = { x: bx, y: by }; }
       // en figurs syssla (103.3.6): bilderna som växlar (minst 400 ms per bild), och att den vinkar när han kommer nära
       if (egen.syssla) { ut.syssla = String(egen.syssla).split(',').map((x) => x.trim()).filter(Boolean); ut.sysslaMs = Math.max(400, Number(egen.syssla_ms) || 500); }
       if (egen.nara) ut.nara = true;

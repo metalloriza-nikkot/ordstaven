@@ -66,7 +66,7 @@ FOREMALSBILDER = {
     # sköldpaddans huvud och fena på sandbanken, där Stil ritade dem (halsen står i rummets bild)
     'skoldpadda_huvud': {'bild': 'skoldpadda_huvud_vilar', 'bild_pa': 'huvud_plats'},
     'skoldpadda_fena': {'bild': 'skoldpadda_fena_sanden', 'bild_tillstand': 'fena_uppe=skoldpadda_fena_lyft,luftskepp=skoldpadda_fena_lyft',
-                        'bild_pa': 'fena_plats'},
+                        'bild_pa': 'fena_plats', 'ersatts_av': 'fena_trappa'},
     'fena_trappa': {'bild': 'skoldpadda_fena_trappa', 'bild_pa': 'fena_plats'},
     **{f'tuva_{i}': {'bild': 'tuva_hel', 'bild_hugg': 'tuva_lyft', 'bild_kvar': 'tuva_lyft'} for i in range(1, 6)},
     'skylt_skal': {'bild': 'skylt_skal'},
@@ -249,13 +249,15 @@ RUMMEN = {
             sak('tang_hjul_3', 470, 158, 16, 14, sida='under'),
             # hornet på avsatsen: han står väster om det, och skriften står på det. Kameran glider ut över floden när han
             # tutar (utsikt), så att han ser verkan
-            # 109.3: hornet (där han blåser, västra änden) och skriften (bandet på hornets östra del) är två saker bredvid
-            # varandra, så att ett tryck vid skriften läser den och ett tryck vid hornet tutar. Förut låg de på samma
-            # ruta, och ett tryck gick alltid till hornet: skriften gick bara att öppna med musen
-            sak('hornet', 572, 88, 12, 6, sida='vanster', utsikt='on', blas=True),
+            # 109.1 och 109.3: Stils horn har munstycket mot väster i munhöjd (572, 93). Hornet (det han trycker på) är
+            # foten av drivved, det enda som stänger på avsatsen; röret mellan munstycket och foten stänger inte. Han
+            # blåser från platsen vid munstycket (blas_vid, fötterna i 564, 107) med munnen vid hornet. Skriften står
+            # på rörets östra del, och han läser den öster om foten. Förut låg de på samma ruta, och ett tryck gick
+            # alltid till hornet: skriften gick bara att öppna med musen
+            sak('hornet', 578, 96, 8, 9, sida='vanster', utsikt='on', blas=True, blas_vid='564,107'),
             # där hissen kommer upp: dörren ut till avsatsen (hissen själv står inne i kvarnen)
             sak('sackhiss', 500, 74, 20, 14, sida='under'),
-            sak('hornet_skrift', 584, 88, 12, 6, sida='under'),
+            sak('hornet_skrift', 572, 88, 6, 5, sida='vanster'),
             # kvarnens brygga, och plankan från bryggan upp på ön (tillståndet on)
             sak('brygga_kvarn', 548, 196, 44, 22, golv=True),
             sak('planka_on', 560, 218, 24, 10, sida='over'),

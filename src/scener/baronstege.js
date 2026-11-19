@@ -82,8 +82,19 @@ export class BaronStege {
 
   tomgang() { this.slinga('grund', TOMGANG_MS); }
 
-  /** @param {boolean} pa */
-  ropar(pa) { this.stoppa(); if (pa) this.slinga('ropar', 300); else this.tomgang(); }
+  /** Har Stil ritat ett läge (paraplyet, 109.7)? @param {string} namn hela bildens namn */
+  har(namn) { return this.scen.textures.get('baronen').has(namn); }
+
+  /**
+   * När han har ropat petar han ned mot hjälten med det stängda paraplyet, en gång per kort (109.7, Stils
+   * baronen_stege_petar_<utrustning>_01–02). Utan bilderna står han i tomgång som förut. @param {boolean} pa
+   */
+  ropar(pa) {
+    this.stoppa();
+    if (pa) { this.slinga('ropar', 300); return; }
+    if (!this.har('baronen_stege_petar_hel_01')) { this.tomgang(); return; }
+    this.visa('petar', 1); this.sen(250, () => this.visa('petar', 2)); this.sen(650, () => this.visa('petar', 1)); this.sen(900, () => this.tomgang());
+  }
 
   /** Ett steg upp (−1) eller ned (+1), med händerna en i taget. @param {number} dir */
   klattra(dir) {
@@ -109,7 +120,10 @@ export class BaronStege {
 
   /** Rätt kort: förvirrad, en medalj eller fjädern trillar, och han klättrar själv ett steg upp. @returns {number} ms */
   ratt() {
-    this.stoppa(); this.slinga('forvirrad', 200);
+    this.stoppa();
+    // 109.7: SKÖLD parerar paraplyet, som vänds ut och in (baronen_stege_utochin_<utrustning>_01), och han blir förvirrad
+    if (this.har('baronen_stege_utochin_hel_01')) { this.scen.skoldParerar?.(); this.visa('utochin', 1); this.sen(350, () => this.slinga('forvirrad', 200)); }
+    else this.slinga('forvirrad', 200);
     this.ratta++;
     this.sen(300, () => { this.tappaMedalj(); this.utrustning = this.ratta >= 2 ? 'medalj_fjader' : 'medalj'; });
     this.sen(500, () => { if (this.loop) this.scen.time.removeEvent(this.loop); this.loop = null; this.klattra(-1); });
@@ -128,6 +142,12 @@ export class BaronStege {
     this.stoppa();
     this.visa('tappar', 1); this.sen(200, () => this.visa('tappar', 2)); this.sen(400, () => this.visa('tappar', 3));
     const t = this.scen.textures.get('baronen');
+    // 109.7: han hänger i paraplyet som fallskärm (baronen_paraply_fallskarm_01–02) medan stegen rullas upp
+    if (t.has('baronen_paraply_fallskarm_01')) {
+      let n = 0;
+      const dinglar = () => { if (!this.img.active || !this.img.visible) return; this.img.setFrame(`baronen_paraply_fallskarm_0${1 + (n++ % 2)}`); this.scen.smutsig = true; this.sen(300, dinglar); };
+      this.sen(600, dinglar);
+    }
     // stegen rullas upp nedifrån, och baronen följer med upp
     const rull = { h: 96 };
     this.sen(600, () => this.scen.tweens.add({
