@@ -74,6 +74,24 @@ utan figurer och utan föremål som spelet ritar själv. `rum.py` skriver `rum/k
 `<rum>_over.png` (den höga vassen ovanför figurerna) och masken `vassen_falt.png`, och `fotter.py` vassfältets toppar
 vid fötterna (`figurer/omgivning/vass_fotter_01–02`).
 
+rum3/ (beslut 102.3–102.4): kapitel 3:s rum som färdiga bilder efter skissen version 2 med avsatsen, ritade med
+`skiss3/` (`bas.py`, `myt.py`, `avsats.py`, `rum_k3.py`). `rum3.py` skriver `rum/kap-03/floden.png` (640 × 384),
+`floden_kvall.png`, `kvarnen.png`, `on.png` och `sandbanken.png`. `sprites3.py` skriver sköldpaddan i den gemensamma
+skalan (skalet 280 × 192), ön som stiger (`on_stiger_01–06`), ön som simmar, huvudet, fenan, vattenhjulet som snurrar
+och hornet på avsatsen, till `foremal/flod/`. Kör `rum3.py` före `sprites3.py`.
+
+k3/sysslor.py, fas4/ljud_k3.py, fas4/stycken_k3.py (beslut 103.3): flodfolkets sysslor och hjälten som blåser i hornet
+(`figurer/`), kapitel 3:s tio ljud (`fas4/ljud_k3.py <ljud.json>` skriver bara de nya och lägger till dem i ljud.json),
+flodens vals (`fas4/slingor.py floden loop <ut>`) och de två korta stycken efter rätt svar (`fas4/stycken_k3.py <ut>`).
+
+k3/kort_k3b.py (efter 0.94.0): platsernas bildkort ritade om efter rummen som de ser ut i spelet, kvarnens uppdragskort
+med hornet på avsatsen, och `skoldpadda` till ordduellen. Kör efter `rum3/rum3.py` och `rum3/sprites3.py`.
+
+baron2/baron_stege.py, k3/slutbild.py, rum3/zon_floden.py (beslut 106): baronen på repstegen i ordduellen med sakerna
+som trillar av och luftskeppet vid sandbanken; kapitel 3:s slutbild mot solnedgången (`sidovyer/k3_slut_01–08`);
+och zonen floden under taket (kör efter rum3.py och sprites3.py). `fas4/ljud_k3.py` gör också `duell_start`, och
+`fas4/stycken_k3.py <ut> stycke_seger` gör segerstycket.
+
 kvall/ (kapitel 2, 12/11): `kvall.py` skriver `figurer/kvall.json`, en tabell som byter varje palettfärg mot sin
 kvällsfärg, så att figurerna blir mörkare på kvällen utan egna bilder. Målfärgerna tas bara bland färger som redan
 finns i träskets zon.

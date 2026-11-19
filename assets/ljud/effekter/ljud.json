@@ -635,5 +635,12 @@
   "signatur": false,
   "styrka_db": -8,
   "sekunder": 2.4
+ },
+ "duell_start": {
+  "grupp": "Kapitel 3",
+  "vad": "ORDDUELL!: en kort trumvirvel och två fanfarstötar (1,6 s). Samma i varje duell, också i testrummet och i kapitel 5",
+  "signatur": false,
+  "styrka_db": -7,
+  "sekunder": 1.85
  }
 }

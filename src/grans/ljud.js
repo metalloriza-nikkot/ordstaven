@@ -27,6 +27,8 @@ import styckeSkugganM4a from '../../assets/ljud/musik/stycke_skuggan.m4a?url';
 import styckeSkugganOgg from '../../assets/ljud/musik/stycke_skuggan.ogg?url';
 import styckeOnM4a from '../../assets/ljud/musik/stycke_on.m4a?url';
 import styckeOnOgg from '../../assets/ljud/musik/stycke_on.ogg?url';
+import styckeSegerM4a from '../../assets/ljud/musik/stycke_seger.m4a?url';
+import styckeSegerOgg from '../../assets/ljud/musik/stycke_seger.ogg?url';
 import { pausPlan } from '../karna/musik.js';
 import { EFFEKT_FOR, INSPELAT_FOR, INSPELAT_SPELAS, ljudLista } from '../karna/ljudid.js';
 
@@ -65,6 +67,8 @@ export const MUSIK = /** @type {Record<string, { m4a: string, ogg: string, loopS
 export const STYCKEN = /** @type {Record<string, { m4a: string, ogg: string }>} */ ({
   stycke_skuggan: { m4a: styckeSkugganM4a, ogg: styckeSkugganOgg },
   stycke_on: { m4a: styckeOnM4a, ogg: styckeOnOgg },
+  // ordduellens segerstycke (106.5, Stil 10h v0.8)
+  stycke_seger: { m4a: styckeSegerM4a, ogg: styckeSegerOgg },
 });
 export const MUSIK_BYTE_S = 1;
 export const MUSIK_EFTER_PAUS_S = 2;

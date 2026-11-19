@@ -3435,12 +3435,15 @@ export function skapaSpel(d) {
       if (res.resultat === 'vinst') break;
     }
     rum.visaOmrade(null);
-    if (p.vid_vinst && fig) await medFigur(p.vid_vinst, fig.vinst(p.vid_vinst.handling));
-    else if (p.vid_vinst) await reaktion(p.vid_vinst);
-    // 106.5: segern, om scenen inte har en egen mellanscen med ordduell_seger efter duellen (testrummet)
+    // 106.5: segern, om scenen inte har en egen mellanscen med ordduell_seger efter duellen (testrummet). Då spelas
+    // vinstens replik ("Du vann ordduellen!", 107.3) efter segern, som i kapitel 3
     const egenSeger = (b.scen?.steg || []).slice(b.stegIndex + 1).some((/** @type {any} */ st) => st.typ === 'mellanscen' && st.bild === 'ordduell_seger');
+    const vinst = p.vid_vinst && !egenSeger && p.vid_vinst.replik ? { ...p.vid_vinst, replik: undefined } : p.vid_vinst;
+    if (vinst && fig) await medFigur(vinst, fig.vinst(vinst.handling));
+    else if (vinst) await reaktion(vinst);
     const segerMs = egenSeger ? 0 : rum.regi?.('ordduell_seger') ?? 0;
     if (segerMs) { logg.handelse('mellanscen', 'ordduell_seger'); await vanta(tid(segerMs)); }
+    if (vinst !== p.vid_vinst) await replik(p.vid_vinst.replik);
     // ronderna är redan registrerade: pusslet registreras inte en gång till
     return { duell: d2.s.logg };
   }

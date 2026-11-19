@@ -81,6 +81,24 @@ SLINGOR = {
     arp_monster=[0, 1, 2, 3, 2, 1, 2, 1], bas_monster=[(0, 4), (7, 4)],
   ),
   # Byn vid sjön (kapitel 2): vänlig och lite livlig, ett dragspel över bas och ackord på 2 och 4 (umpa). B-dur.
+  # Floden (kapitel 3): en vals i 3/4 med dragspel, för ett handelsfolk på pråmar (granskning 6). F-dur, umpa-pa:
+  # basen på ettan och korta ackord på tvåan och trean. Samma slinga hörs i resan på kvällen (103.3.5).
+  'floden': dict(
+    attondel=60 / 138 / 2, takt=6, ton_bas='F', lead='dragspel', mel_fc=2400, arp_styrka=0.20, bas_styrka=0.28,
+    melodi=[
+      [('A4', 2), ('C5', 2), ('F5', 2)], [('E5', 4), ('D5', 2)], [('C5', 2), ('A4', 2), ('F4', 2)], [('G4', 6)],
+      [('A4', 2), ('Bb4', 2), ('C5', 2)], [('D5', 4), ('C5', 2)], [('Bb4', 2), ('A4', 2), ('G4', 2)], [('F4', 4), (None, 2)],
+      [('A4', 2), ('C5', 2), ('F5', 2)], [('G5', 4), ('F5', 2)], [('E5', 2), ('D5', 2), ('C5', 2)], [('A5', 4), ('F5', 2)],
+      [('F5', 2), ('E5', 2), ('D5', 2)], [('C5', 4), ('A4', 2)], [('G4', 2), ('A4', 2), ('Bb4', 2)], [('A4', 4), (None, 2)],
+      [('D5', 2), ('F5', 2), ('A5', 2)], [('G5', 4), ('F5', 2)], [('E5', 2), ('F5', 2), ('G5', 2)], [('F5', 4), (None, 2)],
+      [('D5', 2), ('E5', 2), ('F5', 2)], [('G5', 4), ('E5', 2)], [('C5', 2), ('D5', 2), ('E5', 2)], [('F5', 4), (None, 2)],
+      [('A4', 2), ('C5', 2), ('F5', 2)], [('E5', 4), ('D5', 2)], [('D5', 2), ('F5', 2), ('Bb5', 2)], [('A5', 4), ('G5', 2)],
+      [('F5', 2), ('E5', 2), ('D5', 2)], [('C5', 2), ('Bb4', 2), ('G4', 2)], [('G4', 2), ('A4', 2), ('E4', 2)], [('F4', 4), (None, 2)],
+    ],
+    ackord=['F', 'C', 'F', 'C7', 'F', 'Bb', 'C7', 'F', 'F', 'C', 'Dm', 'Dm', 'Bb', 'F', 'C7', 'F',
+            'Dm', 'Gm', 'C7', 'F', 'Bb', 'C', 'C7', 'F', 'F', 'C', 'Bb', 'F', 'Dm', 'C7', 'C7', 'F'],
+    arp_monster=[None, None, 'A', None, 'A', None], bas_monster=[(0, 2), (None, 4)],
+  ),
   'byn': dict(
     attondel=60 / 96 / 2, takt=8, ton_bas='Bb', lead='dragspel', mel_fc=2400, arp_styrka=0.22, bas_styrka=0.26,
     melodi=[
@@ -103,9 +121,9 @@ TONER = {'G': ['G3', 'B3', 'D4', 'G4'], 'D/F#': ['F#3', 'A3', 'D4', 'F#4'], 'D':
          'F': ['F3', 'A3', 'C4', 'F4'], 'Dm': ['D3', 'F3', 'A3', 'D4'], 'Bb': ['Bb2', 'D3', 'F3', 'Bb3'],
          'A': ['A2', 'C#3', 'E3', 'A3'], 'A/C#': ['C#3', 'E3', 'A3', 'C#4'], 'A7': ['A2', 'C#3', 'E3', 'G3'],
          'Gm': ['G2', 'Bb2', 'D3', 'G3'], 'C/E': ['E3', 'G3', 'C4', 'E4'], 'Dm7': ['D3', 'F3', 'A3', 'C4'],
-         'Cm': ['C3', 'Eb3', 'G3', 'C4'], 'Eb': ['Eb3', 'G3', 'Bb3', 'Eb4']}
+         'Cm': ['C3', 'Eb3', 'G3', 'C4'], 'Eb': ['Eb3', 'G3', 'Bb3', 'Eb4'], 'C7': ['C3', 'E3', 'G3', 'Bb3']}
 BAS = {'G': 'G2', 'D/F#': 'F#2', 'D': 'D2', 'Em': 'E2', 'C': 'C2', 'Am': 'A2', 'Am7': 'A2', 'Bm': 'B2', 'D7': 'D2',
-       'F': 'F2', 'Dm': 'D2', 'Bb': 'Bb2', 'A': 'A2', 'A/C#': 'C#2', 'A7': 'A2', 'Gm': 'G2', 'C/E': 'E2', 'Dm7': 'D2', 'Cm': 'C2', 'Eb': 'Eb2'}
+       'F': 'F2', 'Dm': 'D2', 'Bb': 'Bb2', 'A': 'A2', 'A/C#': 'C#2', 'A7': 'A2', 'Gm': 'G2', 'C/E': 'E2', 'Dm7': 'D2', 'Cm': 'C2', 'Eb': 'Eb2', 'C7': 'C2'}
 
 # ---------------------------------------------------------------- byggstenarna (som i musik.py)
 def hylsa(n, a=0.01, d=0.25, s=0.55, r=0.12, langd=None):

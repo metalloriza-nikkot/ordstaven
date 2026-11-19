@@ -94,6 +94,8 @@ test('testrummet för ordduellen (61.1): samma regler som i kapitel 3, påhittad
   expect(JSON.parse(fore2).spelare.hjalte.namn).toBe(JSON.parse(fore).spelare.hjalte.namn);
   await page.click('.start-knapp');
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 15000 }).toBe('tr_duell');
+  // 106.5 och 107.3: duellen börjar med rubriken ORDDUELL! stort över bilden (gransnitt.ordduell)
+  await expect(page.locator('#plattan .duell-rubrik')).toHaveText('ORDDUELL!', { timeout: 10000 });
   const norm = (s) => s.replace(/\|/g, '').replace(/\s+/g, ' ').trim().toLocaleUpperCase('sv-SE');
   const ronder = prov.dueller[0].ronder;
   let rond = 0, felValt = false;
@@ -136,6 +138,18 @@ test('duellens testrum med Innehålls fil (90.7): knappen i INSTÄLLNINGAR, halm
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.click('.start-knapp');
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 15000 }).toBe('tr_duell');
+  // 106.5 och 107.3: duellen börjar med rubriken ORDDUELL! stort över bilden (gransnitt.ordduell)
+  await expect(page.locator('#plattan .duell-rubrik')).toHaveText('ORDDUELL!', { timeout: 10000 });
+  await page.screenshot({ path: 'test-results/testrum-ordduell-rubrik.png' });
+  // det som står i replikrutan, med hur många segrar som har spelats när det visas (för raden efter segern)
+  await page.evaluate(() => {
+    const w = /** @type {any} */ (window); w.__sagt = [];
+    new MutationObserver(() => {
+      const t = document.querySelector('#plattan .replik-ruta .text')?.textContent?.trim();
+      const n = (w.__ORDSTAVEN.logg().match(/\[mellanscen\] ordduell_seger/g) || []).length;
+      if (t && w.__sagt.at(-1)?.t !== t) w.__sagt.push({ t, n });
+    }).observe(document.body, { subtree: true, childList: true, characterData: true });
+  });
   const norm = (s) => s.replace(/\|/g, '').replace(/\s+/g, ' ').trim().toLocaleUpperCase('sv-SE');
   const ronder = fil.dueller.flatMap((d) => d.ronder);
   let rond = 0;
@@ -163,6 +177,9 @@ test('duellens testrum med Innehålls fil (90.7): knappen i INSTÄLLNINGAR, halm
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.grafik().regi.filter((r) => r === 'ordduellen är vunnen').length), { timeout: 15000 }).toBe(2);
   expect((await page.evaluate(() => window.__ORDSTAVEN.grafik())).regi.filter((r) => r === 'ordduellen börjar').length).toBe(2);
   expect((await page.evaluate(() => window.__ORDSTAVEN.logg())).match(/\[mellanscen\] ordduell_seger/g)?.length).toBe(2);
+  // 107.3: "Du vann ordduellen!" efter segern i båda duellerna
+  const sagt = await page.evaluate(() => /** @type {any} */ (window).__sagt);
+  expect(sagt.filter((x) => x.t === 'DU VANN ORDDUELLEN!').map((x) => x.n)).toEqual([1, 2]);
 });
 
 test('halmdockan i duellens testrum (91.5): ropar, blir förvirrad och tappar sin sak, backar, hoppar närmare vid fel och trillar i höet', async ({ page }) => {

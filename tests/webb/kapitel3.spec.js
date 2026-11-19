@@ -427,7 +427,7 @@ test('regierna i kapitel 3 (100.4, 101.3, 102.3 och 103.3.1): var och en går i 
     // 106: början, duellens ram och slutet (gråbox tills Stils bilder finns)
     if (scenId === 'k3s01_floden') expect((await ev(() => window.__ORDSTAVEN.grafik())).regi).toContain('ankomsten till floden');
     if (scenId === 'k3s05_sandbanken') expect((await ev(() => window.__ORDSTAVEN.grafik())).regi).toContain('sköldpaddan simmar');
-    if (scenId === 'k3s06_ankaret') expect((await ev(() => window.__ORDSTAVEN.grafik())).regi).toEqual(expect.arrayContaining(['ordduellen börjar', 'ordduellen är vunnen', 'ljud:kapitel', 'ljud:fest_stor']));
+    if (scenId === 'k3s06_ankaret') expect((await ev(() => window.__ORDSTAVEN.grafik())).regi).toEqual(expect.arrayContaining(['ordduellen börjar', 'ordduellen är vunnen', 'ljud:duell_start', 'stycke:stycke_seger']));
     if (scenId === 'k3s07_resan') expect((await ev(() => window.__ORDSTAVEN.grafik())).regi).toEqual(expect.arrayContaining(['kartbit 4 visar berget', 'slutbilden mot solnedgången']));
     // 102.3: ön steg vid bryggan innan hissen bar honom ned, och han kom ut genom kvarnens dörr på kajen
     if (scenId === 'k3s03_hornet') {

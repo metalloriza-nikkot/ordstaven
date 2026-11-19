@@ -20,6 +20,7 @@ const KVALL_TABELL = kvallTabell(kvallJson);
 import { foremaletsBild } from '../karna/egenskaper.js';
 import { Livet } from './livet.js';
 import { Duellfigur } from './duellfigur.js';
+import { BaronStege, harBaronStege } from './baronstege.js';
 import { figurensBilder, portrattUttryck } from '../karna/duellfigur.js';
 
 /** Luftskeppets bild (112 × 96): repstegen hänger på x 74–83 från gondolen (y 60) till y 95, och aktern med propellern är på x 105, y 18 (95.6). */
@@ -44,11 +45,8 @@ export const HJALTE_FARGER = {
 export const HJALTE_FAST = Object.freeze({ hjalm: 0xc9ccd2, skor: 0x1e4fa0 });
 /** Gången: en ny bild var femte pixel han går (stå, steg, stå, steg). */
 const GANG_STEG = 5;
-/**
- * Ordduellens ljud (106.5): startljudet och segerstycket. Gråboxens ljud (kapitelfanfaren och den stora festen) tills
- * Stils egna finns, och då byts id:t här.
- */
-const DUELL_LJUD = { start: 'kapitel', seger: 'fest_stor' };
+/** Ordduellens ljud (106.5): Stils startljud (en effekt) och segerstycke (ett stycke, som spelas över slingan). */
+const DUELL_LJUD = { start: 'duell_start', seger: 'stycke_seger' };
 /**
  * Gråboxens bild av sakerna han kan ha på sig (lager): en färg per sak. Okända saker ritas i en neutral färg.
  * Riktig grafik kommer med Stil (stilguiden §5).
@@ -2184,10 +2182,19 @@ export class Rum extends Phaser.Scene {
     const g = this.add.graphics();
     const ogon = this.add.graphics();
     if (vatten.every(Boolean)) {
+      // Stils läge (LASMIG, 106.3): övre vänstra hörnet i (−40, 64) vid skalets västra kant, aldrig på gräset.
+      // Halva huvudet syns i bild. Det stiger de sista 16 px ur vattnet och växlar mellan bilderna med krusningarna.
       const v0 = /** @type {any} */ (vatten[0]), v1 = /** @type {any} */ (vatten[1]);
-      const bild = this.add.image(0, 12, v0.nyckel, v0.ram).setOrigin(0.5, 1);
-      c.add(bild);
+      c.destroy(); this.k3Huvud = null;
+      const bild = this.add.image(-40, 80, v0.nyckel, v0.ram).setOrigin(0, 0).setAlpha(0);
+      this.lagerLuft.add(bild); this.k3Huvud = bild;
       const vaxla = this.time.addEvent({ delay: 450, loop: true, callback: () => { if (!bild.active) { vaxla.remove(); return; } bild.setTexture(bild.frame.name === v0.ram ? v1.nyckel : v0.nyckel, bild.frame.name === v0.ram ? v1.ram : v0.ram); this.smutsig = true; } });
+      for (let i = 0; i < 3; i++) this.k3Ring(12, 110, 6, 40, 0xf2fbff, 800, i * 250);
+      this.regiFokus = { x: 12, y: 92 };
+      this.tweens.add({ targets: bild, y: 64, alpha: 1, duration: 1300, ease: 'Sine.easeOut', onUpdate: () => { bild.y = Math.round(bild.y); smuts(); } });
+      this.time.delayedCall(3300, () => { this.regiFokus = null; });
+      this.regiLogg.push('sköldpaddans huvud');
+      return 3400;
     } else {
       g.fillStyle(0x6b7a4a, 1).fillEllipse(0, 0, 46, 30).fillStyle(0x4f5c36, 1).fillEllipse(-10, -7, 12, 6).fillEllipse(11, 5, 9, 5);
       ogon.fillStyle(0x111111, 1).fillCircle(-9, -5, 2).fillCircle(9, -5, 2);
@@ -2815,7 +2822,10 @@ export class Rum extends Phaser.Scene {
     this.regiSpelas('ordduell_start');
     const smuts = () => { this.smutsig = true; };
     const fig = /** @type {any} */ (this.duellFig);
-    const mot = fig?.img?.active ? { x: fig.img.x, y: fig.img.y - 12 } : this.duellGrabox();
+    let mot;
+    if (fig?.img?.active) mot = fig instanceof BaronStege ? { x: fig.img.x + 12, y: fig.img.y + 14 } : { x: fig.img.x, y: fig.img.y - 12 };
+    else if (harBaronStege(this)) { const b = /** @type {any} */ (this.duellfigur('baronen')); mot = { x: b.img.x + 12, y: b.img.y + 14 }; }
+    else mot = this.duellGrabox();
     this.vand = { x: 0, y: -1 }; this.ritaHjalte();
     const mitt = { x: Math.round((this.pos.x + mot.x) / 2), y: Math.round((this.pos.y - 12 + mot.y) / 2) };
     this.regiFokus = mitt;
@@ -2845,7 +2855,20 @@ export class Rum extends Phaser.Scene {
     this.regiSpelas('ordduell_seger');
     const smuts = () => { this.smutsig = true; };
     const gb = /** @type {any} */ (this.duellGra);
-    if (gb?.active) {
+    const baron = this.duellFig instanceof BaronStege ? this.duellFig : null;
+    if (baron) {
+      // Stils baron: han har redan landat i gondolen (vinsten), och nu far luftskeppet med Herr Skata efter
+      // hänger han kvar på stegen (en duell utan vinstens bilder, eller regin för sig), tappar han greppet först
+      const forst = baron.img.visible ? baron.vinst() : 0;
+      this.regiFokus = { x: baron.skepp.x + 56, y: Math.round((baron.skepp.y + 60 + this.pos.y) / 2) };
+      this.time.delayedCall(forst, () => { baron.far(); this.regiLjud('luftskepp'); });
+      this.time.delayedCall(forst + 2800, () => { if (this.duellFig === baron) { baron.taBort(); this.duellFig = null; } this.regiFokus = null; smuts(); });
+      this.time.delayedCall(500, () => this.ungeReagerar(true));
+      this.time.delayedCall(1300 + forst, () => this.ungeReagerar(true));
+      this.regiStycke(DUELL_LJUD.seger, 200 + forst);
+      this.regiLogg.push('ordduellen är vunnen');
+      return 2800 + forst;
+    } else if (gb?.active) {
       const k = this.kamera;
       this.regiFokus = { x: gb.skepp.x, y: Math.round((gb.skepp.y + this.pos.y) / 2) };
       this.tweens.add({ targets: gb.baron, angle: 20, duration: 120, yoyo: true, repeat: 1 });
@@ -2859,7 +2882,7 @@ export class Rum extends Phaser.Scene {
     this.time.delayedCall(500, () => this.ungeReagerar(true));
     this.time.delayedCall(1300, () => this.ungeReagerar(true));
     this.time.delayedCall(2100, () => this.ungeReagerar(true));
-    this.regiLjud(DUELL_LJUD.seger, 200);
+    this.regiStycke(DUELL_LJUD.seger, 200);
     this.regiLogg.push('ordduellen är vunnen');
     return 2800;
   }
@@ -2884,6 +2907,18 @@ export class Rum extends Phaser.Scene {
     this.rensaSidovy();
     const k = this.kamera, c = this.sidovy, B = RUM.bredd, H = RUM.hojd, hav = Math.round(H * 0.58);
     c.setPosition(k.x, k.y).setVisible(true).setAlpha(0);
+    // Stils slutbild (10h v0.8): k3_slut_01–08, bara bildbyten, ca 1 s per bild (golvdatorn)
+    const stils = Array.from({ length: 8 }, (_, i) => `sidovy_k3_slut_0${i + 1}`);
+    if (stils.every((n) => this.textures.exists(n))) {
+      const bild = this.add.image(0, 0, stils[0]).setOrigin(0, 0); c.add(bild);
+      const PER = 950, ms = PER * stils.length;
+      this.tweens.add({ targets: c, alpha: 1, duration: 300, onUpdate: smuts });
+      const byten = stils.slice(1).map((n, i) => this.time.delayedCall(PER * (i + 1), () => { if (bild.active) { bild.setTexture(n); smuts(); } }));
+      for (let i = 0; i < 5; i++) this.regiLjud('horn_tut', 600 + i * 700);
+      this.slutbild = { c, solar: [], byten, slut: this.time.delayedCall(ms - 300, () => this.tweens.add({ targets: c, alpha: 0, duration: 300, onUpdate: smuts, onComplete: () => { if (c.alpha === 0) this.rensaSidovy(); this.slutbild = null; smuts(); } })) };
+      this.regiLogg.push('slutbilden mot solnedgången');
+      return ms;
+    }
     const himmel = this.add.graphics();
     const band = [0xf4b860, 0xe8945a, 0xc8665a, 0x8a4a6a, 0x4a3a6a];
     band.forEach((f, i) => himmel.fillStyle(f, 1).fillRect(0, Math.round((hav * i) / band.length), B, Math.ceil(hav / band.length) + 1));
@@ -2931,7 +2966,7 @@ export class Rum extends Phaser.Scene {
   /** Ett tryck hoppar över slutbilden (106.7): den tonas bort direkt. */
   slutbildSlut() {
     const s = this.slutbild; if (!s) return;
-    s.slut.remove(); this.slutbild = null;
+    s.slut.remove(); for (const t of s.byten ?? []) t.remove(); this.slutbild = null;
     this.rensaSidovy(); this.smutsig = true;
     this.regiLogg.push('slutbilden hoppades över');
   }
@@ -3014,8 +3049,15 @@ export class Rum extends Phaser.Scene {
    * @param {string | null | undefined} figur @returns {Duellfigur | null}
    */
   duellfigur(figur) {
+    // baronen på repstegen (106.5): står han redan där (mellanscenen ordduell_start före pusslet), står han kvar
+    if (figur && this.duellFig instanceof BaronStege && figur === 'baronen') return this.duellFig;
     this.duellFig?.taBort(); this.duellFig = null;
     if (!figur) return null;
+    if (figur === 'baronen' && harBaronStege(this)) {
+      this.duellGra?.destroy(); this.duellGra = null;
+      this.duellFig = new BaronStege(this, this.pos, foremalsbild(this, 'baron_medalj_01')?.nyckel ?? null);
+      return this.duellFig;
+    }
     const fb = foremalsbild(this, `${figur}_grund_01_hel`);
     const info = fb ? figurensBilder(figur, this.textures.get(fb.nyckel).getFrameNames()) : null;
     if (!fb || !info) return null;

@@ -1,9 +1,10 @@
 {
  "meta": {
-  "version": "0.1",
-  "datum": "2026-11-13",
+  "version": "0.2",
+  "datum": "2026-11-19",
   "beskrivning": "Testrummet för ordduellen (61.1, beslut 90.7). En halmdocka som inte finns i äventyret ropar fel om det som syns, och spelaren väljer det kort som stämmer med bilden. Två dueller med tre ronder var, i samma trappa som kapitel 3: ett ord (L2), en mening med två egenskaper (L3) och ett sammansatt ord (L4). Duellen kan inte förloras, och korten läses aldrig upp.",
-  "anteckning": "Det halmdockan ropar om (pekar_pa) är ett ord i ordlistorna med en bild, och bilden visar sanningen. Fel kort är det halmdockan ropar, så den som lyssnar väljer fel och den som läser väljer rätt. I rond 2 skiljer båda egenskaperna, och korten är lika långa eller det rätta längre. I rond 3 läser halmdockan bara slutet av ordet, som baronen med SKÖLDPADDA, och det rätta kortet är det längre. Rösten väljer Teknik."
+  "anteckning": "Det halmdockan ropar om (pekar_pa) är ett ord i ordlistorna med en bild, och bilden visar sanningen. Fel kort är det halmdockan ropar, så den som lyssnar väljer fel och den som läser väljer rätt. I rond 2 skiljer båda egenskaperna, och korten är lika långa eller det rätta längre. I rond 3 läser halmdockan bara slutet av ordet, som baronen med SKÖLDPADDA, och det rätta kortet är det längre. Rösten väljer Teknik.",
+  "andrat_v02": "2026-11-19 (beslut 107.3): \"Du vann ordduellen!\" i vid_vinst i båda duellerna. Motorn spelar ramen (ordduell_start och ordduell_seger) själv i testrummet."
  },
  "talare": {
   "halmdockan": {
@@ -126,7 +127,12 @@
    },
    "vid_vinst": {
     "handling": "halmdockan trillar baklänges i en hög med hö, och halmstråna yr",
-    "fest": "stor"
+    "fest": "stor",
+    "replik": {
+     "talare": "berattare",
+     "text": "Du vann ordduellen!",
+     "upplast": true
+    }
    },
    "anteckning": "Duell 1. Rond 1: bilen, och BIL och BÅT börjar på B och har tre bokstäver. Rond 2: svampen är röd med vita prickar (🍄), och korten är lika långa. Rond 3: en snögubbe är ingen gubbe."
   },
@@ -243,7 +249,12 @@
    },
    "vid_vinst": {
     "handling": "halmdockan snurrar runt tre varv och sätter sig på rumpan i höet",
-    "fest": "stor"
+    "fest": "stor",
+    "replik": {
+     "talare": "berattare",
+     "text": "Du vann ordduellen!",
+     "upplast": true
+    }
    },
    "anteckning": "Duell 2, för ett andra varv. Rond 1: hunden, och HUND och HUS börjar på H. Det rätta kortet är det längre. Rond 2: koppen är full och vit (☕), och det rätta kortet är det längre. Rond 3: en solros är ingen ros."
   }
