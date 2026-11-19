@@ -16,7 +16,7 @@
  },
  "meta": {
   "namn": "Floden",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "datum": "2026-11-19",
   "agare": "Innehåll",
   "kalla": "Manus 19 v0.4.1 (Ön som simmade), godkänt 17/11 (beslut 98–99).",
@@ -28,7 +28,8 @@
   "andrat_v032": "2026-11-18 (beslut 102.2–102.3): säckhissen (effekt sackhiss_upp på pa_stora i k3_kvarn_2, och bild sackhiss_ner), och hornet på en avsats i floden. Loftet har utgått som rum: k3s02_loftet och k3s03_hornet spelas i floden, som får tillståndet rent och föremålen hornet, hornet_skrift och sackhiss. Inga repliker är ändrade.",
   "andrat_v033": "2026-11-18 (beslut 103.5): bild frukost på frukostens mellanscen i k3s01, och bild på reaktionerna i k3_hornet (tallrikar på 3, skuggan_stiger på 1, 2 och 4, skuggan_dyker på 6+). Ingen text är ändrad.",
   "andrat_v034": "2026-11-18 (beslut 105.3 och 106): instruktionerna efter trappan i 104.3, skepparen_pekar efter repliken om morfar, musiken floden, ankomsten, snäckornas verb, simturen, utmaningen och ORDDUELL!, segern med \"Du vann ordduellen!\", kartbit 4 med Farfars replik om vägen hem, och slutbilden. Farfars två repliker om baronens bit väntar till kapitel 4 (99.4). Inga id:n är ändrade.",
-  "andrat_v035": "2026-11-19 (beslut 109.6, 109.9 och 109.10): baronens utmaning säger vad som står på spel (\"Vinner jag, tar jag flaskan! Jag utmanar dig!\"), Farfars sista replik är \"Sköldpaddan tar er till berget. Trevlig resa!\", och slutbildens text följer 109.10. Inga nya steg."
+  "andrat_v035": "2026-11-19 (beslut 109.6, 109.9 och 109.10): baronens utmaning säger vad som står på spel (\"Vinner jag, tar jag flaskan! Jag utmanar dig!\"), Farfars sista replik är \"Sköldpaddan tar er till berget. Trevlig resa!\", och slutbildens text följer 109.10. Inga nya steg.",
+  "andrat_v036": "2026-11-19 (beslut 110.4): bild ankaret_faller och skold_ankaret, och texten för den vuxne i duellen följer paraplyet (109.7). Ingen uppläst text är ändrad, och inga nya steg."
  },
  "var_var_vi": [
   {
@@ -820,7 +821,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Ankaret faller rakt mot hjälten och ungen och stannar i luften. På skylten lyser SKÖLD."
+     "beskrivning": "Ankaret faller från luftskeppet rakt mot hjälten och ungen och stannar i luften ovanför dem. På skylten lyser SKÖLD.",
+     "bild": "ankaret_faller"
     },
     {
      "typ": "pussel",
@@ -840,7 +842,7 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Bubblan står kvar. Baronen klättrar halvvägs ned för repstegen, och Herr Skata hoppar efter. ORDDUELL! står stort över bilden, och baronen och hjälten står mittemot varandra.",
+     "beskrivning": "Bubblan står kvar. Baronen klättrar halvvägs ned för repstegen med ett stängt paraply, och Herr Skata hoppar efter. ORDDUELL! står stort över bilden, och baronen och hjälten står mittemot varandra.",
      "bild": "ordduell_start"
     },
     {
@@ -1844,9 +1846,10 @@
     "upplast": true
    },
    "vid_ratt": {
-    "handling": "regnbågsljuset pulserar ur staven, och en stor bubbla välver sig över hjälten, ungen och sköldpaddans huvud. Ankaret studsar på bubblan och borrar ner sig i sanden bredvid.",
+    "handling": "regnbågsljuset pulserar ur staven, och en stor bubbla växer runt hjälten och ungen. Ankaret slår i bubblan, studsar och borrar ner sig i sanden bredvid. Bubblan står kvar.",
     "fest": "mellan",
-    "ljudord": "boing"
+    "ljudord": "boing",
+    "bild": "skold_ankaret"
    },
    "vid_fel": {
     "reaktion": "en bubbla som är för liten spricker"
@@ -1898,11 +1901,11 @@
         }
        ],
        "vid_ratt": {
-        "handling": "baronen blir förvirrad och tappar en medalj, som plumsar i floden. Han klättrar själv ett steg upp, sur.",
+        "handling": "baronen petar med paraplyet, SKÖLD parerar, och paraplyet vänds ut och in. Han blir förvirrad och tappar en medalj, som plumsar i floden. Han klättrar själv ett steg upp, sur.",
         "fest": "liten"
        },
        "vid_fel": {
-        "handling": "baronen klättrar ett steg ned, och Herr Skata skrattar, tjack-tjack"
+        "handling": "baronen petar med paraplyet, ungen duckar, och baronen klättrar ett steg ned mot flaskan. Herr Skata skrattar, tjack-tjack."
        }
       }
      ]
@@ -1930,11 +1933,11 @@
         }
        ],
        "vid_ratt": {
-        "handling": "baronen blir förvirrad, och fjädern i hans hatt böjer sig. Han klättrar själv ett steg upp, sur.",
+        "handling": "baronen petar igen, SKÖLD parerar, och paraplyet vänds ut och in. Fjädern i hans hatt böjer sig. Han klättrar själv ett steg upp, sur.",
         "fest": "liten"
        },
        "vid_fel": {
-        "handling": "baronen klättrar ett steg ned, och Herr Skata skrattar, tjack-tjack"
+        "handling": "baronen petar med paraplyet, ungen duckar, och baronen klättrar ett steg ned mot flaskan. Herr Skata skrattar, tjack-tjack."
        }
       }
      ]
@@ -1967,10 +1970,10 @@
         }
        ],
        "vid_ratt": {
-        "handling": "baronen blir så förvirrad att han tappar greppet själv."
+        "handling": "baronen petar en sista gång, SKÖLD parerar, och han blir så förvirrad att han tappar greppet själv."
        },
        "vid_fel": {
-        "handling": "baronen klättrar ett steg ned, och Herr Skata skrattar, tjack-tjack"
+        "handling": "baronen petar med paraplyet, ungen duckar, och baronen klättrar ett steg ned mot flaskan. Herr Skata skrattar, tjack-tjack."
        }
       }
      ]
@@ -1984,10 +1987,10 @@
     "handling": "korten glimtar"
    },
    "vid_vinst": {
-    "handling": "repstegen rullar upp sig med baronen hängande i den, ända upp i gondolen, och han landar på huvudet. Medaljerna regnar ner i floden.",
+    "handling": "baronen hänger i paraplyet som i en fallskärm medan repstegen rullar upp sig, ända upp i gondolen, och han landar på huvudet. Medaljerna regnar ner i floden.",
     "fest": "stor"
    },
-   "anteckning": "Ordduellen, övning (manus 19, Tekniks P16_ordduell, 87.4). Reglerna ligger utanför Phaser, så att testrummet kör samma kod med halmdockan (61.1). Det baronen ropar om syns hela tiden: sköldpaddan ligger där (pekar_pa), och det han ser är sanningen. Korten läses aldrig upp. Regeln sägs av Farfar före rond 1. Bubblan från k3_skold (skrivs i steget före, skold) står kvar hela duellen och rör aldrig baronen (86.4.2): vid rätt kort blir han förvirrad, något trillar av honom och han klättrar själv ett steg upp. Vid fel klättrar han ett steg ned. Herr Skata (harmare) ropar efter med en egen pratbubbla. I rond 3 delar strecket i sköld|padda ordet för nosen, och det rätta kortet är det längre (78.6). Vinsten är hjältens sista kort (granskning 8, fynd 1). Räknas som läsval i budgeten. 106.5: baronen utmanar, ORDDUELL! (ordduell_start), och sedan Farfars regel direkt före första kortet. Segern är ordduell_seger och \"Du vann ordduellen!\"."
+   "anteckning": "Ordduellen, övning (manus 19, Tekniks P16_ordduell, 87.4). Reglerna ligger utanför Phaser, så att testrummet kör samma kod med halmdockan (61.1). Det baronen ropar om syns hela tiden: sköldpaddan ligger där (pekar_pa), och det han ser är sanningen. Korten läses aldrig upp. Regeln sägs av Farfar före rond 1. Bubblan från k3_skold (skrivs i steget före, skold) står kvar hela duellen och rör aldrig baronen (86.4.2): vid rätt kort blir han förvirrad, något trillar av honom och han klättrar själv ett steg upp. Vid fel klättrar han ett steg ned. Herr Skata (harmare) ropar efter med en egen pratbubbla. I rond 3 delar strecket i sköld|padda ordet för nosen, och det rätta kortet är det längre (78.6). Vinsten är hjältens sista kort (granskning 8, fynd 1). Räknas som läsval i budgeten. 106.5: baronen utmanar, ORDDUELL! (ordduell_start), och sedan Farfars regel direkt före första kortet. Segern är ordduell_seger och \"Du vann ordduellen!\". 110.4 (paraplyet, 109.7): baronen petar med ett paraply en gång per kort. Vid rätt kort parerar SKÖLD och paraplyet vänds ut och in, och vid fel klättrar han ned mot flaskan. Bubblan rör aldrig baronen, bara paraplyet."
   },
   {
    "id": "k3_morkret",

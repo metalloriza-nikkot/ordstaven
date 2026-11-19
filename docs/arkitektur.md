@@ -1240,3 +1240,8 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Paraplyet i duellen** (109.7, `baronstege.js`): när baronen har ropat petar han en gång med paraplyet (`petar_01–02`). Vid rätt kort parerar SKÖLD (`Rum.skoldParerar`), och paraplyet vänds ut och in (`utochin_01`). Vid sista kortet hänger han i paraplyet (`baronen_paraply_fallskarm_01–02`) medan stegen rullas upp. Utan bilderna är det som förut.
 - **Den nya slutbilden** (109.10): `k3_slut_bakgrund_01–02` (640 × 192, 600 ms) och `k3_slut_skoldpadda_01–02` (500 ms). Bakgrunden glider från x 0 till −320 på 7,5 s, och sköldpaddan simmar från x 40 till 380 i bildens koordinater. `k3_slut_01–08` är borttagna.
 - **Bildkorten** `mat`, `sol`, `apa` och `farfars_lista_sista_raden` (108.2): listan i testet mot emoji är tom.
+
+## Ankaret och SKÖLD i kapitlet (0.99.0, beslut 112.3)
+- Innehålls pass 110 sätter `bild: ankaret_faller` på mellanscenen och `bild: skold_ankaret` på `vid_ratt` i `k3_skold`. `skold_ankaret` står i `REAKTION_REGI` (`karna/mellanscen.js`) och i schemats lista (2.51).
+- Kartans `ankare` står i öppen sand i nordväst (36, 64, 24 × 22), så att bågen från bubblan syns (110.6).
+- Berget som ryker står med foten i vattnet uppe till vänster (kameran + (13, 40)), och toppen ryms i bild (112.2).

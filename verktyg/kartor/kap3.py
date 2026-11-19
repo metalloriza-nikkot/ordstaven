@@ -355,7 +355,8 @@ RUMMEN = {
             # Förut stod det vid handleden bakom skalkanten, och han fick gå runt för att nå det (den vuxnes spelning 19/11). Hindren
             # är desamma: rutan ligger inne i fenan, som redan är ett hinder.
             sak('fena_trappa', 206, 146, 32, 10, sida='under'),
-            sak('ankare', 76, 142, 24, 22, sida='alla'),
+            # 110.6 och 112.2: öppen sand i nordväst, så att ankaret studsar i en synlig båge från där han står vid SKÖLD
+            sak('ankare', 36, 64, 24, 22, sida='alla'),
         ],
     },
 }

@@ -2403,7 +2403,8 @@ export class Rum extends Phaser.Scene {
     const bergBilder = ['berget_ryker_01', 'berget_ryker_02', 'berget_ryker_03'].map((n) => foremalsbild(this, n));
     if (bergBilder.every(Boolean)) {
       const b0 = /** @type {any} */ (bergBilder[0]);
-      const img = this.add.image(bx, by + 12, b0.nyckel, b0.ram).setOrigin(0.5, 1).setAlpha(0); this.lagerLuft.add(img); this.lagda.push(img); // står kvar tills rummet byts
+      // 112.2: foten i vattnet uppe till vänster, längre ut i hörnet än gråboxens triangel (toppen ryms fortfarande i bild)
+      const img = this.add.image(Math.round(k.x + 13), Math.round(k.y + 40), b0.nyckel, b0.ram).setOrigin(0.5, 1).setAlpha(0); this.lagerLuft.add(img); this.lagda.push(img); // står kvar tills rummet byts
       this.tweens.add({ targets: img, alpha: 1, duration: 600, delay: 1600, onUpdate: smuts });
       let nr = 0;
       const ev = this.time.addEvent({ delay: 400, loop: true, callback: () => { if (!img.active) { ev.remove(); return; } nr = (nr + 1) % 3; const b = /** @type {any} */ (bergBilder[nr]); img.setTexture(b.nyckel, b.ram); smuts(); } });

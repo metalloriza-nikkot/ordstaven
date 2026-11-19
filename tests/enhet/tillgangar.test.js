@@ -221,7 +221,9 @@ describe('mellanscenernas bilder och bildkorten', () => {
     // 103.3.1: frukosten med tre korta tut och tallrikarna
     'frukost',
     // 105.4: skepparen pekar på det stora hornet och hjulet
-    'skepparen_pekar']);
+    'skepparen_pekar',
+    // 109.5: ankaret faller och stannar (Stils bilder, Rum.ankaretFaller)
+    'ankaret_faller']);
   it('varje mellanscen med bild har grafik (morgonen i sängen, luftskeppets lägen, sidovyerna, ungen på kartbiten, ägget)', () => {
     const saknas = [];
     for (const k of kapitel) for (const sc of k.scener) for (const st of sc.steg) {
