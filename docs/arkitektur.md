@@ -1262,7 +1262,8 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Reglerna** står i `src/karna/bokstavsstig.js` utan Phaser och DOM: rutnätet (`lasRutnat`), grannarna (raden framför, rakt eller snett), `valj` (inte, fel, rätt, återvändsgränd eller klar), `hjalpFlak` (ett rätt flak som leder fram) och `kontrolleraStig` för innehållskontrollen.
 - **Flaken ritas i rummet** (`Rum.visaStig`, i `lagerStig` under figurerna): gråbox, eller Stils `isflak` och `isvagg` när de finns. Vakar är vatten. Hjälten hoppar i en båge (`stigHopp`), fel bokstav knakar (`stigKnak`), en gren sjunker och blir mörk (`stigSjunk`), flaken han har gått på får en spricka (`stigSpricka`), och hjälpens kant lyser (`stigKant`).
 - **Gemenerna står i Lexend i textlagret** (`ui.stigord`, `#stigord` i världslagret), en knapp per flak, som placeras om när kameran eller skalan ändras (`stigNu`). De är aldrig pixlar och har ingen versaltransform. Ordet i versaler står på andra sidan (`visa_ord`, eller efter `versaler_efter_fel`).
-- **Styrningen:** upp hoppar rakt fram, vänster och höger snett framåt, och ett tryck på ett flak hoppar dit. Alla andra tangenter gör inget.
+- **Styrningen** följer Innehålls ritning (21b, han går från vänster till höger): höger hoppar rakt fram, upp och ned snett framåt, och ett tryck på ett flak hoppar dit. Alla andra tangenter gör inget.
+- **Ljuden (115.8):** rätt flak ger ett glatt ljud (brickans ton som stiger, tills Stils eget ljud finns) och ett kort glitter. Knaket hörs bara vid fel. En gren som sjunker plumsar, och `vid_atervand` säger att bokstaven var rätt.
 - **Testrummet** `?testrum=stig` (kap-92) läser `content/testrum-stig.json`, eller i testerna provfilen `ordstaven_testrum_stig` i localStorage (`tests/fixturer/testrum-stig.json`). Knappen i menyn för vuxna syns när Innehålls fil finns.
 - **Lärandet:** stigen räknas som ett läsval (`LASNIVA_TYP`) på pusslets `niva`, rätt direkt bara utan fel och utan återvändsgränd.
 

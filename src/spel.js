@@ -3376,8 +3376,8 @@ export function skapaSpel(d) {
   let stigNu = null;
   /**
    * Bokstavsstigen (P18, 114.6): han hoppar från flak till flak och stavar ordet. Reglerna står i karna/bokstavsstig.js.
-   * Flaken ritas i rummet (Rum.visaStig), och gemenerna står i Lexend i textlagret ovanpå dem. Pilarna hoppar: upp
-   * rakt fram, vänster och höger snett framåt. Ett tryck på ett flak hoppar dit. Ingen klocka räknar, och han börjar
+   * Flaken ritas i rummet (Rum.visaStig), och gemenerna står i Lexend i textlagret ovanpå dem. Pilarna hoppar: höger
+   * rakt fram, upp och ned snett framåt. Ett tryck på ett flak hoppar dit. Ingen klocka räknar, och han börjar
    * aldrig om från början. @param {any} p
    */
   async function bokstavsstig(p) {
@@ -3386,8 +3386,8 @@ export function skapaSpel(d) {
     const ankare = rum.ruta(`stig_${p.id}`);
     const lage = rum.visaStig(g, ankare ? { x: ankare.x + ankare.b / 2, y: ankare.y + ankare.h / 2 } : undefined);
     const fot = (/** @type {{ x: number, y: number }} */ q) => ({ x: q.x, y: q.y + 4 });
-    rum.pos = { ...lage.strand }; rum.vand = { x: 0, y: -1 }; rum.placera();
-    if (rum.unge.visible) { rum.ungePos = { x: lage.strand.x - 14, y: lage.strand.y }; rum.placera(); }
+    rum.pos = { ...lage.strand }; rum.vand = { x: 1, y: 0 }; rum.placera();
+    if (rum.unge.visible) { rum.ungePos = { x: lage.strand.x - 8, y: lage.strand.y + 12 }; rum.placera(); }
     const nyckelFor = (/** @type {{ r: number, k: number }} */ q) => `${q.r},${q.k}`;
     let fel = 0, hjalp = false, knuffFore = false, versal = false, upptagen = false, forstaVal = true;
     const start = speltid();
@@ -3400,7 +3400,7 @@ export function skapaSpel(d) {
       }
       const visas = p.visa_ord || versal;
       // ordet i versaler står på andra sidan, där han ska fram (stolpen, eller hjälpen efter två fel)
-      const op = skarm(lage.mal.x, lage.mal.y);
+      const op = skarm(lage.skylt.x, lage.skylt.y);
       ui.stigord(lista, (n) => { const [r, k] = n.split(',').map(Number); hoppa({ r, k }); }, visas ? { x: op.x, y: op.y, text: String(p.ord).toLocaleUpperCase('sv-SE') } : null);
     };
     stigNu = rita;
@@ -3418,7 +3418,7 @@ export function skapaSpel(d) {
       knuffT = window.setTimeout(() => {
         const h = hjalpFlak(s); if (!h || upptagen) return;
         const q = lage.flak(h.r, h.k);
-        if (rum.unge.visible) { rum.ungeGarTill({ x: rum.pos.x + (q.x < rum.pos.x ? -12 : 12), y: rum.pos.y }); }
+        if (rum.unge.visible) { rum.ungeGarTill({ x: rum.pos.x, y: rum.pos.y + (q.y < rum.pos.y ? -12 : 12) }); }
         rum.stigKant(h); hjalp = true; if (forstaVal) knuffFore = true;
         ljud.spela('hmm');
         logg.handelse('knuff', `${p.id}: ungen nosar mot ${g.celler[h.r][h.k].bokstav}`);
@@ -3433,6 +3433,7 @@ export function skapaSpel(d) {
       try {
         if (v.sort === 'fel') {
           fel++; forstaVal = false;
+          // knaket hörs bara vid fel (granskning 9, 115.8)
           rum.stigKnak(till.r, till.k); ljud.spela('knarr');
           logg.handelse('stig', `${p.id}: ${bokstav} fel (${nastaBokstav(s)} var rätt)`);
           // hjälpen efter ett fel: kanten på ett rätt flak lyser, aldrig bokstaven
@@ -3444,26 +3445,29 @@ export function skapaSpel(d) {
         forstaVal = false;
         rum.stigKant(null);
         await vanta(rum.stigHopp(fot(lage.flak(till.r, till.k))));
+        // rätt flak: ett glatt ljud (115.8: tills Stils eget ljud finns, brickans ton som stiger) och ett kort glitter
         ljud.spela(`bricka_${Math.min(8, s.vag.length || 1)}`);
+        rum.stigGlitter(till.r, till.k);
         rum.stigSpricka(till.r, till.k);
         logg.handelse('stig', `${p.id}: ${bokstav} rätt`);
         if (v.sort === 'atervand') {
           // en återvändsgränd: grenen sjunker, och han står där vägen delade sig. Han börjar aldrig om
           rita();
           await vanta(tid(450));
-          ljud.spela('knarr');
+          // det som är sant: bokstaven var rätt, men isen tar slut (vid_atervand, Innehålls replik)
+          if (p.vid_atervand) await replik(p.vid_atervand);
+          ljud.spela('plums');
           rum.stigSjunk(v.sjunker || []);
           await vanta(tid(600));
           const t = /** @type {{ r: number, k: number }} */ (v.tillbaka);
           await vanta(rum.stigHopp(t.r < 0 ? { ...lage.strand } : fot(lage.flak(t.r, t.k))));
-          ljud.spela('plums');
           logg.handelse('stig', `${p.id}: återvändsgränd, ${(v.sjunker || []).length} flak sjönk`);
         }
         rita();
         if (v.sort === 'klar') {
           await vanta(tid(250));
           await vanta(rum.stigHopp({ ...lage.mal }));
-          if (rum.unge.visible) { rum.ungePos = { x: lage.mal.x - 14, y: lage.mal.y }; rum.placera(); }
+          if (rum.unge.visible) { rum.ungePos = { x: lage.mal.x - 6, y: lage.mal.y + 12 }; rum.placera(); }
           ljud.spela('fest_mellan');
           logg.handelse('stig', `${p.id}: klar, ${s.fel} fel, ${s.atervandor} återvändsgränder, ${Math.round((speltid() - start) / 1000)} s`);
           klar(true);
@@ -3472,7 +3476,8 @@ export function skapaSpel(d) {
     };
     const stopp = lyssnaHandling((h) => {
       if (h.typ !== 'ga') return;
-      const d = h.kod === 'ArrowUp' ? 0 : h.kod === 'ArrowLeft' ? -1 : h.kod === 'ArrowRight' ? 1 : null;
+      // höger hoppar rakt fram, upp och ned snett framåt (han går från vänster till höger, 21b)
+      const d = h.kod === 'ArrowRight' ? 0 : h.kod === 'ArrowUp' ? -1 : h.kod === 'ArrowDown' ? 1 : null;
       if (d === null) return;
       hoppa({ r: s.nu.r + 1, k: s.nu.k + d });
     });

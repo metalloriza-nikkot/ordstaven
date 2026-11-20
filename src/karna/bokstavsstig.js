@@ -2,21 +2,23 @@
 // flak i raden framför, rakt fram eller snett, och stavar ordet ett flak i taget. Reglerna står här, utan Phaser och
 // utan DOM, så att kapitel 4 och testrummet kör samma kod.
 //
-// Rutnätet skrivs som det syns (Innehålls ritning): första raden är den bortersta, den sista raden är den närmaste.
-// Varje ruta är en bokstav (ett flak), # (en vak) eller | (en isvägg). Rutorna skiljs åt med mellanslag.
+// Rutnätet skrivs som Innehålls ritning (21b): raderna uppifrån och ned, kolumnerna från vänster till höger. Han kommer
+// från vänster, och varje hopp går en kolumn åt höger: rakt, snett upp eller snett ned. Varje ruta är en gemen (ett
+// flak), ~ (en vak) eller | (en isvägg). Rutorna skiljs åt med mellanslag.
 //
-//   "rutnat": ["g # g",     <- bortersta raden (sista bokstaven)
-//              "g g y",
-//              "y r #",
-//              "a r b"]     <- närmaste raden (första bokstaven)
+//   "rutnat": ["s a v k e",
+//              "t e x l a",     <- utgången till höger om sista kolumnen
+//              "o r s u o"]
 //
-// Ordet har lika många bokstäver som rutnätet har rader. Han börjar på stranden framför den närmaste raden, i
-// kolumnen `start` (mitten om den saknas), och är framme när han står på den bortersta raden med hela ordet.
+// Ordet har lika många bokstäver som rutnätet har kolumner. Första hoppet går till ett flak i första kolumnen (bara
+// raderna runt `start` om den finns), och han är framme när ordet är stavat i sista kolumnen.
+//
+// I koden är r stegets nummer (kolumnen, 0 = den första) och k raden (0 = den översta).
 
 /** Gemener som inte får vara den enda skillnaden mellan två flak bredvid varandra (08 §3). */
-export const FORVAXLINGAR = Object.freeze([['n', 'u'], ['b', 'd'], ['p', 'q'], ['a', 'ä'], ['m', 'w'], ['l', 'i']]);
+export const FORVAXLINGAR = Object.freeze([['n', 'u'], ['b', 'd'], ['p', 'q'], ['a', 'ä'], ['m', 'w'], ['l', 'i'], ['o', 'ö'], ['h', 'b']]);
 
-/** @typedef {{ r: number, k: number }} Ruta  r = 0 är den närmaste raden, k = kolumnen från vänster */
+/** @typedef {{ r: number, k: number }} Ruta  r = kolumnen (stegets nummer från vänster), k = raden uppifrån */
 /** @typedef {{ sort: 'flak' | 'vak' | 'vagg', bokstav: string | null }} Cell */
 
 /** Liten bokstav som den står på flaket (gemener, 114). @param {string} s */
@@ -27,16 +29,18 @@ export const gemen = (s) => String(s || '').toLocaleLowerCase('sv-SE');
  * @returns {{ rader: number, kolumner: number, celler: Cell[][], ord: string, start: number }}
  */
 export function lasRutnat(p) {
-  const rader = (p.rutnat || []).map((rad) => String(rad).trim().split(/\s+/)).reverse();
+  const rader = (p.rutnat || []).map((rad) => String(rad).trim().split(/\s+/));
   const kolumner = Math.max(0, ...rader.map((r) => r.length));
-  const celler = rader.map((rad) => Array.from({ length: kolumner }, (_, k) => {
-    const t = rad[k] ?? '#';
-    if (t === '#') return /** @type {Cell} */ ({ sort: 'vak', bokstav: null });
+  // celler[steg][rad]: kolumnen i ritningen är stegets nummer
+  const celler = Array.from({ length: kolumner }, (_, steg) => rader.map((rad) => {
+    const t = rad[steg] ?? '~';
+    if (t === '~' || t === '#') return /** @type {Cell} */ ({ sort: 'vak', bokstav: null });
     if (t === '|') return /** @type {Cell} */ ({ sort: 'vagg', bokstav: null });
     return /** @type {Cell} */ ({ sort: 'flak', bokstav: gemen(t) });
   }));
-  const start = Number.isInteger(p.start) ? /** @type {number} */ (p.start) : Math.floor((kolumner - 1) / 2);
-  return { rader: rader.length, kolumner, celler, ord: gemen(p.ord), start };
+  const start = Number.isInteger(p.start) ? /** @type {number} */ (p.start) : null;
+  // steg (kolumner i ritningen) och bredd (rader i ritningen)
+  return { rader: kolumner, kolumner: rader.length, celler, ord: gemen(p.ord), start };
 }
 
 /** @param {Ruta} a @param {Ruta} b */
@@ -53,9 +57,14 @@ export function grannar(g, fran) {
   const r = fran.r + 1;
   if (r >= g.rader) return [];
   const ut = [];
-  for (let k = fran.k - 1; k <= fran.k + 1; k++) if (k >= 0 && k < g.kolumner && g.celler[r][k].sort === 'flak') ut.push({ r, k });
+  // från stranden utan start: alla flak i första kolumnen (21b: han kliver upp på ett flak i k0)
+  const [fr, til] = fran.r < 0 && g.start === null ? [0, g.kolumner - 1] : [fran.k - 1, fran.k + 1];
+  for (let k = fr; k <= til; k++) if (k >= 0 && k < g.kolumner && g.celler[r][k].sort === 'flak') ut.push({ r, k });
   return ut;
 }
+
+/** Var han står på stranden (raden mitt i, eller start). @param {ReturnType<typeof lasRutnat>} g */
+export const strandRad = (g) => g.start ?? Math.floor((g.kolumner - 1) / 2);
 
 /**
  * Går ordet att stava färdigt härifrån, med bokstav nr i som nästa? (Flak som har sjunkit räknas inte.)
@@ -74,7 +83,7 @@ export function skapaStig(p) {
   return {
     g,
     /** @type {Ruta} där han står (r = -1 är stranden) */
-    nu: { r: -1, k: g.start },
+    nu: { r: -1, k: strandRad(g) },
     /** @type {Ruta[]} flaken han har gått på, i ordning (hans spår, flaken får en spricka) */
     vag: /** @type {Ruta[]} */ ([]),
     /** @type {Set<string>} flak som har sjunkit (en återvändsgränd) */
@@ -118,7 +127,7 @@ export function valj(s, till) {
   while (s.vag.length) {
     const sista = /** @type {Ruta} */ (s.vag.pop());
     sjunker.push(sista); s.sjunkna.add(nyckel(sista));
-    const fran = s.vag.at(-1) ?? { r: -1, k: s.g.start };
+    const fran = s.vag.at(-1) ?? { r: -1, k: strandRad(s.g) };
     if (kanNaFram(s.g, fran, s.vag.length, s.sjunkna)) { s.nu = fran; break; }
     s.nu = fran;
   }
@@ -145,17 +154,17 @@ export function kontrolleraStig(p) {
   if (!Array.isArray(p.rutnat) || !p.rutnat.length) { fel.push(`${p.id}: rutnätet saknas`); return { fel, varningar }; }
   const rader = p.rutnat.map((r) => String(r).trim().split(/\s+/));
   if (new Set(rader.map((r) => r.length)).size > 1) fel.push(`${p.id}: raderna i rutnätet är olika långa`);
-  for (const r of rader) for (const t of r) if (!/^(#|\||[a-zåäöé])$/.test(t)) fel.push(`${p.id}: rutan \"${t}\" är inte en gemen, # eller |`);
+  for (const r of rader) for (const t of r) if (!/^(~|#|\||[a-zåäöé])$/.test(t)) fel.push(`${p.id}: rutan "${t}" är inte en gemen, ~ eller |`);
   const g = lasRutnat(p);
-  if (g.ord.length !== g.rader) fel.push(`${p.id}: ordet har ${g.ord.length} bokstäver men rutnätet ${g.rader} rader (en rad per bokstav)`);
-  if (g.start < 0 || g.start >= g.kolumner) fel.push(`${p.id}: start ligger utanför rutnätet`);
-  if (!fel.length && !kanNaFram(g, { r: -1, k: g.start }, 0)) fel.push(`${p.id}: ordet går inte att stava hela vägen fram`);
-  // förväxlingsbara gemener: två flak han kan välja mellan i samma hopp får inte skilja sig bara på det sättet
-  for (let r = 0; r < g.rader; r++) for (let k = 0; k < g.kolumner; k++) {
+  if (g.ord.length !== g.rader) fel.push(`${p.id}: ordet har ${g.ord.length} bokstäver men rutnätet ${g.rader} kolumner (en kolumn per bokstav)`);
+  if (g.start !== null && (g.start < 0 || g.start >= g.kolumner)) fel.push(`${p.id}: start ligger utanför rutnätet`);
+  if (!fel.length && !kanNaFram(g, { r: -1, k: strandRad(g) }, 0)) fel.push(`${p.id}: ordet går inte att stava hela vägen fram`);
+  // förväxlingsbara gemener: två flak han kan välja mellan i samma hopp (samma kolumn) får inte skilja sig bara så
+  if (!fel.length) for (let r = 0; r < g.rader; r++) for (let k = 0; k < g.kolumner; k++) {
     const a = g.celler[r][k].bokstav;
     for (const kk of [k + 1, k + 2]) {
       const b = g.celler[r][kk]?.bokstav;
-      if (a && b && FORVAXLINGAR.some(([x, y]) => (a === x && b === y) || (a === y && b === x))) varningar.push(`${p.id}: ${a} och ${b} ligger i samma rad (rad ${g.rader - r} uppifrån) och kan förväxlas (08 §3)`);
+      if (a && b && FORVAXLINGAR.some(([x, y]) => (a === x && b === y) || (a === y && b === x))) varningar.push(`${p.id}: ${a} och ${b} står i samma kolumn (kolumn ${r + 1}) och kan förväxlas (08 §3)`);
     }
   }
   return { fel, varningar };

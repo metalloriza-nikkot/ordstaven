@@ -6,14 +6,14 @@ const prov = JSON.parse(readFileSync(new URL('../fixturer/testrum-stig.json', im
 const rygg = prov.stigar[0];
 
 describe('bokstavsstigen (P18, 114.6)', () => {
-  it('läser rutnätet med den närmaste raden först', () => {
+  it('läser rutnätet som Innehålls ritning: en kolumn per bokstav, från vänster', () => {
     const g = lasRutnat(rygg);
-    expect(g.rader).toBe(4); expect(g.kolumner).toBe(3); expect(g.start).toBe(1);
+    expect(g.rader).toBe(4); expect(g.kolumner).toBe(3); expect(g.start).toBe(null);
     expect(g.celler[0].map((c) => c.bokstav)).toEqual(['r', 'a', 'r']);
     expect(g.celler[1][1].sort).toBe('vagg');
     expect(g.celler[3][1].sort).toBe('vak');
   });
-  it('han hoppar bara till raden framför, rakt eller snett, och aldrig till en vak eller en isvägg', () => {
+  it('han hoppar bara en kolumn åt höger, rakt eller snett, och aldrig till en vak eller en isvägg', () => {
     const g = lasRutnat(rygg);
     expect(grannar(g, { r: -1, k: 1 })).toEqual([{ r: 0, k: 0 }, { r: 0, k: 1 }, { r: 0, k: 2 }]);
     expect(grannar(g, { r: 0, k: 2 })).toEqual([{ r: 1, k: 2 }]);
@@ -70,8 +70,23 @@ describe('bokstavsstigen (P18, 114.6)', () => {
   });
   it('kontrollen: provfilen går igenom, och den säger till om ett ord som inte går att stava eller förväxlingsbara gemener', () => {
     for (const p of prov.stigar) expect(kontrolleraStig(p).fel).toEqual([]);
-    expect(kontrolleraStig({ ...rygg, ord: 'rygga' }).fel.join()).toMatch(/rader/);
-    expect(kontrolleraStig({ ...rygg, rutnat: ['g # #', 'g a #', 'y | #', 'r a #'], start: 2 }).fel.join()).toMatch(/inte att stava/);
-    expect(kontrolleraStig({ ...rygg, rutnat: ['g # g', 'g a #', 'y | y', 'r n u'] }).varningar.join()).toMatch(/förväxlas/);
+    expect(kontrolleraStig({ ...rygg, ord: 'rygga' }).fel.join()).toMatch(/kolumner/);
+    expect(kontrolleraStig({ ...rygg, rutnat: ['r y g g', 'a | a ~', 'r ~ ~ ~'], start: 2 }).fel.join()).toMatch(/inte att stava/);
+    expect(kontrolleraStig({ ...rygg, rutnat: ['r y g g', 'n | a ~', 'u y ~ g'] }).varningar.join()).toMatch(/förväxlas/);
+  });
+  it('Innehålls tre ritningar (21b v0.2) går igenom, och klo i stig 3 sjunker tillbaka till k', () => {
+    const stigar = [
+      { id: 's1', ord: 'upp', rutnat: ['u x p', 'o p v'] },
+      { id: 's2', ord: 'tavla', rutnat: ['s a v k e', 't e x l a', 'o r s u o'] },
+      { id: 's3', ord: 'klubba', rutnat: ['f l u b e o', 'k f s r b a', 'x l o ~ s t'] },
+    ];
+    for (const p of stigar) expect(kontrolleraStig(p)).toEqual({ fel: [], varningar: [] });
+    const s = skapaStig(stigar[2]);
+    expect(valj(s, { r: 0, k: 1 }).sort).toBe('ratt'); // k
+    const a = valj(s, { r: 1, k: 2 }); // l nere: därifrån finns bara s och o
+    expect(a.sort).toBe('atervand');
+    expect(a.tillbaka).toEqual({ r: 0, k: 1 });
+    for (const t of [{ r: 1, k: 0 }, { r: 2, k: 0 }, { r: 3, k: 0 }, { r: 4, k: 1 }]) expect(valj(s, t).sort).toBe('ratt');
+    expect(valj(s, { r: 5, k: 1 }).sort).toBe('klar');
   });
 });

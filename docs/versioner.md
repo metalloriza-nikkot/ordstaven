@@ -2,6 +2,7 @@
 
 | Version | Datum | Vad |
 |---|---|---|
+| 0.101.2 | 2026-11-20 | **Bokstavsstigen följer Innehålls ritningar** (21b v0.2): han går från vänster till höger, och rutnätet skrivs med raderna uppifrån och ned och `~` för vak. Rätt flak ger ett glatt ljud och glitter, knaket hörs bara vid fel, och `vid_atervand` säger att bokstaven var rätt (115.8). |
 | 0.101.1 | 2026-11-20 | **Paletten 1.2 och kvällstabellen** (beslut 114.3 och 115.6): sex nya kalla färger för kapitel 4, och deras kvällsfärger. Inget i spelet använder dem än, och de gamla kvällsfärgerna är oförändrade. |
 | 0.101.0 | 2026-11-20 | **Bokstavsstigen** (P18, beslut 114.6) i ett testrum (`?testrum=stig`): isflak i ett rutnät med gemener i Lexend, hopp till raden framför, fel bokstav som knakar, återvändsgränder som sjunker tillbaka till förgreningen, vakar och isväggar, och hjälpen (kanten som lyser, ungens knuff och ordet i versaler efter fel). Schema 2.53. Testrummets knapp syns när Innehålls fil finns. |
 | 0.100.1 | 2026-11-20 | **Innehålls pass 113** (kap-03 v0.3.7, beslut 113.3–113.4): Farfars replik "Min flaska! Kartbiten är i den!", flaskan som ett fynd med närbilden när han tar den, och baronen som flyger in. En reaktion med en regi i rummet visar inte texten för den vuxne. Ankaret ligger inte i sanden medan luftskeppet kommer. Schema 2.52 tillåter `flaskan_hittad` på en reaktion. Versionen som den vuxne spelar, och efter den fryses kapitel 3 (113.7). |

@@ -4685,22 +4685,22 @@ export class Rum extends Phaser.Scene {
   /**
    * Ritar bokstavsstigens rutnät: isflak (gråbox, eller Stils `isflak` när den finns), vakar och isväggar, med vattnet
    * under. Bokstäverna står inte här: de står i Lexend i textlagret (spel.js), eftersom text aldrig är pixlar.
-   * @param {{ rader: number, kolumner: number, celler: { sort: string }[][], start: number }} g
+   * @param {{ rader: number, kolumner: number, celler: { sort: string }[][], start: number | null }} g steg (rader) och bredd (kolumner)
    * @param {{ x: number, y: number }} [mitt] rutnätets mitt i rummet (kartans stig_<id>, annars rummets mitt)
-   * @returns {{ flak: (r: number, k: number) => { x: number, y: number }, strand: { x: number, y: number }, mal: { x: number, y: number } }}
+   * @returns {{ flak: (r: number, k: number) => { x: number, y: number }, strand: { x: number, y: number }, mal: { x: number, y: number }, skylt: { x: number, y: number } }}
    */
   visaStig(g, mitt) {
     this.rensaStig();
-    // ett rutnät med sex rader (stig 3) ryms på en skärm: raderna blir lite tätare, flaken lika stora
-    const B = 40, H = Math.min(26, Math.floor((RUM.hojd - 50) / Math.max(1, g.rader))), FB = 32, FH = 18;
+    // Innehålls ritning (21b): han kommer från vänster och hoppar en kolumn åt höger. Steget r är kolumnen på skärmen
+    // och k raden. Sex kolumner (stig 3) ryms på en skärm med stranden på båda sidor
+    const B = Math.min(40, Math.floor((RUM.bredd - 64) / Math.max(1, g.rader))), H = 26, FB = 32, FH = 18;
     const m = mitt || { x: Math.round(this.storlek.bredd / 2), y: Math.round(this.storlek.hojd / 2) };
-    const x0 = Math.round(m.x - (g.kolumner * B) / 2), y0 = Math.round(m.y - (g.rader * H + 12) / 2);
-    // r = 0 är den närmaste raden, längst ned på skärmen
-    const mittFor = (/** @type {number} */ r, /** @type {number} */ k) => ({ x: x0 + k * B + B / 2, y: y0 + (g.rader - 1 - r) * H + H / 2 });
+    const x0 = Math.round(m.x - (g.rader * B) / 2), y0 = Math.round(m.y - (g.kolumner * H) / 2);
+    const mittFor = (/** @type {number} */ r, /** @type {number} */ k) => ({ x: x0 + r * B + B / 2, y: y0 + k * H + H / 2 });
     const vatten = this.add.graphics();
-    vatten.fillStyle(0x1e4e6c, 1).fillRect(x0 - 6, y0 - 4, g.kolumner * B + 12, g.rader * H + 8);
-    vatten.fillStyle(0xdfeaf2, 1).fillRect(x0 - 6, y0 + g.rader * H + 4, g.kolumner * B + 12, 26); // stranden
-    vatten.fillStyle(0xdfeaf2, 1).fillRect(x0 - 6, y0 - 18, g.kolumner * B + 12, 14); // andra sidan
+    vatten.fillStyle(0x1e4e6c, 1).fillRect(x0 - 4, y0 - 6, g.rader * B + 8, g.kolumner * H + 12);
+    vatten.fillStyle(0xdfeaf2, 1).fillRect(x0 - 30, y0 - 6, 26, g.kolumner * H + 12); // stranden, där han kommer från
+    vatten.fillStyle(0xdfeaf2, 1).fillRect(x0 + g.rader * B + 4, y0 - 6, 26, g.kolumner * H + 12); // utgången
     this.lagerStig.add(vatten);
     /** @type {Map<string, any>} */ const bilder = new Map();
     for (let r = 0; r < g.rader; r++) for (let k = 0; k < g.kolumner; k++) {
@@ -4718,13 +4718,15 @@ export class Rum extends Phaser.Scene {
     }
     const kant = this.add.graphics().setVisible(false);
     this.lagerStig.add(kant);
-    // han står på stranden med huvudet under den närmaste raden, så att bokstäverna syns hela
-    const strand = { x: mittFor(-1, g.start).x, y: y0 + g.rader * H + 28 };
-    const mal = { x: m.x, y: y0 - 9 };
+    // han står på stranden till vänster, mitt för den rad han börjar vid, och utgången är till höger
+    const k0 = g.start ?? Math.floor((g.kolumner - 1) / 2);
+    const strand = { x: x0 - 17, y: mittFor(0, k0).y + 4 };
+    const mal = { x: x0 + g.rader * B + 17, y: mittFor(0, Math.floor((g.kolumner - 1) / 2)).y + 4 };
+    const skylt = { x: m.x, y: y0 - 16 };
     this.stig = { g, bilder, kant, kantTw: /** @type {any} */ (null), mittFor, sprickor: this.add.graphics() };
     this.lagerStig.add(this.stig.sprickor);
     this.smutsig = true;
-    return { flak: (r, k) => mittFor(r, k), strand, mal };
+    return { flak: (r, k) => mittFor(r, k), strand, mal, skylt };
   }
 
   /** Tar bort stigen. */
@@ -4740,7 +4742,7 @@ export class Rum extends Phaser.Scene {
    */
   stigHopp(till) {
     const fran = { ...this.pos }, t = { p: 0 }, ms = 320;
-    this.vand = { x: Math.sign(till.x - fran.x) * 0.5, y: till.y < fran.y ? -1 : 1 };
+    this.vand = { x: till.x >= fran.x ? 1 : -1, y: Math.sign(till.y - fran.y) * 0.3 };
     this.tweens.add({ targets: t, p: 1, duration: ms, ease: 'Sine.easeInOut', onUpdate: () => {
       this.pos = { x: fran.x + (till.x - fran.x) * t.p, y: fran.y + (till.y - fran.y) * t.p };
       this.placera();
@@ -4764,6 +4766,16 @@ export class Rum extends Phaser.Scene {
       const b = this.stig?.bilder.get(`${r},${k}`); if (!b) continue;
       this.tweens.add({ targets: b, alpha: 0.25, y: b.y + 3, duration: 700, ease: 'Sine.easeIn', onUpdate: () => { this.smutsig = true; } });
     }
+  }
+
+  /** Ett kort glitter på ett rätt flak (115.8). @param {number} r @param {number} k */
+  stigGlitter(r, k) {
+    if (!this.stig) return;
+    const p = this.stig.mittFor(r, k);
+    const g = this.add.graphics({ x: p.x, y: p.y - 4 });
+    for (const [dx, dy] of [[-8, -3], [7, -5], [0, 4], [10, 3]]) g.fillStyle(0xffffff, 1).fillRect(dx, dy, 1, 3).fillRect(dx - 1, dy + 1, 3, 1);
+    this.lagerStig.add(g);
+    this.tweens.add({ targets: g, alpha: 0, y: g.y - 4, duration: 500, onUpdate: () => { this.smutsig = true; }, onComplete: () => g.destroy() });
   }
 
   /** Flaket han har gått på får en spricka, så att han ser sitt spår. @param {number} r @param {number} k */
