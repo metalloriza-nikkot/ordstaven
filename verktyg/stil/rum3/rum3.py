@@ -93,7 +93,7 @@ def damm(d, cx, cy, rx, ry, seed=0, upptaget=()):
             u = ((x + .5 - cx) / rx) ** 2 + ((y + .5 - cy) / ry) ** 2 + 0.35 * (slat(x, y, 6, seed) - 0.5)
             if u >= 1: continue
             t = 1 - u
-            d.satt(x, y, blanda(d.get(x, y), MJOL[1], 0.10 + 0.32 * t if (x + y) % 2 or t > 0.5 else 0.06 + 0.18 * t))   # svagare: i spelet såg det ut som rök
+            d.satt(x, y, blanda(d.get(x, y), '#F2E8C8', 0.12 + 0.40 * t if (x + y) % 2 or t > 0.5 else 0.08 + 0.22 * t))   # krämvitt mjöl (108.3): grått blev smutsigt och mörkt
 
 def kras_alfa(im):
     """Till palettens närmaste färger; det genomskinliga står kvar genomskinligt (ingen halvgenomskinlighet)."""

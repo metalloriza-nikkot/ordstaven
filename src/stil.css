@@ -282,6 +282,11 @@ html, body {
 .forebild .bokstav.blinkar, .bricka.tips { animation: blinka .5s ease-in-out 6; }
 @keyframes blinka { 50% { opacity: .2; } }
 .platser { display: flex; gap: 12px; }
+/* 113.9: en formel med två ord (STOR SKÖLD) har en glipa mellan orden. Fälten är lite smalare, så att glipan ryms
+   utan att något fält trycks ihop */
+.platser.tva-ord .plats { flex-shrink: 0; }
+.platser.tva-ord .plats { width: calc(74px * var(--t)); }
+.platser .plats.glipa { margin-left: calc(32px * var(--t)); }
 .plats { display: inline-flex; align-items: center; justify-content: center; width: calc(84px * var(--t)); height: calc(96px * var(--t)); border-radius: 12px; border: 4px dashed #b7a98a; font-size: calc(64px * var(--t)); }
 .plats.last { border: 4px solid #6aa36a; background: #e6f4e2; }
 .brickor { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
@@ -360,6 +365,8 @@ html, body {
 /* helskärmar: start, passets slut, meny */
 #skarm { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(20, 14, 10, .92); z-index: 4; }
 #skarm.genomskinlig { background: transparent; pointer-events: none; }
+/* 113.6: slutrutan över kapitlets slutbild: bilden syns, och knapparna står på en mörk rand nedtill */
+#skarm.over-slutbild { background: linear-gradient(rgba(20, 14, 10, 0) 35%, rgba(20, 14, 10, .78) 100%); align-items: flex-end; padding-bottom: 6%; }
 .pass-slut { display: flex; flex-direction: column; align-items: center; gap: 32px; }
 /* F4: startskärmen i världens pixlar (10e v0.4): Stils bilder skalas med --vpx (en av världens pixlar, i hela steg).
    Inga skuggor med oskärpa och inget som rör sig utom ungen (bildbyten), så att golvdatorn klarar den. */
@@ -944,6 +951,8 @@ html, body {
 #plattan.narbild-platta { top: calc(var(--rum-topp) + var(--rum-hojd) / 2); transform: translate(-50%, -50%); max-width: none; box-shadow: 0 0 0 200vmax rgba(14, 12, 10, .62); border-radius: 2px; }
 #plattan.narbild-platta .narbild-kort { background: none; width: auto; height: auto; }
 #plattan.narbild-platta .narbild-kort > .bild.bildkort { width: calc(220 * var(--vpx)); height: calc(140 * var(--vpx)); margin: 0; display: block; }
+/* 113.3: flaskan i närbild (48 × 48), tre gånger så stor och kvadratisk */
+#plattan.narbild-platta .flaska-nara > .bild.bildkort { width: calc(144 * var(--vpx)); height: calc(144 * var(--vpx)); }
 
 /* Chiffret som meddelande (P9 med lage meddelande, 2.47): tecknen i en rad med en ruta under varje, och nyckeln */
 .meddelande-ruta { gap: 18px; align-items: center; }

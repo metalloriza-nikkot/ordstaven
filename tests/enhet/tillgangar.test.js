@@ -223,7 +223,9 @@ describe('mellanscenernas bilder och bildkorten', () => {
     // 105.4: skepparen pekar på det stora hornet och hjulet
     'skepparen_pekar',
     // 109.5: ankaret faller och stannar (Stils bilder, Rum.ankaretFaller)
-    'ankaret_faller']);
+    'ankaret_faller',
+    // 113.3–113.4: baronen flyger in med kikaren, och hjälten håller upp flaskan (närbilden på läsplattan)
+    'baronen_kommer', 'flaskan_hittad']);
   it('varje mellanscen med bild har grafik (morgonen i sängen, luftskeppets lägen, sidovyerna, ungen på kartbiten, ägget)', () => {
     const saknas = [];
     for (const k of kapitel) for (const sc of k.scener) for (const st of sc.steg) {

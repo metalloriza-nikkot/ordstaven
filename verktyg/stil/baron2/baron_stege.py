@@ -34,6 +34,9 @@ def stege_baron(lage='grund', bild=1, utr='hel'):
         if bild == 2: hh = (21, 15); vx, vy = 2, dy + 2; benv, benh = -1, 1   # hänger i vänster hand, kroppen svänger
         if bild == 3: hv, hh = (3, 5), (21, 4); vy = dy + 1   # båda händerna i luften
     if lage == 'ropar' and bild == 2: vy = dy - 1
+    if lage == 'petar': hh = (19, 22 + (bild - 1) * 3)       # 109.7: högra handen ned med paraplyet, och han petar
+    if lage == 'utochin': hh = (19, 21)                       # paraplyet har studsat mot bubblan
+    if lage == 'fallskarm': hv, hh = (10, 3), (14, 3); benv, benh = (1, -1) if bild == 1 else (-1, 1)   # båda händerna i handtaget
     # benen och kängorna
     for i, cx in enumerate((9.6, 14.4)):
         upp = benv if i == 0 else benh
@@ -59,14 +62,14 @@ def stege_baron(lage='grund', bild=1, utr='hel'):
     for x in range(9, 15):
         if d.px.get((x + o, 5 + oy), ('', 0))[0] == 'hjalm' and d.del_.get((x + o, 5 + oy)) == 'kupol': d.fast(x + o, 5 + oy, BAND)
     # ansiktet efter läget
-    if lage == 'forvirrad':
+    if lage in ('forvirrad', 'utochin'):
         d.fast(10 + o, 8 + oy, OGA); d.fast(10 + o, 7 + oy, OGA); d.fast(9 + o, 8 + oy, OGA)   # ett stort öga
         d.fast(14 + o, 8 + oy, OGA)                                                         # och ett litet
         for (x, y) in [(10, 12), (11, 11), (12, 12), (13, 11), (14, 12)]: d.fast(x + o, y + oy, MUN)   # vågig mun
-        if bild == 2: d.fast(17 + o, 6 + oy, '#9AB6FF'); d.fast(17 + o, 7 + oy, '#4F7AE8')       # en svettdroppe
+        if bild == 2 or lage == 'utochin': d.fast(17 + o, 6 + oy, '#9AB6FF'); d.fast(17 + o, 7 + oy, '#4F7AE8')       # en svettdroppe
     else:
         d.fast(10 + o, 8 + oy, OGA); d.fast(14 + o, 8 + oy, OGA)
-        if lage in ('ropar', 'tappar'):
+        if lage in ('ropar', 'tappar', 'fallskarm', 'petar'):
             for (x, y) in [(11, 11), (12, 11), (13, 11), (11, 12), (13, 12)]: d.fast(x + o, y + oy, MUN)
             d.fast(12 + o, 12 + oy, '#8A3A2E'); d.fast(11 + o, 13 + oy, MUN); d.fast(12 + o, 13 + oy, MUN); d.fast(13 + o, 13 + oy, MUN)
         else:

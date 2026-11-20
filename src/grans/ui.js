@@ -321,7 +321,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
   // ---------------------------------------------------------------- helskärmar
   /** @param {string} html */
   function visaSkarm(html) { skarm.innerHTML = html; skarm.hidden = false; ikonKnappar(skarm); return skarm; }
-  function doljSkarm() { skarm.hidden = true; skarm.innerHTML = ''; }
+  function doljSkarm() { skarm.hidden = true; skarm.innerHTML = ''; skarm.classList.remove('over-slutbild'); }
   /** Menyn för vuxna ligger över allt annat, även startskärmen, och rör inte spelets skärmar. @param {string} html */
   function visaMeny(html) { const m = $('#vuxenmeny'); m.innerHTML = html; m.hidden = false; return m; }
   function doljMeny() { const m = $('#vuxenmeny'); m.hidden = true; m.innerHTML = ''; }

@@ -96,6 +96,14 @@ bybor/testrum_kort.py (beslut 107.6): testrummens bildkort i stället för emoji
 bubblan i testrummet för fritt skrivande, och det halmdockan pekar på i duellens testrum (svamp, snögubbe, hund, kopp
 och solros). Läser bildkortens färger ur inkorgen, så att inga nya kommer till: `python3 bybor/testrum_kort.py <inkorg> <ut>`.
 
+Beslut 108–109: `bybor/kort108.py` (bildkorten mat, sol, apa, farfars_lista_sista_raden och skoldpadda),
+`k3/slutbild2.py` (den nya slutbilden och berget som ryker), `k3/ankare_skold.py` (ankaret och SKÖLD),
+`baron2/baron_paraply.py` (paraplyet i duellen; lägena i `baron2/baron_stege.py`). Hornet med munstycket och fenan
+uppfälld står i `rum3/sprites3.py`. `rum3/zon_floden.py` skyddar kvarnens och öns färger (`bybor/zon.py`, `skydd`).
+
+Beslut 113: `bybor/kort113.py` (bildkortet flaska_kartbit, flaskan med kartbiten synlig genom glaset). Paletten är 1.2
+(374 färger) med sex kalla färger för isen och snön i kapitel 4.
+
 kvall/ (kapitel 2, 12/11): `kvall.py` skriver `figurer/kvall.json`, en tabell som byter varje palettfärg mot sin
 kvällsfärg, så att figurerna blir mörkare på kvällen utan egna bilder. Målfärgerna tas bara bland färger som redan
 finns i träskets zon.

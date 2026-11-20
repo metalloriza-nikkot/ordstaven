@@ -21,7 +21,7 @@ import { pekningOmMs, skapaHjalpSpar, knufftidMs } from './karna/hjalp.js';
 import { HJALTE_FARGER, HJALTE_FAST } from './scener/Rum.js';
 import { lagerFor, bytLager, ristasNu } from './karna/hjalte.js';
 import { TANGENTBORD_HOJD } from './grans/tangentbord.js';
-import { kandaOrd, bedomOrd, antalFalt, MAX_BOKSTAVER } from './karna/skrivord.js';
+import { kandaOrd, bedomOrd, antalFalt, ordStarter, MAX_BOKSTAVER } from './karna/skrivord.js';
 import { laddaOrdlista } from './grans/ordlista.js';
 import { skapaRullning } from './grans/rullning.js';
 import { laggUngenPaKartan, kartbitarHtml } from './grans/kartbitar.js';
@@ -2814,7 +2814,8 @@ export function skapaSpel(d) {
         const overst = bild || ledbild ? `<div class="formel-overst">${bild}${ledbild}${forebild}</div>` : forebild;
         // ungen håller tassarna för ögonen medan förebilden är borta (titta–täck), men bara när den har synts
         const tacker = tt && fb.visad && !fb.syns ? '<span class="unge-tacker" aria-hidden="true"><span class="kropp"></span><span class="tass"></span><span class="tass"></span></span>' : '';
-        const platser = `<div class="platser">${f.s.platser.map((id, i) => `<span class="plats ${f.s.last[i] ? 'last' : ''} ${id !== null && !f.s.last[i] ? 'flyttbar' : ''}" data-plats="${i}" ${id !== null ? `data-id="${id}"` : ''}>${ui.esc(bokstav(id))}</span>`).join('')}</div>`;
+        const glipor = ordStarter(p.svar); // 113.9: en glipa mellan orden i STOR SKÖLD
+        const platser = `<div class="platser ${glipor.size ? 'tva-ord' : ''}">${f.s.platser.map((id, i) => `<span class="plats ${glipor.has(i) ? 'glipa' : ''} ${f.s.last[i] ? 'last' : ''} ${id !== null && !f.s.last[i] ? 'flyttbar' : ''}" data-plats="${i}" ${id !== null ? `data-id="${id}"` : ''}>${ui.esc(bokstav(id))}</span>`).join('')}</div>`;
         const brickor = `<div class="brickor ${fb.brickor ? '' : 'vantar'}">${f.s.brickor.map((x) => `<button type="button" class="bricka ${f.s.platser.includes(x.id) ? 'anvand' : ''} ${f.s.tips === x.id ? 'tips' : ''}" data-id="${x.id}">${ui.esc(x.bokstav)}</button>`).join('')}<button type="button" class="bricka sudda" aria-label="Ta tillbaka">⌫</button></div>`;
         ui.visaPlatta(`<div class="formel-ruta">${tacker}${overst}${platser}${brickor}</div>`, 'pussel P11_formel');
         tillatNos(p, spar);
@@ -2953,12 +2954,14 @@ export function skapaSpel(d) {
       });
       const rita = () => {
         const n = antalFalt(p, skrivet), tecken = [...skrivet];
+        // 113.9: STOR SKÖLD har en glipa mellan orden. Inte i ett pussel med antal_falt, där fälten inte säger något om ordet
+        const glipor = Number.isInteger(p.antal_falt) ? new Set() : ordStarter(p.svar);
         const forsta = fb.forsta ? [...versaler(p.svar)][0] : '';
         // täck: förebilden tonas bort när första bokstaven skrivs, och syns igen när fälten är tomma
         const tackt = fb.visad && tecken.length > 0;
         if (tackt && !fb.tackt) logg.handelse('formel', `${p.id}: förebilden tonas bort (täck)`);
         fb.tackt = tackt;
-        const platser = `<div class="platser skriv">${Array.from({ length: n }, (_, i) => `<span class="plats ${i < tecken.length ? 'fylld' : ''} ${!tecken.length && i === 0 && forsta ? 'tand' : ''}">${ui.esc(tecken[i] ?? (i === 0 && forsta ? forsta : ''))}</span>`).join('')}</div>`;
+        const platser = `<div class="platser skriv ${glipor.size ? 'tva-ord' : ''}">${Array.from({ length: n }, (_, i) => `<span class="plats ${glipor.has(i) ? 'glipa' : ''} ${i < tecken.length ? 'fylld' : ''} ${!tecken.length && i === 0 && forsta ? 'tand' : ''}">${ui.esc(tecken[i] ?? (i === 0 && forsta ? forsta : ''))}</span>`).join('')}</div>`;
         // förebilden är ett ord nosen kan läsa (76.2, A5), och vid nära stavning är bokstaven som skiljer markerad
         const forebild = p.forebild && fb.visad ? `<div class="forebild ${tackt ? 'tonad' : ''}" aria-label="Förebild"><span class="ord" data-ord="${ui.esc(p.forebild.text)}">${[...p.forebild.text].map((c, i) => `<span class="bokstav${i === fb.skiljer ? ' skiljer' : ''}">${ui.esc(c)}</span>`).join('')}</span></div>` : '';
         const bild = p.bild ? `<div class="formel-bild" aria-hidden="true">${bilder.html(p.bild)}</div>` : '';
@@ -3385,6 +3388,14 @@ export function skapaSpel(d) {
       await vanta(tid(ms)); if (ord) ui.doljPlatta();
       return true;
     }
+    if (bild === 'flaskan_hittad') {
+      // 113.3: hjälten håller upp flaskan i rummet, och sedan flaskan i närbild med kartbiten genom glaset (Stils bildkort)
+      logg.handelse('mellanscen', bild);
+      await vanta(tid(ms));
+      const kort = bilder.html('flaska_kartbit');
+      if (kort) { ui.visaPlatta(`<div class="bok-bild narbild-kort flaska-nara">${kort}</div>`, 'narbild-platta'); ljud.spela('pling'); await vanta(tid(1800)); ui.doljPlatta(); }
+      return true;
+    }
     if (bild === 'kartbit4_berget') {
       logg.handelse('mellanscen', bild);
       const html = kartbitarHtml([4], { hojd: layout.skala.cssHojd * 0.6, bredd: layout.skala.cssBredd * 0.8 });
@@ -3513,8 +3524,12 @@ export function skapaSpel(d) {
       const sluta = lyssnaHandling((h) => { if (h.typ === 'interagera') gjort(); else if (h.typ === 'ga') glimta(); });
       const k = knuffKlocka({ handling: '' }, () => { rum.markera(st.foremal, true); ui.pulsera?.('#handknapp'); });
     });
-    rum.markera(st.foremal, false); rum.visaOmrade(null); rum.regiFokus = null;
+    rum.markera(st.foremal, false); rum.visaOmrade(null);
     logg.handelse('tryck', st.foremal);
+    // 113.5: ett tryck på en figur som kan vinka (skepparen i resan): hjälten vinkar till den, och den vinkar tillbaka.
+    // Kameran står kvar hos figuren en stund, så att han ser svaret, och glider sedan tillbaka till hjälten som vinkar
+    if (rum.vinkaTill?.(st.foremal)) { logg.handelse('vinka', st.foremal); await vanta(tid(1000)); }
+    rum.regiFokus = null;
     // det första tutet i hornet (k3s02_loftet) hörs och syns som de andra (103.3)
     if (rum.blas?.(st.foremal)) { ljud.spela('horn_tut'); visaLjudord('tut', '', st.foremal); } else ljud.spela('klick');
   }
@@ -4044,6 +4059,7 @@ export function skapaSpel(d) {
     const fr = st?.fraga ?? aventyr.sparpunkt_fraga?.text ?? null;
     const fraga = fr ? `<div class="fraga-text">${ui.rader(fr.text, varden())}</div>` : '';
     const s = ui.visaSkarm(`<div class="pass-slut">${fraga}<div class="knappar"><button type="button" class="knapp stor fortsatt" aria-label="Fortsätt">▶</button><button type="button" class="knapp stor paus" aria-label="Sluta för idag">${sover}</button></div></div>`);
+    overSlutbild(s);
     if (fr) sag(fr).then(() => {}, () => {});
     await new Promise((klar) => {
       s.querySelector('.fortsatt')?.addEventListener('click', () => { rost.tyst(); klar(undefined); });
@@ -4051,6 +4067,12 @@ export function skapaSpel(d) {
     });
     ui.doljSkarm();
   }
+
+  /**
+   * 113.6: står kapitlets slutbild kvar (sköldpaddan mot berget), visas slutrutan över den i stället för på en tom
+   * skärm. @param {HTMLElement} s
+   */
+  const overSlutbild = (s) => { if (rum.harSlutbild) { s.classList.add('over-slutbild'); logg.handelse('slutrutan', 'över slutbilden'); } };
 
   const SOVER = '<span class="unge-sover" aria-hidden="true"><span class="kropp"></span><span class="zz">z z</span></span>';
 
@@ -4082,6 +4104,7 @@ export function skapaSpel(d) {
         else if (st.typ === 'mellanscen' && st.beskrivning) { ui.visaRegi(st.beskrivning, 0); await vanta(tid(1500)); ui.doljRegi(); }
       }
       const p = ui.visaSkarm(`<div class="pass-slut kapitel-last"><div class="stor-ikon">${SOVER}<span class="stjarna" aria-hidden="true">${ikon('stjarna', 'stor')}</span></div><button type="button" class="knapp stor igen" aria-label="Igen">▶</button></div>`);
+      overSlutbild(p);
       await new Promise((klar) => p.querySelector('.igen')?.addEventListener('click', () => klar(undefined), { once: true }));
       ui.doljSkarm();
     }
@@ -4834,6 +4857,8 @@ export function skapaSpel(d) {
     /** För testerna. */
     get scen() { return b?.scen?.id ?? null; },
     get steg() { return aktuelltSteg; },
+    /** Kapitlets data (testerna: ett pussel kan provas med andra värden, 113.9). */
+    get kapitel() { return b?.kapitel ?? null; },
     get pausad() { return pausad; },
     get variant() { return aktuellVariant; },
     /** Öppna en skylt i rummet på läsplattan, som när han går dit (testet för text som kapas, 79.2). @param {string} id */

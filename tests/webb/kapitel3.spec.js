@@ -407,7 +407,7 @@ test('regierna i kapitel 3 (100.4, 101.3, 102.3 och 103.3.1): var och en går i 
   test.setTimeout(300000); // 106: sex regier till
   const ev = (fn, arg) => page.evaluate(fn, arg);
   const REGIER = [['k3s01_floden', ['ankomst_floden', 'frukost', 'skepparen_pekar', 'kartbit3_on']], ['k3s02_kvarnen', ['sackhiss_upp']], ['k3s02_loftet', ['loftet_horn', 'skuggan_lyssnar']], ['k3s03_hornet', ['tallrikar', 'skuggan_stiger', 'skuggan_dyker', 'unge_simmar', 'sackhiss_ner']],
-    ['k3s04_on', ['skoldpadda_huvud', 'skylt_tecken']], ['k3s05_sandbanken', ['skoldpadda_simmar', 'skoldpadda_visar_berget']], ['k3s06_ankaret', ['ankaret_faller', 'skold_ankaret', 'ordduell_start', 'ordduell_seger']], ['k3s07_resan', ['kartbit4_berget', 'resan_kvall', 'resan_slut']]];
+    ['k3s04_on', ['skoldpadda_huvud', 'skylt_tecken']], ['k3s05_sandbanken', ['skoldpadda_simmar', 'skoldpadda_visar_berget', 'flaskan_hittad']], ['k3s06_ankaret', ['baronen_kommer', 'ankaret_faller', 'skold_ankaret', 'ordduell_start', 'ordduell_seger']], ['k3s07_resan', ['kartbit4_berget', 'resan_kvall', 'resan_slut']]];
   for (const [scenId, regier] of REGIER) {
     // på ön börjar den där skylten syns (efter mossan), så att tecknen har sin skylt
     const sc = kap.scener.findIndex((x) => x.id === scenId);
@@ -433,6 +433,13 @@ test('regierna i kapitel 3 (100.4, 101.3, 102.3 och 103.3.1): var och en går i 
     if (scenId === 'k3s06_ankaret') expect((await ev(() => window.__ORDSTAVEN.grafik())).regi).toEqual(expect.arrayContaining(['ordduellen börjar', 'ordduellen är vunnen', 'ljud:duell_start', 'stycke:stycke_seger']));
     // 109.5: ankaret faller och stannar, SKÖLD tänds, och ankaret studsar och borrar ned sig (Stils bilder)
     if (scenId === 'k3s06_ankaret') expect((await ev(() => window.__ORDSTAVEN.grafik())).regi).toEqual(expect.arrayContaining(['ankaret faller och stannar', 'SKÖLD tänds, och ankaret studsar och borrar ned sig']));
+    // 113.3–113.4: hjälten håller upp flaskan, och baronen flyger in med kikaren åt rätt håll. Duellens skepp med
+    // repstegen tar över, så att det aldrig står två skepp
+    if (scenId === 'k3s05_sandbanken') expect((await ev(() => window.__ORDSTAVEN.grafik())).regi).toContain('hjälten håller upp flaskan');
+    if (scenId === 'k3s06_ankaret') {
+      expect((await ev(() => window.__ORDSTAVEN.grafik())).regi).toContain('baronen kommer och tittar i kikaren');
+      expect(await ev(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').luft)).toBeNull();
+    }
     // 109.8: Stils berg i stället för gråboxens triangel
     if (scenId === 'k3s05_sandbanken') expect((await ev(() => window.__ORDSTAVEN.grafik())).regi).toContain('berget: Stils bild');
     // 109.10: den nya slutbilden, där kameran glider längs floden mot berget
@@ -573,4 +580,123 @@ test('kapitel 3 efter 0.99.0: det första tutet vid munstycket, hjälten ut ur h
   expect(await ev(() => window.__ORDSTAVEN.logg().split('== SENASTE')[0].includes('[skylt] skylt_skal'))).toBe(false);
   await page.locator('#plattan .kort').first().click();
   await page.waitForTimeout(500);
+});
+
+// 113.2 (den vuxnes skärmdump på 0.99.1): ankaret och SKÖLD hamnade där han hittade flaskan, inte där han stod. Ankaret
+// räknades mitt emellan hjälten och ungen, och ungen stod kvar där den lockade vid skalkanten.
+test('kapitel 3: ankaret och SKÖLD faller där hjälten står efter flaskan, och ungen går fram till honom först', async ({ page }) => {
+  test.setTimeout(150000);
+  const ev = (fn, arg) => page.evaluate(fn, arg);
+  const vidare = async () => { for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {}); };
+  const p = pussel.get('k3_tangtussarna');
+  await starta(page, 'k3s05_sandbanken', kap.scener.findIndex((x) => x.id === 'k3s05_sandbanken'), 0);
+  // fenan, kramen och tången. Den sista tussen (flaskan) är tang_1, längst från skalkanten där ungen lockar
+  const ordning = ['tang_2', 'tang_3', 'tang_1'];
+  let flyttad = null;
+  for (let i = 0; i < 200; i++) {
+    const st = await ev(() => window.__ORDSTAVEN.steg());
+    const loggen = await ev(() => window.__ORDSTAVEN.logg());
+    if (loggen.includes('[mellanscen] ankaret_faller')) break;
+    // han har gått några steg från flaskan (i snabbläget hinner han inte medan flaskan visas, så testet flyttar honom)
+    if (!flyttad && loggen.includes(': flaska') && await ev(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').rumId === 'sandbanken')) {
+      flyttad = await ev(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); r.pos = { x: r.pos.x - 40, y: r.pos.y - 6 }; r.placera(); return { pos: { ...r.pos }, unge: { ...r.ungePos } }; });
+    }
+    if (await page.locator('#plattan').isVisible()) { await vidare(); await page.waitForTimeout(200); continue; }
+    if (st?.typ === 'ga_till' && st.mal === 'unge') { await ev(() => { const u = window.__ORDSTAVEN.ungePos(); window.__ORDSTAVEN.gaMot(u.x + 14, u.y); }); await page.waitForTimeout(800); continue; }
+    if (st?.pussel_id === 'k3_fenan') {
+      const v = await ev(() => window.__ORDSTAVEN.variant()), q = pussel.get('k3_fenan');
+      await ev(gaMotSida, (q.varianter[v] || Object.values(q.varianter)[0]).alternativ.find((a) => a.ratt).objekt);
+      await page.waitForTimeout(1500); await page.keyboard.press('Space'); await page.waitForTimeout(800); continue;
+    }
+    if (st?.pussel_id === 'k3_tangtussarna') {
+      const id = ordning.find((t) => !loggen.includes(`[lyfta] ${t}:`));
+      // efter första tussen lockar ungen vid skalkanten: den står kvar där
+      if (id) { await ev(gaMotSida, id); await page.waitForTimeout(1500); await page.keyboard.press('Space'); await page.waitForTimeout(600); continue; }
+    }
+    await page.waitForTimeout(300);
+  }
+  expect(flyttad).not.toBeNull();
+  expect(p.foremal).toEqual(expect.arrayContaining(ordning));
+  // ungen stod långt från honom när regin började
+  expect(Math.hypot(flyttad.unge.x - flyttad.pos.x, flyttad.unge.y - flyttad.pos.y)).toBeGreaterThan(28);
+  await page.waitForTimeout(2500);
+  const efter = await ev(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); return { pos: r.pos, unge: r.ungePos, a: r.k3Ankare && { x: r.k3Ankare.x, y: r.k3Ankare.y }, m: r.k3AnkareMitt }; });
+  // ankaret hänger över honom och ungen, inte där han hittade flaskan
+  expect(Math.abs(efter.m.x - flyttad.pos.x)).toBeLessThan(10);
+  expect(Math.abs(efter.a.x - flyttad.pos.x)).toBeLessThan(10);
+  expect(efter.a.y).toBeLessThan(flyttad.pos.y);
+  // ungen gick fram till honom
+  expect(Math.hypot(efter.unge.x - efter.pos.x, efter.unge.y - efter.pos.y)).toBeLessThan(16);
+  const loggen = await ev(() => window.__ORDSTAVEN.logg());
+  expect(loggen).toMatch(/\[regi\] ankaret över/);
+  await page.screenshot({ path: 'test-results/kap3-ankaret-dar-han-star.png' });
+});
+
+// 113.5–113.6: han vinkar till skepparen och hon vinkar tillbaka, och "Fortsättning följer" står över slutbildens sista
+// bild, inte på en tom skärm
+test('kapitel 3: vinkningen till skepparen, och slutrutan över slutbildens sista bild', async ({ page }) => {
+  test.setTimeout(150000);
+  const ev = (fn, arg) => page.evaluate(fn, arg);
+  const sc = kap.scener.findIndex((x) => x.id === 'k3s07_resan');
+  await starta(page, 'k3s07_resan', sc, 0);
+  await expect.poll(async () => {
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    const st = await ev(() => window.__ORDSTAVEN.steg());
+    if (st?.typ === 'tryck' && st.foremal === 'flaska_i_handen') await page.keyboard.press('Space');
+    return st?.foremal;
+  }, { timeout: 30000, intervals: [500] }).toBe('skepparen');
+  await page.waitForTimeout(600);
+  await page.keyboard.press('Space');
+  await expect.poll(() => ev(() => window.__ORDSTAVEN.logg().includes('[vinka] skepparen')), { timeout: 10000 }).toBe(true);
+  await expect.poll(async () => { const regi = (await ev(() => window.__ORDSTAVEN.grafik())).regi; return regi.includes('vinkar: skepparen') && regi.some((r) => r.startsWith('pose:hjalte_vinka_')); }, { timeout: 5000 }).toBe(true);
+  await page.screenshot({ path: 'test-results/kap3-vinkar-till-skepparen.png' });
+  // fram till slutbilden, och ett tryck hoppar till dess sista bild
+  for (let i = 0; i < 60 && !(await ev(() => window.__ORDSTAVEN.logg().includes('[mellanscen] resan_slut'))); i++) {
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    await page.waitForTimeout(300);
+  }
+  // i snabbläget är slutbilden redan slut. Ett tryck hoppar till den sista bilden och tar inte bort den
+  await page.waitForTimeout(300);
+  expect(await ev(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); r.slutbildSlut(); return r.harSlutbild; })).toBe(true);
+  // slutbilden står kvar under "Fortsättning följer." och slutrutan
+  for (let i = 0; i < 40 && !(await page.locator('#skarm:not([hidden]) .pass-slut').isVisible()); i++) {
+    expect(await ev(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').harSlutbild)).toBe(true);
+    if (/FORTSÄTTNING FÖLJER/.test(await page.locator('#plattan').innerText().catch(() => ''))) await page.screenshot({ path: 'test-results/kap3-fortsattning-foljer.png' });
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    await page.waitForTimeout(400);
+  }
+  await expect(page.locator('#skarm.over-slutbild .pass-slut')).toBeVisible();
+  expect(await ev(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').harSlutbild)).toBe(true);
+  expect(await ev(() => window.__ORDSTAVEN.logg())).toContain('[slutrutan] över slutbilden');
+  await page.screenshot({ path: 'test-results/kap3-slutrutan-over-bilden.png' });
+});
+
+// 113.9: STOR SKÖLD i fälten, med en glipa mellan orden (k3_skold med två ord, i testet)
+test('kapitel 3: STOR SKÖLD har en glipa mellan orden i fälten', async ({ page }) => {
+  test.setTimeout(120000);
+  const ev = (fn, arg) => page.evaluate(fn, arg);
+  const sc = kap.scener.findIndex((x) => x.id === 'k3s06_ankaret');
+  // pusslet med två ord, i kapitlets data innan han kommer dit (scenen börjar med baronens repliker)
+  await starta(page, 'k3s06_ankaret', sc, kap.scener[sc].steg.findIndex((x) => x.pussel_id === 'k3_skold') - 1);
+  await expect.poll(() => ev(() => !!window.__ORDSTAVEN.kapitel()), { timeout: 20000 }).toBe(true);
+  await ev(() => {
+    const p = window.__ORDSTAVEN.kapitel().pussel.find((x) => x.id === 'k3_skold');
+    Object.assign(p, { svar: 'STOR SKÖLD', brickor: [...p.brickor, 'O', 'R', 'S'].sort(), formler: [{ ...p.formler[0], ord: 'STOR SKÖLD' }], forebild: { ...p.forebild, text: 'STOR SKÖLD' } });
+  });
+  for (let i = 0; i < 40 && !(await page.locator('#plattan .platser .plats').first().isVisible().catch(() => false)); i++) {
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    await page.waitForTimeout(400);
+  }
+  const falt = page.locator('#plattan .platser .plats');
+  await expect(falt).toHaveCount(9);
+  const lador = await falt.evaluateAll((f) => f.map((e) => e.getBoundingClientRect()).map((r) => ({ x: r.x, b: r.width })));
+  // alla fält är lika breda (glipan trycker inte ihop något fält), och de ryms på läsplattan
+  for (const r of lador) expect(Math.abs(r.b - lador[0].b)).toBeLessThan(1);
+  const platta = await page.locator('#plattan').boundingBox();
+  expect(lador.at(-1).x + lador.at(-1).b).toBeLessThanOrEqual(platta.x + platta.width);
+  const mellan = lador.slice(1).map((r, i) => r.x - (lador[i].x + lador[i].b));
+  // glipan står före S i SKÖLD (fält 5) och är klart större än de andra mellanrummen
+  expect(mellan[3]).toBeGreaterThan(mellan[0] * 2);
+  for (const [i, m] of mellan.entries()) if (i !== 3) expect(Math.abs(m - mellan[0])).toBeLessThan(2);
+  await page.screenshot({ path: 'test-results/kap3-stor-skold-glipa.png' });
 });

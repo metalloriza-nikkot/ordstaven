@@ -145,9 +145,19 @@ def huvud_bild(lage):
         myt.huvud(d, cx, cy + (1 if b == 2 else 0), 1.2, mot='vanster', oga='oppet')
         for y in range(46, 64):                                              # under vattenytan: bara ringar och skum
             for x in range(96): d.px[x, y] = (0, 0, 0, 0)
-        for x in range(4, 92):
-            if (x + b * 2) % 3: d.satt(x, 46, '#FFFFFF')
-            if (x + b) % 4 == 0: d.satt(x, 48, VATT[4])
+        # skummet bara där halsen och huvudet går ned i vattnet, i oregelbundna tussar (en jämn prickad linje såg
+        # ut som en streckad linje i spelet), och korta ringar utanför
+        kant = [x for x in range(96) if not genom(d, x, 45)]
+        if kant:
+            x0, x1 = min(kant), min(max(kant), 59)                          # öster om x 59 ligger skalets kant (ön, −40, 64)
+            rnd = random.Random(40 + b); x = x0
+            while x <= x1:
+                lang = rnd.randint(2, 5)
+                for k in range(lang):
+                    if x + k <= x1: d.satt(x + k, 46, '#FFFFFF'); d.satt(x + k, 45, VATT[4] if rnd.random() < 0.3 else d.get(x + k, 45))
+                x += lang + rnd.randint(1, 4)
+            for (ax, s) in ((x0 - 3, -1),):                                     # ringar ut i vattnet
+                for k in range(4): d.satt(ax + s * k, 47 + (k // 2) + (b - 1), VATT[4])
         for (x, y) in ((28, 50), (60, 50), (14, 52)) if b == 1 else ((32, 52), (64, 51), (20, 50)):
             d.satt(x, y, '#FFFFFF'); d.satt(x + 1, y, VATT[4])                 # droppar från skägget
         return d
@@ -157,11 +167,18 @@ def huvud_bild(lage):
 
 def fena_bild(lage):
     """Vänstra framfenan, 72 x 36. Handleden (roten) står i (65, 16), där armen i rummets bild slutar
-    (kartans fena_plats 186, 132 + 65, 16 = 251, 148). Spetsen pekar mot väster."""
+    (kartans fena_plats 186, 132 + 65, 16 = 251, 148). Spetsen pekar mot väster. Det finns bara en vänster fena: den här
+    bilden, i ett av tre lägen (sanden, lyft eller trappa), aldrig två på en gång (109.8).
+    Lyft: fenan är uppfälld från handleden, kortare och med spetsen högt, och dess skugga ligger i sanden där den låg."""
     d = tom(72, 36)
     if lage == 'trappa': myt.fena2(d, 65, 18, 1.15, mot='vanster', trappa=True)
-    else: myt.fena2(d, 65, 16, 1.15, mot='vanster', lyft=(lage == 'lyft'))
-    for (x, y) in ((64, 14), (65, 16), (66, 18)): pass
+    elif lage == 'lyft':
+        for y in range(14, 34):                                              # skuggan där fenan låg
+            for x in range(10, 66):
+                t = (65 - x) / 55; mitt = 18 + t * 4; halv = 9 * (1 - t) ** 0.5 + 1
+                if abs(y + .5 - mitt) <= halv and (x + y) % 2 == 0: d.satt(x, y, '#A07A4E')
+        myt.fena2(d, 65, 15, 0.85, mot='vanster', lyft=True)
+    else: myt.fena2(d, 65, 16, 1.15, mot='vanster')
     return d
 
 # ---------------- hjulet och hornet ----------------
@@ -183,19 +200,35 @@ def hjul_bild(steg):
     return d
 
 def horn_bild(mjol):
-    """Hornet uppifrån på avsatsen: foten bak mot väggen (norr), röret böjer sig söderut och klockan sticker ut över räcket."""
-    d = tom(24, 36)                                                          # kartans hornet_plats på 0.94.1 (572, 87, 24 x 36)
-    hx, hy = 19, 3
-    for y in range(2, 9):                                                    # foten av drivved, som sticker fram under munstycket
-        for x in range(hx - 4, hx + 4): d.satt(x, y, DRIV[2] if x < hx else DRIV[1])
-    for x in range(hx - 4, hx + 4): d.satt(x, 9, DRIV[0])
-    for i in range(36):
-        t = i / 35; x = hx - 6 * math.sin(t * 2.4); y = hy - 2 + 22 * t
-        r = 2.4 + 1.0 * t + (5.5 * ((t - 0.7) / 0.3) ** 1.5 if t > 0.7 else 0)
-        d.ellips(x, y, r, r * 0.6, MASS[2] if i % 6 else MASS[1], MASS[0])
-        d.satt(int(x - r * 0.5), int(y - 1), MASS[4])
-    d.ellips(hx - 6 * math.sin(2.4), hy + 21, 6.5, 3, '#24160C', MASS[3])    # klockans öppning mot floden
+    """Hornet på avsatsen (109.1): munstycket pekar mot väster, mot hjälten, i munhöjd. Röret går österut på en fot av
+    drivved, böjer sig söderut och klockan sticker ut över räcket mot floden. Kartans hornet_plats (572, 87, 24 x 36).
+    Munstycket sitter i (0, 6) i bilden, alltså i (572, 93) i rummet. Hjälten som blåser (hjalte_blaser_hoger_*, 16 x 24,
+    munnen i (15, 9)) står med bildens övre vänstra hörn i (556, 84), fötterna mitt i (564, 107)."""
+    d = tom(24, 36)
+    for y in range(9, 18):                                                   # foten: en kluven drivvedsstolpe under röret
+        d.satt(9, y, DRIV[2]); d.satt(10, y, DRIV[2]); d.satt(11, y, DRIV[1])
+    for x in range(6, 14): d.satt(x, 18, DRIV[0]); d.satt(x, 17, DRIV[1] if x > 9 else DRIV[2])
+    d.satt(8, 9, DRIV[2]); d.satt(12, 9, DRIV[1])
+    for i in range(48):                                                      # röret: rakt österut, sedan en båge söderut
+        t = i / 47
+        if t < 0.35: x = 1 + t / 0.35 * 12; y = 6
+        else:
+            u = (t - 0.35) / 0.65; x = 13 + 5 * math.sin(u * math.pi * 0.5); y = 6 + 20 * u ** 1.15
+        r = 1.5 + 0.9 * t + (5.4 * ((t - 0.72) / 0.28) ** 1.6 if t > 0.72 else 0)
+        d.ellips(x, y, r, r * (0.75 if t < 0.4 else 0.6), MASS[2] if (i % 7 or t < 0.4) else MASS[1], MASS[0])
+        d.satt(int(x - r * 0.4), int(y - r * 0.5), MASS[4])
+    d.ellips(18, 27.5, 5.8, 2.8, '#24160C', MASS[3])                         # klockans öppning mot floden
+    for y in (5, 6, 7): d.satt(0, y, MASS[0])                                # munstycket: en liten kopp
+    d.satt(1, 5, MASS[3]); d.satt(1, 6, '#24160C'); d.satt(1, 7, MASS[1]); d.satt(2, 6, MASS[4])
+    # bandet med skriften (110.5): målat runt röret strax bakom munstycket, där han läser (kartans hornet_skrift
+    # 572, 88, 6 x 5, alltså x 0–6 i bilden). Samma ljusa band som i närbilden; prickarna är skrift, inte bokstäver.
+    BAND_X = range(3, 9)
+    for x in BAND_X:
+        d.satt(x, 5, '#F2E8C8'); d.satt(x, 6, '#F2E8C8' if x % 2 else '#4A3410'); d.satt(x, 7, '#D6CFA4')
+    d.satt(2, 5, MASS[0]); d.satt(2, 7, MASS[0]); d.satt(9, 5, MASS[0]); d.satt(9, 7, MASS[0])
     if mjol:
+        for x in BAND_X:                                                     # mjölet täcker skriften tills han blåser
+            for y in (5, 6, 7): d.satt(x, y, MJOL[1] if (x + y) % 3 else MJOL[0])
         for y in range(36):
             for x in range(24):
                 if not genom(d, x, y) and d.get(x, y).upper() in {c.upper() for c in MASS} and brus(x, y, 6) < 0.3:

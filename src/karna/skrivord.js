@@ -39,7 +39,28 @@ export function kandaOrd(ordlistor, kapitel = []) {
  * @param {any} pussel @param {string} skrivet
  */
 export const antalFalt = (pussel, skrivet) => Math.min(MAX_BOKSTAVER, Math.max(
-  Number.isInteger(pussel.antal_falt) ? pussel.antal_falt : [...versaler(pussel.svar || '')].length, [...skrivet].length));
+  Number.isInteger(pussel.antal_falt) ? pussel.antal_falt : [...utanMellanslag(pussel.svar || '')].length, [...skrivet].length));
+
+/** En formel med två ord (STOR SKÖLD, 113.9) skrivs utan mellanslag, i fält med en glipa mellan orden. @param {string} s */
+export const utanMellanslag = (s) => versaler(s).replace(/\s+/g, '');
+
+/** Platsen för bokstav nr i (utan mellanslag) i en text med mellanslag. @param {string} text @param {number} i */
+const medMellanslag = (text, i) => { let n = -1; const t = [...text]; for (let j = 0; j < t.length; j++) { if (/\s/.test(t[j])) continue; if (++n === i) return j; } return i; };
+
+/**
+ * Fälten där ett nytt ord börjar (113.9): STOR SKÖLD ger {4}, och fältet för S får en glipa före sig. Ett ord ger en
+ * tom mängd. @param {string} svar @returns {Set<number>}
+ */
+export function ordStarter(svar) {
+  const ut = new Set();
+  let i = 0, ny = false;
+  for (const c of [...versaler(svar || '').trim()]) {
+    if (/\s/.test(c)) { ny = i > 0; continue; }
+    if (ny) ut.add(i);
+    ny = false; i++;
+  }
+  return ut;
+}
 
 /** Vokaler han förväxlar (läspedagogen V6): Å och Ä, O som Å (SOV, KOM), E och Ä. */
 const VOKALPAR = [['Å', 'Ä'], ['Å', 'O'], ['E', 'Ä']];
@@ -85,17 +106,19 @@ export function naraStavning(skrivet, mal) {
  * @returns {Bedomning}
  */
 export function bedomOrd(pussel, skrivet, ord, sparr = null) {
-  const w = versaler(String(skrivet || '').trim());
+  // 113.9: han skriver orden i en formel med två ord utan mellanslag (fälten har en glipa), så mellanslagen räknas inte
+  const w = utanMellanslag(String(skrivet || ''));
   const formler = pussel.formler?.length ? pussel.formler : [{ ord: pussel.svar }];
-  for (const f of formler) if ([f.ord, ...(f.godtas || [])].some((x) => versaler(x) === w)) return { sort: 'formel', ord: versaler(f.ord), formel: f };
-  const n = (pussel.nastan || []).find((/** @type {any} */ x) => versaler(x.ord) === w);
+  for (const f of formler) if ([f.ord, ...(f.godtas || [])].some((x) => utanMellanslag(x) === w)) return { sort: 'formel', ord: versaler(f.ord), formel: f };
+  const n = (pussel.nastan || []).find((/** @type {any} */ x) => utanMellanslag(x.ord) === w);
   if (n) return { sort: 'nastan', ord: w, nastan: n };
-  const r = (pussel.rimliga || []).find((/** @type {any} */ x) => versaler(x.ord) === w);
+  const r = (pussel.rimliga || []).find((/** @type {any} */ x) => utanMellanslag(x.ord) === w);
   if (r) return { sort: 'rimligt', ord: w, rimligt: r };
   // nära stavning av en formel eller en form som godtas (76.2, A4): "nästan", och förebilden visar bokstaven
   for (const f of formler) for (const mal of [f.ord, ...(f.godtas || [])]) {
-    const i = naraStavning(w, mal);
-    if (i >= 0) return { sort: 'nastan', ord: w, nastan: { auto: true }, mal: versaler(mal), skiljer: i };
+    const i = naraStavning(w, utanMellanslag(mal));
+    // platsen i målordet med mellanslagen kvar, så att förebilden markerar rätt bokstav i STOR SKÖLD
+    if (i >= 0) return { sort: 'nastan', ord: w, nastan: { auto: true }, mal: versaler(mal), skiljer: medMellanslag(versaler(mal), i) };
   }
   // ett grovt ord (spärrlistan, 77.2) får aldrig "BRA ORD!": det är ett vanligt försök, och ordet visas inte igen
   if (sparr?.has(w)) return { sort: 'sparrat', ord: '' };

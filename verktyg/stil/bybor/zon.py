@@ -9,10 +9,11 @@ def farger(filer):
         for n, c in Image.open(f).convert('RGBA').getcolors(1 << 20):
             if c[3]: s[hexa(c)] = s.get(hexa(c), 0) + n
     return s
-def krymp(nya, gamla, tak=248):
-    G = farger(gamla); N = farger(nya)
+def krymp(nya, gamla, tak=248, skydd=()):
+    """skydd: bilder vars färger aldrig slås ihop (t.ex. mjöldammet och glittret, som blev för mörka, 108.3)."""
+    G = farger(gamla); N = farger(nya); S = set(farger(list(skydd))) if skydd else set()
     alla = dict(G); [alla.__setitem__(k, alla.get(k, 0) + v) for k, v in N.items()]
-    egna = sorted([k for k in N if k not in G], key=lambda k: N[k])     # de ovanligaste först
+    egna = sorted([k for k in N if k not in G and k not in S], key=lambda k: N[k])     # de ovanligaste först
     byt = {}
     while len(alla) > tak and egna:
         k = egna.pop(0)

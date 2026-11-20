@@ -284,6 +284,8 @@ redo.then(() => { startKlar = true; window.clearTimeout(startVakt); window.remov
   skala: () => layout.skala,
   scen: () => spelet.scen,
   steg: () => spelet.steg,
+  /** Kapitlets data (för testerna). */
+  kapitel: () => spelet.kapitel,
   tillstand: () => tillstand,
   /** Skärmpunkt mitt på ett objekt i rummet (för att trycka på det). @param {string} id */
   objekt: (id) => { const o = rum.ruta(id); if (!o) return null; return varldTillSkarm(layout.skala, rum.kamera, o.x + o.b / 2, o.y + o.h / 2); },

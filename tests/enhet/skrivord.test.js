@@ -2,7 +2,8 @@
 // Formeln med tangentbordet (P11 med skriv: tangentbord, kapitel 2): ordet han skriver bedöms (Teknik 20, del 2).
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { bedomOrd, kandaOrd, antalFalt, MAX_BOKSTAVER, naraStavning, avkodaOrdlista } from '../../src/karna/skrivord.js';
+import { bedomOrd, kandaOrd, antalFalt, ordStarter, MAX_BOKSTAVER, naraStavning, avkodaOrdlista } from '../../src/karna/skrivord.js';
+import { skapaFormel } from '../../src/karna/pussel.js';
 import { ristasNu } from '../../src/karna/hjalte.js';
 import { testrumKapitel, TESTRUM } from '../../src/karna/testrum.js';
 
@@ -113,5 +114,25 @@ describe('SALDO och spärrlistan (beslut 76.2 och 77.2)', () => {
     // ord som spelet använder får aldrig vara spärrade
     for (const w of ['BRO', 'FLYG', 'SVÄRD', 'LJUS', 'REP', 'STEGE', 'SPORRE', 'BAJS', 'PUNG', 'SJUTTON']) expect(sparr.has(w), w).toBe(false);
     for (const w of ord) expect(sparr.has(w), w).toBe(false);
+  });
+});
+
+describe('en formel med två ord: STOR SKÖLD (113.9)', () => {
+  const p = { id: 'p', typ: 'P11_formel', svar: 'STOR SKÖLD', forebild: { text: 'STOR SKÖLD' } };
+  it('har nio fält, med en glipa före S i SKÖLD', () => {
+    expect(antalFalt(p, '')).toBe(9);
+    expect([...ordStarter('STOR SKÖLD')]).toEqual([4]);
+    expect(ordStarter('SKÖLD').size).toBe(0);
+    expect(skapaFormel(p).s.platser).toHaveLength(9);
+  });
+  it('godtar orden skrivna i rad, och med mellanslag', () => {
+    expect(bedomOrd(p, 'STORSKÖLD', new Set()).sort).toBe('formel');
+    expect(bedomOrd(p, 'stor sköld', new Set()).sort).toBe('formel');
+    expect(bedomOrd(p, 'SKÖLD', new Set()).sort).not.toBe('formel');
+  });
+  it('nära stavning markerar rätt bokstav i förebilden, med mellanslaget kvar', () => {
+    const b = bedomOrd(p, 'STORSKÖLLD', new Set());
+    expect(b.sort).toBe('nastan');
+    expect([...'STOR SKÖLD'][b.skiljer]).toBe('L');
   });
 });
