@@ -70,3 +70,31 @@ export function testrumDuellKapitel(data) {
 export function testrumDuellAventyr(aventyr, data) {
   return { ...aventyr, kapitel: [TESTRUM_DUELL.kapitel], kapitel_last: undefined, talare: { ...aventyr.talare, ...(data?.talare || {}) } };
 }
+
+/**
+ * Testrummet för bokstavsstigen (114.6): stigar med påhittade ord i ett tomt rum, på samma egna sparplats som de andra
+ * testrummen. Innehålls fil `content/testrum-stig.json` har `meta`, valfritt `talare`, och `stigar` (en eller flera
+ * P18_bokstavsstig). Kapitlet kör samma regler som kapitel 4 (karna/bokstavsstig.js).
+ */
+export const TESTRUM_STIG = { kapitel: 'kap-92', nummer: 92, rum: 'testrummet', scen: 'tr_stig', plats: 'testrum' };
+
+/** Kapitlet i stigens testrum: stigarna i filens ordning. @param {{ meta?: any, stigar: any[] }} data @returns {any} */
+export function testrumStigKapitel(data) {
+  const stigar = (data?.stigar || []).filter((u) => u && u.id && u.typ === 'P18_bokstavsstig');
+  return {
+    format: 2,
+    id: TESTRUM_STIG.kapitel,
+    kapitel: TESTRUM_STIG.nummer,
+    meta: { namn: 'Testrummet för bokstavsstigen', version: data?.meta?.version ?? '0', testrum: true },
+    rum: [{ id: TESTRUM_STIG.rum, namn: 'Testrummet', innehall: [] }],
+    scener: [{ id: TESTRUM_STIG.scen, pass: 1, rum: TESTRUM_STIG.rum, steg: stigar.map((u) => ({ typ: 'pussel', pussel_id: u.id })) }],
+    pussel: stigar.map((u) => structuredClone(u)),
+    uppdrag: [],
+    var_var_vi: [],
+  };
+}
+
+/** Äventyret i stigens testrum. @param {any} aventyr @param {{ talare?: Record<string, any> }} data */
+export function testrumStigAventyr(aventyr, data) {
+  return { ...aventyr, kapitel: [TESTRUM_STIG.kapitel], kapitel_last: undefined, talare: { ...aventyr.talare, ...(data?.talare || {}) } };
+}

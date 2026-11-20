@@ -207,6 +207,7 @@ export class Rum extends Phaser.Scene {
     /** @type {Phaser.GameObjects.Image | null} ankaret i luften (109.5) */ this.k3Ankare = null;
     /** @type {Phaser.GameObjects.Image | null} SKÖLD-bubblan som står kvar (109.5) */ this.k3Bubbla = null;
     /** @type {{x:number,y:number} | null} där ankaret och SKÖLD räknas från (113.2): hjälten och ungen när regin börjar */ this.k3AnkareMitt = null;
+    /** @type {any} bokstavsstigen som visas (P18, 114.6) */ this.stig = null;
     /** @type {string | null} en hel bild av hjälten i stället för gången (kartbiten upp mot luftskeppet, s22) */
     this.hjaltePose = null;
     /** @type {{ talare: string, riktning: string } | null} det senaste samtalet (testkroken) */
@@ -277,6 +278,8 @@ export class Rum extends Phaser.Scene {
     this.overBild = this.add.image(0, 0, '__DEFAULT').setOrigin(0, 0).setVisible(false);
     // platsernas ringar (104.7): ovanpå föremålen och under figurerna
     this.lagerRingar = this.add.container(0, 0);
+    // bokstavsstigens isflak (P18, 114.6): ovanpå golvet och föremålen, under figurerna
+    this.lagerStig = this.add.container(0, 0);
     this.ljusboll = this.add.graphics().setVisible(false);
     this.lagerFigurer = this.add.container(0, 0);
     // liv i skogen (fåglar, löv, fjärilen, ekorren) i världens pixlar
@@ -4017,7 +4020,7 @@ export class Rum extends Phaser.Scene {
     let viaHissen = false;
     if (v.nyttRum || !this.harRum) { this.rumsbild = (this.harRum && v.karta?.bild) || null; this.falt = faltFor(this.rumsbild); this.mark = (this.harRum && v.karta?.mark) || null; this.rumId = v.rum; this.markObjekt = v.karta?.objekt || []; }
     this.visaUnge = v.unge;
-    if (v.nyttRum) { for (const id of [...this.ramSlinga.keys(), ...this.ramTimrar.keys()]) this.stoppaRamar(id); this.ramFor.clear(); this.dolda.clear(); this.ungeMal = null; this.ungeTittarPa = null; this.ungeKlattrar = null; this.stegeNu = null; this.ungeSang = null; this.ungeLyft = 0; this.ungeFast = null; this.hjalteFast = null; this.lerig = 0; this.undvik = []; this.hinderUndvik = null; this.regiFokus = null; this.forstFokus = false; if (this.ungeSvavar) { this.ungeSvavar.g.destroy(); this.ungeSvavar = null; } for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas?.remove(); this.sover = null; } this.vaknar = null; this.rensaRegi(); this.k3UngeIVattnet = false; this.k3Huvud = null; this.k3Mjol = null; this.k3Skugga = null; this.k3Simmar = null; this.k3Ankare = null; this.k3Bubbla = null; this.k3AnkareMitt = null; viaHissen = this.k3IHissen; this.k3IHissen = false; this.hjalte.setAlpha(1); this.unge.setAlpha(1); this.naraVinkat.clear(); this.blasNr++; if (this.hjaltePose?.startsWith('hjalte_blaser_')) this.sattPose(null); }
+    if (v.nyttRum) { for (const id of [...this.ramSlinga.keys(), ...this.ramTimrar.keys()]) this.stoppaRamar(id); this.ramFor.clear(); this.dolda.clear(); this.ungeMal = null; this.ungeTittarPa = null; this.ungeKlattrar = null; this.stegeNu = null; this.ungeSang = null; this.ungeLyft = 0; this.ungeFast = null; this.hjalteFast = null; this.lerig = 0; this.undvik = []; this.hinderUndvik = null; this.regiFokus = null; this.forstFokus = false; if (this.ungeSvavar) { this.ungeSvavar.g.destroy(); this.ungeSvavar = null; } for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas?.remove(); this.sover = null; } this.vaknar = null; this.rensaRegi(); this.k3UngeIVattnet = false; this.k3Huvud = null; this.k3Mjol = null; this.k3Skugga = null; this.k3Simmar = null; this.k3Ankare = null; this.k3Bubbla = null; this.k3AnkareMitt = null; this.rensaStig(); viaHissen = this.k3IHissen; this.k3IHissen = false; this.hjalte.setAlpha(1); this.unge.setAlpha(1); this.naraVinkat.clear(); this.blasNr++; if (this.hjaltePose?.startsWith('hjalte_blaser_')) this.sattPose(null); }
     this.tillstand = v.tillstand;
     // figurerna på kvällen (84.2): bilderna byggs första gången, sedan byts bara atlasens källa
     sattKvall(this, this.harRum && v.tillstand === 'kvall' ? KVALL_TABELL : null);
@@ -4676,6 +4679,115 @@ export class Rum extends Phaser.Scene {
     const ram = (/** @type {number} */ n) => `${bas}_vinka_${mot === 'upp' ? 'ner' : mot}_0${n}`;
     if (bas && foremalsbild(this, ram(1)) && foremalsbild(this, ram(2))) { this.regiRamar(id, [ram(1), ram(2), ram(1), ram(2)], 250); return; }
     this.hoppa(id); this.time.delayedCall(260, () => this.hoppa(id));
+  }
+
+  // ---------------------------------------------------------------- bokstavsstigen (P18, 114.6)
+  /**
+   * Ritar bokstavsstigens rutnät: isflak (gråbox, eller Stils `isflak` när den finns), vakar och isväggar, med vattnet
+   * under. Bokstäverna står inte här: de står i Lexend i textlagret (spel.js), eftersom text aldrig är pixlar.
+   * @param {{ rader: number, kolumner: number, celler: { sort: string }[][], start: number }} g
+   * @param {{ x: number, y: number }} [mitt] rutnätets mitt i rummet (kartans stig_<id>, annars rummets mitt)
+   * @returns {{ flak: (r: number, k: number) => { x: number, y: number }, strand: { x: number, y: number }, mal: { x: number, y: number } }}
+   */
+  visaStig(g, mitt) {
+    this.rensaStig();
+    // ett rutnät med sex rader (stig 3) ryms på en skärm: raderna blir lite tätare, flaken lika stora
+    const B = 40, H = Math.min(26, Math.floor((RUM.hojd - 50) / Math.max(1, g.rader))), FB = 32, FH = 18;
+    const m = mitt || { x: Math.round(this.storlek.bredd / 2), y: Math.round(this.storlek.hojd / 2) };
+    const x0 = Math.round(m.x - (g.kolumner * B) / 2), y0 = Math.round(m.y - (g.rader * H + 12) / 2);
+    // r = 0 är den närmaste raden, längst ned på skärmen
+    const mittFor = (/** @type {number} */ r, /** @type {number} */ k) => ({ x: x0 + k * B + B / 2, y: y0 + (g.rader - 1 - r) * H + H / 2 });
+    const vatten = this.add.graphics();
+    vatten.fillStyle(0x1e4e6c, 1).fillRect(x0 - 6, y0 - 4, g.kolumner * B + 12, g.rader * H + 8);
+    vatten.fillStyle(0xdfeaf2, 1).fillRect(x0 - 6, y0 + g.rader * H + 4, g.kolumner * B + 12, 26); // stranden
+    vatten.fillStyle(0xdfeaf2, 1).fillRect(x0 - 6, y0 - 18, g.kolumner * B + 12, 14); // andra sidan
+    this.lagerStig.add(vatten);
+    /** @type {Map<string, any>} */ const bilder = new Map();
+    for (let r = 0; r < g.rader; r++) for (let k = 0; k < g.kolumner; k++) {
+      const c = g.celler[r][k], p = mittFor(r, k);
+      if (c.sort === 'vak') continue;
+      const f = foremalsbild(this, c.sort === 'flak' ? 'isflak' : 'isvagg');
+      let bild;
+      if (f) bild = this.add.image(p.x, p.y, f.nyckel, f.ram);
+      else {
+        bild = this.add.graphics({ x: p.x, y: p.y });
+        if (c.sort === 'flak') bild.fillStyle(0x6f8fa8, 1).fillRoundedRect(-FB / 2, -FH / 2 + 2, FB, FH, 5).fillStyle(0xcfe3f0, 1).fillRoundedRect(-FB / 2, -FH / 2, FB, FH - 2, 5);
+        else bild.fillStyle(0x8e9fcc, 1).fillRect(-FB / 2, -FH / 2 - 8, FB, FH + 8).fillStyle(0xb4c4e6, 1).fillRect(-FB / 2, -FH / 2 - 8, FB, 6);
+      }
+      this.lagerStig.add(bild); bilder.set(`${r},${k}`, bild);
+    }
+    const kant = this.add.graphics().setVisible(false);
+    this.lagerStig.add(kant);
+    // han står på stranden med huvudet under den närmaste raden, så att bokstäverna syns hela
+    const strand = { x: mittFor(-1, g.start).x, y: y0 + g.rader * H + 28 };
+    const mal = { x: m.x, y: y0 - 9 };
+    this.stig = { g, bilder, kant, kantTw: /** @type {any} */ (null), mittFor, sprickor: this.add.graphics() };
+    this.lagerStig.add(this.stig.sprickor);
+    this.smutsig = true;
+    return { flak: (r, k) => mittFor(r, k), strand, mal };
+  }
+
+  /** Tar bort stigen. */
+  rensaStig() {
+    if (!this.stig) return;
+    this.stig.kantTw?.remove();
+    this.lagerStig.removeAll(true); this.stig = null; this.smutsig = true;
+  }
+
+  /**
+   * Hjälten hoppar till en punkt på stigen (ca 0,3 s, i en båge). @param {{ x: number, y: number }} till
+   * @returns {number} ms
+   */
+  stigHopp(till) {
+    const fran = { ...this.pos }, t = { p: 0 }, ms = 320;
+    this.vand = { x: Math.sign(till.x - fran.x) * 0.5, y: till.y < fran.y ? -1 : 1 };
+    this.tweens.add({ targets: t, p: 1, duration: ms, ease: 'Sine.easeInOut', onUpdate: () => {
+      this.pos = { x: fran.x + (till.x - fran.x) * t.p, y: fran.y + (till.y - fran.y) * t.p };
+      this.placera();
+      this.hjalte.y -= Math.round(Math.sin(Math.PI * t.p) * 7);
+      this.smutsig = true;
+    }, onComplete: () => { this.pos = { ...till }; this.placera(); this.smutsig = true; } });
+    this.regiLogg.push(`stig: hopp ${Math.round(till.x)},${Math.round(till.y)}`); if (this.regiLogg.length > 160) this.regiLogg.shift();
+    return ms;
+  }
+
+  /** Flaket knakar och gungar (fel bokstav): han står kvar. @param {number} r @param {number} k */
+  stigKnak(r, k) {
+    const b = this.stig?.bilder.get(`${r},${k}`); if (!b) return;
+    const x = b.x;
+    this.tweens.add({ targets: b, x: { from: x - 2, to: x + 2 }, duration: 60, yoyo: true, repeat: 3, onUpdate: () => { this.smutsig = true; }, onComplete: () => { b.x = x; this.smutsig = true; } });
+  }
+
+  /** En återvändsgränd: flaken sjunker långsamt och blir mörka. @param {{ r: number, k: number }[]} lista */
+  stigSjunk(lista) {
+    for (const { r, k } of lista) {
+      const b = this.stig?.bilder.get(`${r},${k}`); if (!b) continue;
+      this.tweens.add({ targets: b, alpha: 0.25, y: b.y + 3, duration: 700, ease: 'Sine.easeIn', onUpdate: () => { this.smutsig = true; } });
+    }
+  }
+
+  /** Flaket han har gått på får en spricka, så att han ser sitt spår. @param {number} r @param {number} k */
+  stigSpricka(r, k) {
+    if (!this.stig) return;
+    const p = this.stig.mittFor(r, k);
+    this.stig.sprickor.lineStyle(1, 0x6f8fa8, 1).beginPath().moveTo(p.x - 9, p.y - 3).lineTo(p.x - 3, p.y).lineTo(p.x + 2, p.y - 4).lineTo(p.x + 9, p.y + 1).strokePath();
+    this.smutsig = true;
+  }
+
+  /**
+   * Kanten på ett flak lyser svagt (hjälpen efter ett fel), aldrig bokstaven. null släcker.
+   * @param {{ r: number, k: number } | null} ruta
+   */
+  stigKant(ruta) {
+    const s = this.stig; if (!s) return;
+    s.kantTw?.remove(); s.kantTw = null;
+    s.kant.clear().setVisible(!!ruta).setAlpha(1);
+    if (ruta) {
+      const p = s.mittFor(ruta.r, ruta.k);
+      s.kant.lineStyle(2, 0xfff3a0, 1).strokeRoundedRect(p.x - 18, p.y - 11, 36, 22, 6);
+      s.kantTw = this.tweens.add({ targets: s.kant, alpha: { from: 1, to: 0.35 }, duration: 600, yoyo: true, repeat: -1, onUpdate: () => { this.smutsig = true; } });
+    }
+    this.smutsig = true;
   }
 
   /**

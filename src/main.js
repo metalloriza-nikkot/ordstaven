@@ -46,7 +46,7 @@ import { skapaTangentbord } from './grans/tangentbord.js';
 import { bevakaBildrutor } from './grans/prestanda.js';
 import { Rum } from './scener/Rum.js';
 import { skapaSpel } from './spel.js';
-import { testrumKapitel, testrumAventyr, TESTRUM, testrumDuellKapitel, testrumDuellAventyr, TESTRUM_DUELL } from './karna/testrum.js';
+import { testrumKapitel, testrumAventyr, TESTRUM, testrumDuellKapitel, testrumDuellAventyr, TESTRUM_DUELL, testrumStigKapitel, testrumStigAventyr, TESTRUM_STIG } from './karna/testrum.js';
 
 const VERSION = __VERSION__;
 const parametrar = new URLSearchParams(location.search);
@@ -56,18 +56,26 @@ const valt = allaAventyr.find((a) => a.data.id === parametrar.get('aventyr')) ??
 // egen sparplats, så att äventyrets sparning och lärandet aldrig påverkas
 // ?testrum=duell (61.1, Teknik 21): ordduellen i ett tomt rum, med Innehålls content/testrum-duell.json. Webbläsartesterna
 // (?snabb eller ?test) kan lägga en provfil i localStorage (ordstaven_testrum_duell) tills Innehålls fil finns.
+// ?testrum=stig (114.6): bokstavsstigen i ett tomt rum, med Innehålls content/testrum-stig.json, och provfilen
+// ordstaven_testrum_stig i webbläsartesterna på samma sätt.
 const duellen = parametrar.get('testrum') === 'duell';
-const provDuell = (() => { if (!duellen || !(parametrar.has('snabb') || parametrar.has('test'))) return null; try { return JSON.parse(localStorage.getItem('ordstaven_testrum_duell') || 'null'); } catch (e) { return null; } })();
-const testrumet = !parametrar.has('testrum') ? null : duellen ? provDuell ?? testrumfiler['../content/testrum-duell.json'] ?? null : testrumfiler['../content/testrum-skriv.json'] ?? null;
+const stigen = parametrar.get('testrum') === 'stig';
+const provFil = (/** @type {string} */ namn) => { if (!(parametrar.has('snabb') || parametrar.has('test'))) return null; try { return JSON.parse(localStorage.getItem(namn) || 'null'); } catch (e) { return null; } };
+const provDuell = duellen ? provFil('ordstaven_testrum_duell') : null;
+const provStig = stigen ? provFil('ordstaven_testrum_stig') : null;
+const testrumet = !parametrar.has('testrum') ? null : duellen ? provDuell ?? testrumfiler['../content/testrum-duell.json'] ?? null
+  : stigen ? provStig ?? testrumfiler['../content/testrum-stig.json'] ?? null : testrumfiler['../content/testrum-skriv.json'] ?? null;
 /** Finns duellens testrum (Innehålls fil)? Menyn för vuxna visar det bara då. */
 const harTestrumDuell = !!testrumfiler['../content/testrum-duell.json'];
-const testKapitel = duellen ? TESTRUM_DUELL : TESTRUM;
-const kapitel = testrumet ? [duellen ? testrumDuellKapitel(/** @type {any} */ (testrumet)) : testrumKapitel(/** @type {any} */ (testrumet))]
+/** Finns bokstavsstigens testrum (Innehålls fil)? */
+const harTestrumStig = !!testrumfiler['../content/testrum-stig.json'];
+const testKapitel = duellen ? TESTRUM_DUELL : stigen ? TESTRUM_STIG : TESTRUM;
+const kapitel = testrumet ? [duellen ? testrumDuellKapitel(/** @type {any} */ (testrumet)) : stigen ? testrumStigKapitel(/** @type {any} */ (testrumet)) : testrumKapitel(/** @type {any} */ (testrumet))]
   : Object.entries(kapitelfiler).filter(([fil]) => mappAv(fil) === valt.mapp).map(([, k]) => /** @type {any} */ (structuredClone(k)));
 // ?kapitel=<id> för ett kapitel som finns i content/ men inte står i äventyrets lista än (kapitel 3 i gråbox, 87.9):
 // kapitlet läggs till efter de listade, bara i den här sidvisningen, för den vuxne och webbläsartesterna. Ett vanligt
 // spel ser det inte, och kapitlet före slutar som förut.
-const aventyr = testrumet ? (duellen ? testrumDuellAventyr(valt.data, /** @type {any} */ (testrumet)) : testrumAventyr(valt.data)) : medValtKapitel(valt.data, parametrar.get('kapitel'), kapitel);
+const aventyr = testrumet ? (duellen ? testrumDuellAventyr(valt.data, /** @type {any} */ (testrumet)) : stigen ? testrumStigAventyr(valt.data, /** @type {any} */ (testrumet)) : testrumAventyr(valt.data)) : medValtKapitel(valt.data, parametrar.get('kapitel'), kapitel);
 // Bara för webbläsartesterna (?snabb&testscen, eller ?test&testscen i vanlig takt): en provscen ur localStorage läggs
 // till i första kapitlet, så att motorns steg kan provas innan innehållet använder dem. Påverkar aldrig ett vanligt spel.
 /** @type {Record<string, any>} provkartor (Tiled-JSON per rum) för webbläsartesterna */
@@ -109,7 +117,7 @@ const plats = testrumet ? TESTRUM.plats : platser.aktiv();
 const sparning = skapaSparning({ lagring, spelversion: VERSION, logg, plats });
 // testrummet börjar alltid från början: där finns inget att spara mellan gångerna
 if (parametrar.has('ny') || testrumet) sparning.nollstall();
-if (testrumet) logg.handelse('testrum', duellen ? 'testrummet för ordduellen' : 'testrummet för fritt skrivande', { uppgifter: kapitel[0].pussel.length });
+if (testrumet) logg.handelse('testrum', duellen ? 'testrummet för ordduellen' : stigen ? 'testrummet för bokstavsstigen' : 'testrummet för fritt skrivande', { uppgifter: kapitel[0].pussel.length });
 const tillstand = sparning.las();
 // bara i testläge (?snabb eller ?test): ?sedan=<dygn> låtsas att han spelade senast för så länge sedan (F2, Farfars långa "Var var vi?")
 if ((parametrar.has('snabb') || parametrar.has('test')) && parametrar.has('sedan')) tillstand.sparad = new Date(Date.now() - Number(parametrar.get('sedan')) * 864e5).toISOString();
@@ -248,6 +256,7 @@ const spelet = skapaSpel({
   valtKapitel: testrumet ? testKapitel.kapitel : parametrar.get('kapitel'),
   testrum: !!testrumet,
   testrumDuell: harTestrumDuell,
+  testrumStig: harTestrumStig,
   // introt (F4): när spelet startar, inte i snabbläget eller testläget (?intro visar det ändå) och inte efter ett byte av spelare
   intro: utanIntro() || testrumet ? false : (parametrar.has('intro') || (!snabb && !parametrar.has('test'))),
   // testläget (62.6): Hoppa till scen och objektens namn i INSTÄLLNINGAR, bara med ?test (och ?snabb, testernas läge)

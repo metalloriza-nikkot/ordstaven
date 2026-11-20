@@ -1257,3 +1257,12 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Slutbilden står kvar** (113.6): kapitlets slutbild tonas inte bort. Den står på sin sista bild tills rummet byts, och ett tryck hoppar till den sista bilden (`slutbildSlut`). "Fortsättning följer." och slutrutan visas över den: läsplattan som vanligt, och `#skarm` med klassen `over-slutbild` (bilden syns, knapparna på en mörk rand nedtill). Det gäller varje kapitel med en slutbild (`rum.harSlutbild`).
 - **En formel med två ord** (113.9, STOR SKÖLD): han skriver orden i rad, och fälten har en glipa före det andra ordet (`ordStarter`, klassen `glipa`, och `tva-ord` som gör fälten lite smalare så att glipan ryms). `bedomOrd` jämför utan mellanslag, och nära stavning markerar bokstaven i förebilden med mellanslaget kvar. Inte i pussel med `antal_falt`.
 - **En reaktion med en regi i rummet** (`bild` i `REAKTION_REGI`) visar inte längre texten för den vuxne, eftersom det syns (som en mellanscen med bild). Det gäller också `skold_ankaret`.
+
+## Bokstavsstigen (0.101.0, beslut 114.6)
+- **Reglerna** står i `src/karna/bokstavsstig.js` utan Phaser och DOM: rutnätet (`lasRutnat`), grannarna (raden framför, rakt eller snett), `valj` (inte, fel, rätt, återvändsgränd eller klar), `hjalpFlak` (ett rätt flak som leder fram) och `kontrolleraStig` för innehållskontrollen.
+- **Flaken ritas i rummet** (`Rum.visaStig`, i `lagerStig` under figurerna): gråbox, eller Stils `isflak` och `isvagg` när de finns. Vakar är vatten. Hjälten hoppar i en båge (`stigHopp`), fel bokstav knakar (`stigKnak`), en gren sjunker och blir mörk (`stigSjunk`), flaken han har gått på får en spricka (`stigSpricka`), och hjälpens kant lyser (`stigKant`).
+- **Gemenerna står i Lexend i textlagret** (`ui.stigord`, `#stigord` i världslagret), en knapp per flak, som placeras om när kameran eller skalan ändras (`stigNu`). De är aldrig pixlar och har ingen versaltransform. Ordet i versaler står på andra sidan (`visa_ord`, eller efter `versaler_efter_fel`).
+- **Styrningen:** upp hoppar rakt fram, vänster och höger snett framåt, och ett tryck på ett flak hoppar dit. Alla andra tangenter gör inget.
+- **Testrummet** `?testrum=stig` (kap-92) läser `content/testrum-stig.json`, eller i testerna provfilen `ordstaven_testrum_stig` i localStorage (`tests/fixturer/testrum-stig.json`). Knappen i menyn för vuxna syns när Innehålls fil finns.
+- **Lärandet:** stigen räknas som ett läsval (`LASNIVA_TYP`) på pusslets `niva`, rätt direkt bara utan fel och utan återvändsgränd.
+

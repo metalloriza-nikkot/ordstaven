@@ -4,6 +4,7 @@ import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { kontrollera } from './innehall/kontroll.js';
 import { lasKarta } from '../src/karna/karta.js';
 import { testrumKapitel, testrumAventyr, testrumDuellKapitel, testrumDuellAventyr } from '../src/karna/testrum.js';
+import { kontrolleraStig } from '../src/karna/bokstavsstig.js';
 
 const rot = new URL('../content/', import.meta.url);
 const las = (u) => JSON.parse(readFileSync(u, 'utf8'));
@@ -55,6 +56,20 @@ if (existsSync(duellFil)) {
   for (const f of r.fel) console.log('FEL      testrummet för ordduellen: ' + f);
   for (const v of r.varningar) console.log('varning  testrummet för ordduellen: ' + v);
   fel += r.fel.length; varningar += r.varningar.length;
+}
+// testrummet för bokstavsstigen (114.6): varje stig går att stava hela vägen, och inga förväxlingsbara gemener bredvid varandra
+const stigFil = new URL('testrum-stig.json', rot);
+if (existsSync(stigFil)) {
+  const data = las(stigFil);
+  const stigar = (data.stigar || []).filter((/** @type {any} */ p) => p.typ === 'P18_bokstavsstig');
+  console.log(`\n== testrummet för bokstavsstigen: ${stigar.length} stigar ==`);
+  if (!stigar.length) { console.log('FEL      testrummet för bokstavsstigen: inga stigar'); fel++; }
+  for (const p of stigar) {
+    const r = kontrolleraStig(p);
+    for (const f of r.fel) console.log('FEL      testrummet för bokstavsstigen: ' + f);
+    for (const v of r.varningar) console.log('varning  testrummet för bokstavsstigen: ' + v);
+    fel += r.fel.length; varningar += r.varningar.length;
+  }
 }
 console.log(`\nInnehållskontroll: ${fel} fel, ${varningar} varningar.`);
 process.exit(fel ? 1 : 0);

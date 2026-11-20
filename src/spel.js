@@ -22,6 +22,7 @@ import { HJALTE_FARGER, HJALTE_FAST } from './scener/Rum.js';
 import { lagerFor, bytLager, ristasNu } from './karna/hjalte.js';
 import { TANGENTBORD_HOJD } from './grans/tangentbord.js';
 import { kandaOrd, bedomOrd, antalFalt, ordStarter, MAX_BOKSTAVER } from './karna/skrivord.js';
+import { skapaStig, valj as valjFlak, hjalpFlak, nastaBokstav } from './karna/bokstavsstig.js';
 import { laddaOrdlista } from './grans/ordlista.js';
 import { skapaRullning } from './grans/rullning.js';
 import { laggUngenPaKartan, kartbitarHtml } from './grans/kartbitar.js';
@@ -57,7 +58,7 @@ const vanta = (/** @type {number} */ ms) => new Promise((r) => setTimeout(r, ms)
  * Pusseltyper som räknas som läsval och följer läsvalens nivå (2.47, 87.4): hornet och ordduellen. Nivån sätts och
  * registreras som för P1, så att lärandet är ett och detsamma.
  */
-const LASNIVA_TYP = /** @type {Record<string, string>} */ ({ P29_tryck: 'P1_las_och_valj', P16_ordduell: 'P1_las_och_valj' });
+const LASNIVA_TYP = /** @type {Record<string, string>} */ ({ P29_tryck: 'P1_las_och_valj', P16_ordduell: 'P1_las_och_valj', P18_bokstavsstig: 'P1_las_och_valj' });
 
 /**
  * @param {{ aventyr: any, kartor?: Record<string, import('./karna/karta.js').Karta>, kapitel: any[], ordlistor: any, tillstand: any, sparning: any, logg: any, rost: any, ljud: any,
@@ -1291,12 +1292,12 @@ export function skapaSpel(d) {
   }
   /** @type {(() => void) | null} skyltarna i valet som pågår, ritas om när layouten ändras */
   let skyltarNu = null;
-  layout.vidAndring(() => { visaEtiketter(); skyltarNu?.(); visaRumsskyltar(); });
+  layout.vidAndring(() => { visaEtiketter(); skyltarNu?.(); stigNu?.(); visaRumsskyltar(); });
   // när kameran har stannat placeras skyltarna om på riktigt (under rörelsen flyttas de bara med, se ui.kamera):
   // då hamnar en skylt vid bildens kant rätt, och en som kommit in i bilden hålls inne i rummet
   {
     let t = 0;
-    ui.vidKamera(() => { window.clearTimeout(t); t = window.setTimeout(() => { visaEtiketter(); skyltarNu?.(); visaRumsskyltar(); }, 150); });
+    ui.vidKamera(() => { window.clearTimeout(t); t = window.setTimeout(() => { visaEtiketter(); skyltarNu?.(); stigNu?.(); visaRumsskyltar(); }, 150); });
   }
 
   // skyltarna täcker aldrig hjälten (beslut 31.2): hans ruta på skärmen, några gånger i sekunden
@@ -2293,6 +2294,7 @@ export function skapaSpel(d) {
       case 'P9_kodlas': res = p.lage === 'meddelande' ? await meddelande(p) : await kodlas(p); break;
       case 'P29_tryck': res = await tryckRakna(p); break;
       case 'P16_ordduell': res = await ordduell(p); break;
+      case 'P18_bokstavsstig': res = await bokstavsstig(p); break;
       default:
         // P15, P9 och andra typer byggs i fas 3. Gråboxen hoppar över dem.
         await ui.visaRegi(`(${p.typ} byggs i fas 3)`, tid(1500)); ui.doljRegi(); res = {};
@@ -3370,6 +3372,120 @@ export function skapaSpel(d) {
    * tystnad_sek bedöms antalet (karna/pussel.js). Ingen klocka går innan första trycket, och ett fel är bara
    * reaktionen för antalet: han kan tuta igen. Nivån följer läsvalen (LASNIVA_TYP). @param {any} p
    */
+  /** Bokstavsstigen som visas just nu: ritar om bokstäverna när kameran eller skalan ändras. @type {(() => void) | null} */
+  let stigNu = null;
+  /**
+   * Bokstavsstigen (P18, 114.6): han hoppar från flak till flak och stavar ordet. Reglerna står i karna/bokstavsstig.js.
+   * Flaken ritas i rummet (Rum.visaStig), och gemenerna står i Lexend i textlagret ovanpå dem. Pilarna hoppar: upp
+   * rakt fram, vänster och höger snett framåt. Ett tryck på ett flak hoppar dit. Ingen klocka räknar, och han börjar
+   * aldrig om från början. @param {any} p
+   */
+  async function bokstavsstig(p) {
+    const s = skapaStig(p);
+    const g = s.g;
+    const ankare = rum.ruta(`stig_${p.id}`);
+    const lage = rum.visaStig(g, ankare ? { x: ankare.x + ankare.b / 2, y: ankare.y + ankare.h / 2 } : undefined);
+    const fot = (/** @type {{ x: number, y: number }} */ q) => ({ x: q.x, y: q.y + 4 });
+    rum.pos = { ...lage.strand }; rum.vand = { x: 0, y: -1 }; rum.placera();
+    if (rum.unge.visible) { rum.ungePos = { x: lage.strand.x - 14, y: lage.strand.y }; rum.placera(); }
+    const nyckelFor = (/** @type {{ r: number, k: number }} */ q) => `${q.r},${q.k}`;
+    let fel = 0, hjalp = false, knuffFore = false, versal = false, upptagen = false, forstaVal = true;
+    const start = speltid();
+    const rita = () => {
+      const lista = [];
+      for (let r = 0; r < g.rader; r++) for (let k = 0; k < g.kolumner; k++) {
+        const c = g.celler[r][k]; if (c.sort !== 'flak') continue;
+        const q = lage.flak(r, k), pt = skarm(q.x, q.y), nyckel = `${r},${k}`;
+        lista.push({ nyckel, x: pt.x, y: pt.y, text: /** @type {string} */ (c.bokstav), klass: s.sjunkna.has(nyckel) ? 'sjunken' : s.vag.some((v) => v.r === r && v.k === k) ? 'trampad' : '' });
+      }
+      const visas = p.visa_ord || versal;
+      // ordet i versaler står på andra sidan, där han ska fram (stolpen, eller hjälpen efter två fel)
+      const op = skarm(lage.mal.x, lage.mal.y);
+      ui.stigord(lista, (n) => { const [r, k] = n.split(',').map(Number); hoppa({ r, k }); }, visas ? { x: op.x, y: op.y, text: String(p.ord).toLocaleUpperCase('sv-SE') } : null);
+    };
+    stigNu = rita;
+    if (p.instruktion) await replik(p.instruktion);
+    rita();
+    if (p.instruktion) visaMoln(null, p.instruktion);
+    logg.handelse('stig', `${p.id}: ${g.ord} (${g.kolumner} × ${g.rader})`);
+    /** @type {(v: any) => void} */ let klar = () => {};
+    const slut = new Promise((res) => { klar = res; });
+    // knuffen: efter en stund utan hopp nosar ungen mot nästa rätta flak, och kanten lyser
+    const knuffMs = (p.knuff?.efter_sek ?? 15) * 1000;
+    let knuffT = 0;
+    const knuffa = () => {
+      window.clearTimeout(knuffT);
+      knuffT = window.setTimeout(() => {
+        const h = hjalpFlak(s); if (!h || upptagen) return;
+        const q = lage.flak(h.r, h.k);
+        if (rum.unge.visible) { rum.ungeGarTill({ x: rum.pos.x + (q.x < rum.pos.x ? -12 : 12), y: rum.pos.y }); }
+        rum.stigKant(h); hjalp = true; if (forstaVal) knuffFore = true;
+        ljud.spela('hmm');
+        logg.handelse('knuff', `${p.id}: ungen nosar mot ${g.celler[h.r][h.k].bokstav}`);
+      }, tid(knuffMs));
+    };
+    const hoppa = async (/** @type {{ r: number, k: number }} */ till) => {
+      if (upptagen || s.klar) return;
+      const v = valjFlak(s, till);
+      if (v.sort === 'inte') return;
+      upptagen = true; knuffa();
+      const bokstav = g.celler[till.r][till.k].bokstav;
+      try {
+        if (v.sort === 'fel') {
+          fel++; forstaVal = false;
+          rum.stigKnak(till.r, till.k); ljud.spela('knarr');
+          logg.handelse('stig', `${p.id}: ${bokstav} fel (${nastaBokstav(s)} var rätt)`);
+          // hjälpen efter ett fel: kanten på ett rätt flak lyser, aldrig bokstaven
+          const h = hjalpFlak(s); rum.stigKant(h); hjalp = true;
+          if (p.versaler_efter_fel && fel >= p.versaler_efter_fel && !versal) { versal = true; logg.handelse('stig', `${p.id}: ordet i versaler efter ${fel} fel`); }
+          rita();
+          return;
+        }
+        forstaVal = false;
+        rum.stigKant(null);
+        await vanta(rum.stigHopp(fot(lage.flak(till.r, till.k))));
+        ljud.spela(`bricka_${Math.min(8, s.vag.length || 1)}`);
+        rum.stigSpricka(till.r, till.k);
+        logg.handelse('stig', `${p.id}: ${bokstav} rätt`);
+        if (v.sort === 'atervand') {
+          // en återvändsgränd: grenen sjunker, och han står där vägen delade sig. Han börjar aldrig om
+          rita();
+          await vanta(tid(450));
+          ljud.spela('knarr');
+          rum.stigSjunk(v.sjunker || []);
+          await vanta(tid(600));
+          const t = /** @type {{ r: number, k: number }} */ (v.tillbaka);
+          await vanta(rum.stigHopp(t.r < 0 ? { ...lage.strand } : fot(lage.flak(t.r, t.k))));
+          ljud.spela('plums');
+          logg.handelse('stig', `${p.id}: återvändsgränd, ${(v.sjunker || []).length} flak sjönk`);
+        }
+        rita();
+        if (v.sort === 'klar') {
+          await vanta(tid(250));
+          await vanta(rum.stigHopp({ ...lage.mal }));
+          if (rum.unge.visible) { rum.ungePos = { x: lage.mal.x - 14, y: lage.mal.y }; rum.placera(); }
+          ljud.spela('fest_mellan');
+          logg.handelse('stig', `${p.id}: klar, ${s.fel} fel, ${s.atervandor} återvändsgränder, ${Math.round((speltid() - start) / 1000)} s`);
+          klar(true);
+        }
+      } finally { upptagen = false; }
+    };
+    const stopp = lyssnaHandling((h) => {
+      if (h.typ !== 'ga') return;
+      const d = h.kod === 'ArrowUp' ? 0 : h.kod === 'ArrowLeft' ? -1 : h.kod === 'ArrowRight' ? 1 : null;
+      if (d === null) return;
+      hoppa({ r: s.nu.r + 1, k: s.nu.k + d });
+    });
+    knuffa();
+    try { await slut; } finally {
+      stopp(); window.clearTimeout(knuffT); stigNu = null; ui.stigord([], () => {}); visaMoln(null);
+      rum.stigKant(null);
+    }
+    await vanta(tid(700));
+    rum.rensaStig();
+    return { niva: p.niva || 'L2', forstaForsoket: s.fel === 0 && s.atervandor === 0, forsok: s.fel + s.atervandor + 1, hjalp, knuffFore };
+  }
+
   /**
    * Ordduellen (P16, 2.47, 61.1 och 87.4). Reglerna står i karna/ordduell.js, så att testrummet kör samma kod.
    * Regeln sägs först. I varje rond ropar motståndaren (och hämnaren efter), och läsplattan visar det han ropar om
@@ -4564,7 +4680,7 @@ export function skapaSpel(d) {
    * kartor i T5). Med ?kapitel=<id> spelas ett kapitel ändå, med föremålen placerade automatiskt (för den vuxne).
    * @param {any} kapitel
    */
-  const stodsAvGrabox = (kapitel) => kapitel.pussel.every((/** @type {any} */ p) => ['P1_las_och_valj', 'P28_packa', 'P11_formel', 'P12_dop', 'P26_krukorna', 'P15_raddning', 'P9_kodlas', 'P29_tryck', 'P16_ordduell'].includes(p.typ))
+  const stodsAvGrabox = (kapitel) => kapitel.pussel.every((/** @type {any} */ p) => ['P1_las_och_valj', 'P28_packa', 'P11_formel', 'P12_dop', 'P26_krukorna', 'P15_raddning', 'P9_kodlas', 'P29_tryck', 'P16_ordduell', 'P18_bokstavsstig'].includes(p.typ))
     && (d.valtKapitel === kapitel.id || kapitel.rum.every((/** @type {any} */ r) => !!kartor[r.id]));
 
 
@@ -4736,7 +4852,7 @@ export function skapaSpel(d) {
     const delar = [
       ['spelare', 'SPELARE', spelargrupp() || '<div class="menygrupp"><small>En spelare på den här enheten.</small></div>'],
       ['pass', 'PASS OCH KAPITEL', `<div class="menygrupp passlista"><b>Börja ett pass</b> <small>(namnen och det som kommer före finns kvar, och lärandet blir som när passet började):</small> ${passStart}${utanBild ? '<small class="utan-bild">* Där står lärandet kvar som det är nu, eftersom det inte finns någon bild av det från passets början.</small>' : ''}${las ? `<div class="kapitel-las">${las}</div>` : ''}</div>
-        <div class="menygrupp testrum-grupp">${d.testrum ? '<button type="button" class="menyval testrum-ut">Tillbaka till äventyret</button><small>Testrummet sparar ingenting. Orden han skrev står i loggen (SPARFIL, Spara loggen).</small>' : '<button type="button" class="menyval testrum-in">Testrummet för fritt skrivande</button><small>Ett tomt rum med skrivuppgifter som inte finns i äventyret. Det påverkar inte sparningen eller lärandet, och alla ord han skriver står i loggen.</small>'}${!d.testrum && d.testrumDuell ? '<button type="button" class="menyval testrum-duell-in">Testrummet för ordduellen</button><small>Ordduellen med påhittade ord och en motståndare som inte finns i äventyret (61.1). Det påverkar inte sparningen eller lärandet, och korten han väljer står i loggen.</small>' : ''}</div>`],
+        <div class="menygrupp testrum-grupp">${d.testrum ? '<button type="button" class="menyval testrum-ut">Tillbaka till äventyret</button><small>Testrummet sparar ingenting. Orden han skrev står i loggen (SPARFIL, Spara loggen).</small>' : '<button type="button" class="menyval testrum-in">Testrummet för fritt skrivande</button><small>Ett tomt rum med skrivuppgifter som inte finns i äventyret. Det påverkar inte sparningen eller lärandet, och alla ord han skriver står i loggen.</small>'}${!d.testrum && d.testrumDuell ? '<button type="button" class="menyval testrum-duell-in">Testrummet för ordduellen</button><small>Ordduellen med påhittade ord och en motståndare som inte finns i äventyret (61.1). Det påverkar inte sparningen eller lärandet, och korten han väljer står i loggen.</small>' : ''}${!d.testrum && d.testrumStig ? '<button type="button" class="menyval testrum-stig-in">Testrummet för bokstavsstigen</button><small>Bokstavsstigen med påhittade ord (114.6). Han hoppar på isflaken som stavar ordet. Det påverkar inte sparningen eller lärandet, och varje hopp står i loggen.</small>' : ''}</div>`],
       ['lasning', 'LÄSNING', `<div class="menygrupp lasniva"><b>Läsnivå (läs och välj):</b> ${Array.from({ length: Math.max(4, niva) }, (_, i) => i + 1).map((n) => `<button type="button" class="menyval niva ${n === niva ? 'nu' : ''}" data-n="${n}">L${n}</button>`).join('')} <small class="niva-i-kapitlet">${nivaIKapitlet()}</small></div>`],
       ['ljud', 'LJUD OCH RÖST', `<div class="menygrupp"><label><input type="checkbox" class="foralder" ${inst.foralderLaser ? 'checked' : ''}> Föräldern läser ${ui.esc(Object.values(aventyr.talare).filter((/** @type {any} */ t) => t.rost === 'foraldern_eller_datorrost').map((/** @type {any} */ t) => t.namn).join(' och ') || 'rollernas')} repliker</label>
         <label><input type="checkbox" class="rostval" ${inst.rost ? 'checked' : ''}> Datorrösten läser upp (av: rullningen piper i ordtakt)</label>
@@ -4789,6 +4905,7 @@ export function skapaSpel(d) {
     // testrummet (41): sidan laddas om med eller utan ?testrum, och äventyrets sparning rörs inte
     s.querySelector('.testrum-in')?.addEventListener('click', () => { logg.handelse('testrum', 'öppnas'); logg.spara?.(true); location.assign(location.pathname + '?testrum'); });
     s.querySelector('.testrum-duell-in')?.addEventListener('click', () => { logg.handelse('testrum', 'ordduellen öppnas'); logg.spara?.(true); location.assign(location.pathname + '?testrum=duell'); });
+    s.querySelector('.testrum-stig-in')?.addEventListener('click', () => { logg.handelse('testrum', 'bokstavsstigen öppnas'); logg.spara?.(true); location.assign(location.pathname + '?testrum=stig'); });
     s.querySelector('.testrum-ut')?.addEventListener('click', () => { logg.handelse('testrum', 'stängs'); logg.spara?.(true); location.assign(location.pathname); });
     s.querySelector('.foralder')?.addEventListener('change', (e) => { inst.foralderLaser = /** @type {HTMLInputElement} */ (e.target).checked; spara(); });
     s.querySelector('.rostval')?.addEventListener('change', (e) => { inst.rost = /** @type {HTMLInputElement} */ (e.target).checked; logg.handelse('inställning', `rösten ${inst.rost ? 'på' : 'av'}`); spara(); });

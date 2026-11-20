@@ -34,6 +34,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
       <div id="etiketter"></div>
       <div id="rumsskyltar"></div>
       <div id="skyltar"></div>
+      <div id="stigord"></div>
       <div id="rop" hidden></div>
       <div id="ordskylt" hidden></div>
       <div id="handknapp" hidden><button type="button" aria-label="Använd">${ikon('hand')}</button></div>
@@ -334,6 +335,33 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     const e = $('#etiketter');
     e.hidden = !visa; ankra(e);
     e.innerHTML = objekt.map((o) => { const p = tillSkarm(o.x + o.b / 2, o.y); return `<span class="etikett-obj" style="left:${p.x}px;top:${p.y}px">${esc(o.id.replace(/_/g, ' '))}</span>`; }).join('');
+  }
+
+  // ---------------------------------------------------------------- bokstavsstigen (P18, 114.6)
+  /**
+   * Bokstäverna på bokstavsstigens isflak, i Lexend i textlagret (aldrig i pixlar), som gemener. Varje bokstav är en
+   * knapp: ett tryck på den väljer flaket. Ordet i versaler (stolpen eller hjälpen efter två fel) står som en skylt.
+   * @param {{ nyckel: string, x: number, y: number, text: string, klass?: string }[]} lista skärmpunkter
+   * @param {(nyckel: string) => void} klick
+   * @param {{ x: number, y: number, text: string } | null} [ord] ordet i versaler, ovanför stigen
+   */
+  function stigord(lista, klick, ord = null) {
+    const e = $('#stigord');
+    e.innerHTML = ''; ankra(e);
+    for (const b of lista) {
+      const k = document.createElement('button');
+      k.type = 'button'; k.className = 'flakord ' + (b.klass || ''); k.dataset.ruta = b.nyckel;
+      k.style.left = b.x + 'px'; k.style.top = b.y + 'px';
+      k.textContent = b.text; k.setAttribute('aria-label', b.text);
+      k.addEventListener('click', () => { if (!nos.aktiv) klick(b.nyckel); });
+      e.appendChild(k);
+    }
+    if (ord) {
+      const s = document.createElement('div');
+      s.className = 'stigord-versal'; s.style.left = ord.x + 'px'; s.style.top = ord.y + 'px';
+      s.innerHTML = `<span class="kort-etikett">${rader(ord.text, {}, 'kort-ord')}</span>`;
+      e.appendChild(s);
+    }
   }
 
   // ---------------------------------------------------------------- läs i rummet
@@ -825,7 +853,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     /** Visas handen, och med vilket tryck (109.2: skyltarnas hand går bara in när ingen annan hand syns). */
     handVisas: () => !hand.hidden,
     handTryckNu: () => handTryck,
-    ljudord, visaTanke, placeraTanke, pulseraTanke, tankeRyms, passaTanke, ordskylt, skyltar, rumsskyltar, skyltHjalte, sattDorrRutor, ordnaSkyltar, skyltStor, pulseraSkylt, skyltNara, ropa,
+    ljudord, visaTanke, placeraTanke, pulseraTanke, tankeRyms, passaTanke, ordskylt, skyltar, stigord, rumsskyltar, skyltHjalte, sattDorrRutor, ordnaSkyltar, skyltStor, pulseraSkylt, skyltNara, ropa,
     ui, $, plattan, rader, esc, visaPlatta, doljPlatta, vidPapper, vantaFortsatt, visaRegi, doljRegi, visaFest,
     uppdateraHud, sattLappknapp, glimta, pulsera, ikonKnappar, visaSkarm, doljSkarm, iris, visaMeny, doljMeny, visaPausmeny, doljPausmeny, etiketter, sattNos, vaxlaNos, ljuda, arHelord,
     fanga, tandNos, markeraOrd,

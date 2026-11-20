@@ -1,0 +1,72 @@
+{
+ "meta": {
+  "version": "0.1-prov",
+  "datum": "2026-11-20",
+  "beskrivning": "Teknikens provfil för bokstavsstigens testrum (114.6). Påhittade ord i stigarnas tre former: rutnät 3 × 4 med en bokstav två gånger och en återvändsgränd (stig 2), 3 × 5 utan ordet, och 3 × 6 där en gren dör efter tre rätta hopp (stig 3). Innehåll skriver content/testrum-stig.json med sina ord och sin instruktion."
+ },
+ "stigar": [
+  {
+   "id": "tr_stig_prov",
+   "typ": "P18_bokstavsstig",
+   "niva": "L2",
+   "ord": "rygg",
+   "visa_ord": true,
+   "rutnat": [
+    "g # g",
+    "g a #",
+    "y | y",
+    "r a r"
+   ],
+   "instruktion": {
+    "talare": "berattare",
+    "text": "Hoppa på flaken som stavar RYGG!",
+    "upplast": true
+   },
+   "knuff": {
+    "efter_sek": 12
+   }
+  },
+  {
+   "id": "tr_stig_prov_2",
+   "typ": "P18_bokstavsstig",
+   "niva": "L5",
+   "ord": "mossa",
+   "visa_ord": false,
+   "versaler_efter_fel": 2,
+   "rutnat": [
+    "a # #",
+    "s a s",
+    "s s a",
+    "o s #",
+    "m o #"
+   ],
+   "start": 0,
+   "instruktion": {
+    "talare": "berattare",
+    "text": "Hoppa på det som växer på stenen!",
+    "upplast": true
+   }
+  },
+  {
+   "id": "tr_stig_prov_3",
+   "typ": "P18_bokstavsstig",
+   "niva": "L5",
+   "ord": "trolla",
+   "visa_ord": false,
+   "versaler_efter_fel": 2,
+   "rutnat": [
+    "a # #",
+    "l a #",
+    "l # l",
+    "o # o",
+    "r a r",
+    "k t s"
+   ],
+   "instruktion": {
+    "talare": "berattare",
+    "text": "Hoppa på det trollkarlen gör!",
+    "upplast": true
+   }
+  }
+ ]
+}
