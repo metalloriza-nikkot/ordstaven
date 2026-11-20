@@ -1,7 +1,7 @@
 {
- "om": "Masterpaletten (stilguiden §2, beslut 28.4). Sluten: Stils skript ritar bara ur den här listan, och en ny färg läggs till här av Stil, med ett skäl. Teknik: assets/palett.json ska vara samma lista. Fältet forst_i säger var färgen först användes (i mappordning). Bygget 2026-11-03 slog ihop 98 färger som inte gick att skilja åt (deltaE < 3). 1.1 (2026-11-12): 18 färger för byborna i kapitel 2: hjältens tre andra hudval (grön, lila, ockra, samma toner som fargbyte.js räknar fram) och Tant Rosas rosa klänning.",
- "version": "1.1 (2026-11-12)",
- "antal": 368,
+ "om": "Masterpaletten (stilguiden §2, beslut 28.4). Sluten: Stils skript ritar bara ur den här listan, och en ny färg läggs till här av Stil, med ett skäl. Teknik: assets/palett.json ska vara samma lista. Fältet forst_i säger var färgen först användes (i mappordning). Bygget 2026-11-03 slog ihop 98 färger som inte gick att skilja åt (deltaE < 3). 1.1 (2026-11-12): 18 färger för byborna i kapitel 2: hjältens tre andra hudval (grön, lila, ockra, samma toner som fargbyte.js räknar fram) och Tant Rosas rosa klänning. 1.2 (2026-11-20): 6 kalla färger för berget i kapitel 4 (113.8): is i skugga och isgrottans djup (#4e9ec2, #2f7498, #1e4e6c, #123248) och snöns blålila skuggor (#b4c4e6, #8e9fcc). De ljusa istonerna fanns redan.",
+ "version": "1.2 (2026-11-20)",
+ "antal": 374,
  "tak_per_zon": 256,
  "farger": [
   {
@@ -1485,6 +1485,30 @@
   {
    "hex": "#f6b4ce",
    "forst_i": "figurer/bybor"
+  },
+  {
+   "hex": "#4e9ec2",
+   "forst_i": "kap-04 (isen och snön, beslut 113.8)"
+  },
+  {
+   "hex": "#2f7498",
+   "forst_i": "kap-04 (isen och snön, beslut 113.8)"
+  },
+  {
+   "hex": "#1e4e6c",
+   "forst_i": "kap-04 (isen och snön, beslut 113.8)"
+  },
+  {
+   "hex": "#123248",
+   "forst_i": "kap-04 (isen och snön, beslut 113.8)"
+  },
+  {
+   "hex": "#8e9fcc",
+   "forst_i": "kap-04 (isen och snön, beslut 113.8)"
+  },
+  {
+   "hex": "#b4c4e6",
+   "forst_i": "kap-04 (isen och snön, beslut 113.8)"
   }
  ],
  "tillagg": [],

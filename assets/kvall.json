@@ -1,5 +1,5 @@
 {
-"om": "Figurerna på kvällen: byt varje färg mot sin kvällsfärg. Gäller hjälten (efter hudbytet), ungen, staven och byborna i tillståndet kvall. Målfärgerna finns redan i träskets zon.",
+"om": "Figurerna på kvällen: byt varje färg mot sin kvällsfärg. Gäller hjälten (efter hudbytet), ungen, staven och byborna i tillståndet kvall. Målfärgerna finns redan i träskets zon. 1.2 (2026-11-20): de sex kalla färgerna för isen och snön i kapitel 4 har fått sina kvällsfärger, bland sig själva och träskets zon.",
 "styrka": 0.8,
 "tabell": {
 "#101c1c": "#101c1c",
@@ -369,6 +369,12 @@
 "#8a2e56": "#7a2a3a",
 "#b8467a": "#8a2e56",
 "#e07aa6": "#b8467a",
-"#f6b4ce": "#e8909a"
+"#f6b4ce": "#e8909a",
+"#4e9ec2": "#3e7eba",
+"#2f7498": "#2e5966",
+"#1e4e6c": "#1e3e6a",
+"#123248": "#123248",
+"#8e9fcc": "#8a90a0",
+"#b4c4e6": "#8e9fcc"
 }
 }
