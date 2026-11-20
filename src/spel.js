@@ -1413,7 +1413,9 @@ export function skapaSpel(d) {
       if (nu && skyltPaVag === nu.id) { skyltPaVag = null; bort(); lasSkyltText(nu); return; }
       if (skyltHand && (!nu || nu.id !== skyltHand.id || !skyltHandNu())) bort();
       if (!nu || skyltHand || ui.handVisas()) return;
-      const tryck = () => { if (!rum.fryst && !skyltOppen) { bort(); lasSkyltText(nu); } };
+      // trycket görs bara om världen fortfarande går och läsplattan är tom: ett pussel som har tagit skylten under tiden
+      // (läsvalet på läsplattan på ön, 112) får aldrig sin läsplatta ersatt av skyltens text
+      const tryck = () => { if (!rum.fryst && !skyltOppen && ui.plattan.hidden && !skyltStyrs.has(nu.id)) { bort(); lasSkyltText(nu); } else bort(); };
       skyltHand = { id: nu.id, tryck };
       ljud.spela('klick'); logg.handelse('hand', nu.id, { avstand: Math.round(avstandTill(rum.pos, /** @type {any} */ (o))), skylt: true });
       const [pt, plats] = skyltPlats(/** @type {any} */ (o));
@@ -2334,9 +2336,14 @@ export function skapaSpel(d) {
     const niva = nivaFor(p);
     const v = skapaValj(p, { niva });
     const spar = { hjalp: false };
+    // 112 (den vuxnes logg på 0.99.0): skylten som läsvalet frågar om (skylten på ön) sköts av läsvalet. Rummets hand
+    // fick annars ta den i glappet efter instruktionen, och skyltens text ersatte korten, så att han inte kom vidare
+    const skyltHar = p.skylt && !skyltStyrs.has(p.skylt);
+    if (skyltHar) skyltStyrs.add(p.skylt);
+    try {
     if (p.instruktion) await replik(p.instruktion);
     rum.frys(true);
-    return new Promise((klar) => {
+    return await new Promise((klar) => {
       let upptagen = false;
       const hjalpSpar = skapaHjalpSpar(() => speltid());
       const vakt = { spar: hjalpSpar, pekOmMs: () => pekningOmMs({ antalAlternativ: v.s.alternativ.length, antalFel: v.s.fel, sedanStartMs: hjalpSpar.sedanStart() }) };
@@ -2435,6 +2442,7 @@ export function skapaSpel(d) {
       };
       rita();
     });
+    } finally { if (skyltHar) skyltStyrs.delete(p.skylt); }
   }
 
   /**
@@ -3471,6 +3479,15 @@ export function skapaSpel(d) {
   async function tryckSteg(st) {
     const o = rum.ruta(st.foremal);
     if (!o) { logg.handelse('FEL', 'tryck: föremålet finns inte i rummet: ' + st.foremal); return; }
+    // ett horn med en plats vid munstycket (109.1, det första tutet på avsatsen): han går dit själv och trycker där,
+    // som vid hornet i nästa pass. Annars står han still (han sitter på skalet i resan, 97.5)
+    if (o.blasVid) {
+      rum.frys(false);
+      await anvand([st.foremal]);
+      logg.handelse('tryck', st.foremal);
+      if (rum.blas?.(st.foremal)) { ljud.spela('horn_tut'); visaLjudord('tut', '', st.foremal); } else ljud.spela('klick');
+      return;
+    }
     rum.frys(true);
     // 97.5: kameran visar det han ska trycka på, också när det står långt från hjälten (skepparen i resan). Han kan
     // inte gå, så han behöver inte synas

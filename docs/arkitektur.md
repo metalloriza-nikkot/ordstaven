@@ -1226,6 +1226,9 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
   - skylten på ön har `rackvidd` 40: snäckorna under den står i vägen nedifrån;
   - ett enhetstest säger fel om en sak med `bild_pa` inte står inom sin bildplats.
 - **Hissen ned** (109.4, `hissGenomDorren`): han kommer ut 10 px framför kvarnens dörr, och ungen bredvid honom, så att han inte står i dörröppningen.
+  - **Det riktiga felet** (0.99.1): regin håller ungen (`hallUngen`, `ungeSvavar.styrd`) medan han åker ned, och den släpptes aldrig. Så länge `ungeSvavar` finns slutar `update()` tidigt, och hjältens bild flyttas inte: positionen gick mot ön men bilden stod kvar i dörren. Nu släpper `hissGenomDorren` ungen och nollar `ungeLyft` när han står framför dörren.
+- **Ett tryck på ett horn med `blas_vid`** (0.99.1, det första tutet i `k3s02_loftet`): `tryckSteg` fryser inte världen utan väntar med `anvand`, som vid hornet i nästa pass. Han går själv till munstycket och trycker där. Annars stod han fast där steget började, med hornets fot i vägen.
+- **Skylten i ett läsval sköts av läsvalet** (0.99.1): `valj` lägger `p.skylt` i `skyltStyrs` medan valet pågår (släpps i `finally`), och `skyltHand` frågar igen när handen trycks. Annars tog rummets hand skylten på ön, och Enter öppnade skyltens text om och om igen i stället för korten.
 - **Fenan** (`fena_trappa`) ligger där han når den från sanden.
 
 ## Stils bilder för 108–109 (0.98.0)

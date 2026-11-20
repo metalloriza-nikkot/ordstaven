@@ -2831,6 +2831,11 @@ export class Rum extends Phaser.Scene {
       this.pos = this.hinder.narmasteFria({ x: f.x, y: f.y + 10 });
       this.ungePos = this.hinder.narmasteFria({ x: this.pos.x + 16, y: this.pos.y });
       this.vand = { x: 0, y: 1 };
+      // 109.4 (det riktiga felet, den vuxnes logg på 0.99.0): regin höll ungen (hallUngen) och släppte den aldrig. Då
+      // slutade rummet att flytta hjältens bild (update väntar medan ungen är styrd), och hjälten stod kvar i dörren
+      // medan han gick osynlig mot ön. Förut bytte hissen rum, och då släpptes ungen när rummet byttes
+      if (this.ungeSvavar) { this.ungeSvavar.g?.destroy(); this.ungeSvavar = null; }
+      this.ungeLyft = 0;
       const t2 = { a: 0 };
       this.tweens.add({ targets: t2, a: 1, duration: 400, onUpdate: () => { this.hjalte.setAlpha(t2.a); this.unge.setAlpha(t2.a); smuts(); } });
     });

@@ -77,7 +77,8 @@ test('kapitel 3 pass 1: SVÄRD vid hjulet, tussarna, kvarnens tavla, hissen och 
     const p = st?.typ === 'pussel' ? pussel.get(st.pussel_id) : null;
     if (st?.typ === 'ga_till') await anvand(st.mal);
     else if (st?.typ === 'prata') await gaMot(st.figur);
-    else if (st?.typ === 'tryck') { await page.waitForTimeout(400); await page.keyboard.press('Space'); }
+    // det första tutet (109.1): hornet har en plats vid munstycket, så han går dit själv och trycker där
+    else if (st?.typ === 'tryck') { await ev(gaMotSida, st.foremal); await page.waitForTimeout(900); await page.keyboard.press('Space'); }
     else if (p?.typ === 'P26_krukorna') {
       const loggen = await ev(() => window.__ORDSTAVEN.logg());
       const kvar = p.foremal.filter((id) => !loggen.includes(`[hugga] ${id}:`));
@@ -527,3 +528,49 @@ for (const [scenId, stegNr, skylt, extra, sida] of [
     await expect(page.locator('#plattan .lapp')).toBeVisible({ timeout: 5000 }).catch(async (e) => { console.log((await ev(() => window.__ORDSTAVEN.logg())).split('== SENASTE')[0].split('\n').slice(-15).join('\n')); throw e; });
   });
 }
+
+// 112, den vuxnes logg på 0.99.0: tre fel i kapitel 3 som testerna inte såg.
+test('kapitel 3 efter 0.99.0: det första tutet vid munstycket, hjälten ut ur hissen, och skylten på ön', async ({ page }) => {
+  test.setTimeout(150000);
+  const ev = (fn, arg) => page.evaluate(fn, arg);
+  const vidare = async (villkor) => expect.poll(async () => {
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    return ev(villkor);
+  }, { timeout: 30000, intervals: [400] }).toBe(true);
+  const rum = () => ev(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); return { pos: r.pos, bild: { x: r.hjalte.x, y: r.hjalte.y } }; });
+  const sc = (id) => kap.scener.findIndex((x) => x.id === id);
+
+  // 1. det första tutet (tryck i k3s02_loftet): han går själv till hornet och står vid munstycket när han blåser
+  await starta(page, 'k3s02_loftet', sc('k3s02_loftet'), 2);
+  await vidare(() => window.__ORDSTAVEN.steg()?.typ === 'tryck' && document.querySelector('#plattan').hidden);
+  await expect.poll(async () => { await ev(gaMotSida, 'hornet'); await page.waitForTimeout(900); await page.keyboard.press('Space'); return ev(() => window.__ORDSTAVEN.logg().split('== SENASTE')[0].includes('[tryck] hornet')); }, { timeout: 20000, intervals: [500] }).toBe(true);
+  const vidHornet = await rum();
+  expect(Math.hypot(vidHornet.pos.x - 564, vidHornet.pos.y - 107)).toBeLessThan(2);
+
+  // 2. ut ur hissen (k3s03_hornet): bilden följer honom när han går, han står inte kvar i dörren
+  await starta(page, 'k3s03_hornet', sc('k3s03_hornet'), 3);
+  await vidare(() => window.__ORDSTAVEN.steg()?.typ === 'ga_till' && document.querySelector('#plattan').hidden);
+  await page.waitForTimeout(2600);
+  await page.keyboard.down('ArrowDown'); await page.waitForTimeout(700); await page.keyboard.up('ArrowDown');
+  await page.keyboard.down('ArrowRight'); await page.waitForTimeout(700); await page.keyboard.up('ArrowRight');
+  await page.waitForTimeout(200);
+  const ute = await rum();
+  expect(Math.abs(ute.bild.x + 8 - ute.pos.x)).toBeLessThan(3);
+  expect(Math.abs(ute.bild.y + 24 - ute.pos.y)).toBeLessThan(3);
+
+  // 3. skylten på ön (k3s04_on, k3_skylten_1): Enter efter instruktionen öppnar aldrig skyltens text över korten
+  await page.addInitScript(() => {
+    const s = JSON.parse(localStorage.getItem('ordstaven_spar') || 'null'); const av = s?.aventyr?.['den-gomda-dalen'];
+    if (!av || av.kapitelId !== 'kap-03') return;
+    av.visade = { ...(av.visade || {}), on: ['skylt_skal'] }; localStorage.setItem('ordstaven_spar', JSON.stringify(s));
+  });
+  await starta(page, 'k3s04_on', sc('k3s04_on'), 4);
+  // han står vid skylten när läsvalet börjar (han har just läst den, som i den vuxnes logg)
+  await page.waitForTimeout(800);
+  await ev(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); r.pos = { x: 160, y: 92 }; r.placera(); });
+  for (let i = 0; i < 12; i++) { await page.keyboard.press('Enter'); await page.waitForTimeout(350); }
+  await expect(page.locator('#plattan .kort').first()).toBeVisible({ timeout: 10000 });
+  expect(await ev(() => window.__ORDSTAVEN.logg().split('== SENASTE')[0].includes('[skylt] skylt_skal'))).toBe(false);
+  await page.locator('#plattan .kort').first().click();
+  await page.waitForTimeout(500);
+});
