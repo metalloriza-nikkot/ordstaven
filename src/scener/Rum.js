@@ -2297,6 +2297,8 @@ export class Rum extends Phaser.Scene {
    */
   baronenKommer() {
     if (!this.luftskepp('glider', this.pos.x)) return 0;
+    // ankaret hänger under skeppet tills det faller: det ligger inte i sanden förrän det har borrat ned sig
+    if (this.ruta('ankare')) this.gomForemal('ankare', true);
     const l = /** @type {any} */ (this.luft);
     // han håller kikaren rätt (Stils luftskepp_ser_kartan, kikaren ned mot det han ser), också medan skeppet glider in:
     // i glider_01–02 håller han den åt fel håll, och det skämtet kommer bara ibland (38.5)

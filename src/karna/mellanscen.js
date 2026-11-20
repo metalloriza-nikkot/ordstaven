@@ -77,7 +77,7 @@ export const BILD_PA_KORTET = Object.freeze(new Set(['ekorre_skakar']));
  * Regier i rummet som en reaktion kan ha (`bild`, 2.48, 102.3): hornet på avsatsen i kapitel 3. Texten för den vuxne
  * visas som förut, eftersom regin är gråbox tills Stil har ritat.
  */
-export const REAKTION_REGI = Object.freeze(new Set(['tallrikar', 'skuggan_stiger', 'skuggan_dyker', 'skold_ankaret']));
+export const REAKTION_REGI = Object.freeze(new Set(['tallrikar', 'skuggan_stiger', 'skuggan_dyker', 'skold_ankaret', 'flaskan_hittad']));
 
 /**
  * Pusseltyper och steg vars knuff aldrig visar rutan: den pekar i världen (krukorna: ungen nosar mot närmaste

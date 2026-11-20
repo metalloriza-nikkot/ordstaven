@@ -262,9 +262,10 @@
             "tallrikar",
             "skuggan_stiger",
             "skuggan_dyker",
-            "skold_ankaret"
+            "skold_ankaret",
+            "flaskan_hittad"
           ],
-          "description": "En figur på kortet han valde (2.35, Teknik 31): ekorre_skakar = ekorren tittar upp bakom kortet och skakar på huvudet. Med bild visas inte texten. En regi i rummet (2.48, 102.3, hornet på avsatsen i kapitel 3): tallrikar = flodfolket springer fram med tallrikarna, skuggan_stiger = skuggan stiger en bit och stannar under vattnet, skuggan_dyker = skuggan dyker. 2.51 (109.5): skold_ankaret = SKÖLD tänds som en bubbla runt hjälten och ungen, och ankaret studsar och borrar ned sig."
+          "description": "En figur på kortet han valde (2.35, Teknik 31): ekorre_skakar = ekorren tittar upp bakom kortet och skakar på huvudet. Med bild visas inte texten. En regi i rummet (2.48, 102.3, hornet på avsatsen i kapitel 3): tallrikar = flodfolket springer fram med tallrikarna, skuggan_stiger = skuggan stiger en bit och stannar under vattnet, skuggan_dyker = skuggan dyker. 2.51 (109.5): skold_ankaret = SKÖLD tänds som en bubbla runt hjälten och ungen, och ankaret studsar och borrar ned sig. 2.52 (113.3): flaskan_hittad = hjälten håller upp flaskan, och den visas i närbild med kartbiten genom glaset."
         }
       }
     },

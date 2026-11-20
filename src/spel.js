@@ -757,14 +757,17 @@ export function skapaSpel(d) {
     const rad = forst ? [forst, ...(egna.length ? egna : ['fel'])] : egna;
     if (rad.length) ljud.spelaRad?.(rad);
     if (h.ljudord) visaLjudord(h.ljudord, '', foremal);
-    // texten för den vuxne, om det som händer inte redan syns (syns_redan, 67.3)
-    const regi = visarRegi(h) ? h.handling || h.reaktion : null;
-    if (regi) ui.visaRegi(regi, 0);
-    if (h.fest) { ljud.spela('fest_mellan'); ui.visaFest('✨', tid(900)); }
     // reaktionens regi i rummet (102.3, kapitel 3:s horn: tallrikarna, skuggan som stiger eller dyker), som en
     // mellanscens bild
-    const regiMs = h.bild && !BILD_PA_KORTET.has(h.bild) ? rum.regi(h.bild) : 0;
+    let regiMs = h.bild && !BILD_PA_KORTET.has(h.bild) ? rum.regi(h.bild) : 0;
     if (h.bild && !BILD_PA_KORTET.has(h.bild) && !regiMs) logg.handelse('FEL', `reaktionen har en bild som inte finns som regi: ${h.bild}`);
+    // texten för den vuxne, om det som händer inte redan syns (syns_redan, 67.3). Med en regi i rummet syns det,
+    // som en mellanscen med bild (113.3, flaskan och SKÖLD)
+    const regi = visarRegi(h) && !regiMs ? h.handling || h.reaktion : null;
+    if (regi) ui.visaRegi(regi, 0);
+    if (h.fest) { ljud.spela('fest_mellan'); ui.visaFest('✨', tid(900)); }
+    // flaskan (113.3): hjälten håller upp den, och sedan närbilden på läsplattan, som när regin står på en mellanscen
+    if (regiMs && h.bild === 'flaskan_hittad' && await regiMedText(h.bild, regiMs)) regiMs = 0;
     const ruta = ui.plattan.hidden ? null : ui.plattan.querySelector('.pussel-ruta, .formel-ruta');
     if (h.replik && ruta) { const rad = document.createElement('div'); rad.className = 'svar-rad'; rad.innerHTML = portratt(h.replik.talare) + `<div class="text">${ui.rader(h.replik.text, varden())}</div>`; ruta.prepend(rad); }
     if (h.replik && !ruta) { await Promise.all([replik(h.replik), vanta(tid(regiMs))]); if (regi) ui.doljRegi(); return; }

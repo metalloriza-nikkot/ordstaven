@@ -309,6 +309,7 @@ test('kapitel 3 pass 3: fenan, kramen, tången med skalkanten mitt i, SKÖLD, or
     if (await page.locator('#plattan :is(.formel-skriv, .formel-ruta)').first().isVisible().catch(() => false)) {
       const p = pussel.get(st?.pussel_id); if (p?.svar) { await typ(p.svar); await page.keyboard.press('Enter'); await page.waitForTimeout(1200); continue; }
     }
+    if (await page.locator('#plattan .flaska-nara').isVisible().catch(() => false)) await page.screenshot({ path: 'test-results/kap3-flaskan-nara.png' });
     if (await page.locator('#plattan').isVisible()) { await vidare(); await page.waitForTimeout(150); continue; }
     const p = st?.typ === 'pussel' ? pussel.get(st.pussel_id) : null;
     if (st?.typ === 'ga_till' && st.mal === 'unge') await ev(() => { const u = window.__ORDSTAVEN.ungePos(); window.__ORDSTAVEN.gaMot(u.x + 14, u.y); });
@@ -344,6 +345,10 @@ test('kapitel 3 pass 3: fenan, kramen, tången med skalkanten mitt i, SKÖLD, or
   expect(loggen).toMatch(/\[ringar\] (?=.*under_fenan)(?=.*bakom_fenan)(?=.*under_huvudet)(?=.*bakom_huvudet)/);
   expect(loggen).toContain('[tryck] flaska_i_handen');
   expect(loggen).toContain('[tryck] skepparen');
+  // 113.3–113.5: flaskan är ett fynd med närbilden, baronen flyger in, och han vinkar till skepparen
+  expect(loggen).toContain('[mellanscen] flaskan_hittad');
+  expect(loggen).toContain('[vinka] skepparen');
+  expect((await ev(() => window.__ORDSTAVEN.grafik())).regi).toEqual(expect.arrayContaining(['hjälten håller upp flaskan', 'baronen kommer och tittar i kikaren']));
   const t = await ev(() => window.__ORDSTAVEN.tillstand());
   const av = t.aventyr['den-gomda-dalen'];
   expect(av.kartbitar).toContain(4);
