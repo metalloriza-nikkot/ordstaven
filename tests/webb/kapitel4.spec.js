@@ -93,7 +93,8 @@ async function spelaPasset(page, namn) {
       await typ(p.formler[0].ord.replace(' ', '')); await page.keyboard.press('Enter'); await page.waitForTimeout(800); continue;
     }
     if (p?.typ === 'P9_kodlas' && await page.locator('#plattan .bricka[data-id]').first().isVisible()) {
-      await expect(page.locator('#plattan .ordlas-mening')).toContainText('STENEN ÄR');
+      await expect(page.locator('#plattan .ordlas')).toContainText('STENEN ÄR INTE KALL.');
+      await expect(page.locator('#plattan .ordlas-mening')).toContainText('DEN ÄR');
       expect(await page.locator('#plattan .kod-nyckel').count()).toBe(0);
       await page.screenshot({ path: `test-results/kap4-${namn}-ordlas.png` });
       for (const b of p.svar.toUpperCase()) await page.locator('#plattan .bricka[data-id]:not(.anvand)', { hasText: new RegExp(`^${b}$`) }).first().click();
@@ -127,7 +128,8 @@ test('kapitel 4 pass 1: skyltarna, stig 1, snön, Farfars sten och STOR SKÖLD m
   expect(loggen).toContain('[stig] k4_stig1: klar');
   expect(loggen).toMatch(/\[formel\] k4_stor_skold: klar/);
   const regi = (await page.evaluate(() => window.__ORDSTAVEN.grafik())).regi.join('\n');
-  for (const r of ['ankomst_berget', 'baronen_kikare_berg', 'blocket_lyfts', 'stor_skold_ras', 'mynningen_stangs']) expect(regi).toContain(r);
+  for (const r of ['ankomst_berget', 'baronen_kikare_berg', 'blocket_lyfts', 'blocket rycks loss', 'snöraset i ett svep', 'stor_skold_ras', 'mynningen_stangs']) expect(regi).toContain(r);
+  expect(loggen).toContain('[stig] k4_stig1: ungen skuttar i spåret');
 });
 
 test('kapitel 4 pass 2: mörkret, LJUS, stig 2, gåtan och stig 3 med klo', async ({ page }, info) => {
@@ -156,4 +158,76 @@ test('kapitel 4 pass 3: stenarna, ordlåset VARM, kartbit fem och resan mot moln
   expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).not.toContain('k4_ladan: fel');
   const regi = (await page.evaluate(() => window.__ORDSTAVEN.grafik())).regi.join('\n');
   for (const r of ['blocket_driva', 'fossil_svans', 'svansarna', 'ladan_oppnas', 'kartbit5_molnkant', 'skata_harmar_molnkant', 'resan_molnkant']) expect(regi).toContain(r);
+});
+
+/** Klickar fram repliker ("Var var vi?" och instruktionen) tills det som söks syns. */
+async function tills(page, sel, ms = 30000) {
+  const slut = Date.now() + ms;
+  while (Date.now() < slut) {
+    if (await page.locator(sel).first().isVisible().catch(() => false)) return;
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    await page.waitForTimeout(300);
+  }
+  throw new Error(`${sel} syns inte`);
+}
+
+/** Lägger fält på ett pussel i kapitlet som spelet har läst (119.4: motorn prövas innan Innehålls data finns). */
+async function pusselFalt(page, id, falt) {
+  await page.waitForFunction((id) => window.__ORDSTAVEN.kapitel()?.pussel?.some((p) => p.id === id), id);
+  await page.evaluate(({ id, falt }) => { const p = window.__ORDSTAVEN.kapitel().pussel.find((x) => x.id === id); for (const [k, v] of Object.entries(falt)) if (p[k] === undefined) p[k] = v; }, { id, falt });
+}
+
+test('kapitel 4: stig 1 går uppför, och ungen skuttar i spåret när hjälten är över (119.4)', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(120000);
+  await starta(page, 'k4s01_foten', 4);
+  await tills(page, '#stigord .flakord');
+  const p = pussel.get('k4_stig1'), vag = stigVag(p);
+  // stegen ligger nedifrån och upp: det första flaket står längre ned i rummet än det sista
+  const forsta = await page.evaluate(() => window.__ORDSTAVEN.position());
+  const yFlak = async (q) => (await page.locator(`#stigord .flakord[data-ruta="${q.r},${q.k}"]`).boundingBox()).y;
+  expect(await yFlak(vag[0])).toBeGreaterThan(await yFlak(vag.at(-1)));
+  await page.screenshot({ path: 'test-results/kap4-stig1-uppfor.png' });
+  for (const q of vag) { await page.locator(`#stigord .flakord[data-ruta="${q.r},${q.k}"]`).click(); await page.waitForTimeout(700); }
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 15000 }).toContain('ungen skuttar i spåret, 3 flak');
+  const efter = await page.evaluate(() => window.__ORDSTAVEN.position());
+  expect(efter.y).toBeLessThan(forsta.y - 60);
+});
+
+test('kapitel 4: hjälptrappan i stig 3 kommer ett steg i taget (119.4)', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(120000);
+  await starta(page, 'k4s04_utvagen', 1);
+  await tills(page, '#stigord .flakord');
+  const versal = page.locator('#stigord .stigord-versal');
+  await expect(versal).toHaveCount(0);
+  // gåtans rad står inte vid stigen från början, och efter ett fel glimtar väggen och ungen viftar med svansen
+  await page.locator('#stigord .flakord[data-ruta="0,0"]').click();
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 8000 }).toContain('hjälptrappan steg 1');
+  await expect(versal).toHaveCount(0);
+  await page.waitForTimeout(1800);
+  await page.locator('#stigord .flakord[data-ruta="0,2"]').click();
+  await expect(versal).toContainText('SVANSEN HAR EN KLUBBA', { timeout: 8000 });
+  await page.screenshot({ path: 'test-results/kap4-hjalptrappan.png' });
+  await page.waitForTimeout(600);
+  await page.locator('#stigord .flakord[data-ruta="0,0"]').click();
+  await expect(versal).toHaveText(/^\s*KLUBBA\s*$/, { timeout: 8000 });
+});
+
+test('kapitel 4: gåtan står på läsplattan på stenfältet (119.4)', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(120000);
+  await starta(page, 'k4s05_stenfaltet', 3);
+  // gåtans tre rader läses först på läsplattan, och sedan öppnar papperet i molnet dem igen
+  const slut = Date.now() + 30000;
+  while (Date.now() < slut && !(await page.locator('#plattan').textContent().catch(() => '')).includes('SVANSEN HAR EN KLUBBA')) {
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    await page.waitForTimeout(300);
+  }
+  await expect(page.locator('#plattan')).toContainText('STENEN ÄR VARM');
+  await page.screenshot({ path: 'test-results/kap4-gatan.png' });
+  await page.locator('#plattan .vidare').click();
+  await tills(page, '#tanke .tanke-lapp');
+  await page.locator('#tanke .tanke-lapp').click();
+  await expect(page.locator('#plattan')).toContainText('DEN HAR EN SVANS', { timeout: 8000 });
 });

@@ -16,12 +16,13 @@
  },
  "meta": {
   "namn": "Berget",
-  "version": "0.1",
+  "version": "0.2",
   "datum": "2026-11-21",
   "agare": "Innehåll",
   "kalla": "Berättelsen 21 v0.5.2, manus 21 v0.3.1 och ritningarna 21b v0.2.1, godkända av den vuxne (beslut 118.1).",
   "teknik": "Nytt i kapitlet (118.4): bokstavsstigen P18_bokstavsstig i ett kapitel (k4_stig1–3, kartan har stig_<id>), snön som stannar i luften tills STOR SKÖLD är skriven, färgtabellen för mörkret som LJUS stänger av, P9 utan chiffer (k4_ladan), tre rum utan Tiled-karta, och regierna: ankomst_berget, baronen_kikare_berg, blocket_lyfts, stor_skold_ras, mynningen_stangs, grottan_glittrar, grottan_visar_vaggen, fotavtryck_stor, ungen_fot_avtryck, ungen_slar_isen, blocket_driva, fossil_svans, svansarna, ladan_oppnas, kartbit5_molnkant, skata_harmar_molnkant och resan_molnkant. Musiken står som spel tills Stil har en slinga för berget. Föremålens id är förslag, och Teknik sätter dem efter kartan.",
-  "anteckning": "Tre pass (114.4). En ny formel (STOR SKÖLD), LJUS på huvudvägen, FLYG frivilligt. Inga nya figurer."
+  "anteckning": "Tre pass (114.4). En ny formel (STOR SKÖLD), LJUS på huvudvägen, FLYG frivilligt. Inga nya figurer.",
+  "andrat_v02": "2026-11-21 (beslut 119.3, granskning 10): Farfars replik om den sista biten i pass 3, snöraset i ett svep, hjälptrappan i stig 3, en grotta av is, lådan med INTE KALL, gåtan i boken, RÄTT sten, instruktionerna till stig 2, FLYG och STOR SKÖLD, och tre repliker. Mellanscenen där han skriver av gåtan är ny och har ännu ingen bild."
  },
  "var_var_vi": [
   {
@@ -46,7 +47,7 @@
     },
     {
      "talare": "farfar",
-     "text": "Bit fem är vid isgrottan.",
+     "text": "Bit fem är i en grotta av is.",
      "upplast": true,
      "via": "radio"
     }
@@ -102,7 +103,7 @@
     },
     {
      "talare": "farfar",
-     "text": "Biten är vid en speciell sten.",
+     "text": "Biten är vid rätt sten.",
      "upplast": true,
      "via": "radio"
     }
@@ -140,7 +141,7 @@
    ],
    "skyltar": {
     "sten_farfar": {
-     "text": "Biten är vid en speciell sten.",
+     "text": "Biten är vid rätt sten.",
      "papper": "traskylt"
     }
    },
@@ -203,10 +204,7 @@
     },
     {
      "id": "gata_3_igen",
-     "syns_i": [
-      "ljus",
-      "ut"
-     ]
+     "dold": true
     },
     {
      "id": "spricka",
@@ -263,7 +261,10 @@
    "anteckning": "1 skärm. Fem platser: fyra stenar och hålet där baronens block stod, med hans orange rep vid kanten (116.5). Ånga från sten_varm, sten_taggar och sten_klubba, och frost på sten_is. Avtrycken är fossil i sten, aldrig djur som sover (granskning 9). Molnkanten långt borta i norr, och stig_molnkanten längs bergskammen dit de går i slutet.",
    "skyltar": {
     "lada_farfar": {
-     "text": "Stenen är ____."
+     "text": [
+      "Stenen är inte kall.",
+      "Den är ____."
+     ]
     }
    }
   }
@@ -289,7 +290,7 @@
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Bit fem gömde jag vid isgrottan.",
+     "text": "Bit fem gömde jag i en grotta av is.",
      "upplast": true,
      "via": "radio"
     },
@@ -324,7 +325,7 @@
     "text": "Var var vi? Ni är vid isgrottan.",
     "upplast": true
    },
-   "anteckning": "Baronen läser högt och hoppar över SPECIELL (granskning 9). Blocket står på stenfältet, på andra sidan berget (116.5). Farfars två repliker om baronens bit (99.4) står i mörkret, vid lägsta punkten.",
+   "anteckning": "Baronen läser högt och hoppar över RÄTT (granskning 9 och 10). Snöraset i ett svep: stenfältet ligger på sluttningen ovanför grottan, så lyftet och hålet i pass 3 är samma plats (119.2). Pass 1 slutar i mörkret med Farfar på radion. Hans repliker om baronens bit står i pass 3.",
    "steg": [
     {
      "typ": "pussel",
@@ -357,9 +358,15 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Luftskeppet surrar bort över krönet. Långt borta, på andra sidan berget, lyfter det ett jättelikt stenblock i ett rep. Jag har biten! Berget skakar. Ovanför grottan lossnar snön, rasar och stannar i luften.",
+     "beskrivning": "Luftskeppet surrar upp till sluttningen ovanför grottan, där ett jättelikt stenblock står. Herr Skata knyter repet runt blocket. Repet spänns, och blocket rycks loss: Jag har biten! Det mullrar. En spricka rullar nedför sluttningen ända till snön över mynningen. Snön lossnar, rasar och stannar i luften.",
      "bild": "blocket_lyfts",
      "tillstand_efter": "ras"
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Blocket drog loss snön!",
+     "upplast": true
     },
     {
      "typ": "pussel",
@@ -373,14 +380,7 @@
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Baronen har den sista kartbiten.",
-     "upplast": true,
-     "via": "radio"
-    },
-    {
-     "typ": "replik",
-     "talare": "farfar",
-     "text": "Jag gömde den uppe i molnen. Han hittade den!",
+     "text": "Hallå? Är ni där inne? Vad mörkt det låter!",
      "upplast": true,
      "via": "radio"
     },
@@ -453,6 +453,10 @@
     {
      "typ": "las_skylt",
      "foremal": "gata_3"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Hjälten skriver av gåtans tre rader i sin bok, en rad i taget. Ungen tittar på."
     },
     {
      "typ": "ga_till",
@@ -550,7 +554,7 @@
     "text": "Var var vi? Ni kom ut ur grottan.",
     "upplast": true
    },
-   "anteckning": "Stenfältet är kapitlets L6. Lådan med ordlåset är passets skrivuppgift (118.2). Farfars replik om bit fem är struken (115.2): kartbitens mellanscen visar vägen, och Herr Skata härmar ordet i bubblan.",
+   "anteckning": "Stenfältet är kapitlets L6, och gåtan står i hans bok (119.2). Farfars replik om den sista biten kommer efter \"Bara en sten?!\" (granskning 10, sorteringen 1). Lådan med ordlåset är passets skrivuppgift. Kartbitens mellanscen visar vägen, och Herr Skata härmar ordet i bubblan.",
    "steg": [
     {
      "typ": "mellanscen",
@@ -566,6 +570,13 @@
     {
      "typ": "ljud",
      "id": "skata"
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Baronen har den sista biten. Den låg i molnen!",
+     "upplast": true,
+     "via": "radio"
     },
     {
      "typ": "pussel",
@@ -603,7 +614,7 @@
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Gåtlösare! Du löser gåtor ur flera ledtrådar.",
+     "text": "Du läste alla ledtrådarna! Du är en gåtlösare!",
      "upplast": true,
      "via": "radio"
     },
@@ -657,7 +668,7 @@
    "instruktion": {
     "typ": "replik",
     "talare": "berattare",
-    "text": "Vilken väg går till isgrottan?",
+    "text": "Vilken väg går dit?",
     "upplast": true
    },
    "varianter": {
@@ -678,7 +689,7 @@
         "reaktion": "ungen halkar på isen, snurrar ett varv och fnissar",
         "replik": {
          "talare": "berattare",
-         "text": "Där är en frusen sjö. Ingen grotta.",
+         "text": "Där finns bara en frusen sjö. Ingen grotta.",
          "upplast": true
         }
        }
@@ -863,6 +874,24 @@
       "text": "Nästan!",
       "upplast": true
      }
+    },
+    {
+     "ord": "SKÖLD STOR",
+     "effekt": "liten_bubbla_spricker",
+     "replik": {
+      "talare": "berattare",
+      "text": "Nästan!",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "STOR SKÖLDEN",
+     "effekt": "liten_bubbla_spricker",
+     "replik": {
+      "talare": "berattare",
+      "text": "Nästan!",
+      "upplast": true
+     }
     }
    ],
    "forebild": {
@@ -874,7 +903,7 @@
    "instruktion": {
     "typ": "replik",
     "talare": "berattare",
-    "text": "En ny formel! Gör skölden stor!",
+    "text": "En ny formel! Gör en stor sköld!",
     "upplast": true
    },
    "vid_ratt": {
@@ -995,7 +1024,7 @@
    "instruktion": {
     "typ": "replik",
     "talare": "berattare",
-    "text": "Hoppa till Farfars tavla!",
+    "text": "Hoppa på ordet över golvet!",
     "upplast": true
    },
    "knuff": {
@@ -1055,7 +1084,7 @@
    "instruktion": {
     "typ": "replik",
     "talare": "berattare",
-    "text": "Skriv ett ord som hjälper!",
+    "text": "Blocket är för tungt. Skriv en formel!",
     "upplast": true
    },
    "vid_ratt": {
@@ -1083,7 +1112,22 @@
    "niva": "L5",
    "ord": "klubba",
    "visa_ord": false,
-   "versaler_efter_fel": 2,
+   "versaler_efter_fel": 3,
+   "hjalptrappa": [
+    {
+     "efter_fel": 1,
+     "glimt": "gata_3",
+     "unge": "svans"
+    },
+    {
+     "efter_fel": 2,
+     "visa": "gata_3_igen"
+    },
+    {
+     "efter_fel": 3,
+     "ord": true
+    }
+   ],
    "rutnat": [
     "f l u b e o",
     "k f s r b a",
@@ -1102,9 +1146,10 @@
     "upplast": true
    },
    "knuff": {
-    "efter_sek": 15
+    "efter_sek": 15,
+    "handling": "gåtans vägg glimtar, och ungen viftar med klubbsvansen"
    },
-   "anteckning": "21b v0.2.1, stig 3. Ordet står inte i klartext: vagg_ut säger GÅ PÅ DET SOM SVANSEN HAR., och gata_3_igen bredvid säger SVANSEN HAR EN KLUBBA. (granskning 9). Lockordet klo: grenen sjunker redan på det nedre l:et (116.2). Repliken är berättarens, medan ungen tittar ner i vaken."
+   "anteckning": "21b v0.2.1, stig 3. Ordet står inte i klartext: vagg_ut säger GÅ PÅ DET SOM SVANSEN HAR. Gåtans tre väggar står i samma grotta, så han kan gå tillbaka och läsa dem. Hjälptrappan (119.2, granskning 10, sorteringen 3): efter ett fel glimtar gåtans vägg och ungen viftar med klubbsvansen; efter två syns gata_3_igen (SVANSEN HAR EN KLUBBA.) vid stigen; efter tre står KLUBBA i versaler. Lockordet klo: grenen sjunker redan på det nedre l:et (116.2). Ungen väntar på kanten och skuttar i spåret när han är över (119.2)."
   },
   {
    "id": "k4_stenarna",
@@ -1114,22 +1159,26 @@
    "instruktion": {
     "typ": "replik",
     "talare": "berattare",
-    "text": "Hitta den speciella stenen!",
+    "text": "Hitta rätt sten!",
     "upplast": true
    },
    "varianter": {
     "L5": {
-     "text": "Vilken sten stämmer med gåtan?",
+     "text": [
+      "Stenen är varm.",
+      "Den har en svans.",
+      "Svansen har en klubba."
+     ],
      "alternativ": [
       {
        "id": "sten_varm",
        "objekt": "sten_varm",
        "bild": "sten_varm",
        "vid_valj": {
-        "reaktion": "det ångar om stenen, men den är slät",
+        "reaktion": "det ångar om stenen, och ungen sätter sig och värmer rumpan",
         "replik": {
          "talare": "berattare",
-         "text": "Den är varm. Men var är svansen?",
+         "text": "Mysigt varmt. Men inte den här.",
          "upplast": true
         }
        }
@@ -1142,7 +1191,7 @@
         "reaktion": "ungen petar på taggarna och drar bort tassen",
         "replik": {
          "talare": "berattare",
-         "text": "Aj! Inga taggar på klubban!",
+         "text": "Aj! Inte den här.",
          "upplast": true
         }
        }
@@ -1155,7 +1204,7 @@
         "reaktion": "frosten knastrar, och ungen huttrar",
         "replik": {
          "talare": "berattare",
-         "text": "Brrr! Den här är kall.",
+         "text": "Brrr! Inte den här heller.",
          "upplast": true
         }
        }
@@ -1192,9 +1241,9 @@
    },
    "forenkla": {
     "efter_fel": 2,
-    "andring": "stenen han har prövat täcks av snö"
+    "andring": "gåtan i hans bok glimtar, och rösten säger: Läs gåtan igen!"
    },
-   "anteckning": "Kapitlets L6 (granskning 9, sorteringen 11): ingen rad räcker ensam, och rätt sten är inte den enda udda. Ingen reaktion läser upp gåtan igen (08 §4). L5 är den högsta variant som schemat har."
+   "anteckning": "Kapitlets L6 (granskning 9 och 10): ingen rad räcker ensam, och rätt sten är inte den enda udda. Läsplattan visar gåtan som han skrev av i sin bok i pass 2 (119.2). Felreplikerna säger något sant och roligt om stenen, men inte vilket villkor som saknas. Efter två fel: Läs gåtan igen!"
   },
   {
    "id": "k4_ladan",
@@ -1209,6 +1258,7 @@
    "brickor": [
     "A",
     "K",
+    "L",
     "L",
     "M",
     "R",
@@ -1226,10 +1276,10 @@
     "bild": "ladan_oppnas"
    },
    "vid_fel": {
-    "reaktion": "låset rasslar, och de fel bokstäverna studsar tillbaka",
+    "reaktion": "låset rasslar, och bokstäverna studsar tillbaka",
     "replik": {
      "talare": "berattare",
-     "text": "Läs gåtan på väggen igen!",
+     "text": "Läs locket igen!",
      "upplast": true
     }
    },
@@ -1240,7 +1290,7 @@
     "efter_fel": 2,
     "andring": "förebilden VARM står ovanför brickorna"
    },
-   "anteckning": "Farfars låda med ordlås (den vuxnes val B, 118.2). Locket säger STENEN ÄR ____. Ingen nyckel och inget chiffer: ordet har han läst i gåtan. K och L ur KLUBBA, så den som tar fel rad prövar fel ord. Teknik: P9 utan chiffer (118.4). Lockets text står i rummets skylt lada_farfar."
+   "anteckning": "Farfars låda med ordlås (118.2, granskning 10, sorteringen 7). Locket säger STENEN ÄR INTE KALL. DEN ÄR ____. Det för in negationen i kapitlet. Brickorna har två L, så att KALL går att lägga och får sitt svar. Ingen nyckel och inget chiffer: ordet står i gåtan. Teknik: P9 utan chiffer."
   }
  ],
  "uppdrag": [

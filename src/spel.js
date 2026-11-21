@@ -3218,7 +3218,9 @@ export function skapaSpel(d) {
     const c = p.chiffer || { tecken: [], nyckel: [] };
     // ordlåset (P9 utan chiffer, 2.54, Farfars låda i kapitel 4): ingen nyckel och inga tecken. Locket är rummets skylt
     // med en lucka (____), och fälten står i luckan. Ordet har han läst någon annanstans (gåtan på väggen)
-    const lock = p.chiffer ? null : Object.values(b.rum(visadScen?.rum)?.skyltar || {}).map((x) => /** @type {any} */ (x).text).find((t) => typeof t === 'string' && t.includes('____')) ?? null;
+    // locket kan ha flera rader (STENEN ÄR INTE KALL. / DEN ÄR ____., 119): raderna före luckan står ovanför
+    const harLucka = (/** @type {any} */ t) => (Array.isArray(t) ? t : [t]).some((r) => typeof r === 'string' && r.includes('____'));
+    const lock = p.chiffer ? null : Object.values(b.rum(visadScen?.rum)?.skyltar || {}).map((x) => /** @type {any} */ (x).text).find(harLucka) ?? null;
     let visar = p.visa_forsta ? 0 : -1;
     if (visar >= 0) logg.handelse('kodlås', 'ungen visar första tecknet (inte hjälp)');
     return new Promise((klar) => {
@@ -3232,8 +3234,10 @@ export function skapaSpel(d) {
         const tb = tipsBokstav();
         if (!p.chiffer) {
           const platser = las.slice(las.indexOf('<div class="platser">'), las.lastIndexOf('</div>'));
-          const [fore, efter] = String(forSkarm(lock || '____')).split('____');
-          const ordlas = `<div class="kod-kort kod-las ordlas"><span class="kod-bygel" aria-hidden="true"></span><div class="ordlas-mening"><span>${ui.esc(fore ?? '')}</span>${platser}<span>${ui.esc(efter ?? '')}</span></div></div>`;
+          const raderna = forSkarm(lock || '____'), iLucka = Math.max(0, raderna.findIndex((r) => r.includes('____')));
+          const [fore, efter] = String(raderna[iLucka] ?? '____').split('____');
+          const ovanfor = raderna.slice(0, iLucka).map((r) => `<div class="ordlas-rad">${ui.esc(r)}</div>`).join('');
+          const ordlas = `<div class="kod-kort kod-las ordlas"><span class="kod-bygel" aria-hidden="true"></span>${ovanfor}<div class="ordlas-mening"><span>${ui.esc(fore ?? '')}</span>${platser}<span>${ui.esc(efter ?? '')}</span></div></div>`;
           const brickor = `<div class="brickor">${f.s.brickor.map((x) => `<button type="button" class="bricka ${f.s.platser.includes(x.id) ? 'anvand' : ''}" data-id="${x.id}">${ui.esc(x.bokstav)}</button>`).join('')}<button type="button" class="bricka sudda" aria-label="Ta tillbaka">⌫</button></div>`;
           ui.visaPlatta(`<div class="pussel-ruta kod-ruta"><div class="kod-rad">${ordlas}</div>${brickor}</div>`, 'pussel P9_kodlas ordlas');
           tillatNos(p, spar);
@@ -3410,14 +3414,45 @@ export function skapaSpel(d) {
     const s = skapaStig(p);
     const g = s.g;
     const ankare = rum.ruta(`stig_${p.id}`);
-    const lage = rum.visaStig(g, ankare ? { x: ankare.x + ankare.b / 2, y: ankare.y + ankare.h / 2 } : undefined);
+    // stig 1 går uppför sluttningen (119.4): kartans ankare säger upp
+    const lage = rum.visaStig(g, ankare ? { x: ankare.x + ankare.b / 2, y: ankare.y + ankare.h / 2 } : undefined, !!ankare?.upp);
     const fot = (/** @type {{ x: number, y: number }} */ q) => ({ x: q.x, y: q.y + 4 });
-    rum.pos = { ...lage.strand }; rum.vand = { x: 1, y: 0 }; rum.placera();
+    rum.pos = { ...lage.strand }; rum.vand = lage.upp ? { x: 0, y: -1 } : { x: 1, y: 0 }; rum.placera();
     // kameran visar hela rutnätet medan stigen pågår (i ett större rum stod den kvar där han var, 2.54)
-    rum.regiFokus = { x: Math.round((lage.strand.x + lage.mal.x) / 2), y: lage.strand.y };
-    if (rum.unge.visible) { rum.ungePos = { x: lage.strand.x - 8, y: lage.strand.y + 12 }; rum.placera(); }
+    rum.regiFokus = lage.upp ? { x: lage.strand.x, y: Math.round((lage.strand.y + lage.mal.y) / 2) } : { x: Math.round((lage.strand.x + lage.mal.x) / 2), y: lage.strand.y };
+    // ungen väntar på kanten (119.4, granskning 10 punkt 4): den följer inte med ut på flaken och pekar aldrig ut ett
+    // flak. När hjälten är över skuttar den i hans spår
+    const kanten = lage.upp ? { x: lage.strand.x - 18, y: lage.strand.y + 2 } : { x: lage.strand.x - 8, y: lage.strand.y + 12 };
+    if (rum.unge.visible) { rum.ungePos = { ...kanten }; rum.placera(); }
     const nyckelFor = (/** @type {{ r: number, k: number }} */ q) => `${q.r},${q.k}`;
     let fel = 0, hjalp = false, knuffFore = false, versal = false, upptagen = false, forstaVal = true;
+    /** @type {string | null} hjälptrappans rad vid stigen (119.4) */ let trappRad = null;
+    /** hur många av hjälptrappans steg som har kommit */ let trappSteg = 0;
+    /**
+     * Hjälptrappan (119.4, granskning 10 punkt 3): stödet kommer bara när det behövs, som i skrivtrappan. Varje steg
+     * har `efter_fel` (fel bokstäver och återvändsgränder räknas) och något av: `glimt` (ett föremål i rummet glimtar,
+     * och kameran visar det en stund), `unge: "svans"` (ungen viftar med klubbsvansen på kanten), `visa` (ett dolt
+     * föremål, vars skylt står vid stigen) och `ord: true` (ordet i versaler). Slutledningen ligger kvar hos honom.
+     */
+    const trappa = async () => {
+      const lista = Array.isArray(p.hjalptrappa) ? p.hjalptrappa : [];
+      const misstag = s.fel + s.atervandor;
+      while (trappSteg < lista.length && misstag >= (Number(lista[trappSteg].efter_fel) || 1)) {
+        const t = lista[trappSteg++];
+        if (t.unge === 'svans' && rum.unge.visible) rum.ungeLage('svansslag', 'hoger', 150, 1);
+        // visa: ett dolt föremål vid stigen (gata_3_igen), vars skylt står vid stigen
+        if (t.visa) { const tx = b?.rum(visadScen?.rum)?.skyltar?.[t.visa]?.text; if (tx) trappRad = Array.isArray(tx) ? tx.join(' ') : String(tx); else logg.handelse('FEL', `${p.id}: hjälptrappan visar ${t.visa}, som inte har någon skylt`); }
+        if (t.ord) versal = true;
+        if (t.glimt && rum.ruta(t.glimt)) {
+          const o = rum.ruta(t.glimt), fokus = rum.regiFokus;
+          rum.regiFokus = { x: o.x + o.b / 2, y: o.y + o.h / 2 };
+          rum.markera(t.glimt, true); ui.pulseraSkylt?.(t.glimt);
+          await vanta(tid(1600));
+          rum.markera(t.glimt, false); rum.regiFokus = fokus;
+        }
+        logg.handelse('stig', `${p.id}: hjälptrappan steg ${trappSteg} efter ${misstag} fel`);
+      }
+    };
     const start = speltid();
     const rita = () => {
       const lista = [];
@@ -3427,9 +3462,11 @@ export function skapaSpel(d) {
         lista.push({ nyckel, x: pt.x, y: pt.y, text: /** @type {string} */ (c.bokstav), klass: s.sjunkna.has(nyckel) ? 'sjunken' : s.vag.some((v) => v.r === r && v.k === k) ? 'trampad' : '' });
       }
       const visas = p.visa_ord || versal;
-      // ordet i versaler står på andra sidan, där han ska fram (stolpen, eller hjälpen efter två fel)
+      // ordet i versaler står på andra sidan, där han ska fram (stolpen, eller hjälpen efter två fel). Hjälptrappans
+      // rad (119.4) står där innan ordet gör det
       const op = skarm(lage.skylt.x, lage.skylt.y);
-      ui.stigord(lista, (n) => { const [r, k] = n.split(',').map(Number); hoppa({ r, k }); }, visas ? { x: op.x, y: op.y, text: String(p.ord).toLocaleUpperCase('sv-SE') } : null);
+      const text = visas ? String(p.ord).toLocaleUpperCase('sv-SE') : trappRad;
+      ui.stigord(lista, (n) => { const [r, k] = n.split(',').map(Number); hoppa({ r, k }); }, text ? { x: op.x, y: op.y, text } : null);
     };
     stigNu = rita;
     if (p.instruktion) await replik(p.instruktion);
@@ -3445,11 +3482,20 @@ export function skapaSpel(d) {
       window.clearTimeout(knuffT);
       knuffT = window.setTimeout(() => {
         const h = hjalpFlak(s); if (!h || upptagen) return;
-        const q = lage.flak(h.r, h.k);
-        if (rum.unge.visible) { rum.ungeGarTill({ x: rum.pos.x, y: rum.pos.y + (q.y < rum.pos.y ? -12 : 12) }); }
+        // ungen står kvar på kanten och piper, likadant var han än står (119.4): kanten på flaket lyser, aldrig bokstaven.
+        // Med en hjälptrappa som inte är slut är knuffen trappans första steg (väggen glimtar, ungen viftar med svansen)
+        const forsta = Array.isArray(p.hjalptrappa) && trappSteg < p.hjalptrappa.length ? p.hjalptrappa[0] : null;
+        if (forsta) {
+          if (forsta.unge === 'svans' && rum.unge.visible) rum.ungeLage('svansslag', 'hoger', 150, 1); else rum.ungeReagerar(false);
+          if (forsta.glimt && rum.ruta(forsta.glimt)) { const o = rum.ruta(forsta.glimt), fokus = rum.regiFokus; rum.regiFokus = { x: o.x + o.b / 2, y: o.y + o.h / 2 }; rum.markera(forsta.glimt, true); window.setTimeout(() => { rum.markera(forsta.glimt, false); rum.regiFokus = fokus; }, tid(1600)); }
+          hjalp = true; if (forstaVal) knuffFore = true; ljud.spela('hmm');
+          logg.handelse('knuff', `${p.id}: hjälptrappans första steg (knuffen)`);
+          return;
+        }
+        rum.ungeReagerar(false);
         rum.stigKant(h); hjalp = true; if (forstaVal) knuffFore = true;
         ljud.spela('hmm');
-        logg.handelse('knuff', `${p.id}: ungen nosar mot ${g.celler[h.r][h.k].bokstav}`);
+        logg.handelse('knuff', `${p.id}: kanten lyser vid ${g.celler[h.r][h.k].bokstav}, ungen piper på kanten`);
       }, tid(knuffMs));
     };
     const hoppa = async (/** @type {{ r: number, k: number }} */ till) => {
@@ -3465,8 +3511,12 @@ export function skapaSpel(d) {
           rum.stigKnak(till.r, till.k); ljud.spela('flak_knak'); // Stils knak, bara vid fel (115.8)
           logg.handelse('stig', `${p.id}: ${bokstav} fel (${nastaBokstav(s)} var rätt)`);
           // hjälpen efter ett fel: kanten på ett rätt flak lyser, aldrig bokstaven
-          const h = hjalpFlak(s); rum.stigKant(h); hjalp = true;
-          if (p.versaler_efter_fel && fel >= p.versaler_efter_fel && !versal) { versal = true; logg.handelse('stig', `${p.id}: ordet i versaler efter ${fel} fel`); }
+          // med en hjälptrappa (119.4) lyser kanten först när trappan är slut, så att slutledningen ligger kvar hos honom
+          const trappKvar = Array.isArray(p.hjalptrappa) && trappSteg < p.hjalptrappa.length;
+          if (!trappKvar) { const h = hjalpFlak(s); rum.stigKant(h); }
+          hjalp = true;
+          if (p.versaler_efter_fel && !Array.isArray(p.hjalptrappa) && fel >= p.versaler_efter_fel && !versal) { versal = true; logg.handelse('stig', `${p.id}: ordet i versaler efter ${fel} fel`); }
+          await trappa();
           rita();
           return;
         }
@@ -3490,12 +3540,22 @@ export function skapaSpel(d) {
           const t = /** @type {{ r: number, k: number }} */ (v.tillbaka);
           await vanta(rum.stigHopp(t.r < 0 ? { ...lage.strand } : fot(lage.flak(t.r, t.k))));
           logg.handelse('stig', `${p.id}: återvändsgränd, ${(v.sjunker || []).length} flak sjönk`);
+          await trappa();
         }
         rita();
         if (v.sort === 'klar') {
           await vanta(tid(250));
           await vanta(rum.stigHopp({ ...lage.mal }));
-          if (rum.unge.visible) { rum.ungePos = { x: lage.mal.x - 6, y: lage.mal.y + 12 }; rum.placera(); }
+          // ungen skuttar hela vägen i hjältens spår, och varje flak plingar: ordet en gång till (119.4)
+          if (rum.unge.visible) {
+            const spar = s.vag.filter((q) => q.r >= 0).map((q) => fot(lage.flak(q.r, q.k)));
+            const slutet = lage.upp ? { x: lage.mal.x - 16, y: lage.mal.y + 2 } : { x: lage.mal.x - 6, y: lage.mal.y + 12 };
+            for (const q of [...spar, slutet]) {
+              await new Promise((res) => rum.ungeBage({ x: q.x, y: q.y + 2 }, tid(260), 6, () => res(null)));
+              if (q !== slutet) { ljud.spela('flak_ratt'); }
+            }
+            logg.handelse('stig', `${p.id}: ungen skuttar i spåret, ${spar.length} flak`);
+          }
           ljud.spela('fest_mellan');
           logg.handelse('stig', `${p.id}: klar, ${s.fel} fel, ${s.atervandor} återvändsgränder, ${Math.round((speltid() - start) / 1000)} s`);
           klar(true);
@@ -3505,7 +3565,9 @@ export function skapaSpel(d) {
     const stopp = lyssnaHandling((h) => {
       if (h.typ !== 'ga') return;
       // höger hoppar rakt fram, upp och ned snett framåt (han går från vänster till höger, 21b)
-      const d = h.kod === 'ArrowRight' ? 0 : h.kod === 'ArrowUp' ? -1 : h.kod === 'ArrowDown' ? 1 : null;
+      // uppför (119.4): upp rakt fram, vänster och höger snett framåt
+      const d = lage.upp ? (h.kod === 'ArrowUp' ? 0 : h.kod === 'ArrowLeft' ? -1 : h.kod === 'ArrowRight' ? 1 : null)
+        : h.kod === 'ArrowRight' ? 0 : h.kod === 'ArrowUp' ? -1 : h.kod === 'ArrowDown' ? 1 : null;
       if (d === null) return;
       hoppa({ r: s.nu.r + 1, k: s.nu.k + d });
     });

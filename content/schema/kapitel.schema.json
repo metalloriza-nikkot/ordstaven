@@ -2925,6 +2925,43 @@
         },
         "anteckning": {
           "$ref": "#/$defs/anteckning"
+        },
+        "hjalptrappa": {
+          "description": "Hjälptrappan (119.4): stödet kommer steg för steg efter fel bokstäver och återvändsgränder. Kanten på rätt flak lyser först när trappan är slut.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "efter_fel"
+            ],
+            "properties": {
+              "efter_fel": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "så många fel (bokstäver och återvändsgränder) innan steget kommer"
+              },
+              "glimt": {
+                "type": "string",
+                "description": "ett föremål i rummet som glimtar, och kameran visar det en stund"
+              },
+              "unge": {
+                "enum": [
+                  "svans"
+                ],
+                "description": "ungen viftar med klubbsvansen på kanten"
+              },
+              "ord": {
+                "const": true,
+                "description": "ordet i versaler vid stigen"
+              },
+              "visa": {
+                "type": "string",
+                "description": "ett dolt föremål i rummet (innehall med dold) vars skylt står vid stigen"
+              }
+            }
+          }
         }
       }
     }

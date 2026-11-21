@@ -69,12 +69,12 @@ test('bokstavsstigen: sex kolumner (stig 3) ryms på en skärm, och tre flak sju
   await page.screenshot({ path: 'test-results/stig-sex-rader.png' });
 });
 
-test('bokstavsstigen: utan ord i klartext står ordet i versaler efter två fel, och ungen nosar efter en stund', async ({ page }) => {
+test('bokstavsstigen: utan ord i klartext står ordet i versaler efter två fel, och kanten lyser efter en stund medan ungen väntar på kanten', async ({ page }) => {
   test.setTimeout(120000);
   // bara den andra stigen (mossa, utan ordet), och en kort knuff
   await oppna(page, { ...prov, stigar: [{ ...prov.stigar[1], knuff: { efter_sek: 2 } }] });
   await expect(page.locator('#stigord .stigord-versal')).toHaveCount(0);
-  await expect.poll(async () => (await logg(page)).includes('ungen nosar mot m'), { timeout: 10000 }).toBe(true);
+  await expect.poll(async () => (await logg(page)).includes('kanten lyser vid m, ungen piper på kanten'), { timeout: 10000 }).toBe(true);
   await page.keyboard.press('ArrowDown'); // o, inte m
   await page.waitForTimeout(400);
   await expect(page.locator('#stigord .stigord-versal')).toHaveCount(0);

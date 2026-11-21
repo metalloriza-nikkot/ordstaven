@@ -1014,3 +1014,4 @@ html, body {
 .ordlas { padding: calc(14px * var(--t)) calc(18px * var(--t)); }
 .ordlas-mening { display: flex; align-items: center; gap: calc(12px * var(--t)); font-size: calc(40px * var(--t)); font-weight: 600; color: #2a241c; }
 .ordlas-mening .platser { margin: 0; }
+.ordlas-rad { font-size: calc(40px * var(--t)); font-weight: 600; color: #2a241c; margin-bottom: calc(8px * var(--t)); }

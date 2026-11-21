@@ -1122,6 +1122,7 @@ export class Rum extends Phaser.Scene {
       fossil_svans: () => this.fossilSvans(),
       svansarna: () => this.svansarna(),
       ladan_oppnas: () => this.ladanOppnas(),
+      gatan_i_boken: () => this.gatanIBoken(),
       kartbit5_molnkant: () => this.kartbit5Molnkant(),
       skata_harmar_molnkant: () => this.skataHarmarMolnkant(),
       resan_molnkant: () => this.resanMolnkant(),
@@ -4732,18 +4733,29 @@ export class Rum extends Phaser.Scene {
    * @param {{ x: number, y: number }} [mitt] rutnätets mitt i rummet (kartans stig_<id>, annars rummets mitt)
    * @returns {{ flak: (r: number, k: number) => { x: number, y: number }, strand: { x: number, y: number }, mal: { x: number, y: number }, skylt: { x: number, y: number } }}
    */
-  visaStig(g, mitt) {
+  visaStig(g, mitt, upp = false) {
     this.rensaStig();
     // Innehålls ritning (21b): han kommer från vänster och hoppar en kolumn åt höger. Steget r är kolumnen på skärmen
-    // och k raden. Sex kolumner (stig 3) ryms på en skärm med stranden på båda sidor
+    // och k raden. Sex kolumner (stig 3) ryms på en skärm med stranden på båda sidor. Med upp (119.4) går stigen
+    // uppför: steget r ligger nedifrån och upp (26 pixlar), och raden k från vänster till höger (40 pixlar)
     const B = Math.min(40, Math.floor((RUM.bredd - 64) / Math.max(1, g.rader))), H = 26, FB = 32, FH = 18;
     const m = mitt || { x: Math.round(this.storlek.bredd / 2), y: Math.round(this.storlek.hojd / 2) };
-    const x0 = Math.round(m.x - (g.rader * B) / 2), y0 = Math.round(m.y - (g.kolumner * H) / 2);
-    const mittFor = (/** @type {number} */ r, /** @type {number} */ k) => ({ x: x0 + r * B + B / 2, y: y0 + k * H + H / 2 });
+    const x0 = upp ? Math.round(m.x - (g.kolumner * 40) / 2) : Math.round(m.x - (g.rader * B) / 2);
+    const y0 = upp ? Math.round(m.y - (g.rader * H) / 2) : Math.round(m.y - (g.kolumner * H) / 2);
+    const mittFor = upp
+      ? (/** @type {number} */ r, /** @type {number} */ k) => ({ x: x0 + k * 40 + 20, y: y0 + (g.rader - 1 - r) * H + H / 2 })
+      : (/** @type {number} */ r, /** @type {number} */ k) => ({ x: x0 + r * B + B / 2, y: y0 + k * H + H / 2 });
     const vatten = this.add.graphics();
-    vatten.fillStyle(0x1e4e6c, 1).fillRect(x0 - 4, y0 - 6, g.rader * B + 8, g.kolumner * H + 12);
-    vatten.fillStyle(0xdfeaf2, 1).fillRect(x0 - 30, y0 - 6, 26, g.kolumner * H + 12); // stranden, där han kommer från
-    vatten.fillStyle(0xdfeaf2, 1).fillRect(x0 + g.rader * B + 4, y0 - 6, 26, g.kolumner * H + 12); // utgången
+    if (upp) {
+      const bb = g.kolumner * 40, hh = g.rader * H;
+      vatten.fillStyle(0x1e4e6c, 1).fillRect(x0 - 6, y0 - 4, bb + 12, hh + 8);
+      vatten.fillStyle(0xdfeaf2, 1).fillRect(x0 - 6, y0 + hh + 4, bb + 12, 20); // stranden nedanför, där han kommer från
+      vatten.fillStyle(0xdfeaf2, 1).fillRect(x0 - 6, y0 - 24, bb + 12, 20); // utgången ovanför
+    } else {
+      vatten.fillStyle(0x1e4e6c, 1).fillRect(x0 - 4, y0 - 6, g.rader * B + 8, g.kolumner * H + 12);
+      vatten.fillStyle(0xdfeaf2, 1).fillRect(x0 - 30, y0 - 6, 26, g.kolumner * H + 12); // stranden, där han kommer från
+      vatten.fillStyle(0xdfeaf2, 1).fillRect(x0 + g.rader * B + 4, y0 - 6, 26, g.kolumner * H + 12); // utgången
+    }
     this.lagerStig.add(vatten);
     /** @type {Map<string, any>} */ const bilder = new Map();
     for (let r = 0; r < g.rader; r++) for (let k = 0; k < g.kolumner; k++) {
@@ -4764,13 +4776,15 @@ export class Rum extends Phaser.Scene {
     this.lagerStig.add(kant);
     // han står på stranden till vänster, mitt för den rad han börjar vid, och utgången är till höger
     const k0 = g.start ?? Math.floor((g.kolumner - 1) / 2);
-    const strand = { x: x0 - 17, y: mittFor(0, k0).y + 4 };
-    const mal = { x: x0 + g.rader * B + 17, y: mittFor(0, Math.floor((g.kolumner - 1) / 2)).y + 4 };
-    const skylt = { x: m.x, y: y0 - 16 };
-    this.stig = { g, bilder, kant, kantTw: /** @type {any} */ (null), mittFor, sprickor: this.add.graphics() };
+    const kMitt = Math.floor((g.kolumner - 1) / 2);
+    const strand = upp ? { x: mittFor(0, k0).x, y: y0 + g.rader * H + 17 } : { x: x0 - 17, y: mittFor(0, k0).y + 4 };
+    const mal = upp ? { x: mittFor(0, kMitt).x, y: y0 - 13 } : { x: x0 + g.rader * B + 17, y: mittFor(0, kMitt).y + 4 };
+    // ordet står där han ska fram: ovanför rutnätet, eller till höger om utgången när stigen går uppför
+    const skylt = upp ? { x: x0 + g.kolumner * 40 + 34, y: y0 - 14 } : { x: m.x, y: y0 - 16 };
+    this.stig = { g, bilder, kant, kantTw: /** @type {any} */ (null), mittFor, upp, sprickor: this.add.graphics() };
     this.lagerStig.add(this.stig.sprickor);
     this.smutsig = true;
-    return { flak: (r, k) => mittFor(r, k), strand, mal, skylt };
+    return { flak: (r, k) => mittFor(r, k), strand, mal, skylt, upp };
   }
 
   // ------------------------------------------------------------------ kapitel 4 i gråbox (118.4)
@@ -4840,24 +4854,64 @@ export class Rum extends Phaser.Scene {
   }
 
   /**
-   * Luftskeppet surrar bort över krönet, berget skakar, och snön ovanför grottan lossnar och stannar i luften
-   * (113.8): den hänger kvar tills STOR SKÖLD är skriven, så ingen klocka räknar. @returns {number}
+   * Snöraset i ett svep (119.4, granskning 10 punkt 2): luftskeppet hänger över blocket på sluttningen ovanför
+   * grottan (kartans regi_block), repet spänns, blocket rycks loss med ett muller, och en spricka rullar nedför
+   * sluttningen. Kameran följer sprickan till snön över mynningen (regi_snon), och snön lossnar. Den stannar i luften
+   * (113.8) och hänger kvar tills STOR SKÖLD är skriven, så ingen klocka räknar. Skeppet far iväg med blocket.
+   * @returns {number}
    */
   blocketLyfts() {
-    const sk = this.k4Skepp(this.k4Punkt('toppen') || { x: this.pos.x, y: 20 });
     const smuts = () => { this.smutsig = true; };
-    this.tweens.add({ targets: sk, x: sk.x + 160, y: sk.y - 40, duration: 1400, onUpdate: smuts, onComplete: () => sk.setVisible(false) });
-    this.time.delayedCall(1300, () => { this.cameras.main.shake(500, 0.006); smuts(); });
     const m = this.k4Punkt('mynningen') || this.pos;
-    // Stils snomassa_01–02 (96 × 48, LASMIG_114): snön som står i luften, och smulor faller (ca 400 ms per bild)
+    const bl = this.k4Punkt('block') || { x: m.x - 30, y: Math.max(16, m.y - 30) };
+    const snon = this.k4Punkt('snon') || { x: m.x, y: m.y - 14 };
+    const sk = this.k4Skepp(this.k4Punkt('toppen') || { x: bl.x - 60, y: 6 });
+    sk.setVisible(true);
+    // 1. skeppet glider fram över blocket, och kameran visar blocket
+    this.regiFokus = { x: bl.x, y: bl.y + 30 };
+    this.tweens.add({ targets: sk, x: bl.x, y: Math.max(12, bl.y - 30), duration: 700, ease: 'Sine.easeInOut', onUpdate: smuts });
+    // blocket: Stils block_slits_01–02 (gruset när det slits loss) och block_hanger, annars en grå sten
+    const s1 = this.regiram('block_slits_01');
+    /** @type {any} */ const block = s1 ? this.add.image(bl.x, bl.y, s1.nyckel, s1.ram) : this.add.graphics({ x: bl.x, y: bl.y });
+    if (!s1) block.fillStyle(0x8c8378, 1).fillRect(-12, -10, 24, 20).lineStyle(1, 0x5a5048, 1).strokeRect(-12, -10, 24, 20);
+    this.lagerLuft.add(block); this.lagda.push(block);
+    const rep = this.add.graphics(); this.lagerLuft.add(rep); this.lagda.push(rep);
+    const ritaRep = () => { rep.clear(); if (!sk.visible || !block.active) return; rep.lineStyle(1, 0xd9782f, 1).lineBetween(sk.x, sk.y + 16, block.x, block.y - 8); };
+    const repTimer = this.time.addEvent({ delay: 30, loop: true, callback: () => { ritaRep(); smuts(); } });
+    // 2. repet spänns (skeppet drar uppåt och gungar), och blocket rycks loss med ett muller
+    this.time.delayedCall(800, () => { this.tweens.add({ targets: sk, y: sk.y - 6, duration: 160, yoyo: true, repeat: 2, onUpdate: smuts }); this.regiLjud('knarr'); });
+    this.time.delayedCall(1500, () => {
+      const s2 = this.regiram('block_slits_02'); if (s2 && block.setTexture) block.setTexture(s2.nyckel, s2.ram);
+      this.cameras.main.shake(600, 0.008); this.regiLjud('krasch'); this.k4Logg('blocket rycks loss');
+      this.k4Glitter({ x: bl.x, y: bl.y + 8 }, 10);
+      const h = this.regiram('block_hanger');
+      this.time.delayedCall(200, () => { if (h && block.setTexture) block.setTexture(h.nyckel, h.ram); smuts(); });
+      // skeppet far iväg över krönet med blocket i repet
+      this.tweens.add({ targets: sk, x: sk.x + 140, y: sk.y - 50, duration: 1600, delay: 300, ease: 'Quad.easeIn', onUpdate: smuts, onComplete: () => sk.setVisible(false) });
+      this.tweens.add({ targets: block, x: block.x + 140, y: block.y - 50, duration: 1600, delay: 300, ease: 'Quad.easeIn', onUpdate: smuts, onComplete: () => { block.setVisible(false); repTimer.remove(); rep.clear(); } });
+    });
+    // 3. en spricka rullar nedför sluttningen från blocket till snön över mynningen, och kameran följer den
+    const spricka = this.add.graphics(); this.lagerLuft.add(spricka); this.lagda.push(spricka);
+    const steg = 8, t0 = 1800, stegMs = 110;
+    /** @type {{ x: number, y: number }[]} */ const punkter = [];
+    for (let i = 0; i <= steg; i++) { const f = i / steg; punkter.push({ x: Math.round(bl.x + (snon.x - bl.x) * f + (i % 2 ? 5 : -4) * (i && i < steg ? 1 : 0)), y: Math.round(bl.y + 10 + (snon.y - bl.y - 10) * f) }); }
+    for (let i = 1; i <= steg; i++) this.time.delayedCall(t0 + i * stegMs, () => {
+      spricka.lineStyle(3, 0x1a2430, 1).lineBetween(punkter[i - 1].x, punkter[i - 1].y, punkter[i].x, punkter[i].y);
+      this.regiFokus = { x: punkter[i].x, y: punkter[i].y + 40 };
+      if (i % 3 === 0) this.cameras.main.shake(120, 0.004);
+      smuts();
+    });
+    this.time.delayedCall(t0, () => this.regiLjud('rassel'));
+    // 4. snön över mynningen lossnar: Stils snomassa_01–02 (96 × 48, LASMIG_114), och smulor faller (ca 400 ms per bild)
+    const tSno = t0 + steg * stegMs + 150;
     const sm = this.regiram('snomassa_01');
     /** @type {any} */ let sno;
     if (sm && this.regiram('snomassa_02')) {
-      sno = this.add.image(m.x, m.y - 40, sm.nyckel, sm.ram);
+      sno = this.add.image(snon.x, snon.y, sm.nyckel, sm.ram);
       let nr = 0;
       const ev = this.time.addEvent({ delay: 400, loop: true, callback: () => { if (!sno.active) { ev.remove(); return; } nr = 1 - nr; const f = /** @type {any} */ (this.regiram(nr ? 'snomassa_02' : 'snomassa_01')); sno.setTexture(f.nyckel, f.ram); smuts(); } });
     } else {
-      sno = this.add.graphics({ x: m.x, y: m.y - 40 });
+      sno = this.add.graphics({ x: snon.x, y: snon.y });
       sno.fillStyle(0xf4f8fc, 1).fillEllipse(0, 0, 70, 26).fillStyle(0xdbe6ef, 1).fillEllipse(-14, 6, 30, 12).fillEllipse(18, 4, 26, 10);
     }
     sno.setAlpha(0); this.lagerLuft.add(sno); this.lagda.push(sno);
@@ -4866,13 +4920,27 @@ export class Rum extends Phaser.Scene {
     const dolj = this.time.addEvent({ delay: 50, loop: true, callback: () => { const r = /** @type {any} */ (this.ritade.get('ras_mynningen')); if (!this.k4?.rasDolt) { dolj.remove(); r?.setVisible?.(true); smuts(); return; } if (r?.visible) { r.setVisible(false); smuts(); } } });
     // snön rasar och stannar en bit ovanför hjälten och ungen
     const stopp = { x: Math.round((this.pos.x + m.x) / 2), y: Math.round(Math.min(this.pos.y, this.ungePos.y) - 46) };
-    this.tweens.add({ targets: sno, alpha: 1, duration: 200, delay: 1600, onUpdate: smuts });
-    this.tweens.add({ targets: sno, x: stopp.x, y: stopp.y, duration: 700, delay: 1800, ease: 'Quad.easeIn', onUpdate: smuts });
+    this.tweens.add({ targets: sno, alpha: 1, duration: 200, delay: tSno, onUpdate: smuts, onStart: () => { this.cameras.main.shake(400, 0.006); this.regiLjud('duns'); } });
+    this.tweens.add({ targets: sno, x: stopp.x, y: stopp.y, duration: 700, delay: tSno + 250, ease: 'Quad.easeIn', onUpdate: smuts });
     this.k4 = { ...(this.k4 || {}), sno };
-    this.regiFokus = { x: stopp.x, y: stopp.y + 30 };
-    this.time.delayedCall(2700, () => { this.regiFokus = null; });
-    this.k4Logg('blocket_lyfts'); this.k4Logg('snön stannar i luften');
-    return 2800;
+    this.time.delayedCall(tSno + 250, () => { this.regiFokus = { x: stopp.x, y: stopp.y + 30 }; });
+    this.time.delayedCall(tSno + 1100, () => { this.regiFokus = null; });
+    this.k4Logg('blocket_lyfts'); this.k4Logg('snöraset i ett svep'); this.k4Logg('snön stannar i luften');
+    return tSno + 1200;
+  }
+
+  /** gatan_i_boken (Innehåll pass 119): hjälten skriver av gåtans rader i sin bok, en liten bok över honom och pennan, tills Stils bild finns. @returns {number} */
+  gatanIBoken() {
+    const smuts = () => { this.smutsig = true; };
+    const p = { x: Math.round(this.pos.x), y: Math.round(this.pos.y - 34) };
+    const g = this.add.graphics({ x: p.x, y: p.y });
+    g.fillStyle(0x6b4a2b, 1).fillRect(-10, -7, 20, 14).fillStyle(0xf5ecd7, 1).fillRect(-9, -6, 8, 12).fillRect(1, -6, 8, 12);
+    this.lagerLjust.add(g); this.lagda.push(g);
+    const rad = this.add.graphics({ x: p.x, y: p.y }); this.lagerLjust.add(rad); this.lagda.push(rad);
+    for (let i = 0; i < 3; i++) this.time.delayedCall(250 + i * 350, () => { rad.lineStyle(1, 0x1a1410, 1).lineBetween(-8, -3 + i * 4, -3, -3 + i * 4).lineBetween(2, -3 + i * 4, 7, -3 + i * 4); this.regiLjud('penndrag'); smuts(); });
+    this.time.delayedCall(1500, () => this.tweens.add({ targets: [g, rad], alpha: 0, duration: 300, onUpdate: smuts, onComplete: () => { g.destroy(); rad.destroy(); } }));
+    this.k4Logg('gatan_i_boken');
+    return 1900;
   }
 
   /** STOR SKÖLD: en jättebubbla över hjälten och ungen, och snön som hängde dundrar mot den och ligger på den. @returns {number} */
@@ -5103,7 +5171,7 @@ export class Rum extends Phaser.Scene {
    */
   stigHopp(till) {
     const fran = { ...this.pos }, t = { p: 0 }, ms = 320;
-    this.vand = { x: till.x >= fran.x ? 1 : -1, y: Math.sign(till.y - fran.y) * 0.3 };
+    this.vand = this.stig?.upp ? { x: Math.sign(till.x - fran.x) * 0.3, y: till.y <= fran.y ? -1 : 1 } : { x: till.x >= fran.x ? 1 : -1, y: Math.sign(till.y - fran.y) * 0.3 };
     this.tweens.add({ targets: t, p: 1, duration: ms, ease: 'Sine.easeInOut', onUpdate: () => {
       this.pos = { x: fran.x + (till.x - fran.x) * t.p, y: fran.y + (till.y - fran.y) * t.p };
       this.placera();

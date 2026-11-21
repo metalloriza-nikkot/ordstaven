@@ -198,6 +198,8 @@ export function lasKarta(tmj) {
       if (egen.i_bilden) ut.iBilden = true;
       // ankare (2.54, kapitel 4) = en plats i rummet som bara pekas ut (bokstavsstigens stig_<id>): den ritas aldrig
       if (egen.ankare) ut.ankare = true;
+      // upp (119.4, granskning 10 punkt 14) = bokstavsstigen går uppför i rummet: stegen ligger nedifrån och upp, och raderna sida vid sida
+      if (egen.upp) ut.upp = true;
       if (egen.sovplats) ut.sovplats = true;
       if (egen.skata_fonster) ut.skataFonster = true;
       if (egen.lyser) ut.lyser = true;

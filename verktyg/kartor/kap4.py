@@ -53,13 +53,21 @@ def med_bilder(spec):
 STEG_B, RAD_H = 40, 26
 
 
-def stig(pid, mitt, steg, rader, y0=0, y1=192):
+def stig(pid, mitt, steg, rader, y0=0, y1=192, upp=False, x0=0, x1=640):
     """Bokstavsstigen: ankaret (rutnätets mitt) och en ravin tvärs över rummet under rutnätet, så att han bara kommer
-    över på flaken. Han står på stranden till vänster när stigen börjar och på andra sidan när den är klar."""
-    x0 = mitt[0] - steg * STEG_B // 2
+    över på flaken. Han står på stranden till vänster när stigen börjar och på andra sidan när den är klar. Med upp
+    (119.4) går stigen uppför: stegen ligger nedifrån och upp (26 pixlar per steg), raderna sida vid sida (40 per rad),
+    och stupet går tvärs över rummet från x0 till x1. Han börjar nedanför och kommer upp ovanför."""
+    if upp:
+        ytop = mitt[1] - steg * RAD_H // 2
+        return [
+            sak(f'stig_{pid}', mitt[0] - 4, mitt[1] - 4, 8, 8, dekor=True, ankare=True, upp=True),
+            vagg(x0, ytop - 4, x1 - x0, steg * RAD_H + 8, vatten=True),
+        ]
+    xa = mitt[0] - steg * STEG_B // 2
     return [
         sak(f'stig_{pid}', mitt[0] - 4, mitt[1] - 4, 8, 8, dekor=True, ankare=True),
-        vagg(x0 - 4, y0, steg * STEG_B + 8, y1 - y0, vatten=True),
+        vagg(xa - 4, y0, steg * STEG_B + 8, y1 - y0, vatten=True),
     ]
 
 
@@ -69,38 +77,44 @@ RUMMEN = {
     # uppför branten, med ordet på en gammal stolpe. Bakom den grottans mynning i norr, med fyra snöhögar framför. Farfars
     # sten ligger under den tredje han lyfter (sak_vid), och syns när han har lyft den. Snön rasar över mynningen (ras).
     'berget_stigen': {
-        'storlek': (40, 12),
+        # 119.4 (granskning 10 punkt 5 och 14): två skärmar högt. Nedre halvan: floden i väster och gaffeln med de tre
+        # skyltarna. Tvärs över rummet går det isade stupet, och stig 1 (UPP) går uppför det. Övre halvan: snöhögarna,
+        # Farfars sten och grottans mynning i nordöstra hörnet, och ovanför mynningen sluttningen upp mot stenfältet,
+        # där baronens block står. Snöraset syns i ett svep från blocket till snön över mynningen.
+        'storlek': (40, 20),
         'objekt': [
-            punkt('start', 48, 120),
-            punkt('regi_floden', 16, 150),
-            punkt('regi_toppen', 560, 8),
-            punkt('regi_snon', 560, 40),
+            punkt('start', 48, 280),
+            punkt('regi_floden', 16, 296),
+            punkt('regi_toppen', 470, 6),
+            punkt('regi_block', 540, 32),
+            punkt('regi_snon', 584, 40),
             # floden i väster
-            vagg(0, 0, 24, 192, vatten=True),
-            sak('stig_floden', 24, 150, 20, 30, dekor=True),
-            # gaffeln: tre skyltar, ISGROTTAN mot stigen upp och de andra två mot var sitt håll
-            sak('skylt_isgrottan', 150, 70, 22, 18, sida='under'),
-            sak('skylt_issjon', 150, 150, 22, 18, sida='over'),
-            sak('skylt_eldgrottan', 96, 40, 22, 18, sida='under'),
-            # stig 1 (UPP): tre steg och två rader, ravinen under (x 236–364)
-            *stig('k4_stig1', (300, 100), 3, 2),
-            # mynningen i norr, med snöhögarna framför. Farfars sten under den tredje (dold tills han har lyft den)
-            sak('mynningen', 520, 20, 56, 24, sida='under'),
-            sak('ras_mynningen', 520, 30, 56, 20, sida='under'),
-            sak('snohog_1', 412, 70, 24, 16, sida='alla'),
-            sak('snohog_2', 470, 100, 24, 16, sida='alla'),
-            sak('snohog_3', 560, 88, 24, 16, sida='alla'),
-            sak('snohog_4', 600, 140, 24, 16, sida='alla'),
-            sak('sten_farfar', 500, 140, 22, 14, sida='alla'),
-            # bergets sidor
-            vagg(368, 0, 152, 16), vagg(576, 0, 64, 16),
-            liv('fagel', 200, 20, 12, 12),
+            vagg(0, 0, 24, 320, vatten=True),
+            sak('stig_floden', 24, 280, 20, 30, dekor=True),
+            # gaffeln: tre skyltar, ISGROTTAN mot stupet och de andra två mot var sitt håll
+            sak('skylt_isgrottan', 170, 236, 22, 18, sida='under'),
+            sak('skylt_issjon', 150, 292, 22, 18, sida='over'),
+            sak('skylt_eldgrottan', 96, 206, 22, 18, sida='under'),
+            # stig 1 (UPP): tre steg uppför stupet och två rader sida vid sida, stupet tvärs över rummet (y 116–202)
+            *stig('k4_stig1', (300, 159), 3, 2, upp=True, x0=24, x1=640),
+            # övre halvan: sluttningen mot stenfältet (där blocket står) är brant, och mynningen ligger i nordöstra
+            # hörnet under den, med snöhögarna framför. Farfars sten under den tredje (dold tills han har lyft den)
+            vagg(24, 0, 616, 44),
+            vagg(24, 44, 504, 20),
+            sak('mynningen', 552, 48, 64, 28, sida='under'),
+            sak('ras_mynningen', 552, 50, 64, 26, sida='under'),
+            sak('snohog_1', 380, 74, 24, 16, sida='alla'),
+            sak('snohog_2', 450, 92, 24, 16, sida='alla'),
+            sak('snohog_3', 540, 92, 24, 16, sida='alla'),
+            sak('snohog_4', 600, 96, 24, 16, sida='alla'),
+            sak('sten_farfar', 470, 70, 22, 14, sida='alla'),
+            liv('fagel', 200, 236, 12, 12),
         ],
     },
     # 2 × 2 skärmar: i mörkret syns bara hjälten, ungen och stavens glimt (färgtabellen, 113.8), och LJUS stänger av
     # den. Övre halvan: stig 2 (TAVLA, fem steg) är golvet över en vak, och bortom den står Farfars tre skrifter på
     # norra väggen. En öppning mitt i golvet leder ned. Nedre halvan: ishyllan med isblocket (och fotavtrycket under)
-    # i väster, väggen med GÅ PÅ DET SOM SVANSEN HAR. och raden SVANSEN HAR EN KLUBBA. bredvid, och stig 3 (klubba, sex
+    # i väster, väggen med GÅ PÅ DET SOM SVANSEN HAR. (gåtans rad kommer i hjälptrappan, 119.4), och stig 3 (klubba, sex
     # steg) över den sista vaken till sprickan i sydost, där ungen slår upp isen. Sprickan nås bara över stig 3.
     'berget_grottan': {
         'storlek': (40, 24),
@@ -121,8 +135,9 @@ RUMMEN = {
             sak('ishylla', 60, 344, 72, 16, sida='over'),
             sak('isblock', 84, 320, 24, 18, sida='alla'),
             sak('fotavtryck', 80, 324, 28, 14, sida='alla'),
-            # vid stig 3: väggen med vägen ut, och raden ur gåtan bredvid
+            # vid stig 3: väggen med vägen ut. Gåtans rad står inte längre bredvid (119.4): den kommer i hjälptrappan
             sak('vagg_ut', 220, 200, 24, 10, sida='under'),
+            # gåtans rad igen: dold från början (Innehåll pass 119), och hjälptrappan visar den efter två fel
             sak('gata_3_igen', 268, 200, 24, 10, sida='under'),
             # stig 3 (klubba): sex steg och tre rader, mitt i x 460 (vaken x 336–584)
             *stig('k4_stig3', (460, 290), 6, 3, 200, 384),
