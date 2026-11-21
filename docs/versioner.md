@@ -2,6 +2,7 @@
 
 | Version | Datum | Vad |
 |---|---|---|
+| 0.101.3 | 2026-11-21 | **Skylten på ön tar aldrig korten** (den vuxnes logg på 0.101.2): mellanscenen för den vuxne fryser inte världen, så han kunde öppna skylten medan den visades. Läsvalet tog då läsplattan över den öppna skylten, och när han stängde frågan gömde skylten korten och släppte världen. Nu väntar nästa steg tills skylten är stängd, och en skylt gömmer aldrig en läsplatta som något annat har tagit. **Testrummet för bokstavsstigen** med Innehålls pass 116 (`content/testrum-stig.json` v0.1, kapitel 4:s tre stigar, 116.4): knappen syns i den vuxnes meny. |
 | 0.101.2 | 2026-11-20 | **Bokstavsstigen följer Innehålls ritningar** (21b v0.2): han går från vänster till höger, och rutnätet skrivs med raderna uppifrån och ned och `~` för vak. Rätt flak ger ett glatt ljud och glitter, knaket hörs bara vid fel, och `vid_atervand` säger att bokstaven var rätt (115.8). |
 | 0.101.1 | 2026-11-20 | **Paletten 1.2 och kvällstabellen** (beslut 114.3 och 115.6): sex nya kalla färger för kapitel 4, och deras kvällsfärger. Inget i spelet använder dem än, och de gamla kvällsfärgerna är oförändrade. |
 | 0.101.0 | 2026-11-20 | **Bokstavsstigen** (P18, beslut 114.6) i ett testrum (`?testrum=stig`): isflak i ett rutnät med gemener i Lexend, hopp till raden framför, fel bokstav som knakar, återvändsgränder som sjunker tillbaka till förgreningen, vakar och isväggar, och hjälpen (kanten som lyser, ungens knuff och ordet i versaler efter fel). Schema 2.53. Testrummets knapp syns när Innehålls fil finns. |

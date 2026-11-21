@@ -1,0 +1,75 @@
+{
+ "meta": {
+  "version": "0.1",
+  "datum": "2026-11-21",
+  "beskrivning": "Testrummet för bokstavsstigen (P18, beslut 114.6 och 116.4). Kapitel 4:s tre stigar ur ritningarna, i trappans ordning: UPP (gemener som liknar versalerna, inga återvändsgränder), TAVLA (a och l med egen form) och klubba (ordet står inte i klartext, och lockordet klo dör).",
+  "anteckning": "Bara för den vuxne. I kapitlet läser han gåtans rad SVANSEN HAR EN KLUBBA på väggen före stig 3. Här står raden i instruktionen. Klo: grenen sjunker redan på det nedre l:et, eftersom inget flak bredvid har u, och o rakt framför är fel bokstav (116.2). Varje stig har exakt en väg igenom, och inga förväxlingsbara gemener står i samma kolumn."
+ },
+ "stigar": [
+  {
+   "id": "tr_stig_upp",
+   "typ": "P18_bokstavsstig",
+   "niva": "L1",
+   "ord": "upp",
+   "visa_ord": true,
+   "rutnat": [
+    "u x p",
+    "o p v"
+   ],
+   "instruktion": {
+    "talare": "berattare",
+    "text": "Hoppa på flaken som stavar UPP!",
+    "upplast": true
+   },
+   "knuff": {
+    "efter_sek": 15
+   }
+  },
+  {
+   "id": "tr_stig_tavla",
+   "typ": "P18_bokstavsstig",
+   "niva": "L2",
+   "ord": "tavla",
+   "visa_ord": true,
+   "rutnat": [
+    "s a v k e",
+    "t e x l a",
+    "o r s u o"
+   ],
+   "instruktion": {
+    "talare": "berattare",
+    "text": "Hoppa på flaken som stavar TAVLA!",
+    "upplast": true
+   },
+   "knuff": {
+    "efter_sek": 15
+   }
+  },
+  {
+   "id": "tr_stig_klubba",
+   "typ": "P18_bokstavsstig",
+   "niva": "L5",
+   "ord": "klubba",
+   "visa_ord": false,
+   "versaler_efter_fel": 2,
+   "rutnat": [
+    "f l u b e o",
+    "k f s r b a",
+    "x l o ~ s t"
+   ],
+   "instruktion": {
+    "talare": "berattare",
+    "text": "Svansen har en klubba. Gå på det som svansen har!",
+    "upplast": true
+   },
+   "vid_atervand": {
+    "talare": "berattare",
+    "text": "Rätt bokstav! Men här tar isen slut.",
+    "upplast": true
+   },
+   "knuff": {
+    "efter_sek": 15
+   }
+  }
+ ]
+}

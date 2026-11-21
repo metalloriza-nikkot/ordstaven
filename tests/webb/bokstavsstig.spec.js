@@ -82,3 +82,52 @@ test('bokstavsstigen: utan ord i klartext står ordet i versaler efter två fel,
   await expect(page.locator('#stigord .stigord-versal')).toContainText('MOSSA');
   await page.screenshot({ path: 'test-results/stig-versaler.png' });
 });
+
+// 116.4: Innehålls fil (content/testrum-stig.json) med kapitel 4:s tre stigar. Utan provfil öppnar testrummet den, och
+// knappen syns i den vuxnes meny. UPP spelas igenom, och i klubba sjunker lockordet klo redan på det nedre l:et (116.2).
+test('bokstavsstigen: Innehålls tre stigar, UPP igenom och klo som sjunker på l', async ({ page }) => {
+  test.setTimeout(120000);
+  const fil = JSON.parse(readFileSync(new URL('../../content/testrum-stig.json', import.meta.url), 'utf8'));
+  expect(fil.stigar.map((s) => s.id)).toEqual(['tr_stig_upp', 'tr_stig_tavla', 'tr_stig_klubba']);
+  await page.goto('./?snabb&ny');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.evaluate(() => localStorage.removeItem('ordstaven_testrum_stig'));
+  // utan provfil: Innehålls fil
+  await page.goto('./?snabb&testrum=stig');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 15000 }).toBe('tr_stig');
+  const framTillFlaken = async () => {
+    for (let i = 0; i < 30 && !(await page.locator('#stigord .flakord').first().isVisible().catch(() => false)); i++) {
+      for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+      await page.waitForTimeout(300);
+    }
+    await expect(page.locator('#stigord .flakord').first()).toBeVisible();
+  };
+  await framTillFlaken();
+  await expect(page.locator('#stigord .stigord-versal')).toContainText('UPP');
+  await page.screenshot({ path: 'test-results/stig-innehall-upp.png' });
+  for (const [k, r] of [[0, 0], [1, 1], [2, 0]]) { await flak(page, k, r).click(); await page.waitForTimeout(500); }
+  await expect.poll(async () => (await logg(page)).includes('tr_stig_upp: klar, 0 fel, 0 återvändsgränder'), { timeout: 8000 }).toBe(true);
+  // TAVLA: t, a, v, l, a
+  await expect.poll(async () => (await logg(page)).includes('[pussel] tr_stig_tavla'), { timeout: 15000 }).toBe(true);
+  await framTillFlaken();
+  for (const [k, r] of [[0, 1], [1, 0], [2, 0], [3, 1], [4, 1]]) { await flak(page, k, r).click(); await page.waitForTimeout(500); }
+  await expect.poll(async () => (await logg(page)).includes('tr_stig_tavla: klar, 0 fel'), { timeout: 8000 }).toBe(true);
+  // klubba: k, sedan det nedre l:et (klo). Där sjunker grenen, och ungens replik kommer
+  await expect.poll(async () => (await logg(page)).includes('[pussel] tr_stig_klubba'), { timeout: 15000 }).toBe(true);
+  await framTillFlaken();
+  await expect(page.locator('#stigord .stigord-versal')).toHaveCount(0);
+  await flak(page, 0, 1).click(); await page.waitForTimeout(500);
+  await flak(page, 1, 2).click();
+  await expect.poll(async () => (await logg(page)).includes('återvändsgränd'), { timeout: 8000 }).toBe(true);
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: 'test-results/stig-innehall-klo.png' });
+  // sedan rätt väg: k, l, u, b, b, a
+  for (let i = 0; i < 10 && !(await flak(page, 0, 1).isVisible().catch(() => false)); i++) {
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    await page.waitForTimeout(300);
+  }
+  for (const [k, r] of [[0, 1], [1, 0], [2, 0], [3, 0], [4, 1], [5, 1]]) { await flak(page, k, r).click(); await page.waitForTimeout(600); }
+  await expect.poll(async () => (await logg(page)).includes('tr_stig_klubba: klar'), { timeout: 8000 }).toBe(true);
+});

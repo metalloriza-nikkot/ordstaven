@@ -587,6 +587,51 @@ test('kapitel 3 efter 0.99.0: det första tutet vid munstycket, hjälten ut ur h
   await page.waitForTimeout(500);
 });
 
+// 116 (den vuxnes logg på 0.101.2): han öppnade skylten på ön medan mellanscenen för den vuxne visades (den fryser inte
+// världen). Läsvalet tog läsplattan medan skylten var öppen, och när han stängde frågan gömde skylten korten och släppte
+// världen. Nu väntar nästa steg tills skylten är stängd, och korten står kvar tills han har valt.
+test('kapitel 3: skylten på ön som är öppen när läsvalet börjar gömmer aldrig korten', async ({ page }) => {
+  test.setTimeout(90000);
+  const ev = (fn, arg) => page.evaluate(fn, arg);
+  const steg = kap.scener.find((x) => x.id === 'k3s04_on').steg;
+  const mellan = steg.findIndex((x, i) => x.typ === 'mellanscen' && steg[i + 1]?.pussel_id === 'k3_skylten_1');
+  expect(mellan).toBeGreaterThan(0);
+  await page.addInitScript(() => {
+    const s = JSON.parse(localStorage.getItem('ordstaven_spar') || 'null'); const av = s?.aventyr?.['den-gomda-dalen'];
+    if (!av || av.kapitelId !== 'kap-03') return;
+    av.visade = { ...(av.visade || {}), on: ['skylt_skal'] }; localStorage.setItem('ordstaven_spar', JSON.stringify(s));
+  });
+  // skylten öppnas mitt i mellanscenen, som när han gick dit och tryckte
+  await page.addInitScript((idx) => {
+    let gjort = false;
+    const t = setInterval(() => {
+      const o = window.__ORDSTAVEN; if (gjort || !o?.spel?.isRunning) return;
+      if (o.steg()?.typ === 'mellanscen' && o.stegIndex() === idx && o.lasSkylt('skylt_skal')) { gjort = true; clearInterval(t); }
+    }, 2);
+  }, mellan);
+  await starta(page, 'k3s04_on', kap.scener.findIndex((x) => x.id === 'k3s04_on'), mellan);
+  // förbi Farfars "Var var vi?" fram till mellanscenen (Enter bara före den: samma Enter stänger annars skylten)
+  for (let i = 0; i < 40 && !(await page.locator('#plattan.skylt-vy').isVisible()); i++) {
+    if ((await ev(() => window.__ORDSTAVEN.stegIndex())) < mellan) await page.keyboard.press('Enter');
+    await page.waitForTimeout(250);
+  }
+  await expect(page.locator('#plattan.skylt-vy')).toBeVisible({ timeout: 10000 });
+  await page.waitForTimeout(300);
+  // läsvalet har inte tagit läsplattan: skylten står kvar tills han stänger den
+  expect(await page.locator('#plattan.skylt-vy').isVisible()).toBe(true);
+  expect(await ev(() => window.__ORDSTAVEN.logg())).toMatch(/\[skylt\] skylt_skal: nästa steg väntar/);
+  await page.keyboard.press('Enter');
+  // frågan, sedan korten
+  for (let i = 0; i < 20 && !(await page.locator('#plattan .kort').first().isVisible()); i++) { await page.keyboard.press('Enter'); await page.waitForTimeout(300); }
+  await expect(page.locator('#plattan .kort').first()).toBeVisible();
+  // korten står kvar (förut gömde skylten dem när han stängde frågan)
+  await page.waitForTimeout(1500);
+  await expect(page.locator('#plattan .kort[data-id="skold"]')).toBeVisible();
+  await page.locator('#plattan .kort[data-id="skold"]').click();
+  await expect.poll(() => ev(() => window.__ORDSTAVEN.steg()?.pussel_id), { timeout: 15000 }).toBe('k3_skylten_2');
+  await page.screenshot({ path: 'test-results/kap3-skylten-oppen-vid-lasvalet.png' });
+});
+
 // 113.2 (den vuxnes skärmdump på 0.99.1): ankaret och SKÖLD hamnade där han hittade flaskan, inte där han stod. Ankaret
 // räknades mitt emellan hjälten och ungen, och ungen stod kvar där den lockade vid skalkanten.
 test('kapitel 3: ankaret och SKÖLD faller där hjälten står efter flaskan, och ungen går fram till honom först', async ({ page }) => {

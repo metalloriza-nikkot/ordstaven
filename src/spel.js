@@ -1356,6 +1356,8 @@ export function skapaSpel(d) {
   let skyltSpar = null;
   /** @type {string | null} skylten med frågan i läsvalet som pågår */
   let skyltPusselNu = null;
+  /** @type {Promise<void> | null} klar när skylten som är öppen har stängts */
+  let skyltStangd = null;
   /**
    * Läsplattan med skyltens text. Skyltar läses aldrig upp (beslut 13.3), men nosen fungerar: gratis på en skylt
    * i rummet, som i pusslet på pusslets skylt. ▶ stänger.
@@ -1365,15 +1367,21 @@ export function skapaSpel(d) {
   async function lasSkyltText(sk, lys) {
     if (skyltOppen) return;
     skyltOppen = sk.id;
+    let stangd = () => {};
+    skyltStangd = new Promise((r) => { stangd = r; });
     const varFryst = rum.fryst;
     rum.frys(true); inmatning.rensaGaTill();
     logg.handelse('skylt', sk.id + (lys ? ` (${lys} lyser)` : ''));
     const el = ui.visaPlatta(`<div class="pussel-ruta"><div class="lapp p-${ui.esc(sk.papper)}">${ui.rader(sk.text, varden())}</div><button type="button" class="vidare synlig" aria-label="Stäng">▶</button></div>`, 'pussel lapp-vy skylt-vy');
     if (lys) for (const e of el.querySelectorAll('.ord')) if (versaler(/** @type {HTMLElement} */ (e).dataset.ord || '') === versaler(lys)) e.classList.add('lyser');
     if (sk.pussel) tillatNos(sk.pussel, skyltSpar ?? { hjalp: false }); else ui.sattNos(true, { betala: () => true });
-    await ui.vantaFortsatt(/** @type {HTMLElement} */ (el.querySelector('.vidare')), lyssnaHandling);
+    const stang = /** @type {HTMLElement} */ (el.querySelector('.vidare'));
+    await ui.vantaFortsatt(stang, lyssnaHandling);
     await vanta(0); // trycket på ▶ får inte nå nästa steg
-    ui.doljPlatta(); rum.frys(varFryst); skyltOppen = null;
+    // 116 (den vuxnes logg på 0.101.2): har något annat tagit läsplattan under tiden (frågan i läsvalet på ön) får
+    // skylten inte gömma den eller släppa världen när den stängs
+    if (stang.isConnected && !ui.plattan.hidden) { ui.doljPlatta(); rum.frys(varFryst); }
+    skyltOppen = null; skyltStangd = null; stangd();
   }
   /** Rummets skyltar i textlagret: ett ord syns som ordet, en mening som ett papper. Ett tryck går dit (eller läser). */
   function visaRumsskyltar() {
@@ -1454,6 +1462,9 @@ export function skapaSpel(d) {
   // ------------------------------------------------------------------ stegen
   /** @param {any} st */
   async function utfor(st) {
+    // 116 (den vuxnes logg på 0.101.2): mellanscenen för den vuxne fryser inte världen, så han kan ha öppnat en skylt
+    // under tiden (skylten på ön). Nästa steg börjar när han har läst klart, så att det aldrig tar skyltens läsplatta.
+    if (skyltStangd) { logg.handelse('skylt', `${skyltOppen}: nästa steg väntar tills den är stängd`); await skyltStangd; }
     aktuelltSteg = st;
     spelaPlatsensMusik(); // steget `musik` byter slinga, också när spelet startas om efter det
     if (st.typ !== 'ga_till') molnKedja = null;
@@ -4857,7 +4868,7 @@ export function skapaSpel(d) {
     const delar = [
       ['spelare', 'SPELARE', spelargrupp() || '<div class="menygrupp"><small>En spelare på den här enheten.</small></div>'],
       ['pass', 'PASS OCH KAPITEL', `<div class="menygrupp passlista"><b>Börja ett pass</b> <small>(namnen och det som kommer före finns kvar, och lärandet blir som när passet började):</small> ${passStart}${utanBild ? '<small class="utan-bild">* Där står lärandet kvar som det är nu, eftersom det inte finns någon bild av det från passets början.</small>' : ''}${las ? `<div class="kapitel-las">${las}</div>` : ''}</div>
-        <div class="menygrupp testrum-grupp">${d.testrum ? '<button type="button" class="menyval testrum-ut">Tillbaka till äventyret</button><small>Testrummet sparar ingenting. Orden han skrev står i loggen (SPARFIL, Spara loggen).</small>' : '<button type="button" class="menyval testrum-in">Testrummet för fritt skrivande</button><small>Ett tomt rum med skrivuppgifter som inte finns i äventyret. Det påverkar inte sparningen eller lärandet, och alla ord han skriver står i loggen.</small>'}${!d.testrum && d.testrumDuell ? '<button type="button" class="menyval testrum-duell-in">Testrummet för ordduellen</button><small>Ordduellen med påhittade ord och en motståndare som inte finns i äventyret (61.1). Det påverkar inte sparningen eller lärandet, och korten han väljer står i loggen.</small>' : ''}${!d.testrum && d.testrumStig ? '<button type="button" class="menyval testrum-stig-in">Testrummet för bokstavsstigen</button><small>Bokstavsstigen med påhittade ord (114.6). Han hoppar på isflaken som stavar ordet. Det påverkar inte sparningen eller lärandet, och varje hopp står i loggen.</small>' : ''}</div>`],
+        <div class="menygrupp testrum-grupp">${d.testrum ? '<button type="button" class="menyval testrum-ut">Tillbaka till äventyret</button><small>Testrummet sparar ingenting. Orden han skrev står i loggen (SPARFIL, Spara loggen).</small>' : '<button type="button" class="menyval testrum-in">Testrummet för fritt skrivande</button><small>Ett tomt rum med skrivuppgifter som inte finns i äventyret. Det påverkar inte sparningen eller lärandet, och alla ord han skriver står i loggen.</small>'}${!d.testrum && d.testrumDuell ? '<button type="button" class="menyval testrum-duell-in">Testrummet för ordduellen</button><small>Ordduellen med påhittade ord och en motståndare som inte finns i äventyret (61.1). Det påverkar inte sparningen eller lärandet, och korten han väljer står i loggen.</small>' : ''}${!d.testrum && d.testrumStig ? '<button type="button" class="menyval testrum-stig-in">Testrummet för bokstavsstigen</button><small>Kapitel 4:s tre stigar, så att du kan pröva bokstavsstigen innan kapitlet finns (116.4). Han hoppar på isflaken som stavar ordet. Det påverkar inte sparningen eller lärandet, och varje hopp står i loggen.</small>' : ''}</div>`],
       ['lasning', 'LÄSNING', `<div class="menygrupp lasniva"><b>Läsnivå (läs och välj):</b> ${Array.from({ length: Math.max(4, niva) }, (_, i) => i + 1).map((n) => `<button type="button" class="menyval niva ${n === niva ? 'nu' : ''}" data-n="${n}">L${n}</button>`).join('')} <small class="niva-i-kapitlet">${nivaIKapitlet()}</small></div>`],
       ['ljud', 'LJUD OCH RÖST', `<div class="menygrupp"><label><input type="checkbox" class="foralder" ${inst.foralderLaser ? 'checked' : ''}> Föräldern läser ${ui.esc(Object.values(aventyr.talare).filter((/** @type {any} */ t) => t.rost === 'foraldern_eller_datorrost').map((/** @type {any} */ t) => t.namn).join(' och ') || 'rollernas')} repliker</label>
         <label><input type="checkbox" class="rostval" ${inst.rost ? 'checked' : ''}> Datorrösten läser upp (av: rullningen piper i ordtakt)</label>
