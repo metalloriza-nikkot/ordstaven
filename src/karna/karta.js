@@ -196,6 +196,8 @@ export function lasKarta(tmj) {
       // i_bilden (82.7) = föremålet är en del av rummets bild (leran, bryggan, vattnet): det ritas inte som en ruta,
       // men id:t, zonen och hindret står kvar
       if (egen.i_bilden) ut.iBilden = true;
+      // ankare (2.54, kapitel 4) = en plats i rummet som bara pekas ut (bokstavsstigens stig_<id>): den ritas aldrig
+      if (egen.ankare) ut.ankare = true;
       if (egen.sovplats) ut.sovplats = true;
       if (egen.skata_fonster) ut.skataFonster = true;
       if (egen.lyser) ut.lyser = true;

@@ -281,6 +281,9 @@ export class Rum extends Phaser.Scene {
     // bokstavsstigens isflak (P18, 114.6): ovanpå golvet och föremålen, under figurerna
     this.lagerStig = this.add.container(0, 0);
     this.ljusboll = this.add.graphics().setVisible(false);
+    // mörkret i isgrottan (kapitel 4, tillståndet mork, 113.8): under figurerna, så att bara hjälten, ungen och
+    // stavens glimt syns. LJUS byter tillståndet, och då är det borta
+    this.grottMorker = this.add.graphics();
     this.lagerFigurer = this.add.container(0, 0);
     // liv i skogen (fåglar, löv, fjärilen, ekorren) i världens pixlar
     this.livet = new Livet(this, this.lagerFigurer);
@@ -1103,6 +1106,25 @@ export class Rum extends Phaser.Scene {
       skuggan_dyker: () => this.skugganDyker(),
       on_stiger: () => this.onStiger(),
       sackhiss_upp: () => this.sackhiss(-1),
+      // kapitel 4 i gråbox (118.4): gråboxens former tills Stil har ritat (Rum.js, kapitel 4 i gråbox)
+      ankomst_berget: () => this.ankomstBerget(),
+      baronen_kikare_berg: () => this.baronenKikareBerg(),
+      blocket_lyfts: () => this.blocketLyfts(),
+      stor_skold_ras: () => this.storSkoldRas(),
+      mynningen_stangs: () => this.mynningenStangs(),
+      grottan_glittrar: () => this.grottanGlittrar(),
+      grottan_visar_vaggen: () => this.grottanVisarVaggen(),
+      isblock_svavar: () => this.isblockSvavar(),
+      fotavtryck_stor: () => this.isblockSvavar(),
+      ungen_fot_avtryck: () => this.ungenFotAvtryck(),
+      ungen_slar_isen: () => this.ungenSlarIsen(),
+      blocket_driva: () => this.blocketDriva(),
+      fossil_svans: () => this.fossilSvans(),
+      svansarna: () => this.svansarna(),
+      ladan_oppnas: () => this.ladanOppnas(),
+      kartbit5_molnkant: () => this.kartbit5Molnkant(),
+      skata_harmar_molnkant: () => this.skataHarmarMolnkant(),
+      resan_molnkant: () => this.resanMolnkant(),
       sackhiss_ner: () => this.sackhiss(1),
     });
     if (k2[bild]) return k2[bild]();
@@ -3146,6 +3168,38 @@ export class Rum extends Phaser.Scene {
    * ett tryck hoppar över den (spel.js, `slutbildSlut`). Gråbox tills Stils slutbild finns, med bara bildbyten och
    * enkla rörelser. @returns {number}
    */
+  /**
+   * En slutbild från sidan med Stils bilder (109.10 och 115.7): en bred bakgrund (640 × 192, växlar var 600:e ms) och en
+   * figur som rör sig åt höger (byter bild var figurMs). Kameran glider från x 0 till 320 på ca 7,5 s, och figuren går
+   * från `fran` till `till`, lite fortare än kameran. Bilden står kvar på sin sista bild, och slutrutan visas över den
+   * (113.6). Bara bildbyten och läge (golvdatorn). @returns {number} ms, 0 om Stils bilder saknas
+   * @param {{ bak: string[], figur: string[], figurY: number, fran: number, till: number, figurMs: number }} o
+   */
+  slutbildFranSidan(o) {
+    if (![...o.bak, ...o.figur].every((n) => this.textures.exists(n))) return 0;
+    const smuts = () => { this.smutsig = true; };
+    this.rensaSidovy();
+    const k = this.kamera, c = this.sidovy;
+    c.setPosition(k.x, k.y).setVisible(true).setAlpha(0);
+    const GLID = 7500, ms = GLID + 600;
+    const bild = this.add.image(0, 0, o.bak[0]).setOrigin(0, 0);
+    const fig = this.add.image(o.fran, o.figurY, o.figur[0]).setOrigin(0, 0);
+    c.add([bild, fig]);
+    this.tweens.add({ targets: c, alpha: 1, duration: 300, onUpdate: smuts });
+    let nb = 0, nf = 0;
+    const byten = [
+      this.time.addEvent({ delay: 600, loop: true, callback: () => { if (!bild.active) return; nb = 1 - nb; bild.setTexture(o.bak[nb]); smuts(); } }),
+      this.time.addEvent({ delay: o.figurMs, loop: true, callback: () => { if (!fig.active) return; nf = 1 - nf; fig.setTexture(o.figur[nf]); smuts(); } }),
+    ];
+    const lage = (/** @type {number} */ t) => { const kx = Math.round(320 * t); bild.x = -kx; fig.x = Math.round(o.fran + (o.till - o.fran) * t) - kx; smuts(); };
+    const glid = this.tweens.addCounter({ from: 0, to: 1, duration: GLID, onUpdate: (tw) => {
+      if (!bild.active) { tw.stop(); return; }
+      lage(tw.getValue() ?? 0);
+    } });
+    this.slutbild = { c, solar: [], byten, tillSlut: () => { glid.stop(); lage(1); c.setAlpha(1); } };
+    return ms;
+  }
+
   resanSlut() {
     const smuts = () => { this.smutsig = true; };
     this.rensaSidovy();
@@ -3155,29 +3209,12 @@ export class Rum extends Phaser.Scene {
     // rör sig var 600:e ms), och sköldpaddan med hjälten och ungen som egen figur (k3_slut_skoldpadda_01–02, 128 × 72,
     // ett simtag var 500:e ms). Kameran glider längs bilden från x 0 till 320 på ca 7,5 s, och sköldpaddan simmar lite
     // fortare, från x 40 till 380, så att den kommer närmare berget. Bara bildbyten och läge (golvdatorn).
-    const bak = ['sidovy_k3_slut_bakgrund_01', 'sidovy_k3_slut_bakgrund_02'], padda = ['sidovy_k3_slut_skoldpadda_01', 'sidovy_k3_slut_skoldpadda_02'];
-    if ([...bak, ...padda].every((n) => this.textures.exists(n))) {
-      const GLID = 7500, ms = GLID + 600;
-      const bild = this.add.image(0, 0, bak[0]).setOrigin(0, 0);
-      const sk = this.add.image(40, 74, padda[0]).setOrigin(0, 0);
-      c.add([bild, sk]);
-      this.tweens.add({ targets: c, alpha: 1, duration: 300, onUpdate: smuts });
-      let nb = 0, ns = 0;
-      const byten = [
-        this.time.addEvent({ delay: 600, loop: true, callback: () => { if (!bild.active) return; nb = 1 - nb; bild.setTexture(bak[nb]); smuts(); } }),
-        this.time.addEvent({ delay: 500, loop: true, callback: () => { if (!sk.active) return; ns = 1 - ns; sk.setTexture(padda[ns]); smuts(); } }),
-      ];
-      const lage = (/** @type {number} */ t) => { const kx = Math.round(320 * t); bild.x = -kx; sk.x = Math.round(40 + 340 * t) - kx; smuts(); };
-      const glid = this.tweens.addCounter({ from: 0, to: 1, duration: GLID, onUpdate: (tw) => {
-        if (!bild.active) { tw.stop(); return; }
-        lage(tw.getValue() ?? 0);
-      } });
+    const ms0 = this.slutbildFranSidan({ bak: ['sidovy_k3_slut_bakgrund_01', 'sidovy_k3_slut_bakgrund_02'], figur: ['sidovy_k3_slut_skoldpadda_01', 'sidovy_k3_slut_skoldpadda_02'],
+      figurY: 74, fran: 40, till: 380, figurMs: 500 });
+    if (ms0) {
       for (let i = 0; i < 5; i++) this.regiLjud('horn_tut', 600 + i * 700);
-      // 113.6: bilden står kvar på sin sista bild (sköldpaddan mot berget), och slutrutan visas över den. Den tas bort
-      // först när rummet byts
-      this.slutbild = { c, solar: [], byten, tillSlut: () => { glid.stop(); lage(1); c.setAlpha(1); } };
       this.regiLogg.push('slutbilden: kameran glider mot berget');
-      return ms;
+      return ms0;
     }
     const himmel = this.add.graphics();
     const band = [0xf4b860, 0xe8945a, 0xc8665a, 0x8a4a6a, 0x4a3a6a];
@@ -4020,7 +4057,7 @@ export class Rum extends Phaser.Scene {
     let viaHissen = false;
     if (v.nyttRum || !this.harRum) { this.rumsbild = (this.harRum && v.karta?.bild) || null; this.falt = faltFor(this.rumsbild); this.mark = (this.harRum && v.karta?.mark) || null; this.rumId = v.rum; this.markObjekt = v.karta?.objekt || []; }
     this.visaUnge = v.unge;
-    if (v.nyttRum) { for (const id of [...this.ramSlinga.keys(), ...this.ramTimrar.keys()]) this.stoppaRamar(id); this.ramFor.clear(); this.dolda.clear(); this.ungeMal = null; this.ungeTittarPa = null; this.ungeKlattrar = null; this.stegeNu = null; this.ungeSang = null; this.ungeLyft = 0; this.ungeFast = null; this.hjalteFast = null; this.lerig = 0; this.undvik = []; this.hinderUndvik = null; this.regiFokus = null; this.forstFokus = false; if (this.ungeSvavar) { this.ungeSvavar.g.destroy(); this.ungeSvavar = null; } for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas?.remove(); this.sover = null; } this.vaknar = null; this.rensaRegi(); this.k3UngeIVattnet = false; this.k3Huvud = null; this.k3Mjol = null; this.k3Skugga = null; this.k3Simmar = null; this.k3Ankare = null; this.k3Bubbla = null; this.k3AnkareMitt = null; this.rensaStig(); viaHissen = this.k3IHissen; this.k3IHissen = false; this.hjalte.setAlpha(1); this.unge.setAlpha(1); this.naraVinkat.clear(); this.blasNr++; if (this.hjaltePose?.startsWith('hjalte_blaser_')) this.sattPose(null); }
+    if (v.nyttRum) { for (const id of [...this.ramSlinga.keys(), ...this.ramTimrar.keys()]) this.stoppaRamar(id); this.ramFor.clear(); this.dolda.clear(); this.ungeMal = null; this.ungeTittarPa = null; this.ungeKlattrar = null; this.stegeNu = null; this.ungeSang = null; this.ungeLyft = 0; this.ungeFast = null; this.hjalteFast = null; this.lerig = 0; this.undvik = []; this.hinderUndvik = null; this.regiFokus = null; this.forstFokus = false; if (this.ungeSvavar) { this.ungeSvavar.g.destroy(); this.ungeSvavar = null; } for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas?.remove(); this.sover = null; } this.vaknar = null; this.rensaRegi(); this.k3UngeIVattnet = false; this.k3Huvud = null; this.k3Mjol = null; this.k3Skugga = null; this.k3Simmar = null; this.k3Ankare = null; this.k3Bubbla = null; this.k3AnkareMitt = null; this.k4 = null; this.rensaStig(); viaHissen = this.k3IHissen; this.k3IHissen = false; this.hjalte.setAlpha(1); this.unge.setAlpha(1); this.naraVinkat.clear(); this.blasNr++; if (this.hjaltePose?.startsWith('hjalte_blaser_')) this.sattPose(null); }
     this.tillstand = v.tillstand;
     // figurerna på kvällen (84.2): bilderna byggs första gången, sedan byts bara atlasens källa
     sattKvall(this, this.harRum && v.tillstand === 'kvall' ? KVALL_TABELL : null);
@@ -4269,7 +4306,7 @@ export class Rum extends Phaser.Scene {
       this.lagerObjekt.add(c); this.ritade.set(o.id, /** @type {any} */ (c)); return;
     }
     // en del av rummets bild (82.7: leran, bryggan, vattnet): bara en osynlig ruta, som hindren och tester kan hitta
-    if (o.iBilden && this.rumsbild && this.golvBild.visible) {
+    if (o.ankare || (o.iBilden && this.rumsbild && this.golvBild.visible)) {
       const r = this.add.rectangle(o.x, o.y, o.b, o.h, 0, 0).setOrigin(0, 0);
       this.lagerObjekt.add(r); this.ritade.set(o.id, r); return;
     }
@@ -4418,7 +4455,9 @@ export class Rum extends Phaser.Scene {
       for (const [r, a] of [[60, 0.10], [44, 0.12], [28, 0.16]]) g.fillStyle(FARG.ljus, a).fillCircle(l.x, l.y, r);
       g.fillStyle(FARG.ljus, 1).fillCircle(l.x, l.y - 14, 3);
     }
-    this.ljusboll.setVisible(this.harRum && t === 'natt_upplyst');
+    this.ljusboll.setVisible(this.harRum && (t === 'natt_upplyst' || t === 'mork'));
+    const gm = this.grottMorker; gm.clear();
+    if (this.harRum && t === 'mork') { gm.fillStyle(0x04050a, 0.97).fillRect(0, 0, this.storlek.bredd, this.storlek.hojd); this.regiLogg.push('mörkret'); }
   }
 
   placera() {
@@ -4437,7 +4476,11 @@ export class Rum extends Phaser.Scene {
     else this.unge.setPosition(Math.round(this.ungePos.x - 6 + (m ? Math.cos(m.mot) * nos : 0)), Math.round(this.ungePos.y - 12 + (m ? Math.sin(m.mot) * nos : 0)));
     this.ritaVassVidFotter();
     const l = this.ljusboll; l.clear();
-    if (l.visible) {
+    if (l.visible && this.tillstand === 'mork') {
+      // stavens svaga glimt i mörkret: en liten prick vid stavens topp
+      l.fillStyle(0xcfe6ff, 0.25).fillCircle(Math.round(this.pos.x + 6), Math.round(this.pos.y - 26), 6);
+      l.fillStyle(0xeaf4ff, 0.9).fillCircle(Math.round(this.pos.x + 6), Math.round(this.pos.y - 26), 1.5);
+    } else if (l.visible) {
       const cx = Math.round(this.pos.x), cy = Math.round(this.pos.y - 30);
       l.fillStyle(FARG.ljus, 0.18).fillCircle(cx, cy + 18, 56);
       l.fillStyle(FARG.ljus, 1).fillCircle(cx, cy, 3);
@@ -4705,7 +4748,8 @@ export class Rum extends Phaser.Scene {
     /** @type {Map<string, any>} */ const bilder = new Map();
     for (let r = 0; r < g.rader; r++) for (let k = 0; k < g.kolumner; k++) {
       const c = g.celler[r][k], p = mittFor(r, k);
-      if (c.sort === 'vak') continue;
+      // Stils vak (vak_01–02, LASMIG_114): mörkt vatten med ringar. Utan den syns bara vattnet under
+      if (c.sort === 'vak') { const v = foremalsbild(this, 'vak_01'); if (v) { const img = this.add.image(p.x, p.y, v.nyckel, v.ram); this.lagerStig.add(img); } continue; }
       const f = foremalsbild(this, c.sort === 'flak' ? 'isflak' : 'isvagg');
       let bild;
       if (f) bild = this.add.image(p.x, p.y, f.nyckel, f.ram);
@@ -4727,6 +4771,323 @@ export class Rum extends Phaser.Scene {
     this.lagerStig.add(this.stig.sprickor);
     this.smutsig = true;
     return { flak: (r, k) => mittFor(r, k), strand, mal, skylt };
+  }
+
+  // ------------------------------------------------------------------ kapitel 4 i gråbox (118.4)
+  // Gråboxens former tills Stil har ritat: luftskeppet en orange ellips, snön en vit massa, bubblan en ring, isen
+  // blå. Allt som står kvar läggs i this.lagda (borta när rummet byts). Regiloggen får regins namn, för testerna.
+
+  /** En punkt i rummet: kartans regi_<namn>, annars mitten av föremålet. @param {string} id */
+  k4Punkt(id) {
+    const r = this.regiPunkter?.[id];
+    if (r) return { x: r.x, y: r.y };
+    const o = this.ruta(id);
+    return o ? { x: o.x + o.b / 2, y: o.y + o.h / 2 } : null;
+  }
+
+  /** Luftskeppet i gråbox (ellips, gondol och rep), i luften. @param {{ x: number, y: number }} p */
+  k4Skepp(p) {
+    if (this.k4?.skepp?.active) return this.k4.skepp;
+    const g = this.add.graphics({ x: p.x, y: p.y });
+    g.fillStyle(0xd9782f, 1).fillEllipse(0, 0, 44, 18).fillStyle(0x7a4a26, 1).fillRect(-8, 10, 16, 6).lineStyle(1, 0x5a3a1e, 1).lineBetween(-6, 8, -6, 10).lineBetween(6, 8, 6, 10);
+    this.lagerLuft.add(g); this.lagda.push(g);
+    this.k4 = { ...(this.k4 || {}), skepp: g };
+    return g;
+  }
+
+  /** Regins namn i loggen. @param {string} n */
+  k4Logg(n) { this.regiLogg.push(n); if (this.regiLogg.length > 160) this.regiLogg.shift(); this.smutsig = true; }
+
+  /** Ett glitter av färgade prickar runt en punkt. @param {{ x: number, y: number }} p @param {number} [r] */
+  k4Glitter(p, r = 40) {
+    const smuts = () => { this.smutsig = true; };
+    const farger = [0xff6b6b, 0xffd34d, 0x6be37a, 0x5ab8ff, 0xc77dff];
+    for (let i = 0; i < 18; i++) {
+      const v = (i / 18) * Math.PI * 2, g = this.add.graphics({ x: p.x, y: p.y });
+      g.fillStyle(farger[i % farger.length], 1).fillRect(-1, -1, 3, 3); this.lagerLjust.add(g);
+      this.tweens.add({ targets: g, x: p.x + Math.cos(v) * r, y: p.y + Math.sin(v) * r * 0.6, alpha: 0, duration: 1100, delay: (i % 6) * 60, onUpdate: smuts, onComplete: () => g.destroy() });
+    }
+  }
+
+  /**
+   * Ankomsten (manus 21, pass 1): sköldpaddan lägger till vid bergets fot, kameran glider upp mot toppen som ryker,
+   * och luftskeppet hänger över den. Skeppet står kvar tills baronen far med blocket. @returns {number}
+   */
+  ankomstBerget() {
+    const topp = this.k4Punkt('toppen'); if (!topp) return 0;
+    const smuts = () => { this.smutsig = true; };
+    for (let i = 0; i < 3; i++) {
+      const g = this.add.graphics({ x: topp.x - 20 + i * 10, y: topp.y + 18 }); g.fillStyle(0x9a9a9a, 0.8).fillCircle(0, 0, 5);
+      this.lagerLuft.add(g); this.lagda.push(g);
+      this.tweens.add({ targets: g, y: topp.y - 2, alpha: 0.2, duration: 1800, delay: i * 500, repeat: -1, onUpdate: smuts });
+    }
+    this.k4Skepp({ x: topp.x + 30, y: topp.y + 10 });
+    this.regiFokus = topp;
+    this.time.delayedCall(2600, () => { this.regiFokus = null; });
+    this.k4Logg('ankomst_berget');
+    return 3200;
+  }
+
+  /** Baronen läser stenen med kikaren (ett blänk i gondolen). @returns {number} */
+  baronenKikareBerg() {
+    const sk = this.k4Skepp(this.k4Punkt('toppen') || { x: this.pos.x, y: 20 });
+    const g = this.add.graphics({ x: sk.x + 6, y: sk.y + 12 }); g.fillStyle(0xfff6b0, 1).fillCircle(0, 0, 2); this.lagerLjust.add(g);
+    this.tweens.add({ targets: g, alpha: 0.1, duration: 250, yoyo: true, repeat: 4, onUpdate: () => { this.smutsig = true; }, onComplete: () => g.destroy() });
+    this.regiFokus = { x: sk.x, y: sk.y + 30 };
+    this.time.delayedCall(2000, () => { this.regiFokus = null; });
+    this.k4Logg('baronen_kikare_berg');
+    return 2400;
+  }
+
+  /**
+   * Luftskeppet surrar bort över krönet, berget skakar, och snön ovanför grottan lossnar och stannar i luften
+   * (113.8): den hänger kvar tills STOR SKÖLD är skriven, så ingen klocka räknar. @returns {number}
+   */
+  blocketLyfts() {
+    const sk = this.k4Skepp(this.k4Punkt('toppen') || { x: this.pos.x, y: 20 });
+    const smuts = () => { this.smutsig = true; };
+    this.tweens.add({ targets: sk, x: sk.x + 160, y: sk.y - 40, duration: 1400, onUpdate: smuts, onComplete: () => sk.setVisible(false) });
+    this.time.delayedCall(1300, () => { this.cameras.main.shake(500, 0.006); smuts(); });
+    const m = this.k4Punkt('mynningen') || this.pos;
+    // Stils snomassa_01–02 (96 × 48, LASMIG_114): snön som står i luften, och smulor faller (ca 400 ms per bild)
+    const sm = this.regiram('snomassa_01');
+    /** @type {any} */ let sno;
+    if (sm && this.regiram('snomassa_02')) {
+      sno = this.add.image(m.x, m.y - 40, sm.nyckel, sm.ram);
+      let nr = 0;
+      const ev = this.time.addEvent({ delay: 400, loop: true, callback: () => { if (!sno.active) { ev.remove(); return; } nr = 1 - nr; const f = /** @type {any} */ (this.regiram(nr ? 'snomassa_02' : 'snomassa_01')); sno.setTexture(f.nyckel, f.ram); smuts(); } });
+    } else {
+      sno = this.add.graphics({ x: m.x, y: m.y - 40 });
+      sno.fillStyle(0xf4f8fc, 1).fillEllipse(0, 0, 70, 26).fillStyle(0xdbe6ef, 1).fillEllipse(-14, 6, 30, 12).fillEllipse(18, 4, 26, 10);
+    }
+    sno.setAlpha(0); this.lagerLuft.add(sno); this.lagda.push(sno);
+    // den igenrasade mynningen (tillståndet ras) syns först när snön har rasat (mynningen_stangs)
+    this.k4 = { ...(this.k4 || {}), rasDolt: true };
+    const dolj = this.time.addEvent({ delay: 50, loop: true, callback: () => { const r = /** @type {any} */ (this.ritade.get('ras_mynningen')); if (!this.k4?.rasDolt) { dolj.remove(); r?.setVisible?.(true); smuts(); return; } if (r?.visible) { r.setVisible(false); smuts(); } } });
+    // snön rasar och stannar en bit ovanför hjälten och ungen
+    const stopp = { x: Math.round((this.pos.x + m.x) / 2), y: Math.round(Math.min(this.pos.y, this.ungePos.y) - 46) };
+    this.tweens.add({ targets: sno, alpha: 1, duration: 200, delay: 1600, onUpdate: smuts });
+    this.tweens.add({ targets: sno, x: stopp.x, y: stopp.y, duration: 700, delay: 1800, ease: 'Quad.easeIn', onUpdate: smuts });
+    this.k4 = { ...(this.k4 || {}), sno };
+    this.regiFokus = { x: stopp.x, y: stopp.y + 30 };
+    this.time.delayedCall(2700, () => { this.regiFokus = null; });
+    this.k4Logg('blocket_lyfts'); this.k4Logg('snön stannar i luften');
+    return 2800;
+  }
+
+  /** STOR SKÖLD: en jättebubbla över hjälten och ungen, och snön som hängde dundrar mot den och ligger på den. @returns {number} */
+  storSkoldRas() {
+    if (this.k4?.bubbla?.active) return 300; // effekten och reaktionen är samma regi
+    const smuts = () => { this.smutsig = true; };
+    const mx = Math.round((this.pos.x + this.ungePos.x) / 2), my = Math.round(Math.max(this.pos.y, this.ungePos.y) - 12);
+    /** @type {any} */ let b;
+    if (this.regiram('skold_stor_tands_01') && this.regiram('skold_stor_bubbla_01') && this.regiram('skold_stor_bubbla_02')) {
+      const fot = this.mittMellan();
+      const tand = this.regibild(['skold_stor_tands_01', 'skold_stor_tands_02', 'skold_stor_tands_03'], fot.x, fot.y + 2, 150, this.lagerLjust);
+      if (tand) this.time.delayedCall(450, () => tand.destroy());
+      b = this.regibild(['skold_stor_bubbla_01'], fot.x, fot.y + 2, 0, this.lagerLjust); b.setAlpha(0); this.lagda.push(b);
+      this.time.delayedCall(450, () => { if (b.active) b.setAlpha(1); smuts(); });
+      let nr = 0;
+      const ev = this.time.addEvent({ delay: 450, loop: true, callback: () => { if (!b.active) { ev.remove(); return; } nr = 1 - nr; const f = /** @type {any} */ (this.regiram(nr ? 'skold_stor_bubbla_02' : 'skold_stor_bubbla_01')); b.setTexture(f.nyckel, f.ram); smuts(); } });
+      this.regiLjud('glitter');
+    } else {
+      b = this.add.graphics({ x: mx, y: my });
+      b.fillStyle(0xbfe6ff, 0.25).fillEllipse(0, 0, 64, 52).lineStyle(2, 0xffffff, 0.9).strokeEllipse(0, 0, 64, 52);
+      b.setScale(0.2); this.lagerLjust.add(b); this.lagda.push(b);
+      this.tweens.add({ targets: b, scale: 1, duration: 500, ease: 'Back.easeOut', onUpdate: smuts });
+    }
+    this.k4Glitter({ x: mx, y: my }, 36);
+    const sno = this.k4?.sno;
+    if (sno?.active) this.tweens.add({ targets: sno, x: mx, y: my - 30, duration: 500, delay: 600, ease: 'Quad.easeIn', onUpdate: smuts, onComplete: () => this.cameras.main.shake(300, 0.005) });
+    this.k4 = { ...(this.k4 || {}), bubbla: b };
+    this.k4Logg('stor_skold_ras');
+    return 1400;
+  }
+
+  /** De backar in i grottan under bubblan, bubblan slocknar, snön stänger mynningen och det blir kolsvart. @returns {number} */
+  mynningenStangs() {
+    const m = this.k4Punkt('mynningen'); if (!m) return 0;
+    const smuts = () => { this.smutsig = true; };
+    const till = { x: m.x, y: m.y + 18 };
+    const ms = Math.round(Math.hypot(till.x - this.pos.x, till.y - this.pos.y) * 12) + 300;
+    const fran = { ...this.pos }, t = { p: 0 };
+    this.tweens.add({ targets: t, p: 1, duration: ms, onUpdate: () => { this.pos = { x: fran.x + (till.x - fran.x) * t.p, y: fran.y + (till.y - fran.y) * t.p }; this.placera(); smuts(); } });
+    if (this.unge.visible) this.ungeGarTill({ x: till.x - 14, y: till.y });
+    const b = this.k4?.bubbla, sno = this.k4?.sno;
+    if (b?.active) this.tweens.add({ targets: b, x: till.x, y: till.y - 10, duration: ms, onUpdate: smuts, onComplete: () => this.tweens.add({ targets: b, alpha: 0, duration: 300, onUpdate: smuts }) });
+    if (sno?.active) this.tweens.add({ targets: sno, x: m.x, y: m.y + 6, duration: 500, delay: ms + 200, ease: 'Quad.easeIn', onUpdate: smuts, onComplete: () => { sno.setVisible(false); if (this.k4) this.k4.rasDolt = false; } });
+    else if (this.k4) this.time.delayedCall(ms + 700, () => { if (this.k4) this.k4.rasDolt = false; });
+    this.time.delayedCall(ms + 600, () => { this.cameras.main.fade(500, 0, 0, 0); this.cameras.main.shake(300, 0.006); });
+    this.time.delayedCall(ms + 2200, () => { this.cameras.main.resetFX(); this.cameras.main.fadeIn(1); smuts(); });
+    this.k4Logg('mynningen_stangs');
+    return ms + 1400;
+  }
+
+  /** LJUS i grottan: ljusbollen tänds, och regnbågsljuset bryts i isen så att hela grottan glittrar. @returns {number} */
+  grottanGlittrar() {
+    const p = { x: this.pos.x, y: this.pos.y - 24 };
+    this.k4Glitter(p, 70);
+    this.time.delayedCall(300, () => this.k4Glitter(p, 120));
+    this.k4Logg('grottan_glittrar');
+    return 1600;
+  }
+
+  /** Kameran glider till Farfars skrift som glimmar i isen på andra sidan stigen, och tillbaka. @returns {number} */
+  grottanVisarVaggen() {
+    const v = this.k4Punkt('gata_1'); if (!v) return 0;
+    this.regiFokus = v;
+    this.time.delayedCall(800, () => this.k4Glitter({ x: v.x, y: v.y + 4 }, 16));
+    this.time.delayedCall(2200, () => { this.regiFokus = null; });
+    this.k4Logg('grottan_visar_vaggen');
+    return 2700;
+  }
+
+  /** FLYG vid ishyllan: isblocket svävar upp och åt sidan, och under det syns avtrycket av en stor fot. @returns {number} */
+  isblockSvavar() {
+    const r = /** @type {any} */ (this.ritade.get('isblock'));
+    if (!r || this.k4?.blockFlyttat) return r ? 300 : 0;
+    const smuts = () => { this.smutsig = true; };
+    this.k4 = { ...(this.k4 || {}), blockFlyttat: true };
+    this.tweens.add({ targets: r, y: r.y - 14, duration: 500, ease: 'Sine.easeOut', onUpdate: smuts });
+    this.tweens.add({ targets: r, x: r.x + 40, duration: 600, delay: 500, onUpdate: smuts });
+    this.tweens.add({ targets: r, y: r.y, duration: 300, delay: 1100, onUpdate: smuts });
+    const o = this.ruta('fotavtryck');
+    if (o) this.time.delayedCall(1200, () => this.k4Glitter({ x: o.x + o.b / 2, y: o.y + o.h / 2 }, 14));
+    this.k4Logg('fotavtryck_stor');
+    return 1600;
+  }
+
+  /** Ungen ställer sin fot i det stora avtrycket och står stilla en stund. @returns {number} */
+  ungenFotAvtryck() {
+    const o = this.ruta('fotavtryck'); if (!o || !this.unge.visible) return 0;
+    const ms = this.ungeGarTill({ x: o.x + o.b / 2, y: o.y + o.h - 2 });
+    this.time.delayedCall(ms + 50, () => this.ungeLage('fot_avtryck', 'ner', 600, 1));
+    this.k4Logg('ungen_fot_avtryck');
+    return ms + 2400;
+  }
+
+  /** Ungen går till sprickan och slår med klubbsvansen två gånger, isen rasar ut och solen strömmar in. @returns {number} */
+  ungenSlarIsen() {
+    const s = this.k4Punkt('spricka'); if (!s) return 0;
+    const smuts = () => { this.smutsig = true; };
+    const ms = this.unge.visible ? this.ungeGarTill({ x: s.x - 10, y: s.y + 6 }) : 0;
+    // Stils unge1_svansslag_hoger_01–03 (ca 150 ms per bild, två slag), och isväggen spricker och rasar ut
+    this.time.delayedCall(ms + 50, () => this.ungeLage('svansslag', 'hoger', 150, 2));
+    for (const i of [0, 1]) this.time.delayedCall(ms + 350 + i * 450, () => { this.cameras.main.shake(180, 0.006); this.b.ljud?.spela('knak'); smuts(); });
+    this.time.delayedCall(ms + 1300, () => {
+      const r = /** @type {any} */ (this.ritade.get('spricka'));
+      const r1 = this.regiram('isvagg_rasar_01'), r2 = this.regiram('isvagg_rasar_02');
+      if (r?.setTexture && r1 && r2) { r.setTexture(r1.nyckel, r1.ram); this.time.delayedCall(250, () => { if (r.active) r.setTexture(r2.nyckel, r2.ram); smuts(); }); } else r?.setVisible?.(false);
+      const g = this.add.graphics(); g.fillStyle(0xfff3c0, 0.5).fillTriangle(s.x + 8, s.y - 24, s.x + 8, s.y + 24, s.x - 60, s.y + 40);
+      this.lagerLjust.add(g); this.lagda.push(g); this.k4Glitter(s, 30); smuts();
+    });
+    this.k4Logg('ungen_slar_isen');
+    return ms + 2000;
+  }
+
+  /** Blocket glider ur repet under luftskeppet och plumsar ner i en snödriva. @returns {number} */
+  blocketDriva() {
+    const l = this.k4Punkt('luftskepp'), d = this.k4Punkt('driva'); if (!l || !d) return 0;
+    const smuts = () => { this.smutsig = true; };
+    const sk = this.k4Skepp(l); sk.setVisible(true);
+    const block = this.add.graphics({ x: l.x, y: l.y + 34 });
+    block.fillStyle(0x8c8378, 1).fillRect(-10, -8, 20, 16).lineStyle(1, 0xd9782f, 1).lineBetween(0, -8, 0, -24);
+    this.lagerLuft.add(block); this.lagda.push(block);
+    this.regiFokus = { x: l.x, y: l.y + 40 };
+    this.tweens.add({ targets: block, x: d.x, y: d.y, duration: 600, delay: 1000, ease: 'Quad.easeIn', onUpdate: smuts, onComplete: () => {
+      block.clear(); block.fillStyle(0x8c8378, 1).fillRect(-10, -2, 20, 8).fillStyle(0xf4f8fc, 1).fillEllipse(0, 4, 34, 12); this.k4Glitter(d, 16); smuts();
+    } });
+    this.time.delayedCall(2400, () => { this.regiFokus = null; });
+    this.k4Logg('blocket_driva');
+    return 2800;
+  }
+
+  /** Den speciella stenen ångar, och svansen med klubban syns som ett fossil i den. Avtrycket står kvar. @returns {number} */
+  fossilSvans() {
+    const o = this.ruta('sten_klubba'); if (!o) return 0;
+    const g = this.add.graphics({ x: o.x + o.b / 2, y: o.y + o.h / 2 });
+    g.lineStyle(2, 0x4a3f36, 1).beginPath(); g.moveTo(-10, 2); g.lineTo(-2, 0); g.lineTo(4, -2); g.strokePath();
+    g.fillStyle(0x4a3f36, 1).fillCircle(7, -3, 3);
+    this.lagerObjekt.add(g); this.lagda.push(g);
+    this.k4Glitter({ x: o.x + o.b / 2, y: o.y }, 14);
+    this.k4Logg('fossil_svans');
+    return 1600;
+  }
+
+  /** Ungen ställer sig bredvid stenen, lägger svansen intill och viftar så att snön yr. @returns {number} */
+  svansarna() {
+    const o = this.ruta('sten_klubba'); if (!o || !this.unge.visible) return 0;
+    const ms = this.ungeGarTill({ x: o.x + o.b + 10, y: o.y + o.h });
+    this.time.delayedCall(ms + 300, () => this.k4Glitter({ x: o.x + o.b + 10, y: o.y + o.h - 6 }, 18));
+    this.k4Logg('svansarna');
+    return ms + 1600;
+  }
+
+  /** Locket fjädrar upp, och kartbit fem ligger i lådan. @returns {number} */
+  ladanOppnas() {
+    const o = this.ruta('lada_farfar') || this.ruta('sten_klubba'); if (!o) return 0;
+    const r = /** @type {any} */ (this.ritade.get('lada_farfar'));
+    const bild = (/** @type {string} */ n) => { const f = this.regiram(n); if (r?.setTexture && f) { r.setTexture(f.nyckel, f.ram); this.smutsig = true; } };
+    bild('lada_farfar_klick');
+    this.time.delayedCall(300, () => bild('lada_farfar_oppnas'));
+    this.time.delayedCall(450, () => bild('lada_farfar_oppen'));
+    this.k4Glitter({ x: o.x + o.b / 2, y: o.y }, 18);
+    this.k4Logg('ladan_oppnas');
+    return 1200;
+  }
+
+  /** Kartbit fem i gråbox: ett papper mitt i bilden där vägen från berget går upp till molnkanten, som lyser. @returns {number} */
+  kartbit5Molnkant() {
+    const k = this.kamera, cx = Math.round(k.x + RUM.bredd / 2), cy = Math.round(k.y + RUM.hojd / 2);
+    const g = this.add.graphics();
+    g.fillStyle(0xeadcb4, 1).fillRect(cx - 40, cy - 30, 80, 60).lineStyle(1, 0x8a6a3a, 1).strokeRect(cx - 40, cy - 30, 80, 60);
+    g.fillStyle(0x8c8378, 1).fillTriangle(cx - 24, cy + 20, cx - 10, cy - 2, cx + 4, cy + 20);
+    g.lineStyle(1, 0xb03030, 1).beginPath(); g.moveTo(cx - 10, cy); g.lineTo(cx + 6, cy - 12); g.lineTo(cx + 22, cy - 20); g.strokePath();
+    g.fillStyle(0xffffff, 1).fillEllipse(cx + 24, cy - 22, 26, 8);
+    this.lagerLjust.add(g);
+    const ring = this.add.graphics(); ring.lineStyle(2, 0xb03030, 1).strokeCircle(cx + 24, cy - 22, 14); this.lagerLjust.add(ring);
+    this.tweens.add({ targets: ring, alpha: 0.2, duration: 400, yoyo: true, repeat: 4, onUpdate: () => { this.smutsig = true; } });
+    this.time.delayedCall(3300, () => { g.destroy(); ring.destroy(); this.smutsig = true; });
+    this.k4Logg('kartbit5_molnkant');
+    return 3600;
+  }
+
+  /** Herr Skata flyger från en sten till luftskeppet, och skeppet vänder mot molnen i norr. @returns {number} */
+  skataHarmarMolnkant() {
+    const l = this.k4Punkt('luftskepp'), st = this.k4Punkt('sten_varm'); if (!l || !st) return 0;
+    const smuts = () => { this.smutsig = true; };
+    const sk = this.k4Skepp(l); sk.setVisible(true);
+    const f = this.add.graphics({ x: st.x, y: st.y - 12 });
+    f.fillStyle(0x1e1e1e, 1).fillEllipse(0, 0, 10, 6).fillStyle(0xf0f0f0, 1).fillRect(-2, -1, 4, 3);
+    this.lagerLuft.add(f); this.lagda.push(f);
+    this.tweens.add({ targets: f, x: sk.x, y: sk.y + 6, duration: 900, delay: 1200, onUpdate: smuts, onComplete: () => f.setVisible(false) });
+    this.tweens.add({ targets: sk, y: sk.y - 60, x: sk.x - 20, duration: 1000, delay: 2200, onUpdate: smuts });
+    this.k4Logg('skata_harmar_molnkant');
+    return 3200;
+  }
+
+  /** Kvällen: hjälten och ungen går längs bergskammen mot molnkanten, som lyser under två månar. @returns {number} */
+  resanMolnkant() {
+    // Stils slutbild (115.7, LASMIG_115): kammen mot molnkanten i kvällsljus, och hjälten och ungen som går åt höger
+    // (fötterna på kammens stig, bilden i y 105), ett steg var 250:e ms
+    const ms = this.slutbildFranSidan({ bak: ['sidovy_k4_slut_bakgrund_01', 'sidovy_k4_slut_bakgrund_02'], figur: ['sidovy_k4_slut_vandrar_01', 'sidovy_k4_slut_vandrar_02'],
+      figurY: 105, fran: 40, till: 420, figurMs: 250 });
+    if (ms) { this.k4Logg('resan_molnkant'); this.k4Logg('slutbilden: kammen mot molnkanten'); return ms; }
+    const smuts = () => { this.smutsig = true; };
+    const k = this.kamera;
+    const g = this.add.graphics();
+    g.fillStyle(0xffffff, 0.85).fillEllipse(k.x + RUM.bredd / 2, k.y + 6, RUM.bredd * 0.8, 16);
+    g.fillStyle(0xf6efc9, 1).fillCircle(k.x + 40, k.y + 22, 6).fillStyle(0xe9d7f5, 1).fillCircle(k.x + 62, k.y + 30, 4);
+    g.setAlpha(0); this.lagerLjust.add(g); this.lagda.push(g);
+    this.tweens.add({ targets: g, alpha: 1, duration: 1200, onUpdate: smuts });
+    const m = this.k4Punkt('stig_molnkanten');
+    if (m) {
+      const till = { x: m.x, y: m.y + 20 }, fran = { ...this.pos }, t = { p: 0 };
+      this.tweens.add({ targets: t, p: 1, duration: 2400, delay: 600, onUpdate: () => { this.pos = { x: fran.x + (till.x - fran.x) * t.p, y: fran.y + (till.y - fran.y) * t.p }; this.placera(); smuts(); } });
+      if (this.unge.visible) this.time.delayedCall(800, () => this.ungeGarTill({ x: till.x - 12, y: till.y + 4 }));
+    }
+    this.k4Logg('resan_molnkant');
+    return 4000;
   }
 
   /** Tar bort stigen. */
@@ -4754,8 +5115,21 @@ export class Rum extends Phaser.Scene {
   }
 
   /** Flaket knakar och gungar (fel bokstav): han står kvar. @param {number} r @param {number} k */
+  /** Byter ett flaks bild till Stils läge (LASMIG_114), om bilden finns. @param {any} b @param {string} namn @returns {boolean} */
+  stigBild(b, namn) {
+    const f = foremalsbild(this, namn);
+    if (!f || !b?.setTexture) return false;
+    b.setTexture(f.nyckel, f.ram); this.smutsig = true; return true;
+  }
+
   stigKnak(r, k) {
     const b = this.stig?.bilder.get(`${r},${k}`); if (!b) return;
+    // Stils isflak_gungar_01–02: flaket knakar och gungar, och sedan står det som förut
+    if (this.stigBild(b, 'isflak_gungar_01')) {
+      const fore = b.frame?.name;
+      [1, 2, 1, 2].forEach((n, i) => this.time.delayedCall(i * 70, () => this.stigBild(b, `isflak_gungar_0${n}`)));
+      this.time.delayedCall(300, () => { const f = foremalsbild(this, 'isflak'); if (b.active && f && !this.stig?.trampade?.has(`${r},${k}`)) b.setTexture(f.nyckel, f.ram); else if (b.active && fore) this.stigBild(b, 'isflak_spricka'); this.smutsig = true; });
+    }
     const x = b.x;
     this.tweens.add({ targets: b, x: { from: x - 2, to: x + 2 }, duration: 60, yoyo: true, repeat: 3, onUpdate: () => { this.smutsig = true; }, onComplete: () => { b.x = x; this.smutsig = true; } });
   }
@@ -4764,6 +5138,14 @@ export class Rum extends Phaser.Scene {
   stigSjunk(lista) {
     for (const { r, k } of lista) {
       const b = this.stig?.bilder.get(`${r},${k}`); if (!b) continue;
+      this.stig?.trampade?.delete(`${r},${k}`);
+      // Stils isflak_sjunker_01–03: flaket sjunker långsamt, och sedan är det borta under ytan
+      if (this.stigBild(b, 'isflak_sjunker_01')) {
+        this.time.delayedCall(250, () => b.active && this.stigBild(b, 'isflak_sjunker_02'));
+        this.time.delayedCall(500, () => b.active && this.stigBild(b, 'isflak_sjunker_03'));
+        this.tweens.add({ targets: b, alpha: 0.35, duration: 900, delay: 500, onUpdate: () => { this.smutsig = true; } });
+        continue;
+      }
       this.tweens.add({ targets: b, alpha: 0.25, y: b.y + 3, duration: 700, ease: 'Sine.easeIn', onUpdate: () => { this.smutsig = true; } });
     }
   }
@@ -4781,6 +5163,9 @@ export class Rum extends Phaser.Scene {
   /** Flaket han har gått på får en spricka, så att han ser sitt spår. @param {number} r @param {number} k */
   stigSpricka(r, k) {
     if (!this.stig) return;
+    (this.stig.trampade ??= new Set()).add(`${r},${k}`);
+    // Stils isflak_spricka: ett flak han har gått på, med en spricka men det håller
+    if (this.stigBild(this.stig.bilder.get(`${r},${k}`), 'isflak_spricka')) return;
     const p = this.stig.mittFor(r, k);
     this.stig.sprickor.lineStyle(1, 0x6f8fa8, 1).beginPath().moveTo(p.x - 9, p.y - 3).lineTo(p.x - 3, p.y).lineTo(p.x + 2, p.y - 4).lineTo(p.x + 9, p.y + 1).strokePath();
     this.smutsig = true;
@@ -4796,7 +5181,18 @@ export class Rum extends Phaser.Scene {
     s.kant.clear().setVisible(!!ruta).setAlpha(1);
     if (ruta) {
       const p = s.mittFor(ruta.r, ruta.k);
-      s.kant.lineStyle(2, 0xfff3a0, 1).strokeRoundedRect(p.x - 18, p.y - 11, 36, 22, 6);
+      // Stils isflak_kant_01–02 ovanpå flaket: kanten lyser vitt och ljusblått, aldrig guld (LASMIG_114)
+      const k1 = foremalsbild(this, 'isflak_kant_01'), k2 = foremalsbild(this, 'isflak_kant_02');
+      if (k1 && k2) {
+        const img = this.add.image(p.x, p.y, k1.nyckel, k1.ram); this.lagerStig.add(img);
+        let i = 0;
+        const ev = this.time.addEvent({ delay: 350, loop: true, callback: () => { if (!img.active) return; i ^= 1; const f = i ? k2 : k1; img.setTexture(f.nyckel, f.ram); this.smutsig = true; } });
+        s.kantTw = { remove: () => { ev.remove(); img.destroy(); this.smutsig = true; } };
+        s.kant.setVisible(false);
+        this.smutsig = true;
+        return;
+      }
+      s.kant.lineStyle(2, 0xdff4ff, 1).strokeRoundedRect(p.x - 18, p.y - 11, 36, 22, 6);
       s.kantTw = this.tweens.add({ targets: s.kant, alpha: { from: 1, to: 0.35 }, duration: 600, yoyo: true, repeat: -1, onUpdate: () => { this.smutsig = true; } });
     }
     this.smutsig = true;

@@ -263,9 +263,14 @@
             "skuggan_stiger",
             "skuggan_dyker",
             "skold_ankaret",
-            "flaskan_hittad"
+            "flaskan_hittad",
+            "stor_skold_ras",
+            "grottan_glittrar",
+            "fotavtryck_stor",
+            "fossil_svans",
+            "ladan_oppnas"
           ],
-          "description": "En figur på kortet han valde (2.35, Teknik 31): ekorre_skakar = ekorren tittar upp bakom kortet och skakar på huvudet. Med bild visas inte texten. En regi i rummet (2.48, 102.3, hornet på avsatsen i kapitel 3): tallrikar = flodfolket springer fram med tallrikarna, skuggan_stiger = skuggan stiger en bit och stannar under vattnet, skuggan_dyker = skuggan dyker. 2.51 (109.5): skold_ankaret = SKÖLD tänds som en bubbla runt hjälten och ungen, och ankaret studsar och borrar ned sig. 2.52 (113.3): flaskan_hittad = hjälten håller upp flaskan, och den visas i närbild med kartbiten genom glaset."
+          "description": "En figur på kortet han valde (2.35, Teknik 31): ekorre_skakar = ekorren tittar upp bakom kortet och skakar på huvudet. Med bild visas inte texten. En regi i rummet (2.48, 102.3, hornet på avsatsen i kapitel 3): tallrikar = flodfolket springer fram med tallrikarna, skuggan_stiger = skuggan stiger en bit och stannar under vattnet, skuggan_dyker = skuggan dyker. 2.51 (109.5): skold_ankaret = SKÖLD tänds som en bubbla runt hjälten och ungen, och ankaret studsar och borrar ned sig. 2.52 (113.3): flaskan_hittad = hjälten håller upp flaskan, och den visas i närbild med kartbiten genom glaset. 2.54 (118.4, kapitel 4): stor_skold_ras = en jättebubbla välver sig över hjälten och ungen, och snön som hänger i luften dundrar mot den; grottan_glittrar = ljusbollen tänds, och mörkret i grottan går över i glitter; fotavtryck_stor = isblocket svävar bort, och avtrycket av en stor fot syns; fossil_svans = stenen ångar, och svansen med klubban syns i den; ladan_oppnas = locket fjädrar upp, och kartbit fem ligger i lådan."
         }
       }
     },
@@ -1380,6 +1385,9 @@
         },
         {
           "$ref": "#/$defs/P16_ordduell"
+        },
+        {
+          "$ref": "#/$defs/P18_bokstavsstig"
         }
       ]
     },
@@ -2844,6 +2852,76 @@
         },
         "vid_vinst": {
           "$ref": "#/$defs/handling"
+        },
+        "anteckning": {
+          "$ref": "#/$defs/anteckning"
+        }
+      }
+    },
+    "P18_bokstavsstig": {
+      "description": "Bokstavsstigen (2.53, beslut 114.6; i ett kapitel 2.54, beslut 118.4): ett golv av isflak i ett rutnät med en gemen per flak. Han hoppar en kolumn åt höger, rakt eller snett, och stavar ordet. Kartan har stig_<id>, rutnätets mitt i rummet. Reglerna står i karna/bokstavsstig.js.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "typ",
+        "ord",
+        "rutnat"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "typ": {
+          "const": "P18_bokstavsstig"
+        },
+        "niva": {
+          "$ref": "#/$defs/niva_l"
+        },
+        "ord": {
+          "type": "string",
+          "description": "Ordet i gemener, en bokstav per kolumn."
+        },
+        "visa_ord": {
+          "type": "boolean",
+          "description": "Ordet står i versaler på andra sidan (stolpen). false = ordet står inte i klartext."
+        },
+        "rutnat": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          },
+          "description": "Raderna uppifrån och ned, en bokstav per kolumn med mellanslag emellan. ~ eller # är en vak, | en isvägg."
+        },
+        "start": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Raden han börjar vid. Utan start kliver han upp på vilket flak som helst i första kolumnen."
+        },
+        "instruktion": {
+          "$ref": "#/$defs/replik"
+        },
+        "vid_atervand": {
+          "$ref": "#/$defs/replik"
+        },
+        "versaler_efter_fel": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "knuff": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "efter_sek": {
+              "type": "number",
+              "minimum": 3,
+              "maximum": 60
+            },
+            "handling": {
+              "type": "string"
+            }
+          }
         },
         "anteckning": {
           "$ref": "#/$defs/anteckning"

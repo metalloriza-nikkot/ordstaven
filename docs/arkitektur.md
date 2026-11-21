@@ -1267,3 +1267,10 @@ Ersätter det i §53 som gäller hur lappen används. Logiken i `karna/uppdrag.j
 - **Testrummet** `?testrum=stig` (kap-92) läser `content/testrum-stig.json`, eller i testerna provfilen `ordstaven_testrum_stig` i localStorage (`tests/fixturer/testrum-stig.json`). Knappen i menyn för vuxna syns när Innehålls fil finns.
 - **Lärandet:** stigen räknas som ett läsval (`LASNIVA_TYP`) på pusslets `niva`, rätt direkt bara utan fel och utan återvändsgränd.
 
+
+## Kapitel 4 i gråbox (0.102.0, beslut 118.4)
+- **Kartorna** skrivs av `verktyg/kartor/kap4.py`: berget_stigen (2 × 1 skärmar), berget_grottan (2 × 2, stig 2 och gåtan uppe, ishyllan och stig 3 nere) och berget_stenfalt (en skärm). En bokstavsstig har `stig_<id>` (egenskapen `ankare`: en plats som pekas ut men aldrig ritas) och en vak eller ravin tvärs över rummet under rutnätet, så att han bara kommer över på flaken.
+- **Bokstavsstigen i ett rum:** hjälten ställs på stranden, kameran visar hela rutnätet (`regiFokus`), och efteråt står han på andra sidan. Stils isflak (`assets/foremal/berg/`) används när de finns: gungar vid fel, spricka på flak han har gått på, sjunker i en återvändsgränd, kanten som lyser och vaken. Ljuden är Stils `flak_ratt`, `flak_knak` (bara vid fel) och `flak_sjunker` (115.8).
+- **Mörkret i grottan** (`grottMorker` i Rum.js) ligger under figurerna, så att bara hjälten, ungen och stavens glimt syns i tillståndet `mork`.
+- **Ordlåset** (P9 utan chiffer) visar rummets skylt med luckan (`____`) som lock, med fälten i luckan.
+- **Regierna** (`ankomst_berget` till `resan_molnkant`) är gråbox med Stils bilder där de finns: snömassan som står i luften tills STOR SKÖLD är skriven, den stora bubblan, ungens svansslag och fot i avtrycket, isväggen som rasar, lådan som öppnas, stenarna och slutbilden från sidan (`slutbildFranSidan`, samma som kapitel 3:s).

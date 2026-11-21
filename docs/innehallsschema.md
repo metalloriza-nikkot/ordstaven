@@ -1,6 +1,10 @@
 # Innehållsschema – kapitel i format 2
 
-Version 2.53 (2026-11-20). Ägs av teknikspåret.
+Version 2.54 (2026-11-21). Ägs av teknikspåret.
+2.54 (beslut 118.4, kapitel 4): **bokstavsstigen i ett kapitel.** `P18_bokstavsstig` står i kapitlets `pussel` med samma fält som i testrummet, och kartan har `stig_<pusslets id>` (rutnätets mitt, en osynlig ruta med egenskapen `ankare`). Han står på stranden till vänster när stigen börjar och på andra sidan när den är klar, och kameran visar hela rutnätet medan stigen pågår. `knuff` har bara `efter_sek` (och valfritt `handling` för loggen). Stigen räknas som ett läsval i budgeten. Kontrollen prövar stigen som i testrummet.
+- **Ordlåset: `P9_kodlas` utan `chiffer`.** Ingen nyckel och inga tecken: locket är rummets skylt med en lucka (`____`, t.ex. `"Stenen är ____."`), och fälten står i luckan. Brickorna, nära stavning och `kontroll` fungerar som i kodlåset. Ett P9 utan chiffer räknas som en skrivuppgift i budgeten (118.2), kodlåset med chiffer fortfarande som vila.
+- **Reaktionens `bild`** får också vara `stor_skold_ras`, `grottan_glittrar`, `fotavtryck_stor`, `fossil_svans` och `ladan_oppnas` (regier i rummet).
+- **Rummets tillstånd `mork`:** allt utom hjälten, ungen och stavens glimt är mörkt (färgtabellen för mörkret, 113.8, i gråbox en svart yta under figurerna). Ett annat tillstånd (LJUS: `tillstand_efter: "ljus"`) tar bort det.
 2.53: **Bokstavsstigen, `P18_bokstavsstig`** (beslut 114.6), först i testrummet `content/testrum-stig.json` (`meta`, valfritt `talare`, `stigar`). Fälten:
 - `ord`: ordet han stavar, i gemener (`"tavla"`). Lika många bokstäver som rutnätet har kolumner.
 - `rutnat`: raderna uppifrån och ned, som i Innehålls ritning (21b). Han kommer från vänster, och varje hopp går en kolumn åt höger: rakt, snett upp eller snett ned. Rutorna skiljs med mellanslag: en gemen är ett isflak, `~` en vak och `|` en isvägg. Alla rader lika långa. Stig 2 i 21b v0.2 skrivs `["s a v k e", "t e x l a", "o r s u o"]`.

@@ -1297,7 +1297,7 @@ test('menyn för vuxna hoppar till en scen i ett senare kapitel: det som kommer 
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('s00_start');
   await page.keyboard.press('Control+Shift+KeyM');
   await page.click('#vuxenmeny .del[data-del="test"]');
-  await expect(page.locator('#vuxenmeny .kapitelrad')).toHaveCount(4); // prologen och kapitel 1–3 (kapitel 3 från 0.78.0)
+  await expect(page.locator('#vuxenmeny .kapitelrad')).toHaveCount(5); // prologen och kapitel 1–4 (kapitel 3 från 0.78.0, kapitel 4 från 0.102.0)
   await page.screenshot({ path: 'test-results/meny-alla-kapitel.png' });
   await page.click('#vuxenmeny .scenlista .scen[data-kapitel="kap-01"][data-i="5"]'); // k1s07_stigarna, pass 2
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
@@ -1420,7 +1420,7 @@ test('menyn för vuxna startar ett pass: pass 3 börjar med morgonen, namnen och
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.keyboard.press('Control+Shift+KeyM');
   await page.click('#vuxenmeny .del[data-del="pass"]');
-  await expect(page.locator('#vuxenmeny .pass-start')).toHaveCount(11); // prologens tre pass, kapitel 1:s två, och kapitel 2:s och 3:s tre
+  await expect(page.locator('#vuxenmeny .pass-start')).toHaveCount(14); // prologens tre pass, kapitel 1:s två, och kapitel 2:s, 3:s och 4:s tre
   await page.screenshot({ path: 'test-results/meny-pass.png' });
   await page.locator('#vuxenmeny .pass-start', { hasText: 'Prologen, pass 3' }).click();
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
@@ -2005,7 +2005,8 @@ test('menyn sätter tillbaka lärandet till passets början, utan spår av det s
   // passen utan bild av lärandet är märkta
   // kapitel 3:s namn i menyn är kapitlets meta.namn (Innehålls fält)
   const kap3namn = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-03.json', import.meta.url), 'utf8')).meta.namn;
-  await expect(page.locator('#vuxenmeny .pass-start[data-bild="nej"]')).toHaveText(['Prologen, pass 2 *', 'Skogen, pass 2 *', 'Träsket, pass 1 *', 'Träsket, pass 2 *', 'Träsket, pass 3 *', ...[1, 2, 3].map((n) => `${kap3namn}, pass ${n} *`)]);
+  const kap4namn = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-04.json', import.meta.url), 'utf8')).meta.namn;
+  await expect(page.locator('#vuxenmeny .pass-start[data-bild="nej"]')).toHaveText(['Prologen, pass 2 *', 'Skogen, pass 2 *', 'Träsket, pass 1 *', 'Träsket, pass 2 *', 'Träsket, pass 3 *', ...[1, 2, 3].map((n) => `${kap3namn}, pass ${n} *`), ...[1, 2, 3].map((n) => `${kap4namn}, pass ${n} *`)]);
   await expect(page.locator('#vuxenmeny .utan-bild')).toBeVisible();
   await page.screenshot({ path: 'test-results/meny-larandet.png' });
   await Promise.all([page.waitForEvent('load'), page.locator('#vuxenmeny .pass-start', { hasText: 'Prologen, pass 3' }).click()]);

@@ -642,5 +642,26 @@
   "signatur": false,
   "styrka_db": -7,
   "sekunder": 1.85
+ },
+ "flak_ratt": {
+  "grupp": "Kapitel 4",
+  "vad": "Rätt flak i bokstavsstigen: ett glatt, klart TING-TING i is, uppåt, och lite glitter (0,5 s). Knaket hörs bara vid fel",
+  "signatur": false,
+  "styrka_db": -9,
+  "sekunder": 0.65
+ },
+ "flak_knak": {
+  "grupp": "Kapitel 4",
+  "vad": "Fel bokstav: flaket knakar och gungar lite, kort och ofarligt (0,35 s)",
+  "signatur": false,
+  "styrka_db": -12,
+  "sekunder": 0.6
+ },
+ "flak_sjunker": {
+  "grupp": "Kapitel 4",
+  "vad": "En återvändsgränd: flaket sjunker långsamt med ett mjukt blubb (0,9 s). Inget som skrämmer",
+  "signatur": false,
+  "styrka_db": -12,
+  "sekunder": 1.15
  }
 }

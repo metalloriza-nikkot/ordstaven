@@ -1,0 +1,1348 @@
+{
+ "$schema": "../schema/kapitel.schema.json",
+ "format": 2,
+ "id": "kap-04",
+ "kapitel": 4,
+ "musik": "spel",
+ "nivaer": {
+  "lasning": [
+   "L1",
+   "L6"
+  ],
+  "skrivning": [
+   "S2",
+   "S4"
+  ]
+ },
+ "meta": {
+  "namn": "Berget",
+  "version": "0.1",
+  "datum": "2026-11-21",
+  "agare": "Innehåll",
+  "kalla": "Berättelsen 21 v0.5.2, manus 21 v0.3.1 och ritningarna 21b v0.2.1, godkända av den vuxne (beslut 118.1).",
+  "teknik": "Nytt i kapitlet (118.4): bokstavsstigen P18_bokstavsstig i ett kapitel (k4_stig1–3, kartan har stig_<id>), snön som stannar i luften tills STOR SKÖLD är skriven, färgtabellen för mörkret som LJUS stänger av, P9 utan chiffer (k4_ladan), tre rum utan Tiled-karta, och regierna: ankomst_berget, baronen_kikare_berg, blocket_lyfts, stor_skold_ras, mynningen_stangs, grottan_glittrar, grottan_visar_vaggen, fotavtryck_stor, ungen_fot_avtryck, ungen_slar_isen, blocket_driva, fossil_svans, svansarna, ladan_oppnas, kartbit5_molnkant, skata_harmar_molnkant och resan_molnkant. Musiken står som spel tills Stil har en slinga för berget. Föremålens id är förslag, och Teknik sätter dem efter kartan.",
+  "anteckning": "Tre pass (114.4). En ny formel (STOR SKÖLD), LJUS på huvudvägen, FLYG frivilligt. Inga nya figurer."
+ },
+ "var_var_vi": [
+  {
+   "pass": 1,
+   "ord": {
+    "ord": "snö"
+   },
+   "kort": [
+    {
+     "talare": "farfar",
+     "text": "Var var vi? Ni kom till berget.",
+     "upplast": true,
+     "via": "radio"
+    }
+   ],
+   "lang": [
+    {
+     "talare": "farfar",
+     "text": "Var var vi? Ni har fyra kartbitar.",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "talare": "farfar",
+     "text": "Bit fem är vid isgrottan.",
+     "upplast": true,
+     "via": "radio"
+    }
+   ]
+  },
+  {
+   "pass": 2,
+   "ord": {
+    "ord": "grotta"
+   },
+   "kort": [
+    {
+     "talare": "farfar",
+     "text": "Var var vi? Snön stängde grottan.",
+     "upplast": true,
+     "via": "radio"
+    }
+   ],
+   "lang": [
+    {
+     "talare": "farfar",
+     "text": "Var var vi? Snön stängde grottan.",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "talare": "farfar",
+     "text": "Det var kolsvart.",
+     "upplast": true,
+     "via": "radio"
+    }
+   ]
+  },
+  {
+   "pass": 3,
+   "ord": {
+    "ord": "sten"
+   },
+   "kort": [
+    {
+     "talare": "farfar",
+     "text": "Var var vi? Ni kom ut ur grottan.",
+     "upplast": true,
+     "via": "radio"
+    }
+   ],
+   "lang": [
+    {
+     "talare": "farfar",
+     "text": "Var var vi? Ni kom ut ur grottan.",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "talare": "farfar",
+     "text": "Biten är vid en speciell sten.",
+     "upplast": true,
+     "via": "radio"
+    }
+   ]
+  }
+ ],
+ "rum": [
+  {
+   "id": "berget_stigen",
+   "namn": "Stigen",
+   "tillstand": [
+    "morgon",
+    "ras"
+   ],
+   "innehall": [
+    "stig_floden",
+    "skylt_isgrottan",
+    "skylt_issjon",
+    "skylt_eldgrottan",
+    "snohog_1",
+    "snohog_2",
+    "snohog_3",
+    "snohog_4",
+    {
+     "id": "sten_farfar",
+     "dold": true
+    },
+    "mynningen",
+    {
+     "id": "ras_mynningen",
+     "syns_i": [
+      "ras"
+     ]
+    }
+   ],
+   "skyltar": {
+    "sten_farfar": {
+     "text": "Biten är vid en speciell sten.",
+     "papper": "traskylt"
+    }
+   },
+   "anteckning": "2 × 1 skärmar (manus 21 v0.3.1). Bergets fot vid floden i väster, där sköldpaddan lägger till, och stigen upp mot öster. Vid gaffeln tre gamla skyltar (läsval i rummet). Stig 1 (UPP, P18) är isade flak uppför branten, med ordet på en gammal stolpe: kartan har stig_k4_stig1. Grottans mynning med fyra snöhögar. Toppen ryker, och luftskeppet hänger över den. Inget block här (116.5): blocket står på stenfältet."
+  },
+  {
+   "id": "berget_grottan",
+   "namn": "Isgrottan",
+   "tillstand": [
+    "mork",
+    "ljus",
+    "ut"
+   ],
+   "innehall": [
+    {
+     "id": "gata_1",
+     "syns_i": [
+      "ljus",
+      "ut"
+     ]
+    },
+    {
+     "id": "gata_2",
+     "syns_i": [
+      "ljus",
+      "ut"
+     ]
+    },
+    {
+     "id": "gata_3",
+     "syns_i": [
+      "ljus",
+      "ut"
+     ]
+    },
+    {
+     "id": "ishylla",
+     "syns_i": [
+      "ljus",
+      "ut"
+     ]
+    },
+    {
+     "id": "isblock",
+     "syns_i": [
+      "ljus",
+      "ut"
+     ]
+    },
+    {
+     "id": "fotavtryck",
+     "dold": true
+    },
+    {
+     "id": "vagg_ut",
+     "syns_i": [
+      "ljus",
+      "ut"
+     ]
+    },
+    {
+     "id": "gata_3_igen",
+     "syns_i": [
+      "ljus",
+      "ut"
+     ]
+    },
+    {
+     "id": "spricka",
+     "syns_i": [
+      "ljus"
+     ]
+    },
+    {
+     "id": "utgang_stenfalt",
+     "syns_i": [
+      "ut"
+     ]
+    }
+   ],
+   "skyltar": {
+    "gata_1": {
+     "text": "Stenen är varm."
+    },
+    "gata_2": {
+     "text": "Den har en svans."
+    },
+    "gata_3": {
+     "text": "Svansen har en klubba."
+    },
+    "gata_3_igen": {
+     "text": "Svansen har en klubba."
+    },
+    "vagg_ut": {
+     "text": "Gå på det som svansen har."
+    }
+   },
+   "anteckning": "2 × 1 skärmar. I mork syns bara hjälten, ungen och stavens glimt (färgtabellen, 113.8), och LJUS stänger av den. Stig 2 (TAVLA) är golvet fram till gåtans väggar: kartan har stig_k4_stig2. Ishyllan med isblocket och fotavtrycket under (hemligheten). Det sista golvet med stig 3 (klubba): kartan har stig_k4_stig3, med vagg_ut och gata_3_igen bredvid. Skrifterna på väggarna är en glimt i isen utan bokstäver, och texten står på läsplattan när han trycker (113.8). Sprickan längst bort, och utgången i tillståndet ut."
+  },
+  {
+   "id": "berget_stenfalt",
+   "namn": "Stenfältet",
+   "tillstand": [
+    "dag",
+    "kvall"
+   ],
+   "innehall": [
+    "sten_varm",
+    "sten_taggar",
+    "sten_is",
+    "halet",
+    "sten_klubba",
+    {
+     "id": "lada_farfar",
+     "dold": true
+    },
+    "luftskepp_borta",
+    "stig_molnkanten"
+   ],
+   "anteckning": "1 skärm. Fem platser: fyra stenar och hålet där baronens block stod, med hans orange rep vid kanten (116.5). Ånga från sten_varm, sten_taggar och sten_klubba, och frost på sten_is. Avtrycken är fossil i sten, aldrig djur som sover (granskning 9). Molnkanten långt borta i norr, och stig_molnkanten längs bergskammen dit de går i slutet.",
+   "skyltar": {
+    "lada_farfar": {
+     "text": "Stenen är ____."
+    }
+   }
+  }
+ ],
+ "scener": [
+  {
+   "id": "k4s01_foten",
+   "pass": 1,
+   "rum": "berget_stigen",
+   "tillstand": "morgon",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Ni kom till berget.",
+    "upplast": true
+   },
+   "anteckning": "Manus 21 v0.3.1, pass 1. Farfar säger platsen men inte stället (20 §13).",
+   "steg": [
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Sköldpaddan lägger till vid bergets fot i morgondimman. Hjälten och ungen kliver av. Sköldpaddan puffar på ungen med nosen och simmar hem nedför floden. Uppe på toppen ryker det, och på sidorna ligger snö. Över toppen hänger ett orange luftskepp.",
+     "bild": "ankomst_berget"
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Bit fem gömde jag vid isgrottan.",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Jag skrev ledtrådar. Men var?",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "typ": "pussel",
+     "pussel_id": "k4_skyltarna"
+    },
+    {
+     "typ": "pussel",
+     "pussel_id": "k4_stig1"
+    },
+    {
+     "typ": "ga_till",
+     "mal": "mynningen"
+    }
+   ]
+  },
+  {
+   "id": "k4s02_mynningen",
+   "pass": 1,
+   "rum": "berget_stigen",
+   "tillstand": "morgon",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Ni är vid isgrottan.",
+    "upplast": true
+   },
+   "anteckning": "Baronen läser högt och hoppar över SPECIELL (granskning 9). Blocket står på stenfältet, på andra sidan berget (116.5). Farfars två repliker om baronens bit (99.4) står i mörkret, vid lägsta punkten.",
+   "steg": [
+    {
+     "typ": "pussel",
+     "pussel_id": "k4_snon"
+    },
+    {
+     "typ": "visa_foremal",
+     "foremal": "sten_farfar"
+    },
+    {
+     "typ": "las_skylt",
+     "foremal": "sten_farfar"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Högt ovanför lutar sig baronen ut ur luftskeppet med kikaren, åt rätt håll den här gången, och läser samma sten. Herr Skata sitter på tropikhjälmen.",
+     "bild": "baronen_kikare_berg"
+    },
+    {
+     "typ": "replik",
+     "talare": "baronen",
+     "text": "Biten är vid en … sten! Vid en sten!",
+     "upplast": true
+    },
+    {
+     "typ": "replik",
+     "talare": "baronen",
+     "text": "Då tar jag den största!",
+     "upplast": true
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Luftskeppet surrar bort över krönet. Långt borta, på andra sidan berget, lyfter det ett jättelikt stenblock i ett rep. Jag har biten! Berget skakar. Ovanför grottan lossnar snön, rasar och stannar i luften.",
+     "bild": "blocket_lyfts",
+     "tillstand_efter": "ras"
+    },
+    {
+     "typ": "pussel",
+     "pussel_id": "k4_stor_skold"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Snön dundrar mot bubblan. Hjälten och ungen backar in i grottan under den. Bubblan slocknar, och snön rasar ner bakom dem och stänger mynningen. Det blir kolsvart.",
+     "bild": "mynningen_stangs"
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Baronen har den sista kartbiten.",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Jag gömde den uppe i molnen. Han hittade den!",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "typ": "sparpunkt",
+     "pass_slut": true,
+     "valfri": false
+    }
+   ]
+  },
+  {
+   "id": "k4s03_grottan",
+   "pass": 2,
+   "rum": "berget_grottan",
+   "tillstand": "mork",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Snön stängde grottan.",
+    "upplast": true
+   },
+   "anteckning": "Mörkret är en färgtabell, och LJUS stänger av den (113.8). Stig 2 (TAVLA) leder till gåtans väggar.",
+   "steg": [
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Kolsvart. Bara stavens svaga glimt syns, och ungens ögon. Det droppar någonstans.",
+     "syns_redan": true
+    },
+    {
+     "typ": "pussel",
+     "pussel_id": "k4_ljus"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Grottan är full av istappar och blå valv. På andra sidan ett golv av isflak glimmar något på en vägg.",
+     "bild": "grottan_visar_vaggen"
+    },
+    {
+     "typ": "pussel",
+     "pussel_id": "k4_stig2"
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Farfars skrift glimmar i isen. Hitta den!",
+     "upplast": true
+    },
+    {
+     "typ": "ga_till",
+     "mal": "gata_1",
+     "leta": true
+    },
+    {
+     "typ": "las_skylt",
+     "foremal": "gata_1"
+    },
+    {
+     "typ": "ga_till",
+     "mal": "gata_2",
+     "leta": true
+    },
+    {
+     "typ": "las_skylt",
+     "foremal": "gata_2"
+    },
+    {
+     "typ": "ga_till",
+     "mal": "gata_3",
+     "leta": true
+    },
+    {
+     "typ": "las_skylt",
+     "foremal": "gata_3"
+    },
+    {
+     "typ": "ga_till",
+     "mal": "vagg_ut"
+    }
+   ]
+  },
+  {
+   "id": "k4s03_ishyllan",
+   "pass": 2,
+   "rum": "berget_grottan",
+   "frivillig": true,
+   "startar_i_rum": "berget_grottan",
+   "startar_vid": "isblock",
+   "till_scen": "k4s04_utvagen",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Ni är vid ishyllan.",
+    "upplast": true
+   },
+   "lockar": {
+    "vid": "isblock",
+    "beskrivning": "Ungen nosar vid isblocket under ishyllan och skrapar med tassen. Isblocket glittrar."
+   },
+   "anteckning": "Kapitlets hemlighet och frivilliga formel (08 §4, 116.5). Ett ögonblick med mamma utan rop.",
+   "steg": [
+    {
+     "typ": "pussel",
+     "pussel_id": "k4_ishyllan"
+    },
+    {
+     "typ": "visa_foremal",
+     "foremal": "fotavtryck"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Ungen sätter sin lilla fot i det stora avtrycket och står stilla en stund, som om den tänker på mamma. Ingen säger vems foten är.",
+     "bild": "ungen_fot_avtryck"
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "En ny sida i Dinoboken!",
+     "upplast": true
+    },
+    {
+     "typ": "dinobok",
+     "sida": {
+      "bildtext": "En stor fot",
+      "bild": "fotavtryck_stor"
+     }
+    }
+   ]
+  },
+  {
+   "id": "k4s04_utvagen",
+   "pass": 2,
+   "rum": "berget_grottan",
+   "tillstand": "ljus",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Ni läste Farfars skrift.",
+    "upplast": true
+   },
+   "anteckning": "Stig 3: ordet ur gåtan, med raden bredvid (granskning 9). Ungen slår upp isen med klubbsvansen.",
+   "steg": [
+    {
+     "typ": "las_skylt",
+     "foremal": "vagg_ut"
+    },
+    {
+     "typ": "pussel",
+     "pussel_id": "k4_stig3"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Hjälten står på det sista flaket. Genom en smal spricka i isen syns dagsljus. Ungen ställer sig vid sprickan, vänder sig om och slår med klubbsvansen, en gång, två gånger. Isen rasar ut, och solen strömmar in.",
+     "bild": "ungen_slar_isen",
+     "tillstand_efter": "ut"
+    },
+    {
+     "typ": "sparpunkt",
+     "pass_slut": true,
+     "valfri": false
+    }
+   ]
+  },
+  {
+   "id": "k4s05_stenfaltet",
+   "pass": 3,
+   "rum": "berget_stenfalt",
+   "tillstand": "dag",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Ni kom ut ur grottan.",
+    "upplast": true
+   },
+   "anteckning": "Stenfältet är kapitlets L6. Lådan med ordlåset är passets skrivuppgift (118.2). Farfars replik om bit fem är struken (115.2): kartbitens mellanscen visar vägen, och Herr Skata härmar ordet i bubblan.",
+   "steg": [
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Hjälten och ungen kliver ut på ett fält med stenar som ryker. Långt borta i snön hänger luftskeppet. Blocket glider ur repet och plumsar ner i en snödriva. Baronen tittar ner på det länge.",
+     "bild": "blocket_driva"
+    },
+    {
+     "typ": "replik",
+     "talare": "baronen",
+     "text": "Bara en sten?!",
+     "upplast": true
+    },
+    {
+     "typ": "ljud",
+     "id": "skata"
+    },
+    {
+     "typ": "pussel",
+     "pussel_id": "k4_stenarna"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Ungen ställer sig bredvid stenen och lägger sin svans intill. De är likadana! Ungen viftar så att snön yr.",
+     "bild": "svansarna"
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Leta under stenen!",
+     "upplast": true
+    },
+    {
+     "typ": "ga_till",
+     "mal": "lada_farfar",
+     "leta": true
+    },
+    {
+     "typ": "pussel",
+     "pussel_id": "k4_ladan"
+    },
+    {
+     "typ": "ge_kartbit",
+     "nummer": 5
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Kartbit fem passar ihop med de andra. Den visar vägen från berget till molnkanten. Ungen nosar på den.",
+     "bild": "kartbit5_molnkant"
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Gåtlösare! Du löser gåtor ur flera ledtrådar.",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "typ": "ge_grad",
+     "grad": "Gåtlösare",
+     "fest": "mellan_dampad"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Herr Skata sitter på en sten och härmar: molnkanten! molnkanten! Den flyger till luftskeppet, och baronen vänder skeppet mot molnen.",
+     "bild": "skata_harmar_molnkant"
+    },
+    {
+     "typ": "ga_till",
+     "mal": "stig_molnkanten"
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "God natt. Snart når ni molnen.",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Kvällen kommer. Hjälten och ungen går längs bergskammen mot molnkanten, som lyser långt borta under två månar.",
+     "bild": "resan_molnkant",
+     "tillstand_efter": "kvall"
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Fortsättning följer.",
+     "upplast": true
+    },
+    {
+     "typ": "sparpunkt",
+     "pass_slut": true,
+     "valfri": false
+    }
+   ]
+  }
+ ],
+ "pussel": [
+  {
+   "id": "k4_skyltarna",
+   "typ": "P1_las_och_valj",
+   "i_rummet": true,
+   "hjalp": "ett_ord",
+   "instruktion": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "Vilken väg går till isgrottan?",
+    "upplast": true
+   },
+   "varianter": {
+    "L3": {
+     "bild": "tankebubbla_isgrotta",
+     "alternativ": [
+      {
+       "id": "isgrottan",
+       "ord": "isgrottan",
+       "objekt": "skylt_isgrottan",
+       "ratt": true
+      },
+      {
+       "id": "issjon",
+       "ord": "issjön",
+       "objekt": "skylt_issjon",
+       "vid_valj": {
+        "reaktion": "ungen halkar på isen, snurrar ett varv och fnissar",
+        "replik": {
+         "talare": "berattare",
+         "text": "Där är en frusen sjö. Ingen grotta.",
+         "upplast": true
+        }
+       }
+      },
+      {
+       "id": "eldgrottan",
+       "ord": "eldgrottan",
+       "objekt": "skylt_eldgrottan",
+       "vid_valj": {
+        "reaktion": "en varm pust ryker ut, och ungen backar",
+        "replik": {
+         "talare": "berattare",
+         "text": "Där ryker det. Det är för varmt!",
+         "upplast": true
+        }
+       }
+      }
+     ]
+    }
+   },
+   "vid_ratt": {
+    "handling": "stigen mot isgrottan glimtar",
+    "fest": "liten"
+   },
+   "knuff": {
+    "handling": "skylten ISGROTTAN glimtar"
+   },
+   "forenkla": {
+    "efter_fel": 2,
+    "andring": "stigen han har prövat spärras med en snödriva"
+   },
+   "anteckning": "Korsat (08 §4): två skyltar har IS och två har GROTTAN, så den som läser bara början eller slutet kan välja fel. Instruktionen säger ordet högt, och skylten avgör ändå."
+  },
+  {
+   "id": "k4_stig1",
+   "typ": "P18_bokstavsstig",
+   "niva": "L1",
+   "ord": "upp",
+   "visa_ord": true,
+   "rutnat": [
+    "u x p",
+    "o p v"
+   ],
+   "instruktion": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "Hoppa på bokstäverna som stavar upp!",
+    "upplast": true
+   },
+   "knuff": {
+    "efter_sek": 15
+   },
+   "anteckning": "21b v0.2.1, stig 1. Gemener som liknar sina versaler, inga återvändsgränder. Ordet står på en gammal stolpe."
+  },
+  {
+   "id": "k4_snon",
+   "typ": "P26_krukorna",
+   "verb": "lyfta",
+   "instruktion": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "Farfars ledtråd är här. Leta under snön!",
+    "upplast": true
+   },
+   "innehall": [
+    "kotte",
+    "bar",
+    "sten_farfar",
+    "tom"
+   ],
+   "foremal": [
+    "snohog_1",
+    "snohog_2",
+    "snohog_3",
+    "snohog_4"
+   ],
+   "sak_vid": 3,
+   "vid_ratt": {
+    "handling": "under snön syns en sten med Farfars kompassros"
+   },
+   "knuff": {
+    "handling": "ungen nosar vid närmaste snöhög",
+    "efter_sek": 15
+   },
+   "anteckning": "Vila. Farfars sten hittas alltid som nummer tre (sak_vid)."
+  },
+  {
+   "id": "k4_stor_skold",
+   "typ": "P11_formel",
+   "niva": "S4",
+   "skriv": "tangentbord",
+   "bild": "snon_hanger",
+   "ledbild": "tankebubbla_stor_bubbla",
+   "svar": "STOR SKÖLD",
+   "formler": [
+    {
+     "ord": "STOR SKÖLD",
+     "godtas": [
+      "STORSKÖLD",
+      "STORA SKÖLD",
+      "JÄTTESKÖLD"
+     ],
+     "effekt": "stor_skold_ras"
+    }
+   ],
+   "rimliga": [
+    {
+     "ord": "SKÖLD",
+     "reaktion": "en liten bubbla tänds runt hjälten och slocknar",
+     "replik": {
+      "talare": "berattare",
+      "text": "Skölden är för liten!",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "STOR",
+     "reaktion": "staven blir lite större",
+     "replik": {
+      "talare": "berattare",
+      "text": "Stor vad?",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "LJUS",
+     "reaktion": "snön glittrar",
+     "replik": {
+      "talare": "berattare",
+      "text": "Snön hänger kvar!",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "SPRING",
+     "reaktion": "ungen trampar på stället",
+     "replik": {
+      "talare": "berattare",
+      "text": "Snön är för nära!",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "SNABB",
+     "reaktion": "ungen trampar på stället",
+     "replik": {
+      "talare": "berattare",
+      "text": "Snön är för nära!",
+      "upplast": true
+     }
+    }
+   ],
+   "vanligt_svar": {
+    "talare": "berattare",
+    "text": "Bra ord! Men det hjälper inte här.",
+    "upplast": true
+   },
+   "nastan": [
+    {
+     "ord": "STOR SKÖL",
+     "effekt": "liten_bubbla_spricker",
+     "replik": {
+      "talare": "berattare",
+      "text": "Nästan!",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "STOOR SKÖLD",
+     "effekt": "liten_bubbla_spricker",
+     "replik": {
+      "talare": "berattare",
+      "text": "Nästan!",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "STOR SKOLD",
+     "effekt": "liten_bubbla_spricker",
+     "replik": {
+      "talare": "berattare",
+      "text": "Nästan!",
+      "upplast": true
+     }
+    }
+   ],
+   "forebild": {
+    "text": "STOR SKÖLD",
+    "upplast": false,
+    "visas": "andra_felet"
+   },
+   "hjalp": "ett_ord",
+   "instruktion": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "En ny formel! Gör skölden stor!",
+    "upplast": true
+   },
+   "vid_ratt": {
+    "handling": "regnbågsljuset pulserar, och en jättebubbla välver sig över hjälten och ungen",
+    "fest": "mellan",
+    "bild": "stor_skold_ras"
+   },
+   "vid_fel": {
+    "reaktion": "staven fräser, pff",
+    "replik": {
+     "talare": "berattare",
+     "text": "Pff! Vad skyddade er mot ankaret?",
+     "upplast": true
+    },
+    "ljud": "fras"
+   },
+   "knuff": {
+    "handling": "bilden i molnet glimtar"
+   },
+   "anteckning": "Kapitlets nya formel, egenskap + ord (S4, 113.9). Det som måste hända sägs, och att formeln är ny (104.3). Han kan SKÖLD sedan kapitel 3 och får egenskapen. Svaret har två ord, och fälten har en glipa (2.52). Snön står stilla i luften tills han har skrivit, som ankaret, så ingen klocka räknar."
+  },
+  {
+   "id": "k4_ljus",
+   "typ": "P11_formel",
+   "niva": "S2",
+   "skriv": "tangentbord",
+   "bild": "morker_grotta",
+   "ledbild": "tankebubbla_ljusboll",
+   "svar": "LJUS",
+   "formler": [
+    {
+     "ord": "LJUS",
+     "godtas": [
+      "LYS",
+      "LYSA",
+      "LYSER"
+     ],
+     "effekt": "grottan_glittrar"
+    }
+   ],
+   "rimliga": [
+    {
+     "ord": "LAMPA",
+     "reaktion": "en liten lampa tänds och slocknar",
+     "replik": {
+      "talare": "berattare",
+      "text": "Bra ord! Men staven kan något bättre.",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "ELD",
+     "reaktion": "en liten låga fladdrar och slocknar",
+     "replik": {
+      "talare": "berattare",
+      "text": "Bra ord! Men staven kan något bättre.",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "STOR SKÖLD",
+     "reaktion": "bubblan lyser svagt och slocknar",
+     "replik": {
+      "talare": "berattare",
+      "text": "Det blev bara lite ljust.",
+      "upplast": true
+     }
+    }
+   ],
+   "vanligt_svar": {
+    "talare": "berattare",
+    "text": "Bra ord! Men det hjälper inte här.",
+    "upplast": true
+   },
+   "forebild": {
+    "text": "LJUS",
+    "upplast": false,
+    "visas": "andra_felet"
+   },
+   "hjalp": "ett_ord",
+   "instruktion": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "Det är kolsvart. Skriv en formel!",
+    "upplast": true
+   },
+   "vid_ratt": {
+    "handling": "ljusbollen tänds, och stavens regnbågsljus bryts i isen. Hela grottan glittrar i alla färger.",
+    "fest": "mellan",
+    "bild": "grottan_glittrar"
+   },
+   "vid_fel": {
+    "reaktion": "staven fräser, pff",
+    "replik": {
+     "talare": "berattare",
+     "text": "Pff! Hur lyste du upp vinden?",
+     "upplast": true
+    },
+    "ljud": "fras"
+   },
+   "knuff": {
+    "handling": "stavens glimt blinkar"
+   },
+   "tillstand_efter": "ljus",
+   "anteckning": "Den gamla formeln på huvudvägen (71.6). LYS, LYSA och LYSER godtas, som vid lyktorna (105.3). Mörkret är en färgtabell, och LJUS stänger av den (113.8)."
+  },
+  {
+   "id": "k4_stig2",
+   "typ": "P18_bokstavsstig",
+   "niva": "L2",
+   "ord": "tavla",
+   "visa_ord": true,
+   "rutnat": [
+    "s a v k e",
+    "t e x l a",
+    "o r s u o"
+   ],
+   "instruktion": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "Hoppa till Farfars tavla!",
+    "upplast": true
+   },
+   "knuff": {
+    "efter_sek": 15
+   },
+   "anteckning": "21b v0.2.1, stig 2. a och l med egen form, med versalerna att jämföra med. Ingen återvändsgränd."
+  },
+  {
+   "id": "k4_ishyllan",
+   "typ": "P11_formel",
+   "niva": "S3",
+   "skriv": "tangentbord",
+   "bild": "isblock_hylla",
+   "ledbild": "tankebubbla_brev_flyger",
+   "svar": "FLYG",
+   "formler": [
+    {
+     "ord": "FLYG",
+     "godtas": [
+      "LYFT",
+      "LYFTA"
+     ],
+     "effekt": "isblock_svavar"
+    }
+   ],
+   "rimliga": [
+    {
+     "ord": "SVÄRD",
+     "reaktion": "svärdet studsar mot isen",
+     "replik": {
+      "talare": "berattare",
+      "text": "Svärdet skär bara växter.",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "SPADE",
+     "reaktion": "spaden skrapar lite is",
+     "replik": {
+      "talare": "berattare",
+      "text": "Isen är för hård!",
+      "upplast": true
+     }
+    }
+   ],
+   "vanligt_svar": {
+    "talare": "berattare",
+    "text": "Bra ord! Men det hjälper inte här.",
+    "upplast": true
+   },
+   "forebild": {
+    "text": "FLYG",
+    "upplast": false,
+    "visas": "andra_felet"
+   },
+   "hjalp": "ett_ord",
+   "instruktion": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "Skriv ett ord som hjälper!",
+    "upplast": true
+   },
+   "vid_ratt": {
+    "handling": "isblocket svävar, och han styr bort det. Under det syns avtrycket av en stor fot i isen, mycket större än ungens.",
+    "fest": "liten",
+    "bild": "fotavtryck_stor"
+   },
+   "vid_fel": {
+    "reaktion": "staven fräser, pff",
+    "replik": {
+     "talare": "berattare",
+     "text": "Pff! Hur lyfte du tavlan hos Tant Rosa?",
+     "upplast": true
+    },
+    "ljud": "fras"
+   },
+   "knuff": {
+    "handling": "isblocket glimtar, och ungen skrapar vid det"
+   },
+   "anteckning": "Kapitlets frivilliga formel och hemlighet (08 §4, 116.5). Avtrycket är en vuxen av ungens art, och ingen säger vems."
+  },
+  {
+   "id": "k4_stig3",
+   "typ": "P18_bokstavsstig",
+   "niva": "L5",
+   "ord": "klubba",
+   "visa_ord": false,
+   "versaler_efter_fel": 2,
+   "rutnat": [
+    "f l u b e o",
+    "k f s r b a",
+    "x l o ~ s t"
+   ],
+   "instruktion": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "Hur kommer vi ut? Läs väggen!",
+    "upplast": true
+   },
+   "vid_atervand": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "Rätt bokstav! Men här tar isen slut.",
+    "upplast": true
+   },
+   "knuff": {
+    "efter_sek": 15
+   },
+   "anteckning": "21b v0.2.1, stig 3. Ordet står inte i klartext: vagg_ut säger GÅ PÅ DET SOM SVANSEN HAR., och gata_3_igen bredvid säger SVANSEN HAR EN KLUBBA. (granskning 9). Lockordet klo: grenen sjunker redan på det nedre l:et (116.2). Repliken är berättarens, medan ungen tittar ner i vaken."
+  },
+  {
+   "id": "k4_stenarna",
+   "typ": "P1_las_och_valj",
+   "i_rummet": true,
+   "hjalp": "ett_ord",
+   "instruktion": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "Hitta den speciella stenen!",
+    "upplast": true
+   },
+   "varianter": {
+    "L5": {
+     "text": "Vilken sten stämmer med gåtan?",
+     "alternativ": [
+      {
+       "id": "sten_varm",
+       "objekt": "sten_varm",
+       "bild": "sten_varm",
+       "vid_valj": {
+        "reaktion": "det ångar om stenen, men den är slät",
+        "replik": {
+         "talare": "berattare",
+         "text": "Den är varm. Men var är svansen?",
+         "upplast": true
+        }
+       }
+      },
+      {
+       "id": "sten_taggar",
+       "objekt": "sten_taggar",
+       "bild": "sten_taggar",
+       "vid_valj": {
+        "reaktion": "ungen petar på taggarna och drar bort tassen",
+        "replik": {
+         "talare": "berattare",
+         "text": "Aj! Inga taggar på klubban!",
+         "upplast": true
+        }
+       }
+      },
+      {
+       "id": "sten_is",
+       "objekt": "sten_is",
+       "bild": "sten_is",
+       "vid_valj": {
+        "reaktion": "frosten knastrar, och ungen huttrar",
+        "replik": {
+         "talare": "berattare",
+         "text": "Brrr! Den här är kall.",
+         "upplast": true
+        }
+       }
+      },
+      {
+       "id": "halet",
+       "objekt": "halet",
+       "bild": "halet",
+       "vid_valj": {
+        "reaktion": "ungen tittar ner i hålet och fnissar",
+        "replik": {
+         "talare": "berattare",
+         "text": "Här låg baronens sten.",
+         "upplast": true
+        }
+       }
+      },
+      {
+       "id": "sten_klubba",
+       "objekt": "sten_klubba",
+       "bild": "sten_klubba",
+       "ratt": true
+      }
+     ]
+    }
+   },
+   "vid_ratt": {
+    "handling": "stenen ångar, och i den syns avtrycket av en uråldrig svans med en klubba längst ut, ett fossil i sten",
+    "fest": "mellan",
+    "bild": "fossil_svans"
+   },
+   "knuff": {
+    "handling": "gåtans tre rader glimtar i ett moln"
+   },
+   "forenkla": {
+    "efter_fel": 2,
+    "andring": "stenen han har prövat täcks av snö"
+   },
+   "anteckning": "Kapitlets L6 (granskning 9, sorteringen 11): ingen rad räcker ensam, och rätt sten är inte den enda udda. Ingen reaktion läser upp gåtan igen (08 §4). L5 är den högsta variant som schemat har."
+  },
+  {
+   "id": "k4_ladan",
+   "typ": "P9_kodlas",
+   "niva": "S2",
+   "instruktion": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "Lådan är låst! Läs locket.",
+    "upplast": true
+   },
+   "brickor": [
+    "A",
+    "K",
+    "L",
+    "M",
+    "R",
+    "V"
+   ],
+   "svar": "varm",
+   "ratt_bokstav_stannar": true,
+   "kontroll": "hela_ordet",
+   "hjalp": "ett_ord",
+   "svar_lyser_sek": 2,
+   "vid_ratt": {
+    "handling": "VARM lyser. Låset klickar, och locket fjädrar upp. I lådan ligger kartbit fem.",
+    "fest": "mellan",
+    "ljud": "klick_las",
+    "bild": "ladan_oppnas"
+   },
+   "vid_fel": {
+    "reaktion": "låset rasslar, och de fel bokstäverna studsar tillbaka",
+    "replik": {
+     "talare": "berattare",
+     "text": "Läs gåtan på väggen igen!",
+     "upplast": true
+    }
+   },
+   "knuff": {
+    "handling": "gåtans rad STENEN ÄR VARM. glimtar i ett moln"
+   },
+   "forenkla": {
+    "efter_fel": 2,
+    "andring": "förebilden VARM står ovanför brickorna"
+   },
+   "anteckning": "Farfars låda med ordlås (den vuxnes val B, 118.2). Locket säger STENEN ÄR ____. Ingen nyckel och inget chiffer: ordet har han läst i gåtan. K och L ur KLUBBA, så den som tar fel rad prövar fel ord. Teknik: P9 utan chiffer (118.4). Lockets text står i rummets skylt lada_farfar."
+  }
+ ],
+ "uppdrag": [
+  {
+   "id": "u4_grottan",
+   "rubrik": "ISGROTTAN",
+   "bild": "kort_grotta",
+   "pass": 1,
+   "steg": [
+    {
+     "text": "GÅ TILL GROTTAN",
+     "klart": {
+      "scen": "k4s01_foten",
+      "pussel": "k4_stig1"
+     }
+    },
+    {
+     "text": "LETA I SNÖN",
+     "klart": {
+      "scen": "k4s02_mynningen",
+      "pussel": "k4_snon"
+     }
+    },
+    {
+     "text": "SKYDDA ER",
+     "klart": {
+      "scen": "k4s02_mynningen",
+      "pussel": "k4_stor_skold"
+     }
+    }
+   ],
+   "stampel": {
+    "scen": "k4s02_mynningen",
+    "efter": {
+     "pussel": "k4_stor_skold"
+    }
+   },
+   "anteckning": "Inget steg säger formelns namn (69.3)."
+  },
+  {
+   "id": "u4_ut",
+   "rubrik": "UT UR GROTTAN",
+   "bild": "kort_is",
+   "pass": 2,
+   "steg": [
+    {
+     "text": "TÄND LJUS",
+     "klart": {
+      "scen": "k4s03_grottan",
+      "pussel": "k4_ljus"
+     }
+    },
+    {
+     "text": "LÄS VÄGGEN",
+     "klart": {
+      "scen": "k4s03_grottan",
+      "pussel": "k4_stig2"
+     }
+    },
+    {
+     "text": "HITTA UT",
+     "klart": {
+      "scen": "k4s04_utvagen",
+      "pussel": "k4_stig3"
+     }
+    }
+   ],
+   "stampel": {
+    "scen": "k4s04_utvagen",
+    "efter": {
+     "pussel": "k4_stig3"
+    }
+   },
+   "anteckning": "TÄND LJUS säger formelns namn, men LJUS är känt sedan prologen och står redan på staven."
+  },
+  {
+   "id": "u4_stenen",
+   "rubrik": "STENEN",
+   "bild": "kort_sten",
+   "pass": 3,
+   "steg": [
+    {
+     "text": "HITTA STENEN",
+     "klart": {
+      "scen": "k4s05_stenfaltet",
+      "pussel": "k4_stenarna"
+     }
+    },
+    {
+     "text": "ÖPPNA LÅDAN",
+     "klart": {
+      "scen": "k4s05_stenfaltet",
+      "pussel": "k4_ladan"
+     }
+    }
+   ],
+   "stampel": {
+    "scen": "k4s05_stenfaltet",
+    "efter": {
+     "pussel": "k4_ladan"
+    }
+   }
+  }
+ ]
+}

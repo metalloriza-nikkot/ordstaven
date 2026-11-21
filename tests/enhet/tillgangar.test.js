@@ -225,7 +225,10 @@ describe('mellanscenernas bilder och bildkorten', () => {
     // 109.5: ankaret faller och stannar (Stils bilder, Rum.ankaretFaller)
     'ankaret_faller',
     // 113.3–113.4: baronen flyger in med kikaren, och hjälten håller upp flaskan (närbilden på läsplattan)
-    'baronen_kommer', 'flaskan_hittad']);
+    'baronen_kommer', 'flaskan_hittad',
+    // 118.4: kapitel 4:s gråbox (Rum.js, kapitel 4 i gråbox), med Stils bilder där de finns
+    'ankomst_berget', 'baronen_kikare_berg', 'blocket_lyfts', 'mynningen_stangs', 'grottan_visar_vaggen', 'ungen_fot_avtryck',
+    'ungen_slar_isen', 'blocket_driva', 'svansarna', 'kartbit5_molnkant', 'skata_harmar_molnkant', 'resan_molnkant']);
   it('varje mellanscen med bild har grafik (morgonen i sängen, luftskeppets lägen, sidovyerna, ungen på kartbiten, ägget)', () => {
     const saknas = [];
     for (const k of kapitel) for (const sc of k.scener) for (const st of sc.steg) {
@@ -267,7 +270,9 @@ describe('mellanscenernas bilder och bildkorten', () => {
   });
   it('uppdragslappen (2d): varje uppdrag har sitt bildkort, och lappens papper, kompassros och stämpel finns', () => {
     const saknas = [];
-    for (const k of kapitel) for (const u of k.uppdrag || []) if (!existsSync(new URL(`assets/bildkort/${u.bild}.png`, rot))) saknas.push(`${k.id} ${u.id}: ${u.bild}`);
+    // ett kapitel i gråbox (118.4, kapitel 4) har platshållare tills Stil har ritat korten
+    const vantar = JSON.parse(las('kartor/den-gomda-dalen/platshallare.json').toString()).bilder;
+    for (const k of kapitel) for (const u of k.uppdrag || []) if (!existsSync(new URL(`assets/bildkort/${u.bild}.png`, rot)) && !(k.id === 'kap-04' && vantar[u.bild])) saknas.push(`${k.id} ${u.id}: ${u.bild}`);
     expect(saknas).toEqual([]);
     for (const f of ['lapp_uppdrag', 'lapp_kompassros', 'stampel', 'ikon_uppdrag', 'ikon_klar', 'ikon_fram']) expect(existsSync(new URL(`assets/ui/${f}.png`, rot)), f).toBe(true);
   });

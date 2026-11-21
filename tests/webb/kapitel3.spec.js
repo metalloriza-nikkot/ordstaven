@@ -287,7 +287,7 @@ test('kapitel 3 pass 3: fenan, kramen, tången med skalkanten mitt i, SKÖLD, or
   let rond = 0, felValt = false, duellBild = false, slut = false, skalkant = false;
   for (let i = 0; i < 700; i++) {
     const st = await ev(() => window.__ORDSTAVEN.steg());
-    if (await page.locator('.pass-slut .fortsatt, .pass-slut .om').first().isVisible().catch(() => false)) { slut = true; break; }
+    if (await page.locator('.pass-slut .fortsatt, .pass-slut .om, .pass-slut.kapitel-last .igen').first().isVisible().catch(() => false)) { slut = true; break; } // 0.102.0: kapitel 4 är låst, så slutrutan för ett låst kapitel kommer
     if (await page.locator('#plattan .duell-kort').isVisible()) {
       if (!duellBild && rond === 2) {
         duellBild = true; await page.screenshot({ path: 'test-results/kap3-duellen.png' });

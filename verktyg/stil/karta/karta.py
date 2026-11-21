@@ -4,7 +4,7 @@
 # Bit 1: berg, en dal full av moln och mammas stora skugga, som liknar ungen (13, s14). Fryst.
 # Bit 2: Farfars hus, skogen, stenen, bron och träsket (15, k1s11, granskningen A 1). Fryst.
 # Bit 3: vassbyn, vassen och vägen fram till en bred flod med en ö (17, k2s09, och manus 19 v0.3 k3s01). Färdig.
-# Bit 1–4 är färdiga. Bit 5–6 är skisser som ändras när kapitlen skrivs.
+# Bit 1–5 är färdiga. Bit 6 är en skiss som ändras när kapitlen skrivs.
 # Bit 1 och 2 ritas exakt som förut: de ritas med den gamla teckningen (sju bitar) och klistras in pixel för pixel.
 # Allt ritas ur masterpaletten (palett/palett.json): färgerna väljs med pf(), som tar palettens närmaste.
 import os, sys, math, random
@@ -302,11 +302,14 @@ def ny_teckning():
     on(14, 57, k=0.8)        # ön ligger på bit 3, i floden där biten tar slut (manus 19 v0.3, k3s01: kartbit 3 i närbild visar ön)
     for (x, y) in [(10, 22), (22, 14), (8, 36), (86, 14), (40, 22)]: trad(x, y)
     for (x, y) in [(30, 32), (76, 44), (110, 44)]: vass(x, y, 2)
-    # ---------- bit 5: berget (kapitel 4, skiss): vulkanen och isgrottorna ----------
+    # ---------- bit 5: berget (kapitel 4, färdig efter berättelsen v0.4): vulkanen, isgrottan och stenfältet ----------
     vulkan_ny(152, 44)
     isberg_ny(188, 40, 12); isberg_ny(208, 30, 9, grotta=False); isberg_ny(174, 30, 7, grotta=False)
     isberg_ny(200, 70, 13); isberg_ny(182, 80, 7, grotta=False)
-    berg(214, 92, 8, skiss=True); berg(166, 64, 7, skiss=True)
+    berg(216, 96, 8); berg(166, 66, 7)
+    for (x, y) in [(206, 86), (212, 80), (196, 92), (214, 90), (204, 94)]:          # stenfältet: stenar som ryker
+        sten(x, y)
+        for k, (dx, dy) in enumerate(((0, -8), (1, -9), (1, -10), (0, -11))): satt(x + dx, y + dy, rgb('#8E8AA8' if k < 2 else '#B8B4CC'))
     # ---------- bit 6: molnkanten och baronens bit (kapitel 5, skiss) ----------
     for (cx, cy, rx) in [(120, 116, 6), (132, 126, 5), (114, 132, 7)]: molntapp(cx, cy, rx)
     for (x, y) in [(158, 134), (170, 140), (214, 140)]: trad(x, y)
@@ -316,7 +319,7 @@ def ny_teckning():
     VAGEN = [(64, 97), (56, 90), (46, 85), (36, 79), (29, 71), (24, 64), (17, 61),          # bit 3: genom byn och vassen till floden och ön
              (24, 55), (36, 46), (48, 40), (58, 36),                                     # bit 4: längs floden mot berget
              (74, 32), (88, 28), (102, 29), (116, 33), (128, 36),                         # ... och vidare nedför floden
-             (138, 36), (144, 28), (150, 26), (158, 28), (170, 36), (184, 40),            # bit 5: upp på vulkanen och in i isgrottan
+             (138, 38), (146, 44), (158, 47), (172, 46), (184, 40),                       # bit 5: längs bergets fot och upp till isgrottan
              (200, 72), (198, 77), (192, 84), (186, 90),                                  # ... ut ur grottan nedanför
              (180, 102), (166, 116), (146, 114), (130, 104), (124, 98)]                   # bit 6: till molnkanten
     for a, b in zip(VAGEN, VAGEN[1:]):
@@ -386,7 +389,8 @@ if __name__ == '__main__':
     for n in (1, 2): bitbild(n).save(f'ut/karta/kartbit_{n}.png')
     bitbild(3).save('ut/karta/kartbit_3.png')
     bitbild(4).save('ut/karta/kartbit_4.png')                        # färdig (kapitel 3, beslut 100.6)
-    for n in (5, 6): bitbild(n).save(f'ut/karta/skiss_kartbit_{n}.png')
+    bitbild(5).save('ut/karta/kartbit_5.png')                        # färdig (kapitel 4, beslut 114)
+    bitbild(6).save('ut/karta/skiss_kartbit_6.png')
     import json
     json.dump({'om': 'Var varje bit ligger i hela kartan (224 x 144), övre vänstra hörnet. Bitarna läggs ihop med 1 pixels glipa (rivna kanter).',
                'storlek': [W, H], 'bitar': POS}, open('ut/karta/karta.json', 'w'), ensure_ascii=False, indent=1)

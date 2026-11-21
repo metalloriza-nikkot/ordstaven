@@ -22,7 +22,9 @@ const FILER = [
  */
 // Tom sedan 0.98.0: Stils fyra kort (108.2) ersatte de sista (mat, sol, apa och Farfars lista). Nytt som väntar
 // på Stil skrivs in här, och listan får bara krympa.
-const VANTAR_PA_STIL = new Set([]);
+// 118.4: kapitel 4:s gråbox. Bilderna i formlerna, läsvalet vid skyltarna och uppdragens kort väntar på Stil (efter
+// kartversionen), och står som gråboxens platshållare tills dess
+const VANTAR_PA_STIL = new Set(['snon_hanger', 'tankebubbla_stor_bubbla', 'isblock_hylla', 'morker_grotta', 'tankebubbla_isgrotta', 'kort_grotta', 'kort_is', 'kort_sten']);
 
 /** Fält vars värde är en bild på läsplattan. En mellanscens och en reaktions `bild` är en regi i rummet, inte en bild. */
 const BILDFALT = new Set(['bild', 'ledbild', 'pekar_pa']);

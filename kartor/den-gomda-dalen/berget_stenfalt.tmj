@@ -1,0 +1,293 @@
+{
+ "type": "map",
+ "version": "1.10",
+ "tiledversion": "1.11.0",
+ "orientation": "orthogonal",
+ "renderorder": "right-down",
+ "width": 20,
+ "height": 12,
+ "tilewidth": 16,
+ "tileheight": 16,
+ "infinite": false,
+ "compressionlevel": -1,
+ "nextlayerid": 2,
+ "nextobjectid": 13,
+ "properties": [
+  {
+   "name": "rum",
+   "type": "string",
+   "value": "berget_stenfalt"
+  }
+ ],
+ "tilesets": [],
+ "layers": [
+  {
+   "id": 1,
+   "name": "foremal",
+   "type": "objectgroup",
+   "draworder": "index",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 1,
+     "name": "start",
+     "type": "",
+     "x": 30,
+     "y": 150,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 2,
+     "name": "regi_luftskepp",
+     "type": "",
+     "x": 250,
+     "y": 30,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 3,
+     "name": "regi_driva",
+     "type": "",
+     "x": 270,
+     "y": 70,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 4,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 0,
+     "width": 320,
+     "height": 12,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 5,
+     "name": "sten_varm",
+     "type": "sak",
+     "x": 70,
+     "y": 60,
+     "width": 26,
+     "height": 20,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "anim_ms",
+       "type": "int",
+       "value": 500
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "sten_varm_slat_01"
+      },
+      {
+       "name": "bild_anim",
+       "type": "string",
+       "value": "sten_varm_slat_01,sten_varm_slat_02"
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 6,
+     "name": "sten_taggar",
+     "type": "sak",
+     "x": 140,
+     "y": 46,
+     "width": 26,
+     "height": 20,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "anim_ms",
+       "type": "int",
+       "value": 500
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "sten_varm_taggsvans_01"
+      },
+      {
+       "name": "bild_anim",
+       "type": "string",
+       "value": "sten_varm_taggsvans_01,sten_varm_taggsvans_02"
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 7,
+     "name": "sten_is",
+     "type": "sak",
+     "x": 210,
+     "y": 70,
+     "width": 26,
+     "height": 20,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "sten_kall_klubbsvans"
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 8,
+     "name": "halet",
+     "type": "sak",
+     "x": 240,
+     "y": 130,
+     "width": 30,
+     "height": 18,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "sten_hal"
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 9,
+     "name": "sten_klubba",
+     "type": "sak",
+     "x": 110,
+     "y": 120,
+     "width": 26,
+     "height": 20,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "anim_ms",
+       "type": "int",
+       "value": 500
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "sten_varm_klubbsvans_01"
+      },
+      {
+       "name": "bild_anim",
+       "type": "string",
+       "value": "sten_varm_klubbsvans_01,sten_varm_klubbsvans_02"
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 10,
+     "name": "lada_farfar",
+     "type": "sak",
+     "x": 114,
+     "y": 148,
+     "width": 18,
+     "height": 12,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "lada_farfar_stangd"
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 11,
+     "name": "luftskepp_borta",
+     "type": "sak",
+     "x": 262,
+     "y": 14,
+     "width": 40,
+     "height": 20,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "ankare",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 12,
+     "name": "stig_molnkanten",
+     "type": "sak",
+     "x": 160,
+     "y": 12,
+     "width": 30,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

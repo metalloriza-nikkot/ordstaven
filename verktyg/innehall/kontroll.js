@@ -9,6 +9,7 @@ import { SLINGOR } from '../../src/karna/musik.js';
 import { kandaLjud, ljudLista } from '../../src/karna/ljudid.js';
 import { beskrivningarSomVisas, aventyretsBeskrivningar, reaktionerSomVisas } from '../../src/karna/mellanscen.js';
 import { budgetVarningar, talareI } from './budget.js';
+import { kontrolleraStig } from '../../src/karna/bokstavsstig.js';
 
 const schema = (namn) => JSON.parse(readFileSync(new URL(`../../content/schema/${namn}.schema.json`, import.meta.url), 'utf8'));
 // teckenbredderna för typsnittet i textlagret (Lexend, beslut 13)
@@ -27,9 +28,10 @@ export const MAX_MINUTER_PER_PASS = 10;
  * ingen läsning: alla brickor går att trycka, och stegen visar ordet (76.3, C4).
  */
 // P29 (hornet) och P16 (ordduellen) är läsval, och P9 med lage meddelande (chiffret) är en skrivuppgift (2.47, 87.6)
-export const LASUPPGIFTER = new Set(['P1_las_och_valj', 'P28_packa', 'P11_formel', 'P29_tryck', 'P16_ordduell']);
+// P18 (bokstavsstigen, 2.54) är ett läsval, och P9 utan chiffer (ordlåset i kapitel 4, 118.2) en skrivuppgift
+export const LASUPPGIFTER = new Set(['P1_las_och_valj', 'P28_packa', 'P11_formel', 'P29_tryck', 'P16_ordduell', 'P18_bokstavsstig']);
 /** Avgör pusslet en läs- eller skrivuppgift? @param {any} p */
-export const arLasuppgift = (p) => LASUPPGIFTER.has(p.typ) || (p.typ === 'P9_kodlas' && p.lage === 'meddelande');
+export const arLasuppgift = (p) => LASUPPGIFTER.has(p.typ) || (p.typ === 'P9_kodlas' && (p.lage === 'meddelande' || !p.chiffer));
 
 let ajv;
 function validerare() {
@@ -616,6 +618,12 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
           for (const ch of svar) { const i = kvar.indexOf(ch); if (i < 0) fel.push(var_(`${plats}: brickorna saknar ${ch} till ${svar}`)); else kvar.splice(i, 1); }
           if (p.niva === 'S2' && (kvar.length < 2 || kvar.length > 3)) varningar.push(var_(`${plats}: S2 har 2–3 extra brickor, har ${kvar.length}`));
         }
+      }
+      // bokstavsstigen i ett kapitel (2.54): samma kontroll som i testrummet, och kartan har stig_<id>
+      if (p.typ === 'P18_bokstavsstig') {
+        const r = kontrolleraStig(p);
+        for (const f of r.fel) fel.push(var_(`${plats}: ${f}`));
+        for (const v of r.varningar) varningar.push(var_(`${plats}: ${v}`));
       }
       if (p.typ === 'P26_krukorna') {
         if (p.sak_i_sista && !p.innehall.includes(p.sak_i_sista)) fel.push(var_(`${plats}: sak_i_sista ${p.sak_i_sista} finns inte i innehall`));

@@ -920,10 +920,110 @@
     "h": 16
    }
   },
-  "skold_tands_01": {
+  "skold_stor_bubbla_01": {
    "frame": {
     "x": 0,
     "y": 312,
+    "w": 112,
+    "h": 72
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 72
+   },
+   "sourceSize": {
+    "w": 112,
+    "h": 72
+   }
+  },
+  "skold_stor_bubbla_02": {
+   "frame": {
+    "x": 113,
+    "y": 312,
+    "w": 112,
+    "h": 72
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 72
+   },
+   "sourceSize": {
+    "w": 112,
+    "h": 72
+   }
+  },
+  "skold_stor_tands_01": {
+   "frame": {
+    "x": 0,
+    "y": 385,
+    "w": 112,
+    "h": 72
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 72
+   },
+   "sourceSize": {
+    "w": 112,
+    "h": 72
+   }
+  },
+  "skold_stor_tands_02": {
+   "frame": {
+    "x": 113,
+    "y": 385,
+    "w": 112,
+    "h": 72
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 72
+   },
+   "sourceSize": {
+    "w": 112,
+    "h": 72
+   }
+  },
+  "skold_stor_tands_03": {
+   "frame": {
+    "x": 226,
+    "y": 385,
+    "w": 112,
+    "h": 72
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 72
+   },
+   "sourceSize": {
+    "w": 112,
+    "h": 72
+   }
+  },
+  "skold_tands_01": {
+   "frame": {
+    "x": 0,
+    "y": 458,
     "w": 56,
     "h": 44
    },
@@ -943,7 +1043,7 @@
   "skold_tands_02": {
    "frame": {
     "x": 57,
-    "y": 312,
+    "y": 458,
     "w": 56,
     "h": 44
    },
@@ -963,7 +1063,7 @@
   "skold_tands_03": {
    "frame": {
     "x": 114,
-    "y": 312,
+    "y": 458,
     "w": 56,
     "h": 44
    },
@@ -986,7 +1086,7 @@
   "format": "RGBA8888",
   "size": {
    "w": 436,
-   "h": 357
+   "h": 503
   },
   "scale": "1",
   "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."

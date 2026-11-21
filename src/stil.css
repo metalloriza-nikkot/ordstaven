@@ -1009,3 +1009,8 @@ html, body {
 #stigord .stigord-versal { position: absolute; transform: translate(-50%, -50%); pointer-events: none; padding: 0 calc(5 * var(--vpx));
   background: #f5ecd7; border: calc(1 * var(--vpx)) solid #6b4a2b; border-radius: calc(3 * var(--vpx)); font-size: calc(10 * var(--vpx)); line-height: 1.2; color: #1a1410; white-space: nowrap; }
 .platta-oppen #stigord { visibility: hidden; }
+
+/* 2.54: ordlåset (P9 utan chiffer, Farfars låda i kapitel 4). Lockets mening står på en rad, och fälten i luckan */
+.ordlas { padding: calc(14px * var(--t)) calc(18px * var(--t)); }
+.ordlas-mening { display: flex; align-items: center; gap: calc(12px * var(--t)); font-size: calc(40px * var(--t)); font-weight: 600; color: #2a241c; }
+.ordlas-mening .platser { margin: 0; }

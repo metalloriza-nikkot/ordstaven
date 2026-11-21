@@ -1,0 +1,392 @@
+{
+ "type": "map",
+ "version": "1.10",
+ "tiledversion": "1.11.0",
+ "orientation": "orthogonal",
+ "renderorder": "right-down",
+ "width": 40,
+ "height": 24,
+ "tilewidth": 16,
+ "tileheight": 16,
+ "infinite": false,
+ "compressionlevel": -1,
+ "nextlayerid": 2,
+ "nextobjectid": 21,
+ "properties": [
+  {
+   "name": "rum",
+   "type": "string",
+   "value": "berget_grottan"
+  }
+ ],
+ "tilesets": [],
+ "layers": [
+  {
+   "id": 1,
+   "name": "foremal",
+   "type": "objectgroup",
+   "draworder": "index",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 1,
+     "name": "start",
+     "type": "",
+     "x": 40,
+     "y": 110,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 2,
+     "name": "regi_spricka",
+     "type": "",
+     "x": 616,
+     "y": 290,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 3,
+     "name": "stig_k4_stig2",
+     "type": "sak",
+     "x": 196,
+     "y": 92,
+     "width": 8,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "ankare",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 4,
+     "name": "",
+     "type": "vagg",
+     "x": 96,
+     "y": 0,
+     "width": 208,
+     "height": 184,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vatten",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 5,
+     "name": "",
+     "type": "vagg",
+     "x": 304,
+     "y": 0,
+     "width": 336,
+     "height": 14,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 6,
+     "name": "gata_1",
+     "type": "sak",
+     "x": 352,
+     "y": 14,
+     "width": 24,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      }
+     ]
+    },
+    {
+     "id": 7,
+     "name": "gata_2",
+     "type": "sak",
+     "x": 436,
+     "y": 14,
+     "width": 24,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      }
+     ]
+    },
+    {
+     "id": 8,
+     "name": "gata_3",
+     "type": "sak",
+     "x": 520,
+     "y": 14,
+     "width": 24,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      }
+     ]
+    },
+    {
+     "id": 9,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 184,
+     "width": 304,
+     "height": 16,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 10,
+     "name": "",
+     "type": "vagg",
+     "x": 336,
+     "y": 184,
+     "width": 304,
+     "height": 16,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 11,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 368,
+     "width": 336,
+     "height": 16,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 12,
+     "name": "ishylla",
+     "type": "sak",
+     "x": 60,
+     "y": 344,
+     "width": 72,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "over"
+      }
+     ]
+    },
+    {
+     "id": 13,
+     "name": "isblock",
+     "type": "sak",
+     "x": 84,
+     "y": 320,
+     "width": 24,
+     "height": 18,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "anim_ms",
+       "type": "int",
+       "value": 500
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "isblock_hylla_01"
+      },
+      {
+       "name": "bild_anim",
+       "type": "string",
+       "value": "isblock_hylla_01,isblock_hylla_02"
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 14,
+     "name": "fotavtryck",
+     "type": "sak",
+     "x": 80,
+     "y": 324,
+     "width": 28,
+     "height": 14,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "fotavtryck_is"
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 15,
+     "name": "vagg_ut",
+     "type": "sak",
+     "x": 220,
+     "y": 200,
+     "width": 24,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      }
+     ]
+    },
+    {
+     "id": 16,
+     "name": "gata_3_igen",
+     "type": "sak",
+     "x": 268,
+     "y": 200,
+     "width": 24,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      }
+     ]
+    },
+    {
+     "id": 17,
+     "name": "stig_k4_stig3",
+     "type": "sak",
+     "x": 456,
+     "y": 286,
+     "width": 8,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "ankare",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 18,
+     "name": "",
+     "type": "vagg",
+     "x": 336,
+     "y": 200,
+     "width": 248,
+     "height": 184,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vatten",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 19,
+     "name": "spricka",
+     "type": "sak",
+     "x": 624,
+     "y": 270,
+     "width": 16,
+     "height": 40,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "isvagg_spricka"
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "vanster"
+      }
+     ]
+    },
+    {
+     "id": 20,
+     "name": "utgang_stenfalt",
+     "type": "sak",
+     "x": 620,
+     "y": 266,
+     "width": 20,
+     "height": 48,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "vanster"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

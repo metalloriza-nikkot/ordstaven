@@ -3216,6 +3216,9 @@ export function skapaSpel(d) {
     if (p.instruktion) await replik(p.instruktion);
     rum.frys(true);
     const c = p.chiffer || { tecken: [], nyckel: [] };
+    // ordlåset (P9 utan chiffer, 2.54, Farfars låda i kapitel 4): ingen nyckel och inga tecken. Locket är rummets skylt
+    // med en lucka (____), och fälten står i luckan. Ordet har han läst någon annanstans (gåtan på väggen)
+    const lock = p.chiffer ? null : Object.values(b.rum(visadScen?.rum)?.skyltar || {}).map((x) => /** @type {any} */ (x).text).find((t) => typeof t === 'string' && t.includes('____')) ?? null;
     let visar = p.visa_forsta ? 0 : -1;
     if (visar >= 0) logg.handelse('kodlås', 'ungen visar första tecknet (inte hjälp)');
     return new Promise((klar) => {
@@ -3227,6 +3230,18 @@ export function skapaSpel(d) {
         const las = `<div class="kod-kort kod-las"><span class="kod-bygel" aria-hidden="true"></span><div class="kod-tecken">${c.tecken.map((t, i) => `<span class="kod-tecken-ruta ${f.s.last[i] ? 'ratt' : ''} ${i === visar ? 'visar' : ''}">${teckenBild(t)}</span>`).join('')}</div>
           <div class="platser">${f.s.platser.map((id, i) => `<span class="plats ${f.s.last[i] ? 'last' : ''} ${id !== null && !f.s.last[i] ? 'flyttbar' : ''}" data-plats="${i}">${ui.esc(bokstav(id))}</span>`).join('')}</div></div>`;
         const tb = tipsBokstav();
+        if (!p.chiffer) {
+          const platser = las.slice(las.indexOf('<div class="platser">'), las.lastIndexOf('</div>'));
+          const [fore, efter] = String(forSkarm(lock || '____')).split('____');
+          const ordlas = `<div class="kod-kort kod-las ordlas"><span class="kod-bygel" aria-hidden="true"></span><div class="ordlas-mening"><span>${ui.esc(fore ?? '')}</span>${platser}<span>${ui.esc(efter ?? '')}</span></div></div>`;
+          const brickor = `<div class="brickor">${f.s.brickor.map((x) => `<button type="button" class="bricka ${f.s.platser.includes(x.id) ? 'anvand' : ''}" data-id="${x.id}">${ui.esc(x.bokstav)}</button>`).join('')}<button type="button" class="bricka sudda" aria-label="Ta tillbaka">⌫</button></div>`;
+          ui.visaPlatta(`<div class="pussel-ruta kod-ruta"><div class="kod-rad">${ordlas}</div>${brickor}</div>`, 'pussel P9_kodlas ordlas');
+          tillatNos(p, spar);
+          ui.plattan.querySelectorAll('.bricka[data-id]').forEach((el) => el.addEventListener('click', () => svar(f.lagg(Number(/** @type {HTMLElement} */ (el).dataset.id)))));
+          ui.plattan.querySelectorAll('.plats.flyttbar').forEach((el) => el.addEventListener('click', () => { if (!upptagen && f.taBort(Number(/** @type {HTMLElement} */ (el).dataset.plats))) { ljud.spela('klick'); rita(); } }));
+          ui.plattan.querySelector('.sudda')?.addEventListener('click', () => { if (!upptagen && f.sudda()) { ljud.spela('klick'); rita(); } });
+          return;
+        }
         const nyckel = `<div class="kod-kort kod-nyckel">${c.nyckel.map((n) => `<span class="kod-par ${visar >= 0 && n.tecken === c.tecken[visar] ? 'visar' : ''} ${tb && n.bokstav === tb ? 'tips' : ''}">${teckenBild(n.tecken)}<span class="kod-bokstav">${ui.esc(n.bokstav)}</span></span>`).join('')}</div>`;
         const brickor = `<div class="brickor">${f.s.brickor.map((x) => `<button type="button" class="bricka ${f.s.platser.includes(x.id) ? 'anvand' : ''}" data-id="${x.id}">${ui.esc(x.bokstav)}</button>`).join('')}<button type="button" class="bricka sudda" aria-label="Ta tillbaka">⌫</button></div>`;
         ui.visaPlatta(`<div class="pussel-ruta kod-ruta"><div class="kod-rad">${las}${nyckel}</div>${brickor}</div>`, 'pussel P9_kodlas');
@@ -3398,6 +3413,8 @@ export function skapaSpel(d) {
     const lage = rum.visaStig(g, ankare ? { x: ankare.x + ankare.b / 2, y: ankare.y + ankare.h / 2 } : undefined);
     const fot = (/** @type {{ x: number, y: number }} */ q) => ({ x: q.x, y: q.y + 4 });
     rum.pos = { ...lage.strand }; rum.vand = { x: 1, y: 0 }; rum.placera();
+    // kameran visar hela rutnätet medan stigen pågår (i ett större rum stod den kvar där han var, 2.54)
+    rum.regiFokus = { x: Math.round((lage.strand.x + lage.mal.x) / 2), y: lage.strand.y };
     if (rum.unge.visible) { rum.ungePos = { x: lage.strand.x - 8, y: lage.strand.y + 12 }; rum.placera(); }
     const nyckelFor = (/** @type {{ r: number, k: number }} */ q) => `${q.r},${q.k}`;
     let fel = 0, hjalp = false, knuffFore = false, versal = false, upptagen = false, forstaVal = true;
@@ -3445,7 +3462,7 @@ export function skapaSpel(d) {
         if (v.sort === 'fel') {
           fel++; forstaVal = false;
           // knaket hörs bara vid fel (granskning 9, 115.8)
-          rum.stigKnak(till.r, till.k); ljud.spela('knarr');
+          rum.stigKnak(till.r, till.k); ljud.spela('flak_knak'); // Stils knak, bara vid fel (115.8)
           logg.handelse('stig', `${p.id}: ${bokstav} fel (${nastaBokstav(s)} var rätt)`);
           // hjälpen efter ett fel: kanten på ett rätt flak lyser, aldrig bokstaven
           const h = hjalpFlak(s); rum.stigKant(h); hjalp = true;
@@ -3457,7 +3474,7 @@ export function skapaSpel(d) {
         rum.stigKant(null);
         await vanta(rum.stigHopp(fot(lage.flak(till.r, till.k))));
         // rätt flak: ett glatt ljud (115.8: tills Stils eget ljud finns, brickans ton som stiger) och ett kort glitter
-        ljud.spela(`bricka_${Math.min(8, s.vag.length || 1)}`);
+        ljud.spela('flak_ratt'); // Stils glada TING-TING för rätt flak (115.8)
         rum.stigGlitter(till.r, till.k);
         rum.stigSpricka(till.r, till.k);
         logg.handelse('stig', `${p.id}: ${bokstav} rätt`);
@@ -3467,7 +3484,7 @@ export function skapaSpel(d) {
           await vanta(tid(450));
           // det som är sant: bokstaven var rätt, men isen tar slut (vid_atervand, Innehålls replik)
           if (p.vid_atervand) await replik(p.vid_atervand);
-          ljud.spela('plums');
+          ljud.spela('flak_sjunker'); // ett mjukt blubb när grenen sjunker (115.8)
           rum.stigSjunk(v.sjunker || []);
           await vanta(tid(600));
           const t = /** @type {{ r: number, k: number }} */ (v.tillbaka);
@@ -3495,6 +3512,7 @@ export function skapaSpel(d) {
     knuffa();
     try { await slut; } finally {
       stopp(); window.clearTimeout(knuffT); stigNu = null; ui.stigord([], () => {}); visaMoln(null);
+      rum.regiFokus = null;
       rum.stigKant(null);
     }
     await vanta(tid(700));

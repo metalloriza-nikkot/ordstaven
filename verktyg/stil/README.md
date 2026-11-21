@@ -104,6 +104,10 @@ uppfälld står i `rum3/sprites3.py`. `rum3/zon_floden.py` skyddar kvarnens och 
 Beslut 113: `bybor/kort113.py` (bildkortet flaska_kartbit, flaskan med kartbiten synlig genom glaset). Paletten är 1.2
 (374 färger) med sex kalla färger för isen och snön i kapitel 4.
 
+Beslut 114 (kapitel 4, det som inte beror på rummen): `k4/foremal_k4.py` (snöraset, STOR SKÖLD, baronens block,
+isflaken, isväggen, stenarna med fossilen, vanten och ungens svansslag; behöver `k3/` och `unge2/`), `karta/karta.py`
+(kartbit 5 färdig), `kvall/kvall_12.py` (kvällsfärgerna för palettens sex nya färger) `fas4/ljud_k4.py` (isflakens ljud: flak_ratt, flak_knak och flak_sjunker, 115.8) och `k4/slutbild_k4.py` (slutbilden mot molnkanten, 115.7, bygger på `k3/slutbild2.py`).
+
 kvall/ (kapitel 2, 12/11): `kvall.py` skriver `figurer/kvall.json`, en tabell som byter varje palettfärg mot sin
 kvällsfärg, så att figurerna blir mörkare på kvällen utan egna bilder. Målfärgerna tas bara bland färger som redan
 finns i träskets zon.
