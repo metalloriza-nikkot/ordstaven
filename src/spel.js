@@ -1000,8 +1000,9 @@ export function skapaSpel(d) {
     if (st.typ === 'ga_till' && st.mal) {
       const o = objekt.find((/** @type {any} */ x) => x.id === st.mal);
       const bars = steg.slice(ti + 1).some((/** @type {any} */ x) => x.typ === 'bara' && x.bild && (x.bild === st.mal || st.mal.startsWith(x.bild + '_')));
-      // en skylt (gåtans rader, gemenernas vägg) letar han upp och läser, men den sitter kvar i isen
-      if ((b?.kapitel?.rum || []).some((/** @type {any} */ r) => r.skyltar?.[st.mal])) return [];
+      // en skylt han bara letar upp (gåtans rader, gemenernas vägg) läser han, men den sitter kvar i isen. Det han
+      // sedan bär (brevhalvan med sin text) tar han som förut
+      if (!bars && !o?.landarNara && (b?.kapitel?.rum || []).some((/** @type {any} */ r) => r.skyltar?.[st.mal])) return [];
       return st.leta || o?.landarNara || bars ? [[st.mal, false]] : [];
     }
     if (st.typ === 'mellanscen' && REGI_TAR[st.bild]) return [[REGI_TAR[st.bild], true]];
