@@ -11,7 +11,7 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 23,
+ "nextobjectid": 24,
  "properties": [
   {
    "name": "rum",
@@ -150,7 +150,7 @@
      "name": "skylt_issjon",
      "type": "sak",
      "x": 150,
-     "y": 292,
+     "y": 284,
      "width": 22,
      "height": 18,
      "rotation": 0,
@@ -165,6 +165,17 @@
     },
     {
      "id": 10,
+     "name": "",
+     "type": "vagg",
+     "x": 24,
+     "y": 306,
+     "width": 616,
+     "height": 14,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 11,
      "name": "skylt_eldgrottan",
      "type": "sak",
      "x": 96,
@@ -182,7 +193,7 @@
      ]
     },
     {
-     "id": 11,
+     "id": 12,
      "name": "stig_k4_stig1",
      "type": "sak",
      "x": 296,
@@ -210,7 +221,7 @@
      ]
     },
     {
-     "id": 12,
+     "id": 13,
      "name": "",
      "type": "vagg",
      "x": 24,
@@ -228,7 +239,7 @@
      ]
     },
     {
-     "id": 13,
+     "id": 14,
      "name": "",
      "type": "vagg",
      "x": 24,
@@ -239,7 +250,7 @@
      "visible": true
     },
     {
-     "id": 14,
+     "id": 15,
      "name": "",
      "type": "vagg",
      "x": 24,
@@ -250,7 +261,7 @@
      "visible": true
     },
     {
-     "id": 15,
+     "id": 16,
      "name": "mynningen",
      "type": "sak",
      "x": 552,
@@ -268,7 +279,7 @@
      ]
     },
     {
-     "id": 16,
+     "id": 17,
      "name": "ras_mynningen",
      "type": "sak",
      "x": 552,
@@ -291,7 +302,7 @@
      ]
     },
     {
-     "id": 17,
+     "id": 18,
      "name": "snohog_1",
      "type": "sak",
      "x": 380,
@@ -309,7 +320,7 @@
      ]
     },
     {
-     "id": 18,
+     "id": 19,
      "name": "snohog_2",
      "type": "sak",
      "x": 450,
@@ -327,7 +338,7 @@
      ]
     },
     {
-     "id": 19,
+     "id": 20,
      "name": "snohog_3",
      "type": "sak",
      "x": 540,
@@ -345,7 +356,7 @@
      ]
     },
     {
-     "id": 20,
+     "id": 21,
      "name": "snohog_4",
      "type": "sak",
      "x": 600,
@@ -363,7 +374,7 @@
      ]
     },
     {
-     "id": 21,
+     "id": 22,
      "name": "sten_farfar",
      "type": "sak",
      "x": 470,
@@ -381,7 +392,7 @@
      ]
     },
     {
-     "id": 22,
+     "id": 23,
      "name": "fagel_200_236",
      "type": "omgivning",
      "x": 200,

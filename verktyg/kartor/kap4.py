@@ -19,7 +19,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from kap2 import KARTOR, ROT, karta, liv, punkt, sak, vagg  # noqa: E402
+from kap2 import KARTOR, ROT, karta, liv, punkt, sak, utg, vagg  # noqa: E402
 
 RUMSBILDER = ROT / 'assets' / 'rum' / 'kap-04'
 I_BILDEN = set()
@@ -48,6 +48,34 @@ FOREMALSBILDER = {
 def med_bilder(spec):
     """Rummets objekt med Stils bilder (FOREMALSBILDER) inlagda."""
     return {**spec, 'objekt': [(t, n, x, y, b, h, {**e, **FOREMALSBILDER.get(n, {})}) for t, n, x, y, b, h, e in spec['objekt']]}
+
+def golv_vaggar(bredd, hojd, golv, vatten=(), ruta=2):
+    """Rummet som golv i rutor (x, y, b, h): allt som inte är golv eller vatten blir väggar i rutor om `ruta` pixlar
+    (sammanslagna i rader och sedan i block), och vattnet blir vak (vatten). Isgrottan efter Stils plan (120.2)."""
+    def inne(px, py, rutor):
+        return any(x <= px < x + b and y <= py < y + h for x, y, b, h in rutor)
+    rader = []
+    for y in range(0, hojd, ruta):
+        lopp, x0 = [], None
+        for x in range(0, bredd + ruta, ruta):
+            fri = x >= bredd or inne(x + ruta / 2, y + ruta / 2, golv) or inne(x + ruta / 2, y + ruta / 2, vatten)
+            if not fri and x0 is None:
+                x0 = x
+            if fri and x0 is not None:
+                lopp.append((x0, x - x0)); x0 = None
+        rader.append((y, tuple(lopp)))
+    ut, i = [], 0
+    while i < len(rader):
+        y, lopp = rader[i]
+        j = i
+        while j + 1 < len(rader) and rader[j + 1][1] == lopp:
+            j += 1
+        for x0, b in lopp:
+            ut.append(vagg(x0, y, b, (j - i + 1) * ruta))
+        i = j + 1
+    ut += [vagg(x, y, b, h, vatten=True) for x, y, b, h in vatten]
+    return ut
+
 
 # Bokstavsstigens mått i rummet (Rum.visaStig): 40 pixlar per steg och 26 per rad, och stranden 17 pixlar utanför
 STEG_B, RAD_H = 40, 26
@@ -93,7 +121,9 @@ RUMMEN = {
             sak('stig_floden', 24, 280, 20, 30, dekor=True),
             # gaffeln: tre skyltar, ISGROTTAN mot stupet och de andra två mot var sitt håll
             sak('skylt_isgrottan', 170, 236, 22, 18, sida='under'),
-            sak('skylt_issjon', 150, 292, 22, 18, sida='over'),
+            sak('skylt_issjon', 150, 284, 22, 18, sida='over'),
+            # branten ned mot dalen i söder (Stil, LASMIG_skiss2, 120.1)
+            vagg(24, 306, 616, 14),
             sak('skylt_eldgrottan', 96, 206, 22, 18, sida='under'),
             # stig 1 (UPP): tre steg uppför stupet och två rader sida vid sida, stupet tvärs över rummet (y 116–202)
             *stig('k4_stig1', (300, 159), 3, 2, upp=True, x0=24, x1=640),
@@ -111,39 +141,64 @@ RUMMEN = {
             liv('fagel', 200, 236, 12, 12),
         ],
     },
-    # 2 × 2 skärmar: i mörkret syns bara hjälten, ungen och stavens glimt (färgtabellen, 113.8), och LJUS stänger av
-    # den. Övre halvan: stig 2 (TAVLA, fem steg) är golvet över en vak, och bortom den står Farfars tre skrifter på
-    # norra väggen. En öppning mitt i golvet leder ned. Nedre halvan: ishyllan med isblocket (och fotavtrycket under)
-    # i väster, väggen med GÅ PÅ DET SOM SVANSEN HAR. (gåtans rad kommer i hjälptrappan, 119.4), och stig 3 (klubba, sex
-    # steg) över den sista vaken till sprickan i sydost, där ungen slår upp isen. Sprickan nås bara över stig 3.
+    # 2 × 2 skärmar efter Stils plan A–E (120.2, `skisser/kap-04/LASMIG_skiss2.md`), kartan byggs efter planen (120.4).
+    # I mörkret syns bara hjälten, ungen och stavens glimt (färgtabellen), och LJUS stänger av den.
+    # A: den smala gången från starten i sydväst upp mot norr, där han skriver LJUS. F1: en kammare med bär från gången.
+    # B: gemenernas vägg i en kammare i nordväst. C: salen med stig 2 (TAVLA) över vattnet, från västra stranden till D.
+    # D: gåtans galleri med de tre raderna på norra väggen. F2: gången under sjön till ishyllan med isblocket och
+    # fotavtrycket. E: landningen öster om D, och stig 3 (klubba) uppåt över vattnet till hyllan vid sprickan i norr.
+    # F3: istappsgrottan söder om landningen, och genom den vägen till stig 4 (121.3, eget rum).
     'berget_grottan': {
         'storlek': (40, 24),
         'objekt': [
-            punkt('start', 40, 110),
-            punkt('regi_spricka', 616, 290),
-            # övre halvan: stig 2 (TAVLA), fem steg och tre rader, mitt i x 200 (vaken x 96–304)
-            *stig('k4_stig2', (200, 96), 5, 3, 0, 184),
-            # gåtans tre skrifter på norra väggen, glimtar i isen (texten står på läsplattan)
-            vagg(304, 0, 336, 14),
-            sak('gata_1', 352, 14, 24, 10, sida='under'),
-            sak('gata_2', 436, 14, 24, 10, sida='under'),
-            sak('gata_3', 520, 14, 24, 10, sida='under'),
-            # golvet mellan halvorna, med en öppning ned vid x 304–336
-            vagg(0, 184, 304, 16), vagg(336, 184, 304, 16),
-            # nedre halvan: ishyllan i sydväst med isblocket, och fotavtrycket under blocket (hemligheten)
-            vagg(0, 368, 336, 16),
-            sak('ishylla', 60, 344, 72, 16, sida='over'),
-            sak('isblock', 84, 320, 24, 18, sida='alla'),
-            sak('fotavtryck', 80, 324, 28, 14, sida='alla'),
-            # vid stig 3: väggen med vägen ut. Gåtans rad står inte längre bredvid (119.4): den kommer i hjälptrappan
-            sak('vagg_ut', 220, 200, 24, 10, sida='under'),
-            # gåtans rad igen: dold från början (Innehåll pass 119), och hjälptrappan visar den efter två fel
-            sak('gata_3_igen', 268, 200, 24, 10, sida='under'),
-            # stig 3 (klubba): sex steg och tre rader, mitt i x 460 (vaken x 336–584)
-            *stig('k4_stig3', (460, 290), 6, 3, 200, 384),
-            # sprickan i sydost, i en ficka som bara nås över stig 3, och utgången när isen är uppslagen (ut)
-            sak('spricka', 624, 270, 16, 40, sida='vanster'),
-            sak('utgang_stenfalt', 620, 266, 20, 48, sida='vanster'),
+            punkt('start', 42, 372),
+            punkt('regi_spricka', 558, 22),
+            punkt('in_berget_istappar', 606, 350),
+            *golv_vaggar(640, 384, golv=[
+                # A, gången
+                (24, 330, 36, 54), (28, 200, 28, 132), (28, 196, 96, 26), (96, 120, 28, 100),
+                # F1
+                (56, 272, 48, 22), (100, 250, 44, 60),
+                # B
+                (52, 62, 130, 62),
+                # C, västra stranden
+                (160, 90, 22, 220),
+                # D
+                (378, 64, 108, 256),
+                # F2
+                (400, 318, 36, 48), (214, 340, 222, 26), (214, 322, 90, 20),
+                # E, landningen, hyllan vid sprickan och nischen
+                (486, 246, 140, 64), (486, 30, 140, 52), (536, 10, 44, 20),
+                # F3, och gången ut i söder till istappsgrottan
+                (586, 300, 40, 84),
+            ], vatten=[
+                # C, salen: stig 2 tvärs över, och E: stig 3 uppåt (vattnet är rutnätets höjd, 119.4)
+                (182, 96, 196, 214), (486, 82, 140, 164),
+            ]),
+            # B: gemenernas vägg (Farfars par, versal och gemen, på läsplattan)
+            sak('vagg_gemener', 96, 62, 40, 10, sida='under'),
+            # F1: något litet att hitta (Innehåll väljer, 120.2)
+            sak('bar_f1', 116, 286, 12, 10, sida='alla'),
+            # C: stig 2 (TAVLA), fem steg och tre rader, från västra stranden till galleriet
+            sak('stig_k4_stig2', 276, 196, 8, 8, dekor=True, ankare=True),
+            # D: gåtans tre rader på norra väggen, glimtar i isen (texten står på läsplattan)
+            sak('gata_1', 386, 64, 24, 10, sida='under'),
+            sak('gata_2', 422, 64, 24, 10, sida='under'),
+            sak('gata_3', 458, 64, 24, 10, sida='under'),
+            # F2: ishyllan med isblocket, och fotavtrycket under blocket (hemligheten)
+            sak('ishylla', 222, 322, 74, 8, sida='under'),
+            sak('isblock', 246, 326, 24, 14, sida='alla'),
+            sak('fotavtryck', 244, 328, 28, 14, sida='alla'),
+            # E: väggen med vägen ut, och gåtans rad igen (dold, hjälptrappan visar den)
+            sak('vagg_ut', 492, 300, 24, 10, sida='over'),
+            sak('gata_3_igen', 520, 300, 24, 10, sida='over'),
+            # E: stig 3 (klubba) uppåt, sex steg och tre rader, från landningen till hyllan vid sprickan
+            sak('stig_k4_stig3', 552, 160, 8, 8, dekor=True, ankare=True, upp=True),
+            # sprickan i nischen i norr, och utgången när isen är uppslagen (ut)
+            sak('spricka', 548, 10, 24, 16, sida='under'),
+            sak('utgang_stenfalt', 548, 0, 24, 14, sida='under'),
+            # F3: vägen till istappsgrottan, där stig 4 är (121.3)
+            utg('stig_istappar', 586, 376, 40, 8, golv=True, riktning='ned', till='berget_istappar'),
         ],
     },
     # En skärm: fyra stenar och hålet där baronens block stod, med hans orange rep vid kanten (116.5). Lådan ligger
@@ -155,7 +210,8 @@ RUMMEN = {
             punkt('start', 30, 150),
             punkt('regi_luftskepp', 250, 30),
             punkt('regi_driva', 270, 70),
-            vagg(0, 0, 320, 12),
+            # Stils väggar (LASMIG_skiss2, 120.1): molnhavet i norr, kanten i öster och söder, och klippan i väster
+            vagg(0, 0, 320, 26), vagg(304, 26, 16, 166), vagg(0, 176, 304, 16), vagg(0, 56, 46, 66),
             sak('sten_varm', 70, 60, 26, 20, sida='alla'),
             sak('sten_taggar', 140, 46, 26, 20, sida='alla'),
             sak('sten_is', 210, 70, 26, 20, sida='alla'),
@@ -163,10 +219,27 @@ RUMMEN = {
             sak('sten_klubba', 110, 120, 26, 20, sida='alla'),
             sak('lada_farfar', 114, 148, 18, 12, sida='alla'),
             sak('luftskepp_borta', 262, 14, 40, 20, dekor=True, ankare=True),
-            sak('stig_molnkanten', 160, 12, 30, 16, sida='under'),
+            sak('stig_molnkanten', 160, 26, 30, 16, sida='under'),
         ],
     },
 }
+
+
+# Föremål och rum som kartan har innan Innehålls data har dem (120.2 och 121.3): de skrivs i kartan först när
+# kap-04.json har dem (föremålet i rummets innehåll, eller rummet som utgången leder till), så att kontrollen är grön.
+VANTAR_PA_DATA = {'vagg_gemener', 'bar_f1', 'stig_istappar', 'in_berget_istappar', 'klattring', 'stig_k4_stig4', 'istappar'}
+
+
+def finns_i_datan():
+    """Id:n i kap-04.json: föremålen i rummens innehåll, rummen (som in_<rum>) och utgångarna."""
+    d = json.loads((ROT / 'content' / 'den-gomda-dalen' / 'kap-04.json').read_text(encoding='utf-8'))
+    ids = set()
+    for r in d.get('rum', []):
+        ids.add('in_' + r['id'])
+        for x in r.get('innehall', []):
+            ids.add(x['id'] if isinstance(x, dict) else x)
+    ids |= {f"stig_{p['id']}" for p in d.get('pussel', [])}
+    return ids, {r['id'] for r in d.get('rum', [])}
 
 
 def main():
@@ -174,7 +247,11 @@ def main():
     ap.add_argument('--prova', action='store_true', help='skriv ingenting, säg bara om något skulle ändras')
     a = ap.parse_args()
     andrade = []
+    ids, rummen = finns_i_datan()
     for rum, spec in RUMMEN.items():
+        if rum not in rummen and rum != 'berget_stigen':
+            continue
+        spec = {**spec, 'objekt': [o for o in spec['objekt'] if o[1] not in VANTAR_PA_DATA or (o[1] in ids and (o[6].get('till') in (None, *rummen)))]}
         text = json.dumps(karta(rum, med_bilder(spec), rumsbilder=RUMSBILDER, i_bilden=I_BILDEN, foremalsbilder={}, over_som_vagg=False), ensure_ascii=False, indent=1) + '\n'
         f = KARTOR / f'{rum}.tmj'
         if f.exists() and f.read_text(encoding='utf-8') == text:
