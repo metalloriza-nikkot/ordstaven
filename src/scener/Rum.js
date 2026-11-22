@@ -1123,6 +1123,13 @@ export class Rum extends Phaser.Scene {
       svansarna: () => this.svansarna(),
       ladan_oppnas: () => this.ladanOppnas(),
       gatan_i_boken: () => this.gatanIBoken(),
+      // 121.4: klippan, formeln blir det han skrev (och de nästan rätta orden blir för korta)
+      stege_klippan: () => this.klippanUpp('stege'),
+      rep_klippan: () => this.klippanUpp('rep'),
+      trappa_klippan: () => this.klippanUpp('trappa'),
+      ett_trappsteg_klippan: () => this.klippanNastan('trappa'),
+      en_kort_stege_klippan: () => this.klippanNastan('stege'),
+      ett_kort_rep_klippan: () => this.klippanNastan('rep'),
       kartbit5_molnkant: () => this.kartbit5Molnkant(),
       skata_harmar_molnkant: () => this.skataHarmarMolnkant(),
       resan_molnkant: () => this.resanMolnkant(),
@@ -4867,21 +4874,65 @@ export class Rum extends Phaser.Scene {
     const snon = this.k4Punkt('snon') || { x: m.x, y: m.y - 14 };
     const sk = this.k4Skepp(this.k4Punkt('toppen') || { x: bl.x - 60, y: 6 });
     sk.setVisible(true);
-    // 1. skeppet glider fram över blocket, och kameran visar blocket
+    // 121.2: raset är en scen på ca 12 s. Dramat ligger i bilden och ljudet: Stils stycke för raset (om det finns) går
+    // under hela scenen, Herr Skata knyter fel först och sedan rätt, och baronen hejar. Sedan som i 0.103.0 (T ms senare)
+    const T = 6000;
+    this.regiStycke('stycke_ras');
+    // 1. skeppet glider fram och sänker sig över blocket, och kameran visar blocket
     this.regiFokus = { x: bl.x, y: bl.y + 30 };
-    this.tweens.add({ targets: sk, x: bl.x, y: Math.max(12, bl.y - 30), duration: 700, ease: 'Sine.easeInOut', onUpdate: smuts });
-    // blocket: Stils block_slits_01–02 (gruset när det slits loss) och block_hanger, annars en grå sten
-    const s1 = this.regiram('block_slits_01');
+    const skY = Math.max(12, bl.y - 30);
+    this.tweens.add({ targets: sk, x: bl.x, y: skY - 8, duration: 700, ease: 'Sine.easeInOut', onUpdate: smuts });
+    this.tweens.add({ targets: sk, y: skY, duration: 900, delay: 750, ease: 'Sine.easeOut', onUpdate: smuts });
+    this.regiLjud('luftskepp');
+    // blocket (Stils LASMIG_114): block_driva i snön, block_hanger med repet i kors när knuten sitter, och
+    // block_slits_01–02 är gruset och snön som faller när det slits loss. Utan bilderna en grå sten
+    const s1 = this.regiram('block_driva'), hanger = this.regiram('block_hanger');
     /** @type {any} */ const block = s1 ? this.add.image(bl.x, bl.y, s1.nyckel, s1.ram) : this.add.graphics({ x: bl.x, y: bl.y });
     if (!s1) block.fillStyle(0x8c8378, 1).fillRect(-12, -10, 24, 20).lineStyle(1, 0x5a5048, 1).strokeRect(-12, -10, 24, 20);
+    const topp = () => block.y - (hanger && block.frame?.name === hanger.ram ? 22 : s1 ? 14 : 10);
     this.lagerLuft.add(block); this.lagda.push(block);
+    // Herr Skata: Stils flygande skata, annars en svart prick
+    const harSkata = this.textures.exists('herr_skata') && this.textures.get('herr_skata').has('herr_skata_flyga_vanster_01');
+    /** @type {any} */ const skata = harSkata ? this.add.image(sk.x, sk.y, 'herr_skata', 'herr_skata_flyga_vanster_01').setOrigin(0.5, 1) : this.add.graphics({ x: sk.x, y: sk.y });
+    if (!harSkata) skata.fillStyle(0x1a1a22, 1).fillEllipse(0, -4, 10, 7).fillStyle(0xffffff, 1).fillRect(-3, -5, 2, 2);
+    skata.setVisible(false); this.lagerLuft.add(skata); this.lagda.push(skata);
+    const flax = this.time.addEvent({ delay: 140, loop: true, callback: () => { if (harSkata && skata.visible) { skata.setFrame(`herr_skata_flyga_vanster_0${1 + (Math.floor(this.time.now / 140) % 2)}`); smuts(); } } });
+    // repet: först en slinga som Herr Skata lägger om blocket (fel knut, den glider av), sedan i kors (rätt knut)
+    /** @type {'inget' | 'slinga' | 'av' | 'kors'} */ let knut = 'inget';
     const rep = this.add.graphics(); this.lagerLuft.add(rep); this.lagda.push(rep);
-    const ritaRep = () => { rep.clear(); if (!sk.visible || !block.active) return; rep.lineStyle(1, 0xd9782f, 1).lineBetween(sk.x, sk.y + 16, block.x, block.y - 8); };
+    const ritaRep = () => {
+      rep.clear(); if (!sk.visible || !block.active || knut === 'inget') return;
+      rep.lineStyle(1, 0xd9782f, 1);
+      if (knut === 'av') { rep.lineBetween(sk.x, sk.y + 16, block.x + 14, topp() - 8); return; }
+      rep.lineBetween(sk.x, sk.y + 16, block.x, topp());
+      if (knut === 'slinga') rep.strokeEllipse(block.x, topp() + 1, 18, 6);
+      else if (!hanger) rep.lineBetween(block.x - 11, block.y - 9, block.x + 11, block.y + 9).lineBetween(block.x + 11, block.y - 9, block.x - 11, block.y + 9);
+    };
     const repTimer = this.time.addEvent({ delay: 30, loop: true, callback: () => { ritaRep(); smuts(); } });
-    // 2. repet spänns (skeppet drar uppåt och gungar), och blocket rycks loss med ett muller
-    this.time.delayedCall(800, () => { this.tweens.add({ targets: sk, y: sk.y - 6, duration: 160, yoyo: true, repeat: 2, onUpdate: smuts }); this.regiLjud('knarr'); });
-    this.time.delayedCall(1500, () => {
-      const s2 = this.regiram('block_slits_02'); if (s2 && block.setTexture) block.setTexture(s2.nyckel, s2.ram);
+    // 2. Herr Skata flyger ned med repet och lägger en slinga över blocket: fel knut, den glider av
+    this.time.delayedCall(1700, () => {
+      skata.setPosition(sk.x, sk.y + 12).setVisible(true);
+      this.tweens.add({ targets: skata, x: bl.x - 12, y: bl.y - 10, duration: 700, ease: 'Sine.easeInOut', onUpdate: smuts, onComplete: () => { knut = 'slinga'; this.regiLjud('vingflax'); } });
+    });
+    this.time.delayedCall(2900, () => { knut = 'av'; this.regiLjud('plopp'); this.k4Logg('fel knut'); this.tweens.add({ targets: skata, y: skata.y - 4, duration: 120, yoyo: true, repeat: 2, onUpdate: smuts }); });
+    // 3. ett nytt försök: Herr Skata flyger ett varv runt blocket, och repet sitter i kors (rätt knut)
+    this.time.delayedCall(3600, () => {
+      const varv = { v: Math.PI };
+      this.tweens.add({ targets: varv, v: Math.PI * 3, duration: 1100, onUpdate: () => { skata.setPosition(bl.x + Math.cos(varv.v) * 16, bl.y - 4 + Math.sin(varv.v) * 8); smuts(); }, onComplete: () => { knut = 'kors'; if (hanger && block.setTexture) block.setTexture(hanger.nyckel, hanger.ram); this.regiLjud('klick'); this.k4Logg('rätt knut'); } });
+    });
+    // 4. baronen hejar: skeppet guppar, och Herr Skata flyger upp till gondolen igen
+    this.time.delayedCall(4900, () => {
+      this.tweens.add({ targets: sk, y: sk.y - 5, duration: 140, yoyo: true, repeat: 3, onUpdate: smuts }); this.regiLjud('vissling'); this.k4Logg('baronen hejar');
+      this.tweens.add({ targets: skata, x: sk.x - 8, y: sk.y + 12, duration: 800, delay: 300, ease: 'Sine.easeIn', onUpdate: smuts, onComplete: () => { skata.setVisible(false); flax.remove(); } });
+    });
+    // 5. repet spänns (skeppet drar uppåt och gungar), och blocket rycks loss med ett muller
+    this.time.delayedCall(T + 800, () => { this.tweens.add({ targets: sk, y: sk.y - 6, duration: 160, yoyo: true, repeat: 2, onUpdate: smuts }); this.regiLjud('knarr'); });
+    this.time.delayedCall(T + 1500, () => {
+      // gruset och snön faller där blocket satt (block_slits_01 och sedan _02)
+      const g1 = this.regiram('block_slits_01'), g2 = this.regiram('block_slits_02');
+      if (g1) { const grus = this.add.image(bl.x, bl.y + 10, g1.nyckel, g1.ram); this.lagerLuft.add(grus); this.lagda.push(grus);
+        this.time.delayedCall(350, () => { if (g2) grus.setTexture(g2.nyckel, g2.ram); smuts(); });
+        this.tweens.add({ targets: grus, y: grus.y + 14, alpha: 0, duration: 900, delay: 500, onUpdate: smuts, onComplete: () => grus.destroy() }); }
       this.cameras.main.shake(600, 0.008); this.regiLjud('krasch'); this.k4Logg('blocket rycks loss');
       this.k4Glitter({ x: bl.x, y: bl.y + 8 }, 10);
       const h = this.regiram('block_hanger');
@@ -4890,9 +4941,9 @@ export class Rum extends Phaser.Scene {
       this.tweens.add({ targets: sk, x: sk.x + 140, y: sk.y - 50, duration: 1600, delay: 300, ease: 'Quad.easeIn', onUpdate: smuts, onComplete: () => sk.setVisible(false) });
       this.tweens.add({ targets: block, x: block.x + 140, y: block.y - 50, duration: 1600, delay: 300, ease: 'Quad.easeIn', onUpdate: smuts, onComplete: () => { block.setVisible(false); repTimer.remove(); rep.clear(); } });
     });
-    // 3. en spricka rullar nedför sluttningen från blocket till snön över mynningen, och kameran följer den
+    // 6. en spricka rullar nedför sluttningen från blocket till snön över mynningen, och kameran följer den
     const spricka = this.add.graphics(); this.lagerLuft.add(spricka); this.lagda.push(spricka);
-    const steg = 8, t0 = 1800, stegMs = 110;
+    const steg = 8, t0 = T + 1800, stegMs = 110;
     /** @type {{ x: number, y: number }[]} */ const punkter = [];
     for (let i = 0; i <= steg; i++) { const f = i / steg; punkter.push({ x: Math.round(bl.x + (snon.x - bl.x) * f + (i % 2 ? 5 : -4) * (i && i < steg ? 1 : 0)), y: Math.round(bl.y + 10 + (snon.y - bl.y - 10) * f) }); }
     for (let i = 1; i <= steg; i++) this.time.delayedCall(t0 + i * stegMs, () => {
@@ -4902,7 +4953,7 @@ export class Rum extends Phaser.Scene {
       smuts();
     });
     this.time.delayedCall(t0, () => this.regiLjud('rassel'));
-    // 4. snön över mynningen lossnar: Stils snomassa_01–02 (96 × 48, LASMIG_114), och smulor faller (ca 400 ms per bild)
+    // 7. snön över mynningen lossnar: Stils snomassa_01–02 (96 × 48, LASMIG_114), och smulor faller (ca 400 ms per bild)
     const tSno = t0 + steg * stegMs + 150;
     const sm = this.regiram('snomassa_01');
     /** @type {any} */ let sno;
@@ -4927,6 +4978,35 @@ export class Rum extends Phaser.Scene {
     this.time.delayedCall(tSno + 1100, () => { this.regiFokus = null; });
     this.k4Logg('blocket_lyfts'); this.k4Logg('snöraset i ett svep'); this.k4Logg('snön stannar i luften');
     return tSno + 1200;
+  }
+
+  /**
+   * Luftskeppet glider förbi högt ovanför medan han hoppar en stig (121.2): kartans stig har `luftskepp`. Det säger att
+   * något är på väg, utan repliker. Stils luftskepp om det finns (litet, på väg mot toppen), annars gråboxens.
+   * @param {{ x: number, y: number }} fran stigens nedre kant @param {{ x: number, y: number }} till dit han ska upp
+   */
+  skeppForbi(fran, till) {
+    const smuts = () => { this.smutsig = true; };
+    const y = Math.max(8, Math.min(fran.y, till.y) - 70);
+    const x0 = Math.round(Math.min(fran.x, till.x) - 200), x1 = Math.round(Math.max(fran.x, till.x) + 220);
+    // hänger skeppet redan kvar efter ankomsten, är det det skeppet som glider förbi och tillbaka mot toppen
+    const kvar = this.k4?.skepp?.active && this.k4.skepp.visible ? this.k4.skepp : null;
+    if (kvar) {
+      const hem = { x: kvar.x, y: kvar.y };
+      this.tweens.chain({ targets: kvar, tweens: [
+        { x: Math.round((fran.x + till.x) / 2), y, duration: 4000, ease: 'Sine.easeInOut', onUpdate: smuts },
+        { x: hem.x, y: hem.y, duration: 5000, ease: 'Sine.easeInOut', onUpdate: smuts },
+      ] });
+      this.regiLjud('luftskepp'); this.k4Logg('luftskeppet glider förbi över stigen');
+      return;
+    }
+    /** @type {any} */ let sk;
+    if (this.textures.exists('baronen') && this.textures.get('baronen').has('luftskepp_glider_01')) sk = this.add.image(x0, y, 'baronen', 'luftskepp_glider_01').setScale(0.5).setOrigin(0.5, 0.5);
+    else { sk = this.add.graphics({ x: x0, y }); sk.fillStyle(0xd9782f, 1).fillEllipse(0, 0, 30, 12).fillStyle(0x7a4a26, 1).fillRect(-5, 7, 10, 4); }
+    sk.setAlpha(0.9); this.lagerLuft.add(sk); this.lagda.push(sk);
+    this.regiLjud('luftskepp');
+    this.tweens.add({ targets: sk, x: x1, y: y - 10, duration: 9000, ease: 'Linear', onUpdate: smuts, onComplete: () => sk.destroy() });
+    this.k4Logg('luftskeppet glider förbi över stigen');
   }
 
   /** gatan_i_boken (Innehåll pass 119): hjälten skriver av gåtans rader i sin bok, en liten bok över honom och pennan, tills Stils bild finns. @returns {number} */
@@ -5051,6 +5131,58 @@ export class Rum extends Phaser.Scene {
     });
     this.k4Logg('ungen_slar_isen');
     return ms + 2000;
+  }
+
+  /**
+   * Formeln vid klippan (121.4) i gråbox: en stege av trä, ett orange rep eller trappsteg av is växer upp längs kartans
+   * klippan_uppe, ett efter ett nedifrån. Bilden står kvar tills rummet byts. @param {'stege' | 'rep' | 'trappa'} sort
+   * @param {number} andel hur långt upp den når (1 = ända upp) @returns {any} bilden, eller null
+   */
+  klippanRita(sort, andel = 1) {
+    const o = this.ruta('klippan_uppe') || this.ruta('klippa');
+    if (!o) return null;
+    const x = o.x + o.b / 2, nere = o.y + o.h, uppe = nere - Math.round(o.h * andel);
+    const g = this.add.graphics();
+    const delar = Math.max(1, Math.round((nere - uppe) / 8));
+    for (let i = 0; i < delar; i++) {
+      this.time.delayedCall(i * 90, () => {
+        const y = nere - (i + 1) * 8;
+        if (sort === 'stege') g.fillStyle(0x8a5a2e, 1).fillRect(x - 9, y, 3, 8).fillRect(x + 6, y, 3, 8).fillStyle(0xb07a44, 1).fillRect(x - 8, y + 3, 16, 2);
+        else if (sort === 'rep') g.fillStyle(0xd9782f, 1).fillRect(x - 1 + (i % 2 ? 1 : -1), y, 2, 8);
+        else g.fillStyle(0x9cc3dc, 1).fillRect(x - 12 + (i % 2) * 2, y + 2, 24, 6).fillStyle(0xe4f1fa, 1).fillRect(x - 12 + (i % 2) * 2, y + 2, 24, 2);
+        if (i % 2 === 0) this.b.ljud?.spela('pling');
+        this.smutsig = true;
+      });
+    }
+    this.lagerObjekt.add(g); this.lagda.push(g);
+    return { g, ms: delar * 90, x, uppe, nere };
+  }
+
+  /** Rätt formel vid klippan: den växer upp, hjälten klättrar upp och ungen kommer efter. @param {'stege' | 'rep' | 'trappa'} sort */
+  klippanUpp(sort) {
+    const r = this.klippanRita(sort); if (!r) return 0;
+    const smuts = () => { this.smutsig = true; };
+    this.regiFokus = { x: r.x, y: Math.round((r.uppe + r.nere) / 2) };
+    const fran = { ...this.pos }, till = { x: r.x, y: r.uppe - 10 }, t = { p: 0 };
+    this.time.delayedCall(r.ms + 300, () => {
+      this.tweens.add({ targets: t, p: 1, duration: 1400, ease: 'Sine.easeInOut', onUpdate: () => {
+        this.pos = { x: fran.x + (r.x - fran.x) * Math.min(1, t.p * 3), y: fran.y + (till.y - fran.y) * t.p };
+        this.vand = { x: 0, y: -1 }; this.placera(); smuts();
+      }, onComplete: () => { this.pos = { ...till }; this.placera(); smuts(); } });
+      // ungen kommer efter med svansen först
+      if (this.unge.visible) this.time.delayedCall(700, () => this.ungeBage({ x: r.x - 14, y: r.uppe - 6 }, 1100, 12, () => {}));
+    });
+    this.time.delayedCall(r.ms + 2100, () => { this.regiFokus = null; });
+    this.k4Logg(`klippan: ${sort} upp`);
+    return r.ms + 2200;
+  }
+
+  /** Nästan rätt vid klippan: det som växer är för kort, gungar och blir borta. @param {'stege' | 'rep' | 'trappa'} sort */
+  klippanNastan(sort) {
+    const r = this.klippanRita(sort, sort === 'trappa' ? 0.15 : 0.4); if (!r) return 0;
+    this.time.delayedCall(r.ms + 500, () => this.tweens.add({ targets: r.g, alpha: 0, duration: 500, onUpdate: () => { this.smutsig = true; } }));
+    this.k4Logg(`klippan: ${sort} för kort`);
+    return r.ms + 1100;
   }
 
   /** Blocket glider ur repet under luftskeppet och plumsar ner i en snödriva. @returns {number} */

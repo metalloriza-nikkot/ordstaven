@@ -1000,6 +1000,8 @@ export function skapaSpel(d) {
     if (st.typ === 'ga_till' && st.mal) {
       const o = objekt.find((/** @type {any} */ x) => x.id === st.mal);
       const bars = steg.slice(ti + 1).some((/** @type {any} */ x) => x.typ === 'bara' && x.bild && (x.bild === st.mal || st.mal.startsWith(x.bild + '_')));
+      // en skylt (gåtans rader, gemenernas vägg) letar han upp och läser, men den sitter kvar i isen
+      if ((b?.kapitel?.rum || []).some((/** @type {any} */ r) => r.skyltar?.[st.mal])) return [];
       return st.leta || o?.landarNara || bars ? [[st.mal, false]] : [];
     }
     if (st.typ === 'mellanscen' && REGI_TAR[st.bild]) return [[REGI_TAR[st.bild], true]];
@@ -1331,14 +1333,15 @@ export function skapaSpel(d) {
    * Skyltarna i rummet just nu: rummets egna (rum.skyltar), och skylten med frågan i ett läsval i världen
    * (pusslets skylt, t.ex. Farfars skylt vid stenarna) medan scenen har det pusslet. Pusslets skylt har texten
    * i den variant han får.
-   * @returns {{ id: string, text: string, papper: string, mening: boolean, pussel?: any }[]}
+   * @returns {{ id: string, text: string, papper: string, mening: boolean, pussel?: any, gemener?: boolean }[]}
    */
   function skyltarIRummet() {
     const scen = visadScen;
     if (!b || !scen?.rum || !rum.harRum) return [];
     const ut = [];
     for (const [id, x] of Object.entries(b.rum(scen.rum)?.skyltar || {})) {
-      if (rum.ruta(id)) ut.push({ id, text: /** @type {any} */ (x).text, papper: /** @type {any} */ (x).papper || 'skylt', mening: arMening(/** @type {any} */ (x).text) });
+      // gemener (2.56, gemenernas vägg 120.2): texten står som den är skriven, "L l   B b"
+      if (rum.ruta(id)) ut.push({ id, text: /** @type {any} */ (x).text, papper: /** @type {any} */ (x).papper || 'skylt', mening: arMening(/** @type {any} */ (x).text), ...(/** @type {any} */ (x).gemener ? { gemener: true } : {}) });
     }
     for (const st of scen.steg || []) {
       const p = st.typ === 'pussel' ? b.pussel(st.pussel_id) : null;
@@ -1372,7 +1375,7 @@ export function skapaSpel(d) {
     const varFryst = rum.fryst;
     rum.frys(true); inmatning.rensaGaTill();
     logg.handelse('skylt', sk.id + (lys ? ` (${lys} lyser)` : ''));
-    const el = ui.visaPlatta(`<div class="pussel-ruta"><div class="lapp p-${ui.esc(sk.papper)}">${ui.rader(sk.text, varden())}</div><button type="button" class="vidare synlig" aria-label="Stäng">▶</button></div>`, 'pussel lapp-vy skylt-vy');
+    const el = ui.visaPlatta(`<div class="pussel-ruta"><div class="lapp p-${ui.esc(sk.papper)}">${ui.rader(sk.text, varden(), 'rad', sk.gemener ? 'vanlig' : 'versaler')}</div><button type="button" class="vidare synlig" aria-label="Stäng">▶</button></div>`, 'pussel lapp-vy skylt-vy');
     if (lys) for (const e of el.querySelectorAll('.ord')) if (versaler(/** @type {HTMLElement} */ (e).dataset.ord || '') === versaler(lys)) e.classList.add('lyser');
     if (sk.pussel) tillatNos(sk.pussel, skyltSpar ?? { hjalp: false }); else ui.sattNos(true, { betala: () => true });
     const stang = /** @type {HTMLElement} */ (el.querySelector('.vidare'));
@@ -1391,7 +1394,7 @@ export function skapaSpel(d) {
       const [punkt, plats] = skyltPlats(o);
       const html = sk.mening
         ? `<button type="button" class="kort mening-skylt p-${ui.esc(sk.papper)}" data-id="${ui.esc(sk.id)}" aria-label="Skylten">${ikon('lapp', 'stor')}</button>`
-        : `<button type="button" class="kort p-${ui.esc(sk.papper)}" data-id="${ui.esc(sk.id)}"><span class="kort-etikett">${ui.rader(sk.text, varden(), 'kort-ord')}</span></button>`;
+        : `<button type="button" class="kort p-${ui.esc(sk.papper)}" data-id="${ui.esc(sk.id)}"><span class="kort-etikett">${ui.rader(sk.text, varden(), 'kort-ord', sk.gemener ? 'vanlig' : 'versaler')}</span></button>`;
       return { objekt: sk.id, punkt, plats, html, vidTryck: () => {
         if (rum.fryst || pausad) return;
         if (sk.mening && vidObjekt(rum.pos, o)) {
@@ -3424,6 +3427,7 @@ export function skapaSpel(d) {
     // flak. När hjälten är över skuttar den i hans spår
     const kanten = lage.upp ? { x: lage.strand.x - 18, y: lage.strand.y + 2 } : { x: lage.strand.x - 8, y: lage.strand.y + 12 };
     if (rum.unge.visible) { rum.ungePos = { ...kanten }; rum.placera(); }
+    if (ankare?.luftskepp) rum.skeppForbi(lage.strand, lage.mal);
     const nyckelFor = (/** @type {{ r: number, k: number }} */ q) => `${q.r},${q.k}`;
     let fel = 0, hjalp = false, knuffFore = false, versal = false, upptagen = false, forstaVal = true;
     /** @type {string | null} hjälptrappans rad vid stigen (119.4) */ let trappRad = null;
@@ -3555,6 +3559,15 @@ export function skapaSpel(d) {
               if (q !== slutet) { ljud.spela('flak_ratt'); }
             }
             logg.handelse('stig', `${p.id}: ungen skuttar i spåret, ${spar.length} flak`);
+          }
+          // en återvändsgränd (121.3, kartans tillbaka): han hoppar tillbaka i sitt eget spår till stranden, och ungen
+          // skuttar före honom, så att de inte står kvar på andra sidan vattnet
+          if (ankare?.tillbaka) {
+            await vanta(tid(400));
+            const spar = s.vag.filter((q) => q.r >= 0).map((q) => fot(lage.flak(q.r, q.k))).reverse();
+            if (rum.unge.visible) rum.ungeBage({ x: kanten.x, y: kanten.y }, tid(900), 10, () => {});
+            for (const q of [...spar, { ...lage.strand }]) await vanta(rum.stigHopp(q));
+            logg.handelse('stig', `${p.id}: tillbaka över stigen, ${spar.length} flak`);
           }
           ljud.spela('fest_mellan');
           logg.handelse('stig', `${p.id}: klar, ${s.fel} fel, ${s.atervandor} återvändsgränder, ${Math.round((speltid() - start) / 1000)} s`);

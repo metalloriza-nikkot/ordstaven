@@ -200,6 +200,10 @@ export function lasKarta(tmj) {
       if (egen.ankare) ut.ankare = true;
       // upp (119.4, granskning 10 punkt 14) = bokstavsstigen går uppför i rummet: stegen ligger nedifrån och upp, och raderna sida vid sida
       if (egen.upp) ut.upp = true;
+      // luftskepp (121.2) = luftskeppet glider förbi högt ovanför medan han hoppar stigen
+      if (egen.luftskepp) ut.luftskepp = true;
+      // tillbaka (121.3) = stigen är en återvändsgränd: när den är klar hoppar han tillbaka till stranden (stig 4 i F3)
+      if (egen.tillbaka) ut.tillbaka = true;
       if (egen.sovplats) ut.sovplats = true;
       if (egen.skata_fonster) ut.skataFonster = true;
       if (egen.lyser) ut.lyser = true;

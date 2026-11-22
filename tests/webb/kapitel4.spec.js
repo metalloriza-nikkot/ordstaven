@@ -26,17 +26,18 @@ function gaMotSida(id) {
 }
 
 /** Starta kapitel 4 vid en scen, med namnen klara. @param {any} page @param {string} scenId */
-async function starta(page, scenId, steg = 0) {
+async function starta(page, scenId, steg = 0, rumstillstand = {}) {
   const scen = kap.scener.findIndex((s) => s.id === scenId);
   await page.goto('./?snabb&ny&kapitel=kap-04');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
-  await page.evaluate(({ scenId, scen, steg, pass }) => {
+  await page.evaluate(({ scenId, scen, steg, pass, rumstillstand }) => {
     const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
     Object.assign(av, { kapitelId: 'kap-04', scen, scenId, steg, startad: steg > 0, pass });
+    av.rumstillstand = { ...(av.rumstillstand || {}), ...rumstillstand };
     t.spelare.hjalte.namn = 'TESTA'; t.spelare.hjalte.formler = ['LJUS', 'SVÄRD', 'FLYG', 'SKÖLD'];
     t.spelare.unge = { format: 1, steg: 1, formagor: [], ...t.spelare.unge, namn: 'KNOPP', folj: true };
     localStorage.setItem('ordstaven_spar', JSON.stringify(t));
-  }, { scenId, scen, steg, pass: kap.scener[scen].pass });
+  }, { scenId, scen, steg, pass: kap.scener[scen].pass, rumstillstand });
   await page.goto('./?snabb&kapitel=kap-04');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.click('.start-knapp');
@@ -127,37 +128,42 @@ test('kapitel 4 pass 1: skyltarna, stig 1, snön, Farfars sten och STOR SKÖLD m
   const loggen = await page.evaluate(() => window.__ORDSTAVEN.logg());
   expect(loggen).toContain('[stig] k4_stig1: klar');
   expect(loggen).toMatch(/\[formel\] k4_stor_skold: klar/);
-  const regi = (await page.evaluate(() => window.__ORDSTAVEN.grafik())).regi.join('\n');
-  for (const r of ['ankomst_berget', 'baronen_kikare_berg', 'blocket_lyfts', 'blocket rycks loss', 'snöraset i ett svep', 'stor_skold_ras', 'mynningen_stangs']) expect(regi).toContain(r);
+  // raset är en scen på ca 12 s (121.2), och i testläget hinner passet längre än regin: vänta in hela scenen
+  const regi = async () => (await page.evaluate(() => window.__ORDSTAVEN.grafik())).regi.join('\n');
+  for (const r of ['ankomst_berget', 'baronen_kikare_berg', 'luftskeppet glider förbi över stigen', 'blocket_lyfts', 'fel knut', 'rätt knut', 'baronen hejar', 'blocket rycks loss', 'snöraset i ett svep', 'stor_skold_ras', 'mynningen_stangs']) await expect.poll(regi, { timeout: 20000 }).toContain(r);
   expect(loggen).toContain('[stig] k4_stig1: ungen skuttar i spåret');
 });
 
-test('kapitel 4 pass 2: mörkret, LJUS, stig 2, gåtan och stig 3 med klo', async ({ page }, info) => {
+test('kapitel 4 pass 2: mörkret, LJUS, gemenernas vägg, stig 2 och gåtan (120.3)', async ({ page }, info) => {
   test.skip(!['mac-helskarm', 'ipad-10', 'mac-safari'].includes(info.project.name), 'tre projekt räcker, som kapitel 3');
   test.setTimeout(240000);
   await starta(page, 'k4s03_grottan');
   const scener = await spelaPasset(page, 'pass2');
-  expect(scener).toEqual(['k4s03_grottan', 'k4s04_utvagen']);
+  // passet slutar när gåtan står i boken (Men hur kommer de ut?), och stig 3 är pass 3
+  expect(scener).toEqual(['k4s03_grottan']);
   const loggen = await page.evaluate(() => window.__ORDSTAVEN.logg());
+  expect(loggen).toContain('[skylt] vagg_gemener');
   expect(loggen).toContain('[stig] k4_stig2: klar');
-  expect(loggen).toMatch(/\[stig\] k4_stig3: klar, 0 fel, 1 återvändsgränder/);
+  expect(loggen).not.toContain('k4_stig3');
   const regi = (await page.evaluate(() => window.__ORDSTAVEN.grafik())).regi.join('\n');
-  for (const r of ['mörkret', 'grottan_glittrar', 'grottan_visar_vaggen', 'ungen_slar_isen']) expect(regi).toContain(r);
+  for (const r of ['mörkret', 'grottan_glittrar', 'grottan_visar_vaggen']) expect(regi).toContain(r);
 });
 
-test('kapitel 4 pass 3: stenarna, ordlåset VARM, kartbit fem och resan mot molnkanten', async ({ page }, info) => {
+test('kapitel 4 pass 3: stig 3 med klo, klippan, stenarna, ordlåset VARM och resan mot molnkanten', async ({ page }, info) => {
   test.skip(!['mac-helskarm', 'ipad-10', 'mac-safari'].includes(info.project.name), 'tre projekt räcker, som kapitel 3');
-  test.setTimeout(240000);
-  await starta(page, 'k4s05_stenfaltet');
+  test.setTimeout(300000);
+  await starta(page, 'k4s04_utvagen');
   const scener = await spelaPasset(page, 'pass3');
-  expect(scener).toEqual(['k4s05_stenfaltet']);
+  expect(scener).toEqual(['k4s04_utvagen', 'k4s05_klippan', 'k4s05_stenfaltet']);
   const loggen = await page.evaluate(() => window.__ORDSTAVEN.logg());
+  expect(loggen).toMatch(/\[stig\] k4_stig3: klar, 0 fel, 1 återvändsgränder/);
+  expect(loggen).toMatch(/\[formel\] k4_klippan: stege_klippan/);
   expect(loggen).toContain('[val] k4_stenarna: sten_klubba');
   expect(loggen).toMatch(/\[val\] k4_ladan: VARM .*klar/);
   // locket: STENEN ÄR och fälten i luckan, ingen nyckel (P9 utan chiffer, 2.54)
-  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).not.toContain('k4_ladan: fel');
+  expect(loggen).not.toContain('k4_ladan: fel');
   const regi = (await page.evaluate(() => window.__ORDSTAVEN.grafik())).regi.join('\n');
-  for (const r of ['blocket_driva', 'fossil_svans', 'svansarna', 'ladan_oppnas', 'kartbit5_molnkant', 'skata_harmar_molnkant', 'resan_molnkant']) expect(regi).toContain(r);
+  for (const r of ['ungen_slar_isen', 'klippan: stege upp', 'blocket_driva', 'fossil_svans', 'svansarna', 'ladan_oppnas', 'kartbit5_molnkant', 'skata_harmar_molnkant', 'resan_molnkant']) expect(regi).toContain(r);
 });
 
 /** Klickar fram repliker ("Var var vi?" och instruktionen) tills det som söks syns. */
@@ -230,4 +236,29 @@ test('kapitel 4: gåtan står på läsplattan på stenfältet (119.4)', async ({
   await tills(page, '#tanke .tanke-lapp');
   await page.locator('#tanke .tanke-lapp').click();
   await expect(page.locator('#plattan')).toContainText('DEN HAR EN SVANS', { timeout: 8000 });
+});
+
+test('kapitel 4: stig 4 i F3 (tand), och han hoppar tillbaka till stranden (121.3)', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(120000);
+  // i galleriet (D) efter stig 2: han går till ristningen på västra stranden i F3, och den frivilliga scenen börjar
+  await starta(page, 'k4s03_grottan', 8, { berget_grottan: 'ljus' });
+  for (let i = 0; i < 60 && (await page.evaluate(() => window.__ORDSTAVEN.steg()?.typ)) !== 'ga_till'; i++) {
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    await page.waitForTimeout(300);
+  }
+  await page.waitForTimeout(800);
+  await page.evaluate(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); r.pos = { x: 430, y: 280 }; r.placera(); });
+  await page.evaluate(gaMotSida, 'ristning_tand');
+  await page.waitForTimeout(2500);
+  await page.keyboard.press('Space');
+  await tills(page, '#stigord .flakord');
+  const forsta = await page.evaluate(() => window.__ORDSTAVEN.position());
+  await page.screenshot({ path: 'test-results/kap4-stig4.png' });
+  for (const q of stigVag(pussel.get('k4_stig4'))) { await page.locator(`#stigord .flakord[data-ruta="${q.r},${q.k}"]`).click(); await page.waitForTimeout(700); }
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 15000 }).toContain('k4_stig4: tillbaka över stigen, 4 flak');
+  const efter = await page.evaluate(() => window.__ORDSTAVEN.position());
+  expect(Math.abs(efter.x - forsta.x)).toBeLessThan(4);
+  await tills(page, '#plattan .dinobok, #plattan .bok-sida, #plattan .vidare', 20000);
+  await page.screenshot({ path: 'test-results/kap4-stig4-tanden.png' });
 });

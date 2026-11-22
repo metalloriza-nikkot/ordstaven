@@ -433,6 +433,10 @@
               "papper": {
                 "$ref": "#/$defs/id",
                 "description": "Papperet på läsplattan för en mening (traskylt för Farfars träskyltar)."
+              },
+              "gemener": {
+                "type": "boolean",
+                "description": "Texten står som den är skriven, med gemener (2.56, gemenernas vägg): L l   B b."
               }
             }
           }

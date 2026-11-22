@@ -2,8 +2,8 @@
  "$schema": "schema/ordlistor.schema.json",
  "format": 1,
  "meta": {
-  "version": "0.19",
-  "datum": "2026-11-21",
+  "version": "0.20",
+  "datum": "2026-11-22",
   "agare": "Innehåll",
   "textform": "Orden lagras med små bokstäver, formler i versaler. Böjda former (skogen, bron) står med när de används som alternativ.",
   "beskrivning": "Ordlistor 1-6 for ORDSTAVEN. Bilderna ar platshallare (emoji) for grabox. Ett ord ligger i den hogsta lista som nagot av dess drag kraver.",
@@ -22,7 +22,8 @@
   "andrat_v016": "2026-11-13 (beslut 90.7): orden i duellens testrum som saknades, snögubbe, gubbe, solros, ros och tom. Snögubbe och solros har bilder, eftersom halmdockan pekar på dem.",
   "andrat_v017": "2026-11-15 (beslut 95.3–95.4): brevhalva, brevhalvan och brevhalvorna (berättelseord, sammansatt), och rev.",
   "andrat_v018": "2026-11-17 (kapitel 3 v0.3, manus 19 v0.4.1): luckan, vattnet, stå och säcken (kvarnens tavla), fem (hornet), ha (bubblan), horn (Var var vi?) och kvarnen, lossa, hjulet och hornet (uppdragslappen).",
-  "andrat_v019": "Kapitel 4 (manus 21 v0.3.1): skyltarna, gåtan, Farfars sten, lådans lock, Var var vi? och uppdragslappen."
+  "andrat_v019": "Kapitel 4 (manus 21 v0.3.1): skyltarna, gåtan, Farfars sten, lådans lock, Var var vi? och uppdragslappen.",
+  "andrat_v020": "Kapitel 4 (manus 21 v0.5): stig 4 och Dinoboken (tand), Var var vi? (gåta), klippan, över och skrivorden vid klippan."
  },
  "listor": {
   "1": "Korta ljudenliga ord, 2-3 bokstaver, ingen konsonantgrupp, ingen dubbelteckning",
@@ -3184,6 +3185,54 @@
    "tema": "berättelse",
    "flaggor": [],
    "varfor": "Kapitel 4 v0.1 (manus 21 v0.3.1): frågan vid stenarna"
+  },
+  {
+   "ord": "tand",
+   "lista": 2,
+   "bild": null,
+   "tema": "dino",
+   "flaggor": [],
+   "varfor": "Kapitel 4 v0.3 (manus 21 v0.5): Dinoboken och stig 4"
+  },
+  {
+   "ord": "gåta",
+   "lista": 2,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 4 v0.3 (manus 21 v0.5): Var var vi? i pass 3"
+  },
+  {
+   "ord": "klippan",
+   "lista": 4,
+   "bild": null,
+   "tema": "uppdrag",
+   "flaggor": [],
+   "varfor": "Kapitel 4 v0.3 (manus 21 v0.5): uppdragslappen"
+  },
+  {
+   "ord": "trappa",
+   "lista": 4,
+   "bild": null,
+   "tema": "skrivord",
+   "flaggor": [],
+   "varfor": "Kapitel 4 v0.3 (manus 21 v0.5): skrivord vid klippan"
+  },
+  {
+   "ord": "klättra",
+   "lista": 4,
+   "bild": null,
+   "tema": "skrivord",
+   "flaggor": [],
+   "varfor": "Kapitel 4 v0.3 (manus 21 v0.5): rimligt ord vid klippan"
+  },
+  {
+   "ord": "över",
+   "lista": 2,
+   "bild": null,
+   "tema": "småord",
+   "flaggor": [],
+   "varfor": "Kapitel 4 v0.3 (manus 21 v0.5): uppdragslappen (HOPPA ÖVER)"
   }
  ]
 }

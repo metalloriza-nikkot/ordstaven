@@ -475,7 +475,8 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
       const ids = r.innehall.map(objId);
       for (const [id, sk] of Object.entries(r.skyltar || {})) {
         if (!ids.includes(id)) fel.push(var_(`rum ${r.id}: skylten ${id} finns inte i rummets innehall`));
-        textKontroll(sk.text, `rum ${r.id} skylt ${id}`, { lasesSjalv: true });
+        // gemenernas vägg (2.56): bokstavspar, inga ord, så ordlistorna prövas inte
+        textKontroll(sk.text, `rum ${r.id} skylt ${id}`, { lasesSjalv: !sk.gemener });
       }
       const frivilliga = new Set();
       (r.frivilligt || []).forEach((fv, j) => {
