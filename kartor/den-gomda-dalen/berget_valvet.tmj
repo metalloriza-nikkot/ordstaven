@@ -1,0 +1,241 @@
+{
+ "type": "map",
+ "version": "1.10",
+ "tiledversion": "1.11.0",
+ "orientation": "orthogonal",
+ "renderorder": "right-down",
+ "width": 40,
+ "height": 12,
+ "tilewidth": 16,
+ "tileheight": 16,
+ "infinite": false,
+ "compressionlevel": -1,
+ "nextlayerid": 2,
+ "nextobjectid": 14,
+ "properties": [
+  {
+   "name": "rum",
+   "type": "string",
+   "value": "berget_valvet"
+  }
+ ],
+ "tilesets": [],
+ "layers": [
+  {
+   "id": 1,
+   "name": "foremal",
+   "type": "objectgroup",
+   "draworder": "index",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 1,
+     "name": "start",
+     "type": "",
+     "x": 56,
+     "y": 168,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 2,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 0,
+     "width": 640,
+     "height": 36,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 3,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 36,
+     "width": 16,
+     "height": 140,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 4,
+     "name": "",
+     "type": "vagg",
+     "x": 264,
+     "y": 36,
+     "width": 208,
+     "height": 140,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 5,
+     "name": "",
+     "type": "vagg",
+     "x": 624,
+     "y": 36,
+     "width": 16,
+     "height": 140,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 6,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 176,
+     "width": 40,
+     "height": 16,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 7,
+     "name": "",
+     "type": "vagg",
+     "x": 72,
+     "y": 176,
+     "width": 496,
+     "height": 16,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 8,
+     "name": "",
+     "type": "vagg",
+     "x": 600,
+     "y": 176,
+     "width": 40,
+     "height": 16,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 9,
+     "name": "gang_salen",
+     "type": "utgang",
+     "x": 40,
+     "y": 184,
+     "width": 32,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "riktning",
+       "type": "string",
+       "value": "ned"
+      },
+      {
+       "name": "till",
+       "type": "string",
+       "value": "berget_grottan"
+      }
+     ]
+    },
+    {
+     "id": 10,
+     "name": "gang_galleriet",
+     "type": "utgang",
+     "x": 568,
+     "y": 184,
+     "width": 32,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "riktning",
+       "type": "string",
+       "value": "ned"
+      },
+      {
+       "name": "till",
+       "type": "string",
+       "value": "berget_grottan"
+      }
+     ]
+    },
+    {
+     "id": 11,
+     "name": "vagg_valvet",
+     "type": "sak",
+     "x": 196,
+     "y": 36,
+     "width": 44,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      }
+     ]
+    },
+    {
+     "id": 12,
+     "name": "stig_k4_stig_valv",
+     "type": "sak",
+     "x": 360,
+     "y": 96,
+     "width": 8,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "ankare",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 13,
+     "name": "",
+     "type": "vagg",
+     "x": 260,
+     "y": 36,
+     "width": 208,
+     "height": 128,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vatten",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

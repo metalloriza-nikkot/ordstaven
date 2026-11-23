@@ -274,6 +274,10 @@ export function objektFarg(o) {
   if (o.sort === 'figur') return 0xc9a27a;
   // gråboxen (72.8): leran (lerpölen, leran i träsket och vid bryggan) är brun, så att det syns var man sjunker
   if (/(^|_)ler(an|pol)(_|$)/.test(o.id)) return 0x6b5436;
+  // gråboxen (122.2): stigarnas spår i snön vid gaffeln, ljust bruna så att de syns gå åt var sitt håll
+  if (o.id.startsWith('stigspar_')) return 0xcbb68c;
+  // snödrivorna på stenfältet (122.4), som halvt gömmer stenarna
+  if (o.id.startsWith('snodriva_')) return 0xeef3f8;
   return 0xb9b2a4;
 }
 

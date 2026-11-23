@@ -141,7 +141,7 @@ test('kapitel 4 pass 1: skyltarna, stig 1, snön, Farfars sten och STOR SKÖLD m
   expect(loggen).toMatch(/\[formel\] k4_stor_skold: klar/);
   // raset är en scen på ca 12 s (121.2), och i testläget hinner passet längre än regin: vänta in hela scenen
   const regi = async () => (await page.evaluate(() => window.__ORDSTAVEN.grafik())).regi.join('\n');
-  for (const r of ['ankomst_berget', 'baronen_kikare_berg', 'luftskeppet glider förbi över stigen', 'blocket_lyfts', 'fel knut', 'rätt knut', 'baronen hejar', 'blocket rycks loss', 'snöraset i ett svep', 'stor_skold_ras', 'mynningen_stangs']) await expect.poll(regi, { timeout: 20000 }).toContain(r);
+  for (const r of ['ankomst_berget', 'baronen_kikare_berg', 'luftskeppet glider förbi över stigen', 'blocket_lyfts', 'fel knut', 'rätt knut', 'baronen hejar', 'blocket rycks loss', 'snöraset i ett svep', 'raset nedför berget', 'stor_skold_ras', 'mynningen_stangs', 'de springer in i grottan', 'snön täpper till öppningen']) await expect.poll(regi, { timeout: 20000 }).toContain(r);
   expect(loggen).toContain('[stig] k4_stig1: ungen skuttar i spåret');
 });
 
@@ -151,10 +151,12 @@ test('kapitel 4 pass 2: mörkret, LJUS, gemenernas vägg, stig 2 och gåtan (120
   await starta(page, 'k4s03_grottan');
   const scener = await spelaPasset(page, 'pass2');
   // passet slutar när gåtan står i boken (Men hur kommer de ut?), och stig 3 är pass 3
-  expect(scener).toEqual(['k4s03_grottan']);
+  expect(scener).toEqual(['k4s03_grottan', 'k4s03_valvet', 'k4s03_galleriet']);
   const loggen = await page.evaluate(() => window.__ORDSTAVEN.logg());
   expect(loggen).toContain('[skylt] vagg_gemener');
   expect(loggen).toContain('[stig] k4_stig2: klar');
+  expect(loggen).toContain('[stig] k4_stig_valv: klar');
+  expect(loggen).toContain('[skylt] vagg_valvet');
   expect(loggen).not.toContain('k4_stig3');
   const regi = (await page.evaluate(() => window.__ORDSTAVEN.grafik())).regi.join('\n');
   for (const r of ['mörkret', 'grottan_glittrar', 'grottan_visar_vaggen']) expect(regi).toContain(r);
@@ -254,7 +256,7 @@ test('kapitel 4: stig 4 i F3 (tand), och han hoppar tillbaka till stranden (121.
   test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
   test.setTimeout(120000);
   // i galleriet (D) efter stig 2: han går till ristningen på västra stranden i F3, och den frivilliga scenen börjar
-  await starta(page, 'k4s03_grottan', 8, { berget_grottan: 'ljus' });
+  await starta(page, 'k4s03_galleriet', 0, { berget_grottan: 'ljus' });
   for (let i = 0; i < 60 && (await page.evaluate(() => window.__ORDSTAVEN.steg()?.typ)) !== 'ga_till'; i++) {
     for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
     await page.waitForTimeout(300);
@@ -266,6 +268,8 @@ test('kapitel 4: stig 4 i F3 (tand), och han hoppar tillbaka till stranden (121.
   await page.evaluate(gaMotSida, 'ristning_tand');
   await page.waitForTimeout(2500);
   await page.keyboard.press('Space');
+  // 122.11: på vägen förbi gången in till istappsgrottan lockar det (ungen nosar, något glimtar, istapparna klingar)
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('[lockar] k4s03_tanden vid gang_istapparna');
   await tills(page, '#stigord .flakord');
   const forsta = await page.evaluate(() => window.__ORDSTAVEN.position());
   await page.screenshot({ path: 'test-results/kap4-stig4.png' });

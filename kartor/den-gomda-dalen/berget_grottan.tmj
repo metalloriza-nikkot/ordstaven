@@ -11,7 +11,7 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 101,
+ "nextobjectid": 116,
  "properties": [
   {
    "name": "rum",
@@ -81,6 +81,18 @@
     },
     {
      "id": 5,
+     "name": "regi_hjalte_k4s03_galleriet",
+     "type": "",
+     "x": 444,
+     "y": 140,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 6,
      "name": "",
      "type": "vagg",
      "x": 0,
@@ -91,7 +103,7 @@
      "visible": true
     },
     {
-     "id": 6,
+     "id": 7,
      "name": "",
      "type": "vagg",
      "x": 0,
@@ -102,7 +114,7 @@
      "visible": true
     },
     {
-     "id": 7,
+     "id": 8,
      "name": "",
      "type": "vagg",
      "x": 580,
@@ -113,7 +125,7 @@
      "visible": true
     },
     {
-     "id": 8,
+     "id": 9,
      "name": "",
      "type": "vagg",
      "x": 0,
@@ -124,7 +136,7 @@
      "visible": true
     },
     {
-     "id": 9,
+     "id": 10,
      "name": "",
      "type": "vagg",
      "x": 626,
@@ -135,7 +147,7 @@
      "visible": true
     },
     {
-     "id": 10,
+     "id": 11,
      "name": "",
      "type": "vagg",
      "x": 0,
@@ -146,7 +158,7 @@
      "visible": true
     },
     {
-     "id": 11,
+     "id": 12,
      "name": "",
      "type": "vagg",
      "x": 182,
@@ -157,7 +169,7 @@
      "visible": true
     },
     {
-     "id": 12,
+     "id": 13,
      "name": "",
      "type": "vagg",
      "x": 626,
@@ -168,7 +180,7 @@
      "visible": true
     },
     {
-     "id": 13,
+     "id": 14,
      "name": "",
      "type": "vagg",
      "x": 0,
@@ -179,18 +191,18 @@
      "visible": true
     },
     {
-     "id": 14,
+     "id": 15,
      "name": "",
      "type": "vagg",
      "x": 182,
      "y": 64,
-     "width": 196,
+     "width": 222,
      "height": 18,
      "rotation": 0,
      "visible": true
     },
     {
-     "id": 15,
+     "id": 16,
      "name": "",
      "type": "vagg",
      "x": 486,
@@ -201,7 +213,7 @@
      "visible": true
     },
     {
-     "id": 16,
+     "id": 17,
      "name": "",
      "type": "vagg",
      "x": 626,
@@ -212,23 +224,12 @@
      "visible": true
     },
     {
-     "id": 17,
+     "id": 18,
      "name": "",
      "type": "vagg",
      "x": 0,
      "y": 82,
      "width": 52,
-     "height": 14,
-     "rotation": 0,
-     "visible": true
-    },
-    {
-     "id": 18,
-     "name": "",
-     "type": "vagg",
-     "x": 182,
-     "y": 82,
-     "width": 196,
      "height": 14,
      "rotation": 0,
      "visible": true
@@ -237,6 +238,17 @@
      "id": 19,
      "name": "",
      "type": "vagg",
+     "x": 182,
+     "y": 82,
+     "width": 222,
+     "height": 14,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 20,
+     "name": "",
+     "type": "vagg",
      "x": 626,
      "y": 82,
      "width": 14,
@@ -245,7 +257,7 @@
      "visible": true
     },
     {
-     "id": 20,
+     "id": 21,
      "name": "",
      "type": "vagg",
      "x": 0,
@@ -256,7 +268,18 @@
      "visible": true
     },
     {
-     "id": 21,
+     "id": 22,
+     "name": "",
+     "type": "vagg",
+     "x": 378,
+     "y": 96,
+     "width": 26,
+     "height": 28,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 23,
      "name": "",
      "type": "vagg",
      "x": 626,
@@ -267,35 +290,13 @@
      "visible": true
     },
     {
-     "id": 22,
+     "id": 24,
      "name": "",
      "type": "vagg",
      "x": 0,
      "y": 124,
      "width": 96,
-     "height": 72,
-     "rotation": 0,
-     "visible": true
-    },
-    {
-     "id": 23,
-     "name": "",
-     "type": "vagg",
-     "x": 124,
-     "y": 124,
-     "width": 36,
-     "height": 72,
-     "rotation": 0,
-     "visible": true
-    },
-    {
-     "id": 24,
-     "name": "",
-     "type": "vagg",
-     "x": 626,
-     "y": 124,
-     "width": 14,
-     "height": 72,
+     "height": 34,
      "rotation": 0,
      "visible": true
     },
@@ -303,10 +304,10 @@
      "id": 25,
      "name": "",
      "type": "vagg",
-     "x": 0,
-     "y": 196,
-     "width": 28,
-     "height": 26,
+     "x": 124,
+     "y": 124,
+     "width": 36,
+     "height": 34,
      "rotation": 0,
      "visible": true
     },
@@ -314,10 +315,10 @@
      "id": 26,
      "name": "",
      "type": "vagg",
-     "x": 124,
-     "y": 196,
-     "width": 36,
-     "height": 26,
+     "x": 378,
+     "y": 124,
+     "width": 26,
+     "height": 34,
      "rotation": 0,
      "visible": true
     },
@@ -326,9 +327,9 @@
      "name": "",
      "type": "vagg",
      "x": 626,
-     "y": 196,
+     "y": 124,
      "width": 14,
-     "height": 26,
+     "height": 34,
      "rotation": 0,
      "visible": true
     },
@@ -337,9 +338,9 @@
      "name": "",
      "type": "vagg",
      "x": 0,
-     "y": 222,
-     "width": 28,
-     "height": 28,
+     "y": 158,
+     "width": 96,
+     "height": 38,
      "rotation": 0,
      "visible": true
     },
@@ -347,10 +348,10 @@
      "id": 29,
      "name": "",
      "type": "vagg",
-     "x": 56,
-     "y": 222,
-     "width": 104,
-     "height": 28,
+     "x": 124,
+     "y": 158,
+     "width": 36,
+     "height": 38,
      "rotation": 0,
      "visible": true
     },
@@ -358,10 +359,10 @@
      "id": 30,
      "name": "",
      "type": "vagg",
-     "x": 626,
-     "y": 222,
-     "width": 14,
-     "height": 28,
+     "x": 378,
+     "y": 158,
+     "width": 6,
+     "height": 38,
      "rotation": 0,
      "visible": true
     },
@@ -369,10 +370,10 @@
      "id": 31,
      "name": "",
      "type": "vagg",
-     "x": 0,
-     "y": 250,
-     "width": 28,
-     "height": 22,
+     "x": 398,
+     "y": 158,
+     "width": 6,
+     "height": 38,
      "rotation": 0,
      "visible": true
     },
@@ -380,10 +381,10 @@
      "id": 32,
      "name": "",
      "type": "vagg",
-     "x": 56,
-     "y": 250,
-     "width": 44,
-     "height": 22,
+     "x": 626,
+     "y": 158,
+     "width": 14,
+     "height": 38,
      "rotation": 0,
      "visible": true
     },
@@ -391,10 +392,10 @@
      "id": 33,
      "name": "",
      "type": "vagg",
-     "x": 144,
-     "y": 250,
-     "width": 16,
-     "height": 22,
+     "x": 0,
+     "y": 196,
+     "width": 28,
+     "height": 26,
      "rotation": 0,
      "visible": true
     },
@@ -402,10 +403,10 @@
      "id": 34,
      "name": "",
      "type": "vagg",
-     "x": 626,
-     "y": 250,
-     "width": 14,
-     "height": 22,
+     "x": 124,
+     "y": 196,
+     "width": 36,
+     "height": 26,
      "rotation": 0,
      "visible": true
     },
@@ -413,10 +414,10 @@
      "id": 35,
      "name": "",
      "type": "vagg",
-     "x": 0,
-     "y": 272,
-     "width": 28,
-     "height": 22,
+     "x": 378,
+     "y": 196,
+     "width": 6,
+     "height": 26,
      "rotation": 0,
      "visible": true
     },
@@ -424,10 +425,10 @@
      "id": 36,
      "name": "",
      "type": "vagg",
-     "x": 144,
-     "y": 272,
-     "width": 16,
-     "height": 22,
+     "x": 398,
+     "y": 196,
+     "width": 6,
+     "height": 26,
      "rotation": 0,
      "visible": true
     },
@@ -436,6 +437,204 @@
      "name": "",
      "type": "vagg",
      "x": 626,
+     "y": 196,
+     "width": 14,
+     "height": 26,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 38,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 222,
+     "width": 28,
+     "height": 16,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 39,
+     "name": "",
+     "type": "vagg",
+     "x": 56,
+     "y": 222,
+     "width": 104,
+     "height": 16,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 40,
+     "name": "",
+     "type": "vagg",
+     "x": 378,
+     "y": 222,
+     "width": 6,
+     "height": 16,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 41,
+     "name": "",
+     "type": "vagg",
+     "x": 398,
+     "y": 222,
+     "width": 6,
+     "height": 16,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 42,
+     "name": "",
+     "type": "vagg",
+     "x": 626,
+     "y": 222,
+     "width": 14,
+     "height": 16,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 43,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 238,
+     "width": 28,
+     "height": 12,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 44,
+     "name": "",
+     "type": "vagg",
+     "x": 56,
+     "y": 238,
+     "width": 104,
+     "height": 12,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 45,
+     "name": "",
+     "type": "vagg",
+     "x": 378,
+     "y": 238,
+     "width": 26,
+     "height": 12,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 46,
+     "name": "",
+     "type": "vagg",
+     "x": 626,
+     "y": 238,
+     "width": 14,
+     "height": 12,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 47,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 250,
+     "width": 28,
+     "height": 22,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 48,
+     "name": "",
+     "type": "vagg",
+     "x": 56,
+     "y": 250,
+     "width": 44,
+     "height": 22,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 49,
+     "name": "",
+     "type": "vagg",
+     "x": 144,
+     "y": 250,
+     "width": 16,
+     "height": 22,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 50,
+     "name": "",
+     "type": "vagg",
+     "x": 378,
+     "y": 250,
+     "width": 26,
+     "height": 22,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 51,
+     "name": "",
+     "type": "vagg",
+     "x": 626,
+     "y": 250,
+     "width": 14,
+     "height": 22,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 52,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 272,
+     "width": 28,
+     "height": 22,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 53,
+     "name": "",
+     "type": "vagg",
+     "x": 144,
+     "y": 272,
+     "width": 16,
+     "height": 22,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 54,
+     "name": "",
+     "type": "vagg",
+     "x": 378,
+     "y": 272,
+     "width": 26,
+     "height": 22,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 55,
+     "name": "",
+     "type": "vagg",
+     "x": 626,
      "y": 272,
      "width": 14,
      "height": 22,
@@ -443,7 +642,7 @@
      "visible": true
     },
     {
-     "id": 38,
+     "id": 56,
      "name": "",
      "type": "vagg",
      "x": 0,
@@ -454,7 +653,7 @@
      "visible": true
     },
     {
-     "id": 39,
+     "id": 57,
      "name": "",
      "type": "vagg",
      "x": 56,
@@ -465,7 +664,7 @@
      "visible": true
     },
     {
-     "id": 40,
+     "id": 58,
      "name": "",
      "type": "vagg",
      "x": 144,
@@ -476,7 +675,18 @@
      "visible": true
     },
     {
-     "id": 41,
+     "id": 59,
+     "name": "",
+     "type": "vagg",
+     "x": 378,
+     "y": 294,
+     "width": 26,
+     "height": 2,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 60,
      "name": "",
      "type": "vagg",
      "x": 626,
@@ -487,7 +697,7 @@
      "visible": true
     },
     {
-     "id": 42,
+     "id": 61,
      "name": "",
      "type": "vagg",
      "x": 0,
@@ -498,7 +708,7 @@
      "visible": true
     },
     {
-     "id": 43,
+     "id": 62,
      "name": "",
      "type": "vagg",
      "x": 56,
@@ -509,7 +719,7 @@
      "visible": true
     },
     {
-     "id": 44,
+     "id": 63,
      "name": "",
      "type": "vagg",
      "x": 144,
@@ -520,29 +730,18 @@
      "visible": true
     },
     {
-     "id": 45,
+     "id": 64,
      "name": "",
      "type": "vagg",
      "x": 378,
      "y": 296,
-     "width": 4,
+     "width": 14,
      "height": 6,
      "rotation": 0,
      "visible": true
     },
     {
-     "id": 46,
-     "name": "",
-     "type": "vagg",
-     "x": 410,
-     "y": 296,
-     "width": 4,
-     "height": 6,
-     "rotation": 0,
-     "visible": true
-    },
-    {
-     "id": 47,
+     "id": 65,
      "name": "",
      "type": "vagg",
      "x": 436,
@@ -553,7 +752,7 @@
      "visible": true
     },
     {
-     "id": 48,
+     "id": 66,
      "name": "",
      "type": "vagg",
      "x": 0,
@@ -564,7 +763,7 @@
      "visible": true
     },
     {
-     "id": 49,
+     "id": 67,
      "name": "",
      "type": "vagg",
      "x": 56,
@@ -575,7 +774,7 @@
      "visible": true
     },
     {
-     "id": 50,
+     "id": 68,
      "name": "",
      "type": "vagg",
      "x": 144,
@@ -586,29 +785,18 @@
      "visible": true
     },
     {
-     "id": 51,
+     "id": 69,
      "name": "",
      "type": "vagg",
      "x": 378,
      "y": 302,
-     "width": 4,
+     "width": 14,
      "height": 8,
      "rotation": 0,
      "visible": true
     },
     {
-     "id": 52,
-     "name": "",
-     "type": "vagg",
-     "x": 410,
-     "y": 302,
-     "width": 4,
-     "height": 8,
-     "rotation": 0,
-     "visible": true
-    },
-    {
-     "id": 53,
+     "id": 70,
      "name": "",
      "type": "vagg",
      "x": 436,
@@ -619,7 +807,7 @@
      "visible": true
     },
     {
-     "id": 54,
+     "id": 71,
      "name": "",
      "type": "vagg",
      "x": 626,
@@ -630,7 +818,7 @@
      "visible": true
     },
     {
-     "id": 55,
+     "id": 72,
      "name": "",
      "type": "vagg",
      "x": 0,
@@ -641,29 +829,18 @@
      "visible": true
     },
     {
-     "id": 56,
+     "id": 73,
      "name": "",
      "type": "vagg",
      "x": 56,
      "y": 310,
-     "width": 326,
+     "width": 336,
      "height": 12,
      "rotation": 0,
      "visible": true
     },
     {
-     "id": 57,
-     "name": "",
-     "type": "vagg",
-     "x": 410,
-     "y": 310,
-     "width": 4,
-     "height": 12,
-     "rotation": 0,
-     "visible": true
-    },
-    {
-     "id": 58,
+     "id": 74,
      "name": "",
      "type": "vagg",
      "x": 436,
@@ -674,7 +851,7 @@
      "visible": true
     },
     {
-     "id": 59,
+     "id": 75,
      "name": "",
      "type": "vagg",
      "x": 626,
@@ -685,7 +862,7 @@
      "visible": true
     },
     {
-     "id": 60,
+     "id": 76,
      "name": "",
      "type": "vagg",
      "x": 0,
@@ -696,7 +873,7 @@
      "visible": true
     },
     {
-     "id": 61,
+     "id": 77,
      "name": "",
      "type": "vagg",
      "x": 56,
@@ -707,29 +884,18 @@
      "visible": true
     },
     {
-     "id": 62,
+     "id": 78,
      "name": "",
      "type": "vagg",
      "x": 304,
      "y": 322,
-     "width": 78,
+     "width": 88,
      "height": 8,
      "rotation": 0,
      "visible": true
     },
     {
-     "id": 63,
-     "name": "",
-     "type": "vagg",
-     "x": 410,
-     "y": 322,
-     "width": 4,
-     "height": 8,
-     "rotation": 0,
-     "visible": true
-    },
-    {
-     "id": 64,
+     "id": 79,
      "name": "",
      "type": "vagg",
      "x": 436,
@@ -740,7 +906,7 @@
      "visible": true
     },
     {
-     "id": 65,
+     "id": 80,
      "name": "",
      "type": "vagg",
      "x": 626,
@@ -751,7 +917,7 @@
      "visible": true
     },
     {
-     "id": 66,
+     "id": 81,
      "name": "",
      "type": "vagg",
      "x": 0,
@@ -762,7 +928,7 @@
      "visible": true
     },
     {
-     "id": 67,
+     "id": 82,
      "name": "",
      "type": "vagg",
      "x": 60,
@@ -773,29 +939,18 @@
      "visible": true
     },
     {
-     "id": 68,
+     "id": 83,
      "name": "",
      "type": "vagg",
      "x": 304,
      "y": 330,
-     "width": 78,
+     "width": 88,
      "height": 10,
      "rotation": 0,
      "visible": true
     },
     {
-     "id": 69,
-     "name": "",
-     "type": "vagg",
-     "x": 410,
-     "y": 330,
-     "width": 4,
-     "height": 10,
-     "rotation": 0,
-     "visible": true
-    },
-    {
-     "id": 70,
+     "id": 84,
      "name": "",
      "type": "vagg",
      "x": 436,
@@ -806,7 +961,7 @@
      "visible": true
     },
     {
-     "id": 71,
+     "id": 85,
      "name": "",
      "type": "vagg",
      "x": 626,
@@ -817,7 +972,7 @@
      "visible": true
     },
     {
-     "id": 72,
+     "id": 86,
      "name": "",
      "type": "vagg",
      "x": 0,
@@ -828,7 +983,7 @@
      "visible": true
     },
     {
-     "id": 73,
+     "id": 87,
      "name": "",
      "type": "vagg",
      "x": 60,
@@ -839,18 +994,7 @@
      "visible": true
     },
     {
-     "id": 74,
-     "name": "",
-     "type": "vagg",
-     "x": 410,
-     "y": 340,
-     "width": 4,
-     "height": 26,
-     "rotation": 0,
-     "visible": true
-    },
-    {
-     "id": 75,
+     "id": 88,
      "name": "",
      "type": "vagg",
      "x": 436,
@@ -861,7 +1005,7 @@
      "visible": true
     },
     {
-     "id": 76,
+     "id": 89,
      "name": "",
      "type": "vagg",
      "x": 626,
@@ -872,7 +1016,7 @@
      "visible": true
     },
     {
-     "id": 77,
+     "id": 90,
      "name": "",
      "type": "vagg",
      "x": 0,
@@ -883,7 +1027,7 @@
      "visible": true
     },
     {
-     "id": 78,
+     "id": 91,
      "name": "",
      "type": "vagg",
      "x": 60,
@@ -894,7 +1038,7 @@
      "visible": true
     },
     {
-     "id": 79,
+     "id": 92,
      "name": "",
      "type": "vagg",
      "x": 436,
@@ -905,7 +1049,7 @@
      "visible": true
     },
     {
-     "id": 80,
+     "id": 93,
      "name": "",
      "type": "vagg",
      "x": 626,
@@ -916,7 +1060,7 @@
      "visible": true
     },
     {
-     "id": 81,
+     "id": 94,
      "name": "",
      "type": "vagg",
      "x": 182,
@@ -934,7 +1078,7 @@
      ]
     },
     {
-     "id": 82,
+     "id": 95,
      "name": "",
      "type": "vagg",
      "x": 486,
@@ -952,7 +1096,7 @@
      ]
     },
     {
-     "id": 83,
+     "id": 96,
      "name": "vagg_gemener",
      "type": "sak",
      "x": 96,
@@ -970,7 +1114,7 @@
      ]
     },
     {
-     "id": 84,
+     "id": 97,
      "name": "isficka_bar",
      "type": "sak",
      "x": 116,
@@ -988,7 +1132,7 @@
      ]
     },
     {
-     "id": 85,
+     "id": 98,
      "name": "stig_k4_stig2",
      "type": "sak",
      "x": 276,
@@ -1011,12 +1155,12 @@
      ]
     },
     {
-     "id": 86,
+     "id": 99,
      "name": "gata_1",
      "type": "sak",
-     "x": 386,
+     "x": 408,
      "y": 64,
-     "width": 24,
+     "width": 22,
      "height": 10,
      "rotation": 0,
      "visible": true,
@@ -1029,12 +1173,12 @@
      ]
     },
     {
-     "id": 87,
+     "id": 100,
      "name": "gata_2",
      "type": "sak",
-     "x": 422,
+     "x": 434,
      "y": 64,
-     "width": 24,
+     "width": 22,
      "height": 10,
      "rotation": 0,
      "visible": true,
@@ -1047,12 +1191,12 @@
      ]
     },
     {
-     "id": 88,
+     "id": 101,
      "name": "gata_3",
      "type": "sak",
-     "x": 458,
+     "x": 460,
      "y": 64,
-     "width": 24,
+     "width": 22,
      "height": 10,
      "rotation": 0,
      "visible": true,
@@ -1065,7 +1209,35 @@
      ]
     },
     {
-     "id": 89,
+     "id": 102,
+     "name": "gang_valvet",
+     "type": "utgang",
+     "x": 384,
+     "y": 158,
+     "width": 14,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "riktning",
+       "type": "string",
+       "value": "upp"
+      },
+      {
+       "name": "till",
+       "type": "string",
+       "value": "berget_valvet"
+      }
+     ]
+    },
+    {
+     "id": 103,
      "name": "ishylla",
      "type": "sak",
      "x": 222,
@@ -1083,7 +1255,7 @@
      ]
     },
     {
-     "id": 90,
+     "id": 104,
      "name": "isblock",
      "type": "sak",
      "x": 246,
@@ -1116,7 +1288,7 @@
      ]
     },
     {
-     "id": 91,
+     "id": 105,
      "name": "fotavtryck",
      "type": "sak",
      "x": 244,
@@ -1139,7 +1311,7 @@
      ]
     },
     {
-     "id": 92,
+     "id": 106,
      "name": "vagg_ut",
      "type": "sak",
      "x": 492,
@@ -1157,7 +1329,7 @@
      ]
     },
     {
-     "id": 93,
+     "id": 107,
      "name": "gata_3_igen",
      "type": "sak",
      "x": 520,
@@ -1175,7 +1347,7 @@
      ]
     },
     {
-     "id": 94,
+     "id": 108,
      "name": "stig_k4_stig3",
      "type": "sak",
      "x": 552,
@@ -1203,7 +1375,7 @@
      ]
     },
     {
-     "id": 95,
+     "id": 109,
      "name": "spricka",
      "type": "sak",
      "x": 548,
@@ -1226,7 +1398,7 @@
      ]
     },
     {
-     "id": 96,
+     "id": 110,
      "name": "utgang_stenfalt",
      "type": "sak",
      "x": 548,
@@ -1244,7 +1416,7 @@
      ]
     },
     {
-     "id": 97,
+     "id": 111,
      "name": "ristning_tand",
      "type": "sak",
      "x": 408,
@@ -1262,7 +1434,30 @@
      ]
     },
     {
-     "id": 98,
+     "id": 112,
+     "name": "gang_istapparna",
+     "type": "sak",
+     "x": 414,
+     "y": 292,
+     "width": 22,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "lockradie",
+       "type": "int",
+       "value": 100
+      }
+     ]
+    },
+    {
+     "id": 113,
      "name": "stig_k4_stig4",
      "type": "sak",
      "x": 516,
@@ -1290,7 +1485,7 @@
      ]
     },
     {
-     "id": 99,
+     "id": 114,
      "name": "",
      "type": "vagg",
      "x": 436,
@@ -1308,7 +1503,7 @@
      ]
     },
     {
-     "id": 100,
+     "id": 115,
      "name": "tand_isen",
      "type": "sak",
      "x": 604,

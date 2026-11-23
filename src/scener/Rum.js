@@ -4132,6 +4132,8 @@ export class Rum extends Phaser.Scene {
         // som bara nås med hissen, och på skalet ute på floden i resan. Platsen är exakt och flyttas inte till närmaste
         // fria punkt (på skalet kan han inte gå)
         const plats = v.scen ? this.regiPunkter?.[`hjalte_${v.scen}`] : null;
+        // står han på scenens plats har han inte kommit in genom dörren (122.11: från valvet in i galleriet)
+        if (plats) this.inkom = null;
         const start = plats || hiss || (dorr ? framfor(dorr) : (v.franRum && v.karta?.in?.[v.franRum]) || v.karta?.start || { x: this.storlek.bredd / 2, y: this.storlek.hojd - 12 });
         this.niva = 0; this.paStege = false; this.byggHinder(); this.sattNivaVid(start);
         this.pos = plats ? { ...plats } : this.hinder.narmasteFria(start);
@@ -4338,7 +4340,8 @@ export class Rum extends Phaser.Scene {
     const r = o.rund
       ? this.add.ellipse(o.x + o.b / 2, o.y + o.h / 2, o.b, o.h, 0x6f8a4a, 1).setStrokeStyle(3, 0x4a3a28, 1)
       : this.add.rectangle(o.x, o.y, o.b, o.h, fyll, delar ? 0 : 1).setOrigin(0, 0).setStrokeStyle(1, sidodorr ? 0x3a3129 : FARG.sakKant, delar ? 0 : 1);
-    this.lagerObjekt.add(r);
+    // ovanpa i gråboxen (122.4): snödrivorna ligger över stenarnas nederkant, så att stenarna är halvt gömda
+    (o.ovanpa ? this.lagerLuft : this.lagerObjekt).add(r);
     this.ritade.set(o.id, r);
     if (o.ute || o.klattra || (o.sort === 'utgang' && !o.golv) || o.sort === 'yta') this.ritaDetaljer(o);
     this.ritadeDelar.get(o.id)?.forEach((x) => x.destroy());
@@ -4460,6 +4463,8 @@ export class Rum extends Phaser.Scene {
     const t = this.tillstand || '';
     const alfa = !this.harRum ? 0 : t === 'natt' ? (this.morkerNatt ?? 0.72) : t === 'natt_upplyst' ? 0.42 : 0;
     if (alfa) g.fillStyle(0x0a0820, alfa).fillRect(0, 0, this.storlek.bredd, this.storlek.hojd);
+    // 122.3: i grottans mörker ligger en slöja också över figurerna, så att hjälten och ungen bara syns mycket svagt
+    if (this.harRum && t === 'mork') g.fillStyle(0x04050a, 0.72).fillRect(0, 0, this.storlek.bredd, this.storlek.hojd);
     // en lampa (läslampan vid Farfars plats) lyser varmt i mörkret: ljusare ringar inåt och en glödande punkt
     if (alfa) for (const l of this.lampor) {
       for (const [r, a] of [[60, 0.10], [44, 0.12], [28, 0.16]]) g.fillStyle(FARG.ljus, a).fillCircle(l.x, l.y, r);
@@ -4879,7 +4884,7 @@ export class Rum extends Phaser.Scene {
     // 121.2: raset är en scen på ca 12 s. Dramat ligger i bilden och ljudet: Stils stycke för raset (om det finns) går
     // under hela scenen, Herr Skata knyter fel först och sedan rätt, och baronen hejar. Sedan som i 0.103.0 (T ms senare)
     const T = 6000;
-    this.regiStycke('stycke_ras');
+    this.regiStycke('stycke_raset');
     // 1. skeppet glider fram och sänker sig över blocket, och kameran visar blocket
     this.regiFokus = { x: bl.x, y: bl.y + 30 };
     const skY = Math.max(12, bl.y - 30);
@@ -4955,31 +4960,78 @@ export class Rum extends Phaser.Scene {
       smuts();
     });
     this.time.delayedCall(t0, () => this.regiLjud('rassel'));
-    // 7. snön över mynningen lossnar: Stils snomassa_01–02 (96 × 48, LASMIG_114), och smulor faller (ca 400 ms per bild)
+    // 7. raset (122.2): snön och stenarna rasar nedför hela berget. Fronten rullar från toppen ned till dem, och kameran
+    // följer den, så att det syns hur högt upp de är. Stenar studsar och snödammet yr. Bara läge, opacitet och bildbyte
+    // (golvdatorn), och en kort skakning. Stils ras_front_01–03, ras_sten_* och ras_damm_01–03 (LASMIG_122) när de
+    // finns, annars gråbox. Snön stannar sedan i luften som en vägg över dem (ras_vagg_01–02, 176 × 88)
     const tSno = t0 + steg * stegMs + 150;
-    const sm = this.regiram('snomassa_01');
+    const stopp = { x: Math.round((this.pos.x + m.x) / 2), y: Math.round(Math.min(this.pos.y, this.ungePos.y) - 50) };
+    const rasMs = 2200;
+    const ramar = (/** @type {string} */ bas, n = 3) => Array.from({ length: n }, (_, i) => `${bas}_0${i + 1}`).filter((r) => this.regiram(r));
+    const frontRamar = ramar('ras_front');
+    /** @type {any} */ let front;
+    if (frontRamar.length) { const f = /** @type {any} */ (this.regiram(frontRamar[0])); front = this.add.image(stopp.x, -40, f.nyckel, f.ram); }
+    else {
+      front = this.add.graphics({ x: stopp.x, y: -40 });
+      front.fillStyle(0xf4f8fc, 1).fillEllipse(0, 0, 200, 46).fillStyle(0xdbe6ef, 1).fillEllipse(-50, 10, 80, 22).fillEllipse(46, 12, 70, 20)
+        .fillStyle(0x8c8378, 1).fillCircle(-30, 4, 4).fillCircle(20, -6, 3).fillCircle(60, 2, 4);
+    }
+    front.setAlpha(0); this.lagerLuft.add(front); this.lagda.push(front);
+    if (frontRamar.length > 1) { let i = 0; const ev = this.time.addEvent({ delay: 160, loop: true, callback: () => { if (!front.active || !front.visible) { ev.remove(); return; } i = (i + 1) % frontRamar.length; const f = /** @type {any} */ (this.regiram(frontRamar[i])); front.setTexture(f.nyckel, f.ram); smuts(); } }); }
+    this.time.delayedCall(tSno, () => {
+      front.setAlpha(1); this.cameras.main.shake(500, 0.007); this.regiLjud('rassel'); this.k4Logg('raset nedför berget');
+      this.regiFokus = { x: front.x, y: Math.max(96, front.y + 40) };
+    });
+    this.tweens.add({ targets: front, y: stopp.y - 6, duration: rasMs, delay: tSno, ease: 'Quad.easeIn', onUpdate: () => { this.regiFokus = { x: front.x, y: Math.max(96, front.y + 50) }; smuts(); } });
+    // stenarna studsar nedför framför fronten (bildbyte i stället för att snurra), och snödammet yr upp och tonar bort
+    const stenRamar = ['ras_sten_01', 'ras_sten_02', 'ras_sten_03', 'ras_sten_04'].filter((r) => this.regiram(r));
+    for (let i = 0; i < 5; i++) {
+      const x = stopp.x - 70 + i * 34, d = tSno + 150 + i * 180;
+      /** @type {any} */ let sten;
+      if (stenRamar.length) { const f = /** @type {any} */ (this.regiram(stenRamar[i % stenRamar.length])); sten = this.add.image(x, -20, f.nyckel, f.ram); }
+      else { sten = this.add.graphics({ x, y: -20 }); sten.fillStyle(0x7d746a, 1).fillCircle(0, 0, 4 + (i % 2) * 2).fillStyle(0x5a5048, 1).fillCircle(1, 1, 2); }
+      sten.setAlpha(0); this.lagerLuft.add(sten); this.lagda.push(sten);
+      const studs = 4, del = Math.round((rasMs - 200) / studs);
+      const tw = []; for (let j = 1; j <= studs; j++) { const y = -20 + ((stopp.y + 10) / studs) * j; tw.push({ y: y - 14, duration: Math.round(del / 2), ease: 'Sine.easeOut' }, { y, duration: Math.round(del / 2), ease: 'Sine.easeIn' }); }
+      this.time.delayedCall(d, () => { sten.setAlpha(1); this.tweens.chain({ targets: sten, tweens: [...tw, { alpha: 0, duration: 300 }], onUpdate: smuts }); });
+      if (stenRamar.length > 1) this.time.addEvent({ delay: 120, repeat: Math.round(rasMs / 120), startAt: 0, callback: () => { if (!sten.active) return; const f = /** @type {any} */ (this.regiram(stenRamar[(i + Math.floor(this.time.now / 120)) % stenRamar.length])); sten.setTexture(f.nyckel, f.ram); } });
+    }
+    const dammRamar = ramar('ras_damm');
+    for (let i = 0; i < 6; i++) this.time.delayedCall(tSno + 200 + i * 320, () => {
+      const x = stopp.x - 80 + ((i * 53) % 160), y = Math.max(10, front.y - 6);
+      /** @type {any} */ let damm;
+      if (dammRamar.length) { const f = /** @type {any} */ (this.regiram(dammRamar[0])); damm = this.add.image(x, y, f.nyckel, f.ram); dammRamar.slice(1).forEach((r, k) => this.time.delayedCall(180 * (k + 1), () => { const g = /** @type {any} */ (this.regiram(r)); if (damm.active) damm.setTexture(g.nyckel, g.ram); })); }
+      else { damm = this.add.graphics({ x, y }); damm.fillStyle(0xffffff, 0.8).fillCircle(0, 0, 8).fillCircle(7, -3, 6).fillCircle(-6, -2, 5); }
+      this.lagerLuft.add(damm); this.lagda.push(damm);
+      this.tweens.add({ targets: damm, y: y - 14, alpha: 0, duration: 700, onUpdate: smuts, onComplete: () => damm.destroy() });
+    });
+    // snöväggen: fronten stannar och blir en vägg av snö över dem, som smular (Stils ras_vagg_01–02, annars
+    // snomassa_01–02, annars gråbox)
+    const vagg = ramar('ras_vagg', 2).length === 2 ? ['ras_vagg_01', 'ras_vagg_02'] : this.regiram('snomassa_01') && this.regiram('snomassa_02') ? ['snomassa_01', 'snomassa_02'] : null;
     /** @type {any} */ let sno;
-    if (sm && this.regiram('snomassa_02')) {
-      sno = this.add.image(snon.x, snon.y, sm.nyckel, sm.ram);
+    if (vagg) {
+      const sm = /** @type {any} */ (this.regiram(vagg[0]));
+      sno = this.add.image(stopp.x, stopp.y, sm.nyckel, sm.ram);
       let nr = 0;
-      const ev = this.time.addEvent({ delay: 400, loop: true, callback: () => { if (!sno.active) { ev.remove(); return; } nr = 1 - nr; const f = /** @type {any} */ (this.regiram(nr ? 'snomassa_02' : 'snomassa_01')); sno.setTexture(f.nyckel, f.ram); smuts(); } });
+      const ev = this.time.addEvent({ delay: 400, loop: true, callback: () => { if (!sno.active) { ev.remove(); return; } nr = 1 - nr; const f = /** @type {any} */ (this.regiram(vagg[nr])); sno.setTexture(f.nyckel, f.ram); smuts(); } });
     } else {
-      sno = this.add.graphics({ x: snon.x, y: snon.y });
-      sno.fillStyle(0xf4f8fc, 1).fillEllipse(0, 0, 70, 26).fillStyle(0xdbe6ef, 1).fillEllipse(-14, 6, 30, 12).fillEllipse(18, 4, 26, 10);
+      sno = this.add.graphics({ x: stopp.x, y: stopp.y });
+      sno.fillStyle(0xdbe6ef, 1).fillRect(-88, -34, 176, 50).fillStyle(0xf4f8fc, 1).fillEllipse(0, -34, 184, 30).fillRect(-80, -30, 160, 34)
+        .fillStyle(0x8c8378, 1).fillCircle(-50, -10, 4).fillCircle(30, -16, 5).fillCircle(64, -2, 3).fillStyle(0xbfe6ff, 1).fillRect(-14, -4, 8, 6).fillRect(40, -22, 6, 5);
     }
     sno.setAlpha(0); this.lagerLuft.add(sno); this.lagda.push(sno);
     // den igenrasade mynningen (tillståndet ras) syns först när snön har rasat (mynningen_stangs)
     this.k4 = { ...(this.k4 || {}), rasDolt: true };
     const dolj = this.time.addEvent({ delay: 50, loop: true, callback: () => { const r = /** @type {any} */ (this.ritade.get('ras_mynningen')); if (!this.k4?.rasDolt) { dolj.remove(); r?.setVisible?.(true); smuts(); return; } if (r?.visible) { r.setVisible(false); smuts(); } } });
-    // snön rasar och stannar en bit ovanför hjälten och ungen
-    const stopp = { x: Math.round((this.pos.x + m.x) / 2), y: Math.round(Math.min(this.pos.y, this.ungePos.y) - 46) };
-    this.tweens.add({ targets: sno, alpha: 1, duration: 200, delay: tSno, onUpdate: smuts, onStart: () => { this.cameras.main.shake(400, 0.006); this.regiLjud('duns'); } });
-    this.tweens.add({ targets: sno, x: stopp.x, y: stopp.y, duration: 700, delay: tSno + 250, ease: 'Quad.easeIn', onUpdate: smuts });
+    // fronten stannar en bit ovanför hjälten och ungen och blir väggen, som står kvar tills STOR SKÖLD är skriven
+    const tVagg = tSno + rasMs;
+    this.time.delayedCall(tVagg, () => { this.cameras.main.shake(300, 0.006); this.regiLjud('duns'); this.regiFokus = { x: stopp.x, y: stopp.y + 30 }; });
+    this.tweens.add({ targets: sno, alpha: 1, duration: 250, delay: tVagg, onUpdate: smuts });
+    this.tweens.add({ targets: front, alpha: 0, duration: 300, delay: tVagg + 100, onUpdate: smuts });
     this.k4 = { ...(this.k4 || {}), sno };
-    this.time.delayedCall(tSno + 250, () => { this.regiFokus = { x: stopp.x, y: stopp.y + 30 }; });
-    this.time.delayedCall(tSno + 1100, () => { this.regiFokus = null; });
+    this.time.delayedCall(tVagg + 900, () => { this.regiFokus = null; });
     this.k4Logg('blocket_lyfts'); this.k4Logg('snöraset i ett svep'); this.k4Logg('snön stannar i luften');
-    return tSno + 1200;
+    return tVagg + 1000;
   }
 
   /**
@@ -5009,6 +5061,24 @@ export class Rum extends Phaser.Scene {
     this.regiLjud('luftskepp');
     this.tweens.add({ targets: sk, x: x1, y: y - 10, duration: 9000, ease: 'Linear', onUpdate: smuts, onComplete: () => sk.destroy() });
     this.k4Logg('luftskeppet glider förbi över stigen');
+  }
+
+  /**
+   * Något glimtar där en frivillig scen lockar (122.11, istappsgrottan): Stils lockglimt_01–04 tänds och släcks vid
+   * föremålet, annars gråboxens glitter, och föremålet glimtar en stund. @param {string} id
+   */
+  lockGlimt(id) {
+    const o = this.ruta(id); if (!o) return;
+    const p = { x: o.x + o.b / 2, y: o.y + o.h / 2 };
+    const ramar = ['lockglimt_01', 'lockglimt_02', 'lockglimt_03', 'lockglimt_04'].filter((r) => this.regiram(r));
+    if (ramar.length) {
+      const f = /** @type {any} */ (this.regiram(ramar[0]));
+      const img = this.add.image(p.x, p.y, f.nyckel, f.ram); this.lagerLjust.add(img); this.lagda.push(img);
+      ramar.slice(1).forEach((r, i) => this.time.delayedCall(200 * (i + 1), () => { const g = /** @type {any} */ (this.regiram(r)); if (img.active) img.setTexture(g.nyckel, g.ram); this.smutsig = true; }));
+      this.time.delayedCall(200 * ramar.length + 200, () => img.destroy());
+    } else { this.k4Glitter(p, 14); this.time.delayedCall(500, () => this.k4Glitter(p, 10)); }
+    this.markera(id, true); this.time.delayedCall(1600, () => this.markera(id, false));
+    this.k4Logg(`lockglimt vid ${id}`);
   }
 
   /** gatan_i_boken (Innehåll pass 119): hjälten skriver av gåtans rader i sin bok, en liten bok över honom och pennan, tills Stils bild finns. @returns {number} */
@@ -5054,23 +5124,68 @@ export class Rum extends Phaser.Scene {
     return 1400;
   }
 
-  /** De backar in i grottan under bubblan, bubblan slocknar, snön stänger mynningen och det blir kolsvart. @returns {number} */
+  /**
+   * Efter STOR SKÖLD (122.2): bubblan växer runt hjälten och ungen, och bilden byter till grottan inifrån vid ingången.
+   * De springer in genom öppningen, snöraset täpper till den och allt blir svart. Pass 1 slutar i det svarta. Bilden
+   * inifrån är en egen bild över rummet (Stils mynning_inifran_01–04, ca 250 ms per bild, annars gråbox), och den står
+   * kvar svart tills rummet byts. @returns {number}
+   */
   mynningenStangs() {
-    const m = this.k4Punkt('mynningen'); if (!m) return 0;
     const smuts = () => { this.smutsig = true; };
-    const till = { x: m.x, y: m.y + 18 };
-    const ms = Math.round(Math.hypot(till.x - this.pos.x, till.y - this.pos.y) * 12) + 300;
-    const fran = { ...this.pos }, t = { p: 0 };
-    this.tweens.add({ targets: t, p: 1, duration: ms, onUpdate: () => { this.pos = { x: fran.x + (till.x - fran.x) * t.p, y: fran.y + (till.y - fran.y) * t.p }; this.placera(); smuts(); } });
-    if (this.unge.visible) this.ungeGarTill({ x: till.x - 14, y: till.y });
     const b = this.k4?.bubbla, sno = this.k4?.sno;
-    if (b?.active) this.tweens.add({ targets: b, x: till.x, y: till.y - 10, duration: ms, onUpdate: smuts, onComplete: () => this.tweens.add({ targets: b, alpha: 0, duration: 300, onUpdate: smuts }) });
-    if (sno?.active) this.tweens.add({ targets: sno, x: m.x, y: m.y + 6, duration: 500, delay: ms + 200, ease: 'Quad.easeIn', onUpdate: smuts, onComplete: () => { sno.setVisible(false); if (this.k4) this.k4.rasDolt = false; } });
-    else if (this.k4) this.time.delayedCall(ms + 700, () => { if (this.k4) this.k4.rasDolt = false; });
-    this.time.delayedCall(ms + 600, () => { this.cameras.main.fade(500, 0, 0, 0); this.cameras.main.shake(300, 0.006); });
-    this.time.delayedCall(ms + 2200, () => { this.cameras.main.resetFX(); this.cameras.main.fadeIn(1); smuts(); });
+    // 1. bubblan växer fram runt dem, och snöväggen trycker mot den
+    if (b?.active) this.tweens.add({ targets: b, scale: (b.scale || 1) * 1.2, duration: 500, ease: 'Back.easeOut', onUpdate: smuts });
+    if (sno?.active) this.tweens.add({ targets: sno, y: sno.y + 8, duration: 500, ease: 'Quad.easeIn', onUpdate: smuts });
+    this.regiLjud('glitter');
+    // 2. bilden byter till grottan inifrån (en svart övertoning, sedan bilden vid ingången)
+    const vy = this.cameras.main.worldView;
+    const x0 = Math.round(vy.x), y0 = Math.round(vy.y), B = 320, H = 192;
+    const lager = this.add.container(0, 0); this.lagerLjust.add(lager); this.lagda.push(lager);
+    const svart = this.add.rectangle(x0, y0, B, H, 0x000000, 1).setOrigin(0, 0).setAlpha(0);
+    lager.add(svart);
+    const vy0 = 700;
+    this.tweens.add({ targets: svart, alpha: 1, duration: 300, delay: vy0 - 300, onUpdate: smuts });
+    const inne = this.add.container(0, 0).setAlpha(0); lager.add(inne);
+    const mitt = { x: x0 + B / 2, y: y0 + H - 28 };
+    const ramar = ['mynning_inifran_01', 'mynning_inifran_02', 'mynning_inifran_03', 'mynning_inifran_04'].filter((r) => this.regiram(r));
+    /** @type {any} */ let oppning;
+    /** @type {any} */ let snoIn = null;
+    if (ramar.length === 4) {
+      inne.add(this.add.rectangle(x0, y0, B, H, 0x1b2430, 1).setOrigin(0, 0));
+      const f = /** @type {any} */ (this.regiram(ramar[0])); oppning = this.add.image(mitt.x, y0 + H, f.nyckel, f.ram).setOrigin(0.5, 1); inne.add(oppning);
+    } else {
+      // gråbox: isväggar i den smala gången, och öppningen i söder med dagsljus
+      const g = this.add.graphics();
+      g.fillStyle(0x1b2430, 1).fillRect(x0, y0, B, H).fillStyle(0x3a4a5c, 1).fillRect(x0 + 110, y0, 100, H).fillStyle(0x56687c, 1).fillRect(x0 + 126, y0, 68, H)
+        .fillStyle(0xdfeaf2, 1).fillRect(mitt.x - 28, y0 + H - 44, 56, 44).fillStyle(0xf8fbfd, 1).fillRect(mitt.x - 20, y0 + H - 36, 40, 36);
+      inne.add(g); oppning = g;
+      snoIn = this.add.graphics(); inne.add(snoIn);
+    }
+    // hjälten och ungen springer in genom öppningen, uppåt in i gången
+    const hjTex = this.hjalteTextur, hjUpp = this.textures.get(hjTex).has('hjalte_ga_upp_01') ? ['hjalte_ga_upp_01', 'hjalte_ga_upp_02'] : null;
+    const hj = hjUpp ? this.add.image(mitt.x + 6, y0 + H + 4, hjTex, hjUpp[0]).setOrigin(0.5, 1) : this.add.rectangle(mitt.x + 6, y0 + H + 4, 12, 18, 0x3a6ea5, 1).setOrigin(0.5, 1);
+    const uTex = this.ungeBild?.texture?.key, uRam = String(this.ungeBild?.frame?.name || '').replace(/_(ner|upp|vanster|hoger)_0\d$/, '_upp_01');
+    const un = this.unge.visible && uTex && this.textures.get(uTex).has(uRam) ? this.add.image(mitt.x - 10, y0 + H + 10, uTex, uRam).setOrigin(0.5, 1) : null;
+    inne.add(hj); if (un) inne.add(un);
+    const t1 = vy0 + 150;
+    this.tweens.add({ targets: inne, alpha: 1, duration: 250, delay: vy0, onUpdate: smuts });
+    this.tweens.add({ targets: svart, alpha: 0, duration: 250, delay: vy0, onUpdate: smuts });
+    const spring = 900;
+    this.tweens.add({ targets: hj, y: y0 + H - 70, duration: spring, delay: t1, ease: 'Sine.easeOut', onUpdate: smuts });
+    if (un) this.tweens.add({ targets: un, y: y0 + H - 60, duration: spring, delay: t1 + 120, ease: 'Sine.easeOut', onUpdate: smuts });
+    if (hjUpp) this.time.delayedCall(t1, () => { let i = 0; this.time.addEvent({ delay: 140, repeat: Math.round(spring / 140), callback: () => { i = 1 - i; if (hj.active) hj.setFrame(hjUpp[i]); smuts(); } }); });
+    this.time.delayedCall(t1, () => { this.regiLjud('prassel'); this.k4Logg('de springer in i grottan'); });
+    // 3. snöraset täpper till öppningen (Stils bilder, ca 250 ms per bild), och allt blir svart
+    const t2 = t1 + spring + 150;
+    if (ramar.length === 4) ramar.slice(1).forEach((r, i) => this.time.delayedCall(t2 + i * 250, () => { const f = /** @type {any} */ (this.regiram(r)); if (oppning.active) oppning.setTexture(f.nyckel, f.ram); smuts(); }));
+    else for (let i = 1; i <= 4; i++) this.time.delayedCall(t2 + (i - 1) * 250, () => { snoIn?.clear().fillStyle(0xf4f8fc, 1).fillRect(mitt.x - 28, y0 + H - 44 * (i / 4), 56, 44 * (i / 4)).fillStyle(0xdbe6ef, 1).fillEllipse(mitt.x, y0 + H - 44 * (i / 4), 60, 10); smuts(); });
+    this.time.delayedCall(t2, () => { this.cameras.main.shake(400, 0.006); this.regiLjud('duns'); this.k4Logg('snön täpper till öppningen'); });
+    const t3 = t2 + 4 * 250 + 200;
+    this.tweens.add({ targets: svart, alpha: 1, duration: 500, delay: t3, onUpdate: smuts });
+    // ute i stigens rum: snön ligger över mynningen (tillståndet ras), när bilden kommer tillbaka efter en omstart
+    this.time.delayedCall(t3, () => { if (sno?.active) sno.setVisible(false); if (b?.active) b.setVisible(false); if (this.k4) this.k4.rasDolt = false; });
     this.k4Logg('mynningen_stangs');
-    return ms + 1400;
+    return t3 + 700;
   }
 
   /** LJUS i grottan: ljusbollen tänds, och regnbågsljuset bryts i isen så att hela grottan glittrar. @returns {number} */
@@ -5144,6 +5259,15 @@ export class Rum extends Phaser.Scene {
     const o = this.ruta('klippan_uppe') || this.ruta('klippa');
     if (!o) return null;
     const x = o.x + o.b / 2, nere = o.y + o.h, uppe = nere - Math.round(o.h * andel);
+    // Stils klippa_stege, klippa_rep och klippa_trappa (LASMIG_122): bilden tonas fram nedifrån och upp
+    const stil = andel >= 1 ? this.regiram(`klippa_${sort}`) : null;
+    if (stil) {
+      const img = this.add.image(x, nere, stil.nyckel, stil.ram).setOrigin(0.5, 1).setAlpha(0);
+      this.lagerObjekt.add(img); this.lagda.push(img);
+      this.tweens.add({ targets: img, alpha: 1, duration: 700, onUpdate: () => { this.smutsig = true; } });
+      this.b.ljud?.spela('stege');
+      return { g: img, ms: 700, x, uppe: nere - img.height, nere };
+    }
     const g = this.add.graphics();
     const delar = Math.max(1, Math.round((nere - uppe) / 8));
     for (let i = 0; i < delar; i++) {
@@ -5171,8 +5295,27 @@ export class Rum extends Phaser.Scene {
         this.pos = { x: fran.x + (r.x - fran.x) * Math.min(1, t.p * 3), y: fran.y + (till.y - fran.y) * t.p };
         this.vand = { x: 0, y: -1 }; this.placera(); smuts();
       }, onComplete: () => { this.pos = { ...till }; this.placera(); smuts(); } });
-      // ungen kommer efter med svansen först
-      if (this.unge.visible) this.time.delayedCall(700, () => this.ungeBage({ x: r.x - 14, y: r.uppe - 6 }, 1100, 12, () => {}));
+    });
+    // ungen flyger inte (122.4, spelarens regel): den klamrar sig fast under hjälten och biter i ryggsäcken medan han
+    // klättrar. Med Stils hjalte_klattrar_unge_upp_01–02 är ungen med i hjältens bild, annars hänger gråboxens unge
+    // tätt under honom hela vägen upp
+    const klattrar = this.textures.get(this.hjalteTextur).has('hjalte_klattrar_unge_upp_01') ? ['hjalte_klattrar_unge_upp_01', 'hjalte_klattrar_unge_upp_02'] : null;
+    const ungeMed = this.unge.visible;
+    this.time.delayedCall(r.ms + 250, () => {
+      if (ungeMed && !klattrar) this.ungeGarTill({ x: fran.x, y: fran.y + 6 });
+      if (ungeMed && klattrar) this.unge.setVisible(false);
+    });
+    const halla = this.time.addEvent({ delay: 50, loop: true, startAt: 0, callback: () => {
+      if (t.p <= 0 || !ungeMed) return;
+      if (klattrar) { this.kropp?.setFrame?.(klattrar[Math.floor(this.time.now / 220) % 2]); }
+      else { this.ungePos = { x: this.pos.x - 3, y: this.pos.y + 7 }; this.ungeFast = null; this.placera(); }
+      smuts();
+    } });
+    this.time.delayedCall(r.ms + 300 + 1450, () => {
+      halla.remove();
+      if (ungeMed) { this.unge.setVisible(true); this.ungePos = { x: till.x - 14, y: till.y + 2 }; this.placera(); }
+      if (klattrar) this.ritaHjalte();
+      smuts();
     });
     this.time.delayedCall(r.ms + 2100, () => { this.regiFokus = null; });
     this.k4Logg(`klippan: ${sort} upp`);

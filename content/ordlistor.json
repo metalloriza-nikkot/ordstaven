@@ -2,8 +2,8 @@
  "$schema": "schema/ordlistor.schema.json",
  "format": 1,
  "meta": {
-  "version": "0.20",
-  "datum": "2026-11-22",
+  "version": "0.21",
+  "datum": "2026-11-23",
   "agare": "Innehåll",
   "textform": "Orden lagras med små bokstäver, formler i versaler. Böjda former (skogen, bron) står med när de används som alternativ.",
   "beskrivning": "Ordlistor 1-6 for ORDSTAVEN. Bilderna ar platshallare (emoji) for grabox. Ett ord ligger i den hogsta lista som nagot av dess drag kraver.",
@@ -23,7 +23,8 @@
   "andrat_v017": "2026-11-15 (beslut 95.3–95.4): brevhalva, brevhalvan och brevhalvorna (berättelseord, sammansatt), och rev.",
   "andrat_v018": "2026-11-17 (kapitel 3 v0.3, manus 19 v0.4.1): luckan, vattnet, stå och säcken (kvarnens tavla), fem (hornet), ha (bubblan), horn (Var var vi?) och kvarnen, lossa, hjulet och hornet (uppdragslappen).",
   "andrat_v019": "Kapitel 4 (manus 21 v0.3.1): skyltarna, gåtan, Farfars sten, lådans lock, Var var vi? och uppdragslappen.",
-  "andrat_v020": "Kapitel 4 (manus 21 v0.5): stig 4 och Dinoboken (tand), Var var vi? (gåta), klippan, över och skrivorden vid klippan."
+  "andrat_v020": "Kapitel 4 (manus 21 v0.5): stig 4 och Dinoboken (tand), Var var vi? (gåta), klippan, över och skrivorden vid klippan.",
+  "andrat_v021": "Kapitel 4 (manus 21 v0.6): skatt (valvets stig) och konstig (Farfars sten)."
  },
  "listor": {
   "1": "Korta ljudenliga ord, 2-3 bokstaver, ingen konsonantgrupp, ingen dubbelteckning",
@@ -3233,6 +3234,22 @@
    "tema": "småord",
    "flaggor": [],
    "varfor": "Kapitel 4 v0.3 (manus 21 v0.5): uppdragslappen (HOPPA ÖVER)"
+  },
+  {
+   "ord": "konstig",
+   "lista": 4,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 4 v0.4 (manus 21 v0.6): Farfars sten"
+  },
+  {
+   "ord": "konstiga",
+   "lista": 4,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 4 v0.4 (manus 21 v0.6): stenarnas instruktion"
   }
  ]
 }

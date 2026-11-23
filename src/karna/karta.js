@@ -204,6 +204,8 @@ export function lasKarta(tmj) {
       if (egen.luftskepp) ut.luftskepp = true;
       // tillbaka (121.3) = stigen är en återvändsgränd: när den är klar hoppar han tillbaka till stranden (stig 4 i F3)
       if (egen.tillbaka) ut.tillbaka = true;
+      // lockradie (122.11): det som lockar till en frivillig scen vid föremålet händer redan på så många pixlars avstånd
+      if (typeof egen.lockradie === 'number') ut.lockradie = egen.lockradie;
       if (egen.sovplats) ut.sovplats = true;
       if (egen.skata_fonster) ut.skataFonster = true;
       if (egen.lyser) ut.lyser = true;

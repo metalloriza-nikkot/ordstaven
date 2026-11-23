@@ -11,7 +11,7 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 26,
+ "nextobjectid": 36,
  "properties": [
   {
    "name": "rum",
@@ -158,6 +158,186 @@
     },
     {
      "id": 10,
+     "name": "stigspar_in",
+     "type": "sak",
+     "x": 44,
+     "y": 340,
+     "width": 110,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 11,
+     "name": "stigspar_isgrottan_1",
+     "type": "sak",
+     "x": 172,
+     "y": 306,
+     "width": 40,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 12,
+     "name": "stigspar_isgrottan_2",
+     "type": "sak",
+     "x": 206,
+     "y": 296,
+     "width": 40,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 13,
+     "name": "stigspar_isgrottan_3",
+     "type": "sak",
+     "x": 240,
+     "y": 286,
+     "width": 50,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 14,
+     "name": "stigspar_isgrottan_4",
+     "type": "sak",
+     "x": 284,
+     "y": 276,
+     "width": 30,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 15,
+     "name": "stigspar_issjon_1",
+     "type": "sak",
+     "x": 168,
+     "y": 350,
+     "width": 44,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 16,
+     "name": "stigspar_issjon_2",
+     "type": "sak",
+     "x": 206,
+     "y": 358,
+     "width": 150,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 17,
+     "name": "stigspar_eldgrottan_1",
+     "type": "sak",
+     "x": 120,
+     "y": 300,
+     "width": 40,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 18,
+     "name": "stigspar_eldgrottan_2",
+     "type": "sak",
+     "x": 90,
+     "y": 290,
+     "width": 36,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 19,
+     "name": "stigspar_eldgrottan_3",
+     "type": "sak",
+     "x": 60,
+     "y": 280,
+     "width": 36,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 20,
      "name": "skylt_isgrottan",
      "type": "sak",
      "x": 170,
@@ -175,7 +355,7 @@
      ]
     },
     {
-     "id": 11,
+     "id": 21,
      "name": "skylt_issjon",
      "type": "sak",
      "x": 150,
@@ -193,7 +373,7 @@
      ]
     },
     {
-     "id": 12,
+     "id": 22,
      "name": "",
      "type": "vagg",
      "x": 24,
@@ -204,7 +384,7 @@
      "visible": true
     },
     {
-     "id": 13,
+     "id": 23,
      "name": "skylt_eldgrottan",
      "type": "sak",
      "x": 96,
@@ -222,7 +402,7 @@
      ]
     },
     {
-     "id": 14,
+     "id": 24,
      "name": "stig_k4_stig1",
      "type": "sak",
      "x": 296,
@@ -255,7 +435,7 @@
      ]
     },
     {
-     "id": 15,
+     "id": 25,
      "name": "",
      "type": "vagg",
      "x": 24,
@@ -273,7 +453,7 @@
      ]
     },
     {
-     "id": 16,
+     "id": 26,
      "name": "",
      "type": "vagg",
      "x": 24,
@@ -284,7 +464,7 @@
      "visible": true
     },
     {
-     "id": 17,
+     "id": 27,
      "name": "",
      "type": "vagg",
      "x": 24,
@@ -295,7 +475,7 @@
      "visible": true
     },
     {
-     "id": 18,
+     "id": 28,
      "name": "mynningen",
      "type": "sak",
      "x": 552,
@@ -313,7 +493,7 @@
      ]
     },
     {
-     "id": 19,
+     "id": 29,
      "name": "ras_mynningen",
      "type": "sak",
      "x": 552,
@@ -336,7 +516,7 @@
      ]
     },
     {
-     "id": 20,
+     "id": 30,
      "name": "snohog_1",
      "type": "sak",
      "x": 380,
@@ -354,7 +534,7 @@
      ]
     },
     {
-     "id": 21,
+     "id": 31,
      "name": "snohog_2",
      "type": "sak",
      "x": 450,
@@ -372,7 +552,7 @@
      ]
     },
     {
-     "id": 22,
+     "id": 32,
      "name": "snohog_3",
      "type": "sak",
      "x": 540,
@@ -390,7 +570,7 @@
      ]
     },
     {
-     "id": 23,
+     "id": 33,
      "name": "snohog_4",
      "type": "sak",
      "x": 600,
@@ -408,7 +588,7 @@
      ]
     },
     {
-     "id": 24,
+     "id": 34,
      "name": "sten_farfar",
      "type": "sak",
      "x": 470,
@@ -426,7 +606,7 @@
      ]
     },
     {
-     "id": 25,
+     "id": 35,
      "name": "fagel_200_236",
      "type": "omgivning",
      "x": 200,

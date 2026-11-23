@@ -2076,9 +2076,12 @@ export function skapaSpel(d) {
         if (sc.startar_vid && !vidForemal.includes(sc)) continue;
         const o = rum.ruta(l.vid);
         if (!o) continue;
-        const nu = avstandTill(rum.pos, o) <= RUM.ruta * 3;
+        // kartans lockradie (122.11, stig 4): det lockar redan på avstånd (från galleriet), och igen var 12:e sekund
+        // medan han är kvar där, så att en frivillig stig han inte ser ändå syns och hörs
+        const radie = o.lockradie ?? RUM.ruta * 3;
+        const nu = avstandTill(rum.pos, o) <= radie;
         if (!nu) { nara.delete(l.vid); continue; }
-        if (nara.has(l.vid)) continue;
+        if (nara.has(l.vid) && !(o.lockradie && performance.now() - (senast.get(l.vid) ?? -1e9) > 12000)) continue;
         nara.add(l.vid);
         if (performance.now() - (senast.get(l.vid) ?? -1e9) < 4000) continue;
         // står något i vägen (repen på torget) lockar det inte: han kan inte gå dit
@@ -2086,10 +2089,11 @@ export function skapaSpel(d) {
         if (Math.hypot(rum.pos.x - f.x, rum.pos.y - f.y) > 8 && !rum.vagTill(f).length) continue;
         senast.set(l.vid, performance.now());
         logg.handelse('lockar', `${sc.id} vid ${l.vid}`);
-        ljud.spelaRad?.(l.ljud);
+        ljud.spelaRad?.(l.ljud ?? (o.lockradie ? 'klirr' : undefined));
         visaLjudord(l.ljudord, Array.isArray(l.ljud) ? l.ljud[0] : l.ljud, l.vid);
         rum.hoppa(l.vid);
         rum.ungePekar(l.vid);
+        if (o.lockradie) { rum.lockGlimt(l.vid); window.setTimeout(() => rum.ungePekar(null), tid(2500)); }
         const ms = l.bild ? rum.regi(l.bild) : 0;
         if (!ms && lockarVisarBeskrivning(l)) { ui.visaRegi(l.beskrivning, 0); window.setTimeout(() => ui.doljRegi(), tid(Math.min(5000, 1500 + l.beskrivning.split(' ').length * 120))); }
       }
