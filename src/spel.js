@@ -3414,6 +3414,32 @@ export function skapaSpel(d) {
    * rakt fram, upp och ned snett framåt. Ett tryck på ett flak hoppar dit. Ingen klocka räknar, och han börjar
    * aldrig om från början. @param {any} p
    */
+  /**
+   * Väntar tills han har gått till stigens kant själv (122.3). Är han redan nära börjar stigen direkt.
+   * @param {any} p @param {{ strand: { x: number, y: number }, upp: boolean }} lage
+   */
+  async function tillKanten(p, lage) {
+    const nara = () => {
+      const dx = Math.abs(rum.pos.x - lage.strand.x), dy = Math.abs(rum.pos.y - lage.strand.y);
+      return lage.upp ? dx <= 30 && dy <= 14 : dx <= 14 && dy <= 30;
+    };
+    if (nara()) return;
+    rum.frys(false);
+    rum.stigKanten = { ...lage.strand };
+    if (p.instruktion) { visaMoln(null, p.instruktion); placeraMoln([]); }
+    const start = speltid();
+    const k = knuffKlocka({ handling: '' }, () => {
+      const pekar = rum.ungePekar(`stig_${p.id}`);
+      if (p.instruktion) ui.pulseraTanke();
+      logg.handelse('knuff', `${p.id}: ungen nosar mot stigen`, { ungenPekar: pekar });
+    }, undefined, MAL_KNUFF_MS);
+    await new Promise((klar) => { const t = window.setInterval(() => { if (!rum.fryst && nara()) { window.clearInterval(t); klar(undefined); } }, 60); });
+    k.stopp(); rum.ungePekar(null); rum.stigKanten = null;
+    if (p.instruktion) visaMoln(null);
+    logg.handelse('stig', `${p.id}: han är vid kanten`, { sek: Math.round((speltid() - start) / 100) / 10 });
+    rum.frys(true);
+  }
+
   async function bokstavsstig(p) {
     const s = skapaStig(p);
     const g = s.g;
@@ -3421,6 +3447,9 @@ export function skapaSpel(d) {
     // stig 1 går uppför sluttningen (119.4): kartans ankare säger upp
     const lage = rum.visaStig(g, ankare ? { x: ankare.x + ankare.b / 2, y: ankare.y + ankare.h / 2 } : undefined, !!ankare?.upp);
     const fot = (/** @type {{ x: number, y: number }} */ q) => ({ x: q.x, y: q.y + 4 });
+    // 122.3: han går själv till kanten, och stigen börjar när han är där. Flaken syns, men bokstäverna kommer först
+    // vid kanten. Efter en stund nosar ungen mot stigen. Utan ankare (testrummet) står han redan vid kanten
+    if (ankare) await tillKanten(p, lage);
     rum.pos = { ...lage.strand }; rum.vand = lage.upp ? { x: 0, y: -1 } : { x: 1, y: 0 }; rum.placera();
     // kameran visar hela rutnätet medan stigen pågår (i ett större rum stod den kvar där han var, 2.54)
     rum.regiFokus = lage.upp ? { x: lage.strand.x, y: Math.round((lage.strand.y + lage.mal.y) / 2) } : { x: Math.round((lage.strand.x + lage.mal.x) / 2), y: lage.strand.y };

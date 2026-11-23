@@ -89,6 +89,8 @@ export class Rum extends Phaser.Scene {
     super({ key: 'Rum' });
     this.b = b;
     this.pos = { x: RUM.bredd / 2, y: RUM.hojd - 12 };
+    /** @type {{ x: number, y: number } | null} stigens kant medan han går dit själv (122.3) */
+    this.stigKanten = null;
     /** @type {Promise<HTMLImageElement | null> | null} bilden av rummet som tas nu (bild()) */
     this.bildKo = null;
     /**

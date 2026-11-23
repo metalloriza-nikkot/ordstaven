@@ -178,7 +178,7 @@ RUMMEN = {
                 # F2
                 (382, 296, 28, 70), (214, 340, 196, 26), (214, 322, 90, 20),
                 # E, landningen, hyllan vid sprickan och nischen
-                (486, 246, 140, 50), (486, 30, 140, 52), (536, 10, 44, 20),
+                (486, 246, 140, 50), (494, 30, 132, 52), (536, 10, 44, 20),
                 # F3: västra stranden (från galleriet) och östra stranden (vägg mot landningen)
                 (414, 296, 22, 88), (600, 302, 26, 82),
             ], vatten=[
@@ -208,7 +208,7 @@ RUMMEN = {
             sak('spricka', 548, 10, 24, 16, sida='under'),
             sak('utgang_stenfalt', 548, 0, 24, 14, sida='under'),
             # F3: Farfars ristning av en tand på västra stranden, stig 4 (tand) österut, och tanden i isen längst in
-            sak('ristning_tand', 414, 298, 20, 8, sida='under'),
+            sak('ristning_tand', 408, 318, 6, 18, sida='hoger'),
             *stig('k4_stig4', (520, 342), 4, 3, 296, 384, tillbaka=True),
             sak('tand_isen', 604, 304, 20, 12, sida='under'),
         ],

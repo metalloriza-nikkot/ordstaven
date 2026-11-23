@@ -25,6 +25,15 @@ function gaMotSida(id) {
   window.__ORDSTAVEN.gaMot(p[0], p[1]); return true;
 }
 
+/** Går till bokstavsstigens kant om stigen väntar på det (122.3), och väntar tills bokstäverna står. @param {any} page */
+async function tillKanten(page) {
+  const k = await page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').stigKanten);
+  if (!k) return false;
+  await page.evaluate(({ x, y }) => window.__ORDSTAVEN.gaMot(x, y), k);
+  await page.locator('#stigord .flakord').first().waitFor({ timeout: 15000 }).catch(() => {});
+  return true;
+}
+
 /** Starta kapitel 4 vid en scen, med namnen klara. @param {any} page @param {string} scenId */
 async function starta(page, scenId, steg = 0, rumstillstand = {}) {
   const scen = kap.scener.findIndex((s) => s.id === scenId);
@@ -72,6 +81,8 @@ async function spelaPasset(page, namn) {
     if (r && !bilder.has(`${r}-${st?.typ}`) && !(await page.locator('#plattan').isVisible()) && st?.typ !== 'mellanscen') {
       bilder.add(`${r}-${st?.typ}`); await page.screenshot({ path: `test-results/kap4-${namn}-${r}-${st?.pussel_id || st?.typ}.png` });
     }
+    // 122.3: han går själv till stigens kant, och bokstäverna kommer när han är där
+    if (p?.typ === 'P18_bokstavsstig') await tillKanten(page);
     // bokstavsstigen: ett tryck på nästa rätta flak (klo först i stig 3)
     if (p?.typ === 'P18_bokstavsstig' && await page.locator('#stigord .flakord').first().isVisible().catch(() => false)) {
       if (!stigar.has(p.id)) stigar.set(p.id, stigVag(p));
@@ -171,6 +182,7 @@ async function tills(page, sel, ms = 30000) {
   const slut = Date.now() + ms;
   while (Date.now() < slut) {
     if (await page.locator(sel).first().isVisible().catch(() => false)) return;
+    if (sel.includes('flakord')) await tillKanten(page);
     for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
     await page.waitForTimeout(300);
   }
@@ -249,6 +261,8 @@ test('kapitel 4: stig 4 i F3 (tand), och han hoppar tillbaka till stranden (121.
   }
   await page.waitForTimeout(800);
   await page.evaluate(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); r.pos = { x: 430, y: 280 }; r.placera(); });
+  // 122.3: utgången i norr (sprickan) går bara att nå över stig 3, inte från galleriet
+  expect(await page.evaluate(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); return r.hinder.vag(r.pos, { x: 556, y: 40 }).length; })).toBe(0);
   await page.evaluate(gaMotSida, 'ristning_tand');
   await page.waitForTimeout(2500);
   await page.keyboard.press('Space');
