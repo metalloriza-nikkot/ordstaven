@@ -337,7 +337,8 @@ STENFALT_KLIPPA = {
         sak('sten_is', 250, 56, 26, 20, sida='alla'),
         sak('halet', 470, 120, 30, 18, sida='alla'),
         sak('sten_klubba', 560, 44, 26, 20, sida='alla'),
-        sak('lada_farfar', 564, 70, 18, 12, sida='alla'),
+        # lådan ligger tätt under stenen (ingen glipa att klämmas in i), och han står framför den
+        sak('lada_farfar', 564, 64, 18, 12, sida='under'),
         # snödrivorna täcker bara stenarnas fot (gråbox, ritas ovanpå), så att ingen sten är dold
         sak('snodriva_taggar', 106, 114, 34, 8, dekor=True, ovanpa=True),
         sak('snodriva_is', 246, 70, 34, 8, dekor=True, ovanpa=True),

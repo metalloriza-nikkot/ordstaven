@@ -1805,10 +1805,25 @@ export function skapaSpel(d) {
     return lova;
   }
 
+  /** Är föremålet dolt i rummet han är i (rummets innehåll i datan)? @param {string} id */
+  function doltIRummet(id) {
+    const r = b?.kapitel?.rum?.find((/** @type {any} */ x) => x.id === aktuelltRum);
+    return !!r?.innehall?.some((/** @type {any} */ x) => typeof x === 'object' && x.id === id && x.dold);
+  }
+
   /** @param {any} st */
   async function gaTill(st) {
     if (st.mal === 'unge') return gaTillUngen(st);
     rum.frys(false);
+    // han letar efter något som är gömt i rummet ("Leta under stenen!", lådan i kapitel 4): datan visar det inte
+    // först, så det kommer fram som med visa_foremal, och sedan går han dit. Förut stod det inte i rummet, och han gick
+    // aldrig dit (felet i den vuxnes logg på 0.107.0, sedan 0.102.0)
+    if (st.leta && !rum.ruta(st.mal) && !aterAvstickare && doltIRummet(st.mal)) {
+      const v = { typ: 'visa_foremal', foremal: st.mal };
+      logg.handelse('letar', `${st.mal} är gömt och kommer fram`);
+      b.effektUtanfor(v, aktuelltRum ?? null);
+      await visaForemal(v);
+    }
     // (står han kvar i en avstickare efter en omstart finns målet i scenens rum, inte här)
     if (!rum.ruta(st.mal) && !aterAvstickare) { logg.handelse('FEL', 'objektet finns inte i rummet: ' + st.mal); return; }
     if (st.visa_styrhjalp) rum.markera(st.mal, true);

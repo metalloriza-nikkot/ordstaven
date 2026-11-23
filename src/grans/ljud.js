@@ -448,6 +448,21 @@ export function skapaLjud({ tyst = () => false } = {}) {
     },
     musik,
     stycke,
+    /** Finns ljudet (Stils fil eller en inspelning)? @param {string} id */
+    har(id) { return !!EFFEKTER[id] || id in INSPELADE; },
+    /**
+     * Tystnad (126.6): stycket och slingan tonas ut på en kvarts sekund, och efter ms kommer den önskade slingan
+     * tillbaka. Raset dånar, och när snön stannar blir det tyst. @param {number} ms
+     */
+    tystnad(ms) {
+      if (!ac) return;
+      const n = onskad ?? stycket?.namn ?? spelar?.namn ?? null;
+      if (stycket) { const x = stycket; stycket = null; tonaUt(x, 0.25); }
+      if (spelar) { tonaUt(spelar, 0.25); spelar = null; }
+      if (vilar) { clearTimeout(vilar.timer); vilar = null; }
+      onskad = null;
+      window.setTimeout(() => { if (!stycket && !spelar && n && !STYCKEN[n]) musik(n); }, ms);
+    },
     effektSlinga,
     /** För testerna och loggen: ljudslingorna som går i rummet. */
     get slingorNu() { return [...effektSlingor.keys()]; },

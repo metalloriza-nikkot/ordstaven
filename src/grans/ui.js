@@ -846,6 +846,8 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     kamera,
     /** När kameran har flyttat sig. @param {() => void} f */
     vidKamera(f) { kameraLyssnare.add(f); return () => kameraLyssnare.delete(f); },
+    /** Berget på långt håll (126.6): världens skala stämmer inte med textlagret, så det göms. @param {boolean} pa */
+    fjarrvy(pa) { $('#varldslager').classList.toggle('fjarran', !!pa); },
     glid, tona,
     styrhjalp,
     flygBar,

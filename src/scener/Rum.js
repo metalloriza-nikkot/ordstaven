@@ -1114,6 +1114,7 @@ export class Rum extends Phaser.Scene {
       blocket_lyfts: () => this.blocketLyfts(),
       stor_skold_ras: () => this.storSkoldRas(),
       mynningen_stangs: () => this.mynningenStangs(),
+      ungens_ogon: () => this.ungensOgon(),
       grottan_glittrar: () => this.grottanGlittrar(),
       grottan_visar_vaggen: () => this.grottanVisarVaggen(),
       isblock_svavar: () => this.isblockSvavar(),
@@ -4067,7 +4068,7 @@ export class Rum extends Phaser.Scene {
     let viaHissen = false;
     if (v.nyttRum || !this.harRum) { this.rumsbild = (this.harRum && v.karta?.bild) || null; this.falt = faltFor(this.rumsbild); this.mark = (this.harRum && v.karta?.mark) || null; this.rumId = v.rum; this.markObjekt = v.karta?.objekt || []; }
     this.visaUnge = v.unge;
-    if (v.nyttRum) { for (const id of [...this.ramSlinga.keys(), ...this.ramTimrar.keys()]) this.stoppaRamar(id); this.ramFor.clear(); this.dolda.clear(); this.ungeMal = null; this.ungeTittarPa = null; this.ungeKlattrar = null; this.stegeNu = null; this.ungeSang = null; this.ungeLyft = 0; this.ungeFast = null; this.hjalteFast = null; this.lerig = 0; this.undvik = []; this.hinderUndvik = null; this.regiFokus = null; this.forstFokus = false; if (this.ungeSvavar) { this.ungeSvavar.g.destroy(); this.ungeSvavar = null; } for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas?.remove(); this.sover = null; } this.vaknar = null; this.rensaRegi(); this.k3UngeIVattnet = false; this.k3Huvud = null; this.k3Mjol = null; this.k3Skugga = null; this.k3Simmar = null; this.k3Ankare = null; this.k3Bubbla = null; this.k3AnkareMitt = null; this.k4 = null; this.rensaStig(); viaHissen = this.k3IHissen; this.k3IHissen = false; this.hjalte.setAlpha(1); this.unge.setAlpha(1); this.naraVinkat.clear(); this.blasNr++; if (this.hjaltePose?.startsWith('hjalte_blaser_')) this.sattPose(null); }
+    if (v.nyttRum) { for (const id of [...this.ramSlinga.keys(), ...this.ramTimrar.keys()]) this.stoppaRamar(id); this.ramFor.clear(); this.dolda.clear(); this.ungeMal = null; this.ungeTittarPa = null; this.ungeKlattrar = null; this.stegeNu = null; this.ungeSang = null; this.ungeLyft = 0; this.ungeFast = null; this.hjalteFast = null; this.lerig = 0; this.undvik = []; this.hinderUndvik = null; this.regiFokus = null; this.forstFokus = false; if (this.ungeSvavar) { this.ungeSvavar.g.destroy(); this.ungeSvavar = null; } for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas?.remove(); this.sover = null; } this.vaknar = null; this.rensaRegi(); this.k3UngeIVattnet = false; this.k3Huvud = null; this.k3Mjol = null; this.k3Skugga = null; this.k3Simmar = null; this.k3Ankare = null; this.k3Bubbla = null; this.k3AnkareMitt = null; if (this.k4?.fjarran) { this.cameras.main.setZoom(1); this.b.vidFjarrvy?.(false); } this.k4 = null; this.rensaStig(); viaHissen = this.k3IHissen; this.k3IHissen = false; this.hjalte.setAlpha(1); this.unge.setAlpha(1); this.naraVinkat.clear(); this.blasNr++; if (this.hjaltePose?.startsWith('hjalte_blaser_')) this.sattPose(null); }
     this.tillstand = v.tillstand;
     // figurerna på kvällen (84.2): bilderna byggs första gången, sedan byts bara atlasens källa
     sattKvall(this, this.harRum && v.tillstand === 'kvall' ? KVALL_TABELL : null);
@@ -4983,11 +4984,17 @@ export class Rum extends Phaser.Scene {
     }
     front.setAlpha(0); this.lagerLuft.add(front); this.lagda.push(front);
     if (frontRamar.length > 1) { let i = 0; const ev = this.time.addEvent({ delay: 90, loop: true, callback: () => { if (!front.active || !front.visible) { ev.remove(); return; } i = (i + 1) % frontRamar.length; const f = /** @type {any} */ (this.regiram(frontRamar[i])); front.list.forEach((/** @type {any} */ b, k) => { const g = /** @type {any} */ (this.regiram(frontRamar[(i + k) % frontRamar.length])); b.setTexture(g.nyckel, g.ram); }); void f; smuts(); } }); }
+    // 126.6: raset i stor skala. Kameran klipper till berget på långt håll (hela rummet på en skärm, figurerna små),
+    // och raset dånar nedför hela berget. Ungen kryper bakom hjälten medan snön kommer. När snön stannar klipper
+    // kameran tillbaka till dem, och det blir tyst. Bara kamerans skala, läge, opacitet och bildbyte (golvdatorn)
+    const fjarr = this.fjarrvy(true, tSno);
     this.time.delayedCall(tSno, () => {
       front.setAlpha(1); this.cameras.main.shake(500, 0.007); this.regiLjud('rassel'); this.k4Logg('raset nedför berget');
-      this.regiFokus = { x: front.x, y: Math.max(96, front.y + 40) };
+      if (!fjarr) this.regiFokus = { x: front.x, y: Math.max(96, front.y + 40) };
     });
-    this.tweens.add({ targets: front, y: stopp.y - 6, duration: rasMs, delay: tSno, ease: 'Quad.easeIn', onUpdate: () => { this.regiFokus = { x: front.x, y: Math.max(96, front.y + 50) }; smuts(); } });
+    this.time.delayedCall(tSno + 900, () => { this.regiLjud('rassel'); this.cameras.main.shake(400, 0.005); });
+    this.time.delayedCall(tSno + Math.round(rasMs * 0.4), () => this.ungeBakomHjalten());
+    this.tweens.add({ targets: front, y: stopp.y - 6, duration: rasMs, delay: tSno, ease: 'Quad.easeIn', onUpdate: () => { if (!fjarr) this.regiFokus = { x: front.x, y: Math.max(96, front.y + 50) }; smuts(); } });
     // stenarna studsar nedför framför fronten (bildbyte i stället för att snurra), och snödammet yr upp och tonar bort
     // Stils ras_sten_01–04 (16 × 14) och ras_sten_liten_01–04 (10 × 9), som snurrar med ca 80 ms per bild
     const stora = ['ras_sten_01', 'ras_sten_02', 'ras_sten_03', 'ras_sten_04'].filter((r) => this.regiram(r));
@@ -5034,13 +5041,74 @@ export class Rum extends Phaser.Scene {
     const dolj = this.time.addEvent({ delay: 50, loop: true, callback: () => { const r = /** @type {any} */ (this.ritade.get('ras_mynningen')); if (!this.k4?.rasDolt) { dolj.remove(); r?.setVisible?.(true); smuts(); return; } if (r?.visible) { r.setVisible(false); smuts(); } } });
     // fronten stannar en bit ovanför hjälten och ungen och blir väggen, som står kvar tills STOR SKÖLD är skriven
     const tVagg = tSno + rasMs;
-    this.time.delayedCall(tVagg, () => { this.cameras.main.shake(300, 0.006); this.regiLjud('duns'); this.regiFokus = { x: stopp.x, y: stopp.y + 30 }; });
+    this.time.delayedCall(tVagg, () => {
+      this.cameras.main.shake(300, 0.006); this.regiLjud('duns');
+      // tillbaka till dem, och tyst (126.6): stycket och slingan tystnar en stund medan snön hänger över dem
+      this.regiFokus = { x: stopp.x, y: stopp.y + 30 };
+      if (fjarr) this.fjarrvy(false);
+      this.b.ljud?.tystnad?.(2600); this.k4Logg('tystnad när snön stannar');
+    });
+    // ungen kikar fram bakom hjälten och tittar upp på snön
+    this.time.delayedCall(tVagg + 700, () => this.ungeKikarFram());
     this.tweens.add({ targets: sno, alpha: 1, duration: 250, delay: tVagg, onUpdate: smuts });
     this.tweens.add({ targets: front, alpha: 0, duration: 300, delay: tVagg + 100, onUpdate: smuts });
     this.k4 = { ...(this.k4 || {}), sno };
-    this.time.delayedCall(tVagg + 900, () => { this.regiFokus = null; });
+    this.time.delayedCall(tVagg + 2400, () => { this.regiFokus = null; });
     this.k4Logg('blocket_lyfts'); this.k4Logg('snöraset i ett svep'); this.k4Logg('snön stannar i luften');
-    return tVagg + 1000;
+    return tVagg + 2500;
+  }
+
+  /**
+   * Berget på långt håll (126.6): kameran visar hela rummet på en skärm (skalan hälften), med figurerna små, från ms
+   * (eller av direkt). Det går bara i ett rum som är 2 × 2 skärmar eller mindre, och textlagret i världen göms medan
+   * skalan inte stämmer med det. @param {boolean} pa @param {number} [om] ms @returns {boolean} om det går
+   */
+  fjarrvy(pa, om = 0) {
+    const k = this.cameras.main;
+    if (pa && (this.storlek.bredd > 640 || this.storlek.hojd > 384 || enSkarm(this.storlek))) return false;
+    const gor = () => {
+      const S = this.storlek;
+      this.k4 = { ...(this.k4 || {}), fjarran: pa };
+      if (pa) {
+        // klipp (ingen glidning): hela rummet mitt på skärmen, i halva skalan
+        k.setZoom(0.5);
+        this.sattKamera({ x: Math.round(S.bredd / 2 - RUM.bredd / 2), y: Math.round(S.hojd / 2 - RUM.hojd / 2) });
+        this.k4Logg('raset på långt håll');
+      } else {
+        // klipp tillbaka till dem (regiFokus, annars hjälten)
+        k.setZoom(1);
+        const f = this.regiFokus ?? this.pos;
+        this.sattKamera({ x: Math.max(0, Math.min(S.bredd - RUM.bredd, f.x - RUM.bredd / 2)), y: Math.max(0, Math.min(S.hojd - RUM.hojd, f.y - RUM.hojd / 2)) });
+      }
+      this.b.vidFjarrvy?.(pa);
+      this.smutsig = true;
+    };
+    if (om > 0) this.time.delayedCall(om, gor); else gor();
+    return true;
+  }
+
+  /** Ungen kryper ihop bakom hjälten, på andra sidan om raset (126.6). */
+  ungeBakomHjalten() {
+    if (!this.unge.visible) return;
+    const fran = { ...this.ungePos }, mal = { x: this.pos.x - 3, y: this.pos.y + 7 };
+    this.ungeMal = { x: mal.x, y: mal.y, mot: -Math.PI / 2 };
+    const t = { p: 0 };
+    this.tweens.add({ targets: t, p: 1, duration: 450, ease: 'Sine.easeOut', onUpdate: () => { this.ungePos = { x: fran.x + (mal.x - fran.x) * t.p, y: fran.y + (mal.y - fran.y) * t.p }; this.placera(); this.smutsig = true; },
+      onComplete: () => { this.ungeLage('kryper_ihop', 'ner', 200, 3); } });
+    this.k4Logg('ungen kryper bakom hjälten');
+  }
+
+  /** Ungen kikar fram bakom hjälten och tittar upp på snön som hänger över dem, och kryper tillbaka (126.6). */
+  ungeKikarFram() {
+    if (!this.unge.visible) return;
+    const hem = { ...this.ungePos }, ut = { x: hem.x + 9, y: hem.y - 2 };
+    const t = { p: 0 };
+    this.tweens.chain({ targets: t, tweens: [
+      { p: 1, duration: 350, ease: 'Sine.easeOut', onUpdate: () => { this.ungePos = { x: hem.x + (ut.x - hem.x) * t.p, y: hem.y + (ut.y - hem.y) * t.p }; this.placera(); this.smutsig = true; },
+        onComplete: () => { this.ungeLage('lyssnar', 'upp', 400, 2); } },
+      { p: 0, duration: 400, delay: 1400, ease: 'Sine.easeIn', onUpdate: () => { this.ungePos = { x: hem.x + (ut.x - hem.x) * t.p, y: hem.y + (ut.y - hem.y) * t.p }; this.placera(); this.smutsig = true; } },
+    ] });
+    this.k4Logg('ungen kikar fram');
   }
 
   /**
@@ -5193,8 +5261,41 @@ export class Rum extends Phaser.Scene {
     this.tweens.add({ targets: svart, alpha: 1, duration: 500, delay: t3, onUpdate: smuts });
     // ute i stigens rum: snön ligger över mynningen (tillståndet ras), när bilden kommer tillbaka efter en omstart
     this.time.delayedCall(t3, () => { if (sno?.active) sno.setVisible(false); if (b?.active) b.setVisible(false); if (this.k4) this.k4.rasDolt = false; });
+    // där ungen står inne i grottan, när dess ögon tänds i mörkret (ungens_ogon, 126.7)
+    this.k4 = { ...(this.k4 || {}), inne: { lager, x: un ? un.x : mitt.x + 10, y: y0 + H - 60 } };
     this.k4Logg('mynningen_stangs');
     return t3 + 700;
+  }
+
+  /**
+   * Ungens ögon i mörkret (124.6, 126.7): efter det svarta tänds två små ljus svagt där ungen står, och ungen blinkar en
+   * gång med ett litet ljud. Stils bilder `unge_ogon_morker_01–02` (öppna och blinkande) och ljudet `unge_blinkar`
+   * när de finns, annars gråbox och `lucka_pip`. Ögonen står kvar till passets slut. @returns {number}
+   */
+  ungensOgon() {
+    const smuts = () => { this.smutsig = true; };
+    const inne = this.k4?.inne, vy = this.cameras.main.worldView;
+    const p = inne ? { x: Math.round(inne.x), y: Math.round(inne.y) } : { x: Math.round(vy.x + vy.width / 2), y: Math.round(vy.y + vy.height - 60) };
+    let lager = inne?.lager;
+    if (!lager?.active) {
+      // utan scenen före (en omstart): ett svart lager över skärmen
+      lager = this.add.container(0, 0); this.lagerLjust.add(lager); this.lagda.push(lager);
+      lager.add(this.add.rectangle(Math.round(vy.x), Math.round(vy.y), vy.width, vy.height, 0x000000, 1).setOrigin(0, 0));
+    }
+    const oppna = this.regiram('unge_ogon_morker_01'), blink = this.regiram('unge_ogon_morker_02');
+    /** @type {any} */ let ogon;
+    if (oppna) ogon = this.add.image(p.x, p.y, oppna.nyckel, oppna.ram);
+    else { ogon = this.add.graphics({ x: p.x, y: p.y }); ogon.fillStyle(0xfff2a8, 1).fillCircle(-3, 0, 1.5).fillCircle(3, 0, 1.5); }
+    ogon.setAlpha(0); lager.add(ogon);
+    this.tweens.add({ targets: ogon, alpha: 0.75, duration: 700, delay: 300, ease: 'Sine.easeIn', onUpdate: smuts });
+    const ljud = this.b.ljud?.har?.('unge_blinkar') ? 'unge_blinkar' : 'lucka_pip';
+    this.time.delayedCall(1500, () => {
+      if (blink && oppna) { ogon.setTexture(blink.nyckel, blink.ram); this.time.delayedCall(160, () => { if (ogon.active) ogon.setTexture(oppna.nyckel, oppna.ram); smuts(); }); }
+      else this.tweens.add({ targets: ogon, scaleY: 0.15, duration: 80, yoyo: true, onUpdate: smuts });
+      this.regiLjud(ljud); smuts();
+    });
+    this.k4Logg('ungens ögon tänds i mörkret');
+    return 2400;
   }
 
   /** LJUS i grottan: ljusbollen tänds, och regnbågsljuset bryts i isen så att hela grottan glittrar. @returns {number} */
@@ -5386,8 +5487,8 @@ export class Rum extends Phaser.Scene {
   /** Locket fjädrar upp, och kartbit fem ligger i lådan. @returns {number} */
   ladanOppnas() {
     const o = this.ruta('lada_farfar') || this.ruta('sten_klubba'); if (!o) return 0;
-    const r = /** @type {any} */ (this.ritade.get('lada_farfar'));
-    const bild = (/** @type {string} */ n) => { const f = this.regiram(n); if (r?.setTexture && f) { r.setTexture(f.nyckel, f.ram); this.smutsig = true; } };
+    // lådan hämtas varje gång: rummet kan ha ritats om under tiden (visa_foremal), och då är den gamla bilden borta
+    const bild = (/** @type {string} */ n) => { const r = /** @type {any} */ (this.ritade.get('lada_farfar')), f = this.regiram(n); if (r?.active && r.setTexture && f) { r.setTexture(f.nyckel, f.ram); this.smutsig = true; } };
     bild('lada_farfar_klick');
     this.time.delayedCall(300, () => bild('lada_farfar_oppnas'));
     this.time.delayedCall(450, () => bild('lada_farfar_oppen'));
@@ -5961,6 +6062,8 @@ export class Rum extends Phaser.Scene {
   flyttaKameran(dtMs) {
     const S = this.storlek;
     if (enSkarm(S)) { if (this.kamera.x || this.kamera.y) this.sattKamera({ x: 0, y: 0 }); return; }
+    // berget på långt håll (126.6): kameran står still över hela rummet
+    if (this.k4?.fjarran) return;
     // ungen som svävar iväg i bubblan (69.5) ska synas: kameran följer den tills den följer hjälten
     // ljuset som hoppar mellan lyktorna (71.6): kameran följer ljuset ned till udden, och sedan hjälten igen
     const fokus = this.regiFokus ?? ((this.ungeSvavar && !this.ungeSvavar.foljer && this.ungeSvavar.r > 0) || this.ungeFast?.farg === 'vatten' ? this.ungePos : this.pos);

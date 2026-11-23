@@ -143,8 +143,37 @@ test('kapitel 4 pass 1: skyltarna, stig 1, snön, Farfars sten och STOR SKÖLD m
   expect(loggen).toMatch(/\[formel\] k4_stor_skold: klar/);
   // raset är en scen på ca 12 s (121.2), och i testläget hinner passet längre än regin: vänta in hela scenen
   const regi = async () => (await page.evaluate(() => window.__ORDSTAVEN.grafik())).regi.join('\n');
-  for (const r of ['ankomst_berget', 'baronen_kikare_berg', 'luftskeppet glider förbi över stigen', 'blocket_lyfts', 'fel knut', 'rätt knut', 'baronen hejar', 'blocket rycks loss', 'snöraset i ett svep', 'raset nedför berget', 'stor_skold_ras', 'mynningen_stangs', 'de springer in i grottan', 'snön täpper till öppningen']) await expect.poll(regi, { timeout: 20000 }).toContain(r);
+  for (const r of ['ankomst_berget', 'baronen_kikare_berg', 'luftskeppet glider förbi över stigen', 'blocket_lyfts', 'fel knut', 'rätt knut', 'baronen hejar', 'blocket rycks loss', 'snöraset i ett svep', 'raset nedför berget', 'stor_skold_ras', 'mynningen_stangs', 'de springer in i grottan', 'snön täpper till öppningen', 'raset på långt håll', 'ungen kryper bakom hjälten', 'tystnad när snön stannar', 'ungen kikar fram']) await expect.poll(regi, { timeout: 20000 }).toContain(r);
   expect(loggen).toContain('[stig] k4_stig1: ungen skuttar i spåret');
+});
+
+test('kapitel 4: raset på långt håll, tystnaden, ungen bakom hjälten och ungens ögon i mörkret (126.6–126.7)', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(120000);
+  const steg = kap.scener.find((s) => s.id === 'k4s02_mynningen').steg.findIndex((s) => s.typ === 'mellanscen' && s.bild === 'blocket_lyfts');
+  await starta(page, 'k4s02_mynningen', steg);
+  const zoom = () => page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').cameras.main.zoom);
+  // kameran visar hela berget med figurerna små, och textlagret i världen är gömt under tiden
+  for (let i = 0; i < 80 && (await zoom()) !== 0.5; i++) {
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    await page.waitForTimeout(250);
+  }
+  expect(await zoom()).toBe(0.5);
+  await expect(page.locator('#varldslager')).toHaveClass(/fjarran/);
+  await page.screenshot({ path: 'test-results/kap4-raset-langt-hall.png' });
+  // när snön stannar är kameran tillbaka hos dem, och ungen sitter bakom hjälten
+  await expect.poll(zoom, { timeout: 30000 }).toBe(1);
+  await expect(page.locator('#varldslager')).not.toHaveClass(/fjarran/);
+  const r = await page.evaluate(() => { const x = window.__ORDSTAVEN.spel.scene.getScene('Rum'); return { h: x.pos, u: x.ungePos }; });
+  expect(r.u.y).toBeGreaterThan(r.h.y);
+  expect(Math.abs(r.u.x - r.h.x)).toBeLessThan(14);
+  await page.screenshot({ path: 'test-results/kap4-raset-snon-stannar.png' });
+  const regi = async () => (await page.evaluate(() => window.__ORDSTAVEN.grafik())).regi.join('\n');
+  for (const t of ['raset på långt håll', 'ungen kryper bakom hjälten', 'tystnad när snön stannar', 'ungen kikar fram']) await expect.poll(regi, { timeout: 15000 }).toContain(t);
+  // ungens ögon tänds i det svarta, och ungen blinkar med ett litet ljud
+  await page.evaluate(() => window.__ORDSTAVEN.regi('ungens_ogon'));
+  await expect.poll(regi, { timeout: 8000 }).toContain('ungens ögon tänds i mörkret');
+  await expect.poll(regi, { timeout: 8000 }).toMatch(/ljud:(unge_blinkar|lucka_pip)/);
 });
 
 test('kapitel 4 pass 2: mörkret, LJUS, gemenernas vägg, salen med stig 2 och valvet (124.2)', async ({ page }, info) => {
@@ -179,6 +208,9 @@ test('kapitel 4 pass 3: gåtan i galleriet, stig 3 med klo, klippan, stenarna, o
   expect(await page.evaluate(() => window.__ORDSTAVEN.tillstand().aventyr['den-gomda-dalen'].lappar)).toContain('k4_stenarna');
   // 124.4: klo knakar på o (ett fel), och ingen återvändsgränd går att nå
   expect(loggen).toMatch(/\[stig\] k4_stig3: klar, 1 fel, 0 återvändsgränder/);
+  // den vuxnes logg på 0.107.0: lådan under stenen är gömd, och han går dit när den har kommit fram
+  expect(loggen).toContain('[letar] lada_farfar');
+  expect(loggen).not.toContain('[FEL]');
   expect(loggen).toMatch(/\[formel\] k4_klippan: stege_klippan/);
   expect(loggen).toContain('[val] k4_stenarna: sten_klubba');
   expect(loggen).toMatch(/\[val\] k4_ladan: VARM .*klar/);

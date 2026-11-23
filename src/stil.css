@@ -133,6 +133,8 @@ html, body {
 #ui > * { pointer-events: auto; }
 #ui [hidden] { display: none !important; }
 #etiketter { pointer-events: none !important; position: absolute; inset: 0; }
+/* berget på långt håll (126.6): textlagret i världen göms medan kameran visar hela rummet */
+#varldslager.fjarran { visibility: hidden; }
 /* Världslagret: allt i textlagret som sitter på något i världen. Det flyttas med kameran (translate), och i ett
    område som är större än skärmen klipps det vid rummets kanter. */
 #varldslager { position: absolute; inset: 0; z-index: 4; pointer-events: none !important; }
