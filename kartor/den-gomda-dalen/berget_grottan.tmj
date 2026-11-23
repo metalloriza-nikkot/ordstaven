@@ -1427,6 +1427,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "bild",
+       "type": "string",
+       "value": "ristning_tand"
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "hoger"
@@ -1513,6 +1518,21 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "anim_ms",
+       "type": "int",
+       "value": 500
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "tand_isen_01"
+      },
+      {
+       "name": "bild_anim",
+       "type": "string",
+       "value": "tand_isen_01,tand_isen_02"
+      },
       {
        "name": "sida",
        "type": "string",

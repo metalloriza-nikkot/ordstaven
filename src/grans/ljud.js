@@ -29,6 +29,8 @@ import styckeOnM4a from '../../assets/ljud/musik/stycke_on.m4a?url';
 import styckeOnOgg from '../../assets/ljud/musik/stycke_on.ogg?url';
 import styckeSegerM4a from '../../assets/ljud/musik/stycke_seger.m4a?url';
 import styckeSegerOgg from '../../assets/ljud/musik/stycke_seger.ogg?url';
+import styckeRasetM4a from '../../assets/ljud/musik/stycke_raset.m4a?url';
+import styckeRasetOgg from '../../assets/ljud/musik/stycke_raset.ogg?url';
 import { pausPlan } from '../karna/musik.js';
 import { EFFEKT_FOR, INSPELAT_FOR, INSPELAT_SPELAS, ljudLista } from '../karna/ljudid.js';
 
@@ -69,6 +71,8 @@ export const STYCKEN = /** @type {Record<string, { m4a: string, ogg: string }>} 
   stycke_on: { m4a: styckeOnM4a, ogg: styckeOnOgg },
   // ordduellens segerstycke (106.5, Stil 10h v0.8)
   stycke_seger: { m4a: styckeSegerM4a, ogg: styckeSegerOgg },
+  // raset i kapitel 4 (121.2, Stil 22/11), följer regin blocket_lyfts
+  stycke_raset: { m4a: styckeRasetM4a, ogg: styckeRasetOgg },
 });
 export const MUSIK_BYTE_S = 1;
 export const MUSIK_EFTER_PAUS_S = 2;

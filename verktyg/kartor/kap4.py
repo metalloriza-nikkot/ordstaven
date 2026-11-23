@@ -42,6 +42,9 @@ FOREMALSBILDER = {
     'spricka': {'bild': 'isvagg_spricka'},
     # snön som har rasat över mynningen (tillståndet ras)
     'ras_mynningen': {'bild': 'mynning_igenrasad'},
+    # stig 4 (LASMIG_122): tanden som glimtar genom isen (ca 500 ms per bild), och Farfars ristning av en tand
+    'tand_isen': {'bild': 'tand_isen_01', 'bild_anim': 'tand_isen_01,tand_isen_02', 'anim_ms': 500},
+    'ristning_tand': {'bild': 'ristning_tand'},
 }
 
 

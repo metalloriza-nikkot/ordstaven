@@ -480,10 +480,70 @@
     "h": 40
    }
   },
-  "lada_farfar_klick": {
+  "klippa_rep": {
    "frame": {
     "x": 0,
     "y": 406,
+    "w": 24,
+    "h": 72
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 72
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 72
+   }
+  },
+  "klippa_stege": {
+   "frame": {
+    "x": 25,
+    "y": 406,
+    "w": 24,
+    "h": 72
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 72
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 72
+   }
+  },
+  "klippa_trappa": {
+   "frame": {
+    "x": 50,
+    "y": 406,
+    "w": 32,
+    "h": 72
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 72
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 72
+   }
+  },
+  "lada_farfar_klick": {
+   "frame": {
+    "x": 0,
+    "y": 479,
     "w": 20,
     "h": 20
    },
@@ -503,7 +563,7 @@
   "lada_farfar_oppen": {
    "frame": {
     "x": 21,
-    "y": 406,
+    "y": 479,
     "w": 20,
     "h": 20
    },
@@ -523,7 +583,7 @@
   "lada_farfar_oppen_tom": {
    "frame": {
     "x": 0,
-    "y": 427,
+    "y": 500,
     "w": 20,
     "h": 20
    },
@@ -543,7 +603,7 @@
   "lada_farfar_oppnas": {
    "frame": {
     "x": 0,
-    "y": 448,
+    "y": 521,
     "w": 20,
     "h": 20
    },
@@ -563,7 +623,7 @@
   "lada_farfar_stangd": {
    "frame": {
     "x": 21,
-    "y": 448,
+    "y": 521,
     "w": 20,
     "h": 20
    },
@@ -578,12 +638,92 @@
    "sourceSize": {
     "w": 20,
     "h": 20
+   }
+  },
+  "lockglimt_01": {
+   "frame": {
+    "x": 0,
+    "y": 542,
+    "w": 8,
+    "h": 8
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 8,
+    "h": 8
+   },
+   "sourceSize": {
+    "w": 8,
+    "h": 8
+   }
+  },
+  "lockglimt_02": {
+   "frame": {
+    "x": 9,
+    "y": 542,
+    "w": 8,
+    "h": 8
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 8,
+    "h": 8
+   },
+   "sourceSize": {
+    "w": 8,
+    "h": 8
+   }
+  },
+  "lockglimt_03": {
+   "frame": {
+    "x": 18,
+    "y": 542,
+    "w": 8,
+    "h": 8
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 8,
+    "h": 8
+   },
+   "sourceSize": {
+    "w": 8,
+    "h": 8
+   }
+  },
+  "lockglimt_04": {
+   "frame": {
+    "x": 27,
+    "y": 542,
+    "w": 8,
+    "h": 8
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 8,
+    "h": 8
+   },
+   "sourceSize": {
+    "w": 8,
+    "h": 8
    }
   },
   "mynning_igenrasad": {
    "frame": {
     "x": 0,
-    "y": 469,
+    "y": 551,
     "w": 64,
     "h": 44
    },
@@ -598,12 +738,412 @@
    "sourceSize": {
     "w": 64,
     "h": 44
+   }
+  },
+  "mynning_inifran_01": {
+   "frame": {
+    "x": 0,
+    "y": 596,
+    "w": 44,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 44,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 44,
+    "h": 48
+   }
+  },
+  "mynning_inifran_02": {
+   "frame": {
+    "x": 45,
+    "y": 596,
+    "w": 44,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 44,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 44,
+    "h": 48
+   }
+  },
+  "mynning_inifran_03": {
+   "frame": {
+    "x": 90,
+    "y": 596,
+    "w": 44,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 44,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 44,
+    "h": 48
+   }
+  },
+  "mynning_inifran_04": {
+   "frame": {
+    "x": 135,
+    "y": 596,
+    "w": 44,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 44,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 44,
+    "h": 48
+   }
+  },
+  "ras_damm_01": {
+   "frame": {
+    "x": 0,
+    "y": 645,
+    "w": 56,
+    "h": 36
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 56,
+    "h": 36
+   },
+   "sourceSize": {
+    "w": 56,
+    "h": 36
+   }
+  },
+  "ras_damm_02": {
+   "frame": {
+    "x": 57,
+    "y": 645,
+    "w": 56,
+    "h": 36
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 56,
+    "h": 36
+   },
+   "sourceSize": {
+    "w": 56,
+    "h": 36
+   }
+  },
+  "ras_damm_03": {
+   "frame": {
+    "x": 114,
+    "y": 645,
+    "w": 56,
+    "h": 36
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 56,
+    "h": 36
+   },
+   "sourceSize": {
+    "w": 56,
+    "h": 36
+   }
+  },
+  "ras_front_01": {
+   "frame": {
+    "x": 0,
+    "y": 682,
+    "w": 112,
+    "h": 56
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 56
+   },
+   "sourceSize": {
+    "w": 112,
+    "h": 56
+   }
+  },
+  "ras_front_02": {
+   "frame": {
+    "x": 113,
+    "y": 682,
+    "w": 112,
+    "h": 56
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 56
+   },
+   "sourceSize": {
+    "w": 112,
+    "h": 56
+   }
+  },
+  "ras_front_03": {
+   "frame": {
+    "x": 226,
+    "y": 682,
+    "w": 112,
+    "h": 56
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 56
+   },
+   "sourceSize": {
+    "w": 112,
+    "h": 56
+   }
+  },
+  "ras_sten_01": {
+   "frame": {
+    "x": 0,
+    "y": 739,
+    "w": 16,
+    "h": 14
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 14
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 14
+   }
+  },
+  "ras_sten_02": {
+   "frame": {
+    "x": 17,
+    "y": 739,
+    "w": 16,
+    "h": 14
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 14
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 14
+   }
+  },
+  "ras_sten_03": {
+   "frame": {
+    "x": 34,
+    "y": 739,
+    "w": 16,
+    "h": 14
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 14
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 14
+   }
+  },
+  "ras_sten_04": {
+   "frame": {
+    "x": 51,
+    "y": 739,
+    "w": 16,
+    "h": 14
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 14
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 14
+   }
+  },
+  "ras_sten_liten_01": {
+   "frame": {
+    "x": 0,
+    "y": 754,
+    "w": 10,
+    "h": 9
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 10,
+    "h": 9
+   },
+   "sourceSize": {
+    "w": 10,
+    "h": 9
+   }
+  },
+  "ras_sten_liten_02": {
+   "frame": {
+    "x": 11,
+    "y": 754,
+    "w": 10,
+    "h": 9
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 10,
+    "h": 9
+   },
+   "sourceSize": {
+    "w": 10,
+    "h": 9
+   }
+  },
+  "ras_sten_liten_03": {
+   "frame": {
+    "x": 22,
+    "y": 754,
+    "w": 10,
+    "h": 9
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 10,
+    "h": 9
+   },
+   "sourceSize": {
+    "w": 10,
+    "h": 9
+   }
+  },
+  "ras_sten_liten_04": {
+   "frame": {
+    "x": 33,
+    "y": 754,
+    "w": 10,
+    "h": 9
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 10,
+    "h": 9
+   },
+   "sourceSize": {
+    "w": 10,
+    "h": 9
+   }
+  },
+  "ras_vagg_01": {
+   "frame": {
+    "x": 0,
+    "y": 764,
+    "w": 176,
+    "h": 88
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 176,
+    "h": 88
+   },
+   "sourceSize": {
+    "w": 176,
+    "h": 88
+   }
+  },
+  "ras_vagg_02": {
+   "frame": {
+    "x": 177,
+    "y": 764,
+    "w": 176,
+    "h": 88
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 176,
+    "h": 88
+   },
+   "sourceSize": {
+    "w": 176,
+    "h": 88
    }
   },
   "rep_orange": {
    "frame": {
     "x": 0,
-    "y": 514,
+    "y": 853,
     "w": 4,
     "h": 16
    },
@@ -620,10 +1160,30 @@
     "h": 16
    }
   },
+  "ristning_tand": {
+   "frame": {
+    "x": 0,
+    "y": 870,
+    "w": 20,
+    "h": 10
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 10
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 10
+   }
+  },
   "snomassa_01": {
    "frame": {
     "x": 0,
-    "y": 531,
+    "y": 881,
     "w": 96,
     "h": 48
    },
@@ -643,7 +1203,7 @@
   "snomassa_02": {
    "frame": {
     "x": 97,
-    "y": 531,
+    "y": 881,
     "w": 96,
     "h": 48
    },
@@ -663,7 +1223,7 @@
   "snomassa_rasar_01": {
    "frame": {
     "x": 0,
-    "y": 580,
+    "y": 930,
     "w": 96,
     "h": 56
    },
@@ -683,7 +1243,7 @@
   "snomassa_rasar_02": {
    "frame": {
     "x": 97,
-    "y": 580,
+    "y": 930,
     "w": 96,
     "h": 56
    },
@@ -703,7 +1263,7 @@
   "snomoln_01": {
    "frame": {
     "x": 0,
-    "y": 637,
+    "y": 987,
     "w": 48,
     "h": 24
    },
@@ -723,7 +1283,7 @@
   "snomoln_02": {
    "frame": {
     "x": 49,
-    "y": 637,
+    "y": 987,
     "w": 48,
     "h": 24
    },
@@ -743,7 +1303,7 @@
   "sten_hal": {
    "frame": {
     "x": 0,
-    "y": 662,
+    "y": 1012,
     "w": 40,
     "h": 32
    },
@@ -763,7 +1323,7 @@
   "sten_kall_klubbsvans": {
    "frame": {
     "x": 0,
-    "y": 695,
+    "y": 1045,
     "w": 40,
     "h": 32
    },
@@ -783,7 +1343,7 @@
   "sten_varm_klubbsvans_01": {
    "frame": {
     "x": 0,
-    "y": 728,
+    "y": 1078,
     "w": 40,
     "h": 32
    },
@@ -803,7 +1363,7 @@
   "sten_varm_klubbsvans_02": {
    "frame": {
     "x": 41,
-    "y": 728,
+    "y": 1078,
     "w": 40,
     "h": 32
    },
@@ -823,7 +1383,7 @@
   "sten_varm_slat_01": {
    "frame": {
     "x": 0,
-    "y": 761,
+    "y": 1111,
     "w": 40,
     "h": 32
    },
@@ -843,7 +1403,7 @@
   "sten_varm_slat_02": {
    "frame": {
     "x": 41,
-    "y": 761,
+    "y": 1111,
     "w": 40,
     "h": 32
    },
@@ -863,7 +1423,7 @@
   "sten_varm_taggsvans_01": {
    "frame": {
     "x": 0,
-    "y": 794,
+    "y": 1144,
     "w": 40,
     "h": 32
    },
@@ -883,7 +1443,7 @@
   "sten_varm_taggsvans_02": {
    "frame": {
     "x": 41,
-    "y": 794,
+    "y": 1144,
     "w": 40,
     "h": 32
    },
@@ -900,10 +1460,50 @@
     "h": 32
    }
   },
+  "tand_isen_01": {
+   "frame": {
+    "x": 0,
+    "y": 1177,
+    "w": 24,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 16
+   }
+  },
+  "tand_isen_02": {
+   "frame": {
+    "x": 25,
+    "y": 1177,
+    "w": 24,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 16
+   }
+  },
   "vak_01": {
    "frame": {
     "x": 0,
-    "y": 827,
+    "y": 1194,
     "w": 32,
     "h": 24
    },
@@ -923,7 +1523,7 @@
   "vak_02": {
    "frame": {
     "x": 33,
-    "y": 827,
+    "y": 1194,
     "w": 32,
     "h": 24
    },
@@ -943,7 +1543,7 @@
   "vante": {
    "frame": {
     "x": 0,
-    "y": 852,
+    "y": 1219,
     "w": 16,
     "h": 12
    },
@@ -963,7 +1563,7 @@
   "vante_kartbit": {
    "frame": {
     "x": 17,
-    "y": 852,
+    "y": 1219,
     "w": 16,
     "h": 12
    },
@@ -985,8 +1585,8 @@
   "image": "berg.png",
   "format": "RGBA8888",
   "size": {
-   "w": 194,
-   "h": 865
+   "w": 354,
+   "h": 1232
   },
   "scale": "1",
   "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."

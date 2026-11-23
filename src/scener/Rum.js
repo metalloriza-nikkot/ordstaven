@@ -4965,28 +4965,36 @@ export class Rum extends Phaser.Scene {
     // (golvdatorn), och en kort skakning. Stils ras_front_01–03, ras_sten_* och ras_damm_01–03 (LASMIG_122) när de
     // finns, annars gråbox. Snön stannar sedan i luften som en vägg över dem (ras_vagg_01–02, 176 × 88)
     const tSno = t0 + steg * stegMs + 150;
-    const stopp = { x: Math.round((this.pos.x + m.x) / 2), y: Math.round(Math.min(this.pos.y, this.ungePos.y) - 50) };
+    // snön stannar rakt över hjälten och ungen (LASMIG_122), inom rummet
+    const stopp = { x: Math.round(Math.min(this.storlek.bredd - 88, Math.max(88, (this.pos.x + this.ungePos.x) / 2))), y: Math.round(Math.min(this.pos.y, this.ungePos.y) - 50) };
     const rasMs = 2200;
     const ramar = (/** @type {string} */ bas, n = 3) => Array.from({ length: n }, (_, i) => `${bas}_0${i + 1}`).filter((r) => this.regiram(r));
     const frontRamar = ramar('ras_front');
+    // fronten: Stils ras_front_01–03 (112 × 56, ca 90 ms per bild), tre i rad längs berget (LASMIG_122)
     /** @type {any} */ let front;
-    if (frontRamar.length) { const f = /** @type {any} */ (this.regiram(frontRamar[0])); front = this.add.image(stopp.x, -40, f.nyckel, f.ram); }
-    else {
+    if (frontRamar.length) {
+      const f = /** @type {any} */ (this.regiram(frontRamar[0]));
+      front = this.add.container(stopp.x, -40);
+      for (const dx of [-100, 0, 100]) front.add(this.add.image(dx, (dx === 0 ? 0 : 6), f.nyckel, f.ram));
+    } else {
       front = this.add.graphics({ x: stopp.x, y: -40 });
       front.fillStyle(0xf4f8fc, 1).fillEllipse(0, 0, 200, 46).fillStyle(0xdbe6ef, 1).fillEllipse(-50, 10, 80, 22).fillEllipse(46, 12, 70, 20)
         .fillStyle(0x8c8378, 1).fillCircle(-30, 4, 4).fillCircle(20, -6, 3).fillCircle(60, 2, 4);
     }
     front.setAlpha(0); this.lagerLuft.add(front); this.lagda.push(front);
-    if (frontRamar.length > 1) { let i = 0; const ev = this.time.addEvent({ delay: 160, loop: true, callback: () => { if (!front.active || !front.visible) { ev.remove(); return; } i = (i + 1) % frontRamar.length; const f = /** @type {any} */ (this.regiram(frontRamar[i])); front.setTexture(f.nyckel, f.ram); smuts(); } }); }
+    if (frontRamar.length > 1) { let i = 0; const ev = this.time.addEvent({ delay: 90, loop: true, callback: () => { if (!front.active || !front.visible) { ev.remove(); return; } i = (i + 1) % frontRamar.length; const f = /** @type {any} */ (this.regiram(frontRamar[i])); front.list.forEach((/** @type {any} */ b, k) => { const g = /** @type {any} */ (this.regiram(frontRamar[(i + k) % frontRamar.length])); b.setTexture(g.nyckel, g.ram); }); void f; smuts(); } }); }
     this.time.delayedCall(tSno, () => {
       front.setAlpha(1); this.cameras.main.shake(500, 0.007); this.regiLjud('rassel'); this.k4Logg('raset nedför berget');
       this.regiFokus = { x: front.x, y: Math.max(96, front.y + 40) };
     });
     this.tweens.add({ targets: front, y: stopp.y - 6, duration: rasMs, delay: tSno, ease: 'Quad.easeIn', onUpdate: () => { this.regiFokus = { x: front.x, y: Math.max(96, front.y + 50) }; smuts(); } });
     // stenarna studsar nedför framför fronten (bildbyte i stället för att snurra), och snödammet yr upp och tonar bort
-    const stenRamar = ['ras_sten_01', 'ras_sten_02', 'ras_sten_03', 'ras_sten_04'].filter((r) => this.regiram(r));
-    for (let i = 0; i < 5; i++) {
-      const x = stopp.x - 70 + i * 34, d = tSno + 150 + i * 180;
+    // Stils ras_sten_01–04 (16 × 14) och ras_sten_liten_01–04 (10 × 9), som snurrar med ca 80 ms per bild
+    const stora = ['ras_sten_01', 'ras_sten_02', 'ras_sten_03', 'ras_sten_04'].filter((r) => this.regiram(r));
+    const sma = ['ras_sten_liten_01', 'ras_sten_liten_02', 'ras_sten_liten_03', 'ras_sten_liten_04'].filter((r) => this.regiram(r));
+    for (let i = 0; i < 7; i++) {
+      const stenRamar = i % 2 && sma.length ? sma : stora;
+      const x = stopp.x - 90 + i * 30, d = tSno + 120 + i * 150;
       /** @type {any} */ let sten;
       if (stenRamar.length) { const f = /** @type {any} */ (this.regiram(stenRamar[i % stenRamar.length])); sten = this.add.image(x, -20, f.nyckel, f.ram); }
       else { sten = this.add.graphics({ x, y: -20 }); sten.fillStyle(0x7d746a, 1).fillCircle(0, 0, 4 + (i % 2) * 2).fillStyle(0x5a5048, 1).fillCircle(1, 1, 2); }
@@ -4994,7 +5002,7 @@ export class Rum extends Phaser.Scene {
       const studs = 4, del = Math.round((rasMs - 200) / studs);
       const tw = []; for (let j = 1; j <= studs; j++) { const y = -20 + ((stopp.y + 10) / studs) * j; tw.push({ y: y - 14, duration: Math.round(del / 2), ease: 'Sine.easeOut' }, { y, duration: Math.round(del / 2), ease: 'Sine.easeIn' }); }
       this.time.delayedCall(d, () => { sten.setAlpha(1); this.tweens.chain({ targets: sten, tweens: [...tw, { alpha: 0, duration: 300 }], onUpdate: smuts }); });
-      if (stenRamar.length > 1) this.time.addEvent({ delay: 120, repeat: Math.round(rasMs / 120), startAt: 0, callback: () => { if (!sten.active) return; const f = /** @type {any} */ (this.regiram(stenRamar[(i + Math.floor(this.time.now / 120)) % stenRamar.length])); sten.setTexture(f.nyckel, f.ram); } });
+      if (stenRamar.length > 1) this.time.addEvent({ delay: 80, repeat: Math.round(rasMs / 80), startAt: 0, callback: () => { if (!sten.active) return; const f = /** @type {any} */ (this.regiram(stenRamar[(i + Math.floor(this.time.now / 80)) % stenRamar.length])); sten.setTexture(f.nyckel, f.ram); } });
     }
     const dammRamar = ramar('ras_damm');
     for (let i = 0; i < 6; i++) this.time.delayedCall(tSno + 200 + i * 320, () => {
@@ -5011,9 +5019,10 @@ export class Rum extends Phaser.Scene {
     /** @type {any} */ let sno;
     if (vagg) {
       const sm = /** @type {any} */ (this.regiram(vagg[0]));
-      sno = this.add.image(stopp.x, stopp.y, sm.nyckel, sm.ram);
+      // väggens fot (y 72 i bilden) står ca 12 px norr om deras huvuden (LASMIG_122), och bilderna växlar var 300:e ms
+      sno = vagg[0] === 'ras_vagg_01' ? this.add.image(stopp.x, Math.round(Math.min(this.pos.y, this.ungePos.y) - 36), sm.nyckel, sm.ram).setOrigin(0.5, 72 / 88) : this.add.image(stopp.x, stopp.y, sm.nyckel, sm.ram);
       let nr = 0;
-      const ev = this.time.addEvent({ delay: 400, loop: true, callback: () => { if (!sno.active) { ev.remove(); return; } nr = 1 - nr; const f = /** @type {any} */ (this.regiram(vagg[nr])); sno.setTexture(f.nyckel, f.ram); smuts(); } });
+      const ev = this.time.addEvent({ delay: vagg[0] === 'ras_vagg_01' ? 300 : 400, loop: true, callback: () => { if (!sno.active) { ev.remove(); return; } nr = 1 - nr; const f = /** @type {any} */ (this.regiram(vagg[nr])); sno.setTexture(f.nyckel, f.ram); smuts(); } });
     } else {
       sno = this.add.graphics({ x: stopp.x, y: stopp.y });
       sno.fillStyle(0xdbe6ef, 1).fillRect(-88, -34, 176, 50).fillStyle(0xf4f8fc, 1).fillEllipse(0, -34, 184, 30).fillRect(-80, -30, 160, 34)
@@ -5307,7 +5316,7 @@ export class Rum extends Phaser.Scene {
     });
     const halla = this.time.addEvent({ delay: 50, loop: true, startAt: 0, callback: () => {
       if (t.p <= 0 || !ungeMed) return;
-      if (klattrar) { this.kropp?.setFrame?.(klattrar[Math.floor(this.time.now / 220) % 2]); }
+      if (klattrar) { this.kropp?.setFrame?.(klattrar[Math.floor(this.time.now / 200) % 2]); }
       else { this.ungePos = { x: this.pos.x - 3, y: this.pos.y + 7 }; this.ungeFast = null; this.placera(); }
       smuts();
     } });
