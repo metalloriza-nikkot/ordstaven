@@ -278,6 +278,12 @@ export function objektFarg(o) {
   if (o.id.startsWith('stigspar_')) return 0xcbb68c;
   // snödrivorna på stenfältet (122.4), som halvt gömmer stenarna
   if (o.id.startsWith('snodriva_')) return 0xeef3f8;
+  // 124.8: klippans istappar, dagsljuset i sprickan, och molnen och dalen långt nedanför hyllan med floden
+  if (o.id.startsWith('istappar_')) return 0xd6ecfa;
+  if (o.id.startsWith('ljussken_')) return 0xf3e3a2;
+  if (o.id.startsWith('moln_')) return 0xf2f5f8;
+  if (o.id.startsWith('dalen_')) return 0x7f9f6e;
+  if (o.id.startsWith('flod_')) return 0x6fa6d6;
   return 0xb9b2a4;
 }
 

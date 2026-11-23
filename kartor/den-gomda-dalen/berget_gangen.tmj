@@ -1,0 +1,395 @@
+{
+ "type": "map",
+ "version": "1.10",
+ "tiledversion": "1.11.0",
+ "orientation": "orthogonal",
+ "renderorder": "right-down",
+ "width": 20,
+ "height": 24,
+ "tilewidth": 16,
+ "tileheight": 16,
+ "infinite": false,
+ "compressionlevel": -1,
+ "nextlayerid": 2,
+ "nextobjectid": 27,
+ "properties": [
+  {
+   "name": "rum",
+   "type": "string",
+   "value": "berget_gangen"
+  }
+ ],
+ "tilesets": [],
+ "layers": [
+  {
+   "id": 1,
+   "name": "foremal",
+   "type": "objectgroup",
+   "draworder": "index",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 1,
+     "name": "start",
+     "type": "",
+     "x": 160,
+     "y": 336,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 2,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 0,
+     "width": 320,
+     "height": 24,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 3,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 24,
+     "width": 176,
+     "height": 48,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 4,
+     "name": "",
+     "type": "vagg",
+     "x": 304,
+     "y": 24,
+     "width": 16,
+     "height": 48,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 5,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 72,
+     "width": 212,
+     "height": 24,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 6,
+     "name": "",
+     "type": "vagg",
+     "x": 240,
+     "y": 72,
+     "width": 80,
+     "height": 24,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 7,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 96,
+     "width": 108,
+     "height": 64,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 8,
+     "name": "",
+     "type": "vagg",
+     "x": 196,
+     "y": 96,
+     "width": 16,
+     "height": 64,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 9,
+     "name": "",
+     "type": "vagg",
+     "x": 240,
+     "y": 96,
+     "width": 80,
+     "height": 64,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 10,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 160,
+     "width": 40,
+     "height": 28,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 11,
+     "name": "",
+     "type": "vagg",
+     "x": 240,
+     "y": 160,
+     "width": 80,
+     "height": 28,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 12,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 188,
+     "width": 40,
+     "height": 108,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 13,
+     "name": "",
+     "type": "vagg",
+     "x": 68,
+     "y": 188,
+     "width": 252,
+     "height": 108,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 14,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 296,
+     "width": 40,
+     "height": 28,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 15,
+     "name": "",
+     "type": "vagg",
+     "x": 208,
+     "y": 296,
+     "width": 112,
+     "height": 28,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 16,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 324,
+     "width": 112,
+     "height": 36,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 17,
+     "name": "",
+     "type": "vagg",
+     "x": 208,
+     "y": 324,
+     "width": 112,
+     "height": 36,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 18,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 360,
+     "width": 320,
+     "height": 24,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 19,
+     "name": "mynningen_inifran",
+     "type": "sak",
+     "x": 132,
+     "y": 348,
+     "width": 56,
+     "height": 12,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "over"
+      }
+     ]
+    },
+    {
+     "id": 20,
+     "name": "isficka",
+     "type": "sak",
+     "x": 142,
+     "y": 96,
+     "width": 20,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "lockradie",
+       "type": "int",
+       "value": 90
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      }
+     ]
+    },
+    {
+     "id": 21,
+     "name": "isklump_1",
+     "type": "sak",
+     "x": 114,
+     "y": 108,
+     "width": 14,
+     "height": 12,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 22,
+     "name": "isklump_2",
+     "type": "sak",
+     "x": 176,
+     "y": 106,
+     "width": 14,
+     "height": 12,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 23,
+     "name": "isklump_3",
+     "type": "sak",
+     "x": 118,
+     "y": 138,
+     "width": 14,
+     "height": 12,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 24,
+     "name": "farfars_kompass",
+     "type": "sak",
+     "x": 119,
+     "y": 140,
+     "width": 12,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 25,
+     "name": "vagg_gemener",
+     "type": "sak",
+     "x": 186,
+     "y": 24,
+     "width": 40,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      }
+     ]
+    },
+    {
+     "id": 26,
+     "name": "gang_salen_in",
+     "type": "utgang",
+     "x": 264,
+     "y": 24,
+     "width": 28,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "riktning",
+       "type": "string",
+       "value": "upp"
+      },
+      {
+       "name": "till",
+       "type": "string",
+       "value": "berget_salen"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

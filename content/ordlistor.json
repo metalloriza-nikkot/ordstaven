@@ -2,7 +2,7 @@
  "$schema": "schema/ordlistor.schema.json",
  "format": 1,
  "meta": {
-  "version": "0.21",
+  "version": "0.22",
   "datum": "2026-11-23",
   "agare": "Innehåll",
   "textform": "Orden lagras med små bokstäver, formler i versaler. Böjda former (skogen, bron) står med när de används som alternativ.",
@@ -24,7 +24,8 @@
   "andrat_v018": "2026-11-17 (kapitel 3 v0.3, manus 19 v0.4.1): luckan, vattnet, stå och säcken (kvarnens tavla), fem (hornet), ha (bubblan), horn (Var var vi?) och kvarnen, lossa, hjulet och hornet (uppdragslappen).",
   "andrat_v019": "Kapitel 4 (manus 21 v0.3.1): skyltarna, gåtan, Farfars sten, lådans lock, Var var vi? och uppdragslappen.",
   "andrat_v020": "Kapitel 4 (manus 21 v0.5): stig 4 och Dinoboken (tand), Var var vi? (gåta), klippan, över och skrivorden vid klippan.",
-  "andrat_v021": "Kapitel 4 (manus 21 v0.6): skatt (valvets stig) och konstig (Farfars sten)."
+  "andrat_v021": "Kapitel 4 (manus 21 v0.6): skatt (valvets stig) och konstig (Farfars sten).",
+  "andrat_v022": "Kapitel 4 (manus 21 v0.7): isen (uppdraget i pass 2)."
  },
  "listor": {
   "1": "Korta ljudenliga ord, 2-3 bokstaver, ingen konsonantgrupp, ingen dubbelteckning",
@@ -3250,6 +3251,14 @@
    "tema": "berättelse",
    "flaggor": [],
    "varfor": "Kapitel 4 v0.4 (manus 21 v0.6): stenarnas instruktion"
+  },
+  {
+   "ord": "isen",
+   "lista": 2,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 4 v0.5 (manus 21 v0.7): uppdraget ISEN"
   }
  ]
 }

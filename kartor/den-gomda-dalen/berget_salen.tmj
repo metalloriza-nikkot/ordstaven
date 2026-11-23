@@ -1,0 +1,191 @@
+{
+ "type": "map",
+ "version": "1.10",
+ "tiledversion": "1.11.0",
+ "orientation": "orthogonal",
+ "renderorder": "right-down",
+ "width": 30,
+ "height": 12,
+ "tilewidth": 16,
+ "tileheight": 16,
+ "infinite": false,
+ "compressionlevel": -1,
+ "nextlayerid": 2,
+ "nextobjectid": 11,
+ "properties": [
+  {
+   "name": "rum",
+   "type": "string",
+   "value": "berget_salen"
+  }
+ ],
+ "tilesets": [],
+ "layers": [
+  {
+   "id": 1,
+   "name": "foremal",
+   "type": "objectgroup",
+   "draworder": "index",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 1,
+     "name": "start",
+     "type": "",
+     "x": 40,
+     "y": 170,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 2,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 0,
+     "width": 480,
+     "height": 36,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 3,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 36,
+     "width": 16,
+     "height": 140,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 4,
+     "name": "",
+     "type": "vagg",
+     "x": 64,
+     "y": 36,
+     "width": 2,
+     "height": 140,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 5,
+     "name": "",
+     "type": "vagg",
+     "x": 464,
+     "y": 36,
+     "width": 16,
+     "height": 140,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 6,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 176,
+     "width": 480,
+     "height": 16,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 7,
+     "name": "",
+     "type": "vagg",
+     "x": 66,
+     "y": 36,
+     "width": 208,
+     "height": 140,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vatten",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 8,
+     "name": "stig_k4_stig2",
+     "type": "sak",
+     "x": 166,
+     "y": 102,
+     "width": 8,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "ankare",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 9,
+     "name": "tavla_farfar",
+     "type": "sak",
+     "x": 280,
+     "y": 36,
+     "width": 24,
+     "height": 22,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      }
+     ]
+    },
+    {
+     "id": 10,
+     "name": "gang_valvet",
+     "type": "utgang",
+     "x": 420,
+     "y": 36,
+     "width": 28,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "riktning",
+       "type": "string",
+       "value": "upp"
+      },
+      {
+       "name": "till",
+       "type": "string",
+       "value": "berget_valvet"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

@@ -173,6 +173,8 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
   /** Steget att fortsätta på efter "Var var vi?" (vid_omstart). */
   let aterupptaSteg = 0;
   /** Passet som scenen räknas till: i navet och dess grenar navets pass (pass 3 efter navets sparpunkt). @param {any} scen */
+  /** En frivillig scen i ett eget rum som börjar vid utgången dit (124.12.4): startar_vid i startar_i_rum, och scenen i rum. @param {any} s */
+  const arEgetRum = (s) => !!(s && s.frivillig && s.startar_vid && s.startar_i_rum && s.rum && s.startar_i_rum !== s.rum);
   function passFor(scen) {
     if (av.nav && (scen.id === av.nav.scen || scen.id === av.nav.gren)) return av.nav.pass ?? scen.pass;
     return scen.pass;
@@ -367,9 +369,15 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
      * @param {string} rumId
      */
     frivilligScen(rumId) {
-      // en scen som börjar vid ett föremål (startar_vid, 2.47) startar inte när han går in i rummet
-      return kapitel.scener.find((/** @type {any} */ s) => s.frivillig && !s.startar_vid && (s.startar_i_rum || s.rum) === rumId && !av.frivilligt.includes(s.id)) ?? null;
+      // en scen som börjar vid ett föremål (startar_vid, 2.47) startar inte när han går in i rummet. Undantaget är en
+      // scen i ett eget rum som börjar vid utgången dit (124.12.4, tandgrottan): den startar när han kommer in i sitt rum
+      // genom utgången, medan den går att starta (frivilligaVid i rummet där utgången står)
+      return kapitel.scener.find((/** @type {any} */ s) => s.frivillig && !s.startar_vid && (s.startar_i_rum || s.rum) === rumId && !av.frivilligt.includes(s.id))
+        ?? kapitel.scener.find((/** @type {any} */ s) => arEgetRum(s) && s.rum === rumId && this.frivilligaVid(s.startar_i_rum).includes(s))
+        ?? null;
     },
+    /** Är den frivilliga scenen i ett eget rum, och börjar vid utgången dit (124.12.4)? @param {any} s */
+    egetRum(s) { return arEgetRum(s); },
     /**
      * Frivilliga scener som börjar vid ett föremål i rummet (startar_vid, 2.47: skalkanten) och går att starta nu:
      * från början av scenens pass, tills berättelsen kommer till till_scen. I till_scen stänger den när scenens första

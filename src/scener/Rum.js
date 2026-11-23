@@ -5208,7 +5208,8 @@ export class Rum extends Phaser.Scene {
 
   /** Kameran glider till Farfars skrift som glimmar i isen på andra sidan stigen, och tillbaka. @returns {number} */
   grottanVisarVaggen() {
-    const v = this.k4Punkt('gata_1'); if (!v) return 0;
+    // 124.2: i salen glider kameran till Farfars tavla på andra stranden (förut gåtans vägg i den stora grottan)
+    const v = this.k4Punkt('tavla_farfar') ?? this.k4Punkt('gata_1'); if (!v) return 0;
     this.regiFokus = v;
     this.time.delayedCall(800, () => this.k4Glitter({ x: v.x, y: v.y + 4 }, 16));
     this.time.delayedCall(2200, () => { this.regiFokus = null; });
@@ -5271,11 +5272,14 @@ export class Rum extends Phaser.Scene {
     // Stils klippa_stege, klippa_rep och klippa_trappa (LASMIG_122): bilden tonas fram nedifrån och upp
     const stil = andel >= 1 ? this.regiram(`klippa_${sort}`) : null;
     if (stil) {
-      const img = this.add.image(x, nere, stil.nyckel, stil.ram).setOrigin(0.5, 1).setAlpha(0);
+      // klippan är högre än bilden (124.8, ca 120 px): bilderna staplas nedifrån, och den översta når kanten
+      const hb = /** @type {any} */ (this.textures.getFrame(stil.nyckel, stil.ram))?.height || 72;
+      const img = this.add.container(0, 0).setAlpha(0);
+      for (let y = nere; y > uppe; y -= hb) img.add(this.add.image(x, Math.max(y, uppe + hb), stil.nyckel, stil.ram).setOrigin(0.5, 1));
       this.lagerObjekt.add(img); this.lagda.push(img);
       this.tweens.add({ targets: img, alpha: 1, duration: 700, onUpdate: () => { this.smutsig = true; } });
       this.b.ljud?.spela('stege');
-      return { g: img, ms: 700, x, uppe: nere - img.height, nere };
+      return { g: img, ms: 700, x, uppe, nere };
     }
     const g = this.add.graphics();
     const delar = Math.max(1, Math.round((nere - uppe) / 8));
@@ -5299,8 +5303,10 @@ export class Rum extends Phaser.Scene {
     const smuts = () => { this.smutsig = true; };
     this.regiFokus = { x: r.x, y: Math.round((r.uppe + r.nere) / 2) };
     const fran = { ...this.pos }, till = { x: r.x, y: r.uppe - 10 }, t = { p: 0 };
+    // klättringen tar längre tid uppför en högre klippa (ca 1,4 s för 60 px, 124.8)
+    const klattring = Math.round(Math.max(1400, (fran.y - till.y) * 16));
     this.time.delayedCall(r.ms + 300, () => {
-      this.tweens.add({ targets: t, p: 1, duration: 1400, ease: 'Sine.easeInOut', onUpdate: () => {
+      this.tweens.add({ targets: t, p: 1, duration: klattring, ease: 'Sine.easeInOut', onUpdate: () => {
         this.pos = { x: fran.x + (r.x - fran.x) * Math.min(1, t.p * 3), y: fran.y + (till.y - fran.y) * t.p };
         this.vand = { x: 0, y: -1 }; this.placera(); smuts();
       }, onComplete: () => { this.pos = { ...till }; this.placera(); smuts(); } });
@@ -5320,15 +5326,15 @@ export class Rum extends Phaser.Scene {
       else { this.ungePos = { x: this.pos.x - 3, y: this.pos.y + 7 }; this.ungeFast = null; this.placera(); }
       smuts();
     } });
-    this.time.delayedCall(r.ms + 300 + 1450, () => {
+    this.time.delayedCall(r.ms + 300 + klattring + 50, () => {
       halla.remove();
       if (ungeMed) { this.unge.setVisible(true); this.ungePos = { x: till.x - 14, y: till.y + 2 }; this.placera(); }
       if (klattrar) this.ritaHjalte();
       smuts();
     });
-    this.time.delayedCall(r.ms + 2100, () => { this.regiFokus = null; });
+    this.time.delayedCall(r.ms + klattring + 700, () => { this.regiFokus = null; });
     this.k4Logg(`klippan: ${sort} upp`);
-    return r.ms + 2200;
+    return r.ms + klattring + 800;
   }
 
   /** Nästan rätt vid klippan: det som växer är för kort, gungar och blir borta. @param {'stege' | 'rep' | 'trappa'} sort */

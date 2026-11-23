@@ -1,0 +1,234 @@
+{
+ "type": "map",
+ "version": "1.10",
+ "tiledversion": "1.11.0",
+ "orientation": "orthogonal",
+ "renderorder": "right-down",
+ "width": 20,
+ "height": 12,
+ "tilewidth": 16,
+ "tileheight": 16,
+ "infinite": false,
+ "compressionlevel": -1,
+ "nextlayerid": 2,
+ "nextobjectid": 12,
+ "properties": [
+  {
+   "name": "rum",
+   "type": "string",
+   "value": "berget_tandgrottan"
+  }
+ ],
+ "tilesets": [],
+ "layers": [
+  {
+   "id": 1,
+   "name": "foremal",
+   "type": "objectgroup",
+   "draworder": "index",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 1,
+     "name": "start",
+     "type": "",
+     "x": 36,
+     "y": 60,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 2,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 0,
+     "width": 320,
+     "height": 24,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 3,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 24,
+     "width": 16,
+     "height": 152,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 4,
+     "name": "",
+     "type": "vagg",
+     "x": 64,
+     "y": 24,
+     "width": 8,
+     "height": 152,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 5,
+     "name": "",
+     "type": "vagg",
+     "x": 304,
+     "y": 24,
+     "width": 16,
+     "height": 152,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 6,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 176,
+     "width": 320,
+     "height": 16,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 7,
+     "name": "",
+     "type": "vagg",
+     "x": 72,
+     "y": 24,
+     "width": 168,
+     "height": 152,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vatten",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 8,
+     "name": "gang_galleriet_tillbaka",
+     "type": "utgang",
+     "x": 24,
+     "y": 24,
+     "width": 28,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "riktning",
+       "type": "string",
+       "value": "upp"
+      },
+      {
+       "name": "till",
+       "type": "string",
+       "value": "berget_galleriet"
+      }
+     ]
+    },
+    {
+     "id": 9,
+     "name": "ristning_tand",
+     "type": "sak",
+     "x": 16,
+     "y": 100,
+     "width": 6,
+     "height": 18,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "ristning_tand"
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "hoger"
+      }
+     ]
+    },
+    {
+     "id": 10,
+     "name": "stig_k4_stig4",
+     "type": "sak",
+     "x": 152,
+     "y": 96,
+     "width": 8,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "ankare",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "tillbaka",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 11,
+     "name": "tand_isen",
+     "type": "sak",
+     "x": 276,
+     "y": 24,
+     "width": 20,
+     "height": 12,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "anim_ms",
+       "type": "int",
+       "value": 500
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "tand_isen_01"
+      },
+      {
+       "name": "bild_anim",
+       "type": "string",
+       "value": "tand_isen_01,tand_isen_02"
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

@@ -144,7 +144,7 @@
       {
        "name": "till",
        "type": "string",
-       "value": "berget_grottan"
+       "value": "berget_salen"
       }
      ]
     },
@@ -172,7 +172,7 @@
       {
        "name": "till",
        "type": "string",
-       "value": "berget_grottan"
+       "value": "berget_galleriet"
       }
      ]
     },

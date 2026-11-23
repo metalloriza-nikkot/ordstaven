@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Kapitel 4:s kartor i gråbox (beslut 118.4), efter Innehålls anteckningar i kap-04.json v0.1 (rummens `anteckning`).
 
-Skriver tre Tiled-kartor i kartor/den-gomda-dalen/: berget_stigen (2 × 1 skärmar), berget_grottan (2 × 2 skärmar) och
-berget_stenfalt (en skärm). Kartorna har bara id:n, aldrig text som spelaren läser. Bokstavsstigarna står där kartan har
-stig_<pusslets id> (rutnätets mitt), och en ravin eller vak går tvärs över rummet där, så att han bara kommer över på
-stigen. Rutnätet är 40 pixlar per kolumn och 26 per rad (Rum.visaStig), med stranden 17 pixlar utanför på båda sidor.
-Isgrottan är 2 × 2 skärmar (ett rum är högst så stort): stig 2 och gåtans väggar i den övre halvan, och ishyllan och stig 3
-(sex kolumner) i den nedre, eftersom de inte ryms bredvid varandra.
+Skriver kapitlets kartor i kartor/den-gomda-dalen/: berget_stigen, grottans fem rum i följd (berget_gangen, berget_salen,
+berget_valvet, berget_galleriet och berget_sprickan, 124.2), stig 4:s lilla rum berget_tandgrottan, och berget_stenfalt.
+Kartorna har bara id:n, aldrig text som spelaren läser. Bokstavsstigarna står där kartan har stig_<pusslets id>
+(rutnätets mitt), och en ravin eller vak går tvärs över rummet där, så att han bara kommer över på stigen. Rutnätet är 40
+pixlar per kolumn och 26 per rad (Rum.visaStig), med stranden 17 pixlar utanför på båda sidor. Ett rum är högst 2 × 2
+skärmar.
 Hjälparna är desamma som i kap2.py. Stil skissar ovanpå skärmdumparna när gråboxen är spelad (kedjan i 07, steg 4).
 
     python3 verktyg/kartor/kap4.py [--prova]
@@ -163,93 +163,111 @@ RUMMEN = {
             ]),
         ],
     },
-    # 2 × 2 skärmar efter Stils plan A–E (120.2, `skisser/kap-04/LASMIG_skiss2.md`), kartan byggs efter planen (120.4).
-    # I mörkret syns bara hjälten, ungen och stavens glimt (färgtabellen), och LJUS stänger av den.
-    # A: den smala gången från starten i sydväst upp mot norr, där han skriver LJUS. F1: en kammare med bär från gången.
-    # B: gemenernas vägg i en kammare i nordväst. C: salen med stig 2 (TAVLA) över vattnet, från västra stranden till D.
-    # D: gåtans galleri med de tre raderna på norra väggen. F2: gången under sjön till ishyllan med isblocket och
-    # fotavtrycket. E: landningen öster om D, och stig 3 (klubba) uppåt över vattnet till hyllan vid sprickan i norr.
-    # F3 (121.3): istappsgrottan söder om galleriet och landningen, med Farfars ristning på västra stranden och stig 4
-    # (fyra steg, tre rader) österut till tanden i isen. Den är en återvändsgränd: när stigen är klar hoppar han
-    # tillbaka (tillbaka), och östra stranden når han inte från landningen.
-    'berget_grottan': {
-        'storlek': (40, 24),
+    # 124.2 (granskning 11): grottan är fem rum i följd med en kort gång mellan varje, och ingen sal syns från en annan.
+    # R1 gången (320 × 384): de kommer in genom mynningen i söder, som snön har täppt till. Gången slingrar sig västerut,
+    # norrut och österut, och F1 (isfickan med isklumparna) ligger norr om gången vid svängen, framåt i gångriktningen,
+    # med ett varmt sken som lockar. Farfars vägg med paren står sist, i kammaren i norr vid gången till salen.
+    'berget_gangen': {
+        'storlek': (20, 24),
         'objekt': [
-            punkt('start', 42, 372),
-            punkt('regi_spricka', 558, 22),
-            # där han står när pass 3 börjar (landningen vid stig 3), och vid ristningen i F3 efter en omstart
-            punkt('regi_hjalte_k4s04_utvagen', 540, 280),
-            punkt('regi_hjalte_k4s03_tanden', 424, 330),
-            # 122.11: galleriet nås bara genom valvet, och han kommer tillbaka från valvet in i galleriet
-            punkt('regi_hjalte_k4s03_galleriet', 444, 140),
-            *golv_vaggar(640, 384, golv=[
-                # A, gången
-                (24, 330, 36, 54), (28, 200, 28, 132), (28, 196, 96, 26), (96, 120, 28, 100),
-                # F1
-                (56, 272, 48, 22), (100, 250, 44, 60),
-                # B
-                (52, 62, 130, 62),
-                # C, västra stranden
-                (160, 90, 22, 220),
-                # C, östra stranden efter stig 2: en nisch med gången till valvet (122.11), avskild från D
-                (384, 158, 14, 80),
-                # D
-                (404, 64, 82, 232),
-                # F2
-                (392, 296, 22, 70), (214, 340, 196, 26), (214, 322, 90, 20),
-                # E, landningen, hyllan vid sprickan och nischen
-                (486, 246, 140, 50), (494, 30, 132, 52), (536, 10, 44, 20),
-                # F3: västra stranden (från galleriet) och östra stranden (vägg mot landningen)
-                (414, 296, 22, 88), (600, 302, 26, 82),
-            ], vatten=[
-                # C, salen: stig 2 tvärs över, och E: stig 3 uppåt (vattnet är rutnätets höjd, 119.4)
-                (182, 96, 196, 214), (486, 82, 140, 164),
+            punkt('start', 160, 336),
+            *golv_vaggar(320, 384, golv=[
+                (112, 296, 96, 64), (40, 296, 72, 28), (40, 160, 28, 164), (40, 160, 200, 28),
+                # F1, isfickan norr om gången
+                (108, 96, 88, 64),
+                (212, 64, 28, 124), (176, 24, 128, 48),
             ]),
-            # B: gemenernas vägg (Farfars par, versal och gemen, på läsplattan)
-            sak('vagg_gemener', 96, 62, 40, 10, sida='under'),
-            # F1: isfickan med frusna bär (Innehålls isficka_bar, frivilligt)
-            sak('isficka_bar', 116, 286, 12, 10, sida='alla'),
-            # C: stig 2 (TAVLA), fem steg och tre rader, från västra stranden till galleriet
-            sak('stig_k4_stig2', 276, 196, 8, 8, dekor=True, ankare=True),
-            # D: gåtans tre rader på norra väggen, glimtar i isen (texten står på läsplattan)
-            sak('gata_1', 408, 64, 22, 10, sida='under'),
-            sak('gata_2', 434, 64, 22, 10, sida='under'),
-            sak('gata_3', 460, 64, 22, 10, sida='under'),
-            # C: gången från stig 2:s östra strand in till valvet (berget_valvet, 122.11)
-            utg('gang_valvet', 384, 158, 14, 8, golv=True, riktning='upp', till='berget_valvet'),
-            # F2: ishyllan med isblocket, och fotavtrycket under blocket (hemligheten)
-            sak('ishylla', 222, 322, 74, 8, sida='under'),
-            sak('isblock', 246, 326, 24, 14, sida='alla'),
-            sak('fotavtryck', 244, 328, 28, 14, sida='alla'),
-            # E: väggen med vägen ut, och gåtans rad igen (dold, hjälptrappan visar den)
-            sak('vagg_ut', 492, 288, 24, 8, sida='over'),
-            sak('gata_3_igen', 520, 288, 24, 8, sida='over'),
-            # E: stig 3 (klubba) uppåt, sex steg och tre rader, från landningen till hyllan vid sprickan
-            sak('stig_k4_stig3', 552, 160, 8, 8, dekor=True, ankare=True, upp=True),
-            # sprickan i nischen i norr, och utgången när isen är uppslagen (ut)
-            sak('spricka', 548, 10, 24, 16, sida='under'),
-            sak('utgang_stenfalt', 548, 0, 24, 14, sida='under'),
-            # F3: Farfars ristning av en tand på västra stranden, stig 4 (tand) österut, och tanden i isen längst in
-            sak('ristning_tand', 408, 318, 6, 18, sida='hoger'),
-            # gången in till istappsgrottan, där det lockar (122.11): ungen nosar, något glimtar och istapparna klingar
-            sak('gang_istapparna', 414, 292, 22, 8, golv=True, lockradie=100),
-            *stig('k4_stig4', (520, 342), 4, 3, 296, 384, tillbaka=True),
-            sak('tand_isen', 604, 304, 20, 12, sida='under'),
+            sak('mynningen_inifran', 132, 348, 56, 12, sida='over'),
+            sak('isficka', 142, 96, 20, 8, sida='under', lockradie=90),
+            sak('isklump_1', 114, 108, 14, 12, sida='alla'),
+            sak('isklump_2', 176, 106, 14, 12, sida='alla'),
+            sak('isklump_3', 118, 138, 14, 12, sida='alla'),
+            sak('farfars_kompass', 119, 140, 12, 10, sida='alla'),
+            sak('vagg_gemener', 186, 24, 40, 10, sida='under'),
+            utg('gang_salen_in', 264, 24, 28, 8, golv=True, riktning='upp', till='berget_salen'),
         ],
     },
-    # 122.11: valvet, ett rum till i isgrottan mellan salen och gåtans galleri (2 × 1 skärmar). Han kommer upp från salen
-    # i sydväst (gang_salen), läser Farfars mening på väggen före vaken (vagg_valvet) och hoppar stigen (skatt, fem steg
-    # och tre rader) över vaken. Gången ned till galleriet (gang_galleriet) i sydost nås bara över stigen.
+    # Utgångarna tillbaka till rummet innan finns inte i datan, så han kommer in i varje rum vid dess start (vid gången in).
+    # R2 salen (480 × 192): han kommer in i sydväst. Stig 2 (TAVLA) går över vattnet, och Farfars tavla står på andra
+    # stranden och syns redan från ingången. Gången till valvet ligger på östra stranden och nås bara över stigen.
+    'berget_salen': {
+        'storlek': (30, 12),
+        'objekt': [
+            punkt('start', 40, 170),
+            *golv_vaggar(480, 192, golv=[(16, 36, 48, 140), (274, 36, 190, 140)], vatten=[(66, 36, 208, 140)]),
+            sak('stig_k4_stig2', 166, 102, 8, 8, dekor=True, ankare=True),
+            sak('tavla_farfar', 280, 36, 24, 22, sida='under'),
+            utg('gang_valvet', 420, 36, 28, 8, golv=True, riktning='upp', till='berget_valvet'),
+        ],
+    },
+    # R3 valvet (122.11, 2 × 1 skärmar) mellan salen och galleriet. Han kommer upp från salen i sydväst (gang_salen),
+    # läser Farfars mening på väggen före vaken (vagg_valvet) och hoppar stigen (skatt, fem steg och tre rader) över
+    # vaken. Gången ned till galleriet (gang_galleriet) i sydost nås bara över stigen.
     'berget_valvet': {
         'storlek': (40, 12),
         'objekt': [
             punkt('start', 56, 168),
-            # gångarna går ned mot grottan i söder (den kommer upp från stig 2:s strand, 'upp' där)
             *golv_vaggar(640, 192, golv=[(16, 36, 248, 140), (472, 36, 152, 140), (40, 176, 32, 16), (568, 176, 32, 16)]),
-            utg('gang_salen', 40, 184, 32, 8, golv=True, riktning='ned', till='berget_grottan'),
-            utg('gang_galleriet', 568, 184, 32, 8, golv=True, riktning='ned', till='berget_grottan'),
+            utg('gang_salen', 40, 184, 32, 8, golv=True, riktning='ned', till='berget_salen'),
+            utg('gang_galleriet', 568, 184, 32, 8, golv=True, riktning='ned', till='berget_galleriet'),
             sak('vagg_valvet', 196, 36, 44, 8, sida='under'),
             *stig('k4_stig_valv', (364, 100), 5, 3, 36, 164),
+        ],
+    },
+    # R4 galleriet (640 × 384): han kommer ned från valvet i nordväst. Gåtans tre rader står på var sin vägg (västra
+    # väggen, norra väggen och gången söderut). F2 ligger i en nisch i norr, och isblocket syns från ingången. Söderut
+    # går gången till den nedre hallen, där tanden syns genom isen vid öppningen till tandgrottan, och gången till
+    # sprickan går ut österut.
+    'berget_galleriet': {
+        'storlek': (40, 24),
+        'objekt': [
+            punkt('start', 64, 48),
+            punkt('regi_hjalte_k4s03_galleriet', 64, 48),
+            *golv_vaggar(640, 384, golv=[
+                (16, 32, 420, 128), (196, 12, 84, 20), (400, 160, 36, 100),
+                (120, 260, 504, 100), (196, 360, 28, 24),
+            ]),
+            sak('gata_1', 16, 84, 10, 22, sida='hoger'),
+            sak('gata_2', 330, 32, 22, 10, sida='under'),
+            sak('gata_3', 426, 190, 10, 22, sida='vanster'),
+            # F2: ishyllan med isblocket i nischen, och fotavtrycket under blocket (hemligheten)
+            sak('ishylla', 200, 12, 76, 8, sida='under'),
+            sak('isblock', 226, 16, 24, 14, sida='alla'),
+            sak('fotavtryck', 224, 18, 28, 14, sida='alla'),
+            # tanden genom den klara isen, och öppningen till tandgrottan där det lockar (ungen nosar, det glimtar)
+            sak('tand_genom_isen', 236, 352, 28, 8, dekor=True),
+            utg('oppning_tandgrottan', 196, 376, 28, 8, golv=True, riktning='ned', till='berget_tandgrottan', lockradie=100),
+            utg('gang_sprickan', 616, 296, 8, 32, golv=True, riktning='hoger', till='berget_sprickan'),
+        ],
+    },
+    # Stig 4:s lilla rum (320 × 192), med öppningen i galleriet: Farfars ristning av en tand på västra stranden, stig 4
+    # (tand) österut över vaken, och tanden i isväggen längst in. När stigen är klar hoppar han tillbaka (tillbaka).
+    'berget_tandgrottan': {
+        'storlek': (20, 12),
+        'objekt': [
+            punkt('start', 36, 60),
+            *golv_vaggar(320, 192, golv=[(16, 24, 48, 152), (240, 24, 64, 152)], vatten=[(72, 24, 168, 152)]),
+            utg('gang_galleriet_tillbaka', 24, 24, 28, 8, golv=True, riktning='upp', till='berget_galleriet'),
+            sak('ristning_tand', 16, 100, 6, 18, sida='hoger'),
+            sak('stig_k4_stig4', 152, 96, 8, 8, dekor=True, ankare=True, tillbaka=True),
+            sak('tand_isen', 276, 24, 20, 12, sida='under'),
+        ],
+    },
+    # R5 sprickan (320 × 384): han kommer in i sydväst på landningen. Stig 3 (klubba) går uppåt över vattnet till
+    # hyllan vid sprickan i norr, och dagsljuset från sprickan faller ned längs vattnet, så att det syns hela tiden.
+    'berget_sprickan': {
+        'storlek': (20, 24),
+        'objekt': [
+            punkt('start', 40, 330),
+            punkt('regi_spricka', 160, 26),
+            *golv_vaggar(320, 384, golv=[(16, 286, 288, 82), (16, 40, 288, 82), (138, 10, 44, 30)],
+                         vatten=[(16, 122, 288, 164)]),
+            sak('ljussken_sprickan', 236, 40, 14, 246, dekor=True),
+            sak('vagg_ut', 40, 360, 24, 8, sida='over'),
+            sak('gata_3_igen', 72, 360, 24, 8, sida='over'),
+            sak('stig_k4_stig3', 156, 196, 8, 8, dekor=True, ankare=True, upp=True),
+            sak('spricka', 148, 10, 24, 16, sida='under'),
+            sak('utgang_stenfalt', 148, 0, 24, 14, sida='under'),
         ],
     },
     # En skärm: fyra stenar och hålet där baronens block stod, med hans orange rep vid kanten (116.5). Lådan ligger
@@ -278,7 +296,7 @@ RUMMEN = {
 
 # Föremål som kartan har innan Innehålls data har dem: de skrivs i kartan först när kap-04.json har dem (föremålet i
 # rummets innehåll), så att kontrollen är grön.
-VANTAR_PA_DATA = {'vagg_gemener', 'isficka_bar', 'ristning_tand', 'tand_isen', 'stig_k4_stig4', 'hylla', 'klippa', 'klippan_uppe'}
+VANTAR_PA_DATA = {'hylla', 'klippa', 'klippan_uppe'}
 
 
 def finns_i_datan():
@@ -298,38 +316,43 @@ def finns_i_datan():
 # rummet byter till dag, och vägen upp (klippan_uppe, syns i dag och kvall) skär igenom klippan. Uppe: stenfältet som
 # förut, med Stils väggar. Skrivs i stället för stenfältet ovan när kap-04 har klippan_uppe.
 STENFALT_KLIPPA = {
-    # 122.4 (0.106.0): 2 × 2 skärmar som de andra rummen, så att han letar efter stenarna. De står utspridda, och tre
-    # är halvt gömda i snödrivor (dekor ovanpå stenen). Ett undantag från regeln att ett läsval ryms på en skärm: varje
-    # sten avgörs för sig mot gåtan, som öppnas med ett tryck på papperet. Nere: hyllan, där han kommer ut ur
-    # sprickan, under den isade klippan. Vägen upp (klippan_uppe) syns i dag och kväll och skär igenom klippan.
+    # 124.8–124.9 (0.107.0): 640 × 384. Uppe stenfältet, sedan klippan (104 px hög, blank is med istappar längs
+    # kanten), hyllan där han kommer ut ur sprickan, och nedanför hyllan molnen och dalen långt ned, med floden som en
+    # tunn linje. Han kommer upp mitt på klippan. Den speciella stenen (sten_klubba) står längst bort i nordost, och en
+    # varm sten utan klubba (sten_varm) står närmast. Varje sten har sitt kännemärke, och snödrivorna täcker bara
+    # stenarnas fot. Stigen mot molnkanten syns först när kartbiten är tagen (Innehålls dolda stig_molnkanten). Ett
+    # undantag från regeln att ett läsval ryms på en skärm: varje sten avgörs för sig mot gåtan, som han har på sin lapp.
     'storlek': (40, 24),
     'objekt': [
-        punkt('start', 60, 350),
-        punkt('regi_luftskepp', 540, 30),
-        punkt('regi_driva', 580, 90),
-        punkt('regi_klippan', 316, 300),
+        punkt('start', 60, 312),
+        punkt('regi_luftskepp', 200, 30),
+        punkt('regi_driva', 230, 100),
+        punkt('regi_klippan', 316, 312),
         # uppe på stenfältet när scenen efter klippan börjar (omstart)
-        punkt('regi_hjalte_k4s05_stenfaltet', 316, 250),
+        punkt('regi_hjalte_k4s05_stenfaltet', 316, 164),
         # molnhavet i norr, kanten i öster och branten i väster (Stils väggar, 120.1)
-        vagg(0, 0, 640, 26), vagg(624, 26, 16, 358), vagg(0, 56, 40, 90),
-        sak('sten_varm', 96, 70, 26, 20, sida='alla'),
-        sak('sten_taggar', 300, 48, 26, 20, sida='alla'),
-        sak('sten_is', 540, 120, 26, 20, sida='alla'),
-        sak('halet', 440, 214, 30, 18, sida='alla'),
-        sak('sten_klubba', 150, 186, 26, 20, sida='alla'),
-        sak('lada_farfar', 154, 214, 18, 12, sida='alla'),
-        # snödrivorna som halvt gömmer stenarna (gråbox, ritas ovanpå)
-        sak('snodriva_varm', 86, 76, 36, 16, dekor=True, ovanpa=True),
-        sak('snodriva_is', 534, 126, 40, 16, dekor=True, ovanpa=True),
-        sak('snodriva_taggar', 294, 56, 36, 14, dekor=True, ovanpa=True),
-        sak('luftskepp_borta', 582, 14, 40, 20, dekor=True, ankare=True),
-        sak('stig_molnkanten', 340, 26, 30, 16, sida='under'),
-        # den isade klippan tvärs över (y 270–320), och vägen upp när ordet är skrivet
-        sak('klippa', 0, 270, 624, 50, sida='under'),
-        sak('klippan_uppe', 300, 266, 32, 58, golv=True, oppning=True),
-        # nere: hyllan, och branten ned mot dalen i söder
-        sak('hylla', 0, 320, 624, 48, golv=True),
-        vagg(0, 368, 624, 16),
+        vagg(0, 0, 640, 26), vagg(624, 26, 16, 310), vagg(0, 56, 40, 80),
+        sak('sten_varm', 380, 130, 26, 20, sida='alla'),
+        sak('sten_taggar', 110, 100, 26, 20, sida='alla'),
+        sak('sten_is', 250, 56, 26, 20, sida='alla'),
+        sak('halet', 470, 120, 30, 18, sida='alla'),
+        sak('sten_klubba', 560, 44, 26, 20, sida='alla'),
+        sak('lada_farfar', 564, 70, 18, 12, sida='alla'),
+        # snödrivorna täcker bara stenarnas fot (gråbox, ritas ovanpå), så att ingen sten är dold
+        sak('snodriva_taggar', 106, 114, 34, 8, dekor=True, ovanpa=True),
+        sak('snodriva_is', 246, 70, 34, 8, dekor=True, ovanpa=True),
+        sak('luftskepp_borta', 300, 8, 40, 20, dekor=True, ankare=True),
+        sak('stig_molnkanten', 480, 26, 30, 16, sida='under'),
+        # den isade klippan tvärs över (y 180–284), istapparna längs kanten, och vägen upp när ordet är skrivet
+        sak('klippa', 0, 180, 624, 104, sida='under'),
+        sak('istappar_klippan', 0, 180, 624, 6, dekor=True),
+        sak('klippan_uppe', 300, 176, 32, 112, golv=True, oppning=True),
+        # nere: hyllan, och nedanför den molnen och dalen långt ned med floden
+        sak('hylla', 0, 284, 624, 52, golv=True),
+        vagg(0, 336, 640, 48),
+        sak('moln_under_hyllan', 0, 338, 640, 16, dekor=True),
+        sak('dalen_langt_ned', 0, 354, 640, 30, dekor=True),
+        sak('flod_i_dalen', 0, 368, 640, 3, dekor=True),
     ],
 }
 

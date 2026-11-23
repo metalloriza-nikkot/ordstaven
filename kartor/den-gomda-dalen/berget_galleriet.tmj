@@ -1,0 +1,389 @@
+{
+ "type": "map",
+ "version": "1.10",
+ "tiledversion": "1.11.0",
+ "orientation": "orthogonal",
+ "renderorder": "right-down",
+ "width": 40,
+ "height": 24,
+ "tilewidth": 16,
+ "tileheight": 16,
+ "infinite": false,
+ "compressionlevel": -1,
+ "nextlayerid": 2,
+ "nextobjectid": 23,
+ "properties": [
+  {
+   "name": "rum",
+   "type": "string",
+   "value": "berget_galleriet"
+  }
+ ],
+ "tilesets": [],
+ "layers": [
+  {
+   "id": 1,
+   "name": "foremal",
+   "type": "objectgroup",
+   "draworder": "index",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 1,
+     "name": "start",
+     "type": "",
+     "x": 64,
+     "y": 48,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 2,
+     "name": "regi_hjalte_k4s03_galleriet",
+     "type": "",
+     "x": 64,
+     "y": 48,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 3,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 0,
+     "width": 640,
+     "height": 12,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 4,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 12,
+     "width": 196,
+     "height": 20,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 5,
+     "name": "",
+     "type": "vagg",
+     "x": 280,
+     "y": 12,
+     "width": 360,
+     "height": 20,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 6,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 32,
+     "width": 16,
+     "height": 128,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 7,
+     "name": "",
+     "type": "vagg",
+     "x": 436,
+     "y": 32,
+     "width": 204,
+     "height": 128,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 8,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 160,
+     "width": 400,
+     "height": 100,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 9,
+     "name": "",
+     "type": "vagg",
+     "x": 436,
+     "y": 160,
+     "width": 204,
+     "height": 100,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 10,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 260,
+     "width": 120,
+     "height": 100,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 11,
+     "name": "",
+     "type": "vagg",
+     "x": 624,
+     "y": 260,
+     "width": 16,
+     "height": 100,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 12,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 360,
+     "width": 196,
+     "height": 24,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 13,
+     "name": "",
+     "type": "vagg",
+     "x": 224,
+     "y": 360,
+     "width": 416,
+     "height": 24,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 14,
+     "name": "gata_1",
+     "type": "sak",
+     "x": 16,
+     "y": 84,
+     "width": 10,
+     "height": 22,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "hoger"
+      }
+     ]
+    },
+    {
+     "id": 15,
+     "name": "gata_2",
+     "type": "sak",
+     "x": 330,
+     "y": 32,
+     "width": 22,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      }
+     ]
+    },
+    {
+     "id": 16,
+     "name": "gata_3",
+     "type": "sak",
+     "x": 426,
+     "y": 190,
+     "width": 10,
+     "height": 22,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "vanster"
+      }
+     ]
+    },
+    {
+     "id": 17,
+     "name": "ishylla",
+     "type": "sak",
+     "x": 200,
+     "y": 12,
+     "width": 76,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      }
+     ]
+    },
+    {
+     "id": 18,
+     "name": "isblock",
+     "type": "sak",
+     "x": 226,
+     "y": 16,
+     "width": 24,
+     "height": 14,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "anim_ms",
+       "type": "int",
+       "value": 500
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "isblock_hylla_01"
+      },
+      {
+       "name": "bild_anim",
+       "type": "string",
+       "value": "isblock_hylla_01,isblock_hylla_02"
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 19,
+     "name": "fotavtryck",
+     "type": "sak",
+     "x": 224,
+     "y": 18,
+     "width": 28,
+     "height": 14,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "fotavtryck_is"
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 20,
+     "name": "tand_genom_isen",
+     "type": "sak",
+     "x": 236,
+     "y": 352,
+     "width": 28,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 21,
+     "name": "oppning_tandgrottan",
+     "type": "utgang",
+     "x": 196,
+     "y": 376,
+     "width": 28,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "lockradie",
+       "type": "int",
+       "value": 100
+      },
+      {
+       "name": "riktning",
+       "type": "string",
+       "value": "ned"
+      },
+      {
+       "name": "till",
+       "type": "string",
+       "value": "berget_tandgrottan"
+      }
+     ]
+    },
+    {
+     "id": 22,
+     "name": "gang_sprickan",
+     "type": "utgang",
+     "x": 616,
+     "y": 296,
+     "width": 8,
+     "height": 32,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "riktning",
+       "type": "string",
+       "value": "hoger"
+      },
+      {
+       "name": "till",
+       "type": "string",
+       "value": "berget_sprickan"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

@@ -2152,7 +2152,8 @@ export function skapaSpel(d) {
     let pagar = false;
     window.setInterval(async () => {
       if (!b || pagar || pausad || rum.fryst || !ui.plattan.hidden || !rum.harRum || !aktuelltRum || !garFritt()) return;
-      const sc = b.frivilligaVid(aktuelltRum).find((/** @type {any} */ s) => { const o = rum.ruta(s.startar_vid); return !!o && vidObjekt(rum.pos, o); });
+      // en scen i ett eget rum (124.12.4, tandgrottan) börjar inte här: utgången tar honom dit, och avstickaren spelar den
+      const sc = b.frivilligaVid(aktuelltRum).find((/** @type {any} */ s) => { if (b.egetRum(s)) return false; const o = rum.ruta(s.startar_vid); return !!o && vidObjekt(rum.pos, o); });
       if (!sc) return;
       pagar = true;
       const forra = aktuelltSteg, varPussel = pusselPagar, moln = molnNu;
@@ -2191,7 +2192,10 @@ export function skapaSpel(d) {
       if (o.sort !== 'utgang' || o.id === mal || lastNu(o)) return false;
       const t = tillFor(o);
       if (!t) return false;
-      if (b.frivilligScen(t)) return friVag || oppet;
+      const fs = b.frivilligScen(t);
+      // en frivillig scen i ett eget rum (124.12.4): dess utgång är öppen medan scenen går att starta
+      if (fs && b.egetRum(fs)) return fs.startar_vid === o.id;
+      if (fs) return friVag || oppet;
       return kanda.has(t);
     }).map((o) => o.id);
   }
