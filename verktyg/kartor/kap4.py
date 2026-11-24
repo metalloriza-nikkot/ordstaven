@@ -254,7 +254,7 @@ RUMMEN = {
         ],
     },
     # R5 sprickan (320 × 384): han kommer in i sydväst på landningen. Stig 3 (klubba) går uppåt över vattnet till
-    # hyllan vid sprickan i norr, och dagsljuset från sprickan faller ned längs vattnet, så att det syns hela tiden.
+    # hyllan vid sprickan i norr. Dagsljuset från sprickan ligger på norra stranden (127.2, Stils skiss 4), aldrig över ett flak.
     'berget_sprickan': {
         'storlek': (20, 24),
         'objekt': [
@@ -262,7 +262,7 @@ RUMMEN = {
             punkt('regi_spricka', 160, 26),
             *golv_vaggar(320, 384, golv=[(16, 286, 288, 82), (16, 40, 288, 82), (138, 10, 44, 30)],
                          vatten=[(16, 122, 288, 164)]),
-            sak('ljussken_sprickan', 236, 40, 14, 246, dekor=True),
+            sak('ljussken_sprickan', 132, 84, 68, 32, dekor=True),
             sak('vagg_ut', 40, 360, 24, 8, sida='over'),
             sak('gata_3_igen', 72, 360, 24, 8, sida='over'),
             sak('stig_k4_stig3', 156, 196, 8, 8, dekor=True, ankare=True, upp=True),

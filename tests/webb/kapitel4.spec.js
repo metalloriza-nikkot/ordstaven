@@ -173,7 +173,7 @@ test('kapitel 4: raset på långt håll, tystnaden, ungen bakom hjälten och ung
   // ungens ögon tänds i det svarta, och ungen blinkar med ett litet ljud
   await page.evaluate(() => window.__ORDSTAVEN.regi('ungens_ogon'));
   await expect.poll(regi, { timeout: 8000 }).toContain('ungens ögon tänds i mörkret');
-  await expect.poll(regi, { timeout: 8000 }).toMatch(/ljud:(unge_blinkar|lucka_pip)/);
+  await expect.poll(regi, { timeout: 8000 }).toMatch(/ljud:(unge_blink|lucka_pip)/);
 });
 
 test('kapitel 4 pass 2: mörkret, LJUS, gemenernas vägg, salen med stig 2 och valvet (124.2)', async ({ page }, info) => {

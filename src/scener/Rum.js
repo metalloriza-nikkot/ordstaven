@@ -5268,9 +5268,10 @@ export class Rum extends Phaser.Scene {
   }
 
   /**
-   * Ungens ögon i mörkret (124.6, 126.7): efter det svarta tänds två små ljus svagt där ungen står, och ungen blinkar en
-   * gång med ett litet ljud. Stils bilder `unge_ogon_morker_01–02` (öppna och blinkande) och ljudet `unge_blinkar`
-   * när de finns, annars gråbox och `lucka_pip`. Ögonen står kvar till passets slut. @returns {number}
+   * Ungens ögon i mörkret (124.6, 126.7 och 127.3): efter det svarta tänds två små ljus svagt där ungen står, och ungen
+   * blinkar en gång med ett litet ljud. Stils bilder `unge1_ogon_morker_01–03` i Stils ordning: 01 tonas in, sedan
+   * 01 → 02 → 03 → 02 → 01 med ljudet `unge_blink` vid 03, och sedan står 01 kvar. Utan bilderna gråbox, och utan
+   * ljudet `lucka_pip`. Ögonen står kvar till passets slut. @returns {number}
    */
   ungensOgon() {
     const smuts = () => { this.smutsig = true; };
@@ -5282,17 +5283,24 @@ export class Rum extends Phaser.Scene {
       lager = this.add.container(0, 0); this.lagerLjust.add(lager); this.lagda.push(lager);
       lager.add(this.add.rectangle(Math.round(vy.x), Math.round(vy.y), vy.width, vy.height, 0x000000, 1).setOrigin(0, 0));
     }
-    const oppna = this.regiram('unge_ogon_morker_01'), blink = this.regiram('unge_ogon_morker_02');
+    const ramar = ['unge1_ogon_morker_01', 'unge1_ogon_morker_02', 'unge1_ogon_morker_03'].map((n) => this.regiram(n));
+    const oppna = ramar[0], hela = ramar.every(Boolean);
     /** @type {any} */ let ogon;
     if (oppna) ogon = this.add.image(p.x, p.y, oppna.nyckel, oppna.ram);
     else { ogon = this.add.graphics({ x: p.x, y: p.y }); ogon.fillStyle(0xfff2a8, 1).fillCircle(-3, 0, 1.5).fillCircle(3, 0, 1.5); }
     ogon.setAlpha(0); lager.add(ogon);
     this.tweens.add({ targets: ogon, alpha: 0.75, duration: 700, delay: 300, ease: 'Sine.easeIn', onUpdate: smuts });
-    const ljud = this.b.ljud?.har?.('unge_blinkar') ? 'unge_blinkar' : 'lucka_pip';
+    const ljud = this.b.ljud?.har?.('unge_blink') ? 'unge_blink' : 'lucka_pip';
     this.time.delayedCall(1500, () => {
-      if (blink && oppna) { ogon.setTexture(blink.nyckel, blink.ram); this.time.delayedCall(160, () => { if (ogon.active) ogon.setTexture(oppna.nyckel, oppna.ram); smuts(); }); }
-      else this.tweens.add({ targets: ogon, scaleY: 0.15, duration: 80, yoyo: true, onUpdate: smuts });
-      this.regiLjud(ljud); smuts();
+      if (hela) {
+        // 01 → 02 → 03 → 02 → 01, ca 90 ms per bild, och ljudet när ögonen är stängda (03)
+        [1, 2, 1, 0].forEach((i, n) => this.time.delayedCall((n + 1) * 90, () => {
+          const f = /** @type {any} */ (ramar[i]); if (ogon.active) ogon.setTexture(f.nyckel, f.ram);
+          if (i === 2) this.regiLjud(ljud);
+          smuts();
+        }));
+      } else { this.tweens.add({ targets: ogon, scaleY: 0.15, duration: 80, yoyo: true, onUpdate: smuts }); this.regiLjud(ljud); }
+      smuts();
     });
     this.k4Logg('ungens ögon tänds i mörkret');
     return 2400;
