@@ -467,6 +467,10 @@
               },
               "efter": {
                 "$ref": "#/$defs/efter"
+              },
+              "hemlighet": {
+                "type": "boolean",
+                "description": "Ett frivilligt föremål som är en hemlighet (2.57, beslut 125.5): ungen nosar mot det när han matar den med ett bär. Kräver en belöning som syns (dinobok, ge_sak)."
               }
             }
           }
@@ -610,6 +614,10 @@
         "till_scen": {
           "$ref": "#/$defs/id",
           "description": "Den frivilliga scenen går att starta tills berättelsen kommer till den här scenen (2.47). Utan fältet: tills kapitlet är slut."
+        },
+        "hemlighet": {
+          "type": "boolean",
+          "description": "En frivillig scen som är en hemlighet (2.57, beslut 125.5): ungen nosar mot den när han matar den med ett bär. Kräver lockar och en belöning som syns."
         }
       }
     },
@@ -1304,7 +1312,8 @@
           "enum": [
             "mata_ungen",
             "nosen",
-            "radion"
+            "radion",
+            "krama_ungen"
           ],
           "description": "En instruktion som ber om en handling väntar tills den är gjord (mata_ungen: ungen har ätit ett bär, nosen: spelaren har tänt nosen, radion: spelaren har tryckt på radion och hört Farfars senaste replik genom den igen). Repliken visas uppe i rummet medan världen går, upprepas med en styrbild efter ca 8 s, och nästa steg kommer först efter handlingen."
         },
@@ -2418,6 +2427,11 @@
                   }
                 },
                 "description": "Repliker som lappen ersätter när den visas, så att samma sak inte sägs två gånger."
+              },
+              "knep": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Farfars knep på radion medan steget pågår (2.57, beslut 125.6): en kort replik i vanlig skrift som pekar på ett verktyg (skylten, boken, molnets bild, nosen, staven), aldrig på svaret. Saknas den läser radion stegets text med Farfars röst."
               }
             }
           }

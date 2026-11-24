@@ -91,6 +91,59 @@ test('en instruktion väntar på handlingen: nästa replik först när ungen har
   await expect(page.locator('#styrhjalp.tryck')).toBeHidden();
 });
 
+test('kramen (125.5): rädd ungen väntar på en kram, ett tryck på ungen kramar den, och Enter bredvid ungen också', async ({ page }) => {
+  test.setTimeout(60000);
+  const kramSteg = [R('{unge} är rädd.', 'berattare', { vantar_pa: 'krama_ungen' }), R('Tack.')];
+  await provscen(page, { id: 't_kram', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: kramSteg });
+  await expect(page.locator('#tanke .instruktion')).toHaveText('KNOPP ÄR RÄDD.', { timeout: 8000 });
+  await page.waitForTimeout(1200);
+  expect(await page.locator('#plattan .replik-ruta').count(), 'nästa replik väntar på kramen').toBe(0);
+  // ett tryck på ungen kramar den
+  const p = await page.evaluate(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); const u = r.ungePos; return window.__ORDSTAVEN.varldTillSkarm(u.x, u.y - 8); });
+  await page.mouse.click(p.x, p.y);
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('TACK.', { timeout: 8000 });
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('hjälten kramar ungen');
+  // Enter bredvid ungen kramar den också, och ett tryck på bären gör det inte
+  await provscen(page, { id: 't_kram2', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'ge_bar', antal: 2 }, ...kramSteg] });
+  await expect(page.locator('#tanke .instruktion')).toHaveText('KNOPP ÄR RÄDD.', { timeout: 8000 });
+  await page.click('#hud-bar');
+  await page.waitForTimeout(800);
+  expect(await page.locator('#plattan .replik-ruta').count(), 'ett bär är ingen kram').toBe(0);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').naraUngen())).toBe(true);
+  await page.keyboard.press('Enter');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('TACK.', { timeout: 8000 });
+});
+
+test('kramen: står ungen en bit bort går hjälten fram själv och kramar den (127.5)', async ({ page }) => {
+  test.setTimeout(60000);
+  await provscen(page, { id: 't_kram3', pass: 1, rum: 'provskogen', steg: [R('{unge} är ledsen.', 'berattare', { vantar_pa: 'krama_ungen' }), R('Tack.')] }, undefined, { rum: { provskogen: { innehall: ['sten'] } } });
+  await expect(page.locator('#tanke .instruktion')).toHaveText('KNOPP ÄR LEDSEN.', { timeout: 8000 });
+  // ungen står kvar en bit bort (ungens mål håller den på platsen, som när den nosar vid något)
+  const p = await page.evaluate(() => {
+    const r = window.__ORDSTAVEN.spel.scene.getScene('Rum');
+    r.ungePos = { x: r.pos.x + 70, y: r.pos.y }; r.ungeMal = { ...r.ungePos, mot: Math.PI }; r.placera();
+    return { s: window.__ORDSTAVEN.varldTillSkarm(r.ungePos.x, r.ungePos.y - 8), x0: r.pos.x };
+  });
+  expect(await page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').naraUngen())).toBe(false);
+  await page.mouse.click(p.s.x, p.s.y);
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('TACK.', { timeout: 10000 });
+  const x1 = await page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').pos.x);
+  expect(x1, 'han gick fram till ungen').toBeGreaterThan(p.x0 + 30);
+});
+
+test('nosen är alltid gratis (125.4): att nosa på ett ord i ett läsval kostar inget bär', async ({ page }) => {
+  test.setTimeout(40000);
+  await provscen(page, { id: 't_nos_gratis', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'pussel', pussel_id: 'p0_bar' }, R('Klart.')] },
+    (t) => { const av = t.aventyr['den-gomda-dalen']; av.ui = { ...av.ui, nosknappen: true }; av.bar = 3; });
+  await expect(page.locator('#plattan .ord').first()).toBeVisible({ timeout: 8000 });
+  await page.click('#hud-nos');
+  await page.locator('#plattan .ord').first().click();
+  await expect.poll(async () => (await page.evaluate(() => window.__ORDSTAVEN.logg())).includes('[nos]'), { timeout: 5000 }).toBe(true);
+  await page.waitForTimeout(600);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.tillstand().aventyr['den-gomda-dalen'].bar), 'nosen kostar inget').toBe(3);
+  await expect(page.locator('#hud-bar')).toContainText('3');
+});
+
 test('radion: repliken hörs genom radion, och radioramen glider in', async ({ page }) => {
   await provscen(page, { id: 't_radio', pass: 1, rum: 'koket', tillstand: 'morgon', steg: [{ typ: 'visa_ui', element: 'radioramen' }, R('Test, test. Hör du mig?', 'farfar', { via: 'radio' })] });
   await expect(page.locator('#plattan .replik-ruta.genom-radio .portratt.radio')).toBeVisible({ timeout: 5000 });

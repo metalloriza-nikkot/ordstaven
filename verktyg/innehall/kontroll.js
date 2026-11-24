@@ -50,6 +50,22 @@ export function bredd(rad) {
 }
 
 /** Hur många rader en textrad blir på läsplattan, med radbrytning mellan ord. */
+/** Om stegen ger något som syns (en hemlighets belöning, 125.5). @param {any[]} steg */
+function harBelaning(steg = []) {
+  return steg.some((x) => ['dinobok', 'ge_sak', 'unge_tillagg'].includes(x.typ));
+}
+
+/** Pusslets rätta svar i ord (svar, formlerna, de rätta alternativen), för att knepet aldrig ska säga dem. @param {any} p */
+function rattSvar(p) {
+  const ut = [];
+  if (typeof p.svar === 'string') ut.push(p.svar);
+  for (const f of p.formler || []) if (f.ord) ut.push(f.ord);
+  for (const v of Object.values(p.varianter || {})) for (const a of /** @type {any} */ (v).alternativ || []) if (a.ratt) ut.push(a.ord ?? a.text ?? '');
+  for (const u of p.utfall || []) for (const a of u.alternativ || []) if (a.ratt) ut.push(a.text ?? '');
+  if (typeof p.ord === 'string') ut.push(p.ord);
+  return ut.filter((x) => typeof x === 'string' && x.trim());
+}
+
 export function antalRader(rad, radbredd = RADBREDD_EM) {
   const mellanslag = BREDDER[' '] ?? 0.25;
   let rader = 1, nu = 0;
@@ -318,6 +334,12 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
         // kameran visar det repliken talar om (2.49, 104.6): det ska finnas i rummet
         if (st.visar && (!s.rum || !rum.get(s.rum)?.innehall.map(objId).includes(st.visar))) fel.push(var_(`${sp}: repliken visar ${st.visar}, men det finns inte i rummet ${s.rum}`));
         if (st.paminnelse) { replikKontroll(st.paminnelse.replik, `${sp} paminnelse`); if (!st.vantar_pa) fel.push(var_(`${sp}: paminnelse gäller bara en replik med vantar_pa`)); }
+        // hungrig ungen får bär, och rädd ungen får en kram (2.57, 125.5): repliken eller den före säger vilket
+        if (st.vantar_pa === 'mata_ungen' || st.vantar_pa === 'krama_ungen') {
+          const i = (s.steg || []).indexOf(st), fore = (s.steg || []).slice(Math.max(0, i - 2), i + 1).filter((x) => x.typ === 'replik').map((x) => x.text).join(' ').toLocaleLowerCase('sv-SE');
+          if (st.vantar_pa === 'mata_ungen' && /rädd|ledsen/.test(fore) && !/hungrig/.test(fore)) varningar.push(var_(`${sp}: ungen är rädd eller ledsen, och då får den en kram (krama_ungen), inte ett bär (125.5)`));
+          if (st.vantar_pa === 'krama_ungen' && /hungrig/.test(fore) && !/rädd|ledsen/.test(fore)) varningar.push(var_(`${sp}: ungen är hungrig, och då får den ett bär (mata_ungen), inte en kram (125.5)`));
+        }
         break;
         case 'mellanscen':
           pp.sek += 4;
@@ -465,6 +487,10 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
       if (s.rum !== null && !rum.has(s.rum)) fel.push(var_(`${plats}: rummet ${s.rum} finns inte`));
       if (s.tillstand && !tillstand.has(s.tillstand)) fel.push(var_(`${plats}: tillståndet ${s.tillstand} finns inte i något rum och skapas inte av någon formel`));
       if (s.vid_omstart) replikKontroll(s.vid_omstart, `${plats} vid_omstart`);
+      // en hemlighet (2.57, 125.5): en frivillig scen som lockar, med en belöning som syns
+      if (s.hemlighet && !s.frivillig) fel.push(var_(`${plats}: hemlighet gäller bara en frivillig scen`));
+      if (s.hemlighet && s.frivillig && !s.lockar) fel.push(var_(`${plats}: en hemlighet behöver lockar, så att ungen har något att nosa mot`));
+      if (s.hemlighet && !harBelaning(s.steg)) varningar.push(var_(`${plats}: hemligheten har ingen belöning som syns (dinobok, ge_sak, unge_tillagg)`));
       // det som lockar till en frivillig scen (2.31) står vid en utgång i något av kapitlets rum
       if (s.lockar && !s.frivillig) fel.push(var_(`${plats}: lockar gäller bara en frivillig scen`));
       if (s.lockar && ![...rum.values()].some((r) => r.innehall.map(objId).includes(s.lockar.vid))) fel.push(var_(`${plats}: lockar vid ${s.lockar.vid}, som inte finns i något rum`));
@@ -483,6 +509,7 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
         if (!ids.includes(fv.foremal)) fel.push(var_(`rum ${r.id} frivilligt ${j + 1}: ${fv.foremal} finns inte i rummets innehall`));
         if (frivilliga.has(fv.foremal)) fel.push(var_(`rum ${r.id}: ${fv.foremal} står två gånger i frivilligt`));
         frivilliga.add(fv.foremal);
+        if (fv.hemlighet && !harBelaning(fv.steg)) varningar.push(var_(`rum ${r.id} frivilligt ${fv.foremal}: hemligheten har ingen belöning som syns (dinobok, ge_sak, unge_tillagg)`));
         const pp = { sek: 0, lasuppgifter: 0, sistaSparpunkt: false };
         fv.steg.forEach((st, i) => {
           if (['sparpunkt', 'ga_till', 'las_skylt', 'prata'].includes(st.typ)) fel.push(var_(`rum ${r.id} frivilligt ${fv.foremal} steg ${i + 1}: ${st.typ} hör inte hemma i ett frivilligt föremål`));
@@ -673,6 +700,16 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
             const sc = (k.scener || []).find((x) => x.id === e.scen), pu = k.pussel.find((x) => x.id === e.scen);
             const finns = sc ? sc.steg.some((x) => x.typ === 'replik' && x.text === e.text) : pu ? pu.instruktion?.text === e.text : false;
             if (!finns) fel.push(var_(`${plats} steg ${i + 1}: repliken "${e.text}" i ${e.scen}, som lappen ersätter, finns inte`));
+          }
+          // Farfars knep (2.57, 125.6): ryms på två rader och säger aldrig svaret på stegets pussel
+          if (st.knep) {
+            textKontroll(st.knep, `${plats} steg ${i + 1} knep`);
+            const n = rader(st.knep).reduce((x, rad) => x + antalRader(rad), 0);
+            if (n > 2) varningar.push(var_(`${plats} steg ${i + 1}: knepet blir ${n} rader, högst två: "${st.knep}"`));
+            const pu = st.klart?.pussel ? pussel.get(st.klart.pussel) : null;
+            const svaren = pu ? rattSvar(pu) : [];
+            const knepOrd = new Set(ord(rader(st.knep).join(' ')).map(versaler));
+            for (const sv of svaren) if (sv && ord(sv).length && ord(sv).every((o) => knepOrd.has(versaler(o)))) fel.push(var_(`${plats} steg ${i + 1}: knepet säger svaret (${sv}), det ska peka på ett verktyg`));
           }
           if (st.visas === 'med_paminnelse') {
             const pos = hittaSteg(k, st.klart.scen, st.klart);

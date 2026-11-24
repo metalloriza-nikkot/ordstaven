@@ -604,7 +604,7 @@ export function skapaSpel(d) {
   /** Kartbiten i festen när han hittar eller får den: Stils bild, annars emojin. @param {number} n */
   const kartbitFest = (n) => kartbitarHtml([n], { hojd: Math.min(160, layout.skala.cssHojd * 0.5) }) ?? ikon(Number.isFinite(n) ? 'karta' : 'lapp', 'stor');
   /** Bilden av handlingen i en instruktion som väntar. @param {string} vad */
-  const handlingsBild = (vad) => { const n = ({ nosen: 'nos', mata_ungen: 'bar', radion: 'radio' })[vad]; return n ? `<span class="bild ikon-bild" data-bild="${n}">${ikon(n, 'stor')}</span>` : null; };
+  const handlingsBild = (vad) => { const n = ({ nosen: 'nos', mata_ungen: 'bar', radion: 'radio', krama_ungen: 'hand' })[vad]; return n ? `<span class="bild ikon-bild" data-bild="${n}">${ikon(n, 'stor')}</span>` : null; };
 
   /**
    * En instruktion som ber om en handling väntar tills den är gjord ("Tryck på bären, så får {unge} ett.").
@@ -621,8 +621,22 @@ export function skapaSpel(d) {
     const mal = { mata_ungen: '#hud-bar', nosen: '#hud-nos', radion: '#hud-radio' }[/** @type {string} */ (r.vantar_pa)];
     // nosen ska gå att tända medan instruktionen väntar (den kostar inget här)
     if (r.vantar_pa === 'nosen') ui.sattNos(true, { betala: () => true });
+    // kramen (125.5, 127.5): ett tryck på ungen kramar den var den står. Står ungen en bit bort går hjälten själv
+    // fram först, och Enter eller mellanslag bredvid ungen kramar den också
+    const kram = r.vantar_pa === 'krama_ungen';
+    /** @type {(() => void) | null} */ let slutaKram = null;
+    if (kram) {
+      rum.kramaUnge = () => {
+        rum.kramaUnge = null;
+        rum.kramar?.();
+        ljud.spela('unge'); logg.handelse('kram', 'hjälten kramar ungen');
+        handlingGjord('krama_ungen');
+      };
+      slutaKram = lyssnaHandling((h) => { if (h.typ === 'interagera' && rum.kramaUnge && !rum.fryst && ui.plattan.hidden && rum.naraUngen?.()) rum.kramaUnge(); });
+    }
     // styrbilden: ett finger på det som ska tryckas, eller Tab på datorn när det gäller nosen
     const pekaPa = () => {
+      if (kram) { const u = rum.ungePunkt, sk = skarm(u.x, u.y); ui.styrhjalp('tryck', sk); return; }
       if (r.vantar_pa === 'nosen' && !d.pek()) { const n = ui.$('#hud-nos').getBoundingClientRect(); ui.styrhjalp('tab', { x: n.left + n.width / 2, y: n.bottom }); return; }
       const e = mal ? ui.$(mal) : null; if (!e) return; const b2 = e.getBoundingClientRect(); ui.styrhjalp('tryck', { x: b2.left + b2.width / 2, y: b2.top + b2.height / 2 });
     };
@@ -646,6 +660,7 @@ export function skapaSpel(d) {
     knuff();
     await new Promise((klar) => vantarPaHandling.set(r.vantar_pa, () => klar(undefined)));
     clearTimeout(t);
+    if (kram) { slutaKram?.(); rum.kramaUnge = null; }
     ui.styrhjalp(null); visaMoln(null);
   }
 
@@ -840,21 +855,14 @@ export function skapaSpel(d) {
   let nosSpar = null;
   /** Orden han nosade på i pusslet, för loggen. @param {any} spar @returns {{ nosade?: string }} */
   const nosadeIPusslet = (spar) => (spar?.nosade?.length ? { nosade: spar.nosade.join(' ') } : {});
-  /** Nosen: tillåten i pussel med hjälp "ett_ord". Kostar ett bär, gratis vid 0 bär. @param {any} pussel @param {{ hjalp: boolean }} spar */
+  /** Nosen: tillåten i pussel med hjälp "ett_ord". Alltid gratis (125.4), men den räknas som hjälp. @param {any} pussel @param {{ hjalp: boolean }} spar */
   function tillatNos(pussel, spar) {
     const tillaten = !!pussel && pussel.hjalp === 'ett_ord';
     // orden han nosar på i pusslet loggas med valet (76.5, C3)
     nosSpar = /** @type {any} */ (spar); nosSpar.nosade ??= [];
     ui.sattNos(tillaten, {
-      betala: () => {
-        if (av.bar > 0) {
-          av.bar--; ui.uppdateraHud(av);
-          // nosens pris syns: ett bär flyger från räknaren till nosen (stubbe i gråboxen)
-          const fr = ui.$('#hud-bar').getBoundingClientRect(), ti = ui.$('#hud-nos').getBoundingClientRect();
-          if (fr.width && ti.width) ui.flygBar({ x: fr.left + fr.width / 2, y: fr.top + fr.height / 2 }, { x: ti.left + ti.width / 2, y: ti.top + ti.height / 2 }, tid(400));
-        }
-        return true;
-      },
+      // 125.4: nosen kostar aldrig ett bär, så att hjälpen aldrig har ett pris när han har fastnat
+      betala: () => true,
       anvand: () => { spar.hjalp = true; },
     });
   }

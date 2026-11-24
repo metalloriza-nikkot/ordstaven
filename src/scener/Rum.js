@@ -237,6 +237,10 @@ export class Rum extends Phaser.Scene {
     this.fragaIgen = null;
     /** @type {((id: string) => void) | null} steget tryck: ett tryck på ett föremål, och han går inte (2.47) */
     this.tryckFri = null;
+    /** @type {(() => void) | null} kramen (125.5): ett tryck på ungen kramar den, medan en instruktion väntar på det */
+    this.kramaUnge = null;
+    /** hjälten går fram till ungen för att krama den (ett tryck på ungen en bit bort) */
+    this.kramVag = false;
     /** @type {any} saken hjälten bär (filten), som svävar efter honom */
     this.buren = null;
     /** @type {string[]} föremål som går att använda just nu */
@@ -315,7 +319,15 @@ export class Rum extends Phaser.Scene {
     this.sidovy = this.add.container(0, 0).setVisible(false);
     // tryck på ett objekt = gå fram till det
     this.b.inmatning.lyssna((h) => {
+      if (h.typ === 'ga') this.kramVag = false;
       if (h.typ !== 'tryck') return;
+      this.kramVag = false;
+      // kramen (125.5, 127.5): ett tryck på ungen kramar den var den står. Står den en bit bort går han fram först
+      if (this.kramaUnge && !this.fryst && !this.klattrar && this.traffarUngen(h)) {
+        if (this.naraUngen()) { this.b.inmatning.rensaGaTill(); this.kramaUnge(); return; }
+        const u = this.ungePos, sida = this.pos.x <= u.x ? -12 : 12;
+        this.b.inmatning.sattGaTill(u.x + sida, u.y); this.kramVag = true; return;
+      }
       // steget tryck (2.47, resan): han går inte, och ett tryck på föremålet räcker
       if (this.tryckFri) { this.b.inmatning.rensaGaTill(); const o = this.traff(h); if (o) this.tryckFri(o.id); return; }
       // ett tryck medan världen står still (rummet tonas in, en reaktion, han går tillbaka från kurvan) sparas
@@ -343,6 +355,26 @@ export class Rum extends Phaser.Scene {
     const traffar = this.objekt.filter((x) => x.sort !== 'yta' && !x.dekor && h.x >= x.x - 4 && h.x <= x.x + x.b + 4 && h.y >= x.y - 4 && h.y <= x.y + x.h + 4);
     const avst = (/** @type {any} */ x) => Math.hypot(h.x - (x.x + x.b / 2), h.y - (x.y + x.h / 2));
     return traffar.sort((a, c) => avst(a) - avst(c))[0] ?? null;
+  }
+
+  /** Om ett tryck träffar ungen (en ruta kring ungens kropp, med lite marginal). @param {{ x: number, y: number }} h */
+  traffarUngen(h) {
+    if (!this.unge.visible) return false;
+    const u = this.ungePos;
+    return h.x >= u.x - 12 && h.x <= u.x + 12 && h.y >= u.y - 22 && h.y <= u.y + 4;
+  }
+
+  /** Om hjälten står intill ungen, så nära att han kan krama den. */
+  naraUngen() { return this.unge.visible && Math.hypot(this.pos.x - this.ungePos.x, this.pos.y - this.ungePos.y) <= 22; }
+
+  /** Kramen: hjälten vänder sig mot ungen, och ungen blir glad och trycker sig mot honom (gråbox: ungens glada hopp). */
+  kramar() {
+    this.kramVag = false;
+    const dx = this.ungePos.x - this.pos.x;
+    if (Math.abs(dx) > 1) this.vand = { x: Math.sign(dx), y: 0 };
+    this.ungeVand = { x: this.pos.x - this.ungePos.x, y: 0.01 };
+    this.ritaHjalte(); this.ungeReagerar(true); this.smutsig = true;
+    this.regiLogg.push('kram');
   }
 
   trycktPa(h) {
@@ -6173,6 +6205,11 @@ export class Rum extends Phaser.Scene {
       return;
     }
     this.pilFryst = false;
+    // kramen: han har gått fram till ungen (ungen kan ha kommit honom till mötes)
+    if (this.kramVag) {
+      if (!this.kramaUnge) this.kramVag = false;
+      else if (this.naraUngen()) { inm.rensaGaTill(); this.kramVag = false; this.kramaUnge(); }
+    }
     // ett tryck medan världen stod still görs nu, om det var nyss (högst 1,5 s sedan)
     if (this.sparatTryck) {
       const t = this.sparatTryck; this.sparatTryck = null;

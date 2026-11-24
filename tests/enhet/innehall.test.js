@@ -409,3 +409,48 @@ describe('kapitel 2 i schema 2.31 (Teknik 20, beslut 64.2)', () => {
     expect(f).toMatch(/lang har 4 repliker som hörs, högst tre/);
   });
 });
+
+describe('fälten för 125 (schema 2.57: knep, krama_ungen och hemlighet)', () => {
+  const kap01 = (d) => d.kapitel[1];
+  const scen = (k, id) => k.scener.find((s) => s.id === id);
+  const kontroll = (andra) => { const d = riktigt(); andra(d); return kontrollera(d); };
+  /** Hackspetten i kapitel 1 får kramen, och uppdragets steg följer med (Innehålls underlag 4). */
+  const kram = (d) => {
+    scen(kap01(d), 'k1s13_slutet').steg.find((s) => s.vantar_pa === 'mata_ungen').vantar_pa = 'krama_ungen';
+    const st = kap01(d).uppdrag.find((u) => u.id === 'u1_trosta').steg[0]; st.text = 'KRAMA {UNGE}'; st.klart.vantar_pa = 'krama_ungen';
+  };
+
+  it('knep och krama_ungen går igenom schemat och kontrollen', () => {
+    const r = kontroll((d) => { kap01(d).uppdrag[0].steg[0].knep = 'Läs min skylt!'; kram(d); });
+    expect(r.fel).toEqual([]);
+    expect(r.varningar.join('\n')).not.toMatch(/k1s13_slutet.*kram/);
+  });
+  it('hemlighet på en frivillig scen som lockar, med en belöning', () => {
+    const d = riktigt(); const k4 = las('den-gomda-dalen/kap-04.json');
+    k4.scener.find((s) => s.id === 'k4s03_isfickan').hemlighet = true;
+    d.kapitel = [k4];
+    const r = kontrollera(d);
+    expect(r.fel.filter((f) => /hemlighet/.test(f))).toEqual([]);
+  });
+  it('knepet säger aldrig svaret på stegets pussel, och ryms på två rader', () => {
+    const r = kontroll((d) => {
+      const st = kap01(d).uppdrag.flatMap((u) => u.steg).find((s) => s.klart.pussel === 'k1_svard');
+      st.knep = 'Skriv svärd!';
+      kap01(d).uppdrag[0].steg[0].knep = 'Läs min skylt, och läs den igen, och sedan en gång till, och titta på bilden i molnet, och låt ungen nosa.';
+    });
+    expect(r.fel.join('\n')).toMatch(/knepet säger svaret \(SVÄRD\)/);
+    expect(r.varningar.join('\n')).toMatch(/knepet blir \d+ rader, högst två/);
+  });
+  it('en hemlighet är en frivillig scen som lockar', () => {
+    const r = kontroll((d) => {
+      scen(kap01(d), 'k1s01_brynet').hemlighet = true;
+      scen(kap01(d), 'k1s03_buskarna').hemlighet = true; // buskarna lockar inte än (underlag 5)
+    });
+    const f = r.fel.join('\n');
+    expect(f).toMatch(/k1s01_brynet.*hemlighet gäller bara en frivillig scen/);
+    expect(f).toMatch(/k1s03_buskarna.*en hemlighet behöver lockar/);
+  });
+  it('rädd ungen får en kram, och hungrig ungen ett bär', () => {
+    expect(kontroll(() => {}).varningar.join('\n')).toMatch(/k1s13_slutet.*rädd eller ledsen, och då får den en kram/);
+  });
+});

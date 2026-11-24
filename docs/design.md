@@ -9,7 +9,7 @@ Första äventyret i en tänkt serie. Hjälten (utseende, namn, grad, formler) f
 
 ## Designprinciper som påverkar koden
 1. **Läsningen avgör.** Går en uppgift att lösa utan att läsa är den felbyggd.
-2. **Instruktioner läses alltid upp. Ledtrådar läses aldrig upp automatiskt.** Hjälpknappen (ungens nos) läser upp ett ord i taget och kostar ett bär (gratis vid 0 bär).
+2. **Instruktioner läses alltid upp. Ledtrådar läses aldrig upp automatiskt.** Hjälpknappen (ungens nos) läser upp ett ord i taget och är alltid gratis (beslut 125.4).
 3. **Fel är roliga, aldrig straff.** Ingen tidspress, inga liv, ingen förlorad progress, inga röda kryss.
 4. **Versaler som standard.** Gemener införs senare.
 5. **Texten är aldrig pixlig.** All läsbar text i ett typsnitt (Lexend), i ett skarpt lager ovanpå pixelvärlden.
