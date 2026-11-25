@@ -6,8 +6,8 @@ const LJUD = JSON.parse(readFileSync(new URL('../../assets/ljud/effekter/ljud.js
 const FILER = readdirSync(new URL('../../assets/ljud/effekter/', import.meta.url)).filter((f) => f.endsWith('.wav')).map((f) => f.replace(/\.wav$/, ''));
 
 describe('ljudeffekterna (F5, 10c v0.5)', () => {
-  it('Stils 95 ljud (surr i 70.7, kapitel 3:s tio i 103.3.4, duellens startljud i 106.5 och isflakens tre i 115.8): ett id per fil, och ljud.json säger nivå och längd', () => {
-    expect(FILER).toHaveLength(95);
+  it('Stils 105 ljud (surr i 70.7, kapitel 3:s tio i 103.3.4, duellens startljud i 106.5, isflakens tre i 115.8 och lev127:s tio): ett id per fil, och ljud.json säger nivå och längd', () => {
+    expect(FILER).toHaveLength(105);
     expect(Object.keys(LJUD).sort()).toEqual([...FILER].sort());
     for (const v of Object.values(LJUD)) { expect(v.styrka_db).toBeLessThan(0); expect(v.sekunder).toBeGreaterThan(0); }
   });
@@ -17,6 +17,8 @@ describe('ljudeffekterna (F5, 10c v0.5)', () => {
       'kruka', 'apa_gnaller', 'hackspett', 'uggla', 'ekorre_not', 'mage_kurrar', 'klonk', 'klick_las', 'hugg', 'prassel', 'sla', 'pff', 'bar', 'pling', 'klick', 'ratt', 'fel',
       ...Array.from({ length: 8 }, (_, i) => `bricka_${i + 1}`),
       // kapitel 3 (103.3.4): regierna och rummets slingor spelar dem
-      'horn_tut', 'frukosthorn', 'vattenhjul', 'kvarn_dunk', 'on_stiger', 'droppar', 'plask', 'skoldpadda_rop', 'skuggan', 'sackhiss']) expect(effektFinns(id), id).toBe(true);
+      'horn_tut', 'frukosthorn', 'vattenhjul', 'kvarn_dunk', 'on_stiger', 'droppar', 'plask', 'skoldpadda_rop', 'skuggan', 'sackhiss',
+      // kapitel 4 (lev127): ögonen, svansslaget, isen som rasar och radions sprak
+      'unge_blink', 'svans_slag', 'isen_rasar', 'radio_sprak']) expect(effektFinns(id), id).toBe(true);
   });
 });

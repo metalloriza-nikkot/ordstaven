@@ -22,7 +22,20 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from kap2 import KARTOR, ROT, karta, liv, punkt, sak, utg, vagg  # noqa: E402
 
 RUMSBILDER = ROT / 'assets' / 'rum' / 'kap-04'
-I_BILDEN = set()
+# Det som är målat i rummens bilder (LASMIG_127): kartan har kvar platserna, men gråboxen ritar dem inte
+I_BILDEN = {
+    # stigen: bron, stigspåren, skyltstolparna (orden står på läsplattan), snöhögarna, Farfars sten och valvet i branten
+    'stig_floden', 'stigspar_in', *(f'stigspar_isgrottan_{i}' for i in range(1, 5)), 'stigspar_issjon_1', 'stigspar_issjon_2',
+    *(f'stigspar_eldgrottan_{i}' for i in range(1, 4)), 'skylt_isgrottan', 'skylt_issjon', 'skylt_eldgrottan',
+    *(f'snohog_{i}' for i in range(1, 5)), 'sten_farfar', 'mynningen',
+    # grottan
+    'vagg_gemener', 'vagg_valvet', 'gata_1', 'gata_2', 'gata_3', 'ishylla', 'tand_genom_isen',
+    'vagg_ut', 'gata_3_igen', 'ljussken_sprickan',
+    # också i bilderna (Tekniks läsning av lev127): mynningen inifrån, isfickan, utgången och stigen mot stenfältet
+    'mynningen_inifran', 'isficka', 'utgang_stenfalt', 'stig_molnkanten', 'klippan_uppe', 'hylla',
+    # stenfältet
+    'istappar_klippan', 'klippa', 'moln_under_hyllan', 'dalen_langt_ned', 'flod_i_dalen',
+}
 
 # Stils föremål för kapitel 4 (LASMIG_114 och 118): kartans id → bildens egenskaper. Bilden står på föremålets
 # nederkant, mitt i. Rummen är gråbox tills Stil ritar dem mot kartversionen, så bilderna sätts här (som i kap3.py).
@@ -45,6 +58,22 @@ FOREMALSBILDER = {
     # stig 4 (LASMIG_122): tanden som glimtar genom isen (ca 500 ms per bild), och Farfars ristning av en tand
     'tand_isen': {'bild': 'tand_isen_01', 'bild_anim': 'tand_isen_01,tand_isen_02', 'anim_ms': 500},
     'ristning_tand': {'bild': 'ristning_tand'},
+    # F1 (LASMIG_124 och 126): tre isklumpar att lyfta, och Farfars kompass under den sista, som glimtar
+    **{f'isklump_{i}': {'bild': f'isklump_0{i}', 'bild_hugg': 'isklump_lyft', 'bild_kvar': 'isklump_skugga'} for i in (1, 2, 3)},
+    'farfars_kompass': {'bild': 'farfars_kompass', 'bild_anim': 'farfars_kompass,farfars_kompass_glimt', 'anim_ms': 500},
+    # F1:s varma ljus från sprickan i taket ligger ovanför mörkret, så att det syns och lockar från gången
+    'f1_ljus': {'bild': 'f1_ljus_01', 'bild_anim': 'f1_ljus_01,f1_ljus_02', 'anim_ms': 400, 'lyser': True},
+    'f1_spricka': {'bild': 'f1_spricka', 'lyser': True},
+    # Farfars tavla av trä med kompassrosen och en pil (LASMIG_126)
+    'tavla_farfar': {'bild': 'tavla_farfar'},
+    # snödrivorna som ligger över stenarnas fot (LASMIG_127)
+    'snodriva_taggar': {'bild': 'snodriva'},
+    'snodriva_is': {'bild': 'snodriva'},
+    # det enda som rör sig i varje sal (LASMIG_127)
+    'orgel_blank': {'bild': 'orgel_blank_01', 'bild_anim': 'orgel_blank_01,orgel_blank_02,orgel_blank_03', 'anim_ms': 150, 'anim_paus': '2000-4000'},
+    'valv_ljus': {'bild': 'valv_ljus_01', 'bild_anim': 'valv_ljus_01,valv_ljus_02', 'anim_ms': 900},
+    'tand_gloria': {'bild': 'tand_gloria_01', 'bild_anim': 'tand_gloria_01,tand_gloria_02,tand_gloria_03,tand_gloria_02', 'anim_ms': 400},
+    'snoflingor': {'bild': 'snoflingor_01', 'bild_anim': 'snoflingor_01,snoflingor_02,snoflingor_03', 'anim_ms': 300},
 }
 
 
@@ -179,6 +208,9 @@ RUMMEN = {
             ]),
             sak('mynningen_inifran', 132, 348, 56, 12, sida='over'),
             sak('isficka', 142, 96, 20, 8, sida='under', lockradie=90),
+            # F1:s ljus: fläcken på golvet där klumparna ligger, och sprickan i taket ovanför (LASMIG_124)
+            sak('f1_ljus', 122, 104, 56, 48, dekor=True),
+            sak('f1_spricka', 142, 90, 16, 10, dekor=True),
             sak('isklump_1', 114, 108, 14, 12, sida='alla'),
             sak('isklump_2', 176, 106, 14, 12, sida='alla'),
             sak('isklump_3', 118, 138, 14, 12, sida='alla'),
@@ -197,6 +229,7 @@ RUMMEN = {
             *golv_vaggar(480, 192, golv=[(16, 36, 48, 140), (274, 36, 190, 140)], vatten=[(66, 36, 208, 140)]),
             sak('stig_k4_stig2', 166, 102, 8, 8, dekor=True, ankare=True),
             sak('tavla_farfar', 280, 36, 24, 22, sida='under'),
+            sak('orgel_blank', 118, 0, 8, 36, dekor=True),
             utg('gang_valvet', 420, 36, 28, 8, golv=True, riktning='upp', till='berget_valvet'),
         ],
     },
@@ -211,6 +244,7 @@ RUMMEN = {
             utg('gang_salen', 40, 184, 32, 8, golv=True, riktning='ned', till='berget_salen'),
             utg('gang_galleriet', 568, 184, 32, 8, golv=True, riktning='ned', till='berget_galleriet'),
             sak('vagg_valvet', 196, 36, 44, 8, sida='under'),
+            sak('valv_ljus', 0, 0, 640, 40, dekor=True),
             *stig('k4_stig_valv', (364, 100), 5, 3, 36, 164),
         ],
     },
@@ -250,6 +284,7 @@ RUMMEN = {
             utg('gang_galleriet_tillbaka', 24, 24, 28, 8, golv=True, riktning='upp', till='berget_galleriet'),
             sak('ristning_tand', 16, 100, 6, 18, sida='hoger'),
             sak('stig_k4_stig4', 152, 96, 8, 8, dekor=True, ankare=True, tillbaka=True),
+            sak('tand_gloria', 268, 18, 36, 24, dekor=True),
             sak('tand_isen', 276, 24, 20, 12, sida='under'),
         ],
     },
@@ -263,6 +298,7 @@ RUMMEN = {
             *golv_vaggar(320, 384, golv=[(16, 286, 288, 82), (16, 40, 288, 82), (138, 10, 44, 30)],
                          vatten=[(16, 122, 288, 164)]),
             sak('ljussken_sprickan', 132, 84, 68, 32, dekor=True),
+            sak('snoflingor', 142, 12, 48, 90, dekor=True),
             sak('vagg_ut', 40, 360, 24, 8, sida='over'),
             sak('gata_3_igen', 72, 360, 24, 8, sida='over'),
             sak('stig_k4_stig3', 156, 196, 8, 8, dekor=True, ankare=True, upp=True),

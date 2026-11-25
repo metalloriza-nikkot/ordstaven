@@ -16,7 +16,7 @@
  },
  "meta": {
   "namn": "Berget",
-  "version": "0.7",
+  "version": "0.8",
   "datum": "2026-11-25",
   "agare": "Innehåll",
   "kalla": "Berättelsen 21 v0.5.2, manus 21 v0.3.1 och ritningarna 21b v0.2.1, godkända av den vuxne (beslut 118.1).",
@@ -27,7 +27,8 @@
   "andrat_v04": "2026-11-23 (beslut 122.2–122.4 och 122.11): KONSTIG sten, scenen efter STOR SKÖLD och pass 1:s slut, pass 2 som börjar i mörkret med Farfar, Farfars två repliker om ledtrådarna och de små bokstäverna, valvet med den obligatoriska stigen (skatt, inte skata), det som lockar till stig 4, klippans instruktion, det större stenfältet, och Farfars god natt.",
   "andrat_v05": "2026-11-23 (beslut 124 och 124.12, granskning 11): grottan som fem rum i följd och tandgrottan, tre pass med gränsen vid galleriet, gåtan som en lapp som kan öppnas igen, F1 med isklumparna och Farfars kompass, F2 i galleriet, stig 4 i tandgrottan, rutnät utan återvändsgränder för den som har läst rätt, tavlan på andra stranden, ungens ögon i slutet av pass 1, och stigen mot molnkanten efter kartbiten.",
   "andrat_v06": "2026-11-24 (beslut 127.3 och 127.9): regin ungens_ogon på mellanscenen i mörkret, utan lucka_pip, \"Min gamla kompass! Den tappade jag här!\", och bär under de två första isklumparna.",
-  "andrat_v07": "2026-11-25 (beslut 125 och 127.5): stegen HOPPA ÖVER VATTNET, LÄS VÄGGEN OCH HOPPA och KOM UPP PÅ KLIPPAN, Farfars knep, och F1, F2 och tandgrottan som hemligheter."
+  "andrat_v07": "2026-11-25 (beslut 125 och 127.5): stegen HOPPA ÖVER VATTNET, LÄS VÄGGEN OCH HOPPA och KOM UPP PÅ KLIPPAN, Farfars knep, och F1, F2 och tandgrottan som hemligheter.",
+  "andrat_v08": "2026-11-25 (beslut 128.10.3, rättelse i ett fryst kapitel, en replik mot en): fröet för baronens bit på stenfältet: den har bara ord, om vägen in."
  },
  "var_var_vi": [
   {
@@ -914,7 +915,7 @@
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Baronen har den sista biten. Den låg i molnen!",
+     "text": "Baronens bit har bara ord. Om vägen in!",
      "upplast": true,
      "via": "radio"
     },

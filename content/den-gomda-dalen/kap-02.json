@@ -16,7 +16,7 @@
  },
  "meta": {
   "namn": "Träsket",
-  "version": "0.7.14",
+  "version": "0.7.15",
   "datum": "2026-11-25",
   "agare": "Innehåll",
   "kalla": "Manus 17-kapitel2-manus.md v0.4 (beslut 60–64). Ny fil.",
@@ -42,7 +42,8 @@
   "andrat_v0711": "2026-11-16 (beslut 96.4): Tant Rosa säger \"Är du {hjalte}? Herr Skata tog mitt brev!\".",
   "andrat_v0712": "2026-11-18 (beslut 102.5–102.6): 8 repliker efter provläsningen, valda av spelaren. k2s01_kanten: Skriv en formel med staven! -> Skriv ett ord från din stav! k2s01_kanten: Ordkraft! Ditt ord bar er över. -> Ordkraft! Ni kom över vattnet! k2s02_byn: Är du {hjalte}? Herr Skata tog mitt brev! -> Är du {hjalte}? Herr Skata tog brevet! k2s02_byn: Snälla, du måste hitta båda brevhalvorna. -> Hitta båda halvorna! Jag sätter dem i ramen. k2s04_bryggan: Han har min gamla bit! Ta brevhalvan till Rosa! -> Det är en av mina kartbitar! Gå till Rosa! k2s05_vassen: Vilket hopp! Hur kommer {unge} i land? -> {unge} hoppade ut på en stock! k2s09_kartbiten: Tack! Jag flätade den av vass, med rosa band. -> Tack för hjälpen! Här är en ryggsäck av vass. k2s10_elden: Bra ord! Men byn tänder elden i kväll. -> Bra ord! Men först måste byn se stigen. Lika många repliker, och inga id:n är ändrade.",
   "andrat_v0713": "2026-11-18 (beslut 105.3–105.5): skrivpusslen med ordkraft efter trappan i 104.3. k2s01_kanten: Vassen är för tät. Ni kommer inte fram! -> Vassen är för tät. Hugg er igenom den! k2_svard: Skriv ett ord från din stav! -> Skriv en formel från din stav! k2_vassvaggen: Hugg dig igenom vassen! -> Hugg nu! k2s01_kanten: Hur kommer ni över vattnet? -> Ni måste ta er över vattnet! k2_flyg: Säg åt brevet vad det ska göra! -> En ny formel! Få brevhalvan att flyga hit! k2_lyft: Säg åt tavlan vad den ska göra! -> Tavlan måste ner! Skriv en formel! k2_draken: Skriv ett ord som hjälper draken! -> Draken måste flyga igen! Skriv en formel! k2_lyktorna: Det är mörkt. Skriv ett ord som hjälper! -> Lyktorna måste lysa! Skriv en formel! Inga nya steg, och inga id:n är ändrade.",
-  "andrat_v0714": "2026-11-25 (beslut 125 och 127.5): stegen KOM ÖVER VATTNET, HÄMTA HALVAN VID BRYGGAN, HÄMTA HALVAN I VASSEN och LYS UPP LYKTORNA, Farfars knep, och draken och dammen som hemligheter."
+  "andrat_v0714": "2026-11-25 (beslut 125 och 127.5): stegen KOM ÖVER VATTNET, HÄMTA HALVAN VID BRYGGAN, HÄMTA HALVAN I VASSEN och LYS UPP LYKTORNA, Farfars knep, och draken och dammen som hemligheter.",
+  "andrat_v0715": "2026-11-25 (beslut 128.10.3, rättelse i ett fryst kapitel, en replik mot en): fröet för baronens bit i k2s04: Herr Skata hittade den i molnen, och Farfar säger att det är hans sista bit."
  },
  "var_var_vi": [
   {
@@ -982,7 +983,7 @@
     {
      "typ": "replik",
      "talare": "baronen",
-     "text": "Va?! Inte där? Hmpf! En bit har jag redan!",
+     "text": "Inte där? Hmpf! Herr Skata hittade min bit i molnen!",
      "upplast": true
     },
     {
@@ -1003,7 +1004,7 @@
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Det är en av mina kartbitar! Gå till Rosa!",
+     "text": "Han har min sista bit! Gå till Rosa!",
      "upplast": true,
      "via": "radio"
     },

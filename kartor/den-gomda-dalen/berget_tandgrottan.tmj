@@ -11,8 +11,13 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 12,
+ "nextobjectid": 13,
  "properties": [
+  {
+   "name": "bild",
+   "type": "string",
+   "value": "berget_tandgrottan"
+  },
   {
    "name": "rum",
    "type": "string",
@@ -133,6 +138,11 @@
        "value": true
       },
       {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "riktning",
        "type": "string",
        "value": "upp"
@@ -197,6 +207,39 @@
     },
     {
      "id": 11,
+     "name": "tand_gloria",
+     "type": "sak",
+     "x": 268,
+     "y": 18,
+     "width": 36,
+     "height": 24,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "anim_ms",
+       "type": "int",
+       "value": 400
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "tand_gloria_01"
+      },
+      {
+       "name": "bild_anim",
+       "type": "string",
+       "value": "tand_gloria_01,tand_gloria_02,tand_gloria_03,tand_gloria_02"
+      },
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 12,
      "name": "tand_isen",
      "type": "sak",
      "x": 276,

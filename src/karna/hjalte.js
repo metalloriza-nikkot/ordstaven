@@ -7,6 +7,12 @@
 /** Sakerna han kan ha på sig, i den ordning garderoben visar dem. */
 export const LAGER = Object.freeze(['hjalmdekor', 'ryggsack', 'drakt']);
 
+/**
+ * Saker som sitter på en annan sak och inte byter ut den (LASMIG_126): Farfars kompass hänger på ryggsäcken, vilken
+ * säck han än har. Den ligger i garderoben (där den alltid är på), men lagret för ryggsäcken ändras inte.
+ */
+export const TILLBEHOR = Object.freeze(/** @type {Record<string, string>} */ ({ farfars_kompass: 'ryggsack' }));
+
 /** @param {any} hjalte */
 function sakra(hjalte) {
   hjalte.lager = { hjalmdekor: null, ryggsack: null, drakt: null, ...(hjalte.lager || {}) };
@@ -23,7 +29,7 @@ export function geSak(hjalte, sort, id) {
   const h = sakra(hjalte);
   const ny = !h.garderob.some((/** @type {any} */ x) => x.sort === sort && x.id === id);
   if (ny) h.garderob.push({ sort, id });
-  h.lager[sort] = id;
+  if (TILLBEHOR[id] !== sort) h.lager[sort] = id;
   return ny;
 }
 
@@ -33,6 +39,7 @@ export function geSak(hjalte, sort, id) {
  */
 export function bytLager(hjalte, sort, id) {
   const h = sakra(hjalte);
+  if (id !== null && TILLBEHOR[id]) return false; // kompassen är alltid på
   if (id !== null && !h.garderob.some((/** @type {any} */ x) => x.sort === sort && x.id === id)) return false;
   if (h.lager[sort] === id) return false;
   h.lager[sort] = id;
@@ -52,3 +59,6 @@ export function ristasNu(pussel, formler, ord = pussel?.svar) {
   if (!pussel || pussel.typ !== 'P11_formel' || (formler || []).includes(ord)) return false;
   return (pussel.formler || []).find((/** @type {any} */ f) => f.ord === ord)?.ristas !== false;
 }
+
+/** Tillbehören han har (kompassen på ryggsäcken). @param {any} hjalte @returns {string[]} */
+export const tillbehorFor = (hjalte) => sakra(hjalte).garderob.filter((/** @type {any} */ x) => TILLBEHOR[x.id] === x.sort).map((/** @type {any} */ x) => x.id);

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { geSak, bytLager, lagerFor, ristasNu } from '../../src/karna/hjalte.js';
+import { geSak, bytLager, lagerFor, tillbehorFor, ristasNu } from '../../src/karna/hjalte.js';
 import { readFileSync, readdirSync } from 'node:fs';
 import { skapaSparning, skapaPlatser, nyckelFor, fotoNyckel, spelareAttVisa, nyttTillstand, migrera, FORMAT, NYCKEL, NYCKEL_TRASIG, NYCKEL_PLATSER, aventyrFor } from '../../src/karna/sparning.js';
 const AVENTYR = 'den-gomda-dalen';
@@ -115,6 +115,18 @@ describe('sparning', () => {
     // en gammal sparning utan dräkt i lagret går att läsa
     const gammal = { lager: { hjalmdekor: 'taggkam', ryggsack: null }, garderob: [] };
     expect(lagerFor(gammal)).toEqual({ hjalmdekor: 'taggkam', ryggsack: null, drakt: null });
+  });
+
+  it('Farfars kompass hänger på ryggsäcken han har och byter inte ut den (LASMIG_126)', () => {
+    const t = nyttTillstand('t'); const h = t.spelare.hjalte;
+    geSak(h, 'ryggsack', 'ryggsack_rosa');
+    expect(tillbehorFor(h)).toEqual([]);
+    expect(geSak(h, 'ryggsack', 'farfars_kompass')).toBe(true);
+    expect(lagerFor(h).ryggsack).toBe('ryggsack_rosa');
+    expect(tillbehorFor(h)).toEqual(['farfars_kompass']);
+    // garderoben kan inte ta av den eller byta säcken mot den
+    expect(bytLager(h, 'ryggsack', 'farfars_kompass')).toBe(false);
+    expect(lagerFor(h).ryggsack).toBe('ryggsack_rosa');
   });
 
   // Varje gammalt format har en fixturfil som alltid måste gå att läsa.

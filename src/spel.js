@@ -19,7 +19,7 @@ import { bubblaFor, bubblaText, BUBBLA_MS } from './karna/bubblor.js';
 import { sparaPassbild, aterstallLarande, forstaIPasset } from './karna/larandebild.js';
 import { pekningOmMs, skapaHjalpSpar, knufftidMs } from './karna/hjalp.js';
 import { HJALTE_FARGER, HJALTE_FAST } from './scener/Rum.js';
-import { lagerFor, bytLager, ristasNu } from './karna/hjalte.js';
+import { lagerFor, tillbehorFor, bytLager, ristasNu, TILLBEHOR } from './karna/hjalte.js';
 import { TANGENTBORD_HOJD } from './grans/tangentbord.js';
 import { kandaOrd, bedomOrd, antalFalt, ordStarter, MAX_BOKSTAVER } from './karna/skrivord.js';
 import { skapaStig, valj as valjFlak, hjalpFlak, nastaBokstav } from './karna/bokstavsstig.js';
@@ -1627,7 +1627,7 @@ export function skapaSpel(d) {
    * @param {any} st
    */
   async function geSakSteg(st) {
-    rum.sattLager(lagerFor(tillstand.spelare.hjalte));
+    rum.sattLager(lagerFor(tillstand.spelare.hjalte), tillbehorFor(tillstand.spelare.hjalte));
     ljud.spela('fest_mellan');
     nyttIHjalteboken();
     logg.handelse('gåva', `${st.sort}: ${st.id}`);
@@ -4538,7 +4538,7 @@ export function skapaSpel(d) {
       if (vy === 'staven') sida = `<div class="paus-formler">${(hjalte().formler || []).map((f) => `<button type="button" class="kort formel-ord" data-formel="${ui.esc(f)}"><span class="kort-etikett">${ui.rader(f, varden(), 'kort-ord')}</span></button>`).join('')}</div>`;
       if (vy === 'garderoben') {
         const pa = lagerFor(hjalte());
-        sida = `<div class="paus-garderob">${(hjalte().garderob || []).map((x) => `<button type="button" class="kort sak ${pa[/** @type {'hjalmdekor' | 'ryggsack' | 'drakt'} */ (x.sort)] === x.id ? 'vald' : ''}" data-sort="${ui.esc(x.sort)}" data-id="${ui.esc(x.id)}">${bilder.html(x.id)}</button>`).join('')}</div>`;
+        sida = `<div class="paus-garderob">${(hjalte().garderob || []).map((x) => `<button type="button" class="kort sak ${pa[/** @type {'hjalmdekor' | 'ryggsack' | 'drakt'} */ (x.sort)] === x.id || TILLBEHOR[x.id] ? 'vald' : ''}" data-sort="${ui.esc(x.sort)}" data-id="${ui.esc(x.id)}">${bilder.html(x.id)}</button>`).join('')}</div>`;
       }
       if (vy === 'dinoboken') sida = `<div class="paus-dinobok">${(tillstand.spelare.dinobok || []).map((x) => `<button type="button" class="kort dinosida" data-text="${ui.esc(x.bildtext || '')}">${bilder.html(x.bild)}${x.bildtext ? `<span class="kort-etikett">${ui.rader(x.bildtext, varden(), 'kort-ord')}</span>` : ''}</button>`).join('')}</div>`;
       if (vy === 'klart') sida = klartUppslag(settFore);
@@ -4567,7 +4567,7 @@ export function skapaSpel(d) {
     m.querySelectorAll('.paus-garderob .sak').forEach((el) => el.addEventListener('click', () => {
       const e = /** @type {HTMLElement} */ (el); const sort = /** @type {'hjalmdekor' | 'ryggsack' | 'drakt'} */ (e.dataset.sort);
       const pa = lagerFor(hjalte())[sort] === e.dataset.id;
-      if (bytLager(hjalte(), sort, pa ? null : (e.dataset.id || null))) { ljud.spela('klick'); rum.sattLager(lagerFor(hjalte())); spara(); logg.handelse('garderob', `${sort}: ${pa ? 'av' : e.dataset.id}`); }
+      if (bytLager(hjalte(), sort, pa ? null : (e.dataset.id || null))) { ljud.spela('klick'); rum.sattLager(lagerFor(hjalte()), tillbehorFor(hjalte())); spara(); logg.handelse('garderob', `${sort}: ${pa ? 'av' : e.dataset.id}`); }
       ritaPaus('garderoben');
     }));
   }
@@ -4683,7 +4683,7 @@ export function skapaSpel(d) {
   }
 
   async function spela() {
-    rum.lager = { ...lagerFor(tillstand.spelare.hjalte) };
+    rum.lager = { ...lagerFor(tillstand.spelare.hjalte) }; rum.tillbehor = tillbehorFor(tillstand.spelare.hjalte);
     rum.sattStav((tillstand.spelare.hjalte.formler || []).length > 0);
     rum.sattUtseende(tillstand.spelare.hjalte.utseende || {});
     await startskarm();

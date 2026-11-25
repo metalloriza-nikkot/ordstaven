@@ -15,7 +15,7 @@
  },
  "meta": {
   "namn": "Prologen",
-  "version": "0.17.5",
+  "version": "0.17.6",
   "datum": "2026-11-25",
   "agare": "Innehåll",
   "kalla": "Manus 13-prolog-manus.md v1.10. Byggd på repots kap-00.json från 0.29.0.",
@@ -31,7 +31,8 @@
   "andrat_v0172": "2026-11-17 (beslut 99.5): Farfar säger i s21_uppdraget att han har glömt vägen och bara minns ungefär var han gömde bitarna. Därför behövs kartan, och därför kan han inte bara säga var en bit är. \"Då kan ingen annan hitta dalen.\" är struken. Inget annat är ändrat.",
   "andrat_v0173": "2026-11-17 (beslut 100.3): \"Varje bit visar vägen till nästa.\" är struken i s21_uppdraget, så att Farfar har sex repliker före packlistan, som före pass 99. Kartbitarna visar det själva.",
   "andrat_v0174": "2026-11-18 (beslut 102.5–102.6): 8 repliker efter provläsningen, valda av spelaren. s04_agget: Dunk! Det var ägget som dunkade! -> Dunk! Det är ett ägg som dunkar! s07_dorrarna: Ring! Farfar är där böckerna är. -> Ring! En väckarklocka. Farfar är vid böckerna. s09_lappen: {unge} kan nosa på ett ord. Då hör du ordet. -> {unge} kan nosa på ord och läsa dem högt! s14_kartbiten: {unge} tittar på skuggan. -> En kartbit! {unge} tittar på skuggan. s16_godnattsagan: Du lär dig magi. Därför är du lärling! -> Du lär dig magi, så nu är du lärling! s21_uppdraget: Titta efter hans orange luftskepp! -> Se upp för hans orange luftskepp! s22_tradgarden: Var är dalen? Allt ser så litet ut! -> Hallå där nere! Var är dalen? s22_tradgarden: Herr Skata såg ljuset i natt! -> Min fågel Herr Skata såg ljuset i natt! Lika många repliker, och inga id:n är ändrade.",
-  "andrat_v0175": "2026-11-25 (beslut 125 och 127.5): listan står i boken, och radion svarar när han undrar något. Inga knep, eftersom radion kommer först efter packlistan."
+  "andrat_v0175": "2026-11-25 (beslut 125 och 127.5): listan står i boken, och radion svarar när han undrar något. Inga knep, eftersom radion kommer först efter packlistan.",
+  "andrat_v0176": "2026-11-25 (beslut 128.10.3, rättelse i ett fryst kapitel, en replik mot en): fröet för baronens bit i s22: han har letat i många år, har den sista biten och vill ha kartan, och blir känd om han hittar dalen först. Herr Skata såg dinon i natt."
  },
  "var_var_vi": [
   {
@@ -1508,13 +1509,13 @@
     {
      "typ": "replik",
      "talare": "baronen",
-     "text": "Jag är Baronen!",
+     "text": "Jag är Baronen! Jag har letat i många år!",
      "upplast": true
     },
     {
      "typ": "replik",
      "talare": "baronen",
-     "text": "Min fågel Herr Skata såg ljuset i natt!",
+     "text": "Min fågel Herr Skata såg dinon i natt!",
      "upplast": true
     },
     {
@@ -1525,13 +1526,13 @@
     {
      "typ": "replik",
      "talare": "baronen",
-     "text": "En karta? Den vill jag se!",
+     "text": "Jag har sista biten! Nu vill jag ha kartan!",
      "upplast": true
     },
     {
      "typ": "replik",
      "talare": "baronen",
-     "text": "Jag ska hitta dalen först! Då blir jag känd!",
+     "text": "Hittar jag dalen först, blir jag känd!",
      "upplast": true
     },
     {

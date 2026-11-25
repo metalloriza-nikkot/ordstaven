@@ -11,8 +11,13 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 14,
+ "nextobjectid": 15,
  "properties": [
+  {
+   "name": "bild",
+   "type": "string",
+   "value": "berget_valvet"
+  },
   {
    "name": "rum",
    "type": "string",
@@ -137,6 +142,11 @@
        "value": true
       },
       {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "riktning",
        "type": "string",
        "value": "ned"
@@ -165,6 +175,11 @@
        "value": true
       },
       {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "riktning",
        "type": "string",
        "value": "ned"
@@ -188,6 +203,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "under"
@@ -196,6 +216,39 @@
     },
     {
      "id": 12,
+     "name": "valv_ljus",
+     "type": "sak",
+     "x": 0,
+     "y": 0,
+     "width": 640,
+     "height": 40,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "anim_ms",
+       "type": "int",
+       "value": 900
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "valv_ljus_01"
+      },
+      {
+       "name": "bild_anim",
+       "type": "string",
+       "value": "valv_ljus_01,valv_ljus_02"
+      },
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 13,
      "name": "stig_k4_stig_valv",
      "type": "sak",
      "x": 360,
@@ -218,7 +271,7 @@
      ]
     },
     {
-     "id": 13,
+     "id": 14,
      "name": "",
      "type": "vagg",
      "x": 260,

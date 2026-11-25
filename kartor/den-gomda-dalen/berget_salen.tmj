@@ -11,8 +11,13 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 11,
+ "nextobjectid": 12,
  "properties": [
+  {
+   "name": "bild",
+   "type": "string",
+   "value": "berget_salen"
+  },
   {
    "name": "rum",
    "type": "string",
@@ -151,6 +156,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "bild",
+       "type": "string",
+       "value": "tavla_farfar"
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "under"
@@ -159,6 +169,44 @@
     },
     {
      "id": 10,
+     "name": "orgel_blank",
+     "type": "sak",
+     "x": 118,
+     "y": 0,
+     "width": 8,
+     "height": 36,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "anim_ms",
+       "type": "int",
+       "value": 150
+      },
+      {
+       "name": "anim_paus",
+       "type": "string",
+       "value": "2000-4000"
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "orgel_blank_01"
+      },
+      {
+       "name": "bild_anim",
+       "type": "string",
+       "value": "orgel_blank_01,orgel_blank_02,orgel_blank_03"
+      },
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 11,
      "name": "gang_valvet",
      "type": "utgang",
      "x": 420,
@@ -170,6 +218,11 @@
      "properties": [
       {
        "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "i_bilden",
        "type": "bool",
        "value": true
       },

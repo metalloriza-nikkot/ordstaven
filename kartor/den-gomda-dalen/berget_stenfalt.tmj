@@ -14,6 +14,11 @@
  "nextobjectid": 27,
  "properties": [
   {
+   "name": "bild",
+   "type": "string",
+   "value": "berget_stenfalt"
+  },
+  {
    "name": "rum",
    "type": "string",
    "value": "berget_stenfalt"
@@ -304,6 +309,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "bild",
+       "type": "string",
+       "value": "snodriva"
+      },
+      {
        "name": "dekor",
        "type": "bool",
        "value": true
@@ -326,6 +336,11 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "snodriva"
+      },
       {
        "name": "dekor",
        "type": "bool",
@@ -373,6 +388,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "under"
@@ -390,6 +410,11 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
       {
        "name": "sida",
        "type": "string",
@@ -412,6 +437,11 @@
        "name": "dekor",
        "type": "bool",
        "value": true
+      },
+      {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
       }
      ]
     },
@@ -428,6 +458,11 @@
      "properties": [
       {
        "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "i_bilden",
        "type": "bool",
        "value": true
       },
@@ -451,6 +486,11 @@
      "properties": [
       {
        "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "i_bilden",
        "type": "bool",
        "value": true
       }
@@ -482,6 +522,11 @@
        "name": "dekor",
        "type": "bool",
        "value": true
+      },
+      {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
       }
      ]
     },
@@ -500,6 +545,11 @@
        "name": "dekor",
        "type": "bool",
        "value": true
+      },
+      {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
       }
      ]
     },
@@ -516,6 +566,11 @@
      "properties": [
       {
        "name": "dekor",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "i_bilden",
        "type": "bool",
        "value": true
       }

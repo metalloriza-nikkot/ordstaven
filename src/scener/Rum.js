@@ -293,7 +293,7 @@ export class Rum extends Phaser.Scene {
     this.lagerFigurer = this.add.container(0, 0);
     // liv i skogen (fåglar, löv, fjärilen, ekorren) i världens pixlar
     this.livet = new Livet(this, this.lagerFigurer);
-    /** @type {{ img: any, ramar: string[], ms: number, i: number, senast: number }[]} figurer som rör sig i tomgång (bild_anim) */
+    /** @type {{ img: any, ramar: string[], ms: number, i: number, senast: number, paus?: number[] }[]} figurer som rör sig i tomgång (bild_anim, anim_paus) */
     this.animerade = [];
     /** @type {{ img: any, skugga: any }[]} figurernas skuggor (kartans `skugga`), som följer bilden när en regi flyttar den */
     this.figurSkuggor = [];
@@ -339,6 +339,8 @@ export class Rum extends Phaser.Scene {
     });
     /** @type {{ hjalmdekor: string | null, ryggsack: string | null, drakt?: string | null }} det han har på sig */
     this.lager = this.lager || { hjalmdekor: null, ryggsack: null, drakt: null };
+    /** @type {string[]} tillbehören på hjälten (Farfars kompass på ryggsäcken) */
+    this.tillbehor = this.tillbehor || [];
     this.sattUtseende({});
     this.ritaUnge();
     this.ritaGolv(false);
@@ -557,6 +559,8 @@ export class Rum extends Phaser.Scene {
       const bx = t.img.getBounds();
       if (!syns(bx.x, bx.y, bx.width, bx.height)) continue;
       t.i = (t.i + 1) % t.ramar.length; t.img.setFrame(t.ramar[t.i]); this.smutsig = true;
+      // ett varv klart: stå stilla en stund (anim_paus, orgelns blänk var 2–4 s)
+      if (t.i === 0 && t.paus) t.senast = nu + t.paus[0] + Math.random() * (t.paus[1] - t.paus[0]);
     }
   }
 
@@ -665,7 +669,9 @@ export class Rum extends Phaser.Scene {
     const dekorNamn = this.lager?.hjalmdekor;
     this.kam = dekorNamn && finns(`${dekorNamn}_ner_01`) ? this.add.image(0, 0, 'hjalte', `${dekorNamn}_ner_01`).setOrigin(0, 0) : null;
     this.stav = this.add.image(0, 0, fargad(this, 'stav', hjaltensByten(hud)), 'stav_hand_ner_01').setOrigin(0, 0).setVisible(!!this.harStav);
-    this.hjalte.add(/** @type {any[]} */ ([this.skugga, this.sackBak, this.kropp, this.sackFram, this.kam, this.stav].filter(Boolean)));
+    // Farfars kompass hänger på ryggsäcken (LASMIG_126): kompass_rygg_<håll>_01 ovanpå säcken, framifrån vid remmen
+    this.kompass = (this.tillbehor || []).includes('farfars_kompass') && finns('kompass_rygg_ner_01') ? this.add.image(0, 0, 'hjalte', 'kompass_rygg_ner_01').setOrigin(0, 0) : null;
+    this.hjalte.add(/** @type {any[]} */ ([this.skugga, this.sackBak, this.kropp, this.sackFram, this.kompass, this.kam, this.stav].filter(Boolean)));
     // gråbox för det som inte har bilder än
     if (sack && !sackBild) this.hjalte.addAt(this.add.rectangle(11, 12, 4, 8, farg(sack)).setOrigin(0, 0), this.skugga ? 1 : 0);
     const dekor = this.lager?.hjalmdekor;
@@ -745,9 +751,10 @@ export class Rum extends Phaser.Scene {
     this.stav?.setVisible(pa);
   }
 
-  /** Det han har på sig (hjältens lager: hjälmdekor, ryggsäck och dräkt). @param {{ hjalmdekor: string | null, ryggsack: string | null, drakt?: string | null }} lager */
-  sattLager(lager) {
+  /** Det han har på sig (hjältens lager: hjälmdekor, ryggsäck och dräkt). @param {{ hjalmdekor: string | null, ryggsack: string | null, drakt?: string | null }} lager @param {string[]} [tillbehor] Farfars kompass */
+  sattLager(lager, tillbehor = this.tillbehor || []) {
     this.lager = { ...lager };
+    this.tillbehor = [...tillbehor];
     this.sattUtseende(this.utseende || {});
   }
 
@@ -793,6 +800,7 @@ export class Rum extends Phaser.Scene {
     this.sackBak?.setVisible(sida).setFrame(`${this.sackNamn}_${r}_01`);
     this.sackFram?.setVisible(!sida).setFrame(`${this.sackNamn}_${r}_01`);
     this.kam?.setFrame(`${this.lager?.hjalmdekor}_${r}_01`);
+    if (this.kompass && this.kompass.frame.name !== `kompass_rygg_${r}_01`) { this.kompass.setFrame(`kompass_rygg_${r}_01`); this.smutsig = true; }
   }
 
   /**
@@ -4333,7 +4341,7 @@ export class Rum extends Phaser.Scene {
       else (o.lyser || o.skataFonster ? this.lagerLjust : this.lagerObjekt).add(img);
       // tomgång (bild_anim): bilderna byts var animMs, med ett litet slumpat avstånd mellan figurerna
       const ramar = (o.bildAnim || []).filter((r) => foremalsbild(this, r)?.nyckel === fb.nyckel);
-      if (ramar.length > 1 && !this.bytta?.has(o.id) && (!o.animI || (!!this.tillstand && o.animI.includes(this.tillstand)))) this.animerade.push({ img, ramar, ms: o.animMs || 500, i: 0, senast: performance.now() + Math.random() * 300 });
+      if (ramar.length > 1 && !this.bytta?.has(o.id) && (!o.animI || (!!this.tillstand && o.animI.includes(this.tillstand)))) this.animerade.push({ img, ramar, ms: o.animMs || 500, i: 0, senast: performance.now() + Math.random() * 300, paus: o.animPaus });
       this.ritade.set(o.id, /** @type {any} */ (img));
       return;
     }
@@ -5368,7 +5376,16 @@ export class Rum extends Phaser.Scene {
     this.tweens.add({ targets: r, x: r.x + 40, duration: 600, delay: 500, onUpdate: smuts });
     this.tweens.add({ targets: r, y: r.y, duration: 300, delay: 1100, onUpdate: smuts });
     const o = this.ruta('fotavtryck');
-    if (o) this.time.delayedCall(1200, () => this.k4Glitter({ x: o.x + o.b / 2, y: o.y + o.h / 2 }, 14));
+    // Stils frostglitter på avtrycket (fotavtryck_glitter_01–03, 28 × 14, ca 200 ms per bild) i några sekunder (LASMIG_127)
+    const g1 = this.regiram('fotavtryck_glitter_01');
+    if (o && g1) this.time.delayedCall(1200, () => {
+      const img = this.add.image(o.x, o.y, g1.nyckel, g1.ram).setOrigin(0, 0);
+      this.lagerObjekt.add(img); this.lagda.push(img);
+      let i = 0;
+      const t = this.time.addEvent({ delay: 200, repeat: 17, callback: () => { i = (i + 1) % 3; if (img.active) img.setFrame(`fotavtryck_glitter_0${i + 1}`); smuts(); } });
+      this.time.delayedCall(3700, () => { t.remove(); this.tweens.add({ targets: img, alpha: 0, duration: 300, onUpdate: smuts, onComplete: () => img.destroy() }); });
+    });
+    else if (o) this.time.delayedCall(1200, () => this.k4Glitter({ x: o.x + o.b / 2, y: o.y + o.h / 2 }, 14));
     this.k4Logg('fotavtryck_stor');
     return 1600;
   }
@@ -5386,15 +5403,19 @@ export class Rum extends Phaser.Scene {
   ungenSlarIsen() {
     const s = this.k4Punkt('spricka'); if (!s) return 0;
     const smuts = () => { this.smutsig = true; };
-    const ms = this.unge.visible ? this.ungeGarTill({ x: s.x - 10, y: s.y + 6 }) : 0;
+    // klubbsvansens ben sitter i isen precis öster om sprickan, ca (181–217, 16–28) (LASMIG_127, 127.6.2): ungen
+    // ställer sig under benet med huvudet österut, så att svansen slår i benet
+    const ms = this.unge.visible ? this.ungeGarTill({ x: s.x + 51, y: s.y + 16 }) : 0;
     // Stils unge1_svansslag_hoger_01–03 (ca 150 ms per bild, två slag), och isväggen spricker och rasar ut
     this.time.delayedCall(ms + 50, () => this.ungeLage('svansslag', 'hoger', 150, 2));
-    for (const i of [0, 1]) this.time.delayedCall(ms + 350 + i * 450, () => { this.cameras.main.shake(180, 0.006); this.b.ljud?.spela('knak'); smuts(); });
+    for (const i of [0, 1]) this.time.delayedCall(ms + 350 + i * 450, () => { this.cameras.main.shake(180, 0.006); this.b.ljud?.spela('svans_slag'); smuts(); });
     this.time.delayedCall(ms + 1300, () => {
       const r = /** @type {any} */ (this.ritade.get('spricka'));
       const r1 = this.regiram('isvagg_rasar_01'), r2 = this.regiram('isvagg_rasar_02');
+      this.b.ljud?.spela('isen_rasar');
       if (r?.setTexture && r1 && r2) { r.setTexture(r1.nyckel, r1.ram); this.time.delayedCall(250, () => { if (r.active) r.setTexture(r2.nyckel, r2.ram); smuts(); }); } else r?.setVisible?.(false);
-      const g = this.add.graphics(); g.fillStyle(0xfff3c0, 0.5).fillTriangle(s.x + 8, s.y - 24, s.x + 8, s.y + 24, s.x - 60, s.y + 40);
+      const g = this.add.graphics(); // solskenet är krämvitt, aldrig gult: guld betyder rätt svar (LASMIG_127)
+      g.fillStyle(0xf2e8c8, 0.5).fillTriangle(s.x + 8, s.y - 24, s.x + 8, s.y + 24, s.x - 60, s.y + 40);
       this.lagerLjust.add(g); this.lagda.push(g); this.k4Glitter(s, 30); smuts();
     });
     this.k4Logg('ungen_slar_isen');
@@ -5411,7 +5432,8 @@ export class Rum extends Phaser.Scene {
     if (!o) return null;
     const x = o.x + o.b / 2, nere = o.y + o.h, uppe = nere - Math.round(o.h * andel);
     // Stils klippa_stege, klippa_rep och klippa_trappa (LASMIG_122): bilden tonas fram nedifrån och upp
-    const stil = andel >= 1 ? this.regiram(`klippa_${sort}`) : null;
+    // ...och de höga bilderna (LASMIG_126, 24/32 × 112) är lika höga som klippan, så att ingenting staplas
+    const stil = andel >= 1 ? this.regiram(`klippa_${sort}_hog`) || this.regiram(`klippa_${sort}`) : null;
     if (stil) {
       // klippan är högre än bilden (124.8, ca 120 px): bilderna staplas nedifrån, och den översta når kanten
       const hb = /** @type {any} */ (this.textures.getFrame(stil.nyckel, stil.ram))?.height || 72;

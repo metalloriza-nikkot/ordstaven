@@ -347,4 +347,54 @@ test('kapitel 4: F1 i gången, isklumparna och Farfars kompass (124.3)', async (
   const loggen = await page.evaluate(() => window.__ORDSTAVEN.logg());
   expect(loggen).toContain('scen k4s03_isfickan klar');
   await page.screenshot({ path: 'test-results/kap4-f1-kompassen.png' });
+  // 128.4 (LASMIG_126): kompassen hänger på ryggsäcken, och lagret följer hans håll
+  const kompass = await page.evaluate(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); return r.kompass?.frame?.name ?? null; });
+  expect(kompass).toMatch(/^kompass_rygg_(upp|ner|hoger|vanster)_01$/);
+  for (const [x, namn] of [[60, 'vanster'], [200, 'hoger']]) {
+    await page.evaluate((x) => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); window.__ORDSTAVEN.gaMot(x, r.pos.y); }, x);
+    await page.waitForTimeout(900);
+    await page.locator('canvas').first().screenshot({ path: `test-results/kap4-kompass-${namn}.png` });
+  }
+});
+
+// 128.4: kapitlets rum med Stils bilder (lev127). Varje rum har sin bild (i gången den mörka i tillståndet mork), det
+// som är målat ritas inte en gång till, och de rörliga sakerna står där. Bilden av hela rummet går till Stil.
+test('kapitel 4: rummens bilder och det som rör sig (128.4, LASMIG_127)', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'bilderna är desamma överallt');
+  test.setTimeout(240000);
+  const rummen = [
+    ['k4s01_foten', 'berget_stigen', 'rum_berget_stigen', []],
+    ['k4s03_gangen', 'berget_gangen', 'rum_berget_gangen_mork', ['f1_ljus']],
+    ['k4s03_gangen', 'berget_gangen', 'rum_berget_gangen', ['f1_ljus', 'isklump_1'], 3],
+    ['k4s03_salen', 'berget_salen', 'rum_berget_salen', ['orgel_blank', 'tavla_farfar']],
+    ['k4s03_valvet', 'berget_valvet', 'rum_berget_valvet', ['valv_ljus']],
+    // tandgrottan nås bara genom galleriet (testet av stig 4 visar den)
+    ['k4s03_galleriet', 'berget_galleriet', 'rum_berget_galleriet', ['isblock']],
+    ['k4s04_utvagen', 'berget_sprickan', 'rum_berget_sprickan', ['snoflingor']],
+    ['k4s05_stenfaltet', 'berget_stenfalt', 'rum_berget_stenfalt', []],
+  ];
+  for (const [scen, rum, golv, rorliga, steg = 0] of rummen) {
+    // gången tänd: efter LJUS (steg 3 i k4s03_gangen)
+    await starta(page, scen, steg, steg ? { berget_gangen: 'ljus' } : {});
+    await page.waitForFunction((r) => window.__ORDSTAVEN.spel.scene.getScene('Rum').rumId === r, rum, { timeout: 15000 }).catch(() => {});
+    await page.waitForTimeout(1500);
+    const g = await page.evaluate(() => window.__ORDSTAVEN.grafik());
+    expect(g.golv, rum).toBe(golv);
+    const info2 = await page.evaluate((ids) => {
+      const r = window.__ORDSTAVEN.spel.scene.getScene('Rum');
+      // det som är målat har ingen egen bild (en osynlig ruta), och de rörliga har sin bild
+      const malade = r.objekt.filter((o) => o.iBilden && !o.ankare).filter((o) => r.ritade.get(o.id)?.texture).map((o) => o.id);
+      const bilder = ids.map((id) => [id, r.ritade.get(id)?.frame?.name ?? null]);
+      // hela rummet i bild: kameran zoomar ut tills rummet ryms
+      const c = r.cameras.main, B = r.storlek.bredd, H = r.storlek.hojd;
+      c.stopFollow(); c.setZoom(Math.min(1, 320 / B, 192 / H)); c.centerOn(B / 2, H / 2); r.smutsig = true;
+      return { malade, bilder };
+    }, rorliga);
+    expect(info2.malade, `${rum}: målat i bilden men ritat igen`).toEqual([]);
+    for (const [id, ram] of info2.bilder) expect(ram, `${rum} ${id}`).not.toBeNull();
+    // läsplattan döljs bara för bilden
+    await page.evaluate(() => { for (const e of document.querySelectorAll('#plattan, .replik-ruta')) e.style.visibility = 'hidden'; });
+    await page.waitForTimeout(400);
+    await page.locator('canvas').first().screenshot({ path: `test-results/kap4-rum-${scen.replace('k4s0', '')}-${golv.replace('rum_', '')}.png` });
+  }
 });

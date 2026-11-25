@@ -171,7 +171,12 @@ describe('kartornas grafik', () => {
     }
   });
   it('skogens figurer i tomgång byter bild högst fyra gånger per sekund (golvets gräns, 45)', () => {
-    for (const [f, k] of kartor) for (const l of k.layers) for (const o of l.objects || []) { const e = egen(o); if (e.bild_anim) expect(Number(e.anim_ms), `${f} ${o.name}`).toBeGreaterThanOrEqual(250); }
+    // med anim_paus (orgelns blänk, 128.4) räknas snittet över ett varv med den kortaste pausen
+    for (const [f, k] of kartor) for (const l of k.layers) for (const o of l.objects || []) {
+      const e = egen(o); if (!e.bild_anim) continue;
+      const n = String(e.bild_anim).split(',').length, paus = e.anim_paus ? Number(String(e.anim_paus).split('-')[0]) : 0;
+      expect((n * Number(e.anim_ms) + paus) / n, `${f} ${o.name}`).toBeGreaterThanOrEqual(250);
+    }
   });
   it('rummets bild har kartans storlek', () => {
     for (const [f, k] of kartor) {

@@ -663,5 +663,75 @@
   "signatur": false,
   "styrka_db": -12,
   "sekunder": 1.15
+ },
+ "unge_blink": {
+  "grupp": "Kapitel 4",
+  "vad": "Ungens ögon i mörkret blinkar en gång: ett litet mjukt plipp, upp och ned (0,5 s med klangen). Ersätter lucka_pip efter raset (126.8)",
+  "signatur": false,
+  "styrka_db": -15,
+  "sekunder": 0.55
+ },
+ "radio_sprak": {
+  "grupp": "Överallt",
+  "vad": "Radion är halvt släckt och han trycker: ett kort, mjukt sprak, inget svar (0,3 s, 125.6). Inte fel och inte skrämmande",
+  "signatur": false,
+  "styrka_db": -16,
+  "sekunder": 0.55
+ },
+ "orgel_ton_1": {
+  "grupp": "Kapitel 4",
+  "vad": "Isorgeln i salen: ton 1 av 5 (C5), en för varje rätt flak i stig 2, uppåt (ca 1,2 s med klangen). Spelas i stället för flak_ratt i salen (127.6)",
+  "signatur": false,
+  "styrka_db": -11,
+  "sekunder": 1.25
+ },
+ "orgel_ton_2": {
+  "grupp": "Kapitel 4",
+  "vad": "Isorgeln i salen: ton 2 av 5 (D5), en för varje rätt flak i stig 2, uppåt (ca 1,2 s med klangen). Spelas i stället för flak_ratt i salen (127.6)",
+  "signatur": false,
+  "styrka_db": -11,
+  "sekunder": 1.25
+ },
+ "orgel_ton_3": {
+  "grupp": "Kapitel 4",
+  "vad": "Isorgeln i salen: ton 3 av 5 (E5), en för varje rätt flak i stig 2, uppåt (ca 1,2 s med klangen). Spelas i stället för flak_ratt i salen (127.6)",
+  "signatur": false,
+  "styrka_db": -11,
+  "sekunder": 1.25
+ },
+ "orgel_ton_4": {
+  "grupp": "Kapitel 4",
+  "vad": "Isorgeln i salen: ton 4 av 5 (G5), en för varje rätt flak i stig 2, uppåt (ca 1,2 s med klangen). Spelas i stället för flak_ratt i salen (127.6)",
+  "signatur": false,
+  "styrka_db": -11,
+  "sekunder": 1.25
+ },
+ "orgel_ton_5": {
+  "grupp": "Kapitel 4",
+  "vad": "Isorgeln i salen: ton 5 av 5 (A5), en för varje rätt flak i stig 2, uppåt (ca 1,2 s med klangen). Spelas i stället för flak_ratt i salen (127.6)",
+  "signatur": false,
+  "styrka_db": -11,
+  "sekunder": 1.25
+ },
+ "orgel_ackord": {
+  "grupp": "Kapitel 4",
+  "vad": "Isorgeln när TAVLA är klar: ett stort, glatt ackord i C som rullar uppåt och klingar ut (ca 3,1 s med klangen)",
+  "signatur": false,
+  "styrka_db": -10,
+  "sekunder": 3.1
+ },
+ "svans_slag": {
+  "grupp": "Kapitel 4",
+  "vad": "Ungens klubbsvans slår i isväggen: en dov duns och ett klart knak i isen (ca 0,9 s). Två gånger i ungen_slar_isen, i stället för knak",
+  "signatur": false,
+  "styrka_db": -8,
+  "sekunder": 0.85
+ },
+ "isen_rasar": {
+  "grupp": "Kapitel 4",
+  "vad": "Isväggen rasar ut och dagsljuset strömmar in: isbitar som klirrar ned, och sedan blåst och en fågel långt bort (ca 3,6 s med klangen). Glatt, inte farligt",
+  "signatur": false,
+  "styrka_db": -10,
+  "sekunder": 3.6
  }
 }

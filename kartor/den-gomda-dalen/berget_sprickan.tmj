@@ -11,8 +11,13 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 16,
+ "nextobjectid": 17,
  "properties": [
+  {
+   "name": "bild",
+   "type": "string",
+   "value": "berget_sprickan"
+  },
   {
    "name": "rum",
    "type": "string",
@@ -154,11 +159,49 @@
        "name": "dekor",
        "type": "bool",
        "value": true
+      },
+      {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
       }
      ]
     },
     {
      "id": 11,
+     "name": "snoflingor",
+     "type": "sak",
+     "x": 142,
+     "y": 12,
+     "width": 48,
+     "height": 90,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "anim_ms",
+       "type": "int",
+       "value": 300
+      },
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "snoflingor_01"
+      },
+      {
+       "name": "bild_anim",
+       "type": "string",
+       "value": "snoflingor_01,snoflingor_02,snoflingor_03"
+      },
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 12,
      "name": "vagg_ut",
      "type": "sak",
      "x": 40,
@@ -169,6 +212,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "over"
@@ -176,7 +224,7 @@
      ]
     },
     {
-     "id": 12,
+     "id": 13,
      "name": "gata_3_igen",
      "type": "sak",
      "x": 72,
@@ -187,6 +235,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "over"
@@ -194,7 +247,7 @@
      ]
     },
     {
-     "id": 13,
+     "id": 14,
      "name": "stig_k4_stig3",
      "type": "sak",
      "x": 156,
@@ -222,7 +275,7 @@
      ]
     },
     {
-     "id": 14,
+     "id": 15,
      "name": "spricka",
      "type": "sak",
      "x": 148,
@@ -245,7 +298,7 @@
      ]
     },
     {
-     "id": 15,
+     "id": 16,
      "name": "utgang_stenfalt",
      "type": "sak",
      "x": 148,
@@ -255,6 +308,11 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
       {
        "name": "sida",
        "type": "string",

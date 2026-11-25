@@ -1820,7 +1820,7 @@
     "h": 24
    }
   },
-  "ryggsack_hoger_01": {
+  "kompass_rygg_hoger_01": {
    "frame": {
     "x": 0,
     "y": 1229,
@@ -1840,7 +1840,7 @@
     "h": 24
    }
   },
-  "ryggsack_ner_01": {
+  "kompass_rygg_ner_01": {
    "frame": {
     "x": 0,
     "y": 1254,
@@ -1860,7 +1860,7 @@
     "h": 24
    }
   },
-  "ryggsack_rosa_hoger_01": {
+  "kompass_rygg_upp_01": {
    "frame": {
     "x": 0,
     "y": 1279,
@@ -1880,7 +1880,7 @@
     "h": 24
    }
   },
-  "ryggsack_rosa_ner_01": {
+  "kompass_rygg_vanster_01": {
    "frame": {
     "x": 0,
     "y": 1304,
@@ -1900,7 +1900,7 @@
     "h": 24
    }
   },
-  "ryggsack_rosa_upp_01": {
+  "ryggsack_hoger_01": {
    "frame": {
     "x": 0,
     "y": 1329,
@@ -1920,7 +1920,7 @@
     "h": 24
    }
   },
-  "ryggsack_rosa_vanster_01": {
+  "ryggsack_ner_01": {
    "frame": {
     "x": 0,
     "y": 1354,
@@ -1940,7 +1940,7 @@
     "h": 24
    }
   },
-  "ryggsack_upp_01": {
+  "ryggsack_rosa_hoger_01": {
    "frame": {
     "x": 0,
     "y": 1379,
@@ -1960,7 +1960,7 @@
     "h": 24
    }
   },
-  "ryggsack_vanster_01": {
+  "ryggsack_rosa_ner_01": {
    "frame": {
     "x": 0,
     "y": 1404,
@@ -1980,7 +1980,7 @@
     "h": 24
    }
   },
-  "taggkam_hoger_01": {
+  "ryggsack_rosa_upp_01": {
    "frame": {
     "x": 0,
     "y": 1429,
@@ -2000,7 +2000,7 @@
     "h": 24
    }
   },
-  "taggkam_ner_01": {
+  "ryggsack_rosa_vanster_01": {
    "frame": {
     "x": 0,
     "y": 1454,
@@ -2020,7 +2020,7 @@
     "h": 24
    }
   },
-  "taggkam_upp_01": {
+  "ryggsack_upp_01": {
    "frame": {
     "x": 0,
     "y": 1479,
@@ -2040,10 +2040,90 @@
     "h": 24
    }
   },
-  "taggkam_vanster_01": {
+  "ryggsack_vanster_01": {
    "frame": {
     "x": 0,
     "y": 1504,
+    "w": 16,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 24
+   }
+  },
+  "taggkam_hoger_01": {
+   "frame": {
+    "x": 0,
+    "y": 1529,
+    "w": 16,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 24
+   }
+  },
+  "taggkam_ner_01": {
+   "frame": {
+    "x": 0,
+    "y": 1554,
+    "w": 16,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 24
+   }
+  },
+  "taggkam_upp_01": {
+   "frame": {
+    "x": 0,
+    "y": 1579,
+    "w": 16,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 24
+   }
+  },
+  "taggkam_vanster_01": {
+   "frame": {
+    "x": 0,
+    "y": 1604,
     "w": 16,
     "h": 24
    },
@@ -2066,7 +2146,7 @@
   "format": "RGBA8888",
   "size": {
    "w": 260,
-   "h": 1529
+   "h": 1629
   },
   "scale": "1",
   "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."

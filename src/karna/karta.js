@@ -242,7 +242,10 @@ export function lasKarta(tmj) {
       if (egen.visas_forst === true || egen.visas_forst === 'true') ut.visasForst = true;
       else if (typeof egen.visas_forst === 'string' && egen.visas_forst) ut.visasForst = egen.visas_forst;
       if (egen.bild_vinka) ut.bildVinka = String(egen.bild_vinka).split(',').map((t) => t.trim()).filter(Boolean);
-      if (egen.bild_anim) { ut.bildAnim = String(egen.bild_anim).split(',').map((t) => t.trim()).filter(Boolean); ut.animMs = Math.max(250, tal(egen.anim_ms, 500)); }
+      // anim_paus (128.4) = "min-max" ms: efter ett varv står tomgången stilla så länge (orgelns blänk). Då får ett
+      // varv gå fortare än golvets gräns, så länge bytena i snitt är högst fyra per sekund
+      if (egen.anim_paus) { const [lo, hi] = String(egen.anim_paus).split('-').map((t) => Math.max(0, tal(t, 0))); ut.animPaus = [lo, Math.max(lo, hi ?? lo)]; }
+      if (egen.bild_anim) { ut.bildAnim = String(egen.bild_anim).split(',').map((t) => t.trim()).filter(Boolean); ut.animMs = Math.max(ut.animPaus ? 100 : 250, tal(egen.anim_ms, 500)); }
       // anim_i (103.2) = tomgången går bara i de tillstånden (hjulet står stilla på morgonen)
       if (egen.anim_i) ut.animI = String(egen.anim_i).split(',').map((t) => t.trim()).filter(Boolean);
       // under (103.2) = en stor bild som alltid ligger under figurerna (ön i floden), också när den är högre än föremålet
