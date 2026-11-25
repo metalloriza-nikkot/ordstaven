@@ -2092,11 +2092,14 @@ export function skapaSpel(d) {
       if (!b || pausad || rum.fryst || !ui.plattan.hidden || !rum.harRum || !aktuelltRum) return;
       if (!garFritt()) return;
       const vidForemal = b.frivilligaVid(aktuelltRum);
-      for (const sc of b.kapitel.scener) {
+      // frivilliga scener som lockar, och rummets frivilliga föremål som lockar (2.58: fossilet i gläntan)
+      const lockande = [...b.kapitel.scener.filter((/** @type {any} */ sc) => sc.lockar && sc.frivillig && !b.frivilligtGjort(sc.id)),
+        ...(b.rum(aktuelltRum)?.frivilligt || []).filter((/** @type {any} */ f) => f.lockar && !b.frivilligtGjort(`${aktuelltRum}/${f.foremal}`))
+          .map((/** @type {any} */ f) => ({ id: `${aktuelltRum}/${f.foremal}`, lockar: f.lockar, foremal: true }))];
+      for (const sc of lockande) {
         const l = sc.lockar;
-        if (!l || !sc.frivillig || b.frivilligtGjort(sc.id)) continue;
         // en scen som börjar vid ett föremål lockar bara när den går att starta (2.47: från pass 2 tills duellen)
-        if (sc.startar_vid && !vidForemal.includes(sc)) continue;
+        if (!sc.foremal && sc.startar_vid && !vidForemal.includes(sc)) continue;
         const o = rum.ruta(l.vid);
         if (!o) continue;
         // kartans lockradie (122.11, stig 4): det lockar redan på avstånd (från galleriet), och igen var 12:e sekund
@@ -2116,7 +2119,8 @@ export function skapaSpel(d) {
         visaLjudord(l.ljudord, Array.isArray(l.ljud) ? l.ljud[0] : l.ljud, l.vid);
         rum.hoppa(l.vid);
         rum.ungePekar(l.vid);
-        if (o.lockradie) { rum.lockGlimt(l.vid); window.setTimeout(() => rum.ungePekar(null), tid(2500)); }
+        // glimten betyder samma sak i hela spelet: en hemlighet eller ett frivilligt föremål glimtar också utan lockradie
+        if (o.lockradie || sc.foremal || sc.hemlighet) { rum.lockGlimt(l.vid); window.setTimeout(() => rum.ungePekar(null), tid(2500)); }
         const ms = l.bild ? rum.regi(l.bild) : 0;
         if (!ms && lockarVisarBeskrivning(l)) { ui.visaRegi(l.beskrivning, 0); window.setTimeout(() => ui.doljRegi(), tid(Math.min(5000, 1500 + l.beskrivning.split(' ').length * 120))); }
       }

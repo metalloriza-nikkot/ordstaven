@@ -509,6 +509,8 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
         if (!ids.includes(fv.foremal)) fel.push(var_(`rum ${r.id} frivilligt ${j + 1}: ${fv.foremal} finns inte i rummets innehall`));
         if (frivilliga.has(fv.foremal)) fel.push(var_(`rum ${r.id}: ${fv.foremal} står två gånger i frivilligt`));
         frivilliga.add(fv.foremal);
+        if (fv.lockar && !r.innehall.map(objId).includes(fv.lockar.vid)) fel.push(var_(`rum ${r.id} frivilligt ${fv.foremal}: lockar vid ${fv.lockar.vid}, som inte finns i rummet`));
+        if (fv.lockar) ljudKontroll(fv.lockar, `rum ${r.id} frivilligt ${fv.foremal} lockar`);
         if (fv.hemlighet && !harBelaning(fv.steg)) varningar.push(var_(`rum ${r.id} frivilligt ${fv.foremal}: hemligheten har ingen belöning som syns (dinobok, ge_sak, unge_tillagg)`));
         const pp = { sek: 0, lasuppgifter: 0, sistaSparpunkt: false };
         fv.steg.forEach((st, i) => {

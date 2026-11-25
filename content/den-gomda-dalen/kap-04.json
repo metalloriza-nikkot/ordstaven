@@ -16,8 +16,8 @@
  },
  "meta": {
   "namn": "Berget",
-  "version": "0.5",
-  "datum": "2026-11-23",
+  "version": "0.7",
+  "datum": "2026-11-25",
   "agare": "Innehåll",
   "kalla": "Berättelsen 21 v0.5.2, manus 21 v0.3.1 och ritningarna 21b v0.2.1, godkända av den vuxne (beslut 118.1).",
   "teknik": "Nytt i kapitlet (118.4): bokstavsstigen P18_bokstavsstig i ett kapitel (k4_stig1–3, kartan har stig_<id>), snön som stannar i luften tills STOR SKÖLD är skriven, färgtabellen för mörkret som LJUS stänger av, P9 utan chiffer (k4_ladan), tre rum utan Tiled-karta, och regierna: ankomst_berget, baronen_kikare_berg, blocket_lyfts, stor_skold_ras, mynningen_stangs, grottan_glittrar, grottan_visar_vaggen, fotavtryck_stor, ungen_fot_avtryck, ungen_slar_isen, blocket_driva, fossil_svans, svansarna, ladan_oppnas, kartbit5_molnkant, skata_harmar_molnkant och resan_molnkant. Musiken står som spel tills Stil har en slinga för berget. Föremålens id är förslag, och Teknik sätter dem efter kartan. Pass 121: vagg_gemener är en skylt med gemener (gemener: true, som en bubbla), isficka_bar (frivilligt, F1), ristning_tand och tand_isen (F3) och stig_k4_stig4, hylla, klippa och klippan_uppe i stenfältet med tillståndet hylla. Effekterna stege_klippan, rep_klippan och trappa_klippan, och de nära: ett_trappsteg_klippan, en_kort_stege_klippan och ett_kort_rep_klippan. Bilden klippan_hog i molnet. Pass 122: rummet berget_valvet (vagg_valvet, gang_salen, gang_galleriet och stig_k4_stig_valv), gang_valvet och gang_istapparna i grottan, scenerna k4s03_valvet och k4s03_galleriet, och regin mynningen_stangs med scenen efter STOR SKÖLD (122.2). Pass 124: rummen berget_gangen (R1), berget_salen (R2), berget_valvet (R3), berget_galleriet (R4), berget_tandgrottan och berget_sprickan (R5) ersätter berget_grottan. Id:n och mått får ändras. Nya föremål: mynningen_inifran, isficka, isklump_1–3, farfars_kompass, gang_salen_in, tavla_farfar, tand_genom_isen, oppning_tandgrottan, gang_sprickan och gang_galleriet_tillbaka. ge_sak ryggsack farfars_kompass. k4_stenarna har kan_oppnas_igen, och galleriet öppnar den med oppna_lasplatta.",
@@ -25,7 +25,9 @@
   "andrat_v02": "2026-11-21 (beslut 119.3, granskning 10): Farfars replik om den sista biten i pass 3, snöraset i ett svep, hjälptrappan i stig 3, en grotta av is, lådan med INTE KALL, gåtan i boken, RÄTT sten, instruktionerna till stig 2, FLYG och STOR SKÖLD, och tre repliker. Mellanscenen där han skriver av gåtan är ny och har ännu ingen bild.",
   "andrat_v03": "2026-11-22 (beslut 120.2–120.3 och 121.2–121.5): grottan efter Stils plan A–E med gemenernas vägg och avstickarna F1–F3, raset som en scen, stig 4 (tand) i F3 med en sida i Dinoboken, klippan med STEGE, REP och TRAPPA, och passgränsen: pass 2 slutar när gåtan står i boken, och pass 3 börjar med stig 3.",
   "andrat_v04": "2026-11-23 (beslut 122.2–122.4 och 122.11): KONSTIG sten, scenen efter STOR SKÖLD och pass 1:s slut, pass 2 som börjar i mörkret med Farfar, Farfars två repliker om ledtrådarna och de små bokstäverna, valvet med den obligatoriska stigen (skatt, inte skata), det som lockar till stig 4, klippans instruktion, det större stenfältet, och Farfars god natt.",
-  "andrat_v05": "2026-11-23 (beslut 124 och 124.12, granskning 11): grottan som fem rum i följd och tandgrottan, tre pass med gränsen vid galleriet, gåtan som en lapp som kan öppnas igen, F1 med isklumparna och Farfars kompass, F2 i galleriet, stig 4 i tandgrottan, rutnät utan återvändsgränder för den som har läst rätt, tavlan på andra stranden, ungens ögon i slutet av pass 1, och stigen mot molnkanten efter kartbiten."
+  "andrat_v05": "2026-11-23 (beslut 124 och 124.12, granskning 11): grottan som fem rum i följd och tandgrottan, tre pass med gränsen vid galleriet, gåtan som en lapp som kan öppnas igen, F1 med isklumparna och Farfars kompass, F2 i galleriet, stig 4 i tandgrottan, rutnät utan återvändsgränder för den som har läst rätt, tavlan på andra stranden, ungens ögon i slutet av pass 1, och stigen mot molnkanten efter kartbiten.",
+  "andrat_v06": "2026-11-24 (beslut 127.3 och 127.9): regin ungens_ogon på mellanscenen i mörkret, utan lucka_pip, \"Min gamla kompass! Den tappade jag här!\", och bär under de två första isklumparna.",
+  "andrat_v07": "2026-11-25 (beslut 125 och 127.5): stegen HOPPA ÖVER VATTNET, LÄS VÄGGEN OCH HOPPA och KOM UPP PÅ KLIPPAN, Farfars knep, och F1, F2 och tandgrottan som hemligheter."
  },
  "var_var_vi": [
   {
@@ -478,11 +480,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Det är svart och tyst. Sedan tänds två små ljus i mörkret: ungens ögon, svagt. Den blinkar en gång."
-    },
-    {
-     "typ": "ljud",
-     "id": "lucka_pip"
+     "beskrivning": "Det är svart och tyst. Sedan tänds två små ljus i mörkret: ungens ögon, svagt. Den blinkar en gång.",
+     "bild": "ungens_ogon"
     },
     {
      "typ": "sparpunkt",
@@ -581,7 +580,7 @@
     {
      "typ": "replik",
      "talare": "farfar",
-     "text": "Min kompass! Den tappade jag här för länge sen.",
+     "text": "Min gamla kompass! Den tappade jag här!",
      "upplast": true,
      "via": "radio"
     },
@@ -591,7 +590,8 @@
      "id": "farfars_kompass"
     }
    ],
-   "anteckning": "F1 (124.3 och 124.12.5). Här lärs lockelsen ut: ett varmt ljus, en klang och ungen som stannar betyder att något finns där, och det betyder samma sak varje gång. Tre isklumpar att lyfta, och under den sista ligger Farfars gamla kompass. Farfar känner igen den på radion. Det är en bit av hans historia: han tappade kompassen på berget, och därför hittar han inte vägen själv. Kompassen hänger sedan på ryggsäcken. Den är ingen pryl som gör något."
+   "anteckning": "F1 (124.3 och 124.12.5). Här lärs lockelsen ut: ett varmt ljus, en klang och ungen som stannar betyder att något finns där, och det betyder samma sak varje gång. Tre isklumpar att lyfta, och under den sista ligger Farfars gamla kompass. Farfar känner igen den på radion. Det är en bit av hans historia: han tappade kompassen på berget, och därför hittar han inte vägen själv. Kompassen hänger sedan på ryggsäcken. Den är ingen pryl som gör något.",
+   "hemlighet": true
   },
   {
    "id": "k4s03_salen",
@@ -784,7 +784,8 @@
       "bild": "fotavtryck_stor"
      }
     }
-   ]
+   ],
+   "hemlighet": true
   },
   {
    "id": "k4s03_tanden",
@@ -830,7 +831,8 @@
      }
     }
    ],
-   "anteckning": "Stig 4 (124.12.4), frivillig och i ett eget litet rum med öppningen i galleriet. Tanden syns genom isen redan från galleriet. Ordet kommer ur Farfars ristning av en tand, och tanden blir en sida i Dinoboken. Lockelsen är densamma som vid F1."
+   "anteckning": "Stig 4 (124.12.4), frivillig och i ett eget litet rum med öppningen i galleriet. Tanden syns genom isen redan från galleriet. Ordet kommer ur Farfars ristning av en tand, och tanden blir en sida i Dinoboken. Lockelsen är densamma som vid F1.",
+   "hemlighet": true
   },
   {
    "id": "k4s04_utvagen",
@@ -1370,8 +1372,8 @@
     "upplast": true
    },
    "innehall": [
-    "tom",
-    "tom",
+    "bar",
+    "bar",
     "farfars_kompass"
    ],
    "foremal": [
@@ -1387,7 +1389,7 @@
     "handling": "ungen nosar vid närmaste isklump",
     "efter_sek": 15
    },
-   "anteckning": "F1, vila (124.3): som snön i pass 1. Kompassen ligger alltid under den tredje (sak_vid)."
+   "anteckning": "F1, vila (124.3): som snön i pass 1. Ett bär under var och en av de två första (126.8.2), och kompassen ligger alltid under den tredje (sak_vid)."
   },
   {
    "id": "k4_stig2",
@@ -1858,7 +1860,8 @@
      "klart": {
       "scen": "k4s01_foten",
       "pussel": "k4_stig1"
-     }
+     },
+     "knep": "Läs skyltarna!"
     },
     {
      "text": "LETA I SNÖN",
@@ -1872,7 +1875,8 @@
      "klart": {
       "scen": "k4s02_mynningen",
       "pussel": "k4_stor_skold"
-     }
+     },
+     "knep": "Titta på bilden i molnet!"
     }
    ],
    "stampel": {
@@ -1894,21 +1898,24 @@
      "klart": {
       "scen": "k4s03_gangen",
       "pussel": "k4_ljus"
-     }
+     },
+     "knep": "Titta på staven!"
     },
     {
-     "text": "HOPPA ÖVER",
+     "text": "HOPPA ÖVER VATTNET",
      "klart": {
       "scen": "k4s03_salen",
       "pussel": "k4_stig2"
-     }
+     },
+     "knep": "Titta på andra stranden!"
     },
     {
-     "text": "HOPPA RÄTT",
+     "text": "LÄS VÄGGEN OCH HOPPA",
      "klart": {
       "scen": "k4s03_valvet",
       "pussel": "k4_stig_valv"
-     }
+     },
+     "knep": "Läs hela väggen först!"
     }
    ],
    "stampel": {
@@ -1930,21 +1937,24 @@
      "klart": {
       "scen": "k4s03_galleriet",
       "ga_till": "gata_3"
-     }
+     },
+     "knep": "Mina ledtrådar glimmar i isen!"
     },
     {
      "text": "HITTA UT",
      "klart": {
       "scen": "k4s04_utvagen",
       "pussel": "k4_stig3"
-     }
+     },
+     "knep": "Läs gåtan i din bok!"
     },
     {
-     "text": "UPP PÅ KLIPPAN",
+     "text": "KOM UPP PÅ KLIPPAN",
      "klart": {
       "scen": "k4s05_klippan",
       "pussel": "k4_klippan"
-     }
+     },
+     "knep": "Titta på bilden i molnet!"
     }
    ],
    "stampel": {
@@ -1953,7 +1963,7 @@
      "pussel": "k4_klippan"
     }
    },
-   "anteckning": "Pass 3 (124.12.2): galleriet, sprickan och klippan. UPP PÅ KLIPPAN säger inte ordet (69.3)."
+   "anteckning": "Pass 3 (124.12.2): galleriet, sprickan och klippan. KOM UPP PÅ KLIPPAN säger inte ordet (69.3)."
   },
   {
    "id": "u4_stenen",
@@ -1966,14 +1976,16 @@
      "klart": {
       "scen": "k4s05_stenfaltet",
       "pussel": "k4_stenarna"
-     }
+     },
+     "knep": "Läs gåtan i din bok!"
     },
     {
      "text": "ÖPPNA LÅDAN",
      "klart": {
       "scen": "k4s05_stenfaltet",
       "pussel": "k4_ladan"
-     }
+     },
+     "knep": "Läs locket!"
     }
    ],
    "stampel": {

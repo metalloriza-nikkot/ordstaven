@@ -22,8 +22,8 @@
  },
  "meta": {
   "namn": "Skogen",
-  "version": "0.7.16",
-  "datum": "2026-11-18",
+  "version": "0.7.17",
+  "datum": "2026-11-25",
   "agare": "Innehåll",
   "kalla": "Manus 15-kapitel1-manus.md v0.18. Byggd på repots kap-01.json från 0.29.0.",
   "nya_pusseltyper": [
@@ -45,7 +45,8 @@
   "andrat_v0713": "2026-11-11 (beslut 73.2): felrepliken i k1_svard och k1_svard_igen är \"Nästan!\", och reaktionen säger inte längre att ordet tänds, eftersom förebilden kommer efter två fel (72.2). Rättelser av text som inte längre stämde. Ingen ledbild i kapitel 1.",
   "andrat_v0714": "2026-11-11 (beslut 76.6): återblicken säger att stegen räddade apan, inte SVÄRD. En rättelse av text som inte stämde (brief §4).",
   "andrat_v0715": "2026-11-18 (beslut 102.5–102.6): 9 repliker efter provläsningen, valda av spelaren. k1s01_brynet: Läs skylten vid stenarna! -> Där är en skylt till. Läs den! k1s02_lianerna: Jag gjorde en bild i trädet. Du skriver ordet. -> Gå till trädet! Jag ritade en bild där. k1s02_lianerna: Gå till trädet! Där finns formeln. -> Skriv vad bilden visar. Det är formeln! k1s06_present: Den kommer du att behöva. -> Spara nyckeln. Du kommer att behöva den. k1s09_luckorna: Bara dinos från dalen vet svaret. -> {unge} är från dalen. {unge} vet svaret! k1s09_luckorna: Vilken lucka passar {unge}? -> Vilken lucka stämmer med {unge}? k1s10_koden: Hem. Dit ska ni. -> Ordet var hem! Dit ska ni. k1s12_klaffen: Där gömmer sig baronen! -> Där väntar baronen! k1s13_slutet: Det var mamma! Långt borta. Men hon hör dig. -> Det var mamma, långt borta! Hon hörde {unge}. Lika många repliker, och inga id:n är ändrade.",
-  "andrat_v0716": "2026-11-18 (beslut 105.3–105.5): skrivpusslen med ordkraft efter trappan i 104.3. k1_svard: Vad är det? Skriv ordet! -> En ny formel! Med den kan du hugga. Skriv den! k1_svard_igen: (ingen) -> Hugg bort lianen! Skriv en formel! Inga nya steg, och inga id:n är ändrade."
+  "andrat_v0716": "2026-11-18 (beslut 105.3–105.5): skrivpusslen med ordkraft efter trappan i 104.3. k1_svard: Vad är det? Skriv ordet! -> En ny formel! Med den kan du hugga. Skriv den! k1_svard_igen: (ingen) -> Hugg bort lianen! Skriv en formel! Inga nya steg, och inga id:n är ändrade.",
+  "andrat_v0717": "2026-11-25 (beslut 125 och 127.5): stegen SKRIV EN FORMEL och KRAMA {UNGE}, hackspetten med en kram, Farfars knep, och buskarna och fossilet som hemligheter med samma lockelse som i kapitel 4."
  },
  "var_var_vi": [
   {
@@ -311,7 +312,14 @@
         "bildtext": "fossil"
        }
       }
-     ]
+     ],
+     "hemlighet": true,
+     "lockar": {
+      "vid": "fossil",
+      "ljud": "klirr",
+      "syns_redan": true,
+      "beskrivning": "Vid fossilet i gläntan glimtar det, det klingar till, och ungen stannar och nosar ditåt. Inget sägs."
+     }
     },
     {
      "foremal": "rothal",
@@ -566,7 +574,14 @@
    ],
    "anteckning": "Frivillig gren: spelas första gången hjälten går in i buskarna, högst en gång, under vägvalet eller senare i kapitlet (beslut 26.2). v0.7.4 (A 9): instruktionen \"Vifta med staven mot buskarna!\" och knuffen står i k1_busken. Efter ryggsäcken springer ungen mot utgången och tittar tillbaka. Gråten (BUHU) hörs inte igen här, eftersom han kan komma hit efter att apan är räddad. Radion och ungen pekar mot målet.",
    "frivillig": true,
-   "startar_i_rum": "buskarna"
+   "startar_i_rum": "buskarna",
+   "hemlighet": true,
+   "lockar": {
+    "vid": "stig_buskarna",
+    "ljud": "klirr",
+    "syns_redan": true,
+    "beskrivning": "Vid stigen till buskarna glimtar det, det klingar till, och ungen stannar och nosar ditåt. Inget sägs."
+   }
   },
   {
    "id": "k1s05_glantan",
@@ -984,19 +999,19 @@
      "talare": "berattare",
      "text": "{unge} är rädd.",
      "upplast": true,
-     "vantar_pa": "mata_ungen",
+     "vantar_pa": "krama_ungen",
      "paminnelse": {
       "efter_sek": 8,
       "replik": {
        "talare": "berattare",
-       "text": "Ge {unge} ett bär.",
+       "text": "Krama {unge}!",
        "upplast": true
       }
      }
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Ungen äter och trycker sig mot hjälten.",
+     "beskrivning": "Hjälten kramar ungen, och den trycker sig mot honom.",
      "syns_redan": true
     },
     {
@@ -1083,7 +1098,7 @@
      "valfri": false
     }
    ],
-   "anteckning": "Omsorgen (06): ett ljud i skogen som ungen inte känner igen, en hackspett som knackar två gånger (bara ljud och ljudord, ingen ny figur). Andra gången är ljudet bekant, och ungen fnissar. Rädslan har inget med baronen att göra (beslut 18.2). \"{unge} är rädd.\" väntar på mata_ungen, och påminnelsen kommer efter 8 s. Har han 0 bär trillar ett bär ner från en buske först. v0.7.4 (A 12): de smyger förbi bron, och baronen ser dem inte (kikaren åt fel håll). Mamma är långt borta men hör ungen. v0.7.5 (34.6): \"Följ stigen!\" före målet. v0.7.7 (38.5, spelarens regel): baronen läser fel på något varje gång han syns. Här läser han sin egen lapp upp och ned i stället för att spana med kikaren, som han redan har gjort två gånger i prologen. Spelaren har just läst lappen rätt.",
+   "anteckning": "Omsorgen (06): ett ljud i skogen som ungen inte känner igen, en hackspett som knackar två gånger (bara ljud och ljudord, ingen ny figur). Andra gången är ljudet bekant, och ungen fnissar. Rädslan har inget med baronen att göra (beslut 18.2). \"{unge} är rädd.\" väntar på krama_ungen (125.5: rädd unge får en kram, hungrig unge får ett bär), och påminnelsen \"Krama {unge}!\" kommer efter 8 s. v0.7.4 (A 12): de smyger förbi bron, och baronen ser dem inte (kikaren åt fel håll). Mamma är långt borta men hör ungen. v0.7.5 (34.6): \"Följ stigen!\" före målet. v0.7.7 (38.5, spelarens regel): baronen läser fel på något varje gång han syns. Här läser han sin egen lapp upp och ned i stället för att spana med kikaren, som han redan har gjort två gånger i prologen. Spelaren har just läst lappen rätt.",
    "tillstand": "raddad"
   }
  ],
@@ -1873,7 +1888,8 @@
      "klart": {
       "scen": "k1s01_brynet",
       "las_skylt": "skylt_ingang"
-     }
+     },
+     "knep": "Läs min skylt!"
     },
     {
      "text": "GÅ TILL STENARNA",
@@ -1887,7 +1903,8 @@
      "klart": {
       "scen": "k1s01_brynet",
       "pussel": "k1_stenen"
-     }
+     },
+     "knep": "Läs min skylt!"
     }
    ],
    "stampel": {
@@ -1911,11 +1928,12 @@
      }
     },
     {
-     "text": "SKRIV ORDET",
+     "text": "SKRIV EN FORMEL",
      "klart": {
       "scen": "k1s02_lianerna",
       "pussel": "k1_svard"
-     }
+     },
+     "knep": "Titta på bilden i molnet!"
     },
     {
      "text": "HUGG LIANERNA",
@@ -1950,7 +1968,8 @@
      "klart": {
       "scen": "k1s05_glantan",
       "pussel": "k1_apan"
-     }
+     },
+     "knep": "Läs ledtråden!"
     }
    ],
    "stampel": {
@@ -1971,14 +1990,16 @@
      "klart": {
       "scen": "k1s07_stigarna",
       "ga_till": "skylt_farfar_3"
-     }
+     },
+     "knep": "Läs min skylt!"
     },
     {
      "text": "VÄLJ RÄTT TRÄD",
      "klart": {
       "scen": "k1s07_stigarna",
       "pussel": "k1_tradet"
-     }
+     },
+     "knep": "Läs min skylt!"
     }
    ],
    "stampel": {
@@ -2034,14 +2055,16 @@
      "klart": {
       "scen": "k1s09_luckorna",
       "pussel": "k1_luckorna"
-     }
+     },
+     "knep": "Läs på luckorna!"
     },
     {
      "text": "SKRIV KODEN",
      "klart": {
       "scen": "k1s10_koden",
       "pussel": "k1_kodlas"
-     }
+     },
+     "knep": "Varje bild är en bokstav."
     }
    ],
    "stampel": {
@@ -2062,7 +2085,8 @@
      "klart": {
       "scen": "k1s12_klaffen",
       "pussel": "k1_lappen"
-     }
+     },
+     "knep": "Låt {unge} nosa på orden!"
     }
    ],
    "stampel": {
@@ -2079,10 +2103,10 @@
    "pass": 2,
    "steg": [
     {
-     "text": "MATA {UNGE}",
+     "text": "KRAMA {UNGE}",
      "klart": {
       "scen": "k1s13_slutet",
-      "vantar_pa": "mata_ungen"
+      "vantar_pa": "krama_ungen"
      },
      "visas": "med_paminnelse"
     },

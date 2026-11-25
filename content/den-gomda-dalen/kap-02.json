@@ -16,8 +16,8 @@
  },
  "meta": {
   "namn": "Träsket",
-  "version": "0.7.13",
-  "datum": "2026-11-18",
+  "version": "0.7.14",
+  "datum": "2026-11-25",
   "agare": "Innehåll",
   "kalla": "Manus 17-kapitel2-manus.md v0.4 (beslut 60–64). Ny fil.",
   "teknik": "Förslag från Innehåll (2026-11-08), byggt på Tekniks svar 26 och beslut 64.2. Fält som kontrollen inte känner än: P11 skriv, godtas, tand, rimliga, vanligt_svar och nastan.replik (Teknik 26). Steget nav med grenar (scen, mal, bild för ringen på lappen), mellan_grenar som steg (64.2) och knuff. Navets sparpunkt i mellan_grenar slutar pass 2, och det som kommer efter den räknas som pass 3 (var_var_vi pass 3 och passens tider). Grenarnas scener står som pass 2, eftersom ordningen är fri. {ord:k2_over} = ordet han skrev i k2_over (64.2), i k2s10 och i stämpeln för ELDEN. kraver på en variant (k2_tavlorna L4 bara om k2_grodan är löst i L4), och villkor gren_kvar på en replik i var_var_vi pass 3. Med villkoret har lang fyra repliker, men han hör bara tre. ristas: false på en formel som inte ska ristas in (BRO, STEGE, REP och FLOTTE i k2_over, REP i k2_bubblan). oppna_lasplatta med skylt i stället för pussel_id, och lys_ord (k2s04: brevets halva läses först med las_skylt, sedan visas den igen med INTE i guld). redan_last: 1 på k2_tavlorna (första raden grå med en bock, 63.6). ga_till unge: ungen i leran är målet (k2s01). bara över två rum: halvan bärs från bryggan och vassen till brevram i byn (k2s04 och k2s05). Medan bara pågår i vassen är rummets utgångar stängda, och målet glimtar (64.2). lockar på den frivilliga scenen k2s06 (58.5): draget vid stig_dammen, igen varje gång han går förbi tills han har varit där, aldrig under en replik eller ett läsval, och grodorna landar aldrig på torget under k2_skyltarna. Läsvalet med skyltarna: alternativen är skyltar med en mening (ord) i rummet, och varianten har bara bild (skylt_baronen) eftersom frågan är instruktionen. Byborna (17, Byborna, och 63.9) står bara i rummets anteckning och i 17 (Byborna): fiskaren, tvatterskan och barnet_drake är figurer i byns innehåll. Säg hur deras områden, sysslor, vinkningen vid ett tryck och bubblorna (SUCK, FISK, OJ, HURRA, HEJ) ska stå i datan, så skriver jag det. Tillstånden i byn: rep (k2s02–k2s03 till lögnen), fri (efter lögnen), kvall (k2s10). Repen och skyltarna syns bara i rep. dorr_rosa är låst tills k2s07. Effekterna i formler (bro_over_vattnet, bubblan_foljer_staven …) är namn för gråboxen, och vid_ratt beskriver dem. Mellanscenerna har ingen bild än, så att testet av bilderna går igenom. Stil ritar dem i kedjans steg 4–5 (65.4), och då får de bild: luftskepp_river_brevet, brevram_tom, brevram_halva (en eller två halvor), brevram_hel och under_bryggan. Uppdragens bildkort är lånade tills Stil har ritat kapitlets egna (TRÄSKET, TANT ROSA, BREVET, TAVLORNA och ELDEN, och ringarna med bryggan och vassen, som står som bild på navets grenar). musik och ljud på reaktionerna (64.5–64.6) kommer när Teknik har sagt hur de står i datan (27). k2_bubblan är räddningen.",
@@ -41,7 +41,8 @@
   "andrat_v0710": "2026-11-15 (pass 95b): Tant Rosa säger \"Herr Skata tog mitt brev!\" och \"Snälla, du måste hitta båda brevhalvorna.\", och Farfar \"Hej, Rosa! Var kartbiten är står i brevet.\".",
   "andrat_v0711": "2026-11-16 (beslut 96.4): Tant Rosa säger \"Är du {hjalte}? Herr Skata tog mitt brev!\".",
   "andrat_v0712": "2026-11-18 (beslut 102.5–102.6): 8 repliker efter provläsningen, valda av spelaren. k2s01_kanten: Skriv en formel med staven! -> Skriv ett ord från din stav! k2s01_kanten: Ordkraft! Ditt ord bar er över. -> Ordkraft! Ni kom över vattnet! k2s02_byn: Är du {hjalte}? Herr Skata tog mitt brev! -> Är du {hjalte}? Herr Skata tog brevet! k2s02_byn: Snälla, du måste hitta båda brevhalvorna. -> Hitta båda halvorna! Jag sätter dem i ramen. k2s04_bryggan: Han har min gamla bit! Ta brevhalvan till Rosa! -> Det är en av mina kartbitar! Gå till Rosa! k2s05_vassen: Vilket hopp! Hur kommer {unge} i land? -> {unge} hoppade ut på en stock! k2s09_kartbiten: Tack! Jag flätade den av vass, med rosa band. -> Tack för hjälpen! Här är en ryggsäck av vass. k2s10_elden: Bra ord! Men byn tänder elden i kväll. -> Bra ord! Men först måste byn se stigen. Lika många repliker, och inga id:n är ändrade.",
-  "andrat_v0713": "2026-11-18 (beslut 105.3–105.5): skrivpusslen med ordkraft efter trappan i 104.3. k2s01_kanten: Vassen är för tät. Ni kommer inte fram! -> Vassen är för tät. Hugg er igenom den! k2_svard: Skriv ett ord från din stav! -> Skriv en formel från din stav! k2_vassvaggen: Hugg dig igenom vassen! -> Hugg nu! k2s01_kanten: Hur kommer ni över vattnet? -> Ni måste ta er över vattnet! k2_flyg: Säg åt brevet vad det ska göra! -> En ny formel! Få brevhalvan att flyga hit! k2_lyft: Säg åt tavlan vad den ska göra! -> Tavlan måste ner! Skriv en formel! k2_draken: Skriv ett ord som hjälper draken! -> Draken måste flyga igen! Skriv en formel! k2_lyktorna: Det är mörkt. Skriv ett ord som hjälper! -> Lyktorna måste lysa! Skriv en formel! Inga nya steg, och inga id:n är ändrade."
+  "andrat_v0713": "2026-11-18 (beslut 105.3–105.5): skrivpusslen med ordkraft efter trappan i 104.3. k2s01_kanten: Vassen är för tät. Ni kommer inte fram! -> Vassen är för tät. Hugg er igenom den! k2_svard: Skriv ett ord från din stav! -> Skriv en formel från din stav! k2_vassvaggen: Hugg dig igenom vassen! -> Hugg nu! k2s01_kanten: Hur kommer ni över vattnet? -> Ni måste ta er över vattnet! k2_flyg: Säg åt brevet vad det ska göra! -> En ny formel! Få brevhalvan att flyga hit! k2_lyft: Säg åt tavlan vad den ska göra! -> Tavlan måste ner! Skriv en formel! k2_draken: Skriv ett ord som hjälper draken! -> Draken måste flyga igen! Skriv en formel! k2_lyktorna: Det är mörkt. Skriv ett ord som hjälper! -> Lyktorna måste lysa! Skriv en formel! Inga nya steg, och inga id:n är ändrade.",
+  "andrat_v0714": "2026-11-25 (beslut 125 och 127.5): stegen KOM ÖVER VATTNET, HÄMTA HALVAN VID BRYGGAN, HÄMTA HALVAN I VASSEN och LYS UPP LYKTORNA, Farfars knep, och draken och dammen som hemligheter."
  },
  "var_var_vi": [
   {
@@ -396,7 +397,8 @@
        "id": "drakvimpel"
       }
      ],
-     "anteckning": "76.4 (B10): kapitlets frivilliga formel. Draken syns hela tiden, men fungerar först när han kan FLYG (efter). Barnet står under taket och tittar upp tills draken är loss, och springer sedan med den igen. Gåvan är en hjälmdekor, ett annat slag än Bos dräkt och Tant Rosas ryggsäck (72.11)."
+     "anteckning": "76.4 (B10): kapitlets frivilliga formel. Draken syns hela tiden, men fungerar först när han kan FLYG (efter). Barnet står under taket och tittar upp tills draken är loss, och springer sedan med den igen. Gåvan är en hjälmdekor, ett annat slag än Bos dräkt och Tant Rosas ryggsäck (72.11).",
+     "hemlighet": true
     }
    ]
   },
@@ -1222,7 +1224,8 @@
      "beskrivning": "Ungen springer mot stigen till byn och tittar tillbaka på hjälten."
     }
    ],
-   "anteckning": "Kapitlets frivilliga uppdrag (35.4). Bo glimtar, och uppdraget står inte på lappen. Draget hit (58.5, 63.9) står i lockar: när hjälten går förbi stig_dammen hoppar grodorna ut, och ungen väntar vid stigen. Det kommer igen varje gång han går förbi, tills han har varit här, aldrig medan en replik eller ett läsval pågår, och grodorna landar aldrig på torget medan skyltarna är ett läsval. Ungens knuff efter 15 s pekar bara på huvudvägen (39.4). L4 här är kapitlets första läsval med INTE, och klarar han det får han L4 i huset (k2_tavlorna). 72.11: Bos tack är en ny dräktfärg i grodgrönt, som hjälten tar på direkt och ser att den syns. Gåvorna i ett kapitel är av olika slag, och kapitel 2 upprepar inte kapitel 1:s hjälmdekor och ryggsäck."
+   "anteckning": "Kapitlets frivilliga uppdrag (35.4). Bo glimtar, och uppdraget står inte på lappen. Draget hit (58.5, 63.9) står i lockar: när hjälten går förbi stig_dammen hoppar grodorna ut, och ungen väntar vid stigen. Det kommer igen varje gång han går förbi, tills han har varit här, aldrig medan en replik eller ett läsval pågår, och grodorna landar aldrig på torget medan skyltarna är ett läsval. Ungens knuff efter 15 s pekar bara på huvudvägen (39.4). L4 här är kapitlets första läsval med INTE, och klarar han det får han L4 i huset (k2_tavlorna). 72.11: Bos tack är en ny dräktfärg i grodgrönt, som hjälten tar på direkt och ser att den syns. Gåvorna i ett kapitel är av olika slag, och kapitel 2 upprepar inte kapitel 1:s hjälmdekor och ryggsäck.",
+   "hemlighet": true
   },
   {
    "id": "k2s07_hela_brevet",
@@ -2971,7 +2974,8 @@
      "klart": {
       "scen": "k2s01_kanten",
       "pussel": "k2_vassvaggen"
-     }
+     },
+     "knep": "Titta på staven!"
     },
     {
      "text": "DRA UPP {UNGE}",
@@ -2981,11 +2985,12 @@
      }
     },
     {
-     "text": "SKRIV ETT ORD",
+     "text": "KOM ÖVER VATTNET",
      "klart": {
       "scen": "k2s01_kanten",
       "pussel": "k2_over"
-     }
+     },
+     "knep": "Titta på bilden i molnet!"
     }
    ],
    "stampel": {
@@ -3034,17 +3039,18 @@
      "klart": {
       "scen": "k2s03_torget",
       "pussel": "k2_skyltarna"
-     }
+     },
+     "knep": "Läs alla skyltarna!"
     },
     {
-     "text": "BREVHALVAN VID BRYGGAN",
+     "text": "HÄMTA HALVAN VID BRYGGAN",
      "klart": {
       "scen": "k2s04_bryggan",
       "bara": "brevram"
      }
     },
     {
-     "text": "BREVHALVAN I VASSEN",
+     "text": "HÄMTA HALVAN I VASSEN",
      "klart": {
       "scen": "k2s05_vassen",
       "bara": "brevram"
@@ -3069,14 +3075,16 @@
      "klart": {
       "scen": "k2s08_huset",
       "pussel": "k2_tavlorna"
-     }
+     },
+     "knep": "Läs brevet i din bok!"
     },
     {
      "text": "LYFT TAVLAN",
      "klart": {
       "scen": "k2s08_huset",
       "pussel": "k2_lyft"
-     }
+     },
+     "knep": "Titta på bilden i molnet!"
     },
     {
      "text": "TA KARTBITEN",
@@ -3100,11 +3108,12 @@
    "pass": 3,
    "steg": [
     {
-     "text": "LYS UPP",
+     "text": "LYS UPP LYKTORNA",
      "klart": {
       "scen": "k2s10_elden",
       "pussel": "k2_lyktorna"
-     }
+     },
+     "knep": "Titta på staven!"
     },
     {
      "text": "SAMLA VED",

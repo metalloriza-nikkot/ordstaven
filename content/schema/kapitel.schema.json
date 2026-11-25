@@ -471,6 +471,9 @@
               "hemlighet": {
                 "type": "boolean",
                 "description": "Ett frivilligt föremål som är en hemlighet (2.57, beslut 125.5): ungen nosar mot det när han matar den med ett bär. Kräver en belöning som syns (dinobok, ge_sak)."
+              },
+              "lockar": {
+                "$ref": "#/$defs/lockar"
               }
             }
           }
@@ -582,30 +585,7 @@
           "description": "Ett undantag för hela scenen. Gäller före rummets. null = tyst."
         },
         "lockar": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "vid",
-            "beskrivning"
-          ],
-          "description": "Det som lockar till en frivillig scen (2.31, 58.5): när hjälten går förbi `vid` händer det (igen varje gång tills han har varit där, aldrig under en replik eller ett läsval), och ungen väntar vid utgången. vid får också vara ett föremål i rummet (2.47): då händer det när han går förbi föremålet, och ungen väntar vid det.",
-          "properties": {
-            "vid": {
-              "$ref": "#/$defs/id"
-            },
-            "beskrivning": {
-              "type": "string"
-            },
-            "bild": {
-              "$ref": "#/$defs/id"
-            },
-            "ljud": {
-              "$ref": "#/$defs/ljudlista"
-            },
-            "ljudord": {
-              "$ref": "#/$defs/ljudord"
-            }
-          }
+          "$ref": "#/$defs/lockar"
         },
         "startar_vid": {
           "$ref": "#/$defs/id",
@@ -2980,6 +2960,36 @@
               }
             }
           }
+        }
+      }
+    },
+    "lockar": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "vid",
+        "beskrivning"
+      ],
+      "description": "Det som lockar till en frivillig scen (2.31, 58.5): när hjälten går förbi `vid` händer det (igen varje gång tills han har varit där, aldrig under en replik eller ett läsval), och ungen väntar vid utgången. vid får också vara ett föremål i rummet (2.47): då händer det när han går förbi föremålet, och ungen väntar vid det. På en post i rum.frivilligt (2.58) lockar det till föremålet, tills det frivilliga är gjort.",
+      "properties": {
+        "vid": {
+          "$ref": "#/$defs/id"
+        },
+        "beskrivning": {
+          "type": "string"
+        },
+        "bild": {
+          "$ref": "#/$defs/id"
+        },
+        "ljud": {
+          "$ref": "#/$defs/ljudlista"
+        },
+        "ljudord": {
+          "$ref": "#/$defs/ljudord"
+        },
+        "syns_redan": {
+          "type": "boolean",
+          "description": "Det som lockar syns redan (2.58): glimten och ungen visar det, så beskrivningen visas inte för den vuxne. Den står kvar som anteckning."
         }
       }
     }

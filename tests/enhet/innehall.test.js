@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { forSkarm, namnISkrift, ord } from '../../src/karna/text.js';
 import { kontrollera, antalRader } from '../../verktyg/innehall/kontroll.js';
+import { beskrivningarSomVisas } from '../../src/karna/mellanscen.js';
 
 const las = (p) => JSON.parse(readFileSync(new URL('../../content/' + p, import.meta.url), 'utf8'));
 const riktigt = () => ({ aventyr: las('den-gomda-dalen/aventyr.json'), kapitel: [las('den-gomda-dalen/kap-00.json'), las('den-gomda-dalen/kap-01.json')], ordlistor: las('ordlistor.json') });
@@ -410,27 +411,21 @@ describe('kapitel 2 i schema 2.31 (Teknik 20, beslut 64.2)', () => {
   });
 });
 
-describe('fälten för 125 (schema 2.57: knep, krama_ungen och hemlighet)', () => {
+describe('fälten för 125 (schema 2.57–2.58: knep, krama_ungen, hemlighet och lockar på det frivilliga)', () => {
   const kap01 = (d) => d.kapitel[1];
   const scen = (k, id) => k.scener.find((s) => s.id === id);
   const kontroll = (andra) => { const d = riktigt(); andra(d); return kontrollera(d); };
-  /** Hackspetten i kapitel 1 får kramen, och uppdragets steg följer med (Innehålls underlag 4). */
-  const kram = (d) => {
-    scen(kap01(d), 'k1s13_slutet').steg.find((s) => s.vantar_pa === 'mata_ungen').vantar_pa = 'krama_ungen';
-    const st = kap01(d).uppdrag.find((u) => u.id === 'u1_trosta').steg[0]; st.text = 'KRAMA {UNGE}'; st.klart.vantar_pa = 'krama_ungen';
-  };
+  const fossil = (d) => kap01(d).rum.find((r) => r.id === 'glantan').frivilligt.find((f) => f.foremal === 'fossil');
 
-  it('knep och krama_ungen går igenom schemat och kontrollen', () => {
-    const r = kontroll((d) => { kap01(d).uppdrag[0].steg[0].knep = 'Läs min skylt!'; kram(d); });
-    expect(r.fel).toEqual([]);
-    expect(r.varningar.join('\n')).not.toMatch(/k1s13_slutet.*kram/);
-  });
-  it('hemlighet på en frivillig scen som lockar, med en belöning', () => {
-    const d = riktigt(); const k4 = las('den-gomda-dalen/kap-04.json');
-    k4.scener.find((s) => s.id === 'k4s03_isfickan').hemlighet = true;
-    d.kapitel = [k4];
+  it('datan efter pass 127 går igenom: knepen, kramen, hemligheterna och lockelsen vid fossilet', () => {
+    const d = riktigt();
     const r = kontrollera(d);
-    expect(r.fel.filter((f) => /hemlighet/.test(f))).toEqual([]);
+    expect(r.fel).toEqual([]);
+    expect(r.varningar.join('\n')).not.toMatch(/rädd eller ledsen|hungrig, och då|ingen belöning/);
+    // det som pass 127 skrev står i datan
+    expect(scen(kap01(d), 'k1s13_slutet').steg.some((s) => s.vantar_pa === 'krama_ungen')).toBe(true);
+    expect(kap01(d).uppdrag.flatMap((u) => u.steg).filter((s) => s.knep).length).toBeGreaterThan(0);
+    expect(fossil(d)).toMatchObject({ hemlighet: true, lockar: { vid: 'fossil', syns_redan: true } });
   });
   it('knepet säger aldrig svaret på stegets pussel, och ryms på två rader', () => {
     const r = kontroll((d) => {
@@ -441,16 +436,28 @@ describe('fälten för 125 (schema 2.57: knep, krama_ungen och hemlighet)', () =
     expect(r.fel.join('\n')).toMatch(/knepet säger svaret \(SVÄRD\)/);
     expect(r.varningar.join('\n')).toMatch(/knepet blir \d+ rader, högst två/);
   });
-  it('en hemlighet är en frivillig scen som lockar', () => {
+  it('en hemlighet är en frivillig scen som lockar, och en lockelse vid det frivilliga står i rummet', () => {
     const r = kontroll((d) => {
       scen(kap01(d), 'k1s01_brynet').hemlighet = true;
-      scen(kap01(d), 'k1s03_buskarna').hemlighet = true; // buskarna lockar inte än (underlag 5)
+      delete scen(kap01(d), 'k1s03_buskarna').lockar;
+      fossil(d).lockar.vid = 'ingenstans';
     });
     const f = r.fel.join('\n');
     expect(f).toMatch(/k1s01_brynet.*hemlighet gäller bara en frivillig scen/);
     expect(f).toMatch(/k1s03_buskarna.*en hemlighet behöver lockar/);
+    expect(f).toMatch(/frivilligt fossil: lockar vid ingenstans, som inte finns i rummet/);
   });
   it('rädd ungen får en kram, och hungrig ungen ett bär', () => {
-    expect(kontroll(() => {}).varningar.join('\n')).toMatch(/k1s13_slutet.*rädd eller ledsen, och då får den en kram/);
+    const r = kontroll((d) => {
+      scen(kap01(d), 'k1s13_slutet').steg.find((s) => s.vantar_pa === 'krama_ungen').vantar_pa = 'mata_ungen';
+      kap01(d).uppdrag.find((u) => u.id === 'u1_trosta').steg[0].klart.vantar_pa = 'mata_ungen';
+    });
+    expect(r.varningar.join('\n')).toMatch(/k1s13_slutet.*rädd eller ledsen, och då får den en kram/);
+  });
+  it('lockelsen vid fossilet visar ingen text för den vuxne (syns_redan), och utan syns_redan gör den det', () => {
+    const d = riktigt();
+    expect(beskrivningarSomVisas(kap01(d)).filter((b) => /fossil lockar/.test(b.plats))).toEqual([]);
+    delete fossil(d).lockar.syns_redan;
+    expect(beskrivningarSomVisas(kap01(d)).map((b) => b.plats)).toContain('rum glantan frivilligt fossil lockar');
   });
 });

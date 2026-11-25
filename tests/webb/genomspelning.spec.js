@@ -164,6 +164,11 @@ async function spelaProlog(page, { dumpa = false, felFor = new Set(), stoppVid =
       expect((await page.evaluate(() => window.__ORDSTAVEN.steg()))?.vantar_pa, `instruktionen i ${lage.scen} väntar`).toBe(lage.vantarPa);
       if (lage.vantarPa === 'nosen') { if (satt === 'mellanslag') await page.keyboard.press('Tab'); else await page.click('#hud-nos'); }
       else if (lage.vantarPa === 'mata_ungen') await page.click('#hud-bar');
+      else if (lage.vantarPa === 'krama_ungen') {
+        // kramen (125.5): ett tryck på ungen, eller Enter när hjälten står intill den
+        const p = await page.evaluate(() => { const u = window.__ORDSTAVEN.ungePos(); return window.__ORDSTAVEN.varldTillSkarm(u.x, u.y - 8); });
+        await page.mouse.click(p.x, p.y);
+      }
       // radion: ett tryck säger Farfars senaste replik genom den igen, och instruktionen är klar när den är hörd
       else if (lage.vantarPa === 'radion') { await page.click('#hud-radio'); await page.locator('#plattan .replik-ruta').click(); }
       await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.steg()?.vantar_pa ?? null), { timeout: 5000 }).not.toBe(lage.vantarPa);

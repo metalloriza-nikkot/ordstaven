@@ -673,3 +673,24 @@ test('brevhalvan på bryggan (95.7): han tar den, och den ligger inte kvar på b
   await page.waitForTimeout(600);
   await page.screenshot({ path: 'test-results/regi-brevhalvan-tagen.png' });
 });
+
+test('lockelsen vid fossilet i gläntan (2.58): ett frivilligt föremål lockar med glimten och klangen, utan text för den vuxne', async ({ page }) => {
+  test.setTimeout(60000);
+  // stigarna i gläntan: han går mot Farfars skylt (ett mål, alltså går han fritt)
+  await sparadI(page, 'kap-01', 'k1s07_stigarna', 1);
+  // repliken före målet trycks förbi
+  await expect.poll(async () => {
+    await page.locator('#plattan:not([hidden]) .replik-ruta').click({ timeout: 300 }).catch(() => {});
+    return page.evaluate(() => window.__ORDSTAVEN.steg()?.typ);
+  }, { timeout: 15000 }).toBe('ga_till');
+  // hjälten ställs en bit från fossilet
+  await page.evaluate(() => {
+    const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); const o = r.ruta('fossil');
+    r.pos = { x: o.x + o.b / 2 + 30, y: o.y + o.h + 10 }; r.placera();
+  });
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 8000 }).toContain('glantan/fossil vid fossil');
+  await page.waitForTimeout(300);
+  await page.screenshot({ path: 'test-results/lockar-fossil.png' });
+  // syns_redan: ingen text för den vuxne
+  await expect(page.locator('#regi')).toBeHidden();
+});

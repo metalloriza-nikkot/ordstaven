@@ -39,6 +39,14 @@ async function starta(page, scenId, scen = kap.scener.findIndex((s) => s.id === 
   await page.click('.start-knapp');
 }
 
+/** Kramen (125.5): ett tryck på ungen, där den står. Hjälten går själv fram om den står en bit bort. */
+async function kramaUngen(page) {
+  await page.waitForFunction(() => !window.__ORDSTAVEN.fryst(), null, { timeout: 10000 }).catch(() => {});
+  const p = await page.evaluate(() => { const u = window.__ORDSTAVEN.ungePos(); return window.__ORDSTAVEN.varldTillSkarm(u.x, u.y - 8); });
+  await page.mouse.click(p.x, p.y);
+  await page.waitForTimeout(1200);
+}
+
 test('kapitel 3 pass 1: SVÄRD vid hjulet, tussarna, kvarnens tavla, hissen och det första tutet på avsatsen', { tag: '@rok-mac' }, async ({ page }, info) => {
   test.skip(!['mac-helskarm', 'ipad-10', 'mac-safari'].includes(info.project.name), 'tre projekt räcker, som kapitel 2 (84.6)');
   test.setTimeout(240000);
@@ -312,6 +320,7 @@ test('kapitel 3 pass 3: fenan, kramen, tången med skalkanten mitt i, SKÖLD, or
     if (await page.locator('#plattan .flaska-nara').isVisible().catch(() => false)) await page.screenshot({ path: 'test-results/kap3-flaskan-nara.png' });
     if (await page.locator('#plattan').isVisible()) { await vidare(); await page.waitForTimeout(150); continue; }
     const p = st?.typ === 'pussel' ? pussel.get(st.pussel_id) : null;
+    if (st?.vantar_pa === 'krama_ungen') { await kramaUngen(page); continue; }
     if (st?.typ === 'ga_till' && st.mal === 'unge') await ev(() => { const u = window.__ORDSTAVEN.ungePos(); window.__ORDSTAVEN.gaMot(u.x + 14, u.y); });
     else if (st?.typ === 'ga_till') await anvand(st.mal);
     else if (st?.typ === 'tryck') { await page.waitForTimeout(400); await page.keyboard.press('Space'); }
@@ -649,9 +658,10 @@ test('kapitel 3: ankaret och SKÖLD faller där hjälten står efter flaskan, oc
     if (loggen.includes('[mellanscen] ankaret_faller')) break;
     // han har gått några steg från flaskan (i snabbläget hinner han inte medan flaskan visas, så testet flyttar honom)
     if (!flyttad && loggen.includes(': flaska') && await ev(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').rumId === 'sandbanken')) {
-      flyttad = await ev(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); r.pos = { x: r.pos.x - 40, y: r.pos.y - 6 }; r.placera(); return { pos: { ...r.pos }, unge: { ...r.ungePos } }; });
+      flyttad = await ev(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); r.pos = { x: r.pos.x - 56, y: r.pos.y - 6 }; r.placera(); return { pos: { ...r.pos }, unge: { ...r.ungePos } }; });
     }
     if (await page.locator('#plattan').isVisible()) { await vidare(); await page.waitForTimeout(200); continue; }
+    if (st?.vantar_pa === 'krama_ungen') { await kramaUngen(page); continue; }
     if (st?.typ === 'ga_till' && st.mal === 'unge') { await ev(() => { const u = window.__ORDSTAVEN.ungePos(); window.__ORDSTAVEN.gaMot(u.x + 14, u.y); }); await page.waitForTimeout(800); continue; }
     if (st?.pussel_id === 'k3_fenan') {
       const v = await ev(() => window.__ORDSTAVEN.variant()), q = pussel.get('k3_fenan');

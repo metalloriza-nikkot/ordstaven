@@ -37,7 +37,10 @@ export function beskrivningarSomVisas(kapitel) {
     steg(s.steg, s.id);
     if (lockarVisarBeskrivning(s.lockar)) ut.push({ plats: `${s.id} lockar`, beskrivning: s.lockar.beskrivning });
   }
-  for (const r of kapitel?.rum || []) for (const f of r.frivilligt || []) steg(f.steg, `rum ${r.id} frivilligt ${f.foremal}`);
+  for (const r of kapitel?.rum || []) for (const f of r.frivilligt || []) {
+    steg(f.steg, `rum ${r.id} frivilligt ${f.foremal}`);
+    if (lockarVisarBeskrivning(f.lockar)) ut.push({ plats: `rum ${r.id} frivilligt ${f.foremal} lockar`, beskrivning: f.lockar.beskrivning });
+  }
   return ut;
 }
 

@@ -16,8 +16,8 @@
  },
  "meta": {
   "namn": "Floden",
-  "version": "0.3.7",
-  "datum": "2026-11-20",
+  "version": "0.3.8",
+  "datum": "2026-11-25",
   "agare": "Innehåll",
   "kalla": "Manus 19 v0.4.1 (Ön som simmade), godkänt 17/11 (beslut 98–99).",
   "teknik": "v0.3 skriver fälten som förut (schema 2.47), och inget nytt fält. Två frågor väntar på Teknik (99.6): loftet är ett litet rum i stället för en närbild, och vid_antal har en nyckel per antal och 6+. Säger Teknik något annat skriver Innehåll om datan. Det som behöver byggas eller ritas: rummen kvarnen och loftet, kvarnen ute i floden (hjul, tang_hjul, dorr_kvarn, brygga_kvarn), frukosthornet och flodborna med bubblor, hornet_skrift som syns i tillståndet rent, tillstand_efter på mellanscenen i k3s02_loftet, ungen som hoppar från loftet, och skepparens röst som en ung mans (98.12.2). Regierna som manuset nämner men som inte står i datan än (tills de finns i GRABOX_REGI): kartbit3_on, loftet_horn, skuggan_lyssnar, unge_simmar, skoldpadda_huvud, skylt_tecken, skoldpadda_visar_berget och resan_kvall. Bilder som Stil inte har ritat: som i v0.2, och dessutom tang_hjul och kort_kvarn.",
@@ -30,7 +30,8 @@
   "andrat_v034": "2026-11-18 (beslut 105.3 och 106): instruktionerna efter trappan i 104.3, skepparen_pekar efter repliken om morfar, musiken floden, ankomsten, snäckornas verb, simturen, utmaningen och ORDDUELL!, segern med \"Du vann ordduellen!\", kartbit 4 med Farfars replik om vägen hem, och slutbilden. Farfars två repliker om baronens bit väntar till kapitel 4 (99.4). Inga id:n är ändrade.",
   "andrat_v035": "2026-11-19 (beslut 109.6, 109.9 och 109.10): baronens utmaning säger vad som står på spel (\"Vinner jag, tar jag flaskan! Jag utmanar dig!\"), Farfars sista replik är \"Sköldpaddan tar er till berget. Trevlig resa!\", och slutbildens text följer 109.10. Inga nya steg.",
   "andrat_v036": "2026-11-19 (beslut 110.4): bild ankaret_faller och skold_ankaret, och texten för den vuxne i duellen följer paraplyet (109.7). Ingen uppläst text är ändrad, och inga nya steg.",
-  "andrat_v037": "2026-11-20 (beslut 113.3–113.4): Farfars replik när flaskan är hittad, bild flaskan_hittad och baronen_kommer. Budgeten ligger på taket: fem passiva steg och tre repliker före SKÖLD."
+  "andrat_v037": "2026-11-20 (beslut 113.3–113.4): Farfars replik när flaskan är hittad, bild flaskan_hittad och baronen_kommer. Budgeten ligger på taket: fem passiva steg och tre repliker före SKÖLD.",
+  "andrat_v038": "2026-11-25 (beslut 125 och 127.5): stegen ÅK UPP TILL HORNET och BLÅS I HORNET, kramen som krama_ungen utan promenaden, Farfars knep, och skalkanten som hemlighet."
  },
  "var_var_vi": [
   {
@@ -729,11 +730,8 @@
      "typ": "replik",
      "talare": "berattare",
      "text": "Krama {unge}!",
-     "upplast": true
-    },
-    {
-     "typ": "ga_till",
-     "mal": "unge"
+     "upplast": true,
+     "vantar_pa": "krama_ungen"
     },
     {
      "typ": "mellanscen",
@@ -796,7 +794,8 @@
       "bild": "malning_skal"
      }
     }
-   ]
+   ],
+   "hemlighet": true
   },
   {
    "id": "k3s06_ankaret",
@@ -2086,21 +2085,24 @@
      "klart": {
       "scen": "k3s01_floden",
       "pussel": "k3_tangen_hjul"
-     }
+     },
+     "knep": "Titta på staven!"
     },
     {
      "text": "LÄS TAVLAN",
      "klart": {
       "scen": "k3s02_kvarnen",
       "pussel": "k3_kvarn_1"
-     }
+     },
+     "knep": "Läs tavlan och gör som det står!"
     },
     {
-     "text": "TILL HORNET",
+     "text": "ÅK UPP TILL HORNET",
      "klart": {
       "scen": "k3s02_kvarnen",
       "pussel": "k3_kvarn_2"
-     }
+     },
+     "knep": "Läs tavlan och gör som det står!"
     }
    ],
    "stampel": {
@@ -2118,11 +2120,12 @@
    "pass": 2,
    "steg": [
     {
-     "text": "TUTA RÄTT",
+     "text": "BLÅS I HORNET",
      "klart": {
       "scen": "k3s03_hornet",
       "pussel": "k3_hornet"
-     }
+     },
+     "knep": "Läs vad det står på hornet!"
     },
     {
      "text": "HITTA SKYLTEN",
@@ -2136,7 +2139,8 @@
      "klart": {
       "scen": "k3s04_on",
       "pussel": "k3_chiffret"
-     }
+     },
+     "knep": "Titta i nyckeln!"
     }
    ],
    "stampel": {
@@ -2158,7 +2162,8 @@
      "klart": {
       "scen": "k3s05_sandbanken",
       "pussel": "k3_fenan"
-     }
+     },
+     "knep": "Läs vad tecknen sa!"
     },
     {
      "text": "TA FLASKAN",
@@ -2172,7 +2177,8 @@
      "klart": {
       "scen": "k3s06_ankaret",
       "pussel": "k3_skold"
-     }
+     },
+     "knep": "Titta på bilden i molnet!"
     }
    ],
    "stampel": {
