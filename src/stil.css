@@ -1017,3 +1017,6 @@ html, body {
 .ordlas-mening { display: flex; align-items: center; gap: calc(12px * var(--t)); font-size: calc(40px * var(--t)); font-weight: 600; color: #2a241c; }
 .ordlas-mening .platser { margin: 0; }
 .ordlas-rad { font-size: calc(40px * var(--t)); font-weight: 600; color: #2a241c; margin-bottom: calc(8px * var(--t)); }
+
+/* Radion följer uppdraget (125.6, lev125): spraket när han trycker på den halvt släckta radion, 24 × 24 runt ikonen */
+#hud-radio .radio-sprak { position: absolute; left: 0; top: 0; width: calc(24 * var(--hudpx)); height: calc(24 * var(--hudpx)); image-rendering: pixelated; pointer-events: none; }

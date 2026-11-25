@@ -55,6 +55,13 @@ function harBelaning(steg = []) {
   return steg.some((x) => ['dinobok', 'ge_sak', 'unge_tillagg'].includes(x.typ));
 }
 
+/**
+ * Verben som ett steg i molnet börjar med (125.2). Listan är de verb som stegen har i dag. Ett nytt verb läggs till här;
+ * kontrollen varnar bara, så att ett steg som inte är ett verb syns.
+ */
+const VERB_I_MOLNET = new Set(['GÅ', 'LÄS', 'VÄLJ', 'HITTA', 'TA', 'SKRIV', 'HÄMTA', 'TÄND', 'LÄGG', 'ÖPPNA', 'VIFTA', 'HUGG', 'KOM', 'SKYDDA',
+  'LÄMNA', 'SÄTT', 'PACKA', 'TRYCK', 'RÄDDA', 'KRAMA', 'FÖLJ', 'DRA', 'LYFT', 'LYS', 'SAMLA', 'LOSSA', 'ÅK', 'BLÅS', 'LETA', 'HOPPA', 'MATA',
+  'GE', 'KLÄTTRA', 'SPRING', 'SIMMA', 'ROPA', 'VÄCK', 'BÄR', 'FLYG', 'TITTA', 'LYSSNA', 'STRYK', 'KRYP', 'SÖK', 'BYGG', 'SPÅRA', 'NOSA', 'HJÄLP']);
 /** Pusslets rätta svar i ord (svar, formlerna, de rätta alternativen), för att knepet aldrig ska säga dem. @param {any} p */
 function rattSvar(p) {
   const ut = [];
@@ -713,6 +720,9 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
             const knepOrd = new Set(ord(rader(st.knep).join(' ')).map(versaler));
             for (const sv of svaren) if (sv && ord(sv).length && ord(sv).every((o) => knepOrd.has(versaler(o)))) fel.push(var_(`${plats} steg ${i + 1}: knepet säger svaret (${sv}), det ska peka på ett verktyg`));
           }
+          // molnet är bokens rad (125.2): stegets text börjar med ett verb, som GÅ TILL DÖRREN
+          const forsta = versaler(ord(st.text.replace(/\{(UNGE|HJALTE)\}/gi, ''))[0] || '');
+          if (!VERB_I_MOLNET.has(forsta)) varningar.push(var_(`${plats} steg ${i + 1}: "${st.text}" börjar inte med ett verb, och den står i molnet (125.2)`));
           if (st.visas === 'med_paminnelse') {
             const pos = hittaSteg(k, st.klart.scen, st.klart);
             if (pos && !k.scener[pos[0]].steg[pos[1]].paminnelse) fel.push(var_(`${plats} steg ${i + 1}: visas med påminnelsen, men steget har ingen paminnelse`));

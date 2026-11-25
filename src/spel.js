@@ -240,6 +240,32 @@ export function skapaSpel(d) {
   const lasLappen = (l) => sag({ talare: 'berattare', text: lappTal(l.k.u.rubrik) + '.', upplast: true });
   /** Lappknappen syns när det finns ett uppdrag (eller Farfars lapp i ett pussel, se `uppdateraHud`). */
   const sattLappknapp = () => ui.sattLappknapp(!!lappNu());
+  /**
+   * Radion följer uppdraget (125.6): uppdraget som pågår och steget han gör nu, också utan remsan. Tänd medan ett
+   * uppdrag pågår, med en svag puls när steget har ett knep (`steg[].knep`), och halvt släckt annars.
+   */
+  const radioNu = () => (b && uppdragKomp?.lista.length ? lappenNu(uppdragKomp.lista, lappPos(), paminda, lappGrenar()) : null);
+  /** @type {string} */
+  let radioLage = '';
+  /** @type {number | undefined} */
+  let radioPuls;
+  const sattRadion = () => {
+    const l = radioNu();
+    const lage = !l ? 'slackt' : l.nu?.knep ? 'knep' : 'tand';
+    if (lage === radioLage) return;
+    radioLage = lage;
+    const knapp = ui.$('#hud-radio');
+    knapp.dataset.lage = lage;
+    window.clearInterval(radioPuls);
+    // Stils ikoner (lev125): tänd, knep i två bilder (ca 600 ms), och halvt släckt. Utan dem står den gamla radion
+    const namn = { tand: 'radio_tand', knep: 'radio_knep_01', slackt: 'radio_slackt' }[lage];
+    if (!uiBild('ikon_' + namn)) return;
+    knapp.innerHTML = ikon(namn, 'hud');
+    if (lage === 'knep') {
+      let i = 0;
+      radioPuls = window.setInterval(() => { i = 1 - i; const img = /** @type {HTMLImageElement | null} */ (knapp.querySelector('img')); const u = uiBild(`ikon_radio_knep_0${i + 1}`); if (img && u) img.src = u; }, 600);
+    }
+  };
   /** @type {ReturnType<typeof setTimeout> | null} */
   let lappTimer = null;
   /** lappen står framme medan berättelsen väntar (ett uppdrag eller ett pass börjar): ett nytt moln väntar också */
@@ -320,6 +346,7 @@ export function skapaSpel(d) {
    */
   async function uppdateraLapp() {
     if (!b) return;
+    sattRadion();
     if (!lappAktiv()) { lappen.visa(null); sattLappknapp(); return; }
     const l = lappNu();
     if (lappVisad && (!l || l.k.u.id !== lappVisad)) {
@@ -478,6 +505,16 @@ export function skapaSpel(d) {
   function handlingGjord(namn) { const f = vantarPaHandling.get(namn); if (f) { vantarPaHandling.delete(namn); f(); } }
   ui.vidNos((vad, ord) => { if (vad === 'tand') handlingGjord('nosen'); else { handlingGjord('nosa:' + versaler(ord || '')); if (ord) nosSpar?.nosade?.push(versaler(ord)); } });
 
+  /**
+   * Molnet är bokens aktuella rad (125.2): medan ett uppdrag pågår står stegets verb och mål i molnet, också där
+   * berättelsen inte har en instruktion. Utan uppdrag står instruktionen som förut. Frågan i ett läsval och
+   * instruktionen i ett pussel står kvar som de är (de ställs inte här). @param {any} instr @returns {any}
+   */
+  const molnetsRad = (instr) => {
+    const l = radioNu();
+    if (!l?.nu) return instr;
+    return { talare: 'berattare', text: lappTal(l.nu.text), upplast: true };
+  };
   /** Molnets innehåll: bilden (eller lappen) och uppgiften med högtalaren. @param {string | null} bild @param {any} r */
   function molnHtml(bild, r) {
     return `${bild ? `<span class="moln-bild">${bild}</span>` : ''}${r ? `<span class="instruktion">${ui.rader(r.text, varden())}</span><button type="button" class="moln-hogtalare" aria-label="Läs igen">${ikon('hogtalare')}</button>` : ''}`;
@@ -604,7 +641,7 @@ export function skapaSpel(d) {
   /** Kartbiten i festen när han hittar eller får den: Stils bild, annars emojin. @param {number} n */
   const kartbitFest = (n) => kartbitarHtml([n], { hojd: Math.min(160, layout.skala.cssHojd * 0.5) }) ?? ikon(Number.isFinite(n) ? 'karta' : 'lapp', 'stor');
   /** Bilden av handlingen i en instruktion som väntar. @param {string} vad */
-  const handlingsBild = (vad) => { const n = ({ nosen: 'nos', mata_ungen: 'bar', radion: 'radio', krama_ungen: 'hand' })[vad]; return n ? `<span class="bild ikon-bild" data-bild="${n}">${ikon(n, 'stor')}</span>` : null; };
+  const handlingsBild = (vad) => { const n = ({ nosen: 'nos', mata_ungen: 'bar', radion: 'radio', krama_ungen: uiBild('ikon_kram') ? 'kram' : 'hand' })[vad]; return n ? `<span class="bild ikon-bild" data-bild="${n}">${ikon(n, 'stor')}</span>` : null; };
 
   /**
    * En instruktion som ber om en handling väntar tills den är gjord ("Tryck på bären, så får {unge} ett.").
@@ -616,7 +653,7 @@ export function skapaSpel(d) {
     if (r.upplast && r.talare && aventyr.talare[r.talare]) senaste.set(r.talare, r);
     if (r.talare && r.talare !== 'berattare' && r.via !== 'radio') rum.vandMotTalare?.(r.talare);
     rum.frys(false);
-    visaMoln(handlingsBild(r.vantar_pa), r);
+    visaMoln(handlingsBild(r.vantar_pa), molnetsRad(r));
     sag(r);
     const mal = { mata_ungen: '#hud-bar', nosen: '#hud-nos', radion: '#hud-radio' }[/** @type {string} */ (r.vantar_pa)];
     // nosen ska gå att tända medan instruktionen väntar (den kostar inget här)
@@ -628,9 +665,10 @@ export function skapaSpel(d) {
     if (kram) {
       rum.kramaUnge = () => {
         rum.kramaUnge = null;
-        rum.kramar?.();
-        ljud.spela('unge'); logg.handelse('kram', 'hjälten kramar ungen');
-        handlingGjord('krama_ungen');
+        // Stils kram från sidan visas klart (ca 1,8 s) innan berättelsen går vidare
+        const ms = rum.kramar?.() || 0;
+        logg.handelse('kram', 'hjälten kramar ungen');
+        window.setTimeout(() => handlingGjord('krama_ungen'), tid(ms));
       };
       slutaKram = lyssnaHandling((h) => { if (h.typ === 'interagera' && rum.kramaUnge && !rum.fryst && ui.plattan.hidden && rum.naraUngen?.()) rum.kramaUnge(); });
     }
@@ -1256,14 +1294,33 @@ export function skapaSpel(d) {
   };
   // dialogregeln för radion (granskningen, regel 4 B): ett tryck på radion upprepar Farfars senaste replik genom
   // den i scenen. Har han inte sagt något sprakar det bara.
+  //
+  // Radion följer uppdraget (125.6): medan ett uppdrag pågår svarar Farfar med knepet för steget nu, eller läser
+  // steget med sin röst. Minnet följer uppdraget, inte scenen, så god natt och uppmuntran upprepas inte. Utan uppdrag
+  // är radion halvt släckt och sprakar bara. När en replik väntar på radion (den lärs ut i prologens s21) upprepar den
+  // Farfars senaste replik genom den, som förut.
+  const sprak = () => {
+    ljud.spela('radio_sprak'); ui.pulsera('#hud-radio');
+    const k = ui.$('#hud-radio'), u1 = uiBild('efx_sprak_01'), u2 = uiBild('efx_sprak_02');
+    if (!u1 || !u2) return;
+    const e = document.createElement('img'); e.className = 'radio-sprak'; e.alt = ''; e.src = u1; k.append(e);
+    [80, 160, 240].forEach((ms, i) => window.setTimeout(() => { e.src = i % 2 ? u1 : u2; }, ms));
+    window.setTimeout(() => e.remove(), 320);
+  };
   ui.$('#hud-radio').addEventListener('click', () => {
     if (!b || pausad || fragar || !ui.plattan.hidden) return;
-    const r = senaste.get(RADIO);
-    // en instruktion som väntar på radion ("Tryck på radion, så säger jag det igen.") är klar när repliken är hörd
-    if (!r) { ljud.spela('klick'); ui.pulsera('#hud-radio'); logg.handelse('fråga igen', 'radion (tyst)'); handlingGjord('radion'); return; }
+    const st = aktuelltSteg;
+    const l = radioNu();
+    /** @type {any} */
+    let r = null;
+    if (st?.vantar_pa === 'radion') r = senaste.get(RADIO);
+    else if (l?.nu?.knep) r = { talare: 'farfar', via: 'radio', text: l.nu.knep, upplast: true };
+    else if (l?.nu) r = { talare: 'farfar', via: 'radio', text: lappTal(l.nu.text) + '!', upplast: true };
+    // en instruktion som väntar på radion ("Tryck på radion när du undrar något!") är klar när han har tryckt
+    if (!r) { sprak(); logg.handelse('fråga igen', l ? 'radion (inget steg)' : 'radion (släckt)'); handlingGjord('radion'); return; }
     fragar = true;
     const varFryst = rum.fryst;
-    logg.handelse('fråga igen', 'radion');
+    logg.handelse('fråga igen', st?.vantar_pa === 'radion' ? 'radion' : `radion: ${l?.nu?.knep ? 'knepet' : 'steget'} i ${l?.k.u.id}`);
     replik({ ...r, vantar_pa: undefined }).finally(() => { fragar = false; rum.frys(varFryst); handlingGjord('radion'); });
   });
   /** Utgången är låst i rummets tillstånd (kartans last_i): ytterdörren på natten. @param {any} o */
@@ -1848,7 +1905,7 @@ export function skapaSpel(d) {
     }
     // efter en dialog står målet kvar i molnet nere till vänster, med en bild och instruktionen, tills han är
     // framme. Efter ca 15 s nosar ungen mot målet, och följer ungen inte med än glimtar målet (beslut 31.2, 39.4)
-    const instr = instruktionFore(st);
+    const instr = molnetsRad(instruktionFore(st));
     const iMolnet = !!instr;
     malNu = st.mal;
     // bilden i molnet: stegets egen bild (krönet, som är en yta utan bild, 42.4), annars målets bild ur grafiken
@@ -1951,7 +2008,7 @@ export function skapaSpel(d) {
    */
   async function gaTillUngen(st) {
     rum.frys(false);
-    const instr = instruktionFore(st);
+    const instr = molnetsRad(instruktionFore(st));
     if (instr) { visaMoln(bilder.html('unge'), instr); placeraMoln([]); logg.handelse('mål', 'i molnet: unge'); }
     const start = speltid();
     const k = knuffKlocka(st.knuff ?? { handling: '' }, () => { rum.ungeReagerar?.(true); if (instr) ui.pulseraTanke(); logg.handelse('knuff', 'ungen hoppar till'); }, undefined, MAL_KNUFF_MS);
@@ -1983,7 +2040,7 @@ export function skapaSpel(d) {
     const malen = kvar.map((/** @type {any} */ g) => /** @type {string} */ (g.mal));
     // instruktionen: efter en gren den sista upplästa repliken mellan grenarna, annars den före navet
     const mellan = lage?.klara.length ? [...(st.mellan_grenar || [])].reverse().find((/** @type {any} */ x) => x.typ === 'replik' && x.upplast) : null;
-    const instr = mellan ?? instruktionFore(st);
+    const instr = molnetsRad(mellan ?? instruktionFore(st));
     const visaMal = () => { if (!instr) return; visaMoln(kvar.map((/** @type {any} */ g) => bilder.html(g.bild || g.mal)).join(''), instr); placeraMoln([]); };
     const omplacera = window.setInterval(() => { if (instr && !ui.$('#tanke').hidden && ui.plattan.hidden) placeraMoln([]); }, 250);
     /** Närmaste gren som inte är klar (efter avståndet till dess utgång). */
@@ -4231,7 +4288,7 @@ export function skapaSpel(d) {
     if (st.bild && rum.ruta(st.bild) && rum.ritade.get(st.bild)) rum.gomForemal?.(st.bild, true);
     rum.markera(st.till, true);
     // instruktionen står i molnet med målets bild tills han har lagt saken (beslut 41.5), som före ett ga_till
-    const instr = instruktionFore(st);
+    const instr = molnetsRad(instruktionFore(st));
     malNu = st.till;
     if (instr) { visaMoln(malBild(st.till), instr); placeraMoln([]); logg.handelse('mål', 'i molnet: ' + st.till); }
     const omplacera = window.setInterval(() => { if (instr && !ui.$('#tanke').hidden && ui.plattan.hidden) placeraMoln([]); }, 250);
@@ -4251,7 +4308,7 @@ export function skapaSpel(d) {
    * @param {any} st @param {string} malRum @param {number} farg
    */
   async function baraTillRum(st, malRum, farg) {
-    const instr = instruktionFore(st);
+    const instr = molnetsRad(instruktionFore(st));
     for (let n = 0; n < 8 && aktuelltRum !== malRum; n++) {
       const vag = vagTillbaka(/** @type {string} */ (aktuelltRum), malRum);
       if (!vag) { logg.handelse('FEL', `bära: ingen väg från ${aktuelltRum} till ${malRum}`); return; }

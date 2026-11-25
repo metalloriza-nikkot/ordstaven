@@ -101,8 +101,13 @@ test('kramen (125.5): rädd ungen väntar på en kram, ett tryck på ungen krama
   // ett tryck på ungen kramar den
   const p = await page.evaluate(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); const u = r.ungePos; return window.__ORDSTAVEN.varldTillSkarm(u.x, u.y - 8); });
   await page.mouse.click(p.x, p.y);
+  // Stils kram från sidan (128.2): hjälten och ungen blir en bild, och berättelsen väntar tills den är klar
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').kramBild?.frame?.name ?? null), { timeout: 4000 }).toMatch(/^hjalte_kramar_unge_(hoger|vanster)_0[12]$/);
+  await page.waitForTimeout(700);
+  await page.locator('canvas').first().screenshot({ path: 'test-results/kramen-fran-sidan.png' });
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('TACK.', { timeout: 8000 });
   expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('hjälten kramar ungen');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').regiLogg.join(' '))).toMatch(/kram (hoger|vanster)/);
   // Enter bredvid ungen kramar den också, och ett tryck på bären gör det inte
   await provscen(page, { id: 't_kram2', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'ge_bar', antal: 2 }, ...kramSteg] });
   await expect(page.locator('#tanke .instruktion')).toHaveText('KNOPP ÄR RÄDD.', { timeout: 8000 });
@@ -566,9 +571,10 @@ test('vägen tillbaka (beslut 26.2): från gläntan i pass 2 till buskarna och t
   expect(await page.evaluate(() => window.__ORDSTAVEN.tillstand().aventyr['den-gomda-dalen'].avstickare)).toBeUndefined();
   expect(await page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('k1s07_stigarna');
   expect((await steg(page)).mal).toBe('skylt_farfar_3');
-  // radion upprepar fortfarande Farfars replik i scenen
+  // radion följer uppdraget (125.6): Farfars knep för steget nu, också efter avstickaren
+  await expect(page.locator('#hud-radio')).toHaveAttribute('data-lage', 'knep');
   await page.click('#hud-radio');
-  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('KARTBITEN ÄR NÄRA. LÄS MIN SKYLT!', { timeout: 8000 });
+  await expect(page.locator('#plattan .replik-ruta.genom-radio .text')).toHaveText('LÄS MIN SKYLT!', { timeout: 8000 });
 });
 
 // ---------------------------------------------------------------- kapitel 1:s värld (T2)
@@ -668,18 +674,44 @@ test('SLUTA FÖR IDAG i pausmenyn: ungen somnar, Farfar säger hej då, och ▶ 
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('FRAMME.', { timeout: 8000 });
 });
 
-test('dialogregeln för radion: ett tryck på radion upprepar Farfars senaste replik genom den', async ({ page }) => {
-  await provscen(page, { id: 't_radio', pass: 1, rum: 'provskogen', steg: [R('Titta på trädet!', 'farfar', { via: 'radio' }), { typ: 'ga_till', mal: 'sten' }, R('Framme.')] },
-    (t) => { t.aventyr['den-gomda-dalen'].ui = { ...t.aventyr['den-gomda-dalen'].ui, radioramen: true }; }, { rum: { provskogen: { innehall: ['sten'] } } });
+test('radion följer uppdraget (125.6): släckt utan uppdrag, knepet medan steget pågår, annars steget med Farfars röst', async ({ page }) => {
+  test.setTimeout(60000);
+  const scen = (id) => ({ id, pass: 1, rum: 'provskogen', steg: [R('Titta på trädet!', 'farfar', { via: 'radio' }), { typ: 'ga_till', mal: 'sten' }, R('Framme.')] });
+  const uppdrag = (id, knep) => [{ id: 'tu_' + id, rubrik: 'PROVA', bild: 'sten', pass: 1,
+    steg: [{ text: 'GÅ TILL STENEN', klart: { scen: id, ga_till: 'sten' }, ...(knep ? { knep } : {}) }], stampel: { scen: id, efter: { replik: 'Framme.' } } }];
+  const radio = (t) => { t.aventyr['den-gomda-dalen'].ui = { ...t.aventyr['den-gomda-dalen'].ui, radioramen: true }; };
+  // med ett knep
+  await provscen(page, scen('t_radio'), radio, { rum: { provskogen: { innehall: ['sten'] } }, uppdrag: uppdrag('t_radio', 'Titta noga på {unge}!') });
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText(/TITTA PÅ TRÄDET!/, { timeout: 8000 });
+  // före uppdraget är radion halvt släckt
+  await expect(page.locator('#hud-radio')).toHaveAttribute('data-lage', 'slackt');
   await page.click('#plattan .vidare');
   await expect.poll(() => steg(page).then((s) => s?.typ), { timeout: 5000 }).toBe('ga_till');
   await expect(page.locator('#plattan')).toBeHidden();
+  await expect(page.locator('#hud-radio')).toHaveAttribute('data-lage', 'knep');
+  await expect(page.locator('#hud-radio img[data-ikon^="radio_knep"]')).toBeVisible();
   await page.click('#hud-radio');
-  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText(/TITTA PÅ TRÄDET!/, { timeout: 8000 });
+  await expect(page.locator('#plattan .replik-ruta.genom-radio .text')).toHaveText('TITTA NOGA PÅ KNOPP!', { timeout: 8000 });
   await page.click('#plattan .vidare');
-  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('[fråga igen] radion');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('[fråga igen] radion: knepet i tu_t_radio');
   expect((await steg(page))?.typ).toBe('ga_till'); // steget står kvar
+  // utan knep läser Farfar steget
+  await provscen(page, scen('t_radio2'), radio, { rum: { provskogen: { innehall: ['sten'] } }, uppdrag: uppdrag('t_radio2') });
+  await page.click('#plattan .vidare', { timeout: 8000 });
+  await expect.poll(() => steg(page).then((s) => s?.typ), { timeout: 5000 }).toBe('ga_till');
+  await expect(page.locator('#hud-radio')).toHaveAttribute('data-lage', 'tand');
+  await page.click('#hud-radio');
+  await expect(page.locator('#plattan .replik-ruta.genom-radio .text')).toHaveText('GÅ TILL STENEN!', { timeout: 8000 });
+  await page.click('#plattan .vidare');
+  // utan uppdrag sprakar den bara
+  await provscen(page, scen('t_radio3'), radio, { rum: { provskogen: { innehall: ['sten'] } }, uppdrag: [] });
+  await page.click('#plattan .vidare', { timeout: 8000 });
+  await expect.poll(() => steg(page).then((s) => s?.typ), { timeout: 5000 }).toBe('ga_till');
+  await expect(page.locator('#hud-radio')).toHaveAttribute('data-lage', 'slackt');
+  await page.click('#hud-radio');
+  await page.waitForTimeout(500);
+  expect(await page.locator('#plattan .replik-ruta').count()).toBe(0);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('[fråga igen] radion (släckt)');
 });
 
 test('föräldravyn i menyn för vuxna visar hur det går per pusseltyp, med slumpen för läsvalen', async ({ page }) => {
@@ -1308,7 +1340,7 @@ test('k1s08: krönet är målet i molnet, och ett tryck på det går uppför tra
   await framTill(page, () => window.__ORDSTAVEN.steg()?.mal === 'kronet' && !window.__ORDSTAVEN.fryst());
   const moln = page.locator('#tanke');
   await expect(moln).toBeVisible();
-  await expect(moln.locator('.instruktion')).toHaveText('GÅ UPP PÅ KULLEN!');
+  await expect(moln.locator('.instruktion')).toHaveText('GÅ UPP PÅ KULLEN'); // bokens rad (125.2)
   // bilden i molnet: Stils bildkort för krönet (42.4), aldrig trappans bild
   await expect(moln.locator('.bildkort[data-bild="uppdrag_kullen"]')).toHaveCount(1);
   expect(await moln.locator('.malbild').count()).toBe(0);

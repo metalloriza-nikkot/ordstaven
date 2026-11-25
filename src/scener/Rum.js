@@ -241,6 +241,8 @@ export class Rum extends Phaser.Scene {
     this.kramaUnge = null;
     /** hjälten går fram till ungen för att krama den (ett tryck på ungen en bit bort) */
     this.kramVag = false;
+    /** @type {any} Stils kram från sidan medan den visas */
+    this.kramBild = null;
     /** @type {any} saken hjälten bär (filten), som svävar efter honom */
     this.buren = null;
     /** @type {string[]} föremål som går att använda just nu */
@@ -370,13 +372,35 @@ export class Rum extends Phaser.Scene {
   naraUngen() { return this.unge.visible && Math.hypot(this.pos.x - this.ungePos.x, this.pos.y - this.ungePos.y) <= 22; }
 
   /** Kramen: hjälten vänder sig mot ungen, och ungen blir glad och trycker sig mot honom (gråbox: ungens glada hopp). */
+  /** @returns {number} hur länge kramen visas (ms) */
   kramar() {
     this.kramVag = false;
     const dx = this.ungePos.x - this.pos.x;
     if (Math.abs(dx) > 1) this.vand = { x: Math.sign(dx), y: 0 };
     this.ungeVand = { x: this.pos.x - this.ungePos.x, y: 0.01 };
+    // Stils kram från sidan (LASMIG_128, 36 × 24): hjälten och ungen blir en bild. 01 (ungen rädd) ca 600 ms, sedan
+    // 02 (lugn och glad) med ungens glada läte, som står kvar ca 1,2 s. Håll efter var ungen står, och hjältens fötter
+    // står där han stod (bildens vänstra kant är hjältens x − 1 för _hoger)
+    const hall = dx >= 0 ? 'hoger' : 'vanster';
+    const kram = [1, 2].map((i) => foremalsbild(this, `hjalte_kramar_unge_${hall}_0${i}`));
+    if (kram.every(Boolean) && this.unge.visible && !this.kramBild) {
+      const k0 = /** @type {any} */ (kram[0]), k1 = /** @type {any} */ (kram[1]);
+      const tex = k0.nyckel === 'hjalte' ? this.hjalteTextur || 'hjalte' : k0.nyckel;
+      const vx = hall === 'hoger' ? Math.round(this.pos.x) - 9 : Math.round(this.pos.x) - 27;
+      const img = this.add.image(vx, Math.round(this.pos.y), tex, k0.ram).setOrigin(0, 1);
+      this.lagerFigurer.add(img); this.kramBild = img;
+      this.hjalte.setVisible(false); this.unge.setVisible(false);
+      // ungen står sedan där bilden visar den
+      this.ungePos.x = vx + (hall === 'hoger' ? 26 : 10); this.ungePos.y = this.pos.y;
+      this.time.delayedCall(600, () => { if (img.active) { img.setTexture(tex, k1.ram); this.b.ljud?.spela('unge'); this.smutsig = true; } });
+      this.time.delayedCall(1800, () => { img.destroy(); this.kramBild = null; this.hjalte.setVisible(true); this.unge.setVisible(this.harRum && this.visaUnge); this.placera?.(); this.smutsig = true; });
+      this.regiLogg.push(`kram ${hall}`);
+      return 1800;
+    }
     this.ritaHjalte(); this.ungeReagerar(true); this.smutsig = true;
+    this.b.ljud?.spela('unge');
     this.regiLogg.push('kram');
+    return 0;
   }
 
   trycktPa(h) {

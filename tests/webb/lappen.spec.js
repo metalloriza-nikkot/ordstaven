@@ -44,7 +44,8 @@ test('lappen ersätter inget: dialogen och molnet står som förut, och lappen f
   await page.click('#plattan .vidare');
   // uppdraget börjar: lappen fälls ut en stund och fälls ihop, sedan står målet i molnet
   await expect.poll(() => logg(page), { timeout: 8000 }).toContain('[lappen] framme: t_u');
-  await expect(page.locator('#tanke .instruktion')).toHaveText('GÅ TILL BOKEN!', { timeout: 8000 });
+  // molnet är bokens rad (125.2): stegets verb och mål, inte repliken
+  await expect(page.locator('#tanke .instruktion')).toHaveText('GÅ TILL BOK', { timeout: 8000 });
   await expect(lapp).toBeHidden({ timeout: 3000 });
   // molnet står inne i remsan, inte avskuret i högra kanten (47.8)
   const moln = await page.locator('#tanke').boundingBox(), rum0 = await page.locator('#varld').boundingBox();
@@ -115,7 +116,8 @@ test('utan remsa finns ingen lapp: instruktionen och molnet står som förut', a
   await page.click('#plattan .vidare');
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('GÅ TILL BOKEN!', { timeout: 8000 });
   await page.click('#plattan .vidare');
-  await expect(page.locator('#tanke .instruktion')).toHaveText('GÅ TILL BOKEN!', { timeout: 8000 });
+  // molnet är bokens rad (125.2): stegets verb och mål, inte repliken
+  await expect(page.locator('#tanke .instruktion')).toHaveText('GÅ TILL BOK', { timeout: 8000 });
   await expect(page.locator('#uppdragslapp')).toBeHidden();
   await expect(page.locator('#hud-lapp')).toBeHidden();
 });
