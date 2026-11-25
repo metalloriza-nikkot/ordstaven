@@ -2120,7 +2120,9 @@ export function skapaSpel(d) {
         rum.hoppa(l.vid);
         rum.ungePekar(l.vid);
         // glimten betyder samma sak i hela spelet: en hemlighet eller ett frivilligt föremål glimtar också utan lockradie
-        if (o.lockradie || sc.foremal || sc.hemlighet) { rum.lockGlimt(l.vid); window.setTimeout(() => rum.ungePekar(null), tid(2500)); }
+        // (bara på avstånd, kartans lockradie, slutar ungen peka efter en stund; vid dammen står den kvar och tittar)
+        if (o.lockradie || sc.foremal || sc.hemlighet) rum.lockGlimt(l.vid);
+        if (o.lockradie) window.setTimeout(() => rum.ungePekar(null), tid(2500));
         const ms = l.bild ? rum.regi(l.bild) : 0;
         if (!ms && lockarVisarBeskrivning(l)) { ui.visaRegi(l.beskrivning, 0); window.setTimeout(() => ui.doljRegi(), tid(Math.min(5000, 1500 + l.beskrivning.split(' ').length * 120))); }
       }
