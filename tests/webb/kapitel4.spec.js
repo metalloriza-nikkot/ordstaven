@@ -5,6 +5,7 @@ import { expect } from '@playwright/test';
 import { test } from './hjalp/klocka.js';
 import { readFileSync } from 'node:fs';
 import { skapaStig, hjalpFlak, valj } from '../../src/karna/bokstavsstig.js';
+const PAKET = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8'));
 
 const kap = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-04.json', import.meta.url), 'utf8'));
 const pussel = new Map(kap.pussel.map((p) => [p.id, p]));
@@ -380,6 +381,8 @@ test('kapitel 4: rummens bilder och det som rör sig (128.4, LASMIG_127)', async
     await page.waitForTimeout(1500);
     const g = await page.evaluate(() => window.__ORDSTAVEN.grafik());
     expect(g.golv, rum).toBe(golv);
+    // etiketten i hörnet är versionen som byggdes (130.4): skärmdumparna till Stil ska visa rätt version
+    await expect(page.locator('.etikett.version')).toHaveText(`ORDSTAVEN ${PAKET.version}`);
     const info2 = await page.evaluate((ids) => {
       const r = window.__ORDSTAVEN.spel.scene.getScene('Rum');
       // det som är målat har ingen egen bild (en osynlig ruta), och de rörliga har sin bild
