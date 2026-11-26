@@ -331,14 +331,29 @@ test('kapitel 4: stig 4 i tandgrottan, och han hoppar tillbaka till stranden (12
   // speldosan (127.6, Innehålls pass 132): rummets slinga spelar i tandgrottan
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 8000 }).toContain('[musik] tandgrottan');
   await stigRedo(page);
+  await page.evaluate(() => {
+    const e = document.querySelector('#fynd'); window.__fynd = null;
+    new MutationObserver(() => { if (!e.hidden && e.querySelector('.fynd-kort') && !window.__fynd) window.__fynd = { text: e.querySelector('.fynd-text')?.textContent ?? '', bild: e.querySelector('.fynd-bild [data-bild]')?.getAttribute('data-bild') ?? null }; }).observe(e, { attributes: true, childList: true, subtree: true });
+  });
   const forsta = await page.evaluate(() => window.__ORDSTAVEN.position());
   await page.screenshot({ path: 'test-results/kap4-stig4.png' });
   for (const q of stigVag(pussel.get('k4_stig4'))) { await page.locator(`#stigord .flakord[data-ruta="${q.r},${q.k}"]`).click(); await page.waitForTimeout(700); }
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 15000 }).toContain('k4_stig4: tillbaka över stigen, 4 flak');
   const efter = await page.evaluate(() => window.__ORDSTAVEN.position());
   expect(Math.abs(efter.x - forsta.x)).toBeLessThan(4);
-  await tills(page, '#plattan .dinobok, #plattan .bok-sida, #plattan .vidare', 20000);
+  // 133.10: fyndögonblicket. Hjälten håller upp tanden, fanfaren spelar, och sidan visas i närbild med sitt ord
+  // (i snabbläget står det kort, så det fångas när det syns)
+  for (const slut = Date.now() + 30000; Date.now() < slut && !(await page.evaluate(() => window.__fynd));) {
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    await page.waitForTimeout(200);
+  }
+  const fynd = await page.evaluate(() => window.__fynd);
+  expect(fynd.text).toContain('EN STOR TAND');
+  expect(fynd.bild).toBe('tand_isen');
+  expect((await page.evaluate(() => window.__ORDSTAVEN.grafik())).regi).toContain('fyndet hålls upp');
   await page.screenshot({ path: 'test-results/kap4-stig4-tanden.png' });
+  await expect(page.locator('#fynd')).toBeHidden({ timeout: 6000 });
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('[fynd] dinoboken: tand_isen');
 });
 
 test('kapitel 4: F1 i gången, isklumparna och Farfars kompass (124.3)', async ({ page }, info) => {
@@ -366,6 +381,8 @@ test('kapitel 4: F1 i gången, isklumparna och Farfars kompass (124.3)', async (
   }
   const loggen = await page.evaluate(() => window.__ORDSTAVEN.logg());
   expect(loggen).toContain('scen k4s03_isfickan klar');
+  // 133.10: gåvan får fyndögonblicket också
+  expect(loggen).toContain('[fynd] ryggsack: farfars_kompass');
   await page.screenshot({ path: 'test-results/kap4-f1-kompassen.png' });
   // 128.4 (LASMIG_126): kompassen hänger på ryggsäcken, och lagret följer hans håll
   const kompass = await page.evaluate(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); return r.kompass?.frame?.name ?? null; });

@@ -1760,17 +1760,32 @@ export function skapaSpel(d) {
    * glimtar en gång eftersom garderoben har något nytt.
    * @param {any} st
    */
+  /** Hur länge fyndet står i närbild innan det flyger in i boken (133.10), i spelets tid. */
+  const FYND_MS = 2000;
+  /**
+   * Fyndögonblicket (133.10, som i Zelda): hjälten håller upp fyndet, en kort fanfar spelar, och fyndet visas i
+   * närbild med sin bild och sitt ord. Sedan flyger det in i bokknappen (eller pausknappen, där MIN BOK är), som
+   * glimtar. Ett tryck hoppar över. Körs av sig själv vid `dinobok` och `ge_sak`, så datan behöver inte ändras.
+   * @param {string} bild HTML @param {string} text @param {string} vad för loggen
+   */
+  async function fyndogonblick(bild, text, vad) {
+    logg.handelse('fynd', vad);
+    rum.hallUppFynd(tid(FYND_MS));
+    ljud.spela('fanfar');
+    const mal = ui.$('#hud-lapp').hidden ? '#hud-paus' : '#hud-lapp';
+    await ui.visaFynd(bild, text, tid(FYND_MS), mal);
+  }
   async function geSakSteg(st) {
     rum.sattLager(lagerFor(tillstand.spelare.hjalte), tillbehorFor(tillstand.spelare.hjalte));
-    ljud.spela('fest_mellan');
     nyttIHjalteboken();
     logg.handelse('gåva', `${st.sort}: ${st.id}`);
-    await ui.visaFest(st.sort === 'ryggsack' ? '🎒' : st.sort === 'drakt' ? '👕' : '👑', tid(1100));
+    // gåvans bildkort om Stil har ritat det, annars ikonen för sorten
+    await fyndogonblick(bilder.harKort(st.id) ? bilder.html(st.id) : ikon(st.sort === 'ryggsack' ? 'ryggsack' : 'klader', 'stor'), '', `${st.sort}: ${st.id}`);
   }
-  /** Dinoboken får en sida (stubbe i gråboxen: sidan finns i hjälteboken, och pausknappen glimtar). @param {any} st */
+  /** Dinoboken får en sida: fyndögonblicket med sidans bild och bildtext, och pausknappen glimtar. @param {any} st */
   async function dinobok(st) {
-    ljud.spela('fest_mellan'); nyttIHjalteboken();
-    await ui.visaFest(bilder.html(st.sida.bild), tid(1100), true);
+    nyttIHjalteboken();
+    await fyndogonblick(bilder.html(st.sida.bild), st.sida.bildtext ?? '', `dinoboken: ${st.sida.bild}`);
   }
   /** Ungen lär sig något nytt (stubbe i gråboxen: ungen hoppar och låter glad). @param {any} st */
   async function ungeTillagg(st) {

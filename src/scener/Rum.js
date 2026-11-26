@@ -3710,6 +3710,22 @@ export class Rum extends Phaser.Scene {
     this.ritaHjalte();
   }
 
+  /**
+   * Hjälten håller upp ett fynd (133.10, som i Zelda): Stils `hjalte_haller_upp_<håll>` om den finns (annars
+   * `hjalte_haller_upp_ner`), och i gråbox vänder han sig mot spelaren och det glittrar över hans huvud. Ungen tittar
+   * på honom. Står ms, sedan som förut. @param {number} ms
+   */
+  hallUppFynd(ms) {
+    const hall = riktningFor(this.vand);
+    const pose = [`hjalte_haller_upp_${hall}`, 'hjalte_haller_upp_ner'].find((n) => this.textures.exists('hjalte') && this.textures.get('hjalte').has(n));
+    if (pose) this.sattPose(pose);
+    else { this.vand = { x: 0, y: 1 }; this.ritaHjalte(); this.k4Glitter({ x: this.pos.x, y: this.pos.y - 30 }, 16); }
+    this.ungeTittarPa = { x: this.pos.x, y: this.pos.y - 20, till: this.time.now + ms };
+    this.time.delayedCall(ms, () => { if (pose && this.hjaltePose === pose) this.sattPose(null); });
+    this.regiLogg.push('fyndet hålls upp'); if (this.regiLogg.length > 160) this.regiLogg.shift();
+    this.smutsig = true;
+  }
+
   /** Baronens tropikhjälm trillar ur gondolen och landar i gräset, där den ligger kvar. */
   tappaHjalmen() {
     const l = this.luft; if (!l || !this.textures.get('baronen').has('baronen_hjalm')) return;

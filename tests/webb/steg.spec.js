@@ -930,14 +930,16 @@ test('gåvor tas på direkt, pausknappen glimtar, och hjälteboken har garderobe
   await provscen(page, { id: 't_gava', pass: 1, rum: 'provskogen', steg: [
     { typ: 'ge_sak', sort: 'hjalmdekor', id: 'taggkam' }, { typ: 'dinobok', sida: { bild: 'fossil_och_ungen', bildtext: 'fossil' } }, { typ: 'ga_till', mal: 'sten' }, R('Klart.'),
   ] }, null, { rum: { provskogen: { innehall: ['sten'] } } });
-  // festen visar bilden, aldrig dess kod (fossilet i Dinoboken visade HTML som text i 0.12.1)
-  await page.evaluate(() => { window.__fest = []; new MutationObserver(() => { const f = document.querySelector('#fest'); window.__fest.push({ text: f.textContent, bild: !!f.querySelector('.bild') }); }).observe(document.querySelector('#fest'), { childList: true, characterData: true, subtree: true }); });
-  // skärmdumpen: festen hålls kvar när bilden kommit, så att den hinner fotograferas i snabbläget
-  await page.evaluate(() => { const f = document.querySelector('#fest'); const egen = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'hidden');
-    Object.defineProperty(f, 'hidden', { configurable: true, get() { return egen.get.call(this); }, set(v) { if (v && this.querySelector('.bild')) return; egen.set.call(this, v); } }); });
-  await page.locator('#fest .bild').waitFor({ timeout: 8000 });
+  // 133.10: fyndögonblicket visar bilden i närbild, aldrig dess kod (fossilet i Dinoboken visade HTML som text i 0.12.1),
+  // och sidans ord. Närbilden hålls kvar när fossilet har kommit, så att den hinner fotograferas i snabbläget
+  await page.evaluate(() => { window.__fest = []; new MutationObserver(() => { const f = document.querySelector('#fynd'); window.__fest.push({ text: f.textContent, bild: !!f.querySelector('.bild') }); }).observe(document.querySelector('#fynd'), { childList: true, characterData: true, subtree: true }); });
+  await page.evaluate(() => { const f = document.querySelector('#fynd'); const egen = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'hidden');
+    Object.defineProperty(f, 'hidden', { configurable: true, get() { return egen.get.call(this); }, set(v) { if (v && this.querySelector('[data-bild="fossil_och_ungen"]')) return; egen.set.call(this, v); } }); });
+  await page.locator('#fynd [data-bild="fossil_och_ungen"]').waitFor({ timeout: 8000 });
+  await expect(page.locator('#fynd .fynd-text')).toContainText('FOSSIL');
   await page.screenshot({ path: 'test-results/fest-bild.png' });
-  await page.evaluate(() => { const f = document.querySelector('#fest'); delete f.hidden; f.hidden = true; });
+  await page.evaluate(() => { const f = document.querySelector('#fynd'); delete f.hidden; f.hidden = true; });
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('[fynd] hjalmdekor: taggkam');
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.lager().hjalmdekor), { timeout: 5000 }).toBe('taggkam');
   await expect(page.locator('#hud-paus')).toBeVisible();
   await expect(page.locator('#hud-paus')).toHaveClass(/glimt/);

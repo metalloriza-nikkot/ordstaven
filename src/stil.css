@@ -361,6 +361,15 @@ html, body {
 /* fest och närbild */
 #fest { position: absolute; left: calc(var(--rum-vanster) + var(--rum-bredd) / 2); top: calc(var(--rum-topp) + var(--rum-hojd) / 2); transform: translate(-50%, -50%); font-size: 120px; pointer-events: none; }
 #fest.pop { animation: pop .9s ease; }
+/* fyndet (133.10): bilden och ett ord i närbild mitt över världen, på papper som läsplattan */
+#fynd { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 60; }
+#fynd[hidden] { display: none; }
+#fynd .fynd-kort { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 20px 32px; background: #F5ECD7; color: #2B2420;
+  border-radius: 12px; box-shadow: 0 0 0 4px #c9a24a; font-family: Lexend, sans-serif; }
+#fynd .fynd-bild .bild { height: calc(56 * var(--vpx)); width: auto; image-rendering: pixelated; }
+#fynd .fynd-text { font-size: 48px; line-height: 1.2; }
+#fynd.pop .fynd-kort { animation: fynd-in .35s ease-out; }
+@keyframes fynd-in { from { transform: scale(.3); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes pop { from { transform: translate(-50%, -50%) scale(.2); opacity: 0; } 40% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; } }
 #narbild { position: absolute; left: var(--rum-vanster); top: var(--rum-topp); width: var(--rum-bredd); height: var(--rum-hojd); display: flex; align-items: center; justify-content: center; background: #2b2420; font-size: calc(160px * var(--t)); pointer-events: none; }
 

@@ -45,6 +45,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     <div id="plattan" hidden></div>
     <div id="remsa" hidden></div>
     <div id="fest" hidden></div>
+    <div id="fynd" hidden></div>
     <div id="skarm" hidden></div>
     <div id="iris" hidden></div>
     <div id="pausmeny" hidden></div>
@@ -298,6 +299,35 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     if (ik && ikon(ik, 'stor')) fest.innerHTML = ikon(ik, 'stor');
     else if (html || vad.trimStart().startsWith('<')) fest.innerHTML = vad; else fest.textContent = vad; fest.hidden = false; fest.classList.remove('pop'); void fest.offsetWidth; fest.classList.add('pop');
     return new Promise((r) => setTimeout(() => { fest.hidden = true; r(undefined); }, ms));
+  }
+
+  /**
+   * Fyndet i närbild (133.10): bilden och ett ord mitt över världen, sedan flyger det in i knappen (målet) och den
+   * glimtar. Ett tryck hoppar till flygningen. Bara läge, storlek och opacitet.
+   * @param {string} bild HTML (bildkortet) @param {string} text bildtexten (vanlig skrift, visas genom rader)
+   * @param {number} ms hur länge det står @param {string} mal knappen det flyger in i (#hud-lapp)
+   * @returns {Promise<void>}
+   */
+  function visaFynd(bild, text, ms, mal) {
+    const e = $('#fynd');
+    e.innerHTML = `<div class="fynd-kort"><span class="fynd-bild">${bild}</span>${text ? `<span class="fynd-text">${rader(text, {}, 'kort-ord')}</span>` : ''}</div>`;
+    e.hidden = false; e.classList.remove('pop'); void e.offsetWidth; e.classList.add('pop');
+    return new Promise((klar) => {
+      let slut = false;
+      const flyg = () => {
+        if (slut) return; slut = true;
+        e.removeEventListener('click', flyg); window.clearTimeout(t);
+        const kort = /** @type {HTMLElement | null} */ (e.querySelector('.fynd-kort'));
+        const k = $(mal), dit = k && !k.hidden ? k.getBoundingClientRect() : null, fran = kort?.getBoundingClientRect();
+        const klart = () => { e.hidden = true; e.innerHTML = ''; if (k && !k.hidden) glimta(mal); klar(undefined); };
+        if (!kort || !dit || !fran || !dit.width || !kort.animate) { klart(); return; }
+        const dx = dit.left + dit.width / 2 - (fran.left + fran.width / 2), dy = dit.top + dit.height / 2 - (fran.top + fran.height / 2);
+        const a = kort.animate([{ transform: 'none', opacity: 1 }, { transform: `translate(${dx}px, ${dy}px) scale(0.15)`, opacity: 0.2 }], { duration: 400, easing: 'ease-in', fill: 'forwards' });
+        a.onfinish = klart;
+      };
+      const t = window.setTimeout(flyg, ms);
+      e.addEventListener('click', flyg);
+    });
   }
 
   // ---------------------------------------------------------------- HUD
@@ -856,7 +886,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     handVisas: () => !hand.hidden,
     handTryckNu: () => handTryck,
     ljudord, visaTanke, placeraTanke, pulseraTanke, tankeRyms, passaTanke, ordskylt, skyltar, stigord, rumsskyltar, skyltHjalte, sattDorrRutor, ordnaSkyltar, skyltStor, pulseraSkylt, skyltNara, ropa,
-    ui, $, plattan, rader, esc, visaPlatta, doljPlatta, vidPapper, vantaFortsatt, visaRegi, doljRegi, visaFest,
+    ui, $, plattan, rader, esc, visaPlatta, doljPlatta, vidPapper, vantaFortsatt, visaRegi, doljRegi, visaFest, visaFynd,
     uppdateraHud, sattLappknapp, glimta, pulsera, ikonKnappar, visaSkarm, doljSkarm, iris, visaMeny, doljMeny, visaPausmeny, doljPausmeny, etiketter, sattNos, vaxlaNos, ljuda, arHelord,
     fanga, tandNos, markeraOrd,
     /** @param {(vad: 'tand' | 'ord', ord?: string) => void} f @returns {() => void} */

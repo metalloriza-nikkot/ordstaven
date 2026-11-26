@@ -365,6 +365,8 @@ export function skapaLjud({ tyst = () => false } = {}) {
 
   /** @type {Record<string, () => void>} */
   const fx = {
+    // fyndet (133.10): en kort fanfar i tre stigande toner och ett ackord, tills Stils fanfar finns
+    fanfar: () => { [523, 659, 784].forEach((f, i) => ton({ f, t: 0.14, v: 0.3, typ: 'square', d: i * 0.12 })); [523, 659, 784, 1047].forEach((f) => ton({ f, t: 0.5, v: 0.18, typ: 'square', d: 0.38 })); },
     dunk: () => { ton({ f: 120, f2: 50, t: 0.35, v: 0.8, typ: 'sine' }); },
     tick: () => { for (let i = 0; i < 4; i++) ton({ f: 1800, t: 0.03, v: 0.2, typ: 'square', d: i * 0.18 }); },
     kras: () => { ton({ f: 900, f2: 300, t: 0.2, v: 0.4 }); ton({ f: 600, f2: 200, t: 0.25, v: 0.3, d: 0.08 }); },
