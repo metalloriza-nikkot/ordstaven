@@ -42,7 +42,7 @@ export function skapaValj(pussel, { niva, slump = Math.random, iRummet = !!pusse
     text: variant.text ?? null,
     bild: variant.bild ?? null,
     /** @type {any[]} synliga alternativ, i blandad ordning */
-    alternativ: blanda(variant.alternativ, slump),
+    alternativ: blanda(variant.alternativ || [], slump),
     /** @type {Set<string>} valda (P28) */
     valda: new Set(),
     fel: 0,

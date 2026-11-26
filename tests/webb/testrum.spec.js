@@ -253,3 +253,49 @@ test('halmdockan i duellens testrum (91.5): ropar, blir förvirrad och tappar si
   const saker = (await fig()).saker;
   expect(saker).toEqual(['halmdocka_sak_halmstra_01', 'halmdocka_sak_hatt_01', 'halmdocka_sak_knapp_01']);
 });
+
+test('fäktningens ram (132.4): baronen på marken backar vid rätt kort, tar ett steg fram vid fel, och paraplyet vänds vid segern', async ({ page }) => {
+  test.setTimeout(120000);
+  // testrummets fixtur, med baronen som motståndare och fäktningens ram (kapitel 5)
+  const prov = JSON.parse(readFileSync(new URL('../fixturer/testrum-duell-prov.json', import.meta.url), 'utf8'));
+  const d = prov.dueller[0];
+  d.motstandare = 'baronen'; d.ram = 'faktning';
+  for (const r of d.ronder) for (const u of r.utfall) for (const x of u.ropar || []) x.talare = 'baronen';
+  await page.goto('./?snabb&ny');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.evaluate((prov) => localStorage.setItem('ordstaven_testrum_duell', JSON.stringify(prov)), prov);
+  await page.goto('./?snabb&testrum=duell');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 15000 }).toBe('tr_duell');
+  const regi = () => page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').regiLogg.join(' | '));
+  const fot = () => page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').duellFig?.fot ?? null);
+  // baronen står på marken (inte på repstegen)
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').duellFig?.slag ?? null), { timeout: 15000 }).toBe('faktning');
+  const norm = (s) => s.replace(/\|/g, '').replace(/\s+/g, ' ').trim().toLocaleUpperCase('sv-SE');
+  let rond = 0, felValt = false, bild = false;
+  for (let i = 0; i < 200 && rond < d.ronder.length; i++) {
+    if (await page.locator('#plattan .duell-kort').isVisible()) {
+      const kort = page.locator('#plattan .duell-kort .kort');
+      const texter = (await kort.allTextContents()).map(norm);
+      const ratt = texter.indexOf(norm(d.ronder[rond].utfall[0].alternativ.find((a) => a.ratt).text));
+      const fore = await fot();
+      if (!felValt) {
+        felValt = true; await kort.nth(1 - ratt).click();
+        await expect.poll(regi, { timeout: 4000 }).toContain('baronen tar ett steg fram');
+        await expect.poll(fot, { timeout: 3000 }).toBeGreaterThan(fore);
+        await page.waitForTimeout(1500); continue;
+      }
+      await kort.nth(ratt).click(); rond++;
+      await expect.poll(fot, { timeout: 3000 }).toBeLessThan(fore);
+      if (!bild) { bild = true; await page.waitForTimeout(400); await page.locator('canvas').first().screenshot({ path: 'test-results/faktning-baronen-backar.png' }); }
+      await page.waitForTimeout(2000); continue;
+    }
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    await page.waitForTimeout(250);
+  }
+  expect(rond).toBe(3);
+  expect(await regi()).toContain('baronen_backar');
+  await expect.poll(regi, { timeout: 10000 }).toContain('paraplyet ut och in');
+  await page.locator('canvas').first().screenshot({ path: 'test-results/faktning-segern.png' });
+});

@@ -21,6 +21,7 @@ import { foremaletsBild } from '../karna/egenskaper.js';
 import { Livet } from './livet.js';
 import { Duellfigur } from './duellfigur.js';
 import { BaronStege, harBaronStege } from './baronstege.js';
+import { BaronMark } from './baronmark.js';
 import { figurensBilder, portrattUttryck } from '../karna/duellfigur.js';
 
 /** Luftskeppets bild (112 × 96): repstegen hänger på x 74–83 från gondolen (y 60) till y 95, och aktern med propellern är på x 105, y 18 (95.6). */
@@ -373,8 +374,81 @@ export class Rum extends Phaser.Scene {
   /** Om hjälten står intill ungen, så nära att han kan krama den. */
   naraUngen() { return this.unge.visible && Math.hypot(this.pos.x - this.ungePos.x, this.pos.y - this.ungePos.y) <= 22; }
 
-  /** Kramen: hjälten vänder sig mot ungen, och ungen blir glad och trycker sig mot honom (gråbox: ungens glada hopp). */
-  /** @returns {number} hur länge kramen visas (ms) */
+  /**
+   * Platsernas tillstånd i rummet (mästarprovet i kapitel 5, 132.4): en struken stig har ett streck av ljus som står
+   * kvar. Ritas bara en gång per plats, och följer med när han kommer tillbaka till rummet. @param {Record<string, string>} platser
+   */
+  visaPlatser(platser) {
+    if (!this.harRum) return;
+    if (!this.platsStreck || this.platsStreck.rum !== this.rumId) this.platsStreck = { rum: this.rumId, ids: new Map() };
+    for (const [id, t] of Object.entries(platser || {})) {
+      const g = this.platsStreck.ids.get(id);
+      if (t === 'struken' && !(g && g.active)) this.strykPlats(id, false);
+    }
+  }
+
+  /**
+   * Staven drar ett streck av ljus över platsen (132.4). Gråbox tills Stil har ritat det: en ljus linje snett över
+   * föremålet med en mörk kant, som växer fram med glitter. Krämvitt, eftersom guld bara betyder rätt svar.
+   * @param {string} id @param {boolean} animera @returns {number} hur länge (ms)
+   */
+  strykPlats(id, animera) {
+    const o = this.ruta(id); if (!o) return 0;
+    if (!this.platsStreck || this.platsStreck.rum !== this.rumId) this.platsStreck = { rum: this.rumId, ids: new Map() };
+    this.platsStreck.ids.get(id)?.destroy();
+    const x0 = o.x + 2, y0 = o.y + o.h - 2, x1 = o.x + o.b - 2, y1 = o.y + 2;
+    const g = this.add.graphics(); this.lagerLjust.add(g); this.lagda.push(g); this.platsStreck.ids.set(id, g);
+    const rita = (/** @type {number} */ k) => {
+      const x = x0 + (x1 - x0) * k, y = y0 + (y1 - y0) * k;
+      g.clear().lineStyle(4, 0x1a1410, 0.8).lineBetween(x0, y0, x, y).lineStyle(2, 0xf2e8c8, 1).lineBetween(x0, y0, x, y);
+      this.smutsig = true;
+    };
+    this.regiLogg.push(`streck av ljus över ${id}`);
+    if (!animera) { rita(1); return 0; }
+    const t = { k: 0 };
+    this.tweens.add({ targets: t, k: 1, duration: 500, ease: 'Sine.easeOut', onUpdate: () => rita(t.k), onComplete: () => { rita(1); this.k4Glitter({ x: (x0 + x1) / 2, y: (y0 + y1) / 2 }, 10); } });
+    this.b.ljud?.spela(this.b.ljud?.har?.('streck_ljus') ? 'streck_ljus' : 'pling');
+    return 900;
+  }
+
+  /**
+   * En fel stig i mästarprovet (132.4): dimman vänder honom (en virvel av dimma där han gick in), och ungen nyser.
+   * Spelet låter honom sedan komma ut ur en annan stig (bakomKurvan i spel.js). Gråbox tills Stil har ritat det.
+   * @returns {number}
+   */
+  utUrFelStig() {
+    const p = { x: Math.round(this.pos.x), y: Math.round(this.pos.y - 10) };
+    const g = this.add.graphics({ x: p.x, y: p.y }); this.lagerLjust.add(g); this.lagda.push(g);
+    const t = { k: 0 };
+    this.tweens.add({ targets: t, k: 1, duration: 900, onUpdate: () => {
+      g.clear();
+      for (let i = 0; i < 6; i++) { const v = t.k * Math.PI * 3 + i * Math.PI / 3, r = 6 + t.k * 10; g.fillStyle(0xe8e4dc, 0.7 * (1 - t.k * 0.6)).fillCircle(Math.cos(v) * r, Math.sin(v) * r * 0.6, 5); }
+      this.smutsig = true;
+    }, onComplete: () => g.destroy() });
+    this.time.delayedCall(1000, () => { if (this.unge.visible) this.ungeLage('nysa', 'ner', 300, 2); this.b.ljud?.spela('nys'); });
+    this.regiLogg.push('ut_ur_fel_stig');
+    return 1800;
+  }
+
+  /** Hjälten står på en punkt (han kommer ut ur en annan stig, 132.4). @param {{ x: number, y: number }} p */
+  stallHjalten(p) { this.pos = this.hinder.narmasteFria(p); this.placera(); this.smutsig = true; }
+
+  /**
+   * ROPA (kapitel 5, 129.5): ungen ropar så högt den kan. Stils `unge1_ropar_ner_01–02` om de finns, och ljudet
+   * `unge_rop` (annars `unge`). Regin efter (vrålet) har sitt eget ljudord. @returns {number} hur länge det tar (ms)
+   */
+  ungeRopar() {
+    const u = this.unge;
+    if (!u?.visible) { this.b.ljud?.spela('unge'); this.regiLogg.push('ungen ropar'); return 0; }
+    // utan Stils bilder (gråboxen) syns bara ljudet och molnet med ungen som gapar
+    this.ungeLage('ropar', 'ner', 250, 3);
+    this.b.ljud?.spela(this.b.ljud?.har?.('unge_rop') ? 'unge_rop' : 'unge');
+    this.regiLogg.push('ungen ropar');
+    this.smutsig = true;
+    return 900;
+  }
+
+  /** Kramen: hjälten vänder sig mot ungen, och ungen blir glad och trycker sig mot honom (gråbox: ungens glada hopp). @returns {number} hur länge (ms) */
   kramar() {
     this.kramVag = false;
     const dx = this.ungePos.x - this.pos.x;
@@ -1137,6 +1211,8 @@ export class Rum extends Phaser.Scene {
       draken_flyger_ner_till_barnet: () => this.drakenFlygerNer(),
       byborna_jublar: () => this.byborJublar(),
       bryggan_avslojad: () => this.brygganAvslojad(),
+      // kapitel 5 (132.4): mästarprovet, en fel stig
+      ut_ur_fel_stig: () => this.utUrFelStig(),
       // 72.8: lerpölen i vassen
       hjalte_sjunker: () => this.hjalteSjunker(),
       unge_drar_upp_hjalten: () => this.ungeDrarUppHjalten(),
@@ -3425,13 +3501,19 @@ export class Rum extends Phaser.Scene {
    * Motståndaren i ordduellen som figur (91.5): Stils bilder <figur>_grund_01_hel osv. Den står mittemot hjälten, ovanför
    * honom, och flyttas ett steg i taget. null om figuren inte har bilderna (baronen i kapitel 3:s gråbox), och då står
    * det som händer som text för den vuxne. Ett nytt anrop tar bort den förra figuren och sakerna den tappade.
-   * @param {string | null | undefined} figur @returns {Duellfigur | null}
+   * @param {string | null | undefined} figur @param {string | null} [ram] 'faktning' i kapitel 5 @returns {any}
    */
-  duellfigur(figur) {
+  duellfigur(figur, ram = null) {
     // baronen på repstegen (106.5): står han redan där (mellanscenen ordduell_start före pusslet), står han kvar
-    if (figur && this.duellFig instanceof BaronStege && figur === 'baronen') return this.duellFig;
+    if (figur && this.duellFig instanceof BaronStege && figur === 'baronen' && ram !== 'faktning') return this.duellFig;
     this.duellFig?.taBort(); this.duellFig = null;
     if (!figur) return null;
+    // fäktningen i kapitel 5 (132.4): baronen på marken, som backar vid rätt kort och tar ett steg fram vid fel
+    if (ram === 'faktning' && figur === 'baronen' && this.textures.exists('baronen')) {
+      this.duellGra?.destroy(); this.duellGra = null;
+      this.duellFig = new BaronMark(this, this.pos, 24);
+      return this.duellFig;
+    }
     if (figur === 'baronen' && harBaronStege(this)) {
       this.duellGra?.destroy(); this.duellGra = null;
       // 113.4: skeppet från baronen_kommer lämnar plats för duellens skepp med repstegen, så att det aldrig står två

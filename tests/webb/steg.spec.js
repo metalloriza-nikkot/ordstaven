@@ -136,6 +136,25 @@ test('kramen: står ungen en bit bort går hjälten fram själv och kramar den (
   expect(x1, 'han gick fram till ungen').toBeGreaterThan(p.x0 + 30);
 });
 
+test('ROPA (129.5, 132.4): instruktionen väntar på ett tryck på ungen, och ungen ropar i stället för att kramas', async ({ page }) => {
+  test.setTimeout(40000);
+  await provscen(page, { id: 't_ropa', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [R('Ropa på hjälp.', 'berattare', { vantar_pa: 'ropa' }), R('Hörde du?')] });
+  await expect(page.locator('#tanke .instruktion')).toHaveText('ROPA PÅ HJÄLP.', { timeout: 8000 });
+  await page.waitForTimeout(1200);
+  expect(await page.locator('#plattan .replik-ruta').count(), 'nästa replik väntar på ropet').toBe(0);
+  // molnet visar vad som ska tryckas (ungen som gapar när Stil har ritat ikon_ropa, annars handen)
+  await expect(page.locator('#tanke .ikon-bild')).toHaveAttribute('data-bild', /^(ropa|hand)$/);
+  const p = await page.evaluate(() => { const u = window.__ORDSTAVEN.ungePos(); return window.__ORDSTAVEN.varldTillSkarm(u.x, u.y - 8); });
+  await page.mouse.click(p.x, p.y);
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('HÖRDE DU?', { timeout: 8000 });
+  const loggen = await page.evaluate(() => window.__ORDSTAVEN.logg());
+  expect(loggen).toContain('[ropa] ungen ropar');
+  expect(loggen).not.toContain('hjälten kramar ungen');
+  const regi = await page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').regiLogg.join(' | '));
+  expect(regi).toContain('ungen ropar');
+  expect(regi).not.toMatch(/kram/);
+});
+
 test('nosen är alltid gratis (125.4): att nosa på ett ord i ett läsval kostar inget bär', async ({ page }) => {
   test.setTimeout(40000);
   await provscen(page, { id: 't_nos_gratis', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'pussel', pussel_id: 'p0_bar' }, R('Klart.')] },
@@ -773,6 +792,41 @@ test('stigarna: frågan står på skylten, valet räknas vid kurvan, felet händ
   await tryckPa(page, 'stig_a');
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('RÄTT STIG.', { timeout: 10000 });
   expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toMatch(/t_stigar: a .*"resultat":"klar"/);
+});
+
+test('mästarprovet (132.4): tre läsval i följd på samma stigar, den rätta stryks och står kvar, och en fel stig vänder honom', async ({ page }) => {
+  test.setTimeout(90000);
+  // påhittade rader och stigar (inte kapitel 5:s): raden som gäller står i molnet, och den stig som inte stämmer stryks
+  const stig = (name, x) => ({ name, type: 'utgang', x, y: 30, width: 28, height: 70, properties: { golv: true, riktning: 'upp' } });
+  const alt = (id, ratt) => ({ id, objekt: `stig_${id}`, bild: 'stig', ...(ratt ? { ratt: true, tillstand_efter: 'struken' } : {}) });
+  const rad = (id, text, ids, ratt) => ({ id, typ: 'P1_las_och_valj', i_rummet: true, hjalp: 'ett_ord', varianter: { L6: { text, alternativ: ids.map((x) => alt(x, x === ratt)) } }, vid_fel: { reaktion: 'dimman vänder honom', bild: 'ut_ur_fel_stig' } });
+  const pussel = [rad('t_rad1', 'Stigen går inte vid ån.', ['a', 'b', 'c', 'd'], 'a'), rad('t_rad2', 'Den går mellan två träd.', ['b', 'c', 'd'], 'c'), rad('t_rad3', 'Där växer röda bär.', ['b', 'd'], 'b')];
+  await provscen(page, { id: 't_mast', pass: 1, rum: 'provmast', steg: [...pussel.map((p) => ({ typ: 'pussel', pussel_id: p.id })), R('Nu går vi.')] }, null, {
+    pussel,
+    rum: { provmast: { innehall: ['stig_a', 'stig_b', 'stig_c', 'stig_d'] } },
+    kartor: { provmast: provkarta([stig('stig_a', 24), stig('stig_b', 100), stig('stig_c', 176), stig('stig_d', 252)], { x: 160, y: 170 }) },
+  });
+  const regi = () => page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').regiLogg.join(' | '));
+  const vantaFri = () => expect.poll(() => page.evaluate(() => !window.__ORDSTAVEN.fryst() && window.__ORDSTAVEN.synlig() && window.__ORDSTAVEN.position().y > 104), { timeout: 10000 }).toBe(true);
+  // rad 1 står som frågan i molnet
+  await expect(page.locator('#tanke')).toContainText('STIGEN GÅR INTE VID ÅN.', { timeout: 8000 });
+  // fel stig: han går in, dimman vänder honom, och han kommer ut ur en annan stig
+  await tryckPa(page, 'stig_d');
+  await expect.poll(regi, { timeout: 8000 }).toContain('ut_ur_fel_stig');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 8000 }).toMatch(/\[stig\] ut ur stig_[abc]/);
+  await vantaFri();
+  for (const [ratt, nasta] of [['a', 'DEN GÅR MELLAN TVÅ TRÄD.'], ['c', 'DÄR VÄXER RÖDA BÄR.'], ['b', null]]) {
+    await tryckPa(page, `stig_${ratt}`);
+    await expect.poll(regi, { timeout: 8000 }).toContain(`streck av ljus över stig_${ratt}`);
+    if (ratt === 'a') { await page.waitForTimeout(700); await page.locator('canvas').first().screenshot({ path: 'test-results/mastarprovet-streck.png' }); }
+    if (nasta) { await expect(page.locator('#tanke')).toContainText(nasta, { timeout: 8000 }); await vantaFri(); }
+  }
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('NU GÅR VI.', { timeout: 10000 });
+  await page.locator('canvas').first().screenshot({ path: 'test-results/mastarprovet-tre-strukna.png' });
+  // de tre strukna står kvar i sparningen och i rummet
+  const t = await page.evaluate(() => window.__ORDSTAVEN.tillstand().aventyr['den-gomda-dalen'].platstillstand.provmast);
+  expect(t).toEqual({ stig_a: 'struken', stig_c: 'struken', stig_b: 'struken' });
+  expect(await page.evaluate(() => [...window.__ORDSTAVEN.spel.scene.getScene('Rum').platsStreck.ids.values()].filter((g) => g.active).length)).toBe(3);
 });
 
 test('läsval i rummet: ett rätt alternativ med effekt gör det i rummet (101.3, säckhissen på den stora säcken)', async ({ page }) => {

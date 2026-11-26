@@ -461,3 +461,31 @@ describe('fälten för 125 (schema 2.57–2.58: knep, krama_ungen, hemlighet och
     expect(beskrivningarSomVisas(kap01(d)).map((b) => b.plats)).toContain('rum glantan frivilligt fossil lockar');
   });
 });
+
+describe('lappen utan alternativ (kapitel 5:s bit, 132.4)', () => {
+  it('ett pussel utan alternativ är bara en lapp: oppna_lasplatta går, pussel säger fel', () => {
+    const d = riktigt();
+    const p = d.kapitel[0].pussel.find((x) => x.id === 'p0_dinomat');
+    for (const v of Object.values(p.varianter)) delete v.alternativ;
+    expect(kontrollera(d).fel.join('\n')).toMatch(/p0_dinomat har en variant utan alternativ och är bara en lapp/);
+    // samma lapp som bara visas med oppna_lasplatta (stegets kan_oppnas_igen) är rätt
+    const d2 = riktigt();
+    const l = kopia(d2.kapitel[0].pussel.find((x) => x.id === 'p0_dinomat'));
+    l.id = 'prov_bit_fram'; delete l.kan_oppnas_igen; delete l.i_rummet;
+    for (const v of Object.values(l.varianter)) delete v.alternativ;
+    d2.kapitel[0].pussel.push(l);
+    d2.kapitel[0].scener[0].steg.push({ typ: 'oppna_lasplatta', pussel_id: 'prov_bit_fram', kan_oppnas_igen: true });
+    const r = kontrollera(d2);
+    expect(r.fel.join('\n')).not.toMatch(/prov_bit_fram/);
+    expect(r.varningar.join('\n')).not.toMatch(/prov_bit_fram används inte/);
+  });
+  it('tillstand_efter på ett alternativ (mästarprovet) behöver rätt, objekt och i_rummet', () => {
+    const d = riktigt();
+    const p = d.kapitel[0].pussel.find((x) => x.id === 'p0_dinomat');
+    const v = Object.values(p.varianter)[0];
+    v.alternativ.find((a) => a.ratt).tillstand_efter = 'struken';
+    expect(kontrollera(d).fel.join('\n')).not.toMatch(/tillstand_efter gäller bara/);
+    v.alternativ.find((a) => !a.ratt).tillstand_efter = 'struken';
+    expect(kontrollera(d).fel.join('\n')).toMatch(/tillstand_efter gäller bara ett rätt alternativ/);
+  });
+});

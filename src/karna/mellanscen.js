@@ -82,7 +82,9 @@ export const BILD_PA_KORTET = Object.freeze(new Set(['ekorre_skakar']));
  */
 export const REAKTION_REGI = Object.freeze(new Set(['tallrikar', 'skuggan_stiger', 'skuggan_dyker', 'skold_ankaret', 'flaskan_hittad',
   // 2.54 (118.4): kapitel 4
-  'stor_skold_ras', 'grottan_glittrar', 'fotavtryck_stor', 'fossil_svans', 'ladan_oppnas']));
+  'stor_skold_ras', 'grottan_glittrar', 'fotavtryck_stor', 'fossil_svans', 'ladan_oppnas',
+  // 132.4: kapitel 5, mästarprovet
+  'ut_ur_fel_stig']));
 
 /**
  * Pusseltyper och steg vars knuff aldrig visar rutan: den pekar i världen (krukorna: ungen nosar mot närmaste

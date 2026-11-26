@@ -15,6 +15,19 @@ import { geSak } from './hjalte.js';
 function sakraAventyr(av) {
   av.ui = av.ui || {}; av.rumstillstand = av.rumstillstand || {}; av.lappar = av.lappar || []; av.kartbitar = av.kartbitar || [];
   av.bar = av.bar || 0; av.visade = av.visade || {}; av.frivilligt = av.frivilligt || []; av.skrivet = av.skrivet || {};
+  // platsernas tillstånd per rum (mästarprovet i kapitel 5, 132.4): { rum: { föremål: tillstånd } }
+  av.platstillstand = av.platstillstand || {};
+}
+
+/**
+ * Ett läsval i rummet där det rätta alternativet har tillstand_efter (132.4): platsen får tillståndet och behåller
+ * det. resultat.plats säger vilket alternativ han valde, och utan det (spolningen) gäller varianternas rätta.
+ * @param {any} av @param {any} p @param {string | null} rumId @param {any} [plats]
+ */
+function gePlatstillstand(av, p, rumId, plats) {
+  if (!rumId || !p || p.typ !== 'P1_las_och_valj') return;
+  const lista = plats ? [plats] : Object.values(p.varianter || {}).flatMap((/** @type {any} */ v) => (v.alternativ || []).filter((/** @type {any} */ a) => a.ratt));
+  for (const a of lista) if (a?.objekt && a.tillstand_efter) (av.platstillstand[rumId] = av.platstillstand[rumId] || {})[a.objekt] = a.tillstand_efter;
 }
 
 /**
@@ -59,7 +72,8 @@ function stegetsEffekt(st, { tillstand, av, unge, pussel, rumId }) {
     case 'ge_grad': tillstand.spelare.hjalte.grad = st.grad; break;
     case 'visa_ui': av.ui[st.element] = true; break;
     case 'unge_folj': unge.folj = st.folj; break;
-    case 'oppna_lasplatta': { const p = pussel.get(st.pussel_id); if (p && p.kan_oppnas_igen && !av.lappar.includes(p.id)) av.lappar.push(p.id); break; }
+    // steget kan ge lappen senare än första gången den visas (biten i kapitel 5, 132.4): stegets kan_oppnas_igen går före pusslets
+    case 'oppna_lasplatta': { const p = pussel.get(st.pussel_id); if (p && (st.kan_oppnas_igen ?? p.kan_oppnas_igen) && !av.lappar.includes(p.id)) av.lappar.push(p.id); break; }
     default:
   }
 }
@@ -93,6 +107,7 @@ export function spolaFram({ kapitel, tillstand, aventyrId, tillScen }) {
       if (!p) continue;
       if (p.typ === 'P11_formel') { const f = tillstand.spelare.hjalte.formler; if (!f.includes(p.svar)) f.push(p.svar); }
       if ((p.typ === 'P1_las_och_valj' || p.typ === 'P28_packa') && p.kan_oppnas_igen && !av.lappar.includes(p.id)) av.lappar.push(p.id);
+      gePlatstillstand(av, p, scen.rum ?? null);
       if (p.typ === 'P12_dop') {
         const tom = p.sparas_som === 'hjalte.namn' ? !tillstand.spelare.hjalte.namn : p.sparas_som === 'unge.namn' ? !unge.namn : false;
         if (tom && !dop.includes(p)) dop.push(p);
@@ -141,6 +156,7 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
   /** @type {string[]} frivilliga scener och föremål som är gjorda (scenens id, eller rum/föremål) */
   av.frivilligt = av.frivilligt || [];
   av.skrivet = av.skrivet || {};
+  av.platstillstand = av.platstillstand || {};
   // rum som har gått upp i ett större område (kapitel 1: lianerna i skogsbrynet, gamla_tradet i gläntan, beslut 18.1):
   // det som har visats, rummets tillstånd och det frivilliga följer med till det nya rummet
   for (const [gammalt] of Object.entries(alias.rum || {})) {
@@ -244,6 +260,9 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
     return av.rumstillstand[rumId] ?? (r && r.tillstand ? r.tillstand[0] : null);
   }
 
+  /** Platsernas tillstånd i ett rum (132.4): { föremål: tillstånd }. @param {string | null} rumId */
+  const platstillstand = (rumId) => (rumId ? { ...(av.platstillstand?.[rumId] || {}) } : {});
+
   /**
    * Utför stegets effekt på tillståndet (en gång, när steget blir aktuellt).
    * @param {any} st @param {string | null} [rumId] rummet steget spelas i (visa_foremal)
@@ -257,6 +276,7 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
     kapitel,
     varden,
     rumsTillstand,
+    platstillstand,
     get scen() { return kapitel.scener[scenIndex] ?? null; },
     get scenIndex() { return scenIndex; },
     get stegIndex() { return stegIndex; },
@@ -312,6 +332,7 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
           if (resultat.ord) av.skrivet[p.id] = ord;
         }
         if (p && (p.typ === 'P1_las_och_valj' || p.typ === 'P28_packa') && p.kan_oppnas_igen && !av.lappar.includes(p.id)) av.lappar.push(p.id);
+        if (p) gePlatstillstand(av, p, av.flyttad?.rum ?? scen.rum ?? null, resultat.plats);
       }
       if (st && p && p.tillstand_efter && scen.rum && st.typ === 'pussel') av.rumstillstand[av.flyttad?.rum ?? scen.rum] = p.tillstand_efter;
       // en mellanscen som byter rummets tillstånd (2.47, ön stiger)

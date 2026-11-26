@@ -584,3 +584,39 @@ describe('formeln med tangentbordet i berättelsen (kapitel 2, Teknik 20 del 2)'
     expect(t.spelare.hjalte.formler).toEqual(['LJUS', 'SVÄRD', 'FLYG']);
   });
 });
+
+describe('biten som två lappar (kapitel 5, 132.4)', () => {
+  // påhittade lappar: en P1 utan alternativ är bara en lapp, och stegets kan_oppnas_igen går före pusslets
+  const lapp = (id) => ({ id, typ: 'P1_las_och_valj', avsandare: 'farfar', papper: id, varianter: { L6: { text: ['Ett.', 'Två.'] } } });
+  const kap = {
+    format: 2, id: 'kap-prov', kapitel: 9, rum: [{ id: 'rummet' }], uppdrag: [], var_var_vi: [],
+    pussel: [lapp('prov_fram'), { ...lapp('prov_bak'), kan_oppnas_igen: true }],
+    scener: [
+      { id: 's1', pass: 1, rum: 'rummet', steg: [{ typ: 'oppna_lasplatta', pussel_id: 'prov_fram' }] },
+      { id: 's2', pass: 2, rum: 'rummet', steg: [{ typ: 'oppna_lasplatta', pussel_id: 'prov_fram', kan_oppnas_igen: true }, { typ: 'oppna_lasplatta', pussel_id: 'prov_bak' }] },
+    ],
+  };
+  it('framsidan blir hans först när steget säger det, och baksidan direkt', () => {
+    const t = nyttTillstand('t');
+    spolaFram({ kapitel: kap, tillstand: t, aventyrId: AVENTYR, tillScen: 's2' });
+    expect(t.aventyr[AVENTYR].lappar).toEqual([]);
+    spolaFram({ kapitel: kap, tillstand: t, aventyrId: AVENTYR });
+    expect(t.aventyr[AVENTYR].lappar).toEqual(['prov_fram', 'prov_bak']);
+  });
+  it('en lapp utan alternativ går att visa: läsvalet har texten och inga kort', () => {
+    const v = skapaValj(lapp('prov_fram'), { niva: 'L6' });
+    expect(v.s.text).toEqual(['Ett.', 'Två.']);
+    expect(v.s.alternativ).toEqual([]);
+  });
+});
+
+describe('mästarprovet (kapitel 5, 132.4)', () => {
+  it('en hoppad rad ger platsens tillstånd, som om han hade valt rätt', () => {
+    const rad = (id, ratt) => ({ id, typ: 'P1_las_och_valj', i_rummet: true, varianter: { L6: { text: 'Rad.', alternativ: [{ id: 'a', objekt: 'stig_a', ratt: ratt === 'a', ...(ratt === 'a' ? { tillstand_efter: 'struken' } : {}) }, { id: 'b', objekt: 'stig_b', ratt: ratt === 'b', ...(ratt === 'b' ? { tillstand_efter: 'struken' } : {}) }] } } });
+    const kap = { format: 2, id: 'kap-prov', kapitel: 9, rum: [{ id: 'gl' }], uppdrag: [], var_var_vi: [], pussel: [rad('r1', 'a'), rad('r2', 'b')],
+      scener: [{ id: 's1', pass: 1, rum: 'gl', steg: [{ typ: 'pussel', pussel_id: 'r1' }, { typ: 'pussel', pussel_id: 'r2' }] }] };
+    const t = nyttTillstand('t');
+    spolaFram({ kapitel: kap, tillstand: t, aventyrId: AVENTYR });
+    expect(t.aventyr[AVENTYR].platstillstand).toEqual({ gl: { stig_a: 'struken', stig_b: 'struken' } });
+  });
+});

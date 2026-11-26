@@ -710,7 +710,7 @@ export function skapaSpel(d) {
   /** Kartbiten i festen när han hittar eller får den: Stils bild, annars emojin. @param {number} n */
   const kartbitFest = (n) => kartbitarHtml([n], { hojd: Math.min(160, layout.skala.cssHojd * 0.5) }) ?? ikon(Number.isFinite(n) ? 'karta' : 'lapp', 'stor');
   /** Bilden av handlingen i en instruktion som väntar. @param {string} vad */
-  const handlingsBild = (vad) => { const n = ({ nosen: 'nos', mata_ungen: 'bar', radion: 'radio', krama_ungen: uiBild('ikon_kram') ? 'kram' : 'hand' })[vad]; return n ? `<span class="bild ikon-bild" data-bild="${n}">${ikon(n, 'stor')}</span>` : null; };
+  const handlingsBild = (vad) => { const n = ({ nosen: 'nos', mata_ungen: 'bar', radion: 'radio', krama_ungen: uiBild('ikon_kram') ? 'kram' : 'hand', ropa: uiBild('ikon_ropa') ? 'ropa' : 'hand' })[vad]; return n ? `<span class="bild ikon-bild" data-bild="${n}">${ikon(n, 'stor')}</span>` : null; };
 
   /**
    * En instruktion som ber om en handling väntar tills den är gjord ("Tryck på bären, så får {unge} ett.").
@@ -729,15 +729,17 @@ export function skapaSpel(d) {
     if (r.vantar_pa === 'nosen') ui.sattNos(true, { betala: () => true });
     // kramen (125.5, 127.5): ett tryck på ungen kramar den var den står. Står ungen en bit bort går hjälten själv
     // fram först, och Enter eller mellanslag bredvid ungen kramar den också
-    const kram = r.vantar_pa === 'krama_ungen';
+    // ROPA (129.5) är samma tryck på ungen, men ungen ropar i stället för att kramas
+    const ropa = r.vantar_pa === 'ropa';
+    const kram = r.vantar_pa === 'krama_ungen' || ropa;
     /** @type {(() => void) | null} */ let slutaKram = null;
     if (kram) {
       rum.kramaUnge = () => {
         rum.kramaUnge = null;
         // Stils kram från sidan visas klart (ca 1,8 s) innan berättelsen går vidare
-        const ms = rum.kramar?.() || 0;
-        logg.handelse('kram', 'hjälten kramar ungen');
-        window.setTimeout(() => handlingGjord('krama_ungen'), tid(ms));
+        const ms = (ropa ? rum.ungeRopar?.() : rum.kramar?.()) || 0;
+        logg.handelse(ropa ? 'ropa' : 'kram', ropa ? 'ungen ropar' : 'hjälten kramar ungen');
+        window.setTimeout(() => handlingGjord(ropa ? 'ropa' : 'krama_ungen'), tid(ms));
       };
       slutaKram = lyssnaHandling((h) => { if (h.typ === 'interagera' && rum.kramaUnge && !rum.fryst && ui.plattan.hidden && rum.naraUngen?.()) rum.kramaUnge(); });
     }
@@ -1289,6 +1291,8 @@ export function skapaSpel(d) {
     if (tonas) { rum.frys(true); await ui.tona(true, tid(300)); }
     rum.visa({ rum: scen.rum, scen: scen.id, tillstand: b.rumsTillstand(scen.rum), innehall: r ? innehallNu(r) : [], kvar: r ? kvarNu(r) : [], bytta: r ? byttaNu(r) : [], unge: tillstand.spelare.unge?.folj ?? !!tillstand.spelare.unge?.namn, nyttRum: nytt,
       karta: scen.rum ? kartor[scen.rum] ?? null : null, franRum, delar: scen.rum ? delarIRummet(kartor[scen.rum]) : {}, visade: scen.rum ? b.visade(scen.rum) : [] });
+    // platser som står kvar strukna (mästarprovet i kapitel 5, 132.4)
+    if (scen.rum) rum.visaPlatser(b.platstillstand(scen.rum));
     if (nytt) rullning.rumOppnat(); // rummet laddas: glapp nu säger inget om datorn (75.6)
     if (scen.rum) bildlagen();
     if (scen.rum && nytt) regierSomStarKvar(scen);
@@ -2877,7 +2881,9 @@ export function skapaSpel(d) {
           const lock = harLock(o);
           if (!lock) felljud(r.reaktion);
           borta.add(altId); aktuellVariant = v.s.variantNyckel;
-          if (utgang && o?.golv) await bakomKurvan(o, r.reaktion); // en fel stig leder aldrig vidare
+          // en fel stig leder aldrig vidare. I mästarprovet (ut_ur_fel_stig, 132.4) kommer han ut ur en annan stig
+          const annan = r.reaktion?.bild === 'ut_ur_fel_stig' ? v.s.alternativ.map((a) => (a.objekt ? rum.ruta(a.objekt) : null)).find((x) => x && x.id !== o?.id && x.golv) ?? null : null;
+          if (utgang && o?.golv) await bakomKurvan(o, r.reaktion, annan);
           else {
             // dörren öppnas aldrig: hjälten tar ett steg tillbaka in i rummet
             if (utgang && o) await rum.ga(lasplats(o), tid(250));
@@ -2912,13 +2918,19 @@ export function skapaSpel(d) {
         rum.frys(true);
         // ett rätt alternativ med effekt (2.43) gör det i rummet också här (101.3, säckhissen på den stora säcken),
         // och då visar reaktionen inte sin text för den vuxne
-        const effektMs = alt?.effekt ? rum.regi(alt.effekt) : 0;
+        // platsen står kvar struken (mästarprovet, 132.4): staven drar ett streck av ljus över den
+        const streckMs = alt?.tillstand_efter === 'struken' && alt.objekt ? rum.strykPlats(alt.objekt, true) : 0;
+        if (streckMs) logg.handelse('val', `${p.id}: ${alt.objekt} struken`);
+        const effektMs = (alt?.effekt ? rum.regi(alt.effekt) : 0) || streckMs;
         if (effektMs) {
-          logg.handelse('val', `${p.id}: ${alt.effekt}`);
+          if (alt?.effekt) logg.handelse('val', `${p.id}: ${alt.effekt}`);
           await Promise.all([rattHandelse(alt?.objekt ?? null), vanta(tid(effektMs))]);
           await reaktion(r.reaktion ? { ...r.reaktion, syns_redan: true } : null, alt?.objekt ?? null);
         } else await Promise.all([rattHandelse(alt?.objekt ?? null), reaktion(r.reaktion, alt?.objekt ?? null)]);
-        klar({ niva: v.s.variantNyckel, forstaForsoket: v.forstaForsoket, forsok: v.s.forsok, hjalp: spar.hjalp, knuffFore: hjalpSpar.fore().knuff_fore });
+        // en struken stig går han inte in på: han går tillbaka till vägskälet, där nästa rad gäller
+        const struken = streckMs ? rum.ruta(alt.objekt) : null;
+        if (struken?.golv) await rum.ga(stigStart(struken), tid(500));
+        klar({ niva: v.s.variantNyckel, forstaForsoket: v.forstaForsoket, forsok: v.s.forsok, hjalp: spar.hjalp, knuffFore: hjalpSpar.fore().knuff_fore, plats: alt?.tillstand_efter ? alt : undefined });
       };
     });
   }
@@ -2926,11 +2938,14 @@ export function skapaSpel(d) {
   /**
    * En fel stig: han går bakom kurvan och syns inte, felet händer där (kotten på hjälmen), och sedan kommer han
    * tillbaka till vägskälet (granskningen, punkt 16). @param {any} o stigen @param {any} reakt felreaktionen
+   * @param {any} [annan] en annan stig som han kommer ut ur (mästarprovet, ut_ur_fel_stig, 132.4)
    */
-  async function bakomKurvan(o, reakt) {
+  async function bakomKurvan(o, reakt, annan = null) {
     await rum.ga(framfor(o), tid(200));
     rum.gom(true);
     await vanta(tid(300));
+    // dimman vänder honom (132.4): han kommer ut ur den andra stigen, och ungen nyser när han syns
+    if (annan) { rum.stallHjalten(framfor(annan)); rum.gom(false); logg.handelse('stig', `ut ur ${annan.id}`); await reaktion(reakt); await rum.ga(stigStart(annan), tid(500)); return; }
     await reaktion(reakt);
     rum.gom(false);
     await rum.ga(stigStart(o), tid(500));
@@ -3866,7 +3881,7 @@ export function skapaSpel(d) {
     const d2 = skapaOrdduell(p);
     // motståndaren som figur (91.5, Stils halmdocka), om den har bilderna: då syns det som händer, och texten för den
     // vuxne visas inte. Annars (baronen i kapitel 3:s gråbox) står det som text
-    const fig = rum.duellfigur?.(p.motstandare) ?? null;
+    const fig = rum.duellfigur?.(p.motstandare, p.ram) ?? null;
     const syns = (/** @type {any} */ h) => (fig && h ? { ...h, syns_redan: true } : h);
     const medFigur = (/** @type {any} */ h, /** @type {number} */ ms) => Promise.all([reaktion(syns(h)), vanta(tid(ms))]);
     // 106.5: duellens början, samma i varje duell (kapitel 3, finalen och testrummet). Har en mellanscen med
@@ -4667,7 +4682,7 @@ export function skapaSpel(d) {
     }
     // papperen i kapitlet: lapparna han har fått och kan läsa igen, med en bild per sort (inga ord på korten)
     const papper = (av.lappar || []).filter((/** @type {string} */ id) => b?.pussel(id));
-    const bildFor = (/** @type {any} */ p) => (/brev/.test(p.papper || '') ? 'brev' : p.skylt || p.papper === 'traskylt' ? 'skylt_farfar' : p.papper ? 'lapp' : 'papper_gatan');
+    const bildFor = (/** @type {any} */ p) => (p.papper && bilder.harKort(p.papper) ? p.papper : /brev/.test(p.papper || '') ? 'brev' : p.skylt || p.papper === 'traskylt' ? 'skylt_farfar' : p.papper ? 'lapp' : 'papper_gatan');
     const hoger = papper.map((/** @type {string} */ id) => `<button type="button" class="kort nu-papper" data-pussel="${ui.esc(id)}" aria-label="Läs papperet">${bilder.html(bildFor(b?.pussel(id)))}</button>`).join('');
     return `<div class="paus-nu"><div class="nu-sida vanster">${vanster}</div><div class="nu-sida hoger">${hoger}</div></div>`;
   }

@@ -404,6 +404,10 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
         case 'pussel': {
           const p = pussel.get(st.pussel_id);
           if (!p) { fel.push(var_(`${sp}: pusslet ${st.pussel_id} finns inte`)); break; }
+          // en lapp (P1 utan alternativ, 132.4) visas bara med oppna_lasplatta
+          const baraLapp = p.typ === 'P1_las_och_valj' && Object.values(p.varianter || {}).some((/** @type {any} */ v) => !v.alternativ);
+          if (st.typ === 'oppna_lasplatta') anvanda.add(p.id);
+          if (st.typ === 'pussel' && baraLapp) fel.push(var_(`${sp}: ${p.id} har en variant utan alternativ och är bara en lapp, som visas med oppna_lasplatta`));
           if (st.typ === 'pussel') {
             anvanda.add(p.id);
             // rummets tillstånd när pusslet är löst (2.33): ett tillstånd som rummet har
@@ -411,7 +415,7 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
             if (p.i_rummet) {
               const r = rum.get(s.rum);
               const ids = r ? r.innehall.map(objId) : [];
-              for (const vari of Object.values(p.varianter)) for (const a of vari.alternativ) {
+              for (const vari of Object.values(p.varianter)) for (const a of vari.alternativ || []) {
                 if (!a.objekt) fel.push(var_(`${sp}: ${p.id} har i_rummet, men alternativet ${a.id} saknar objekt`));
                 else if (!ids.includes(a.objekt)) fel.push(var_(`${sp}: ${p.id} alternativet ${a.id} ligger i ${a.objekt}, som inte finns i rummet ${s.rum}`));
                 if (!a.ord && !a.bild) fel.push(var_(`${sp}: ${p.id} har i_rummet, men alternativet ${a.id} saknar ord att läsa (eller en bild som visar egenskapen)`));
@@ -580,11 +584,15 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
           const vp = `${plats} ${niva}`;
           if (vari.text) textKontroll(vari.text, `${vp} text`, { lasesSjalv: true });
           if (!vari.text && !vari.bild) fel.push(var_(`${vp}: behöver en text eller en bild som ställer frågan`));
-          const ratt = vari.alternativ.filter((a) => a.ratt);
+          // en lapp utan alternativ (132.4): bara texten prövas, och scenerna säger fel om den spelas som pussel
+          if (!vari.alternativ && !flera) { if (!vari.text) fel.push(var_(`${vp}: en lapp utan alternativ behöver en text`)); continue; }
+          const ratt = (vari.alternativ || []).filter((a) => a.ratt);
           // flera rätta svar bara med ett uttryckligt fält (2.43, 77.3), så att två rätta av misstag fortfarande fångas
           if (!flera && !p.flera_ratta && ratt.length !== 1) fel.push(var_(`${vp}: exakt ett alternativ ska ha "ratt": true (har ${ratt.length})`));
           if (p.flera_ratta && (ratt.length < 2 || ratt.length === vari.alternativ.length)) fel.push(var_(`${vp}: flera_ratta behöver minst två rätta alternativ och minst ett fel`));
-          for (const a of vari.alternativ) if (a.effekt && !a.ratt) fel.push(var_(`${vp} alternativ ${a.id}: effekt gäller bara ett rätt alternativ`));
+          for (const a of vari.alternativ || []) if (a.effekt && !a.ratt) fel.push(var_(`${vp} alternativ ${a.id}: effekt gäller bara ett rätt alternativ`));
+          // mästarprovet (132.4): platsen stryks när han väljer rätt, så den behöver en plats i rummet
+          for (const a of vari.alternativ || []) if (a.tillstand_efter && (!a.ratt || !a.objekt || !p.i_rummet)) fel.push(var_(`${vp} alternativ ${a.id}: tillstand_efter gäller bara ett rätt alternativ med objekt i ett läsval i rummet`));
           // lys_ord (2.43): ordet ska stå i texten eller på ett rätt kort
           if (p.lys_ord) {
             const ordI = (/** @type {any} */ t) => ord(rader(t).join(' ')).some((o) => versaler(o) === versaler(p.lys_ord));
@@ -594,7 +602,7 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
           const ids = vari.alternativ.map((a) => a.id);
           if (new Set(ids).size !== ids.length) fel.push(var_(`${vp}: två alternativ har samma id`));
           const orden = vari.alternativ.filter((a) => a.ord).map((a) => versaler(a.ord));
-          for (const a of vari.alternativ) {
+          for (const a of vari.alternativ || []) {
             if (a.ord) {
               textKontroll(a.ord, `${vp} alternativ ${a.id}`, { lasesSjalv: true });
             }
