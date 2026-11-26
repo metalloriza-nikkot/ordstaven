@@ -141,6 +141,16 @@
        "name": "dekor",
        "type": "bool",
        "value": true
+      },
+      {
+       "name": "stig_ackord",
+       "type": "string",
+       "value": "orgel_ackord"
+      },
+      {
+       "name": "stig_ton",
+       "type": "string",
+       "value": "orgel_ton"
       }
      ]
     },

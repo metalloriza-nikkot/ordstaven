@@ -227,7 +227,7 @@ RUMMEN = {
         'objekt': [
             punkt('start', 40, 170),
             *golv_vaggar(480, 192, golv=[(16, 36, 48, 140), (274, 36, 190, 140)], vatten=[(66, 36, 208, 140)]),
-            sak('stig_k4_stig2', 166, 102, 8, 8, dekor=True, ankare=True),
+            sak('stig_k4_stig2', 166, 102, 8, 8, dekor=True, ankare=True, stig_ton='orgel_ton', stig_ackord='orgel_ackord'),  # orgeln (127.6)
             sak('tavla_farfar', 280, 36, 24, 22, sida='under'),
             sak('orgel_blank', 118, 0, 8, 36, dekor=True),
             utg('gang_valvet', 420, 36, 28, 8, golv=True, riktning='upp', till='berget_valvet'),

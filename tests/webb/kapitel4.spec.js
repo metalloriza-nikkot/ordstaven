@@ -187,6 +187,8 @@ test('kapitel 4 pass 2: mörkret, LJUS, gemenernas vägg, salen med stig 2 och v
   const loggen = await page.evaluate(() => window.__ORDSTAVEN.logg());
   expect(loggen).toContain('[skylt] vagg_gemener');
   expect(loggen).toContain('[stig] k4_stig2: klar');
+  // orgeln i salen (127.6): en orgelton per rätt flak och ackordet när TAVLA är klar
+  expect(loggen).toContain('[stig] k4_stig2: orgel_ackord');
   expect(loggen).toContain('[stig] k4_stig_valv: klar');
   expect(loggen).toContain('[skylt] vagg_valvet');
   expect(loggen).not.toContain('k4_stig3');

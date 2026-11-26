@@ -561,13 +561,29 @@ export function skapaSpel(d) {
     if (!bild && !r) { minnsMolnetsRad(); ui.visaTanke(null); molnNu = ''; return; }
     const html = molnHtml(bild, r);
     if (html !== molnNu) { ljud.spela('pling'); if (lappen.framme && !lappVantar) lappen.fallIhop(true); }
+    const nyRad = html !== molnNu;
     molnNu = html;
     ui.visaTanke(html);
     if (r) ui.$('#tanke .moln-hogtalare')?.addEventListener('click', (e) => { e.stopPropagation(); sag(r); ui.pulseraTanke(); });
     if (b) placeraMoln([]);
     // texten får aldrig kapas (79.2): frågan ställer sig ovanför lappen om de inte ryms bredvid varandra
-    return ui.passaTanke();
+    const passad = ui.passaTanke();
+    // flygningen (125 steg 7): efter strecket flyger nästa steg ut ur boken till molnet, med plinget
+    if (nyRad && r && performance.now() - strukenNar < 6000) { strukenNar = 0; flygUrBoken(); }
+    return passad;
   }
+  /** Molnet flyger ut ur bokknappen till sin plats (0,35 s, bara läge, storlek och opacitet). */
+  function flygUrBoken() {
+    const t = /** @type {HTMLElement} */ (ui.$('#tanke')), k = ui.$('#hud-lapp');
+    if (k.hidden || !t.animate) return;
+    const a = k.getBoundingClientRect(), m = t.getBoundingClientRect();
+    if (!a.width || !m.width) return;
+    const dx = a.left + a.width / 2 - (m.left + m.width / 2), dy = a.top + a.height / 2 - (m.top + m.height / 2);
+    t.animate([{ transform: `translate(${dx}px, ${dy}px) scale(0.2)`, opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: tid(350), easing: 'ease-out' });
+    logg.handelse('strecket', 'nästa steg flyger ut ur boken');
+  }
+  /** när strecket senast drogs (då flyger nästa steg ut ur boken) */
+  let strukenNar = 0;
   /** @type {{ el: Node, rect: DOMRect, stil: string, tid: number } | null} raden i molnet när det senast gömdes (strecket, 125.3) */
   let molnetsSista = null;
   /** Raden i molnet minns, innan molnet göms, så att strecket kan dras över den när steget är klart. */
@@ -586,6 +602,7 @@ export function skapaSpel(d) {
    */
   function strykMolnet() {
     ljud.spela('penndrag');
+    strukenNar = performance.now();
     const knapp = ui.$('#hud-lapp');
     const glimt = () => { if (!knapp.hidden) ui.glimta('#hud-lapp'); };
     const m = molnetsSista; molnetsSista = null;
@@ -2158,6 +2175,20 @@ export function skapaSpel(d) {
   }
 
   // ------------------------------------------------------------------ det frivilliga
+  /**
+   * Den närmaste hemligheten i rummet som inte är gjord (125.5): en frivillig scen med `hemlighet` och `lockar` vid
+   * något i rummet, eller en post i `rum.frivilligt` med `hemlighet`. Platsen är lockelsens `vid` (annars föremålet).
+   * Bären hjälper aldrig vägen framåt, bara det frivilliga. @returns {string | null}
+   */
+  function hemlighetNara() {
+    if (!b || !aktuelltRum) return null;
+    const vid = [
+      ...b.kapitel.scener.filter((/** @type {any} */ sc) => sc.frivillig && sc.hemlighet && sc.lockar?.vid && !b.frivilligtGjort(sc.id)).map((/** @type {any} */ sc) => sc.lockar.vid),
+      ...(b.rum(aktuelltRum)?.frivilligt || []).filter((/** @type {any} */ f) => f.hemlighet && !b.frivilligtGjort(`${aktuelltRum}/${f.foremal}`)).map((/** @type {any} */ f) => f.lockar?.vid ?? f.foremal),
+    ].filter((/** @type {string} */ id) => !!rum.ruta(id));
+    vid.sort((x, y) => avstandTill(rum.pos, rum.ruta(x)) - avstandTill(rum.pos, rum.ruta(y)));
+    return vid[0] ?? null;
+  }
   /** Föremålen i rummet med något frivilligt kvar (rum.frivilligt): ett tryck gör det, en gång. */
   function frivilligaKvar() {
     const r = aktuelltRum ? b.rum(aktuelltRum) : null;
@@ -3590,6 +3621,7 @@ export function skapaSpel(d) {
     const s = skapaStig(p);
     const g = s.g;
     const ankare = rum.ruta(`stig_${p.id}`);
+    let antalRatt = 0;
     // stig 1 går uppför sluttningen (119.4): kartans ankare säger upp
     const lage = rum.visaStig(g, ankare ? { x: ankare.x + ankare.b / 2, y: ankare.y + ankare.h / 2 } : undefined, !!ankare?.upp);
     const fot = (/** @type {{ x: number, y: number }} */ q) => ({ x: q.x, y: q.y + 4 });
@@ -3704,7 +3736,10 @@ export function skapaSpel(d) {
         rum.stigKant(null);
         await vanta(rum.stigHopp(fot(lage.flak(till.r, till.k))));
         // rätt flak: ett glatt ljud (115.8: tills Stils eget ljud finns, brickans ton som stiger) och ett kort glitter
-        ljud.spela('flak_ratt'); // Stils glada TING-TING för rätt flak (115.8)
+        // Stils glada TING-TING för rätt flak (115.8), eller kartans ton: i salen en orgelton per rätt flak, i stigande
+        // ordning (orgel_ton_1–5, 127.6)
+        antalRatt++;
+        ljud.spela(ankare?.stigTon ? `${ankare.stigTon}_${Math.min(antalRatt, 5)}` : 'flak_ratt');
         rum.stigGlitter(till.r, till.k);
         rum.stigSpricka(till.r, till.k);
         logg.handelse('stig', `${p.id}: ${bokstav} rätt`);
@@ -3724,6 +3759,7 @@ export function skapaSpel(d) {
         }
         rita();
         if (v.sort === 'klar') {
+          if (ankare?.stigAckord) { ljud.spela(ankare.stigAckord); logg.handelse('stig', `${p.id}: ${ankare.stigAckord}`); }
           await vanta(tid(250));
           await vanta(rum.stigHopp({ ...lage.mal }));
           // ungen skuttar hela vägen i hjältens spår, och varje flak plingar: ordet en gång till (119.4)
@@ -4122,11 +4158,21 @@ export function skapaSpel(d) {
     if (av.bar <= 0) { rum.ungeReagerar(false); ljud.spela('hmm'); logg.handelse('bär', 'tom påse'); return; }
     av.bar--; ui.uppdateraHud(av); spara();
     logg.handelse('bär', 'ungen äter', { kvar: av.bar });
+    // bären är ungens godis för hemligheter (125.5): väntar ingen hungrig unge, nosar ungen mot närmaste hemlighet i
+    // rummet med samma lockelse som i kapitel 4 (glimten, klangen och ungen som stannar). Finns ingen, äter den glatt
+    const hungrig = aktuelltSteg?.vantar_pa === 'mata_ungen';
     handlingGjord('mata_ungen');
+    const hem = hungrig ? null : hemlighetNara();
     const fran = ui.$('#hud-bar').getBoundingClientRect();
     const u = rum.ungePunkt, till = skarm(u.x, u.y);
     ui.flygBar({ x: fran.left + fran.width / 2, y: fran.top + fran.height / 2 }, till, tid(450)).then(() => {
       rum.ungeReagerar(true); ljud.spela('unge');
+      if (!hem) return;
+      logg.handelse('bär', 'ungen nosar mot ' + hem);
+      window.setTimeout(() => {
+        rum.ungePekar(hem); rum.lockGlimt(hem); ljud.spela('klirr');
+        window.setTimeout(() => rum.ungePekar(null), tid(4000));
+      }, tid(500));
     });
   });
   ui.$('#tanke').addEventListener('click', (e) => { if (/** @type {HTMLElement} */ (e.target).closest('.tanke-lapp:not(.tanke-skylt)')) /** @type {HTMLElement} */ (ui.$('#hud-lapp')).click(); });

@@ -29,6 +29,8 @@ import styckeOnM4a from '../../assets/ljud/musik/stycke_on.m4a?url';
 import styckeOnOgg from '../../assets/ljud/musik/stycke_on.ogg?url';
 import styckeSegerM4a from '../../assets/ljud/musik/stycke_seger.m4a?url';
 import styckeSegerOgg from '../../assets/ljud/musik/stycke_seger.ogg?url';
+import tandgrottanM4a from '../../assets/ljud/musik/tandgrottan.m4a?url';
+import tandgrottanOgg from '../../assets/ljud/musik/tandgrottan.ogg?url';
 import styckeRasetM4a from '../../assets/ljud/musik/stycke_raset.m4a?url';
 import styckeRasetOgg from '../../assets/ljud/musik/stycke_raset.ogg?url';
 import { pausPlan } from '../karna/musik.js';
@@ -60,6 +62,8 @@ export const MUSIK = /** @type {Record<string, { m4a: string, ogg: string, loopS
   byn: { m4a: bynM4a, ogg: bynOgg, loopStart: 0.5, loopEnd: 0.5 + (16 * 8 * 60) / (96 * 2) },
   // floden (103.3.5, Stil 10h v0.5): en vals i 3/4 med dragspel. Slutpunkten är Stils (41,739138 s efter starten)
   floden: { m4a: flodenM4a, ogg: flodenOgg, loopStart: 0.5, loopEnd: 42.239138 },
+  // speldosan i tandgrottan (127.6, LASMIG_127): 37,9 s, Stils slutpunkt
+  tandgrottan: { m4a: tandgrottanM4a, ogg: tandgrottanOgg, loopStart: 0.5, loopEnd: 38.394739 },
 });
 /** Byte mellan slingor: den gamla tonas ut och den nya in på ca 1 s (Stil, 10c). Efter pausen tonas den in mjukare. */
 /**

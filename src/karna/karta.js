@@ -200,6 +200,9 @@ export function lasKarta(tmj) {
       if (egen.ankare) ut.ankare = true;
       // upp (119.4, granskning 10 punkt 14) = bokstavsstigen går uppför i rummet: stegen ligger nedifrån och upp, och raderna sida vid sida
       if (egen.upp) ut.upp = true;
+      // stigens ljud i kartan (127.6): en ton per rätt flak (`ton_1`, `ton_2` …) och ett ackord när ordet är klart
+      if (egen.stig_ton) ut.stigTon = String(egen.stig_ton);
+      if (egen.stig_ackord) ut.stigAckord = String(egen.stig_ackord);
       // luftskepp (121.2) = luftskeppet glider förbi högt ovanför medan han hoppar stigen
       if (egen.luftskepp) ut.luftskepp = true;
       // tillbaka (121.3) = stigen är en återvändsgränd: när den är klar hoppar han tillbaka till stranden (stig 4 i F3)

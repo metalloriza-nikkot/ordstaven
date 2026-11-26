@@ -73,7 +73,6 @@ test('boken NU (125.1): lappen fälls inte ut, molnet visar steget, och bokknapp
   await expect(page.locator('.moln-streck')).toHaveCount(0, { timeout: 3000 });
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('HÄR ÄR BOKEN.', { timeout: 10000 });
   await page.click('#plattan .vidare');
-  // på sidan NU är steget överstruket
   // stämpeln kommer efter berättelsens stund (Bra.), bredvid hjälten och aldrig över honom eller ungen
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('BRA.', { timeout: 8000 });
   await page.evaluate(() => {
@@ -372,3 +371,19 @@ test('apan klättrar ned för stegen när den är räddad, och vinkar sedan (56.
 });
 
 // (testet för 104.5, att lappen som fälls ut aldrig fryser styrningen, är borta: utfällningen ströks i 125.1)
+
+test('flygningen (125 steg 7): efter strecket flyger nästa steg ut ur boken till molnet', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(60000);
+  const scen = { id: 't_flyg', pass: 1, rum: 'hallen', tillstand: 'natt', steg: [R('Nu går vi.'), { typ: 'ga_till', mal: 'dorr_bok' }, { typ: 'ga_till', mal: 'dorr_sov' }, R('Slut.')] };
+  const uppdrag = [{ id: 't_f', rubrik: 'HITTA {UNGE}', bild: 'uppdrag_stegen', pass: 1,
+    steg: [{ text: 'GÅ TILL BOK', klart: { scen: 't_flyg', ga_till: 'dorr_bok' } }, { text: 'GÅ TILL SOV', klart: { scen: 't_flyg', ga_till: 'dorr_sov' } }],
+    stampel: { scen: 't_flyg', efter: { replik: 'Slut.' } } }];
+  await provscen(page, scen, { uppdrag });
+  await page.click('#plattan .vidare', { timeout: 8000 });
+  await expect(page.locator('#tanke .instruktion')).toHaveText('GÅ TILL BOK', { timeout: 8000 });
+  await dorr(page, 'dorr_bok');
+  await expect.poll(() => logg(page), { timeout: 10000 }).toContain('[strecket] raden stryks i molnet');
+  await expect.poll(() => logg(page), { timeout: 10000 }).toContain('[strecket] nästa steg flyger ut ur boken');
+  await expect(page.locator('#tanke .instruktion')).toHaveText('GÅ TILL SOV');
+});

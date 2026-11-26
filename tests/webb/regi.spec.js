@@ -693,4 +693,9 @@ test('lockelsen vid fossilet i gläntan (2.58): ett frivilligt föremål lockar 
   await page.screenshot({ path: 'test-results/lockar-fossil.png' });
   // syns_redan: ingen text för den vuxne
   await expect(page.locator('#regi')).toBeHidden();
+  // bären (125.5): ett bär till ungen, och den nosar mot hemligheten i rummet (fossilet)
+  await page.evaluate(() => { const t = window.__ORDSTAVEN.tillstand(); t.aventyr['den-gomda-dalen'].bar = 2; });
+  await page.evaluate(() => window.__ORDSTAVEN.uppdateraHud?.());
+  await page.locator('#hud-bar').click({ force: true });
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 8000 }).toContain('[bär] ungen nosar mot fossil');
 });
