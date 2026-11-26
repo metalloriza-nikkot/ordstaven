@@ -28,55 +28,52 @@ const UPPDRAG = [{ id: 't_u', rubrik: 'HITTA {UNGE}', bild: 'uppdrag_stegen', pa
   stampel: { scen: 't_lapp', efter: { replik: 'Bra.' } } }];
 const dorr = async (page, id) => { const o = await page.evaluate((m) => window.__ORDSTAVEN.objekt(m), id); await page.mouse.click(o.x, o.y); };
 
-test('lappen ersätter inget: dialogen och molnet står som förut, och lappen fälls ut när uppdraget börjar och vid tryck', async ({ page }, info) => {
+test('boken NU (125.1): lappen fälls inte ut, molnet visar steget, och bokknappen öppnar sidan NU med stegen och papperen', async ({ page }, info) => {
   test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
   test.setTimeout(60000);
   await provscen(page, SCEN, { uppdrag: UPPDRAG });
   expect(await page.evaluate(() => document.documentElement.classList.contains('text-under'))).toBe(true);
   const lapp = page.locator('#uppdragslapp'), knapp = page.locator('#hud-lapp');
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('NU GÅR VI.', { timeout: 8000 });
-  await expect(lapp).toBeHidden();
   await expect(knapp).toBeHidden(); // inget uppdrag än
   await page.click('#plattan .vidare');
-  // instruktionen visas (lappen ersätter den inte längre), och ingen lapp före frågan
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('GÅ TILL BOKEN!', { timeout: 8000 });
-  await expect(lapp).toBeHidden();
   await page.click('#plattan .vidare');
-  // uppdraget börjar: lappen fälls ut en stund och fälls ihop, sedan står målet i molnet
-  await expect.poll(() => logg(page), { timeout: 8000 }).toContain('[lappen] framme: t_u');
-  // molnet är bokens rad (125.2): stegets verb och mål, inte repliken
+  // uppdraget börjar: lappen fälls inte ut (125.1), och steget står i molnet
+  await expect.poll(() => logg(page), { timeout: 8000 }).toContain('[lappen] nytt: t_u');
   await expect(page.locator('#tanke .instruktion')).toHaveText('GÅ TILL BOK', { timeout: 8000 });
-  await expect(lapp).toBeHidden({ timeout: 3000 });
+  await expect(lapp).toBeHidden();
   // molnet står inne i remsan, inte avskuret i högra kanten (47.8)
   const moln = await page.locator('#tanke').boundingBox(), rum0 = await page.locator('#varld').boundingBox();
   expect(moln.x).toBeGreaterThanOrEqual(rum0.x); expect(moln.x + moln.width).toBeLessThanOrEqual(rum0.x + rum0.width + 1);
-  // lappknappen står överst bland hans knappar
+  // bokknappen står överst bland hans knappar, med Stils bok
   await expect(knapp).toBeVisible();
   expect(await page.evaluate(() => document.querySelector('#hud').firstElementChild.id)).toBe('hud-lapp');
-  // ett tryck på lappknappen: lappen är framme ensam i remsan, och molnet väntar
+  await expect(knapp.locator('img[data-ikon="bok_nu"]')).toHaveCount(1);
+  // ett tryck: boken öppnas på sidan NU, med uppdragets rubrik, steget nu och en ring för steget som är kvar
   await knapp.click();
-  await expect(lapp).toBeVisible();
-  await expect(lapp.locator('.lapp-rubrik')).toHaveText('HITTA KNOPP');
-  await expect(lapp.locator('.lapp-bock')).toHaveCount(0);
-  await expect(lapp.locator('.lapp-ring')).toHaveCount(2);
-  await expect(lapp.locator('.lapp-steg, .lapp-nu')).toHaveCount(0); // ingen text för delstegen
-  await expect(page.locator('#tanke')).toHaveCSS('visibility', 'hidden');
-  const varld = await page.locator('#varld').boundingBox(), r = await lapp.boundingBox();
-  expect(r.y).toBeGreaterThanOrEqual(varld.y + varld.height);
-  expect(r.y + r.height).toBeLessThanOrEqual(800);
-  expect(r.height).toBeLessThanOrEqual(160);
-  expect(r.x + r.width).toBeLessThanOrEqual(varld.x + varld.width + 1);
-  await page.screenshot({ path: 'test-results/lappen-framme.png' });
-  // ett tryck till fäller ihop den, och molnet kommer tillbaka
-  await knapp.click();
-  await expect(lapp).toBeHidden({ timeout: 2000 });
-  await expect(page.locator('#tanke')).toHaveCSS('visibility', 'visible');
+  const nu = page.locator('.pausmeny.vy-nu .paus-nu');
+  await expect(nu).toBeVisible({ timeout: 4000 });
+  await expect(page.locator('.paus-val.flik').first()).toHaveAttribute('data-val', 'nu');
+  await expect(nu.locator('.nu-titel')).toHaveText('HITTA KNOPP');
+  await expect(nu.locator('.nu-steg.nu .nu-text')).toHaveText('GÅ TILL BOK');
+  await expect(nu.locator('.nu-steg.gjort')).toHaveCount(0);
+  await expect(nu.locator('.nu-steg.ring')).toHaveCount(1);
+  await page.screenshot({ path: 'test-results/boken-nu.png' });
+  await page.click('.paus-stang');
+  await expect(page.locator('#pausmeny')).toBeHidden();
+  await page.evaluate(() => { window.__streck = null; new MutationObserver((m) => { for (const x of m) for (const n of x.addedNodes) if (n.classList?.contains('moln-streck')) { const r = n.getBoundingClientRect(); window.__streck = { text: n.innerText.trim(), w: r.width, y: r.top }; } }).observe(document.body, { childList: true }); });
   // framme: en bock och en ring, och dialogen tar remsan (lappen fälls ihop direkt)
   await dorr(page, 'dorr_bok');
+  // steget är klart: pennan stryker raden i molnet, och raden flyger till boken (125.3)
+  await expect.poll(() => logg(page), { timeout: 8000 }).toContain('[strecket] raden stryks i molnet');
+  const sr = await page.evaluate(() => window.__streck);
+  expect(sr?.text).toBe('GÅ TILL BOK');
+  expect(sr.w).toBeGreaterThan(50);
+  await expect(page.locator('.moln-streck')).toHaveCount(0, { timeout: 3000 });
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('HÄR ÄR BOKEN.', { timeout: 10000 });
-  await expect(lapp.locator('.lapp-bock')).toHaveCount(1);
-  await expect(lapp.locator('.lapp-ring')).toHaveCount(1);
   await page.click('#plattan .vidare');
+  // på sidan NU är steget överstruket
   // stämpeln kommer efter berättelsens stund (Bra.), bredvid hjälten och aldrig över honom eller ungen
   await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('BRA.', { timeout: 8000 });
   await page.evaluate(() => {
@@ -93,7 +90,7 @@ test('lappen ersätter inget: dialogen och molnet står som förut, och lappen f
   const krock = st.s.left < st.h.right && st.s.right > st.h.left && st.s.top < st.h.bottom && st.s.bottom > st.h.top;
   expect(krock).toBe(false);
   expect(st.s.width).toBeGreaterThan(100); // 64 av världens pixlar (192 punkter vid 3×, utan rotationen)
-  expect(st.s.top).toBeGreaterThanOrEqual(varld.y - 1); expect(st.s.bottom).toBeLessThanOrEqual(varld.y + varld.height + 1);
+  expect(st.s.top).toBeGreaterThanOrEqual(rum0.y - 1); expect(st.s.bottom).toBeLessThanOrEqual(rum0.y + rum0.height + 1);
   await expect(page.locator('.stampel-ruta')).toHaveCount(0, { timeout: 4000 });
   await expect(knapp).toBeHidden({ timeout: 4000 }); // inget uppdrag längre
   // fliken KLART i MIN BOK: en rad med bild, rubrik och stämpel, och den är ny
@@ -109,7 +106,7 @@ test('lappen ersätter inget: dialogen och molnet står som förut, och lappen f
   await page.screenshot({ path: 'test-results/lappen-klart.png' });
 });
 
-test('utan remsa finns ingen lapp: instruktionen och molnet står som förut', async ({ page }, info) => {
+test('utan remsa finns ingen lapp: molnet visar steget, och bokknappen syns', async ({ page }, info) => {
   test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
   await page.setViewportSize({ width: 1280, height: 700 });
   await provscen(page, SCEN, { uppdrag: UPPDRAG });
@@ -119,7 +116,8 @@ test('utan remsa finns ingen lapp: instruktionen och molnet står som förut', a
   // molnet är bokens rad (125.2): stegets verb och mål, inte repliken
   await expect(page.locator('#tanke .instruktion')).toHaveText('GÅ TILL BOK', { timeout: 8000 });
   await expect(page.locator('#uppdragslapp')).toBeHidden();
-  await expect(page.locator('#hud-lapp')).toBeHidden();
+  // bokknappen syns också utan remsa, eftersom boken öppnas i pausmenyn (125.1)
+  await expect(page.locator('#hud-lapp')).toBeVisible();
 });
 
 test('MIN BOK, fliken KLART: tio rader per uppslag, öppnas på det senaste, och inget skärs av (48.1)', async ({ page }, info) => {
@@ -146,7 +144,12 @@ test('MIN BOK, fliken KLART: tio rader per uppslag, öppnas på det senaste, och
   for (let i = 0; i < 20 && !(await page.locator('#plattan').isHidden()); i++) {
     const v = page.locator('#plattan .vidare'); if (await v.isVisible()) await v.click().catch(() => {}); await page.waitForTimeout(300);
   }
-  await page.click('#hud-paus');
+  // pausknappen går först när läsplattan är stängd (under last kan en replik komma emellan): försök tills menyn står
+  await expect.poll(async () => {
+    const v = page.locator('#plattan .vidare'); if (await v.isVisible()) await v.click().catch(() => {});
+    if (await page.locator('#plattan').isHidden()) await page.click('#hud-paus').catch(() => {});
+    return page.locator('.paus-val[data-val="hjalteboken"]').isVisible();
+  }, { timeout: 20000 }).toBe(true);
   await page.click('.paus-val[data-val="hjalteboken"]');
   await page.click('.paus-val[data-val="klart"]');
   const klart = page.locator('.paus-klart');
@@ -368,24 +371,4 @@ test('apan klättrar ned för stegen när den är räddad, och vinkar sedan (56.
   await page.screenshot({ path: 'test-results/apan-nere.png' });
 });
 
-test('lappen fryser aldrig styrningen (104.5): han kan gå medan den står framme, och den flyger till knappen när han går', async ({ page }, info) => {
-  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
-  test.setTimeout(60000);
-  // uppdraget börjar efter en mellanscen, som håller världen still. Utan snabbläget, så att lappen står framme i ca 3 s
-  const scen = { id: 't_lapp2', pass: 1, rum: 'hallen', tillstand: 'natt', steg: [{ typ: 'mellanscen', beskrivning: 'Hallen.', syns_redan: true }, { typ: 'ga_till', mal: 'dorr_bok' }, R('Slut.')] };
-  const uppdrag = [{ id: 't_u2', rubrik: 'HITTA BOKEN', bild: 'uppdrag_stegen', pass: 1, steg: [{ text: 'GÅ TILL BOK', klart: { scen: 't_lapp2', ga_till: 'dorr_bok' } }], stampel: { scen: 't_lapp2', efter: { ga_till: 'dorr_bok' } } }];
-  await provscen(page, scen, { uppdrag }, '?test&testscen&kapitel=kap-00');
-  const lapp = page.locator('#uppdragslapp');
-  await expect.poll(() => logg(page), { timeout: 8000 }).toContain('[lappen] framme: t_u2');
-  await expect(lapp).toBeVisible();
-  // världen är släppt medan lappen står framme
-  expect(await page.evaluate(() => window.__ORDSTAVEN.fryst())).toBe(false);
-  // han går: lappen flyger till knappen direkt, långt före sina 3 s
-  const fore = await page.evaluate(() => window.__ORDSTAVEN.position());
-  await page.keyboard.down('ArrowDown'); await page.waitForTimeout(400); await page.keyboard.up('ArrowDown');
-  await expect(lapp).toBeHidden({ timeout: 1000 });
-  const efter = await page.evaluate(() => window.__ORDSTAVEN.position());
-  expect(Math.abs(efter.y - fore.y) + Math.abs(efter.x - fore.x)).toBeGreaterThan(2);
-  // och berättelsen går vidare till målet
-  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.steg()?.typ), { timeout: 8000 }).toBe('ga_till');
-});
+// (testet för 104.5, att lappen som fälls ut aldrig fryser styrningen, är borta: utfällningen ströks i 125.1)

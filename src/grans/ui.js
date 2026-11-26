@@ -22,7 +22,7 @@ export function skapaUi({ ordlistor, rost, ljud, logg }) {
     <div id="tona"></div>
     <div id="hud">
       <!-- lappknappen överst bland hans knappar (10d, 47.2): uppdragslappen, och Farfars lapp i ett pussel -->
-      <button type="button" id="hud-lapp" class="hud-knapp" hidden aria-label="Lappen">${ikon('lapp', 'hud')}</button>
+      <button type="button" id="hud-lapp" class="hud-knapp" hidden aria-label="Boken">${uiBild('ikon_bok_nu') ? ikon('bok_nu', 'hud') : ikon('lapp', 'hud')}</button>
       <button type="button" id="hud-radio" class="hud-knapp" hidden aria-label="Radion">${ikon('radio', 'hud')}</button>
       <button type="button" id="hud-nos" class="hud-knapp" hidden aria-label="Nosa på ett ord">${ikon('nos', 'hud')}${ikon('nos_aktiv', 'hud').replace('ikon-px', 'ikon-px aktiv')}</button>
       <button type="button" id="hud-bar" class="hud-knapp" hidden aria-label="Bär">${ikon('bar', 'hud')}<span class="tal">0</span></button>

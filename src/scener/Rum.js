@@ -316,7 +316,9 @@ export class Rum extends Phaser.Scene {
     this.oandliga.add(this.tweens.add({ targets: this.naraRam, alpha: { from: 1, to: 0.55 }, duration: 450, yoyo: true, repeat: -1 }));
     if (this.b.mjukvara) this.events.on('postupdate', () => this.valjRitning());
     this.malKors = this.add.graphics().setVisible(false);
-    this.malKors.fillStyle(FARG.markerad).fillRect(-3, 0, 7, 1).fillRect(0, -3, 1, 7);
+    // målkorset är vitt med en mörk kant (130.4): guld betyder bara rätt svar
+    this.malKors.fillStyle(0x1a1410).fillRect(-4, -1, 9, 3).fillRect(-1, -4, 3, 9);
+    this.malKors.fillStyle(0xffffff).fillRect(-3, 0, 7, 1).fillRect(0, -3, 1, 7);
     // sidovyn (en mellanscen från sidan, t.ex. in i skogen) täcker hela skärmen ovanför allt i rummet
     this.sidovy = this.add.container(0, 0).setVisible(false);
     // tryck på ett objekt = gå fram till det

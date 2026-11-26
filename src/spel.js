@@ -239,7 +239,8 @@ export function skapaSpel(d) {
   /** Läs lappens rubrik. @param {any} l */
   const lasLappen = (l) => sag({ talare: 'berattare', text: lappTal(l.k.u.rubrik) + '.', upplast: true });
   /** Lappknappen syns när det finns ett uppdrag (eller Farfars lapp i ett pussel, se `uppdateraHud`). */
-  const sattLappknapp = () => ui.sattLappknapp(!!lappNu());
+  // bokknappen syns medan ett uppdrag pågår (125.1), och när han har papper att läsa igen
+  const sattLappknapp = () => ui.sattLappknapp(!!radioNu());
   /**
    * Radion följer uppdraget (125.6): uppdraget som pågår och steget han gör nu, också utan remsan. Tänd medan ett
    * uppdrag pågår, med en svag puls när steget har ett knep (`steg[].knep`), och halvt släckt annars.
@@ -279,6 +280,7 @@ export function skapaSpel(d) {
    * den är ihopfälld (när ett uppdrag eller ett pass börjar), annars står den medan han spelar (ett tryck på knappen).
    * @param {any} l @param {boolean} vantaPa
    */
+  // (används inte sedan 125.1, då utfällningen ströks; står kvar tills flygningen in i boken är byggd, 125 steg 7)
   async function fallUtLappen(l, vantaPa) {
     if (lappTimer) { clearTimeout(lappTimer); lappTimer = null; }
     if (!lappen.fallUt()) return;
@@ -333,10 +335,11 @@ export function skapaSpel(d) {
   let lappBockar = null;
   /** Lappens innehåll efter var berättelsen är. En ny bock i samma uppdrag: ett kort penndrag (10c). @param {any} l */
   const lappInnehall = (l) => {
-    if (l && lappBockar?.id === l.k.u.id && l.gjorda.length > lappBockar.gjorda) ljud.spela('penndrag');
     lappBockar = l ? { id: l.k.u.id, gjorda: l.gjorda.length } : null;
     lappen.visa(l ? { id: l.k.u.id, rubrik: l.k.u.rubrik, bild: l.k.u.bild, gjorda: l.gjorda.length, kvar: l.kvar } : null);
   };
+  /** @type {{ id: string, gjorda: number } | null} uppdraget och de gjorda stegen förra gången (strecket) */
+  let strykSenast = null;
   /** Lappen har fällts ut i passet (ett nytt pass visar lappen en gång, brief 9a). */
   let lappIPasset = false;
   /**
@@ -347,6 +350,10 @@ export function skapaSpel(d) {
   async function uppdateraLapp() {
     if (!b) return;
     sattRadion();
+    // ett steg i uppdraget är klart: strecket över raden i molnet (125.3), också utan remsan
+    const lr = radioNu();
+    if (lr && strykSenast?.id === lr.k.u.id && lr.gjorda.length > strykSenast.gjorda) strykMolnet();
+    strykSenast = lr ? { id: lr.k.u.id, gjorda: lr.gjorda.length } : null;
     if (!lappAktiv()) { lappen.visa(null); sattLappknapp(); return; }
     const l = lappNu();
     if (lappVisad && (!l || l.k.u.id !== lappVisad)) {
@@ -358,7 +365,8 @@ export function skapaSpel(d) {
     if (!l) { lappVisad = null; return; }
     const nytt = lappVisad !== l.k.u.id;
     lappVisad = l.k.u.id;
-    if (nytt || !lappIPasset) { lappIPasset = true; logg.handelse('lappen', `nytt: ${l.k.u.id}`); await fallUtLappen(l, true); }
+    // lappens utfällning på 3 s är struken (125.1): steget står i molnet, och boken har resten
+    if (nytt || !lappIPasset) { lappIPasset = true; logg.handelse('lappen', `nytt: ${l.k.u.id}`); }
   }
   /**
    * Stämpeln (47.4, 10d): på spelytan bredvid hjälten, aldrig över honom eller ungen, och remsan är tom under tiden.
@@ -550,7 +558,7 @@ export function skapaSpel(d) {
    */
   let molnNu = '';
   function visaMoln(bild, r = null) {
-    if (!bild && !r) { ui.visaTanke(null); molnNu = ''; return; }
+    if (!bild && !r) { minnsMolnetsRad(); ui.visaTanke(null); molnNu = ''; return; }
     const html = molnHtml(bild, r);
     if (html !== molnNu) { ljud.spela('pling'); if (lappen.framme && !lappVantar) lappen.fallIhop(true); }
     molnNu = html;
@@ -559,6 +567,50 @@ export function skapaSpel(d) {
     if (b) placeraMoln([]);
     // texten får aldrig kapas (79.2): frågan ställer sig ovanför lappen om de inte ryms bredvid varandra
     return ui.passaTanke();
+  }
+  /** @type {{ el: Node, rect: DOMRect, stil: string, tid: number } | null} raden i molnet när det senast gömdes (strecket, 125.3) */
+  let molnetsSista = null;
+  /** Raden i molnet minns, innan molnet göms, så att strecket kan dras över den när steget är klart. */
+  function minnsMolnetsRad() {
+    const ins = /** @type {HTMLElement | null} */ (document.querySelector('#tanke .instruktion'));
+    const t = /** @type {HTMLElement | null} */ (document.querySelector('#tanke'));
+    if (!ins || !t || t.hidden || getComputedStyle(t).visibility === 'hidden') return;
+    const rect = ins.getBoundingClientRect(); if (!rect.width) return;
+    const cs = getComputedStyle(ins);
+    molnetsSista = { el: ins.cloneNode(true), rect, stil: `font:${cs.font};color:${cs.color};letter-spacing:${cs.letterSpacing};`, tid: performance.now() };
+  }
+  /**
+   * Strecket (125.3, LASMIG_125): när ett steg är klart drar pennan ett streck över raden i molnet (0–0,4 s, bredden
+   * växer från vänster), och raden flyger till bokknappen, krymper och tonas ut (0,4–0,7 s). Knappen glimtar. Bara läge,
+   * bredd och opacitet. Syntes inte raden i molnet (en dialog tog remsan), glimtar bara knappen.
+   */
+  function strykMolnet() {
+    ljud.spela('penndrag');
+    const knapp = ui.$('#hud-lapp');
+    const glimt = () => { if (!knapp.hidden) ui.glimta('#hud-lapp'); };
+    const m = molnetsSista; molnetsSista = null;
+    if (!m || performance.now() - m.tid > 4000) { glimt(); logg.handelse('strecket', 'knappen glimtar'); return; }
+    const [sv, sm, sh] = ['streck_vanster', 'streck_mitt', 'streck_hoger'].map((n) => uiBild(n));
+    const box = document.createElement('div');
+    box.className = 'moln-streck';
+    box.style.cssText = `left:${m.rect.left}px;top:${m.rect.top}px;width:${m.rect.width}px;height:${m.rect.height}px;${m.stil}`;
+    box.append(m.el);
+    const streck = document.createElement('span');
+    streck.className = 'moln-streck-linje';
+    streck.innerHTML = sv && sm && sh ? `<img src="${sv}" alt=""><i style="background-image:url('${sm}')"></i><img src="${sh}" alt="">` : '<i class="blatt"></i>';
+    streck.style.transition = `width ${tid(400)}ms linear`;
+    box.append(streck);
+    document.body.append(box);
+    logg.handelse('strecket', 'raden stryks i molnet');
+    requestAnimationFrame(() => requestAnimationFrame(() => { streck.style.width = 'calc(100% + 12px)'; }));
+    window.setTimeout(() => {
+      const k = knapp.getBoundingClientRect();
+      if (knapp.hidden || !k.width) { box.style.transition = `opacity ${tid(300)}ms`; box.style.opacity = '0'; return; }
+      const dx = k.left + k.width / 2 - (m.rect.left + m.rect.width / 2), dy = k.top + k.height / 2 - (m.rect.top + m.rect.height / 2);
+      box.style.transition = `transform ${tid(300)}ms ease-in, opacity ${tid(300)}ms ease-in`;
+      box.style.transform = `translate(${dx}px, ${dy}px) scale(0.2)`; box.style.opacity = '0';
+    }, tid(400));
+    window.setTimeout(() => { box.remove(); glimt(); }, tid(720));
   }
   /** Molnet täcker aldrig ett alternativ, en skylt eller en knapp. @param {{ left: number, top: number, right: number, bottom: number }[]} rutor */
   function placeraMoln(rutor) { const s = layout.skala; ui.placeraTanke([...rutor, ...viktigaRutor()], { vanster: s.vanster, topp: s.topp, bredd: s.cssBredd, hojd: s.cssHojd }); }
@@ -4087,9 +4139,9 @@ export function skapaSpel(d) {
     // medan ett läsval pågår och han har en lapp i kapitlet öppnar knappen den senaste lappen, som före 2g (51.2):
     // vid skyltarna (s22) står svaret på Farfars lista. Utanför pusslen öppnar den uppdragslappen
     if (id && b.pussel(id) && (lappPussel === id || aktuelltSteg?.typ === 'pussel')) { logg.handelse('lappen', 'Farfars lapp: ' + id); visaLapp(b.pussel(id), false); return; }
-    const l = lappNu();
-    if (l) { ljud.spela('klick'); if (lappen.framme) lappIhop(); else fallUtLappen(l, false); return; }
-    if (id && b.pussel(id)) visaLapp(b.pussel(id), false);
+    // annars öppnar bokknappen hjältens bok på sidan NU (125.1)
+    ljud.spela('klick'); logg.handelse('boken', 'sidan NU');
+    oppnaPaus('nu');
   });
 
   /**
@@ -4491,10 +4543,10 @@ export function skapaSpel(d) {
 
   // ------------------------------------------------------------------ pausmenyn (stilguiden §6)
   /** Hjälteboken: vad varje flik har, för stjärnan på en ny flik. */
-  const FLIKAR = /** @type {const} */ (['staven', 'garderoben', 'dinoboken', 'klart']);
+  const FLIKAR = /** @type {const} */ (['nu', 'staven', 'garderoben', 'dinoboken', 'klart']);
   const hjalte = () => tillstand.spelare.hjalte;
   /** @param {typeof FLIKAR[number]} flik */
-  const antalI = (flik) => (flik === 'staven' ? (hjalte().formler || []).length : flik === 'garderoben' ? (hjalte().garderob || []).length : flik === 'klart' ? klaraUppdrag().length : (tillstand.spelare.dinobok || []).length);
+  const antalI = (flik) => (flik === 'nu' ? 0 : flik === 'staven' ? (hjalte().formler || []).length : flik === 'garderoben' ? (hjalte().garderob || []).length : flik === 'klart' ? klaraUppdrag().length : (tillstand.spelare.dinobok || []).length);
   const sett = () => (tillstand.spelare.sett = tillstand.spelare.sett || {});
   /** @param {typeof FLIKAR[number]} flik */
   const nyFlik = (flik) => antalI(flik) > (sett()[flik] || 0);
@@ -4517,7 +4569,7 @@ export function skapaSpel(d) {
   };
   /** Ordet läses upp vid tryck (stilguiden §6). @param {string} nyckel */
   const lasOrd = (nyckel) => { const ord = gransnittsOrd(nyckel); if (ord) sag({ talare: 'berattare', text: ord, upplast: true }); };
-  const BILD = { kartan: ikon('karta', 'stor'), hjalteboken: ikon('bok', 'stor'), staven: '<span class="stav-ikon"></span>', garderoben: ikon('klader', 'stor'), dinoboken: ikon('dinobok', 'stor'), klart: ikon('uppdrag', 'stor') };
+  const BILD = { kartan: ikon('karta', 'stor'), hjalteboken: ikon('bok', 'stor'), nu: uiBild('ikon_penna') ? ikon('penna', 'stor') : ikon('lapp', 'stor'), staven: '<span class="stav-ikon"></span>', garderoben: ikon('klader', 'stor'), dinoboken: ikon('dinobok', 'stor'), klart: ikon('uppdrag', 'stor') };
   /** @type {number | null} uppslaget i fliken KLART som visas (null = det senaste) */
   let klartUppslagNu = null;
   const KLART_PER_SIDA = 5;
@@ -4544,6 +4596,34 @@ export function skapaSpel(d) {
     const radH = Math.max(56, Math.min(112 * t, (window.innerHeight * 0.92 - 250) / KLART_PER_SIDA));
     const bildPx = 48 * Math.max(1, Math.floor(Math.min(96 * t, radH) / 48)), stampelPx = 32 * Math.max(1, Math.floor(Math.min(96 * t, radH) / 32));
     return `<div class="paus-klart" data-uppslag="${nu}" style="--klart-rad:${Math.floor(radH)}px;--klart-bild:${bildPx}px;--klart-stampel:${stampelPx}px">${sida(2 * nu)}${sida(2 * nu + 1)}${nu > 0 ? pil('bak') : ''}${nu < antal - 1 ? pil('fram') : ''}${prickar}</div>`;
+  }
+  /**
+   * Sidan NU i hjältens bok (125.1, Stils skiss125_nu): till vänster uppdraget som pågår med bilden och rubriken, de
+   * gjorda stegen överstrukna med pennstrecket, steget nu på ljusare papper med pennan (samma rad som i molnet), och en
+   * tom ring per steg som är kvar, utan text (48.2). Stegen läses upp med högtalaren. Till höger kapitlets papper att
+   * läsa igen (`av.lappar`: Farfars lappar, skyltar, brev och gåtan), som kort med bara bilden. Ett tryck öppnar
+   * papperet på läsplattan, och nosen fungerar där. Papperen läses inte upp.
+   */
+  function sidaNu() {
+    const l = radioNu();
+    const hog = (/** @type {string} */ t) => `<button type="button" class="nu-hogtalare" data-text="${ui.esc(t)}" aria-label="Läs upp">${ikon('hogtalare')}</button>`;
+    // pennstrecket i tre delar (Stils streck_vanster/_mitt/_hoger, 3 + 8 + 4 × 5) i skala 3, mitten upprepas
+    const [sv, sm, sh] = ['streck_vanster', 'streck_mitt', 'streck_hoger'].map((n) => uiBild(n));
+    const streck = !!(sv && sm && sh);
+    const streckHtml = streck ? `<span class="nu-streck" aria-hidden="true"><img src="${sv}" alt=""><i style="background-image:url('${sm}')"></i><img src="${sh}" alt=""></span>` : '';
+    let vanster = '';
+    if (l) {
+      const u = l.k.u;
+      vanster = `<div class="nu-rubrik"><span class="nu-bild">${bilder.html(u.bild)}</span><span class="nu-titel">${ui.rader(lappText(u.rubrik), varden(), 'kort-ord')}</span>${hog(lappTal(u.rubrik))}</div>`
+        + l.gjorda.map((/** @type {any} */ x) => `<div class="nu-steg gjort${streck ? ' med-streck' : ''}"><span class="nu-text">${ui.rader(lappText(x.text), varden(), 'kort-ord')}${streckHtml}</span></div>`).join('')
+        + (l.nu ? `<div class="nu-steg nu">${uiBild('ikon_penna') ? `<span class="nu-penna">${ikon('penna', 'hud')}</span>` : ''}<span class="nu-text">${ui.rader(lappText(l.nu.text), varden(), 'kort-ord')}</span>${hog(lappTal(l.nu.text))}</div>` : '')
+        + Array.from({ length: Math.max(0, l.kvar - (l.nu ? 1 : 0)) }, () => '<div class="nu-steg ring"><span class="nu-ring"></span></div>').join('');
+    }
+    // papperen i kapitlet: lapparna han har fått och kan läsa igen, med en bild per sort (inga ord på korten)
+    const papper = (av.lappar || []).filter((/** @type {string} */ id) => b?.pussel(id));
+    const bildFor = (/** @type {any} */ p) => (/brev/.test(p.papper || '') ? 'brev' : p.skylt || p.papper === 'traskylt' ? 'skylt_farfar' : p.papper ? 'lapp' : 'papper_gatan');
+    const hoger = papper.map((/** @type {string} */ id) => `<button type="button" class="kort nu-papper" data-pussel="${ui.esc(id)}" aria-label="Läs papperet">${bilder.html(bildFor(b?.pussel(id)))}</button>`).join('');
+    return `<div class="paus-nu"><div class="nu-sida vanster">${vanster}</div><div class="nu-sida hoger">${hoger}</div></div>`;
   }
   /**
    * Pausmenyn: världen står still. KARTAN visar kartbitarna, HJÄLTEBOKEN har flikarna staven (formlerna),
@@ -4601,6 +4681,7 @@ export function skapaSpel(d) {
       }
       if (vy === 'dinoboken') sida = `<div class="paus-dinobok">${(tillstand.spelare.dinobok || []).map((x) => `<button type="button" class="kort dinosida" data-text="${ui.esc(x.bildtext || '')}">${bilder.html(x.bild)}${x.bildtext ? `<span class="kort-etikett">${ui.rader(x.bildtext, varden(), 'kort-ord')}</span>` : ''}</button>`).join('')}</div>`;
       if (vy === 'klart') sida = klartUppslag(settFore);
+      if (vy === 'nu') sida = sidaNu();
       html = `${tillbaka}<div class="paus-flikar">${flikar}</div><div class="paus-sida">${sida}</div>${stang}`;
     }
     const m = ui.visaPausmeny(`<div class="pausmeny vy-${vy}${FLIKAR.includes(/** @type {any} */ (vy)) ? ' bok' : ''}${vy === 'start' ? ' paus-bord' : ''}">${html}</div>`);
@@ -4611,8 +4692,15 @@ export function skapaSpel(d) {
       ljud.spela('klick');
       if (val === 'sluta_for_idag') { stangPaus(); slutaForIdag(); return; }
       // hjälteboken öppnas på den nya fliken, annars på staven
-      ritaPaus(val === 'hjalteboken' ? (FLIKAR.find(nyFlik) ?? 'staven') : /** @type {any} */ (val));
+      // hjälteboken öppnas på NU medan ett uppdrag pågår (125.1), annars på den nya fliken eller staven
+      ritaPaus(val === 'hjalteboken' ? (radioNu() ? 'nu' : FLIKAR.find(nyFlik) ?? 'staven') : /** @type {any} */ (val));
       lasOrd(val);
+    }));
+    m.querySelectorAll('.nu-hogtalare').forEach((el) => el.addEventListener('click', () => { const t = /** @type {HTMLElement} */ (el).dataset.text; if (t) sag({ talare: 'berattare', text: t, upplast: true }); }));
+    m.querySelectorAll('.nu-papper').forEach((el) => el.addEventListener('click', () => {
+      const p = b?.pussel(/** @type {HTMLElement} */ (el).dataset.pussel || ''); if (!p) return;
+      logg.handelse('boken', 'papper: ' + p.id);
+      stangPaus(); visaLapp(p, false);
     }));
     m.querySelectorAll('.formel-ord').forEach((el) => el.addEventListener('click', () => sag({ talare: 'berattare', text: /** @type {HTMLElement} */ (el).dataset.formel || '', upplast: true })));
     m.querySelectorAll('.klart-rad').forEach((el) => el.addEventListener('click', () => {
