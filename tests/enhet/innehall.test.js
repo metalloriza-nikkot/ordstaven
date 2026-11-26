@@ -454,11 +454,15 @@ describe('fälten för 125 (schema 2.57–2.58: knep, krama_ungen, hemlighet och
     });
     expect(r.varningar.join('\n')).toMatch(/k1s13_slutet.*rädd eller ledsen, och då får den en kram/);
   });
-  it('lockelsen vid fossilet visar ingen text för den vuxne (syns_redan), och utan syns_redan gör den det', () => {
+  it('en lockelse visar aldrig text för den vuxne, med eller utan syns_redan (133.8)', () => {
     const d = riktigt();
-    expect(beskrivningarSomVisas(kap01(d)).filter((b) => /fossil lockar/.test(b.plats))).toEqual([]);
+    expect(beskrivningarSomVisas(kap01(d)).filter((b) => /lockar/.test(b.plats))).toEqual([]);
     delete fossil(d).lockar.syns_redan;
-    expect(beskrivningarSomVisas(kap01(d)).map((b) => b.plats)).toContain('rum glantan frivilligt fossil lockar');
+    expect(beskrivningarSomVisas(kap01(d)).filter((b) => /lockar/.test(b.plats))).toEqual([]);
+    // grottans två lockelser i kapitel 4 (isfickan och tandgrottan) står utan syns_redan, och visar ändå ingen text
+    const k4 = las('den-gomda-dalen/kap-04.json');
+    expect(k4.scener.filter((sc) => sc.lockar && !sc.lockar.syns_redan).length).toBeGreaterThan(0);
+    expect(beskrivningarSomVisas(k4).filter((b) => /lockar/.test(b.plats))).toEqual([]);
   });
 });
 

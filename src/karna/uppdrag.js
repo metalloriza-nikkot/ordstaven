@@ -101,3 +101,28 @@ export function lappenNu(lista, pos, paminda = new Set(), grenar = null) {
 
 /** Uppdragen som är klara (stämplade) före ett läge, i ordning. @param {KompileratUppdrag[]} lista @param {Pos} pos */
 export const klaraFore = (lista, pos) => lista.filter((x) => jamfor(x.stampel, pos) < 0).map((x) => x.u);
+
+/**
+ * Rummet där ett uppdragssteg görs (133.9): rummet för scenen där steget är klart (`klart.scen`). null om det inte går
+ * att säga, och då står steget i molnet som förut.
+ * @param {any} steg uppdragets steg @param {any} kapitel @returns {string | null}
+ */
+export function stegetsRum(steg, kapitel) {
+  const k = steg?.klart;
+  if (!k) return null;
+  const sc = (kapitel?.scener || []).find((/** @type {any} */ x) => x.id === k.scen);
+  return sc?.rum ?? null;
+}
+
+/**
+ * Vad molnet visar för bokens steg i ett rum (133.9): steget först i det rum där det görs. I rummen före står stegets
+ * `pa_vagen` (ett gå-steg, GÅ GENOM GROTTAN) om datan har ett, och annars inget av steget: då står berättelsens egen
+ * instruktion, som utan uppdrag. @param {any} steg @param {any} kapitel @param {string | null | undefined} rum
+ * @returns {{ sort: 'steget' | 'pa_vagen' | 'inget', text: string | null }}
+ */
+export function molnetForSteg(steg, kapitel, rum) {
+  const dar = stegetsRum(steg, kapitel);
+  if (!dar || !rum || dar === rum) return { sort: 'steget', text: steg?.text ?? null };
+  if (typeof steg.pa_vagen === 'string' && steg.pa_vagen) return { sort: 'pa_vagen', text: steg.pa_vagen };
+  return { sort: 'inget', text: null };
+}

@@ -14,7 +14,7 @@ import { aventyrFor, spelareAttVisa } from './karna/sparning.js';
 import { varVarVi, senastSpelad } from './karna/varvarvi.js';
 import { musikFor } from './karna/musik.js';
 import { ljudLista } from './karna/ljudid.js';
-import { SYNS_REDAN_MS, UNGE_TILL_MS, visarRegi, lockarVisarBeskrivning, NARBILDER, narbildFor, NARBILD_MS, BLOT_MS, BILD_PA_KORTET } from './karna/mellanscen.js';
+import { SYNS_REDAN_MS, UNGE_TILL_MS, visarRegi, NARBILDER, narbildFor, NARBILD_MS, BLOT_MS, BILD_PA_KORTET } from './karna/mellanscen.js';
 import { bubblaFor, bubblaText, BUBBLA_MS } from './karna/bubblor.js';
 import { sparaPassbild, aterstallLarande, forstaIPasset } from './karna/larandebild.js';
 import { pekningOmMs, skapaHjalpSpar, knufftidMs } from './karna/hjalp.js';
@@ -30,7 +30,7 @@ import { ikon, uiBild } from './grans/ikoner.js';
 import { visaStartskarm, startBild } from './grans/startskarm.js';
 import { menyBild, vlage, satt9slice } from './grans/menybilder.js';
 import { spelaIntro } from './grans/intro.js';
-import { kompileraUppdrag, lappenNu, klaraFore, jamfor } from './karna/uppdrag.js';
+import { kompileraUppdrag, lappenNu, klaraFore, jamfor, molnetForSteg } from './karna/uppdrag.js';
 import { skapaUppdragslapp, lappText, stampelPlats, visaStampel, LAPP_IHOP_MS } from './grans/uppdragslapp.js';
 
 const KNUFF_MS = 9000;
@@ -521,7 +521,11 @@ export function skapaSpel(d) {
   const molnetsRad = (instr) => {
     const l = radioNu();
     if (!l?.nu) return instr;
-    return { talare: 'berattare', text: lappTal(l.nu.text), upplast: true };
+    // 133.9: steget står i molnet först i det rum där det görs. I rummen före står gå-steget (pa_vagen), och utan
+    // det berättelsens egen instruktion. Boken NU har alltid steget, och radion säger det
+    const m = molnetForSteg(l.nu, b?.kapitel, aktuelltRum);
+    if (m.sort === 'inget') return instr;
+    return { talare: 'berattare', text: lappTal(/** @type {string} */ (m.text)), upplast: true };
   };
   /** Molnets innehåll: bilden (eller lappen) och uppgiften med högtalaren. @param {string | null} bild @param {any} r */
   function molnHtml(bild, r) {
@@ -2224,8 +2228,8 @@ export function skapaSpel(d) {
    * Det som lockar till en frivillig scen (`lockar`, 2.31: grodorna vid dammens stig). Det händer när han går förbi
    * utgången, igen varje gång han kommer nära den, tills han har varit där. Bara medan han går fritt (ett mål, navet
    * eller fri lek), aldrig under en replik, ett läsval eller en avstickare, och bara när han kan gå dit (inget rep
-   * står i vägen). Ungen springer till utgången och väntar där, grodorna hoppar (ljudet och ljudordet), och i
-   * gråboxen visas beskrivningen en stund, utan att världen stannar.
+   * står i vägen). Ungen springer till utgången och väntar där, grodorna hoppar (ljudet och ljudordet). Beskrivningen
+   * visas aldrig (133.8).
    */
   {
     /** @type {Set<string>} utgångar han står nära nu (det händer när han kommer nära, inte medan han står kvar) */
@@ -2267,8 +2271,8 @@ export function skapaSpel(d) {
         // (bara på avstånd, kartans lockradie, slutar ungen peka efter en stund; vid dammen står den kvar och tittar)
         if (o.lockradie || sc.foremal || sc.hemlighet) rum.lockGlimt(l.vid);
         if (o.lockradie) window.setTimeout(() => rum.ungePekar(null), tid(2500));
-        const ms = l.bild ? rum.regi(l.bild) : 0;
-        if (!ms && lockarVisarBeskrivning(l)) { ui.visaRegi(l.beskrivning, 0); window.setTimeout(() => ui.doljRegi(), tid(Math.min(5000, 1500 + l.beskrivning.split(' ').length * 120))); }
+        // en lockelse visar aldrig sin beskrivning (133.8): det som händer syns och hörs, och texten är för den vuxne
+        if (l.bild) rum.regi(l.bild);
       }
     }, 200);
   }
@@ -2666,6 +2670,30 @@ export function skapaSpel(d) {
     return !fore.some((/** @type {any} */ x) => ['ga_till', 'prata', 'las_skylt', 'pussel', 'tryck', 'fritt'].includes(x.typ));
   }
 
+  /** Hur länge kameran står vid varje vägs mål före läsvalet (133.2), i spelets tid. */
+  const VAGMAL_MS = 1400;
+  /**
+   * Vägarnas mål före ett läsval i rummet (133.2, gaffeln i kapitel 4): har kartan en punkt `regi_vag_<alternativets
+   * id>` för varje alternativ, glider kameran till varje mål i tur och ordning från väster och står där lika länge
+   * (VAGMAL_MS efter att den har stannat). Ordningen följer kartan, inte vilket som är rätt, och inget glimtar.
+   * Utan punkterna händer inget. @param {any} p @param {any[]} alternativ
+   */
+  async function visaVagarnasMal(p, alternativ) {
+    const punkter = alternativ.map((a) => ({ id: a.id, p: rum.regiPunkter?.[`vag_${a.id}`] }));
+    if (!punkter.length || punkter.some((x) => !x.p)) return;
+    punkter.sort((a, b2) => a.p.x - b2.p.x || a.p.y - b2.p.y);
+    const forut = rum.fryst;
+    rum.frys(true);
+    for (const x of punkter) {
+      rum.regiFokus = { x: x.p.x, y: x.p.y };
+      await kameranStilla(4000);
+      logg.handelse('kamera', `${p.id}: vägens mål ${x.id}`);
+      await vanta(tid(VAGMAL_MS));
+    }
+    rum.regiFokus = null;
+    if (!forut) rum.frys(false);
+  }
+
   async function valjIRummet(p) {
     const niva = nivaFor(p);
     const v = skapaValj(p, { niva });
@@ -2695,6 +2723,8 @@ export function skapaSpel(d) {
     lappPussel = harLapp ? p.id : null; // lappknappen öppnar Farfars lapp medan pusslet pågår
     // kameran visar hela valet innan lappen eller brevet öppnas (alla fyra dörrarna på torget, 80.4)
     const omrade = [...v.s.alternativ.flatMap((a) => (a.objekt ? [a.objekt, rum.ruta(a.objekt)?.lapp ?? ''] : [])), p.skylt ?? ''].filter(Boolean);
+    // 133.2: vägarnas mål visas först, lika länge, så att han har sett det han ska välja mellan utan att något pekas ut
+    await visaVagarnasMal(p, v.s.alternativ);
     rum.visaOmrade(omrade);
     await kameranStilla(1500); // kameran glider i verklig tid, också i testläget
     // står han för långt bort för att valet och han ska synas på samma skärm (fjädern vid stranden, husen på torget)
@@ -3610,7 +3640,7 @@ export function skapaSpel(d) {
    * Väntar tills han har gått till stigens kant själv (122.3). Är han redan nära börjar stigen direkt.
    * @param {any} p @param {{ strand: { x: number, y: number }, upp: boolean }} lage
    */
-  async function tillKanten(p, lage) {
+  async function tillKanten(p, lage, visaBokstaver = () => {}) {
     const nara = () => {
       const dx = Math.abs(rum.pos.x - lage.strand.x), dy = Math.abs(rum.pos.y - lage.strand.y);
       return lage.upp ? dx <= 30 && dy <= 14 : dx <= 14 && dy <= 30;
@@ -3618,6 +3648,8 @@ export function skapaSpel(d) {
     if (nara()) return;
     rum.frys(false);
     rum.stigKanten = { ...lage.strand };
+    // 133.6: bokstäverna står på flaken innan instruktionen kommer, också medan han går till kanten
+    visaBokstaver();
     if (p.instruktion) { visaMoln(null, p.instruktion); placeraMoln([]); }
     const start = speltid();
     const k = knuffKlocka({ handling: '' }, () => {
@@ -3640,9 +3672,14 @@ export function skapaSpel(d) {
     // stig 1 går uppför sluttningen (119.4): kartans ankare säger upp
     const lage = rum.visaStig(g, ankare ? { x: ankare.x + ankare.b / 2, y: ankare.y + ankare.h / 2 } : undefined, !!ankare?.upp);
     const fot = (/** @type {{ x: number, y: number }} */ q) => ({ x: q.x, y: q.y + 4 });
-    // 122.3: han går själv till kanten, och stigen börjar när han är där. Flaken syns, men bokstäverna kommer först
-    // vid kanten. Efter en stund nosar ungen mot stigen. Utan ankare (testrummet) står han redan vid kanten
-    if (ankare) await tillKanten(p, lage);
+    const nyckelFor = (/** @type {{ r: number, k: number }} */ q) => `${q.r},${q.k}`;
+    let fel = 0, hjalp = false, knuffFore = false, versal = false, upptagen = false, forstaVal = true;
+    /** @type {string | null} hjälptrappans rad vid stigen (119.4) */ let trappRad = null;
+    /** hur många av hjälptrappans steg som har kommit */ let trappSteg = 0;
+    // 122.3: han går själv till kanten, och stigen börjar när han är där. Efter en stund nosar ungen mot stigen. Utan
+    // ankare (testrummet) står han redan vid kanten. 133.6: bokstäverna står på flaken redan innan instruktionen kommer.
+    // Ett tryck på ett flak innan han är vid kanten tar honom dit
+    if (ankare) await tillKanten(p, lage, () => { stigNu = () => ritaBokstaver(() => inmatning.sattGaTill(lage.strand.x, lage.strand.y)); stigNu(); });
     rum.pos = { ...lage.strand }; rum.vand = lage.upp ? { x: 0, y: -1 } : { x: 1, y: 0 }; rum.placera();
     // kameran visar hela rutnätet medan stigen pågår (i ett större rum stod den kvar där han var, 2.54)
     rum.regiFokus = lage.upp ? { x: lage.strand.x, y: Math.round((lage.strand.y + lage.mal.y) / 2) } : { x: Math.round((lage.strand.x + lage.mal.x) / 2), y: lage.strand.y };
@@ -3651,10 +3688,6 @@ export function skapaSpel(d) {
     const kanten = lage.upp ? { x: lage.strand.x - 18, y: lage.strand.y + 2 } : { x: lage.strand.x - 8, y: lage.strand.y + 12 };
     if (rum.unge.visible) { rum.ungePos = { ...kanten }; rum.placera(); }
     if (ankare?.luftskepp) rum.skeppForbi(lage.strand, lage.mal);
-    const nyckelFor = (/** @type {{ r: number, k: number }} */ q) => `${q.r},${q.k}`;
-    let fel = 0, hjalp = false, knuffFore = false, versal = false, upptagen = false, forstaVal = true;
-    /** @type {string | null} hjälptrappans rad vid stigen (119.4) */ let trappRad = null;
-    /** hur många av hjälptrappans steg som har kommit */ let trappSteg = 0;
     /**
      * Hjälptrappan (119.4, granskning 10 punkt 3): stödet kommer bara när det behövs, som i skrivtrappan. Varje steg
      * har `efter_fel` (fel bokstäver och återvändsgränder räknas) och något av: `glimt` (ett föremål i rummet glimtar,
@@ -3681,7 +3714,8 @@ export function skapaSpel(d) {
       }
     };
     const start = speltid();
-    const rita = () => {
+    /** @param {(nyckel: string) => void} klick vad ett tryck på ett flak gör */
+    function ritaBokstaver(klick) {
       const lista = [];
       for (let r = 0; r < g.rader; r++) for (let k = 0; k < g.kolumner; k++) {
         const c = g.celler[r][k]; if (c.sort !== 'flak') continue;
@@ -3693,10 +3727,20 @@ export function skapaSpel(d) {
       // rad (119.4) står där innan ordet gör det
       const op = skarm(lage.skylt.x, lage.skylt.y);
       const text = visas ? String(p.ord).toLocaleUpperCase('sv-SE') : trappRad;
-      ui.stigord(lista, (n) => { const [r, k] = n.split(',').map(Number); hoppa({ r, k }); }, text ? { x: op.x, y: op.y, text } : null);
-    };
+      ui.stigord(lista, klick, text ? { x: op.x, y: op.y, text } : null);
+    }
+    const rita = () => ritaBokstaver((n) => { const [r, k] = n.split(',').map(Number); hoppa({ r, k }); });
+    // 133.6: bokstäverna står på flaken innan instruktionen läses. Ett tryck på ett flak medan den läses går vidare
+    // (som ett tryck på repliken), och hoppet görs när repliken är stängd
+    /** @type {string | null} ett flak, eller en piltangent (pil:<kod>), som väntar tills repliken är stängd */
+    let vantandeHopp = null;
+    const stangInstruktionen = () => { for (let i = 0; i < 2 && !ui.plattan.hidden; i++) /** @type {HTMLElement | null} */ (ui.plattan.querySelector('.vidare'))?.click(); };
+    stigNu = () => ritaBokstaver((n) => { vantandeHopp = n; stangInstruktionen(); });
+    stigNu();
+    const pilUnderInstruktionen = lyssnaHandling((h) => { if (h.typ === 'ga' && h.kod && !ui.plattan.hidden) { vantandeHopp = `pil:${h.kod}`; stangInstruktionen(); } });
+    ui.$('#stigord').classList.add('under-instruktion');
+    try { if (p.instruktion) await replik(p.instruktion); } finally { pilUnderInstruktionen(); ui.$('#stigord').classList.remove('under-instruktion'); }
     stigNu = rita;
-    if (p.instruktion) await replik(p.instruktion);
     rita();
     if (p.instruktion) visaMoln(null, p.instruktion);
     logg.handelse('stig', `${p.id}: ${g.ord} (${g.kolumner} × ${g.rader})`);
@@ -3802,16 +3846,22 @@ export function skapaSpel(d) {
         }
       } finally { upptagen = false; }
     };
-    const stopp = lyssnaHandling((h) => {
-      if (h.typ !== 'ga') return;
+    /** Hoppet för en piltangent. @param {string} kod */
+    const pilHopp = (kod) => {
       // höger hoppar rakt fram, upp och ned snett framåt (han går från vänster till höger, 21b)
       // uppför (119.4): upp rakt fram, vänster och höger snett framåt
-      const d = lage.upp ? (h.kod === 'ArrowUp' ? 0 : h.kod === 'ArrowLeft' ? -1 : h.kod === 'ArrowRight' ? 1 : null)
-        : h.kod === 'ArrowRight' ? 0 : h.kod === 'ArrowUp' ? -1 : h.kod === 'ArrowDown' ? 1 : null;
+      const d = lage.upp ? (kod === 'ArrowUp' ? 0 : kod === 'ArrowLeft' ? -1 : kod === 'ArrowRight' ? 1 : null)
+        : kod === 'ArrowRight' ? 0 : kod === 'ArrowUp' ? -1 : kod === 'ArrowDown' ? 1 : null;
       if (d === null) return;
       hoppa({ r: s.nu.r + 1, k: s.nu.k + d });
-    });
+    };
+    const stopp = lyssnaHandling((h) => { if (h.typ === 'ga') pilHopp(h.kod); });
     knuffa();
+    // ett flak eller en pil han tryckte på medan instruktionen lästes (133.6)
+    if (vantandeHopp) {
+      const v = vantandeHopp; vantandeHopp = null;
+      if (v.startsWith('pil:')) pilHopp(v.slice(4)); else { const [r, k] = v.split(',').map(Number); hoppa({ r, k }); }
+    }
     try { await slut; } finally {
       stopp(); window.clearTimeout(knuffT); stigNu = null; ui.stigord([], () => {}); visaMoln(null);
       rum.regiFokus = null;

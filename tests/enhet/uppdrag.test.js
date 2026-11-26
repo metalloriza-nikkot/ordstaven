@@ -1,7 +1,7 @@
 // @ts-check
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { kompileraUppdrag, lappenNu, klaraFore, hittaSteg } from '../../src/karna/uppdrag.js';
+import { kompileraUppdrag, lappenNu, klaraFore, hittaSteg, stegetsRum, molnetForSteg } from '../../src/karna/uppdrag.js';
 
 const R = (text) => ({ typ: 'replik', talare: 'berattare', text, upplast: true });
 /** Ett påhittat kapitel med två uppdrag (som prologens första): gå ut, gå upp, tänd; sedan värm ägget. */
@@ -66,5 +66,24 @@ describe('uppdragslappen (2d, 2g)', () => {
       expect(fel).toEqual([]);
       expect(lista.length).toBe(id === 'kap-00' ? 12 : 8);
     }
+  });
+});
+
+describe('molnet visar steget först i det rum där det görs (133.9)', () => {
+  const kapitel = { scener: [{ id: 'gangen', rum: 'berget_gangen' }, { id: 'salen', rum: 'berget_salen' }] };
+  const steg = { text: 'HOPPA ÖVER VATTNET', klart: { scen: 'salen', pussel: 'k4_stig2' } };
+  it('rummet är scenens rum', () => {
+    expect(stegetsRum(steg, kapitel)).toBe('berget_salen');
+    expect(stegetsRum({ text: 'X', klart: { scen: 'finns_inte' } }, kapitel)).toBeNull();
+    expect(stegetsRum({ text: 'X' }, kapitel)).toBeNull();
+  });
+  it('i stegets rum står steget, i rummen före gå-steget, och utan gå-steg inget', () => {
+    expect(molnetForSteg(steg, kapitel, 'berget_salen')).toEqual({ sort: 'steget', text: 'HOPPA ÖVER VATTNET' });
+    expect(molnetForSteg(steg, kapitel, 'berget_gangen')).toEqual({ sort: 'inget', text: null });
+    expect(molnetForSteg({ ...steg, pa_vagen: 'GÅ GENOM GROTTAN' }, kapitel, 'berget_gangen')).toEqual({ sort: 'pa_vagen', text: 'GÅ GENOM GROTTAN' });
+  });
+  it('utan rum att jämföra med står steget som förut', () => {
+    expect(molnetForSteg(steg, kapitel, null).sort).toBe('steget');
+    expect(molnetForSteg({ text: 'Y', klart: { scen: 'okand' } }, kapitel, 'berget_gangen').sort).toBe('steget');
   });
 });

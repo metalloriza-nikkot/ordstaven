@@ -11,7 +11,7 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 36,
+ "nextobjectid": 39,
  "properties": [
   {
    "name": "bild",
@@ -127,6 +127,42 @@
     },
     {
      "id": 8,
+     "name": "regi_vag_eldgrottan",
+     "type": "",
+     "x": 56,
+     "y": 284,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 9,
+     "name": "regi_vag_issjon",
+     "type": "",
+     "x": 350,
+     "y": 362,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 10,
+     "name": "regi_vag_isgrottan",
+     "type": "",
+     "x": 584,
+     "y": 126,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 11,
      "name": "",
      "type": "vagg",
      "x": 0,
@@ -144,7 +180,7 @@
      ]
     },
     {
-     "id": 9,
+     "id": 12,
      "name": "stig_floden",
      "type": "sak",
      "x": 24,
@@ -167,7 +203,7 @@
      ]
     },
     {
-     "id": 10,
+     "id": 13,
      "name": "stigspar_in",
      "type": "sak",
      "x": 44,
@@ -190,7 +226,7 @@
      ]
     },
     {
-     "id": 11,
+     "id": 14,
      "name": "stigspar_isgrottan_1",
      "type": "sak",
      "x": 172,
@@ -213,7 +249,7 @@
      ]
     },
     {
-     "id": 12,
+     "id": 15,
      "name": "stigspar_isgrottan_2",
      "type": "sak",
      "x": 206,
@@ -236,7 +272,7 @@
      ]
     },
     {
-     "id": 13,
+     "id": 16,
      "name": "stigspar_isgrottan_3",
      "type": "sak",
      "x": 240,
@@ -259,7 +295,7 @@
      ]
     },
     {
-     "id": 14,
+     "id": 17,
      "name": "stigspar_isgrottan_4",
      "type": "sak",
      "x": 284,
@@ -282,7 +318,7 @@
      ]
     },
     {
-     "id": 15,
+     "id": 18,
      "name": "stigspar_issjon_1",
      "type": "sak",
      "x": 168,
@@ -305,7 +341,7 @@
      ]
     },
     {
-     "id": 16,
+     "id": 19,
      "name": "stigspar_issjon_2",
      "type": "sak",
      "x": 206,
@@ -328,7 +364,7 @@
      ]
     },
     {
-     "id": 17,
+     "id": 20,
      "name": "stigspar_eldgrottan_1",
      "type": "sak",
      "x": 120,
@@ -351,7 +387,7 @@
      ]
     },
     {
-     "id": 18,
+     "id": 21,
      "name": "stigspar_eldgrottan_2",
      "type": "sak",
      "x": 90,
@@ -374,7 +410,7 @@
      ]
     },
     {
-     "id": 19,
+     "id": 22,
      "name": "stigspar_eldgrottan_3",
      "type": "sak",
      "x": 60,
@@ -397,7 +433,7 @@
      ]
     },
     {
-     "id": 20,
+     "id": 23,
      "name": "skylt_isgrottan",
      "type": "sak",
      "x": 170,
@@ -420,7 +456,7 @@
      ]
     },
     {
-     "id": 21,
+     "id": 24,
      "name": "skylt_issjon",
      "type": "sak",
      "x": 150,
@@ -443,7 +479,7 @@
      ]
     },
     {
-     "id": 22,
+     "id": 25,
      "name": "",
      "type": "vagg",
      "x": 24,
@@ -454,7 +490,7 @@
      "visible": true
     },
     {
-     "id": 23,
+     "id": 26,
      "name": "skylt_eldgrottan",
      "type": "sak",
      "x": 96,
@@ -477,7 +513,7 @@
      ]
     },
     {
-     "id": 24,
+     "id": 27,
      "name": "stig_k4_stig1",
      "type": "sak",
      "x": 296,
@@ -510,7 +546,7 @@
      ]
     },
     {
-     "id": 25,
+     "id": 28,
      "name": "",
      "type": "vagg",
      "x": 24,
@@ -528,7 +564,7 @@
      ]
     },
     {
-     "id": 26,
+     "id": 29,
      "name": "",
      "type": "vagg",
      "x": 24,
@@ -539,7 +575,7 @@
      "visible": true
     },
     {
-     "id": 27,
+     "id": 30,
      "name": "",
      "type": "vagg",
      "x": 24,
@@ -550,7 +586,7 @@
      "visible": true
     },
     {
-     "id": 28,
+     "id": 31,
      "name": "mynningen",
      "type": "sak",
      "x": 552,
@@ -573,7 +609,7 @@
      ]
     },
     {
-     "id": 29,
+     "id": 32,
      "name": "ras_mynningen",
      "type": "sak",
      "x": 552,
@@ -596,7 +632,7 @@
      ]
     },
     {
-     "id": 30,
+     "id": 33,
      "name": "snohog_1",
      "type": "sak",
      "x": 380,
@@ -619,7 +655,7 @@
      ]
     },
     {
-     "id": 31,
+     "id": 34,
      "name": "snohog_2",
      "type": "sak",
      "x": 450,
@@ -642,7 +678,7 @@
      ]
     },
     {
-     "id": 32,
+     "id": 35,
      "name": "snohog_3",
      "type": "sak",
      "x": 540,
@@ -665,7 +701,7 @@
      ]
     },
     {
-     "id": 33,
+     "id": 36,
      "name": "snohog_4",
      "type": "sak",
      "x": 600,
@@ -688,7 +724,7 @@
      ]
     },
     {
-     "id": 34,
+     "id": 37,
      "name": "sten_farfar",
      "type": "sak",
      "x": 470,
@@ -711,7 +747,7 @@
      ]
     },
     {
-     "id": 35,
+     "id": 38,
      "name": "fagel_200_236",
      "type": "omgivning",
      "x": 200,

@@ -15,8 +15,8 @@ async function oppna(page, fil = prov) {
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.click('.start-knapp');
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 15000 }).toBe('tr_stig');
-  // instruktionen
-  for (let i = 0; i < 20 && !(await page.locator('#stigord .flakord').first().isVisible().catch(() => false)); i++) {
+  // instruktionen (133.6: bokstäverna står redan på flaken medan den läses, så vänta tills den är stängd)
+  for (let i = 0; i < 20 && !(await page.locator('#stigord .flakord').first().isVisible().catch(() => false) && await page.locator('#plattan').isHidden()); i++) {
     for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
     await page.waitForTimeout(300);
   }
@@ -98,7 +98,7 @@ test('bokstavsstigen: Innehålls tre stigar, UPP igenom och klo som sjunker på 
   await page.click('.start-knapp');
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 15000 }).toBe('tr_stig');
   const framTillFlaken = async () => {
-    for (let i = 0; i < 30 && !(await page.locator('#stigord .flakord').first().isVisible().catch(() => false)); i++) {
+    for (let i = 0; i < 30 && !(await page.locator('#stigord .flakord').first().isVisible().catch(() => false) && await page.locator('#plattan').isHidden()); i++) {
       for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
       await page.waitForTimeout(300);
     }

@@ -2423,6 +2423,11 @@
                 "type": "string",
                 "minLength": 1,
                 "description": "Farfars knep på radion medan steget pågår (2.57, beslut 125.6): en kort replik i vanlig skrift som pekar på ett verktyg (skylten, boken, molnets bild, nosen, staven), aldrig på svaret. Saknas den läser radion stegets text med Farfars röst."
+              },
+              "pa_vagen": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Gå-steget (2.60, beslut 133.9): det molnet visar i rummen före det rum där steget görs, med verb och mål (GÅ GENOM GROTTAN). Steget självt står i molnet först i sitt rum. Utan pa_vagen står berättelsens egen instruktion i rummen före. Boken NU och radion har alltid steget."
               }
             }
           }

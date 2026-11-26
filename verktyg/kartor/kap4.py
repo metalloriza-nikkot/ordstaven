@@ -153,6 +153,12 @@ RUMMEN = {
                 punkt('regi_toppen', 470, 6),
                 punkt('regi_block', 540, 32),
                 punkt('regi_snon', 584, 40),
+                # 133.2: vägarnas mål vid gaffeln. Kameran visar dem lika länge före läsvalet, från väster: ELDGROTTAN
+                # längst bort i nordväst, ISSJÖN i öster längs branten och ISGROTTAN vid mynningen. Stils skiss sätter
+                # målen i den nya stigen (133.13.3), och då flyttar punkterna dit
+                punkt('regi_vag_eldgrottan', 56, 220),
+                punkt('regi_vag_issjon', 350, 298),
+                punkt('regi_vag_isgrottan', 584, 62),
                 # floden i väster
                 vagg(0, 0, 24, 320, vatten=True),
                 sak('stig_floden', 24, 280, 20, 30, dekor=True),

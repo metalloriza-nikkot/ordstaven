@@ -731,6 +731,14 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
           // molnet är bokens rad (125.2): stegets text börjar med ett verb, som GÅ TILL DÖRREN
           const forsta = versaler(ord(st.text.replace(/\{(UNGE|HJALTE)\}/gi, ''))[0] || '');
           if (!VERB_I_MOLNET.has(forsta)) varningar.push(var_(`${plats} steg ${i + 1}: "${st.text}" börjar inte med ett verb, och den står i molnet (125.2)`));
+          // gå-steget (2.60, 133.9) står i molnet i rummen före stegets rum: samma regler som stegets text
+          if (st.pa_vagen) {
+            textKontroll(st.pa_vagen, `${plats} steg ${i + 1} pa_vagen`);
+            const f2 = versaler(ord(st.pa_vagen.replace(/\{(UNGE|HJALTE)\}/gi, ''))[0] || '');
+            if (!VERB_I_MOLNET.has(f2)) varningar.push(var_(`${plats} steg ${i + 1}: gå-steget "${st.pa_vagen}" börjar inte med ett verb (133.9)`));
+            const rumSc = (k.scener || []).find((x) => x.id === st.klart?.scen)?.rum;
+            if (!rumSc) varningar.push(var_(`${plats} steg ${i + 1}: gå-steget visas aldrig, eftersom scenen ${st.klart?.scen} inte har något rum (133.9)`));
+          }
           if (st.visas === 'med_paminnelse') {
             const pos = hittaSteg(k, st.klart.scen, st.klart);
             if (pos && !k.scener[pos[0]].steg[pos[1]].paminnelse) fel.push(var_(`${plats} steg ${i + 1}: visas med påminnelsen, men steget har ingen paminnelse`));

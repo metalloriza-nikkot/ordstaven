@@ -16,10 +16,12 @@ export const visarBeskrivning = (st) => !!st && st.typ === 'mellanscen' && !!st.
 export const UNGE_TILL_MS = 1000;
 
 /**
- * Visar det som lockar till en frivillig scen (`lockar`, 2.31) sin beskrivning? Samma regel som en mellanscen.
- * @param {any} l scenens `lockar`
+ * Visar det som lockar till en frivillig scen (`lockar`, 2.31) sin beskrivning? Aldrig (133.8): lockelsen syns och
+ * hörs alltid i världen (ungen springer dit och nosar, det glimtar och klingar), och beskrivningen är bara för den
+ * vuxne som läser datan. Utan `bild` spelas ingen regi, och ingen text visas.
+ * @param {any} _l scenens `lockar`
  */
-export const lockarVisarBeskrivning = (l) => !!l && visarBeskrivning({ ...l, typ: 'mellanscen' });
+export const lockarVisarBeskrivning = (_l) => false;
 
 /**
  * Var mellanscenerna som visar sin beskrivning står: i scenerna (också stegen mellan navets grenar), i det som

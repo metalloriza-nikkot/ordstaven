@@ -31,6 +31,8 @@ async function tillKanten(page) {
   const k = await page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').stigKanten);
   if (!k) return false;
   await page.evaluate(({ x, y }) => window.__ORDSTAVEN.gaMot(x, y), k);
+  // 133.6: bokstäverna står redan medan han går dit, så vänta tills han är vid kanten
+  await expect.poll(() => page.evaluate(() => !window.__ORDSTAVEN.spel.scene.getScene('Rum').stigKanten), { timeout: 15000 }).toBe(true).catch(() => {});
   await page.locator('#stigord .flakord').first().waitFor({ timeout: 15000 }).catch(() => {});
   return true;
 }
@@ -224,6 +226,19 @@ test('kapitel 4 pass 3: gåtan i galleriet, stig 3 med klo, klippan, stenarna, o
 });
 
 /** Klickar fram repliker ("Var var vi?" och instruktionen) tills det som söks syns. */
+/** Stigen är redo: han är vid kanten, instruktionen är stängd och bokstäverna står (133.6). @param {any} page */
+async function stigRedo(page) {
+  const redo = async () => (await page.locator('#stigord .flakord').first().isVisible().catch(() => false)) && await page.locator('#plattan').isHidden()
+    && await page.evaluate(() => !window.__ORDSTAVEN.spel.scene.getScene('Rum').stigKanten);
+  for (let i = 0; i < 100 && !(await redo()); i++) {
+    const k = await page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').stigKanten);
+    if (k) await page.evaluate(({ x, y }) => window.__ORDSTAVEN.gaMot(x, y), k);
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    await page.waitForTimeout(300);
+  }
+  await expect(page.locator('#stigord .flakord').first()).toBeVisible();
+}
+
 async function tills(page, sel, ms = 30000) {
   const slut = Date.now() + ms;
   while (Date.now() < slut) {
@@ -245,7 +260,7 @@ test('kapitel 4: stig 1 går uppför, och ungen skuttar i spåret när hjälten 
   test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
   test.setTimeout(120000);
   await starta(page, 'k4s01_foten', 4);
-  await tills(page, '#stigord .flakord');
+  await stigRedo(page);
   const p = pussel.get('k4_stig1'), vag = stigVag(p);
   // stegen ligger nedifrån och upp: det första flaket står längre ned i rummet än det sista
   const forsta = await page.evaluate(() => window.__ORDSTAVEN.position());
@@ -262,7 +277,7 @@ test('kapitel 4: hjälptrappan i stig 3 kommer ett steg i taget (119.4)', async 
   test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
   test.setTimeout(120000);
   await starta(page, 'k4s04_utvagen', 1);
-  await tills(page, '#stigord .flakord');
+  await stigRedo(page);
   const versal = page.locator('#stigord .stigord-versal');
   await expect(versal).toHaveCount(0);
   // gåtans rad står inte vid stigen från början, och efter ett fel glimtar väggen och ungen viftar med svansen
@@ -315,7 +330,7 @@ test('kapitel 4: stig 4 i tandgrottan, och han hoppar tillbaka till stranden (12
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 15000 }).toContain('scen k4s03_tanden');
   // speldosan (127.6, Innehålls pass 132): rummets slinga spelar i tandgrottan
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 8000 }).toContain('[musik] tandgrottan');
-  await tills(page, '#stigord .flakord');
+  await stigRedo(page);
   const forsta = await page.evaluate(() => window.__ORDSTAVEN.position());
   await page.screenshot({ path: 'test-results/kap4-stig4.png' });
   for (const q of stigVag(pussel.get('k4_stig4'))) { await page.locator(`#stigord .flakord[data-ruta="${q.r},${q.k}"]`).click(); await page.waitForTimeout(700); }
@@ -404,4 +419,137 @@ test('kapitel 4: rummens bilder och det som rör sig (128.4, LASMIG_127)', async
     await page.waitForTimeout(400);
     await page.locator('canvas').first().screenshot({ path: `test-results/kap4-rum-${scen.replace('k4s0', '')}-${golv.replace('rum_', '')}.png` });
   }
+});
+
+// ------------------------------------------------------------------ 133.13.1: felen från den vuxnes spelning av 0.112.0
+
+/** Klickar fram repliker tills steget har typen typ. @param {any} page @param {string} typ */
+async function tillsSteg(page, typ, varv = 60) {
+  for (let i = 0; i < varv && (await page.evaluate(() => window.__ORDSTAVEN.steg()?.typ)) !== typ; i++) {
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    await page.waitForTimeout(300);
+  }
+}
+
+test('kapitel 4: vid gaffeln visar kameran alla tre vägarnas mål lika länge, och luftskeppet syns först efter valet (133.2)', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(120000);
+  await starta(page, 'k4s01_foten');
+  // ankomsten glider inte upp mot toppen och visar inget luftskepp
+  await tillsSteg(page, 'pussel');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 30000 }).toContain('vägens mål isgrottan');
+  const loggen = await page.evaluate(() => window.__ORDSTAVEN.logg());
+  const rader = loggen.split('\n').filter((r) => /vägens mål/.test(r));
+  expect(rader.map((r) => r.replace(/.*vägens mål /, '').trim())).toEqual(['eldgrottan', 'issjon', 'isgrottan']);
+  // ingen av dem pekas ut, och baronen syns inte förrän han har valt
+  expect((await page.evaluate(() => window.__ORDSTAVEN.grafik())).k4Skepp).toBeNull();
+  await page.screenshot({ path: 'test-results/kap4-133-gaffeln.png' });
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.steg()?.pussel_id), { timeout: 15000 }).toBe('k4_skyltarna');
+  expect((await page.evaluate(() => window.__ORDSTAVEN.grafik())).k4Skepp).toBeNull();
+  expect((await page.evaluate(() => window.__ORDSTAVEN.grafik())).regi.join('\n')).not.toMatch(/luftskepp/);
+});
+
+test('kapitel 4: luftskeppet är Stils med baronen och Herr Skata, aldrig gråbox (133.4)', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(120000);
+  const skepp = async () => (await page.evaluate(() => window.__ORDSTAVEN.grafik())).k4Skepp;
+  // stigen: baronen läser stenen med kikaren, och blocket lyfts
+  await starta(page, 'k4s02_mynningen');
+  await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__ORDSTAVEN.regi('baronen_kikare_berg'));
+  await expect.poll(skepp).toBe('luftskepp_ser_kartan');
+  await page.screenshot({ path: 'test-results/kap4-133-luftskepp-kikaren.png' });
+  await expect.poll(skepp, { timeout: 5000 }).toBe('luftskepp_skata_landar');
+  await page.evaluate(() => window.__ORDSTAVEN.regi('blocket_lyfts'));
+  // Herr Skata flyger ut med repet, och baronen står ensam i gondolen tills den är tillbaka
+  await expect.poll(skepp, { timeout: 5000 }).toBe('luftskepp_glider_01');
+  await page.screenshot({ path: 'test-results/kap4-133-luftskepp-blocket.png' });
+  await expect.poll(skepp, { timeout: 10000 }).toBe('luftskepp_skata_landar');
+  // stenfältet: blocket i drivan och Herr Skata som flyger till skeppet
+  const steg = kap.scener.find((s) => s.id === 'k4s05_stenfaltet').steg.findIndex((s) => s.typ !== 'replik');
+  await starta(page, 'k4s05_stenfaltet', Math.max(0, steg));
+  await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__ORDSTAVEN.regi('blocket_driva'));
+  await expect.poll(skepp).toMatch(/^luftskepp_/);
+  await page.screenshot({ path: 'test-results/kap4-133-luftskepp-stenfaltet.png' });
+  await page.evaluate(() => window.__ORDSTAVEN.regi('skata_harmar_molnkant'));
+  await expect.poll(skepp, { timeout: 8000 }).toBe('luftskepp_skata_landar');
+  // inget i kapitlet ritar luftskeppet i gråbox
+  const regi = (await page.evaluate(() => window.__ORDSTAVEN.grafik())).regi.join('\n');
+  expect(regi).toContain('blocket_driva');
+  expect(await skepp()).not.toBe('gråbox');
+});
+
+test('kapitel 4: bokstäverna står på flaken innan instruktionen kommer (133.6)', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(120000);
+  const steg = kap.scener.find((s) => s.id === 'k4s01_foten').steg.findIndex((s) => s.pussel_id === 'k4_stig1');
+  await starta(page, 'k4s01_foten', steg);
+  await tillsSteg(page, 'pussel');
+  // han står en bit från kanten: instruktionen står i molnet, och bokstäverna står redan på flaken
+  await expect.poll(() => page.evaluate(() => !!window.__ORDSTAVEN.spel.scene.getScene('Rum').stigKanten), { timeout: 15000 }).toBe(true);
+  await expect(page.locator('#stigord .flakord').first()).toBeVisible();
+  const flak = await page.locator('#stigord .flakord').allTextContents();
+  expect(flak.join('')).toMatch(/[up]/);
+  await expect(page.locator('#tanke .instruktion')).toBeVisible();
+  await page.screenshot({ path: 'test-results/kap4-133-flaken.png' });
+  // ett tryck på ett flak innan han är vid kanten tar honom dit, och sedan börjar stigen
+  await page.locator('#stigord .flakord').first().click();
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 15000 }).toContain('k4_stig1: han är vid kanten');
+  // instruktionen läses igen vid kanten, och bokstäverna står kvar medan den läses
+  await expect(page.locator('#plattan.replik')).toBeVisible();
+  await expect(page.locator('#stigord .flakord').first()).toBeVisible();
+  await page.screenshot({ path: 'test-results/kap4-133-flaken-kanten.png' });
+});
+
+test('kapitel 4: ungen går runt grottans väggar, aldrig igenom dem (133.7)', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(120000);
+  const steg = kap.scener.find((s) => s.id === 'k4s03_gangen').steg.findIndex((s) => s.typ === 'ga_till');
+  await starta(page, 'k4s03_gangen', steg, { berget_gangen: 'ljus' });
+  await tillsSteg(page, 'ga_till');
+  // ungen ställs där en vägg står mellan den och hjälten, men där det finns en väg runt
+  const satt = await page.evaluate(() => {
+    const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'), h = r.hinder, pos = r.pos;
+    for (let y = 30; y < r.storlek.hojd - 4; y += 4) for (let x = 12; x < r.storlek.bredd - 12; x += 4) {
+      const p = { x, y };
+      const d = Math.hypot(x - pos.x, y - pos.y);
+      if (d < 60 || d > 200 || !h.fri(p) || h.sikt(p, pos)) continue;
+      const v = h.vag(p, pos);
+      if (v.length >= 2) { r.ungePos = p; r.placera(); return { p, pos: { ...pos } }; }
+    }
+    return null;
+  });
+  expect(satt, 'en plats bakom en vägg').not.toBeNull();
+  const fel = [];
+  for (let i = 0; i < 40; i++) {
+    await page.waitForTimeout(100);
+    const u = await page.evaluate(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); return { p: { ...r.ungePos }, fri: r.hinder.fri(r.ungePos) }; });
+    if (!u.fri) fel.push(u.p);
+  }
+  expect(fel, 'ungen stod i en vägg').toEqual([]);
+  const slut = await page.evaluate(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); return Math.hypot(r.ungePos.x - r.pos.x, r.ungePos.y - r.pos.y); });
+  expect(slut).toBeLessThan(40);
+  await page.screenshot({ path: 'test-results/kap4-133-ungen.png' });
+});
+
+test('kapitel 4: lockelsen i grottan visar ingen text för den vuxne, och molnet visar inte nästa rums steg (133.8–133.9)', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(120000);
+  const steg = kap.scener.find((s) => s.id === 'k4s03_gangen').steg.findIndex((s) => s.typ === 'ga_till');
+  await starta(page, 'k4s03_gangen', steg, { berget_gangen: 'ljus' });
+  await page.evaluate(() => {
+    const e = document.querySelector('#regi'); window.__regiText = [];
+    new MutationObserver(() => { if (!e.hidden && e.textContent) window.__regiText.push(e.textContent); }).observe(e, { attributes: true, childList: true, characterData: true, subtree: true });
+  });
+  await tillsSteg(page, 'ga_till');
+  await page.evaluate(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); r.pos = { x: 100, y: 176 }; r.placera(); });
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 8000 }).toContain('[lockar] k4s03_isfickan vid isficka');
+  await page.waitForTimeout(3000);
+  expect(await page.evaluate(() => window.__regiText)).toEqual([]);
+  await expect(page.locator('#regi')).toBeHidden();
+  // 133.9: HOPPA ÖVER VATTNET görs i salen, så molnet i gången visar det inte
+  const moln = await page.locator('#tanke').textContent();
+  expect(moln || '').not.toMatch(/HOPPA ÖVER VATTNET/);
+  await page.screenshot({ path: 'test-results/kap4-133-gangen.png' });
 });
