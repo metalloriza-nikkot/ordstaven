@@ -201,6 +201,11 @@
           "type": "string",
           "minLength": 1
         },
+        "nu": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Ordet under pennan på bokens flik NU (125.1, 132.3)."
+        },
         "ordduell": {
           "type": "string",
           "minLength": 1,
