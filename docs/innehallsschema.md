@@ -1,6 +1,9 @@
 # Innehållsschema – kapitel i format 2
 
-Version 2.59 (2026-11-26). Ägs av teknikspåret.
+Version 2.60 (2026-11-26). Ägs av teknikspåret.
+2.60 (beslut 133.9): **gå-steget.** Ett tillägg, filer i 2.59 gäller fortfarande.
+- **`uppdrag[].steg[].pa_vagen`**: det molnet visar i rummen före det rum där steget görs, med verb och mål (GÅ GENOM GROTTAN). Rummet är rummet för scenen i `klart.scen`. Steget självt står i molnet först i sitt rum. Utan `pa_vagen` står berättelsens egen instruktion i rummen före, som utan uppdrag. Boken NU och radion har alltid steget. Kontrollen varnar när gå-steget inte börjar med ett verb, och när scenen saknar rum.
+- Ett gå-steg kan också vara ett vanligt steg med `klart.ga_till` i det rum där han går. Då får det en egen rad i boken och ett eget streck.
 2.59 (beslut 129.4–129.5, 130.3 och 132.4, manus 22 Till Teknik 2–5): **motorns delar för kapitel 5.** Allt är tillägg, filer i 2.58 gäller fortfarande. Prövat med påhittad data, inte med kapitlets.
 - **`vantar_pa: "ropa"`** på en replik: samma tryck på ungen som kramen (`krama_ungen`), men ungen ropar (Stils `unge1_ropar_ner_01–02` och ljudet `unge_rop` när de finns, annars ungens läte). Molnet visar `ikon_ropa` (ungen med öppen mun) när Stil har ritat den, annars handen. Loggen skriver `[ropa] ungen ropar`.
 - **`ram: "faktning"`** på `P16_ordduell`: fäktningen. Baronen står på marken mittemot hjälten (inte på repstegen), backar ett steg vid rätt kort (regin `baronen_backar`), tar ett steg fram vid fel, och vid segern vänds paraplyet ut och in. Stils `baronen_faktar_<läge>_01–02` (grund, ropar, backar, fram, utochin) används när de finns, annars hans gångbild och ett paraply i gråbox. Reglerna och ronderna är ordduellens.
