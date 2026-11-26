@@ -313,6 +313,8 @@ test('kapitel 4: stig 4 i tandgrottan, och han hoppar tillbaka till stranden (12
   await page.waitForTimeout(2500);
   await page.keyboard.press('Space');
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 15000 }).toContain('scen k4s03_tanden');
+  // speldosan (127.6, Innehålls pass 132): rummets slinga spelar i tandgrottan
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 8000 }).toContain('[musik] tandgrottan');
   await tills(page, '#stigord .flakord');
   const forsta = await page.evaluate(() => window.__ORDSTAVEN.position());
   await page.screenshot({ path: 'test-results/kap4-stig4.png' });

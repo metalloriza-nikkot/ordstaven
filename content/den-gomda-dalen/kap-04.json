@@ -16,8 +16,8 @@
  },
  "meta": {
   "namn": "Berget",
-  "version": "0.8",
-  "datum": "2026-11-25",
+  "version": "0.9",
+  "datum": "2026-11-26",
   "agare": "Innehåll",
   "kalla": "Berättelsen 21 v0.5.2, manus 21 v0.3.1 och ritningarna 21b v0.2.1, godkända av den vuxne (beslut 118.1).",
   "teknik": "Nytt i kapitlet (118.4): bokstavsstigen P18_bokstavsstig i ett kapitel (k4_stig1–3, kartan har stig_<id>), snön som stannar i luften tills STOR SKÖLD är skriven, färgtabellen för mörkret som LJUS stänger av, P9 utan chiffer (k4_ladan), tre rum utan Tiled-karta, och regierna: ankomst_berget, baronen_kikare_berg, blocket_lyfts, stor_skold_ras, mynningen_stangs, grottan_glittrar, grottan_visar_vaggen, fotavtryck_stor, ungen_fot_avtryck, ungen_slar_isen, blocket_driva, fossil_svans, svansarna, ladan_oppnas, kartbit5_molnkant, skata_harmar_molnkant och resan_molnkant. Musiken står som spel tills Stil har en slinga för berget. Föremålens id är förslag, och Teknik sätter dem efter kartan. Pass 121: vagg_gemener är en skylt med gemener (gemener: true, som en bubbla), isficka_bar (frivilligt, F1), ristning_tand och tand_isen (F3) och stig_k4_stig4, hylla, klippa och klippan_uppe i stenfältet med tillståndet hylla. Effekterna stege_klippan, rep_klippan och trappa_klippan, och de nära: ett_trappsteg_klippan, en_kort_stege_klippan och ett_kort_rep_klippan. Bilden klippan_hog i molnet. Pass 122: rummet berget_valvet (vagg_valvet, gang_salen, gang_galleriet och stig_k4_stig_valv), gang_valvet och gang_istapparna i grottan, scenerna k4s03_valvet och k4s03_galleriet, och regin mynningen_stangs med scenen efter STOR SKÖLD (122.2). Pass 124: rummen berget_gangen (R1), berget_salen (R2), berget_valvet (R3), berget_galleriet (R4), berget_tandgrottan och berget_sprickan (R5) ersätter berget_grottan. Id:n och mått får ändras. Nya föremål: mynningen_inifran, isficka, isklump_1–3, farfars_kompass, gang_salen_in, tavla_farfar, tand_genom_isen, oppning_tandgrottan, gang_sprickan och gang_galleriet_tillbaka. ge_sak ryggsack farfars_kompass. k4_stenarna har kan_oppnas_igen, och galleriet öppnar den med oppna_lasplatta.",
@@ -28,7 +28,8 @@
   "andrat_v05": "2026-11-23 (beslut 124 och 124.12, granskning 11): grottan som fem rum i följd och tandgrottan, tre pass med gränsen vid galleriet, gåtan som en lapp som kan öppnas igen, F1 med isklumparna och Farfars kompass, F2 i galleriet, stig 4 i tandgrottan, rutnät utan återvändsgränder för den som har läst rätt, tavlan på andra stranden, ungens ögon i slutet av pass 1, och stigen mot molnkanten efter kartbiten.",
   "andrat_v06": "2026-11-24 (beslut 127.3 och 127.9): regin ungens_ogon på mellanscenen i mörkret, utan lucka_pip, \"Min gamla kompass! Den tappade jag här!\", och bär under de två första isklumparna.",
   "andrat_v07": "2026-11-25 (beslut 125 och 127.5): stegen HOPPA ÖVER VATTNET, LÄS VÄGGEN OCH HOPPA och KOM UPP PÅ KLIPPAN, Farfars knep, och F1, F2 och tandgrottan som hemligheter.",
-  "andrat_v08": "2026-11-25 (beslut 128.10.3, rättelse i ett fryst kapitel, en replik mot en): fröet för baronens bit på stenfältet: den har bara ord, om vägen in."
+  "andrat_v08": "2026-11-25 (beslut 128.10.3, rättelse i ett fryst kapitel, en replik mot en): fröet för baronens bit på stenfältet: den har bara ord, om vägen in.",
+  "andrat_v09": "2026-11-26 (beslut 132.3, ljud i ett fryst kapitel, godkänt i 127.6): speldosan. berget_tandgrottan har musik \"tandgrottan\", Stils slinga. Den gäller i hela rummet, och kapitlets \"spel\" kommer tillbaka i galleriet."
  },
  "var_var_vi": [
   {
@@ -294,7 +295,8 @@
     },
     "gang_galleriet_tillbaka"
    ],
-   "anteckning": "Stig 4:s lilla rum (124.12.4), med öppningen i galleriet. Farfars ristning av en tand (ristning_tand, en bild utan bokstäver) står på väggen före vaken. Stig 4 (stig_k4_stig4) går över vaken till tanden i isväggen (tand_isen), som också syns från galleriet. Stigen hoppar tillbaka efteråt (122.7)."
+   "anteckning": "Stig 4:s lilla rum (124.12.4), med öppningen i galleriet. Farfars ristning av en tand (ristning_tand, en bild utan bokstäver) står på väggen före vaken. Stig 4 (stig_k4_stig4) går över vaken till tanden i isväggen (tand_isen), som också syns från galleriet. Stigen hoppar tillbaka efteråt (122.7).",
+   "musik": "tandgrottan"
   },
   {
    "id": "berget_sprickan",
