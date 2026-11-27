@@ -20,6 +20,11 @@ export const KAMERA = Object.freeze({ zon: Object.freeze({ x: 32, y: 24 }), fram
 
 /** Största område: 2 skärmar brett och 3 högt (stigen i kapitel 4 efter skiss 6, 133.13.3). */
 export const STORSTA = Object.freeze({ bredd: RUM.bredd * 2, hojd: RUM.hojd * 3 });
+/** Det breda undantaget: 3 skärmar brett och en hög (dalen i kapitel 5, finalen, 139.3). */
+export const BREDASTE = Object.freeze({ bredd: RUM.bredd * 3, hojd: RUM.hojd });
+/** Ryms området inom gränserna (2 × 3, eller 3 × 1)? @param {Storlek} s */
+export const omradetRyms = (s) => s.bredd >= RUM.bredd && s.hojd >= RUM.hojd
+  && ((s.bredd <= STORSTA.bredd && s.hojd <= STORSTA.hojd) || (s.bredd <= BREDASTE.bredd && s.hojd <= BREDASTE.hojd));
 
 /** Håll kameran inom områdets gränser, i hela pixlar. @param {Punkt} k @param {Storlek} s @returns {Punkt} */
 export function inomGranserna(k, s) {

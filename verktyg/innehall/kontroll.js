@@ -432,7 +432,8 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
             }
             // ordduellen: regeln, och per rond ropen och valet (ca 30 s)
             pp.sek += p.typ === 'P26_krukorna' ? 30 : p.typ === 'P12_dop' ? 45 : p.typ === 'P16_ordduell' ? 20 + 30 * p.ronder.length : 40;
-            if (arLasuppgift(p)) pp.lasuppgifter++;
+            // en rond i en ordduell är ett läsval för sig (139.5): han läser och väljer i varje rond
+            if (arLasuppgift(p)) pp.lasuppgifter += p.typ === 'P16_ordduell' ? Math.max(1, (p.ronder || []).length) : 1;
           } else pp.sek += 10;
           break;
         }

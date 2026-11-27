@@ -1,0 +1,624 @@
+{
+ "type": "map",
+ "version": "1.10",
+ "tiledversion": "1.11.0",
+ "orientation": "orthogonal",
+ "renderorder": "right-down",
+ "width": 40,
+ "height": 24,
+ "tilewidth": 16,
+ "tileheight": 16,
+ "infinite": false,
+ "compressionlevel": -1,
+ "nextlayerid": 2,
+ "nextobjectid": 38,
+ "properties": [
+  {
+   "name": "rum",
+   "type": "string",
+   "value": "dal_glantan"
+  }
+ ],
+ "tilesets": [],
+ "layers": [
+  {
+   "id": 1,
+   "name": "foremal",
+   "type": "objectgroup",
+   "draworder": "index",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 1,
+     "name": "start",
+     "type": "",
+     "x": 560,
+     "y": 360,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 2,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 300,
+     "width": 500,
+     "height": 20,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 3,
+     "name": "",
+     "type": "vagg",
+     "x": 140,
+     "y": 230,
+     "width": 500,
+     "height": 20,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 4,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 160,
+     "width": 160,
+     "height": 20,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 5,
+     "name": "",
+     "type": "vagg",
+     "x": 480,
+     "y": 160,
+     "width": 160,
+     "height": 20,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 6,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 0,
+     "width": 160,
+     "height": 160,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 7,
+     "name": "",
+     "type": "vagg",
+     "x": 480,
+     "y": 0,
+     "width": 160,
+     "height": 160,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 8,
+     "name": "glantan_mitt",
+     "type": "sak",
+     "x": 310,
+     "y": 132,
+     "width": 20,
+     "height": 12,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 9,
+     "name": "bit_marken",
+     "type": "sak",
+     "x": 300,
+     "y": 150,
+     "width": 10,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 10,
+     "name": "",
+     "type": "vagg",
+     "x": 160,
+     "y": 20,
+     "width": 20,
+     "height": 100,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vatten",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 11,
+     "name": "vattnet",
+     "type": "sak",
+     "x": 160,
+     "y": 20,
+     "width": 20,
+     "height": 100,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "hoger"
+      }
+     ]
+    },
+    {
+     "id": 12,
+     "name": "",
+     "type": "vagg",
+     "x": 160,
+     "y": 0,
+     "width": 320,
+     "height": 20,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 13,
+     "name": "stig_a",
+     "type": "sak",
+     "x": 196,
+     "y": 34,
+     "width": 18,
+     "height": 62,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      }
+     ]
+    },
+    {
+     "id": 14,
+     "name": "",
+     "type": "vagg",
+     "x": 183,
+     "y": 86,
+     "width": 10,
+     "height": 10,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 15,
+     "name": "stor_sten_a1",
+     "type": "sak",
+     "x": 183,
+     "y": 80,
+     "width": 10,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 16,
+     "name": "blommor_bla_a1",
+     "type": "sak",
+     "x": 182,
+     "y": 70,
+     "width": 12,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 17,
+     "name": "",
+     "type": "vagg",
+     "x": 217,
+     "y": 86,
+     "width": 10,
+     "height": 10,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 18,
+     "name": "stor_sten_a2",
+     "type": "sak",
+     "x": 217,
+     "y": 80,
+     "width": 10,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 19,
+     "name": "blommor_bla_a2",
+     "type": "sak",
+     "x": 216,
+     "y": 70,
+     "width": 12,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 20,
+     "name": "stig_b",
+     "type": "sak",
+     "x": 266,
+     "y": 34,
+     "width": 18,
+     "height": 62,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      }
+     ]
+    },
+    {
+     "id": 21,
+     "name": "",
+     "type": "vagg",
+     "x": 253,
+     "y": 86,
+     "width": 10,
+     "height": 10,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 22,
+     "name": "stor_sten_b1",
+     "type": "sak",
+     "x": 253,
+     "y": 80,
+     "width": 10,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 23,
+     "name": "blommor_gul_b1",
+     "type": "sak",
+     "x": 252,
+     "y": 70,
+     "width": 12,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 24,
+     "name": "",
+     "type": "vagg",
+     "x": 287,
+     "y": 86,
+     "width": 10,
+     "height": 10,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 25,
+     "name": "stor_sten_b2",
+     "type": "sak",
+     "x": 287,
+     "y": 80,
+     "width": 10,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 26,
+     "name": "blommor_gul_b2",
+     "type": "sak",
+     "x": 286,
+     "y": 70,
+     "width": 12,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 27,
+     "name": "stig_c",
+     "type": "sak",
+     "x": 336,
+     "y": 34,
+     "width": 18,
+     "height": 62,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      }
+     ]
+    },
+    {
+     "id": 28,
+     "name": "",
+     "type": "vagg",
+     "x": 357,
+     "y": 86,
+     "width": 10,
+     "height": 10,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 29,
+     "name": "stor_sten_c1",
+     "type": "sak",
+     "x": 357,
+     "y": 80,
+     "width": 10,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 30,
+     "name": "blommor_bla_c1",
+     "type": "sak",
+     "x": 356,
+     "y": 70,
+     "width": 12,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 31,
+     "name": "stig_d",
+     "type": "sak",
+     "x": 406,
+     "y": 34,
+     "width": 18,
+     "height": 62,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      }
+     ]
+    },
+    {
+     "id": 32,
+     "name": "",
+     "type": "vagg",
+     "x": 393,
+     "y": 86,
+     "width": 10,
+     "height": 10,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 33,
+     "name": "stor_sten_d1",
+     "type": "sak",
+     "x": 393,
+     "y": 80,
+     "width": 10,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 34,
+     "name": "blommor_bla_d1",
+     "type": "sak",
+     "x": 392,
+     "y": 70,
+     "width": 12,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 35,
+     "name": "",
+     "type": "vagg",
+     "x": 427,
+     "y": 86,
+     "width": 10,
+     "height": 10,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 36,
+     "name": "stor_sten_d2",
+     "type": "sak",
+     "x": 427,
+     "y": 80,
+     "width": 10,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 37,
+     "name": "blommor_bla_d2",
+     "type": "sak",
+     "x": 426,
+     "y": 70,
+     "width": 12,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

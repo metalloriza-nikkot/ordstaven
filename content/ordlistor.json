@@ -2,8 +2,8 @@
  "$schema": "schema/ordlistor.schema.json",
  "format": 1,
  "meta": {
-  "version": "0.23",
-  "datum": "2026-11-25",
+  "version": "0.24",
+  "datum": "2026-11-27",
   "agare": "Innehåll",
   "textform": "Orden lagras med små bokstäver, formler i versaler. Böjda former (skogen, bron) står med när de används som alternativ.",
   "beskrivning": "Ordlistor 1-6 for ORDSTAVEN. Bilderna ar platshallare (emoji) for grabox. Ett ord ligger i den hogsta lista som nagot av dess drag kraver.",
@@ -26,7 +26,8 @@
   "andrat_v020": "Kapitel 4 (manus 21 v0.5): stig 4 och Dinoboken (tand), Var var vi? (gåta), klippan, över och skrivorden vid klippan.",
   "andrat_v021": "Kapitel 4 (manus 21 v0.6): skatt (valvets stig) och konstig (Farfars sten).",
   "andrat_v022": "Kapitel 4 (manus 21 v0.7): isen (uppdraget i pass 2).",
-  "andrat_v023": "Beslut 125 (pass 127): formel, åk, blås, lyktorna, krama och halvan i stegen som verb och mål."
+  "andrat_v023": "Beslut 125 (pass 127): formel, åk, blås, lyktorna, krama och halvan i stegen som verb och mål.",
+  "andrat_v024": "Kapitel 5 (manus 22 v0.2): fäktningens kort, biten, skyltarna, medaljen, korten vid bona, Var var vi? och uppdragen."
  },
  "listor": {
   "1": "Korta ljudenliga ord, 2-3 bokstaver, ingen konsonantgrupp, ingen dubbelteckning",
@@ -3300,6 +3301,476 @@
    "tema": "uppdrag",
    "flaggor": [],
    "varfor": "Beslut 125 (pass 127): uppdragslappen, KRAMA {UNGE}"
+  },
+  {
+   "ord": "av",
+   "lista": 6,
+   "bild": null,
+   "tema": "småord",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): medaljen"
+  },
+  {
+   "ord": "bara",
+   "lista": 2,
+   "bild": null,
+   "tema": "småord",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): skylten på luftskeppet"
+  },
+  {
+   "ord": "baron",
+   "lista": 2,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [
+    "berattelseord"
+   ],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): medaljen"
+  },
+  {
+   "ord": "baronen",
+   "lista": 2,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [
+    "berattelseord"
+   ],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): skyltar och kort"
+  },
+  {
+   "ord": "baroner",
+   "lista": 2,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [
+    "berattelseord"
+   ],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): skylten på luftskeppet"
+  },
+  {
+   "ord": "bladen",
+   "lista": 3,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): Var var vi? och uppdraget"
+  },
+  {
+   "ord": "blommor",
+   "lista": 4,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): bitens baksida"
+  },
+  {
+   "ord": "blöta",
+   "lista": 3,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): fäktningens kort"
+  },
+  {
+   "ord": "bo",
+   "lista": 1,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): fäktningens kort"
+  },
+  {
+   "ord": "bästa",
+   "lista": 2,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): medaljen"
+  },
+  {
+   "ord": "dalen",
+   "lista": 2,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): Dinoboken och biten"
+  },
+  {
+   "ord": "dimman",
+   "lista": 4,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): biten och Var var vi?"
+  },
+  {
+   "ord": "då",
+   "lista": 1,
+   "bild": null,
+   "tema": "småord",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): biten"
+  },
+  {
+   "ord": "fin",
+   "lista": 1,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): fäktningens kort"
+  },
+  {
+   "ord": "flög",
+   "lista": 3,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): fäktningens kort"
+  },
+  {
+   "ord": "glöm",
+   "lista": 3,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): ristningen vid lägret"
+  },
+  {
+   "ord": "går",
+   "lista": 1,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): bitens baksida"
+  },
+  {
+   "ord": "hals",
+   "lista": 2,
+   "bild": null,
+   "tema": "dino",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): kortet vid bo 1"
+  },
+  {
+   "ord": "hatten",
+   "lista": 4,
+   "bild": null,
+   "tema": "uppdrag",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): uppdragslappen"
+  },
+  {
+   "ord": "hela",
+   "lista": 2,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): medaljen och uppdraget"
+  },
+  {
+   "ord": "hem",
+   "lista": 1,
+   "bild": null,
+   "tema": "uppdrag",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): uppdragslappen"
+  },
+  {
+   "ord": "hur",
+   "lista": 1,
+   "bild": null,
+   "tema": "småord",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): frågan vid roten"
+  },
+  {
+   "ord": "kommer",
+   "lista": 4,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): frågan vid roten"
+  },
+  {
+   "ord": "kryp",
+   "lista": 3,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): biten"
+  },
+  {
+   "ord": "landet",
+   "lista": 2,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): medaljen"
+  },
+  {
+   "ord": "lilla",
+   "lista": 4,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): biten"
+  },
+  {
+   "ord": "läsa",
+   "lista": 2,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): fäktningens kort"
+  },
+  {
+   "ord": "lövet",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdrag",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): uppdragslappen"
+  },
+  {
+   "ord": "mellan",
+   "lista": 4,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): bitens baksida"
+  },
+  {
+   "ord": "men",
+   "lista": 6,
+   "bild": null,
+   "tema": "småord",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): fäktningens kort"
+  },
+  {
+   "ord": "mörka",
+   "lista": 2,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): biten"
+  },
+  {
+   "ord": "ni",
+   "lista": 6,
+   "bild": null,
+   "tema": "småord",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): frågan vid roten"
+  },
+  {
+   "ord": "nosen",
+   "lista": 2,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): biten"
+  },
+  {
+   "ord": "platt",
+   "lista": 4,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): fäktningens kort"
+  },
+  {
+   "ord": "privat",
+   "lista": 3,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): skylten på luftskeppet"
+  },
+  {
+   "ord": "raden",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdrag",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): uppdragslappen"
+  },
+  {
+   "ord": "rena",
+   "lista": 2,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): fäktningens kort"
+  },
+  {
+   "ord": "ropa",
+   "lista": 2,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): biten"
+  },
+  {
+   "ord": "roten",
+   "lista": 2,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): biten och läsvalet vid roten"
+  },
+  {
+   "ord": "rädd",
+   "lista": 4,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): fäktningens kort"
+  },
+  {
+   "ord": "sen",
+   "lista": 6,
+   "bild": null,
+   "tema": "småord",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): biten"
+  },
+  {
+   "ord": "sista",
+   "lista": 2,
+   "bild": null,
+   "tema": "uppdrag",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): uppdragslappen"
+  },
+  {
+   "ord": "skatan",
+   "lista": 3,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): fäktningens kort"
+  },
+  {
+   "ord": "spegel",
+   "lista": 3,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): fäktningens kort"
+  },
+  {
+   "ord": "spik",
+   "lista": 3,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): fäktningens kort"
+  },
+  {
+   "ord": "spåren",
+   "lista": 3,
+   "bild": null,
+   "tema": "uppdrag",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): uppdragslappen"
+  },
+  {
+   "ord": "stenar",
+   "lista": 3,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): bitens baksida"
+  },
+  {
+   "ord": "stig",
+   "lista": 3,
+   "bild": null,
+   "tema": "uppdrag",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): uppdragslappen"
+  },
+  {
+   "ord": "svar",
+   "lista": 3,
+   "bild": null,
+   "tema": "uppdrag",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): uppdragslappen"
+  },
+  {
+   "ord": "svarar",
+   "lista": 3,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): biten"
+  },
+  {
+   "ord": "sylten",
+   "lista": 2,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): ristningen vid lägret"
+  },
+  {
+   "ord": "taggar",
+   "lista": 4,
+   "bild": null,
+   "tema": "dino",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): korten vid bona"
+  },
+  {
+   "ord": "torra",
+   "lista": 4,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): fäktningens kort"
+  },
+  {
+   "ord": "två",
+   "lista": 3,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): bitens baksida"
+  },
+  {
+   "ord": "väck",
+   "lista": 4,
+   "bild": null,
+   "tema": "uppdrag",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): uppdragslappen"
+  },
+  {
+   "ord": "växer",
+   "lista": 2,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): bitens baksida"
+  },
+  {
+   "ord": "äggen",
+   "lista": 4,
+   "bild": null,
+   "tema": "uppdrag",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): uppdragslappen"
+  },
+  {
+   "ord": "äta",
+   "lista": 1,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): fäktningens kort"
   }
  ]
 }

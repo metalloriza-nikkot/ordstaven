@@ -1,0 +1,578 @@
+{
+ "type": "map",
+ "version": "1.10",
+ "tiledversion": "1.11.0",
+ "orientation": "orthogonal",
+ "renderorder": "right-down",
+ "width": 40,
+ "height": 24,
+ "tilewidth": 16,
+ "tileheight": 16,
+ "infinite": false,
+ "compressionlevel": -1,
+ "nextlayerid": 2,
+ "nextobjectid": 36,
+ "properties": [
+  {
+   "name": "rum",
+   "type": "string",
+   "value": "dal_dimman"
+  }
+ ],
+ "tilesets": [],
+ "layers": [
+  {
+   "id": 1,
+   "name": "foremal",
+   "type": "objectgroup",
+   "draworder": "index",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 1,
+     "name": "start",
+     "type": "",
+     "x": 320,
+     "y": 356,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 2,
+     "name": "",
+     "type": "vagg",
+     "x": 80,
+     "y": 300,
+     "width": 20,
+     "height": 14,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 3,
+     "name": "trad_80_300",
+     "type": "sak",
+     "x": 76,
+     "y": 274,
+     "width": 28,
+     "height": 26,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 4,
+     "name": "",
+     "type": "vagg",
+     "x": 200,
+     "y": 320,
+     "width": 20,
+     "height": 14,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 5,
+     "name": "trad_200_320",
+     "type": "sak",
+     "x": 196,
+     "y": 294,
+     "width": 28,
+     "height": 26,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 6,
+     "name": "",
+     "type": "vagg",
+     "x": 470,
+     "y": 330,
+     "width": 20,
+     "height": 14,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 7,
+     "name": "trad_470_330",
+     "type": "sak",
+     "x": 466,
+     "y": 304,
+     "width": 28,
+     "height": 26,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 8,
+     "name": "",
+     "type": "vagg",
+     "x": 560,
+     "y": 280,
+     "width": 20,
+     "height": 14,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 9,
+     "name": "trad_560_280",
+     "type": "sak",
+     "x": 556,
+     "y": 254,
+     "width": 28,
+     "height": 26,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 10,
+     "name": "",
+     "type": "vagg",
+     "x": 120,
+     "y": 200,
+     "width": 20,
+     "height": 14,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 11,
+     "name": "trad_120_200",
+     "type": "sak",
+     "x": 116,
+     "y": 174,
+     "width": 28,
+     "height": 26,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 12,
+     "name": "",
+     "type": "vagg",
+     "x": 420,
+     "y": 230,
+     "width": 20,
+     "height": 14,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 13,
+     "name": "trad_420_230",
+     "type": "sak",
+     "x": 416,
+     "y": 204,
+     "width": 28,
+     "height": 26,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 14,
+     "name": "",
+     "type": "vagg",
+     "x": 240,
+     "y": 160,
+     "width": 20,
+     "height": 14,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 15,
+     "name": "trad_240_160",
+     "type": "sak",
+     "x": 236,
+     "y": 134,
+     "width": 28,
+     "height": 26,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 16,
+     "name": "",
+     "type": "vagg",
+     "x": 520,
+     "y": 150,
+     "width": 20,
+     "height": 14,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 17,
+     "name": "trad_520_150",
+     "type": "sak",
+     "x": 516,
+     "y": 124,
+     "width": 28,
+     "height": 26,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 18,
+     "name": "",
+     "type": "vagg",
+     "x": 90,
+     "y": 90,
+     "width": 20,
+     "height": 14,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 19,
+     "name": "trad_90_90",
+     "type": "sak",
+     "x": 86,
+     "y": 64,
+     "width": 28,
+     "height": 26,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 20,
+     "name": "",
+     "type": "vagg",
+     "x": 380,
+     "y": 90,
+     "width": 20,
+     "height": 14,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 21,
+     "name": "trad_380_90",
+     "type": "sak",
+     "x": 376,
+     "y": 64,
+     "width": 28,
+     "height": 26,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 22,
+     "name": "",
+     "type": "vagg",
+     "x": 580,
+     "y": 60,
+     "width": 20,
+     "height": 14,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 23,
+     "name": "trad_580_60",
+     "type": "sak",
+     "x": 576,
+     "y": 34,
+     "width": 28,
+     "height": 26,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 24,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 0,
+     "width": 280,
+     "height": 20,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 25,
+     "name": "",
+     "type": "vagg",
+     "x": 340,
+     "y": 0,
+     "width": 300,
+     "height": 20,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 26,
+     "name": "fotspar",
+     "type": "sak",
+     "x": 300,
+     "y": 140,
+     "width": 40,
+     "height": 200,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 27,
+     "name": "skylt_baronen_var_har",
+     "type": "sak",
+     "x": 268,
+     "y": 250,
+     "width": 14,
+     "height": 12,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 28,
+     "name": "hatt_baronen",
+     "type": "sak",
+     "x": 304,
+     "y": 96,
+     "width": 14,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 29,
+     "name": "",
+     "type": "vagg",
+     "x": 560,
+     "y": 196,
+     "width": 44,
+     "height": 20,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 30,
+     "name": "buske_skata",
+     "type": "sak",
+     "x": 560,
+     "y": 196,
+     "width": 44,
+     "height": 20,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "lockradie",
+       "type": "int",
+       "value": 110
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      }
+     ]
+    },
+    {
+     "id": 31,
+     "name": "skatbo_sked",
+     "type": "sak",
+     "x": 540,
+     "y": 240,
+     "width": 12,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 32,
+     "name": "skatbo_nyckel",
+     "type": "sak",
+     "x": 576,
+     "y": 248,
+     "width": 12,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 33,
+     "name": "skatbo_fjader",
+     "type": "sak",
+     "x": 612,
+     "y": 240,
+     "width": 12,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 34,
+     "name": "medalj_baronen",
+     "type": "sak",
+     "x": 612,
+     "y": 256,
+     "width": 10,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 35,
+     "name": "utgang_roten",
+     "type": "utgang",
+     "x": 284,
+     "y": 0,
+     "width": 52,
+     "height": 20,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "golv",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "riktning",
+       "type": "string",
+       "value": "upp"
+      },
+      {
+       "name": "till",
+       "type": "string",
+       "value": "dal_roten"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

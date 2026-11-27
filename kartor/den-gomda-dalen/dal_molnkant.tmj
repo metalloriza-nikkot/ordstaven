@@ -1,0 +1,356 @@
+{
+ "type": "map",
+ "version": "1.10",
+ "tiledversion": "1.11.0",
+ "orientation": "orthogonal",
+ "renderorder": "right-down",
+ "width": 40,
+ "height": 12,
+ "tilewidth": 16,
+ "tileheight": 16,
+ "infinite": false,
+ "compressionlevel": -1,
+ "nextlayerid": 2,
+ "nextobjectid": 19,
+ "properties": [
+  {
+   "name": "rum",
+   "type": "string",
+   "value": "dal_molnkant"
+  }
+ ],
+ "tilesets": [],
+ "layers": [
+  {
+   "id": 1,
+   "name": "foremal",
+   "type": "objectgroup",
+   "draworder": "index",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 1,
+     "name": "start",
+     "type": "",
+     "x": 48,
+     "y": 120,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 2,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 160,
+     "width": 640,
+     "height": 32,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vatten",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 3,
+     "name": "moln_havet",
+     "type": "sak",
+     "x": 0,
+     "y": 162,
+     "width": 640,
+     "height": 30,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 4,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 0,
+     "width": 640,
+     "height": 24,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 5,
+     "name": "",
+     "type": "vagg",
+     "x": 600,
+     "y": 24,
+     "width": 40,
+     "height": 136,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 6,
+     "name": "dimman_ost",
+     "type": "sak",
+     "x": 596,
+     "y": 24,
+     "width": 44,
+     "height": 136,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 7,
+     "name": "mast_luftskepp",
+     "type": "sak",
+     "x": 40,
+     "y": 40,
+     "width": 12,
+     "height": 40,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 8,
+     "name": "skylt_luftskeppet",
+     "type": "sak",
+     "x": 64,
+     "y": 66,
+     "width": 14,
+     "height": 12,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 9,
+     "name": "skylt_baronens_dal",
+     "type": "sak",
+     "x": 548,
+     "y": 60,
+     "width": 16,
+     "height": 14,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "under"
+      }
+     ]
+    },
+    {
+     "id": 10,
+     "name": "baronen_molnkant",
+     "type": "figur",
+     "x": 520,
+     "y": 92,
+     "width": 16,
+     "height": 24,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "baronen_ga_vanster_01"
+      },
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      },
+      {
+       "name": "skugga",
+       "type": "bool",
+       "value": true
+      },
+      {
+       "name": "talare",
+       "type": "string",
+       "value": "baronen"
+      }
+     ]
+    },
+    {
+     "id": 11,
+     "name": "bit_baronen",
+     "type": "sak",
+     "x": 500,
+     "y": 120,
+     "width": 10,
+     "height": 8,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 12,
+     "name": "bubbla_skolan",
+     "type": "sak",
+     "x": 470,
+     "y": 30,
+     "width": 6,
+     "height": 6,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 13,
+     "name": "spindel_baronen",
+     "type": "sak",
+     "x": 478,
+     "y": 30,
+     "width": 6,
+     "height": 6,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 14,
+     "name": "hatten_platt",
+     "type": "sak",
+     "x": 486,
+     "y": 30,
+     "width": 6,
+     "height": 6,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 15,
+     "name": "stovlarna_pol",
+     "type": "sak",
+     "x": 494,
+     "y": 30,
+     "width": 6,
+     "height": 6,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 16,
+     "name": "bit_baronen_upp",
+     "type": "sak",
+     "x": 502,
+     "y": 30,
+     "width": 6,
+     "height": 6,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 17,
+     "name": "bit_upp_och_ner",
+     "type": "sak",
+     "x": 510,
+     "y": 30,
+     "width": 6,
+     "height": 6,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 18,
+     "name": "fagel_300_40",
+     "type": "omgivning",
+     "x": 300,
+     "y": 40,
+     "width": 12,
+     "height": 12,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "vad",
+       "type": "string",
+       "value": "fagel"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

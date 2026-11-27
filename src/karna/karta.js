@@ -23,7 +23,7 @@
 // "vagg": massiv vägg inne i kartan. De hör till rummets form, inte till innehållet, och har inget namn som används.
 import { RUM } from './skalning.js';
 import { VAGG } from './rumslayout.js';
-import { STORSTA } from './kamera.js';
+import { STORSTA, BREDASTE, omradetRyms } from './kamera.js';
 
 /** @typedef {import('./rumslayout.js').Objekt} Objekt */
 /**
@@ -38,7 +38,7 @@ import { STORSTA } from './kamera.js';
  * inomhus = rummet har väggram (bakvägg, sidoväggar, främre kant). in = var hjälten kommer in från ett rum
  * som inte har någon utgång hit (punkter som heter in_<rum>, t.ex. trädgården från köket). lampor = där det lyser i mörkret.
  * regi = punkter för regin (regi_<namn>): regi_farfar är där Farfar står i dörren (67.2).
- * storlek = områdets storlek i pixlar (kartans bredd och höjd): en skärm (320×192) eller större, högst 640×576.
+ * storlek = områdets storlek i pixlar (kartans bredd och höjd): en skärm (320×192) eller större, högst 640×576 eller 960×192.
  * massiv = väggar inne i rummet (typen vagg), som ger rummet en annan form än en rektangel. Ute är de hus, eller vatten
  * med egenskapen vatten (kapitel 2:s gråbox: träsket, dammen och stranden).
  * overHinder = ridåns rutor (rutlagret over) som hinder, en ruta per rad av rutor bredvid varandra (56.3): ridån
@@ -92,9 +92,10 @@ export const sortFor = (id) => (UTGANG.test(id) ? 'utgang' : 'sak');
 export function lasKarta(tmj) {
   if (!tmj || tmj.type !== 'map') throw new Error('inte en Tiled-karta');
   const bredd = tmj.width * tmj.tilewidth, hojd = tmj.height * tmj.tileheight;
-  // ett område är minst en skärm och högst 2 × 3 skärmar (beslut 14 och 133.13.3). Är det större än skärmen följer kameran hjälten.
-  if (bredd < RUM.bredd || hojd < RUM.hojd || bredd > STORSTA.bredd || hojd > STORSTA.hojd) {
-    throw new Error(`kartan är ${bredd}×${hojd}, ett område är ${RUM.bredd}×${RUM.hojd} till ${STORSTA.bredd}×${STORSTA.hojd}`);
+  // ett område är minst en skärm och högst 2 × 3 skärmar (beslut 14 och 133.13.3), eller 3 × 1 (dalen i kapitel 5, 139.3).
+  // Är det större än skärmen följer kameran hjälten.
+  if (!omradetRyms({ bredd, hojd })) {
+    throw new Error(`kartan är ${bredd}×${hojd}, ett område är ${RUM.bredd}×${RUM.hojd} till ${STORSTA.bredd}×${STORSTA.hojd}, eller ${BREDASTE.bredd}×${BREDASTE.hojd}`);
   }
   /** @type {Objekt[]} */
   const objekt = [];
@@ -229,6 +230,12 @@ export function lasKarta(tmj) {
       // dolt föremål som har visats: häcken med hålet), bild_anim = bilder som byts i tomgång var anim_ms
       // (minst 250 ms, golvets gräns), rutor = föremålet är ritat i rutlagret (kullen, bäcken) och har ingen egen bild
       if (egen.bild_sedan && egen.sedan) { ut.bildSedan = String(egen.bild_sedan); ut.sedan = String(egen.sedan); }
+      // plats_sedan (139.8, kapitel 5): föremålet står på en annan plats (x,y) när `sedan` har hänt (baronen som har
+      // klättrat ned från roten). Rutans storlek är densamma
+      if (egen.plats_sedan && egen.sedan) {
+        const [px, py] = String(egen.plats_sedan).split(',').map(Number);
+        if (Number.isFinite(px) && Number.isFinite(py)) { ut.platsSedan = { x: px, y: py }; ut.sedan = String(egen.sedan); }
+      }
       // bild_sitter (34.4): bilden när hjälten sitter i föremålet (fåtöljen med honom i), när han har gått dit
       if (egen.bild_sitter) ut.bildSitter = String(egen.bild_sitter);
       // prologens nya animationer (51.4, 10f v0.3): bild_ta_emot = figuren tar emot det han bär (Farfar och boken),

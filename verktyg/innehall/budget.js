@@ -6,6 +6,9 @@
 // Räknat som i 08 §4 (beslut 78.3): ett passivt steg är en replik eller en mellanscen (ljud och visa_foremal hör till
 // steget de står i), att leta efter ett dolt mål (ga_till med leta) är vila, och två skrivuppgifter med en ny plats och
 // en ny tid emellan är inte i rad.
+// Beslut 139.5: en rond i en ordduell räknas som ett läsval, en replik som väntar på ett tryck (vantar_pa: kram, ROPA,
+// ett bär) är en handling och inte ett passivt steg, och slutbilderna (kapitlets sista scen när han inte gör något i
+// den, 128.10.2) är undantagna från taket för passiva steg.
 // Per kapitel: högst en ny figur som talar, minst en frivillig formel, baronen talar, och ett ögonblick med mamma.
 // Läsvalen: rätt svar är aldrig det enda udda (alternativen är korsade, eller ett alternativ har inget av dragen).
 // Det som inte går att läsa ur datan (en hemlighet, att baronen läser fel, att det som lovas löses in) prövas inte.
@@ -74,7 +77,7 @@ export function budgetVarningar(k, { tidigareTalare = new Set() } = {}) {
   const steg = (st, plats, pp, nr, sc) => {
     if (st.typ === 'nav') { (st.mellan_grenar || []).forEach((/** @type {any} */ x, /** @type {number} */ i) => steg(x, `${plats} mellan_grenar ${i + 1}`, pp, nr, sc)); return; }
     if (NEUTRALA.has(st.typ)) return;
-    if (PASSIVA.has(st.typ)) {
+    if (PASSIVA.has(st.typ) && !(st.typ === 'replik' && st.vantar_pa)) {
       pp.passivaIRad++;
       if (st.typ === 'replik') pp.replikerIRad++;
       if (pp.replikerIRad === BUDGET.maxReplikerFore + 1) ut.push(`${k.id} ${plats}: fler än ${BUDGET.maxReplikerFore} repliker innan han gör något (76.3)`);
@@ -87,7 +90,7 @@ export function budgetVarningar(k, { tidigareTalare = new Set() } = {}) {
     const t = typ(st);
     if (!t) return;
     const sort = LASVAL.has(t) ? 'las' : SKRIV.has(t) ? 'skriv' : VILA.has(t) ? 'vila' : 'annat';
-    if (sort === 'las') pp.lasval++;
+    if (sort === 'las') pp.lasval += t === 'P16_ordduell' ? Math.max(1, (pussel.get(st.pussel_id)?.ronder || []).length) : 1;
     if (sort === 'vila') pp.vila++;
     if (sort === 'skriv') {
       pp.skriv++;
@@ -100,8 +103,13 @@ export function budgetVarningar(k, { tidigareTalare = new Set() } = {}) {
     }
     pp.uppgifter.push(sort);
   };
+  // slutbilderna (139.5, 128.10.2): kapitlets sista scen, om han inte gör något i den
+  const huvud = (k.scener || []).filter((/** @type {any} */ s) => !s.frivillig);
+  const sista = huvud.at(-1);
+  const slutbilder = sista && (sista.steg || []).every((/** @type {any} */ st) => NEUTRALA.has(st.typ) || (PASSIVA.has(st.typ) && !st.vantar_pa)) ? sista.id : null;
   for (const s of k.scener || []) {
     if (s.frivillig) continue;
+    if (s.id === slutbilder) continue;
     if (!pass.has(s.pass)) pass.set(s.pass, nytt());
     const pp = /** @type {ReturnType<typeof nytt>} */ (pass.get(s.pass));
     (s.steg || []).forEach((/** @type {any} */ st, /** @type {number} */ i) => {

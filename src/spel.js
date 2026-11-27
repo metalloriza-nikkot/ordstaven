@@ -1746,6 +1746,12 @@ export function skapaSpel(d) {
         // kapitlets sista sparpunkt före ett låst kapitel: slutrutan (kapitel_last) kommer i stället för frågan
         const sista = b.scenIndex === b.kapitel.scener.length - 1 && b.stegIndex === b.kapitel.scener[b.scenIndex].steg.length - 1;
         if (st.pass_slut && sista && nastaKapitelLast(b.kapitel.id)) return;
+        // äventyrets sista sparpunkt (kapitel 5, efter titeln och SLUT): startskärmen kommer, utan frågan (139.8)
+        if (st.pass_slut && sista && aventyr.kapitel.at(-1) === b.kapitel.id) {
+          logg.handelse('berättelse', 'äventyret är slut: startskärmen');
+          logg.spara?.(true);
+          laddaOm(); await new Promise(() => {});
+        }
         if (st.pass_slut) return passSlut(st);
         return;
       }

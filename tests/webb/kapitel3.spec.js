@@ -645,7 +645,11 @@ test('kapitel 3: skylten på ön som är öppen när läsvalet börjar gömmer a
 
 // 113.2 (den vuxnes skärmdump på 0.99.1): ankaret och SKÖLD hamnade där han hittade flaskan, inte där han stod. Ankaret
 // räknades mitt emellan hjälten och ungen, och ungen stod kvar där den lockade vid skalkanten.
-test('kapitel 3: ankaret och SKÖLD faller där hjälten står efter flaskan, och ungen går fram till honom först', async ({ page }) => {
+// @ostadig (139.8.3): testets egna prov går igenom. Det som faller ibland är provet efter testet (hjalp/ungen.js):
+// i två stora kontroller i rad (ipad-10 och win-liten, aldrig lokalt) stod ungen ca 2,8 s med fötterna i tang_1
+// (sandbanken, ca x 193–197 och y 173) medan hjälten gick. Testet flyttar hjälten för hand vid flaskan, och det kan
+// vara orsaken. Följs upp i nattens körningar av de ostadiga.
+test('kapitel 3: ankaret och SKÖLD faller där hjälten står efter flaskan, och ungen går fram till honom först @ostadig', async ({ page }) => {
   test.setTimeout(150000);
   const ev = (fn, arg) => page.evaluate(fn, arg);
   const vidare = async () => { for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {}); };

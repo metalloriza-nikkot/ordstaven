@@ -94,6 +94,26 @@ describe('budgeten (76.3)', () => {
     expect(rattArUdda([{ id: 'skylt_vassen' }, { id: 'skylt_brunnen' }, { id: 'skylt_bryggan', ratt: true }])).toBe(false);
     expect(rattArUdda([{ id: 'ja', ratt: true }, { id: 'nej' }])).toBe(false);
   });
+  it('139.5: en replik som väntar på ett tryck är en handling, och slutbilderna är undantagna från taket', () => {
+    const k = bra();
+    // kramen bryter följden: fyra före och fyra efter, aldrig sex i rad (utan den är baronens replik det första av sju)
+    k.scener[0].steg = [P('las'), P('hugg'), R('Ha!', 'baronen'), M, M, M, { ...R('Hon är rädd.'), vantar_pa: 'krama_ungen' }, M, M, M, R('Mamma!'), P('skriv1'), SLUT];
+    k.scener.push({ id: 'slut', pass: 1, steg: [M, R('a'), M, R('b'), M, R('c'), M, R('d'), M, SLUT] });
+    expect(budgetVarningar(k, { tidigareTalare: new Set(['farfar', 'baronen']) })).toEqual([]);
+    // utan vantar_pa blir det sju i rad
+    delete k.scener[0].steg[6].vantar_pa;
+    expect(budgetVarningar(k, { tidigareTalare: new Set(['farfar', 'baronen']) }).join('\n')).toMatch(/s1 steg 8: fler än 5 steg i rad/);
+    // slutbilderna räknas bara när det är kapitlets sista scen
+    k.scener[0].steg[6].vantar_pa = 'krama_ungen';
+    k.scener.push({ id: 's9', pass: 1, steg: [P('las'), SLUT] });
+    expect(budgetVarningar(k, { tidigareTalare: new Set(['farfar', 'baronen']) }).join('\n')).toMatch(/slut steg 8: fler än 3 repliker/);
+  });
+  it('139.5: varje rond i en ordduell räknas som ett läsval', () => {
+    const k = bra();
+    k.pussel.push({ id: 'duell', typ: 'P16_ordduell', ronder: [{}, {}, {}] });
+    k.scener[0].steg = [P('duell'), P('hugg'), R('Ha!', 'baronen'), R('Mamma.'), P('skriv1'), SLUT];
+    expect(budgetVarningar(k, { tidigareTalare: new Set(['farfar', 'baronen']) })).toEqual([]);
+  });
   it('talarna i ett kapitel, också i navet, i frivilliga föremål och i zoner', () => {
     const k = { scener: [{ steg: [R('a', 'x'), { typ: 'nav', mellan_grenar: [R('b', 'y')] }] }], rum: [{ frivilligt: [{ steg: [R('c', 'z')] }], zoner: [{ steg: [R('d', 'w')] }] }] };
     expect([...talareI(k)].sort()).toEqual(['w', 'x', 'y', 'z']);

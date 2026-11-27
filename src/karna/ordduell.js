@@ -21,7 +21,7 @@ function blandadOrdning(lista, slump) {
 }
 
 /**
- * @param {{ ronder: { form?: string, niva?: string, utfall: { pekar_pa: string, ropar: any[], alternativ: { text: string, ratt?: boolean }[], vid_ratt?: any, vid_fel?: any }[] }[], hjalp?: { efter_fel: number, handling: string }, vid_vinst?: any }} p
+ * @param {{ ronder: { form?: string, niva?: string, utfall: { pekar_pa: string, ropar: any[], alternativ: { text: string, ratt?: boolean, vid_fel?: any }[], vid_ratt?: any, vid_fel?: any }[] }[], hjalp?: { efter_fel: number, handling: string }, vid_vinst?: any }} p
  * @param {{ slump?: () => number }} [opt]
  */
 export function skapaOrdduell(p, { slump = Math.random } = {}) {
@@ -74,7 +74,9 @@ export function skapaOrdduell(p, { slump = Math.random } = {}) {
       if (!kort.ratt) {
         s.fel++; s.felIRond++;
         s.steg = Math.min(start + MAX_NARMARE, s.steg + 1);
-        return { resultat: 'fel', reaktion: u.vid_fel, hjalpNu: !!p.hjalp && s.felIRond === p.hjalp.efter_fel, steg: s.steg };
+        // 139.4: kortets eget svar går före utfallets (ett halvrätt kort säger vilken halva som var fel)
+        const reaktion = kort.vid_fel ? { ...(u.vid_fel || {}), ...kort.vid_fel } : u.vid_fel;
+        return { resultat: 'fel', reaktion, hjalpNu: !!p.hjalp && s.felIRond === p.hjalp.efter_fel, steg: s.steg };
       }
       const r = p.ronder[s.rond];
       s.logg.push({ rond: s.rond + 1, form: r.form, niva: r.niva, forsok: s.forsokIRond, fel: s.felIRond });

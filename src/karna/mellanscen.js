@@ -86,7 +86,10 @@ export const REAKTION_REGI = Object.freeze(new Set(['tallrikar', 'skuggan_stiger
   // 2.54 (118.4): kapitel 4
   'stor_skold_ras', 'grottan_glittrar', 'fotavtryck_stor', 'fossil_svans', 'ladan_oppnas',
   // 132.4: kapitel 5, mästarprovet
-  'ut_ur_fel_stig']));
+  'ut_ur_fel_stig',
+  // 2.63 (139.7): kapitel 5:s regier som Innehåll sätter på vid_ratt och vid_fel
+  'dimman_tands', 'kryper_under_roten', 'en_stig_kvar', 'agg_klacks_langhals', 'agg_klacks_taggrygg', 'agg_klacks_hornnos',
+  'agget_nyser', 'stort_ljus_dalen', 'paraplyet_faller_ihop']));
 
 /**
  * Pusseltyper och steg vars knuff aldrig visar rutan: den pekar i världen (krukorna: ungen nosar mot närmaste

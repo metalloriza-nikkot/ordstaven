@@ -269,9 +269,18 @@
             "fotavtryck_stor",
             "fossil_svans",
             "ladan_oppnas",
-            "ut_ur_fel_stig"
+            "ut_ur_fel_stig",
+            "dimman_tands",
+            "kryper_under_roten",
+            "en_stig_kvar",
+            "agg_klacks_langhals",
+            "agg_klacks_taggrygg",
+            "agg_klacks_hornnos",
+            "agget_nyser",
+            "stort_ljus_dalen",
+            "paraplyet_faller_ihop"
           ],
-          "description": "En figur på kortet han valde (2.35, Teknik 31): ekorre_skakar = ekorren tittar upp bakom kortet och skakar på huvudet. Med bild visas inte texten. En regi i rummet (2.48, 102.3, hornet på avsatsen i kapitel 3): tallrikar = flodfolket springer fram med tallrikarna, skuggan_stiger = skuggan stiger en bit och stannar under vattnet, skuggan_dyker = skuggan dyker. 2.51 (109.5): skold_ankaret = SKÖLD tänds som en bubbla runt hjälten och ungen, och ankaret studsar och borrar ned sig. 2.52 (113.3): flaskan_hittad = hjälten håller upp flaskan, och den visas i närbild med kartbiten genom glaset. 2.54 (118.4, kapitel 4): stor_skold_ras = en jättebubbla välver sig över hjälten och ungen, och snön som hänger i luften dundrar mot den; grottan_glittrar = ljusbollen tänds, och mörkret i grottan går över i glitter; fotavtryck_stor = isblocket svävar bort, och avtrycket av en stor fot syns; fossil_svans = stenen ångar, och svansen med klubban syns i den; ladan_oppnas = locket fjädrar upp, och kartbit fem ligger i lådan."
+          "description": "En figur på kortet han valde (2.35, Teknik 31): ekorre_skakar = ekorren tittar upp bakom kortet och skakar på huvudet. Med bild visas inte texten. En regi i rummet (2.48, 102.3, hornet på avsatsen i kapitel 3): tallrikar = flodfolket springer fram med tallrikarna, skuggan_stiger = skuggan stiger en bit och stannar under vattnet, skuggan_dyker = skuggan dyker. 2.51 (109.5): skold_ankaret = SKÖLD tänds som en bubbla runt hjälten och ungen, och ankaret studsar och borrar ned sig. 2.52 (113.3): flaskan_hittad = hjälten håller upp flaskan, och den visas i närbild med kartbiten genom glaset. 2.54 (118.4, kapitel 4): stor_skold_ras = en jättebubbla välver sig över hjälten och ungen, och snön som hänger i luften dundrar mot den; grottan_glittrar = ljusbollen tänds, och mörkret i grottan går över i glitter; fotavtryck_stor = isblocket svävar bort, och avtrycket av en stor fot syns; fossil_svans = stenen ångar, och svansen med klubban syns i den; ladan_oppnas = locket fjädrar upp, och kartbit fem ligger i lådan. 2.63 (139.7, kapitel 5): dimman_tands = ljusbollen tänds, och diset lyser upp och glittrar; kryper_under_roten = hjälten och ungen kryper in under roten; en_stig_kvar = tre streck av ljus, och en stig är kvar; agg_klacks_langhals, agg_klacks_taggrygg och agg_klacks_hornnos = kortet flyger till ägget vid boet, ägget lyser i stavens färger, spricker, och en liten unge piper medan den vuxna hoppar; agget_nyser = ägget nyser, och kortet hoppar tillbaka; stort_ljus_dalen = regnbågsljuset pulserar ur staven, och en jättestor ljusboll stiger över dalen; paraplyet_faller_ihop = paraplyet fäller ihop sig över baronen, så att bara stövlarna syns."
         }
       }
     },
@@ -2864,6 +2873,10 @@
                           },
                           "ratt": {
                             "type": "boolean"
+                          },
+                          "vid_fel": {
+                            "$ref": "#/$defs/handling",
+                            "description": "2.63 (139.4): kortets eget svar när han väljer det. Det går före utfallets vid_fel: det som står här ersätter samma fält där (replik, handling, bild), och resten tas från utfallet. Så visar ett halvrätt kort vilken halva som var fel."
                           }
                         }
                       }

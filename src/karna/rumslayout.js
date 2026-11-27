@@ -12,7 +12,7 @@ const FIGUR_HOJD = 24;
  *             till?: string, sida?: 'under' | 'over' | 'vanster' | 'hoger' | 'alla', golv?: boolean, visar?: string,
  *             riktning?: 'vanster' | 'hoger' | 'upp' | 'ned', klattra?: 'upp' | 'ned', ute?: boolean, lapp?: string,
  *             talare?: string, lastI?: string[], storlek?: { bredd: number, hojd: number }, forsvinnerEfter?: string, oppning?: boolean,
- *             bildSitter?: string, bildSedan?: string, sedan?: string, bildAnim?: string[], animMs?: number, rutor?: boolean, nasNara?: boolean, landarNara?: boolean, rackvidd?: number,
+ *             bildSitter?: string, bildSedan?: string, sedan?: string, platsSedan?: { x: number, y: number }, bildAnim?: string[], animMs?: number, rutor?: boolean, nasNara?: boolean, landarNara?: boolean, rackvidd?: number,
  *             bild?: string, bildNatt?: string, bildKvall?: string, bildTillstand?: Record<string, string>, iBildAv?: string, ersattsAv?: string, bildLagen?: string[], bildOrd?: string, bildPa?: string, bildDel?: string, skugga?: boolean, iBilden?: boolean, sovplats?: boolean, skataFonster?: boolean, lyser?: boolean, delasHela?: boolean, delasDjup?: boolean, dekor?: boolean, ovanpa?: boolean, delar?: number, bildTaEmot?: string[], bildLas?: string[], kommerFran?: string, klattrarFran?: string, visasForst?: boolean | string, rund?: boolean, baraI?: string[], utsikt?: string, malVid?: string, animI?: string[], animPaus?: number[], stigTon?: string, stigAckord?: string, under?: boolean, blas?: boolean, blasVid?: { x: number, y: number }, syssla?: string[], sysslaMs?: number, nara?: boolean, ring?: boolean, ljudSlinga?: string, ljudRadie?: number, bildVinka?: string[],
  *             bildRad?: string[], bildHugg?: string[], bildKvar?: string }} Objekt
  * till = rummet en utgång leder till, sida = var hjälten ställer sig, golv = man går på det (stig, grind).
@@ -284,6 +284,16 @@ export function objektFarg(o) {
   if (o.id.startsWith('moln_')) return 0xf2f5f8;
   if (o.id.startsWith('dalen_')) return 0x7f9f6e;
   if (o.id.startsWith('flod_')) return 0x6fa6d6;
+  // kapitel 5 i gråbox (139.8): gläntans stenar och blommor (mästarprovets drag syns: blått eller gult), träden i dimman,
+  // molnhavet, roten av svart bark, den grå dimman bakom skylten och de frostiga äggen i dalen
+  if (o.id.startsWith('blommor_bla_')) return 0x4f7fd6;
+  if (o.id.startsWith('blommor_gul_')) return 0xe8c840;
+  if (o.id.startsWith('stor_sten_')) return 0x8c8c86;
+  if (o.id.startsWith('trad_')) return 0x3f4636;
+  if (o.id === 'roten_bark') return 0x26221f;
+  if (o.id === 'dimman_ost') return 0x9aa0a8;
+  if (o.id.startsWith('agg_frost_')) return 0xdfe9f2;
+  if (o.id === 'moln_havet') return 0xf2f5f8;
   return 0xb9b2a4;
 }
 

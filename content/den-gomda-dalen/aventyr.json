@@ -59,7 +59,8 @@
   "kap-01",
   "kap-02",
   "kap-03",
-  "kap-04"
+  "kap-04",
+  "kap-05"
  ],
  "sluta_for_idag": {
   "anteckning": "Förslag från Innehåll (brief 9a). Spelas när spelaren väljer SLUTA FÖR IDAG i pausen, från vilken scen som helst. Spelet har redan sparat. Två varianter: före och efter att ungen har kläckts. Teknik bestämmer var i formatet det ska ligga.",
@@ -108,7 +109,8 @@
    "kap-01",
    "kap-02",
    "kap-03",
-   "kap-04"
+   "kap-04",
+   "kap-05"
   ],
   "steg": [
    {

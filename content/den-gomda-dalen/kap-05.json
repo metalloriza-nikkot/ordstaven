@@ -1,0 +1,2498 @@
+{
+ "$schema": "../schema/kapitel.schema.json",
+ "format": 2,
+ "id": "kap-05",
+ "kapitel": 5,
+ "musik": "spel",
+ "nivaer": {
+  "lasning": [
+   "L2",
+   "L7"
+  ],
+  "skrivning": [
+   "S2",
+   "S4"
+  ]
+ },
+ "meta": {
+  "namn": "Dalen bakom molnen",
+  "version": "0.2",
+  "datum": "2026-11-27",
+  "agare": "Innehåll",
+  "kalla": "Berättelsen 22 v0.2.3 och manus 22 v0.2, godkända av den vuxne (130.1 och 2026-11-27).",
+  "teknik": "Nytt i kapitlet: ram faktning med två utfall per rond, lapparna k5_bit_fram, k5_bit_bak och k5_medaljen, mästarprovet (k5_rad1–3) med struken och hjälptrappa, vantar_pa ropa, rummets tillstånd dis (grått och disigt, inte svart), hemligheterna k5s02_gomman och k5s03_lagret, steget musik med slingan slutet, och slutbilderna i k5s08_slutet. Fem rum utan Tiled-karta. Föremålens id är förslag, och Teknik sätter dem efter kartan.",
+  "anteckning": "Tre pass. En ny formel (STORT LJUS), LJUS, SVÄRD och STEGE på huvudvägen. Inga nya namngivna figurer. Hemligheterna är frivilliga och står inte i boken.",
+  "andrat_v02": "2026-11-27 (beslut 139.5–139.6): SVÄRD och bladväggen är strukna i pass 2, och han följer spåren till baronens hatt. Uppdraget DIMMAN har två steg. En sparpunkt utan passets slut står före slutbilderna."
+ },
+ "var_var_vi": [
+  {
+   "pass": 1,
+   "ord": {
+    "ord": "moln"
+   },
+   "kort": [
+    {
+     "talare": "farfar",
+     "text": "Var var vi? Ni kom till molnkanten.",
+     "upplast": true,
+     "via": "radio"
+    }
+   ],
+   "lang": [
+    {
+     "talare": "farfar",
+     "text": "Var var vi? Ni har fem kartbitar.",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "talare": "farfar",
+     "text": "Baronen har den sista.",
+     "upplast": true,
+     "via": "radio"
+    }
+   ]
+  },
+  {
+   "pass": 2,
+   "ord": {
+    "ord": "dimman"
+   },
+   "kort": [
+    {
+     "talare": "farfar",
+     "text": "Var var vi? Baronen gick in i dimman.",
+     "upplast": true,
+     "via": "radio"
+    }
+   ],
+   "lang": [
+    {
+     "talare": "farfar",
+     "text": "Var var vi? Baronen gick in i dimman.",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "talare": "farfar",
+     "text": "Det var mörkt och disigt.",
+     "upplast": true,
+     "via": "radio"
+    }
+   ]
+  },
+  {
+   "pass": 3,
+   "ord": {
+    "ord": "mamma"
+   },
+   "kort": [
+    {
+     "talare": "farfar",
+     "text": "Var var vi? Mamma svarade!",
+     "upplast": true,
+     "via": "radio"
+    }
+   ],
+   "lang": [
+    {
+     "talare": "farfar",
+     "text": "Var var vi? Mamma svarade!",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "talare": "farfar",
+     "text": "Ni gick in i dimman.",
+     "upplast": true,
+     "via": "radio"
+    }
+   ]
+  }
+ ],
+ "rum": [
+  {
+   "id": "dal_molnkant",
+   "namn": "Molnkanten",
+   "tillstand": [
+    "morgon"
+   ],
+   "innehall": [
+    "mast_luftskepp",
+    "skylt_luftskeppet",
+    "skylt_baronens_dal",
+    "baronen_molnkant",
+    "bit_baronen",
+    {
+     "id": "bubbla_skolan",
+     "dold": true
+    },
+    {
+     "id": "spindel_baronen",
+     "dold": true
+    },
+    {
+     "id": "hatten_platt",
+     "dold": true
+    },
+    {
+     "id": "stovlarna_pol",
+     "dold": true
+    },
+    {
+     "id": "bit_baronen_upp",
+     "dold": true
+    },
+    {
+     "id": "bit_upp_och_ner",
+     "dold": true
+    }
+   ],
+   "skyltar": {
+    "skylt_baronens_dal": {
+     "text": "Baronens dal",
+     "papper": "traskylt"
+    },
+    "skylt_luftskeppet": {
+     "text": "Privat. Bara baroner.",
+     "papper": "traskylt"
+    }
+   },
+   "anteckning": "2 × 1 skärmar (manus 22 v0.2). Masten med luftskeppet i väster, klippkanten med molnen som ett vitt hav nedanför, och skylten BARONENS DAL i öster framför den grå dimman. Kanten är fäktningens scen: baronen backar tre steg mot skylten. Skylten på luftskeppet läser han om han vill."
+  },
+  {
+   "id": "dal_dimman",
+   "namn": "Dimman",
+   "tillstand": [
+    "dis",
+    "ljus"
+   ],
+   "innehall": [
+    {
+     "id": "fotspar",
+     "syns_i": [
+      "ljus"
+     ]
+    },
+    {
+     "id": "skylt_baronen_var_har",
+     "syns_i": [
+      "ljus"
+     ]
+    },
+    {
+     "id": "hatt_baronen",
+     "syns_i": [
+      "ljus"
+     ]
+    },
+    {
+     "id": "buske_skata",
+     "syns_i": [
+      "ljus"
+     ]
+    },
+    {
+     "id": "skatbo_sked",
+     "syns_i": [
+      "ljus"
+     ]
+    },
+    {
+     "id": "skatbo_nyckel",
+     "syns_i": [
+      "ljus"
+     ]
+    },
+    {
+     "id": "skatbo_fjader",
+     "syns_i": [
+      "ljus"
+     ]
+    },
+    {
+     "id": "medalj_baronen",
+     "dold": true
+    },
+    {
+     "id": "utgang_roten",
+     "syns_i": [
+      "ljus"
+     ]
+    }
+   ],
+   "skyltar": {
+    "skylt_baronen_var_har": {
+     "text": "Baronen var här.",
+     "papper": "traskylt"
+    }
+   },
+   "anteckning": "Ca 2 × 2 skärmar, söder till norr. dis: grått och disigt som en mörk kväll, mörka trädskuggor och stavens glimt, inte svart (manus 22 v0.2). ljus: LJUS lyser upp diset, och fotspåren och baronens skylt syns. Fotspåren slingrar sig norrut, och baronens hatt ligger i gräset där de tar slut. Åt öster busken med Herr Skatas bo (hemligheten k5s02_gomman). Utgången i norr leder till roten. Bladväggen och SVÄRD är strukna (139.5)."
+  },
+  {
+   "id": "dal_roten",
+   "namn": "Roten",
+   "tillstand": [
+    "ljus"
+   ],
+   "innehall": [
+    "baronen_rot",
+    "rot_upp",
+    "rot_under",
+    "lagret",
+    "ristning_lagret",
+    "duken",
+    "sten_duken",
+    {
+     "id": "farfars_teckning",
+     "dold": true
+    },
+    "gang_glantan"
+   ],
+   "skyltar": {
+    "ristning_lagret": {
+     "text": "Farfar sov här. Glöm inte sylten!"
+    }
+   },
+   "anteckning": "2 × 1 skärmar, nytt rum i v0.2. Den jättelika roten med svart bark: hålet under (rot_under, och gang_glantan där de kryper in) och vägen upp (rot_upp). Baronen sitter högst uppe. Bakom roten i väster Farfars gamla läger: eldstaden med stenar runt, en duk över något, och ristningen i barken (hemligheten k5s03_lagret). Lägret går att nå innan han kryper under roten."
+  },
+  {
+   "id": "dal_glantan",
+   "namn": "Gläntan",
+   "tillstand": [
+    "dimma",
+    "klar"
+   ],
+   "innehall": [
+    "glantan_mitt",
+    {
+     "id": "bit_marken",
+     "dold": true
+    },
+    "vattnet",
+    "stig_a",
+    "stig_b",
+    "stig_c",
+    "stig_d"
+   ],
+   "anteckning": "Ca 2 × 2 skärmar. En lång slingrande väg genom vit dimma i söder, där ungen leder (glantan_mitt är vägskälet). Gläntan med fyra stigar i norr. A går tätt intill vattnet, mellan två stenar, med blå blommor. B inte vid vattnet, två stenar, gula blommor. C inte vid vattnet, en sten, blå blommor. D inte vid vattnet, två stenar, blå blommor. Blommorna växer bakom stenarna sett från vägskälet. Varje drag finns på tre av fyra stigar. Stig D leder ut. Ingen hemlighet här: mästarprovet står ensamt."
+  },
+  {
+   "id": "dal_dalen",
+   "namn": "Dalen",
+   "tillstand": [
+    "frost",
+    "farg"
+   ],
+   "innehall": [
+    "ordtradet",
+    "mamma",
+    "bo_langhals",
+    "bo_taggrygg",
+    "bo_hornnos",
+    {
+     "id": "lovet",
+     "dold": true
+    },
+    "molnen_ut"
+   ],
+   "anteckning": "3 × 1 skärmar. Ordträdet i mitten, tre bon en bit isär med var sin vuxen (grön långhals, blå taggrygg och röd hornnos), och frostiga ägg längre bort. frost: allt grått och Ordträdets löv bleka. farg: efter STORT LJUS, med regnbågslöv. Hjälten går mot molnen (molnen_ut) i avskedet."
+  }
+ ],
+ "scener": [
+  {
+   "id": "k5s01_molnkanten",
+   "pass": 1,
+   "rum": "dal_molnkant",
+   "tillstand": "morgon",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Ni kom till molnkanten.",
+    "upplast": true
+   },
+   "anteckning": "Manus 22 v0.2, pass 1. Baronen utmanar med heder, fäktningen, och sedan biten som han läser fel medan den står på skärmen. Ingen säger att det är fel.",
+   "steg": [
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Hjälten och ungen kommer upp på molnkanten i morgonljuset. Under klippan ligger molnen som ett vitt hav. Vid en gammal mast är baronens orange luftskepp förtöjt. Längst bort står en skylt framför en grå, mörk dimma, och framför skylten står baronen med sitt paraply. Herr Skata sitter på hans hatt.",
+     "bild": "ankomst_molnkant"
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Där inne slutar min karta. I molnen ser man inget!",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "typ": "ga_till",
+     "mal": "skylt_baronens_dal",
+     "leta": true
+    },
+    {
+     "typ": "las_skylt",
+     "foremal": "skylt_baronens_dal"
+    },
+    {
+     "typ": "replik",
+     "talare": "baronen",
+     "text": "Halt! Först in i dalen blir känd!",
+     "upplast": true
+    },
+    {
+     "typ": "replik",
+     "talare": "baronen",
+     "text": "Vi fäktas! Med heder!",
+     "upplast": true
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "ORDDUELL! står stort över bilden. Baronen bugar djupt och svänger paraplyet som en värja. Hjälten bugar tillbaka med staven. Herr Skata flyger upp på skylten och lyfter en vinge, som en domare.",
+     "bild": "ordduell_start"
+    },
+    {
+     "typ": "pussel",
+     "pussel_id": "k5_faktning"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Paraplyet har fällt ihop sig över baronen, och bara stövlarna syns. Ungen jublar.",
+     "bild": "ordduell_seger"
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Du vann ordduellen!",
+     "upplast": true
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Baronen kravlar ut med hatten på sned och bugar ändå djupt.",
+     "bild": "baronen_bugar"
+    },
+    {
+     "typ": "replik",
+     "talare": "baronen",
+     "text": "Oavgjort! Och klart jag kan läsa!",
+     "upplast": true
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Det är ju mina ord! Titta på biten!",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "typ": "ga_till",
+     "mal": "bit_baronen"
+    },
+    {
+     "typ": "oppna_lasplatta",
+     "pussel_id": "k5_bit_fram"
+    },
+    {
+     "typ": "replik",
+     "talare": "baronen",
+     "text": "Ljus? En baron är aldrig rädd för mörker!",
+     "upplast": true
+    },
+    {
+     "typ": "replik",
+     "talare": "baronen",
+     "text": "Kryp upp på den stora roten. Lätt!",
+     "upplast": true
+    },
+    {
+     "typ": "replik",
+     "talare": "baronen",
+     "text": "Följ … min nos! Den bästa i landet!",
+     "upplast": true
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Baronen sätter näsan i vädret och marscherar in i den grå dimman. Herr Skata flaxar efter. Ungen fnissar och tittar på baronens stora näsa.",
+     "bild": "baronen_in_i_dimman"
+    },
+    {
+     "typ": "sparpunkt",
+     "pass_slut": true,
+     "valfri": false
+    }
+   ]
+  },
+  {
+   "id": "k5s02_dimman",
+   "pass": 2,
+   "rum": "dal_dimman",
+   "tillstand": "dis",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Baronen gick in i dimman.",
+    "upplast": true
+   },
+   "anteckning": "Pass 2 börjar grått och disigt, inte svart (v0.2). LJUS, och sedan följer han baronens spår till hatten (vila). SVÄRD och bladväggen är strukna, så att passet har två skrivuppgifter (139.5). Baronens rop leder till roten.",
+   "steg": [
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Det är disigt och grått, som en mörk kväll. Träden syns som mörka skuggor i diset, och ingenting längre bort. Bara stavens glimt lyser. Ungen trycker sig mot hjälten.",
+     "syns_redan": true
+    },
+    {
+     "typ": "pussel",
+     "pussel_id": "k5_ljus"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "I gräset syns stora fotspår med klackar. De slingrar sig in mellan träden.",
+     "bild": "fotspar_syns"
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Baronens fotspår!",
+     "upplast": true
+    },
+    {
+     "typ": "ga_till",
+     "mal": "hatt_baronen",
+     "leta": true
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Där spåren tar slut ligger baronens hatt i gräset. Han har tappat den.",
+     "syns_redan": true
+    },
+    {
+     "typ": "replik",
+     "talare": "baronen",
+     "text": "Hjälp! Jag ser inte marken!",
+     "upplast": true
+    },
+    {
+     "typ": "ga_till",
+     "mal": "utgang_roten"
+    }
+   ]
+  },
+  {
+   "id": "k5s02_gomman",
+   "pass": 2,
+   "rum": "dal_dimman",
+   "frivillig": true,
+   "hemlighet": true,
+   "startar_i_rum": "dal_dimman",
+   "startar_vid": "buske_skata",
+   "till_scen": "k5s03_roten",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Ni hittade ett bo.",
+    "upplast": true
+   },
+   "lockar": {
+    "vid": "buske_skata",
+    "beskrivning": "Inne i en buske glittrar något. Det klingar till, och ungen stannar och nosar ditåt. Inget sägs.",
+    "ljud": "klirr"
+   },
+   "anteckning": "Herr Skatas gömma (manus 22 v0.2, den vuxne 27/11: ett sidospår i pass 2). Busken syns när dimman är ljus. Tre saker att lyfta är en vilouppgift mellan passets läs- och skrivuppgifter, och medaljen är ett skämt som ingen förklarar förrän han har läst.",
+   "steg": [
+    {
+     "typ": "mellanscen",
+     "beskrivning": "I busken sitter ett stort bo av pinnar, fullt av glittriga saker.",
+     "bild": "skatans_bo"
+    },
+    {
+     "typ": "pussel",
+     "pussel_id": "k5_gomman"
+    },
+    {
+     "typ": "visa_foremal",
+     "foremal": "medalj_baronen"
+    },
+    {
+     "typ": "oppna_lasplatta",
+     "pussel_id": "k5_medaljen"
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Ha! Han har gett den till sig själv!",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "typ": "ge_sak",
+     "sort": "ryggsack",
+     "id": "medalj_baronen"
+    }
+   ]
+  },
+  {
+   "id": "k5s03_roten",
+   "pass": 2,
+   "rum": "dal_roten",
+   "tillstand": "ljus",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Någon ropade på hjälp.",
+    "upplast": true
+   },
+   "anteckning": "Baronen sitter fast för att han läste UPP PÅ. Han får ner sig själv med hjälp av ordet, får hatten och ger biten. Sedan läser hjälten KRYP UNDER på riktigt.",
+   "steg": [
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Vid en jättelik rot med svart bark sitter baronen högst uppe, med Herr Skata på axeln. Han kröp upp, precis som han läste. I hjältens ljus syns hur högt det är. Under roten finns ett mörkt hål.",
+     "bild": "baronen_pa_roten"
+    },
+    {
+     "typ": "pussel",
+     "pussel_id": "k5_stege"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Baronen klättrar ner själv och borstar av rocken.",
+     "bild": "baronen_klattrar_ner"
+    },
+    {
+     "typ": "replik",
+     "talare": "baronen",
+     "text": "Min hatt! Var är min hatt?",
+     "upplast": true
+    },
+    {
+     "typ": "bara",
+     "bild": "hatt_baronen",
+     "till": "baronen_rot"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Baronen sätter på sig hatten och rättar till den. Han tittar länge på sin bit.",
+     "bild": "baronen_tittar_pa_biten"
+    },
+    {
+     "typ": "replik",
+     "talare": "baronen",
+     "text": "Ta den. Jag hittar ändå aldrig rätt.",
+     "upplast": true
+    },
+    {
+     "typ": "replik",
+     "talare": "baronen",
+     "text": "Men jag var nästan först!",
+     "upplast": true
+    },
+    {
+     "typ": "ta_emot",
+     "fran": "baronen_rot",
+     "bild": "lapp_bit_fram"
+    },
+    {
+     "typ": "oppna_lasplatta",
+     "pussel_id": "k5_bit_fram",
+     "kan_oppnas_igen": true
+    },
+    {
+     "typ": "pussel",
+     "pussel_id": "k5_roten"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Hjälten och ungen kryper in under roten.",
+     "bild": "kryper_under_roten"
+    },
+    {
+     "typ": "replik",
+     "talare": "baronen",
+     "text": "Under?! Det stod under?! … Jag läser alltid fel.",
+     "upplast": true
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Baronen ler. Han går tillbaka längs den upplysta vägen, och Herr Skata flyger efter.",
+     "bild": "baronen_gar_tillbaka"
+    },
+    {
+     "typ": "replik",
+     "talare": "baronen",
+     "text": "Tack för ljuset! Nu har jag en hemlig sak att göra!",
+     "upplast": true
+    },
+    {
+     "typ": "ga_till",
+     "mal": "gang_glantan"
+    }
+   ]
+  },
+  {
+   "id": "k5s03_lagret",
+   "pass": 2,
+   "rum": "dal_roten",
+   "frivillig": true,
+   "hemlighet": true,
+   "startar_i_rum": "dal_roten",
+   "startar_vid": "lagret",
+   "till_scen": "k5s04_glantan",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Ni hittade ett läger.",
+    "upplast": true
+   },
+   "lockar": {
+    "vid": "lagret",
+    "beskrivning": "Bakom roten skymtar en gammal eldstad med stenar runt. Det klingar till, och ungen stannar och nosar ditåt. Inget sägs.",
+    "ljud": "klirr"
+   },
+   "anteckning": "Farfars gamla läger (manus 22 v0.2, det andra sidospåret i pass 2). Teckningen visar en stor dinosaurie med tre prickar på nosen. Den som hittar den känner igen prickarna i pass 3. Ingen säger vem det är. Ristningen i barken läser han om han vill. Lägret går att nå tills han kryper under roten.",
+   "steg": [
+    {
+     "typ": "pussel",
+     "pussel_id": "k5_lagret"
+    },
+    {
+     "typ": "visa_foremal",
+     "foremal": "farfars_teckning"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Det är en gammal teckning: en stor dinosaurie med tre prickar på nosen.",
+     "bild": "farfars_teckning"
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Min gamla teckning! Det är min vän i dalen.",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "typ": "dinobok",
+     "sida": {
+      "bildtext": "Min vän i dalen",
+      "bild": "farfars_teckning"
+     }
+    }
+   ]
+  },
+  {
+   "id": "k5s04_glantan",
+   "pass": 2,
+   "rum": "dal_glantan",
+   "tillstand": "dimma",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Ni kröp under roten.",
+    "upplast": true
+   },
+   "anteckning": "Ungen leder där kartan slutar (FÖLJ SEN DEN LILLA NOSEN). Nysningen ger baksidan, och mästarprovet är tre rader i följd på samma fyra stigar. Sist ROPA, ett tryck på ungen (129.5).",
+   "steg": [
+    {
+     "typ": "mellanscen",
+     "beskrivning": "På andra sidan roten är dimman vit och tjock som mjölk. Ljuset räcker bara en bit.",
+     "syns_redan": true
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Läs biten! Vad står det sen?",
+     "upplast": true
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Ungen sätter nosen i marken och springer före in i dimman.",
+     "unge_till": "glantan_mitt",
+     "syns_redan": true
+    },
+    {
+     "typ": "ga_till",
+     "mal": "glantan_mitt"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "De kommer till en glänta med fyra stigar. Ungen nosar på alla fyra och nyser. Nysningen blåser biten ur hjältens hand, och den landar med baksidan upp.",
+     "bild": "ungen_nyser_biten"
+    },
+    {
+     "typ": "visa_foremal",
+     "foremal": "bit_marken"
+    },
+    {
+     "typ": "ga_till",
+     "mal": "bit_marken",
+     "leta": true
+    },
+    {
+     "typ": "oppna_lasplatta",
+     "pussel_id": "k5_bit_bak",
+     "kan_oppnas_igen": true
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Står det mer? Det hade jag glömt!",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "typ": "pussel",
+     "pussel_id": "k5_rad1"
+    },
+    {
+     "typ": "pussel",
+     "pussel_id": "k5_rad2"
+    },
+    {
+     "typ": "pussel",
+     "pussel_id": "k5_rad3"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Tre streck av ljus, och en stig är kvar.",
+     "bild": "en_stig_kvar"
+    },
+    {
+     "typ": "ga_till",
+     "mal": "stig_d"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Dimman glesnar längs stigen. Biten vänder sig i hans hand, med framsidan upp.",
+     "bild": "dimman_glesnar",
+     "tillstand_efter": "klar"
+    },
+    {
+     "typ": "oppna_lasplatta",
+     "pussel_id": "k5_bit_fram",
+     "kan_oppnas_igen": true
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Läs sista raden på biten!",
+     "upplast": true,
+     "vantar_pa": "ropa"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Ungen ropar så högt den kan. Sedan blir det alldeles tyst.",
+     "bild": "ungen_ropar",
+     "ljud": [
+      "unge_rop"
+     ]
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Långt borta kommer ett vrål, stort och djupt. Ungen spritter till och viftar med svansen.",
+     "bild": "vralet",
+     "ljud": [
+      "mamma_vral"
+     ]
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Det är mamma!",
+     "upplast": true
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Hjälten och ungen springer in i dimman mot vrålet.",
+     "bild": "in_mot_vralet"
+    },
+    {
+     "typ": "sparpunkt",
+     "pass_slut": true,
+     "valfri": false
+    }
+   ]
+  },
+  {
+   "id": "k5s05_dalen",
+   "pass": 3,
+   "rum": "dal_dalen",
+   "tillstand": "frost",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Mamma svarade!",
+    "upplast": true
+   },
+   "anteckning": "Mötet med mamma bryts av med hjältens egna handlingar (128.10.2): kramen och radion han håller fram.",
+   "steg": [
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Molnen glesnar, och dalen ligger där. Allt är grått och frostigt. Mitt i står Ordträdet med svart bark, men löven är bleka.",
+     "bild": "dalen_frost"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "En jätteskugga glider över dem, samma skugga som på Farfars första kartbit. Ungen gömmer sig bakom hjälten och darrar.",
+     "bild": "skuggan_kommer"
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "{unge} är rädd.",
+     "upplast": true,
+     "vantar_pa": "krama_ungen"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Hjälten kramar ungen, och den blir lugn. Ett stort huvud sänks ner och nosar. Ungen kikar fram.",
+     "bild": "mamma_nosar"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "På ungens nos och på mammas nos lyser samma tre prickar.",
+     "bild": "prickarna"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Ungen piper. Mamma svarar med samma läte, fast djupt. Ungen kryper in under hennes haka, och de står alldeles stilla. Sedan slickar mamma hjälten så att han ramlar.",
+     "bild": "mamma_och_ungen"
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Håll fram radion. Jag vill hälsa!",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "typ": "bara",
+     "bild": "radion",
+     "till": "mamma"
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Hej, gamla vän.",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Mamma lägger huvudet på sned, nosar på radion, hoppar så att marken skakar och piper som en liten unge.",
+     "bild": "mamma_kanner_igen"
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Ha ha! Hon känner igen mig!",
+     "upplast": true,
+     "via": "radio"
+    }
+   ]
+  },
+  {
+   "id": "k5s06_aggen",
+   "pass": 3,
+   "rum": "dal_dalen",
+   "tillstand": "frost",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Äggen var kalla.",
+    "upplast": true
+   },
+   "anteckning": "Tre bon med egna kort (ord, två egenskaper, negation), och sedan kapitlets nya formel. Gå-steget till bo 1 ligger före Farfars repliker (v0.2). Slutets musik börjar när dalen vaknar.",
+   "steg": [
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Runt trädet ligger bon med frostiga ägg. Vid varje bo vaktar en trött vuxen dinosaurie: en grön långhals, en blå med taggar på ryggen och en röd med horn på nosen. Mamma puffar på ett ägg och tittar på hjälten.",
+     "bild": "bona_frost"
+    },
+    {
+     "typ": "ga_till",
+     "mal": "bo_langhals"
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Jag läste för äggen en gång. Nu är det din tur.",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "typ": "pussel",
+     "pussel_id": "k5_bo1"
+    },
+    {
+     "typ": "ga_till",
+     "mal": "bo_taggrygg"
+    },
+    {
+     "typ": "pussel",
+     "pussel_id": "k5_bo2"
+    },
+    {
+     "typ": "ga_till",
+     "mal": "bo_hornnos"
+    },
+    {
+     "typ": "pussel",
+     "pussel_id": "k5_bo3"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Tre små ungar piper och tumlar runt sina föräldrar. Men längre bort i dalen ligger fler frostiga ägg, överallt.",
+     "bild": "fler_agg"
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Det finns ägg i hela dalen!",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "typ": "pussel",
+     "pussel_id": "k5_stort_ljus"
+    },
+    {
+     "typ": "musik",
+     "slinga": "slutet"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Ordkraften i det stora ljuset når hela dalen, och ett vitt sken fyller den. Frosten smälter, Ordträdets löv tänds i regnbågens alla färger, och överallt spricker ägg. De vuxna dinosaurierna hoppar.",
+     "bild": "dalen_vaknar"
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Du läste dem vakna. Nu kan du berätta om dalen!",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "typ": "ge_grad",
+     "grad": "Berättare",
+     "fest": "stor"
+    }
+   ]
+  },
+  {
+   "id": "k5s07_avskedet",
+   "pass": 3,
+   "rum": "dal_dalen",
+   "tillstand": "farg",
+   "musik": "slutet",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Dalen vaknade!",
+    "upplast": true
+   },
+   "anteckning": "Avskedet. Radion stannar hos mamma, ungen ger lövet, och pennstrecket går över TA UNGEN HEM när det sista steget är klart, som vid varje uppdrag (130.3). Han stänger boken själv. Rubriken är TA {UNGE} HEM, eftersom UNGEN har NG, som är spärrat. Sist en sparpunkt utan passets slut (139.6): den som slutar mitt i slutbilderna får se dem igen, och ingen fråga kommer före slutbilderna.",
+   "steg": [
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Ungen leker med de nya ungarna runt mammas fötter. Mamma tittar på ungen och sedan på hjälten.",
+     "bild": "ungen_leker"
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Låt radion stanna här. Då kan jag prata med dem.",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "typ": "bara",
+     "bild": "radion",
+     "till": "mamma"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Ungen springer till Ordträdet och kommer tillbaka med ett regnbågslöv i munnen. Den lägger det framför hjälten.",
+     "bild": "lovet"
+    },
+    {
+     "typ": "visa_foremal",
+     "foremal": "lovet"
+    },
+    {
+     "typ": "ga_till",
+     "mal": "lovet",
+     "leta": true
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Kartan är hel. Nu hittar du alltid hit.",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "typ": "ga_till",
+     "mal": "molnen_ut"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Ungen springer efter en bit, stannar och tittar tillbaka mot mamma. Sedan springer den hem till henne och viftar med svansen.",
+     "bild": "ungen_vander"
+    },
+    {
+     "typ": "sparpunkt",
+     "pass_slut": false,
+     "valfri": false
+    }
+   ]
+  },
+  {
+   "id": "k5s08_slutet",
+   "pass": 3,
+   "rum": "dal_dalen",
+   "tillstand": "farg",
+   "musik": "slutet",
+   "vid_omstart": {
+    "talare": "farfar",
+    "text": "Var var vi? Äventyret är slut.",
+    "upplast": true
+   },
+   "anteckning": "Slutbilderna (manus 22 v0.2): ett tryck för varje, och raden under läses upp. De är undantagna från taket för passiva steg. Musiken slutet spelar genom alla, utan att byta när bilderna visar byn, skogen och floden. Efter den sista bilden kommer startskärmen, utan \"Fortsättning följer\". 139.6: sparpunkten före slutbilderna står sist i k5s07_avskedet. Den sista sparpunkten här avslutar äventyret, och Teknik bestämmer vad som visas efter den (startskärmen, inte frågan om att fortsätta).",
+   "steg": [
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Byn vid träsket i kväll. Elden brinner, och Tant Rosa vinkar.",
+     "bild": "slut_rosa"
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Elden brinner i byn.",
+     "upplast": true
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Skogen. Apan svingar sig från lian till lian.",
+     "bild": "slut_apan"
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Apan svingar sig i skogen.",
+     "upplast": true
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Floden. Skepparen tutar i hornet, och den stora sköldpaddan sträcker upp huvudet och svarar.",
+     "bild": "slut_floden"
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Skepparen tutar. Sköldpaddan svarar.",
+     "upplast": true
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "En skola. Det orange luftskeppet är förtöjt vid flaggstången. Inne sitter baronen vid en pytteliten bänk, med hatten på och Herr Skata på hatten, och följer orden med fingret.",
+     "bild": "slut_baronen_skolan"
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Baronen lär sig läsa.",
+     "upplast": true
+    },
+    {
+     "typ": "replik",
+     "talare": "baronen",
+     "text": "S-K-O-L-A-N. Skolan!",
+     "upplast": true
+    },
+    {
+     "typ": "replik",
+     "talare": "baronen",
+     "text": "På riktigt den här gången!",
+     "upplast": true
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Farfars läsrum. Hjälten sitter bredvid Farfar under läslampan. Farfar slår upp sin gamla bok. Bredvid hans bild av den lilla dinon finns en ny: hjälten, ungen och mamma under Ordträdet. Lövet ligger på sidan.",
+     "bild": "slut_lasrummet"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Radion i Farfars kök sprakar, och ett litet pip hörs från dalen.",
+     "bild": "slut_radion",
+     "ljud": [
+      "unge_pip"
+     ]
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Och dalen hade en läsare igen.",
+     "upplast": true
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "I hörnet glimtar staven en gång. Titeln tonar fram, och sedan SLUT.",
+     "bild": "slut_staven"
+    },
+    {
+     "typ": "sparpunkt",
+     "pass_slut": true,
+     "valfri": false
+    }
+   ]
+  }
+ ],
+ "pussel": [
+  {
+   "id": "k5_faktning",
+   "typ": "P16_ordduell",
+   "ram": "faktning",
+   "motstandare": "baronen",
+   "regel": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "Svara baronen! Välj det som passar.",
+    "upplast": true
+   },
+   "ronder": [
+    {
+     "form": "ord",
+     "niva": "L2",
+     "utfall": [
+      {
+       "pekar_pa": "bubbla_skolan",
+       "ropar": [
+        {
+         "talare": "baronen",
+         "text": "En baron går aldrig vilse!",
+         "upplast": true
+        }
+       ],
+       "alternativ": [
+        {
+         "text": "Du flög till skolan!",
+         "ratt": true
+        },
+        {
+         "text": "Du flög till skogen!"
+        },
+        {
+         "text": "Du flög till skatan!"
+        }
+       ],
+       "vid_ratt": {
+        "handling": "staven parerar med ett klingande pling, paraplyet studsar, och baronen backar ett steg mot skylten. Fjädern i hatten böjer sig.",
+        "fest": "liten"
+       },
+       "vid_fel": {
+        "handling": "baronen gör en piruett, poserar för en publik som inte finns och tar ett steg fram",
+        "replik": {
+         "talare": "baronen",
+         "text": "Ha! Miss!",
+         "upplast": true
+        }
+       }
+      },
+      {
+       "pekar_pa": "spindel_baronen",
+       "ropar": [
+        {
+         "talare": "baronen",
+         "text": "Jag är aldrig rädd!",
+         "upplast": true
+        }
+       ],
+       "alternativ": [
+        {
+         "text": "Rädd för en spindel!",
+         "ratt": true
+        },
+        {
+         "text": "Rädd för en spegel!"
+        },
+        {
+         "text": "Rädd för en spik!"
+        }
+       ],
+       "vid_ratt": {
+        "handling": "staven parerar med ett klingande pling, paraplyet studsar, och baronen backar ett steg mot skylten. Fjädern i hatten böjer sig.",
+        "fest": "liten"
+       },
+       "vid_fel": {
+        "handling": "baronen gör en piruett, poserar för en publik som inte finns och tar ett steg fram",
+        "replik": {
+         "talare": "baronen",
+         "text": "Ha! Miss!",
+         "upplast": true
+        }
+       }
+      }
+     ]
+    },
+    {
+     "form": "mening",
+     "niva": "L3",
+     "utfall": [
+      {
+       "pekar_pa": "hatten_platt",
+       "ropar": [
+        {
+         "talare": "baronen",
+         "text": "Min hatt är hög och fin!",
+         "upplast": true
+        }
+       ],
+       "alternativ": [
+        {
+         "text": "Platt och har ett bo",
+         "ratt": true
+        },
+        {
+         "text": "Hög och har ett bo"
+        },
+        {
+         "text": "Platt och fin"
+        }
+       ],
+       "vid_ratt": {
+        "handling": "staven parerar med ett klingande pling, paraplyet studsar, och baronen backar ett steg mot skylten. Fjädern i hatten böjer sig.",
+        "fest": "liten"
+       },
+       "vid_fel": {
+        "handling": "baronen nickar nöjt, tittar upp på hatten och stelnar. baronen gör en piruett, poserar för en publik som inte finns och tar ett steg fram",
+        "replik": {
+         "talare": "baronen",
+         "text": "Precis! … Vänta.",
+         "upplast": true
+        }
+       }
+      },
+      {
+       "pekar_pa": "stovlarna_pol",
+       "ropar": [
+        {
+         "talare": "baronen",
+         "text": "Mina stövlar är torra och rena!",
+         "upplast": true
+        }
+       ],
+       "alternativ": [
+        {
+         "text": "Blöta och har en snigel",
+         "ratt": true
+        },
+        {
+         "text": "Torra och har en snigel"
+        },
+        {
+         "text": "Blöta och rena"
+        }
+       ],
+       "vid_ratt": {
+        "handling": "staven parerar med ett klingande pling, paraplyet studsar, och baronen backar ett steg mot skylten. Fjädern i hatten böjer sig.",
+        "fest": "liten"
+       },
+       "vid_fel": {
+        "handling": "baronen nickar nöjt, tittar ner på stövlarna och stelnar. baronen gör en piruett, poserar för en publik som inte finns och tar ett steg fram",
+        "replik": {
+         "talare": "baronen",
+         "text": "Precis! … Vänta.",
+         "upplast": true
+        }
+       }
+      }
+     ]
+    },
+    {
+     "form": "sammansatt",
+     "niva": "L4",
+     "utfall": [
+      {
+       "pekar_pa": "bit_baronen_upp",
+       "ropar": [
+        {
+         "talare": "baronen",
+         "text": "Jag behöver ingen karta!",
+         "upplast": true
+        }
+       ],
+       "alternativ": [
+        {
+         "text": "Men kan du läsa den?",
+         "ratt": true
+        },
+        {
+         "text": "Men kan du äta den?"
+        },
+        {
+         "text": "Men kan du flyga?"
+        }
+       ],
+       "vid_ratt": {
+        "handling": "staven parerar med ett klingande pling, paraplyet studsar, och baronen backar ett steg mot skylten. Fjädern i hatten böjer sig.",
+        "fest": "liten"
+       },
+       "vid_fel": {
+        "handling": "baronen gör en piruett, poserar för en publik som inte finns och tar ett steg fram",
+        "replik": {
+         "talare": "baronen",
+         "text": "Ha! Det kan jag!",
+         "upplast": true
+        }
+       }
+      },
+      {
+       "pekar_pa": "bit_upp_och_ner",
+       "ropar": [
+        {
+         "talare": "baronen",
+         "text": "Ingen läser fortare än en baron!",
+         "upplast": true
+        }
+       ],
+       "alternativ": [
+        {
+         "text": "Men den är upp och ner!",
+         "ratt": true
+        },
+        {
+         "text": "Men den är en hatt!"
+        },
+        {
+         "text": "Men den är en fisk!"
+        }
+       ],
+       "vid_ratt": {
+        "handling": "staven parerar med ett klingande pling, paraplyet studsar, och baronen backar ett steg mot skylten. Fjädern i hatten böjer sig.",
+        "fest": "liten"
+       },
+       "vid_fel": {
+        "handling": "baronen gör en piruett, poserar för en publik som inte finns och tar ett steg fram",
+        "replik": {
+         "talare": "baronen",
+         "text": "Ha! Fel!",
+         "upplast": true
+        }
+       }
+      }
+     ]
+    }
+   ],
+   "hjalp": {
+    "efter_fel": 2,
+    "handling": "ungen viskar i hjältens öra, och rätt kort glimtar"
+   },
+   "knuff": {
+    "handling": "korten glimtar"
+   },
+   "vid_vinst": {
+    "handling": "staven parerar en sista gång, och paraplyet fäller ihop sig över baronen med ett plopp, så att bara stövlarna syns. Herr Skata lyfter vingen på skylten som en domare.",
+    "fest": "stor"
+   },
+   "anteckning": "Fäktningen (manus 22 v0.2, den vuxne 27/11): fin och artig med bugningar och utfall, men en stav mot ett paraply, och baronen tar det på blodigt allvar. Två utfall per rond, och motorn slumpar ett (ordduell.js), så den som spelar om får oftast andra skryt. Samma nivå i båda utfallen: ord, mening med två egenskaper, och repliken där slutet avgör. Korten läses aldrig upp. Staven rör aldrig baronen, bara paraplyet. Manuset har ett svar per fel kort, och schemat har ett per utfall. Väntar på ledningen (alternativ[].vid_fel): 1A SKOGEN \"Ha! Miss!\", SKATAN Herr Skata flaxar och skrattar. 1B SPEGEL \"Rädd för en spegel? Jag älskar speglar!\", SPIK \"Ha! Miss!\". 2A HÖG \"Hög! Precis! … Ett bo?\", FIN \"Fin! Precis! … Platt?\". 2B TORRA \"Torra! Precis! … En snigel?\", RENA \"Rena! Precis! … Blöta?\". 3A ÄTA \"… Den smakar papper.\", FLYGA \"Ja! Med luftskepp!\". 3B HATT (han lägger biten på hatten) \"Hm. Den passar mig!\", FISK (Herr Skata nafsar efter biten) \"Skata! Släpp! Den är min!\". Tills dess har varje utfall ett gemensamt svar. Segern är att paraplyet fäller ihop sig över baronen (v0.2), inte ut och in som i kapitel 3."
+  },
+  {
+   "id": "k5_bit_fram",
+   "typ": "P1_las_och_valj",
+   "avsandare": "farfar",
+   "papper": "lapp_bit_fram",
+   "varianter": {
+    "L4": {
+     "text": [
+      "Tänd ljus i den mörka dimman.",
+      "Kryp under den stora roten.",
+      "Följ sen den lilla nosen.",
+      "Ropa. Då svarar dalen."
+     ]
+    }
+   },
+   "anteckning": "Bitens framsida (129.4): en lapp utan alternativ. I pass 1 är den baronens (oppna_lasplatta utan kan_oppnas_igen) och han läser fel medan den står på skärmen. Den blir hjältens när han tar emot biten vid roten. Inga rader lyser."
+  },
+  {
+   "id": "k5_bit_bak",
+   "typ": "P1_las_och_valj",
+   "avsandare": "farfar",
+   "papper": "lapp_bit_bak",
+   "varianter": {
+    "L6": {
+     "text": [
+      "Stigen går inte vid vattnet.",
+      "Den går mellan två stora stenar.",
+      "Bakom stenarna växer blå blommor."
+     ]
+    }
+   },
+   "anteckning": "Bitens baksida (129.4), som baronen aldrig såg. Kommer fram när ungen nyser i gläntan."
+  },
+  {
+   "id": "k5_medaljen",
+   "typ": "P1_las_och_valj",
+   "avsandare": "baronen",
+   "papper": "medalj",
+   "varianter": {
+    "L3": {
+     "text": [
+      "Bästa baron i hela landet.",
+      "Av: Baronen."
+     ]
+    }
+   },
+   "anteckning": "Medaljen i Herr Skatas gömma (hemligheten). Skämtet är att han har gett den till sig själv, och Farfar säger det först efteråt."
+  },
+  {
+   "id": "k5_ljus",
+   "typ": "P11_formel",
+   "niva": "S2",
+   "skriv": "tangentbord",
+   "bild": "dis_dimman",
+   "ledbild": "tankebubbla_ljusboll",
+   "svar": "LJUS",
+   "formler": [
+    {
+     "ord": "LJUS",
+     "godtas": [
+      "LYS",
+      "LYSA",
+      "LYSER"
+     ],
+     "effekt": "dimman_tands"
+    }
+   ],
+   "rimliga": [
+    {
+     "ord": "LAMPA",
+     "reaktion": "en liten lampa tänds och slocknar",
+     "replik": {
+      "talare": "berattare",
+      "text": "Bra ord! Men staven kan något bättre.",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "ELD",
+     "reaktion": "en liten låga fladdrar och slocknar",
+     "replik": {
+      "talare": "berattare",
+      "text": "Bra ord! Men staven kan något bättre.",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "SOL",
+     "reaktion": "en liten sol glimtar i diset och bleknar",
+     "replik": {
+      "talare": "berattare",
+      "text": "Bra ord! Men staven kan något bättre.",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "STOR SKÖLD",
+     "reaktion": "bubblan lyser svagt och slocknar",
+     "replik": {
+      "talare": "berattare",
+      "text": "Det blev bara lite ljust.",
+      "upplast": true
+     }
+    }
+   ],
+   "vanligt_svar": {
+    "talare": "berattare",
+    "text": "Bra ord! Men det hjälper inte här.",
+    "upplast": true
+   },
+   "forebild": {
+    "text": "LJUS",
+    "upplast": false,
+    "visas": "andra_felet"
+   },
+   "hjalp": "ett_ord",
+   "instruktion": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "Det är så mörkt och disigt! Skriv en formel!",
+    "upplast": true
+   },
+   "vid_ratt": {
+    "handling": "ljusbollen tänds, diset lyser upp och glittrar, och man ser långt mellan träden",
+    "fest": "mellan"
+   },
+   "vid_fel": {
+    "reaktion": "staven fräser, pff",
+    "replik": {
+     "talare": "berattare",
+     "text": "Pff! Hur lyste du upp grottan?",
+     "upplast": true
+    },
+    "ljud": "fras"
+   },
+   "knuff": {
+    "handling": "stavens glimt blinkar"
+   },
+   "tillstand_efter": "ljus",
+   "anteckning": "Den gamla formeln på huvudvägen (manus 22). Diset är grått, inte svart (v0.2). LYS, LYSA och LYSER godtas. Ledbilden efter första försöket och förebilden efter två (89). Bilden dimman_tands är en regi som Teknik lägger till."
+  },
+  {
+   "id": "k5_gomman",
+   "typ": "P26_krukorna",
+   "verb": "lyfta",
+   "instruktion": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "Lyft på sakerna i boet!",
+    "upplast": true
+   },
+   "innehall": [
+    "bar",
+    "bar",
+    "medalj_baronen"
+   ],
+   "foremal": [
+    "skatbo_sked",
+    "skatbo_nyckel",
+    "skatbo_fjader"
+   ],
+   "sak_vid": 3,
+   "vid_ratt": {
+    "handling": "under den stora fjädern glimmar en medalj"
+   },
+   "knuff": {
+    "handling": "ungen nosar vid boet",
+    "efter_sek": 15
+   },
+   "anteckning": "Hemligheten i dimman, vila. Skeden glittrar och nyckeln klingar. Medaljen ligger alltid sist (sak_vid)."
+  },
+  {
+   "id": "k5_lagret",
+   "typ": "P11_formel",
+   "niva": "S3",
+   "skriv": "tangentbord",
+   "bild": "sten_pa_duken",
+   "ledbild": "tankebubbla_brev_flyger",
+   "svar": "FLYG",
+   "formler": [
+    {
+     "ord": "FLYG",
+     "godtas": [
+      "LYFT",
+      "LYFTA"
+     ],
+     "effekt": "stenen_svavar"
+    }
+   ],
+   "rimliga": [
+    {
+     "ord": "SVÄRD",
+     "reaktion": "svärdet studsar mot stenen",
+     "replik": {
+      "talare": "berattare",
+      "text": "Svärdet skär bara växter.",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "STOR SKÖLD",
+     "reaktion": "en bubbla välver sig över stenen och slocknar",
+     "replik": {
+      "talare": "berattare",
+      "text": "Stenen ligger kvar!",
+      "upplast": true
+     }
+    }
+   ],
+   "vanligt_svar": {
+    "talare": "berattare",
+    "text": "Bra ord! Men det hjälper inte här.",
+    "upplast": true
+   },
+   "forebild": {
+    "text": "FLYG",
+    "upplast": false,
+    "visas": "andra_felet"
+   },
+   "hjalp": "ett_ord",
+   "instruktion": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "Stenen är för tung. Skriv ett ord som hjälper!",
+    "upplast": true
+   },
+   "vid_ratt": {
+    "handling": "stenen svävar, och han styr bort den. Under duken ligger ett gammalt papper i vaxduk.",
+    "fest": "liten"
+   },
+   "vid_fel": {
+    "reaktion": "staven fräser, pff",
+    "replik": {
+     "talare": "berattare",
+     "text": "Pff! Hur lyfte du isblocket?",
+     "upplast": true
+    },
+    "ljud": "fras"
+   },
+   "knuff": {
+    "handling": "stenen glimtar, och ungen nosar vid duken"
+   },
+   "anteckning": "Kapitlets frivilliga formel (76.3) och den andra hemligheten. En tung sten ligger på duken vid eldstaden, och FLYG lyfter den, som isblocket i kapitel 4. Avsteg från manus 22 v0.2 (där han lyfte duken): kapitlet behöver en frivillig formel, och gömman är redan passets vilouppgift."
+  },
+  {
+   "id": "k5_stege",
+   "typ": "P11_formel",
+   "niva": "S3",
+   "skriv": "tangentbord",
+   "bild": "roten_hog",
+   "ledbild": "tankebubbla_stege",
+   "svar": "STEGE",
+   "formler": [
+    {
+     "ord": "STEGE",
+     "effekt": "stege_roten",
+     "ristas": false
+    },
+    {
+     "ord": "REP",
+     "effekt": "rep_roten",
+     "ristas": false
+    },
+    {
+     "ord": "TRAPPA",
+     "effekt": "trappa_roten",
+     "ristas": false
+    }
+   ],
+   "rimliga": [
+    {
+     "ord": "FLYG",
+     "reaktion": "paraplyet svävar upp till baronen och dimper ner igen",
+     "replik": {
+      "talare": "berattare",
+      "text": "Staven lyfter saker. Inte baronen!",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "SKÖLD",
+     "reaktion": "en bubbla tänds runt baronen och slocknar",
+     "replik": {
+      "talare": "berattare",
+      "text": "Bubblan hjälper honom inte ner.",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "HOPPA",
+     "reaktion": "baronen tittar ner och skakar på huvudet",
+     "replik": {
+      "talare": "berattare",
+      "text": "Det är för högt att hoppa!",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "SVÄRD",
+     "reaktion": "svärdet studsar mot den hårda barken",
+     "replik": {
+      "talare": "berattare",
+      "text": "Svärdet skär bara växter.",
+      "upplast": true
+     }
+    }
+   ],
+   "vanligt_svar": {
+    "talare": "berattare",
+    "text": "Bra ord! Men det hjälper inte här.",
+    "upplast": true
+   },
+   "nastan": [
+    {
+     "ord": "STEG",
+     "effekt": "kort_stege_roten"
+    },
+    {
+     "ord": "STGE",
+     "effekt": "kort_stege_roten"
+    },
+    {
+     "ord": "REPP",
+     "effekt": "kort_rep_roten"
+    }
+   ],
+   "forebild": {
+    "text": "STEGE",
+    "upplast": false,
+    "visas": "andra_felet"
+   },
+   "hjalp": "ett_ord",
+   "instruktion": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "Baronen ska ner! Skriv ett ord som hjälper!",
+    "upplast": true
+   },
+   "vid_ratt": {
+    "handling": "ordet blir det han skrev: en stege av trä växer upp längs roten (STEGE), ett rep slingrar sig upp till baronen (REP), eller trappsteg växer ut ur barken (TRAPPA). Baronen klättrar ner själv.",
+    "fest": "mellan",
+    "ljud": "puff"
+   },
+   "vid_fel": {
+    "reaktion": "staven fräser, pff",
+    "replik": {
+     "talare": "berattare",
+     "text": "Pff! Hur kom du upp på klippan?",
+     "upplast": true
+    },
+    "ljud": "fras"
+   },
+   "knuff": {
+    "handling": "bilden i molnet glimtar, och ungen tittar uppåt"
+   },
+   "anteckning": "Spelarens val, ett ord som hjälper och ingen formel (104.3): inget ristas in. Som klippan i kapitel 4. Baronen klättrar ner själv. Regin baronen_klattrar_ner kommer efter."
+  },
+  {
+   "id": "k5_roten",
+   "typ": "P1_las_och_valj",
+   "i_rummet": true,
+   "hjalp": "ett_ord",
+   "instruktion": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "Läs biten! Hur kommer ni förbi roten?",
+    "upplast": true
+   },
+   "varianter": {
+    "L4": {
+     "text": "Hur kommer ni förbi roten?",
+     "alternativ": [
+      {
+       "id": "under",
+       "ord": "Under roten",
+       "objekt": "rot_under",
+       "ratt": true
+      },
+      {
+       "id": "upp",
+       "ord": "Upp på roten",
+       "objekt": "rot_upp",
+       "vid_valj": {
+        "reaktion": "hjälten klättrar upp en bit, ser bara dimma åt alla håll och glider ner igen. Ungen fnissar.",
+        "replik": {
+         "talare": "berattare",
+         "text": "Där uppe satt ju baronen fast!",
+         "upplast": true
+        }
+       }
+      }
+     ]
+    }
+   },
+   "hjalptrappa": [
+    {
+     "efter_fel": 1,
+     "replik": {
+      "talare": "farfar",
+      "text": "Läs den andra raden på biten!",
+      "upplast": true
+     }
+    }
+   ],
+   "vid_ratt": {
+    "handling": "hjälten och ungen kryper in under roten",
+    "fest": "liten"
+   },
+   "knuff": {
+    "handling": "lappknappen glimtar"
+   },
+   "anteckning": "Läsval i rummet med lägesord (L4). Svaret står på biten (KRYP UNDER DEN STORA ROTEN.), som han just har fått och kan öppna igen. Baronen sa UPP PÅ i pass 1, så den som bara minns honom väljer fel. Två platser, så hjälpen är en replik efter första felet. Regin kryper_under_roten kommer efter."
+  },
+  {
+   "id": "k5_rad1",
+   "typ": "P1_las_och_valj",
+   "i_rummet": true,
+   "instruktion": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "Läs en rad i taget. Vilken stig stämmer inte?",
+    "upplast": true
+   },
+   "varianter": {
+    "L6": {
+     "text": "Stigen går inte vid vattnet.",
+     "alternativ": [
+      {
+       "id": "a",
+       "objekt": "stig_a",
+       "bild": "stig_a",
+       "ratt": true,
+       "tillstand_efter": "struken"
+      },
+      {
+       "id": "b",
+       "objekt": "stig_b",
+       "bild": "stig_b"
+      },
+      {
+       "id": "c",
+       "objekt": "stig_c",
+       "bild": "stig_c"
+      },
+      {
+       "id": "d",
+       "objekt": "stig_d",
+       "bild": "stig_d"
+      }
+     ]
+    }
+   },
+   "hjalptrappa": [
+    {
+     "efter_fel": 1,
+     "replik": {
+      "talare": "farfar",
+      "text": "Läs raden igen!",
+      "upplast": true
+     }
+    },
+    {
+     "efter_fel": 2,
+     "ord": "vattnet"
+    },
+    {
+     "efter_fel": 3,
+     "ratt": true
+    }
+   ],
+   "vid_fel": {
+    "reaktion": "hjälten går en bit in på stigen, dimman vänder honom, och han kommer ut ur en annan. Ungen nyser.",
+    "bild": "ut_ur_fel_stig",
+    "syns_redan": true
+   },
+   "vid_ratt": {
+    "handling": "staven drar ett streck av ljus över stigen",
+    "fest": "liten"
+   },
+   "anteckning": "Mästarprovet (132.4 och 134.3): raden som gäller står som frågan i molnet, och han trycker på den stig som inte stämmer. Den står kvar struken. Varje drag finns på tre av fyra stigar, så det går inte att se svaret utan att läsa. Hjälpen per rad: Farfar, ordet som avgör, och sist stigen."
+  },
+  {
+   "id": "k5_rad2",
+   "typ": "P1_las_och_valj",
+   "i_rummet": true,
+   "instruktion": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "Läs nästa rad!",
+    "upplast": true
+   },
+   "varianter": {
+    "L6": {
+     "text": "Den går mellan två stora stenar.",
+     "alternativ": [
+      {
+       "id": "b",
+       "objekt": "stig_b",
+       "bild": "stig_b"
+      },
+      {
+       "id": "c",
+       "objekt": "stig_c",
+       "bild": "stig_c",
+       "ratt": true,
+       "tillstand_efter": "struken"
+      },
+      {
+       "id": "d",
+       "objekt": "stig_d",
+       "bild": "stig_d"
+      }
+     ]
+    }
+   },
+   "hjalptrappa": [
+    {
+     "efter_fel": 1,
+     "replik": {
+      "talare": "farfar",
+      "text": "Läs raden igen!",
+      "upplast": true
+     }
+    },
+    {
+     "efter_fel": 2,
+     "ord": "två"
+    },
+    {
+     "efter_fel": 3,
+     "ratt": true
+    }
+   ],
+   "vid_fel": {
+    "reaktion": "hjälten går en bit in på stigen, dimman vänder honom, och han kommer ut ur en annan. Ungen nyser.",
+    "bild": "ut_ur_fel_stig",
+    "syns_redan": true
+   },
+   "vid_ratt": {
+    "handling": "staven drar ett streck av ljus över stigen",
+    "fest": "liten"
+   },
+   "anteckning": "Mästarprovet (132.4 och 134.3): raden som gäller står som frågan i molnet, och han trycker på den stig som inte stämmer. Den står kvar struken. Varje drag finns på tre av fyra stigar, så det går inte att se svaret utan att läsa. Hjälpen per rad: Farfar, ordet som avgör, och sist stigen."
+  },
+  {
+   "id": "k5_rad3",
+   "typ": "P1_las_och_valj",
+   "i_rummet": true,
+   "instruktion": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "Läs nästa rad!",
+    "upplast": true
+   },
+   "varianter": {
+    "L7": {
+     "text": "Bakom stenarna växer blå blommor.",
+     "alternativ": [
+      {
+       "id": "b",
+       "objekt": "stig_b",
+       "bild": "stig_b",
+       "ratt": true,
+       "tillstand_efter": "struken"
+      },
+      {
+       "id": "d",
+       "objekt": "stig_d",
+       "bild": "stig_d"
+      }
+     ]
+    }
+   },
+   "hjalptrappa": [
+    {
+     "efter_fel": 1,
+     "replik": {
+      "talare": "farfar",
+      "text": "Läs raden igen!",
+      "upplast": true
+     }
+    },
+    {
+     "efter_fel": 2,
+     "ord": "blå"
+    },
+    {
+     "efter_fel": 3,
+     "ratt": true
+    }
+   ],
+   "vid_fel": {
+    "reaktion": "hjälten går en bit in på stigen, dimman vänder honom, och han kommer ut ur en annan. Ungen nyser.",
+    "bild": "ut_ur_fel_stig",
+    "syns_redan": true
+   },
+   "vid_ratt": {
+    "handling": "staven drar ett streck av ljus över stigen",
+    "fest": "liten"
+   },
+   "anteckning": "Mästarprovet (132.4 och 134.3): raden som gäller står som frågan i molnet, och han trycker på den stig som inte stämmer. Den står kvar struken. Varje drag finns på tre av fyra stigar, så det går inte att se svaret utan att läsa. Hjälpen per rad: Farfar, ordet som avgör, och sist stigen."
+  },
+  {
+   "id": "k5_bo1",
+   "typ": "P1_las_och_valj",
+   "hjalp": "ett_ord",
+   "instruktion": {
+    "typ": "replik",
+    "talare": "farfar",
+    "text": "Titta på den som väntar. Vilket kort stämmer?",
+    "upplast": true
+   },
+   "varianter": {
+    "L2": {
+     "text": "Vem väntar här?",
+     "bild": "bo_langhals",
+     "alternativ": [
+      {
+       "id": "ratt",
+       "ord": "Hals",
+       "ratt": true
+      },
+      {
+       "id": "fel1",
+       "ord": "Horn"
+      },
+      {
+       "id": "fel2",
+       "ord": "Taggar"
+      }
+     ]
+    }
+   },
+   "hjalptrappa": [
+    {
+     "efter_fel": 1,
+     "replik": {
+      "talare": "farfar",
+      "text": "Titta på den som väntar!",
+      "upplast": true
+     }
+    }
+   ],
+   "vid_ratt": {
+    "handling": "kortet flyger till ägget och lyser i stavens färger. Skalet spricker, en liten unge piper, och den vuxna hoppar av glädje.",
+    "fest": "mellan"
+   },
+   "vid_fel": {
+    "reaktion": "ägget nyser, och kortet hoppar tillbaka",
+    "ljud": "nys"
+   },
+   "knuff": {
+    "handling": "den som väntar vid boet tittar upp"
+   },
+   "anteckning": "Bo 1, ord (L2): långhalsen har en hals som syns långt. LÅNG är spärrat (NG), så kortet säger HALS. Varje bo har egna kort, så det sista går inte att lösa genom att utesluta."
+  },
+  {
+   "id": "k5_bo2",
+   "typ": "P1_las_och_valj",
+   "hjalp": "ett_ord",
+   "instruktion": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "Vem väntar här? Läs korten!",
+    "upplast": true
+   },
+   "varianter": {
+    "L3": {
+     "text": "Vem väntar här?",
+     "bild": "bo_taggrygg",
+     "alternativ": [
+      {
+       "id": "ratt",
+       "ord": "Blå och har taggar",
+       "ratt": true
+      },
+      {
+       "id": "fel1",
+       "ord": "Röd och har taggar"
+      },
+      {
+       "id": "fel2",
+       "ord": "Blå och har horn"
+      }
+     ]
+    }
+   },
+   "hjalptrappa": [
+    {
+     "efter_fel": 1,
+     "replik": {
+      "talare": "farfar",
+      "text": "Titta på den som väntar!",
+      "upplast": true
+     }
+    }
+   ],
+   "vid_ratt": {
+    "handling": "kortet flyger till ägget och lyser i stavens färger. Skalet spricker, en liten unge piper, och den vuxna hoppar av glädje.",
+    "fest": "mellan"
+   },
+   "vid_fel": {
+    "reaktion": "ägget nyser, och kortet hoppar tillbaka",
+    "ljud": "nys"
+   },
+   "knuff": {
+    "handling": "den som väntar vid boet tittar upp"
+   },
+   "anteckning": "Bo 2, två egenskaper (L3): båda behövs, och varje fel kort har en av dem rätt."
+  },
+  {
+   "id": "k5_bo3",
+   "typ": "P1_las_och_valj",
+   "hjalp": "ett_ord",
+   "instruktion": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "Vem väntar här? Läs korten!",
+    "upplast": true
+   },
+   "varianter": {
+    "L4": {
+     "text": "Vem väntar här?",
+     "bild": "bo_hornnos",
+     "alternativ": [
+      {
+       "id": "ratt",
+       "ord": "Har inte taggar",
+       "ratt": true
+      },
+      {
+       "id": "fel1",
+       "ord": "Har inte horn"
+      },
+      {
+       "id": "fel2",
+       "ord": "Har taggar"
+      }
+     ]
+    }
+   },
+   "hjalptrappa": [
+    {
+     "efter_fel": 1,
+     "replik": {
+      "talare": "farfar",
+      "text": "Titta på den som väntar!",
+      "upplast": true
+     }
+    }
+   ],
+   "vid_ratt": {
+    "handling": "kortet flyger till ägget och lyser i stavens färger. Skalet spricker, en liten unge piper, och den vuxna hoppar av glädje.",
+    "fest": "mellan"
+   },
+   "vid_fel": {
+    "reaktion": "ägget nyser, och kortet hoppar tillbaka",
+    "ljud": "nys"
+   },
+   "knuff": {
+    "handling": "den som väntar vid boet tittar upp"
+   },
+   "anteckning": "Bo 3, negation (L4): hornnosen har horn men inga taggar. INTE avgör, och HORN är fällan för den som bara läser slutet. LÅNG HALS är bytt mot TAGGAR, eftersom LÅNG är spärrat (NG)."
+  },
+  {
+   "id": "k5_stort_ljus",
+   "typ": "P11_formel",
+   "niva": "S4",
+   "skriv": "tangentbord",
+   "bild": "dalen_full_av_agg",
+   "ledbild": "tankebubbla_stort_ljus",
+   "svar": "STORT LJUS",
+   "formler": [
+    {
+     "ord": "STORT LJUS",
+     "godtas": [
+      "STORTLJUS",
+      "STORA LJUS",
+      "STOR LJUS",
+      "JÄTTELJUS"
+     ],
+     "effekt": "stort_ljus_dalen"
+    }
+   ],
+   "rimliga": [
+    {
+     "ord": "LJUS",
+     "reaktion": "ljusbollen tänds och lyser upp ett enda ägg",
+     "replik": {
+      "talare": "berattare",
+      "text": "Ljuset räcker inte till hela dalen!",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "STOR",
+     "reaktion": "staven blir lite större",
+     "replik": {
+      "talare": "berattare",
+      "text": "Stor vad?",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "STOR SKÖLD",
+     "reaktion": "en jättebubbla välver sig över dalen och slocknar",
+     "replik": {
+      "talare": "berattare",
+      "text": "Äggen behöver ljus, inte en sköld!",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "SOL",
+     "reaktion": "en liten sol glimtar och bleknar",
+     "replik": {
+      "talare": "berattare",
+      "text": "Bra ord! Men staven kan något bättre.",
+      "upplast": true
+     }
+    }
+   ],
+   "vanligt_svar": {
+    "talare": "berattare",
+    "text": "Bra ord! Men det hjälper inte här.",
+    "upplast": true
+   },
+   "nastan": [
+    {
+     "ord": "STORT LJU",
+     "effekt": "litet_ljus_dalen",
+     "replik": {
+      "talare": "berattare",
+      "text": "Nästan!",
+      "upplast": true
+     }
+    },
+    {
+     "ord": "STOORT LJUS",
+     "effekt": "litet_ljus_dalen",
+     "replik": {
+      "talare": "berattare",
+      "text": "Nästan!",
+      "upplast": true
+     }
+    }
+   ],
+   "forebild": {
+    "text": "STORT LJUS",
+    "upplast": false,
+    "visas": "andra_felet"
+   },
+   "hjalp": "ett_ord",
+   "instruktion": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "En ny formel! Skriv det största ljuset du kan!",
+    "upplast": true
+   },
+   "vid_ratt": {
+    "handling": "regnbågsljuset pulserar ur staven, och en jättestor ljusboll stiger över dalen",
+    "fest": "stor"
+   },
+   "vid_fel": {
+    "reaktion": "staven fräser, pff",
+    "replik": {
+     "talare": "berattare",
+     "text": "Pff! Hur lyste du upp dimman?",
+     "upplast": true
+    },
+    "ljud": "fras"
+   },
+   "knuff": {
+    "handling": "bilden i molnet glimtar"
+   },
+   "tillstand_efter": "farg",
+   "anteckning": "Kapitlets nya formel, egenskap och ord (S4), med glipan mellan orden som STOR SKÖLD. Den förklaras innan han skriver (104.3). STORTLJUS, STORA LJUS, STOR LJUS och JÄTTELJUS godtas: klimax är ingen grammatiklektion. Regin stort_ljus_dalen kommer efter."
+  }
+ ],
+ "uppdrag": [
+  {
+   "id": "u5_molnkanten",
+   "rubrik": "MOLNKANTEN",
+   "bild": "kort_molnkant",
+   "pass": 1,
+   "steg": [
+    {
+     "text": "LÄS SKYLTEN",
+     "klart": {
+      "scen": "k5s01_molnkanten",
+      "las_skylt": "skylt_baronens_dal"
+     }
+    },
+    {
+     "text": "VÄLJ RÄTT SVAR",
+     "klart": {
+      "scen": "k5s01_molnkanten",
+      "pussel": "k5_faktning"
+     },
+     "knep": "Läs korten och titta på baronen!"
+    },
+    {
+     "text": "TITTA PÅ BITEN",
+     "klart": {
+      "scen": "k5s01_molnkanten",
+      "ga_till": "bit_baronen"
+     }
+    }
+   ],
+   "stampel": {
+    "scen": "k5s01_molnkanten",
+    "efter": {
+     "bild": "baronen_in_i_dimman"
+    }
+   }
+  },
+  {
+   "id": "u5_dimman",
+   "rubrik": "DIMMAN",
+   "bild": "kort_dimma",
+   "pass": 2,
+   "steg": [
+    {
+     "text": "LYS UPP DIMMAN",
+     "klart": {
+      "scen": "k5s02_dimman",
+      "pussel": "k5_ljus"
+     },
+     "knep": "Titta på staven!"
+    },
+    {
+     "text": "FÖLJ SPÅREN",
+     "klart": {
+      "scen": "k5s02_dimman",
+      "ga_till": "hatt_baronen"
+     }
+    }
+   ],
+   "stampel": {
+    "scen": "k5s02_dimman",
+    "efter": {
+     "ga_till": "hatt_baronen"
+    }
+   },
+   "anteckning": "Två steg efter 139.5: SVÄRD och bladväggen är strukna. Han följer spåren till baronens hatt."
+  },
+  {
+   "id": "u5_roten",
+   "rubrik": "ROTEN",
+   "bild": "kort_rot",
+   "pass": 2,
+   "steg": [
+    {
+     "text": "RÄDDA BARONEN",
+     "klart": {
+      "scen": "k5s03_roten",
+      "pussel": "k5_stege"
+     },
+     "knep": "Titta på bilden i molnet!",
+     "pa_vagen": "Gå mot ropet"
+    },
+    {
+     "text": "TA HATTEN TILL BARONEN",
+     "klart": {
+      "scen": "k5s03_roten",
+      "bara": "baronen_rot"
+     }
+    },
+    {
+     "text": "KOM FÖRBI ROTEN",
+     "klart": {
+      "scen": "k5s03_roten",
+      "pussel": "k5_roten"
+     },
+     "knep": "Läs biten i din bok!"
+    }
+   ],
+   "stampel": {
+    "scen": "k5s03_roten",
+    "efter": {
+     "pussel": "k5_roten"
+    }
+   }
+  },
+  {
+   "id": "u5_stigen",
+   "rubrik": "STIGEN",
+   "bild": "kort_stig",
+   "pass": 2,
+   "steg": [
+    {
+     "text": "FÖLJ {UNGE}",
+     "klart": {
+      "scen": "k5s04_glantan",
+      "ga_till": "glantan_mitt"
+     }
+    },
+    {
+     "text": "VÄLJ RÄTT STIG",
+     "klart": {
+      "scen": "k5s04_glantan",
+      "pussel": "k5_rad3"
+     },
+     "knep": "Läs en rad i taget!"
+    },
+    {
+     "text": "LÄS SISTA RADEN",
+     "klart": {
+      "scen": "k5s04_glantan",
+      "vantar_pa": "ropa"
+     },
+     "knep": "Läs biten i din bok!"
+    }
+   ],
+   "stampel": {
+    "scen": "k5s04_glantan",
+    "efter": {
+     "vantar_pa": "ropa"
+    }
+   }
+  },
+  {
+   "id": "u5_mamma",
+   "rubrik": "MAMMA",
+   "bild": "kort_mamma",
+   "pass": 3,
+   "steg": [
+    {
+     "text": "KRAMA {UNGE}",
+     "klart": {
+      "scen": "k5s05_dalen",
+      "vantar_pa": "krama_ungen"
+     }
+    },
+    {
+     "text": "TA RADION TILL MAMMA",
+     "klart": {
+      "scen": "k5s05_dalen",
+      "bara": "mamma"
+     }
+    }
+   ],
+   "stampel": {
+    "scen": "k5s05_dalen",
+    "efter": {
+     "bild": "mamma_kanner_igen"
+    }
+   }
+  },
+  {
+   "id": "u5_aggen",
+   "rubrik": "VÄCK ÄGGEN",
+   "bild": "kort_agg",
+   "pass": 3,
+   "steg": [
+    {
+     "text": "LÄS FÖR ÄGGEN",
+     "klart": {
+      "scen": "k5s06_aggen",
+      "pussel": "k5_bo3"
+     },
+     "knep": "Titta på den som väntar!"
+    },
+    {
+     "text": "VÄCK HELA DALEN",
+     "klart": {
+      "scen": "k5s06_aggen",
+      "pussel": "k5_stort_ljus"
+     },
+     "knep": "Titta på bilden i molnet!"
+    }
+   ],
+   "stampel": {
+    "scen": "k5s06_aggen",
+    "efter": {
+     "bild": "dalen_vaknar"
+    }
+   }
+  },
+  {
+   "id": "u5_hem",
+   "rubrik": "TA {UNGE} HEM",
+   "bild": "kort_hem",
+   "pass": 3,
+   "steg": [
+    {
+     "text": "LÄMNA RADION HOS MAMMA",
+     "klart": {
+      "scen": "k5s07_avskedet",
+      "bara": "mamma"
+     }
+    },
+    {
+     "text": "TA LÖVET",
+     "klart": {
+      "scen": "k5s07_avskedet",
+      "ga_till": "lovet"
+     }
+    }
+   ],
+   "stampel": {
+    "scen": "k5s07_avskedet",
+    "efter": {
+     "ga_till": "lovet"
+    }
+   },
+   "anteckning": "Pennstrecket går över TA {UNGE} HEM när båda stegen är klara, som vid varje uppdrag, och han stänger boken själv (130.3)."
+  }
+ ]
+}

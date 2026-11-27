@@ -191,6 +191,10 @@ describe('Tiled-kartor och synliga föremål', () => {
   it('en karta i fel storlek godtas inte: minst en skärm, högst 2 × 3 skärmar', () => {
     expect(() => lasKarta({ ...tmj([]), width: 19 })).toThrow(/320×192 till 640×576/);
     expect(() => lasKarta({ ...tmj([]), height: 37 })).toThrow(/320×192 till 640×576/);
+    // 139.3: dalen i kapitel 5 får vara 3 × 1 skärmar, men inte 3 × 2
+    expect(() => lasKarta({ ...tmj([]), width: 60, height: 12 })).not.toThrow();
+    expect(() => lasKarta({ ...tmj([]), width: 60, height: 13 })).toThrow(/eller 960×192/);
+    expect(() => lasKarta({ ...tmj([]), width: 61, height: 12 })).toThrow(/eller 960×192/);
     expect(lasKarta(tmj([])).storlek).toEqual({ bredd: 320, hojd: 192 });
     expect(lasKarta({ ...tmj([]), width: 40, height: 24 }).storlek).toEqual({ bredd: 640, hojd: 384 });
     expect(lasKarta({ ...tmj([]), width: 40, height: 36 }).storlek).toEqual({ bredd: 640, hojd: 576 });

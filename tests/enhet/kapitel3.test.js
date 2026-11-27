@@ -80,7 +80,7 @@ describe('kapitel 3 i kontrollen och budgeten', () => {
   it('kap-03 går igenom kontrollen utan fel', () => {
     const r = kontrollera(alla());
     expect(r.fel).toEqual([]);
-    expect(r.pass.filter((p) => p.kapitel === 'kap-03').map((p) => p.lasuppgifter)).toEqual([3, 4, 3]);
+    expect(r.pass.filter((p) => p.kapitel === 'kap-03').map((p) => p.lasuppgifter)).toEqual([3, 4, 5]); // 139.5: ordduellens tre ronder i pass 3 är tre läsval
   });
   it('kontrollen fångar fel i de nya fälten', () => {
     const fel = (andra) => { const d = alla(); const k = d.kapitel[3]; andra(k); return kontrollera(d).fel.join('\n'); };

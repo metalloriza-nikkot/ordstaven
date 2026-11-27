@@ -1296,6 +1296,30 @@ export class Rum extends Phaser.Scene {
       skata_harmar_molnkant: () => this.skataHarmarMolnkant(),
       resan_molnkant: () => this.resanMolnkant(),
       sackhiss_ner: () => this.sackhiss(1),
+      // kapitel 5 i gråbox (139.8): kameran visar det beskrivningen talar om, och figurerna går. Det som inte står här
+      // visar beskrivningen för den vuxne tills Stil har ritat (kapitlet är i gråbox)
+      ankomst_molnkant: () => this.kameranVisar(['mast_luftskepp', 'skylt_baronens_dal'], 'ankomst_molnkant'),
+      baronen_bugar: () => this.k5Bugar('baronen_molnkant'),
+      baronen_in_i_dimman: () => this.k5FigurGar('baronen_molnkant', 110, 0, 2200, true, 'baronen_in_i_dimman'),
+      fotspar_syns: () => this.kameranVisar(['fotspar'], 'fotspar_syns'),
+      skatans_bo: () => this.kameranVisar(['buske_skata'], 'skatans_bo'),
+      baronen_pa_roten: () => this.kameranVisar(['baronen_rot', 'rot_under'], 'baronen_pa_roten'),
+      baronen_klattrar_ner: () => this.k5FigurFran('baronen_rot', 130, -82, 2000, 'baronen_klattrar_ner'),
+      kryper_under_roten: () => this.k5Kryper('rot_under'),
+      baronen_gar_tillbaka: () => this.k5FigurGar('baronen_rot', -360, 80, 2600, true, 'baronen_gar_tillbaka'),
+      en_stig_kvar: () => this.kameranVisar(['stig_d'], 'en_stig_kvar'),
+      ungen_ropar: () => { this.ungeRopar(); this.k4Logg('ungen_ropar'); return 1800; },
+      bona_frost: () => this.kameranVisar(['bo_langhals', 'bo_taggrygg', 'bo_hornnos'], 'bona_frost'),
+      fler_agg: () => this.kameranVisar(['agg_frost_5', 'agg_frost_6'], 'fler_agg'),
+      dalen_frost: () => this.kameranVisar(['ordtradet'], 'dalen_frost'),
+      // 2.63 (139.7): reaktionernas regier i kapitel 5, i gråbox
+      dimman_tands: () => { this.k4Glitter({ x: this.pos.x, y: this.pos.y - 20 }, 40); this.k4Logg('dimman_tands'); return 1200; },
+      agg_klacks_langhals: () => this.kameranVisar(['bo_langhals'], 'agg_klacks_langhals'),
+      agg_klacks_taggrygg: () => this.kameranVisar(['bo_taggrygg'], 'agg_klacks_taggrygg'),
+      agg_klacks_hornnos: () => this.kameranVisar(['bo_hornnos'], 'agg_klacks_hornnos'),
+      agget_nyser: () => { this.k4Logg('agget_nyser'); return 600; },
+      stort_ljus_dalen: () => { this.k4Glitter({ x: this.pos.x, y: this.pos.y - 40 }, 60); return this.kameranVisar(['ordtradet', 'agg_frost_5'], 'stort_ljus_dalen'); },
+      paraplyet_faller_ihop: () => { this.k4Logg('paraplyet_faller_ihop'); return 800; },
     });
     if (k2[bild]) return k2[bild]();
     if (bild.startsWith('luftskepp_')) {
@@ -4307,6 +4331,8 @@ export class Rum extends Phaser.Scene {
       if (v.nyttRum) { this.flyttade.clear(); this.kvarDelar.clear(); }
       this.objekt = this.harRum ? rumsObjekt(v.innehall, v.tillstand, v.karta, v.visade) : [];
       for (const o of this.objekt) { const f = this.flyttade.get(o.id); if (f) { o.x = f.x; o.y = f.y; } }
+      // plats_sedan (139.8): baronen står vid rotens fot när han har klättrat ned
+      for (const o of this.objekt) if (o.platsSedan && this.bytta.has(o.id)) { o.x = o.platsSedan.x; o.y = o.platsSedan.y; }
       // tussarna som står kvar efter fältet (75.3) ersätter det hela föremålet, också i ett annat tillstånd
       if (this.kvarDelar.size) {
         const baser = new Set([...this.kvarDelar.values()].map((d) => d.delAv));
@@ -4685,9 +4711,14 @@ export class Rum extends Phaser.Scene {
       for (const [r, a] of [[60, 0.10], [44, 0.12], [28, 0.16]]) g.fillStyle(FARG.ljus, a).fillCircle(l.x, l.y, r);
       g.fillStyle(FARG.ljus, 1).fillCircle(l.x, l.y - 14, 3);
     }
-    this.ljusboll.setVisible(this.harRum && (t === 'natt_upplyst' || t === 'mork'));
+    this.ljusboll.setVisible(this.harRum && (t === 'natt_upplyst' || t === 'mork' || t === 'dis'));
     const gm = this.grottMorker; gm.clear();
     if (this.harRum && t === 'mork') { gm.fillStyle(0x04050a, 0.97).fillRect(0, 0, this.storlek.bredd, this.storlek.hojd); this.regiLogg.push('mörkret'); }
+    // kapitel 5 i gråbox (139.8): dimman är grå och disig som en mörk kväll (dis), inte svart, och gläntans dimma är vit
+    // och tjock som mjölk (dimma). Båda ligger under figurerna, och längre bort ses ingenting. En enda rektangel per
+    // tillstånd (golvdatorn, 139.8.5): inget animeras
+    if (this.harRum && t === 'dis') { gm.fillStyle(0x3a3e48, 0.78).fillRect(0, 0, this.storlek.bredd, this.storlek.hojd); this.regiLogg.push('diset'); }
+    if (this.harRum && t === 'dimma') { gm.fillStyle(0xeeeef0, 0.62).fillRect(0, 0, this.storlek.bredd, this.storlek.hojd); this.regiLogg.push('dimman'); }
   }
 
   placera() {
@@ -4706,7 +4737,7 @@ export class Rum extends Phaser.Scene {
     else this.unge.setPosition(Math.round(this.ungePos.x - 6 + (m ? Math.cos(m.mot) * nos : 0)), Math.round(this.ungePos.y - 12 + (m ? Math.sin(m.mot) * nos : 0)));
     this.ritaVassVidFotter();
     const l = this.ljusboll; l.clear();
-    if (l.visible && this.tillstand === 'mork') {
+    if (l.visible && (this.tillstand === 'mork' || this.tillstand === 'dis')) {
       // stavens svaga glimt i mörkret: en liten prick vid stavens topp
       l.fillStyle(0xcfe6ff, 0.25).fillCircle(Math.round(this.pos.x + 6), Math.round(this.pos.y - 26), 6);
       l.fillStyle(0xeaf4ff, 0.9).fillCircle(Math.round(this.pos.x + 6), Math.round(this.pos.y - 26), 1.5);
@@ -5682,6 +5713,61 @@ export class Rum extends Phaser.Scene {
     this.time.delayedCall(mal.length * VID + 200, () => { this.regiFokus = null; });
     this.k4Logg(namn);
     return mal.length * VID + 600;
+  }
+
+  /**
+   * Kapitel 5 i gråbox (139.8): en figur i rummet går dx, dy pixlar på ms och tonas bort med `tona`. Rutan i rummet
+   * står kvar (det han kan gå till), bara bilden går. @param {string} id @param {number} dx @param {number} dy
+   * @param {number} ms @param {boolean} tona @param {string} namn @returns {number}
+   */
+  k5FigurGar(id, dx, dy, ms, tona, namn) {
+    const r = /** @type {any} */ (this.ritade.get(id));
+    if (!r) return 0;
+    this.regiFokus = { x: r.x + dx / 2, y: r.y + dy / 2 };
+    this.tweens.add({ targets: r, x: r.x + dx, y: r.y + dy, alpha: tona ? 0 : 1, duration: ms, onUpdate: () => { r.x = Math.round(r.x); r.y = Math.round(r.y); this.smutsig = true; } });
+    this.time.delayedCall(ms + 100, () => { this.regiFokus = null; });
+    this.k4Logg(namn);
+    return ms + 300;
+  }
+
+  /**
+   * Kapitel 5 i gråbox (139.8): figuren kommer dit den står nu, från dx, dy bort (baronen klättrar ned från roten).
+   * @param {string} id @param {number} dx @param {number} dy @param {number} ms @param {string} namn @returns {number}
+   */
+  k5FigurFran(id, dx, dy, ms, namn) {
+    const r = /** @type {any} */ (this.ritade.get(id));
+    if (!r) return 0;
+    const slut = { x: r.x, y: r.y };
+    r.setPosition(slut.x + dx, slut.y + dy);
+    this.regiFokus = { x: slut.x + dx / 2, y: slut.y + dy / 2 };
+    this.tweens.add({ targets: r, x: slut.x, y: slut.y, duration: ms, onUpdate: () => { r.x = Math.round(r.x); r.y = Math.round(r.y); this.smutsig = true; } });
+    this.time.delayedCall(ms + 100, () => { this.regiFokus = null; });
+    this.k4Logg(namn);
+    return ms + 300;
+  }
+
+  /** Baronen bugar djupt (139.8, gråbox): bilden trycks ihop och reser sig två gånger. @param {string} id @returns {number} */
+  k5Bugar(id) {
+    const r = /** @type {any} */ (this.ritade.get(id));
+    if (!r) return 0;
+    this.tweens.add({ targets: r, scaleY: 0.8, duration: 300, yoyo: true, repeat: 1, onUpdate: () => { this.smutsig = true; } });
+    this.k4Logg('baronen_bugar');
+    return 1400;
+  }
+
+  /**
+   * Hjälten och ungen kryper in under roten (139.8, gråbox): kameran visar hålet, och de går in genom gången när
+   * berättelsen säger det. @param {string} id hålet @returns {number}
+   */
+  k5Kryper(id) {
+    const p = this.k4Punkt(id);
+    if (!p) return 0;
+    // de är kvar i rummet tills han går ut genom gången (baronen talar först), så bara kameran visar hålet
+    this.regiFokus = p;
+    this.time.delayedCall(600, () => this.k4Glitter(p, 14));
+    this.time.delayedCall(1500, () => { this.regiFokus = null; });
+    this.k4Logg('kryper_under_roten');
+    return 1800;
   }
 
   /** Klippan reser sig över hyllan (138.5): kameran tittar upp längs den blanka isen och sedan ned igen. @returns {number} */

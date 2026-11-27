@@ -1,6 +1,12 @@
 # Innehållsschema – kapitel i format 2
 
-Version 2.62 (2026-11-27). Ägs av teknikspåret.
+Version 2.63 (2026-11-28). Ägs av teknikspåret.
+2.63 (beslut 139.4 och 139.7): **kortets eget svar i ordduellen, och kapitel 5:s regier.** Ett tillägg, filer i 2.62 gäller fortfarande.
+- **`vid_fel`** på ett kort i ordduellen (`ronder[].utfall[].alternativ[]`): kortets eget svar när han väljer det. Det går före utfallets `vid_fel`: fälten som står här (`replik`, `handling`, `bild`) ersätter samma fält där, och resten tas från utfallet. Så visar ett halvrätt kort vilken halva som var fel: `{"text": "Hög och har ett bo", "vid_fel": {"replik": {"talare": "baronen", "text": "Hög! Precis! … Ett bo?", "upplast": true}}}`.
+- **`handling.bild`** har kapitel 5:s regier: `dimman_tands`, `kryper_under_roten`, `en_stig_kvar`, `agg_klacks_langhals`, `agg_klacks_taggrygg`, `agg_klacks_hornnos`, `agget_nyser`, `stort_ljus_dalen` och `paraplyet_faller_ihop`. De är gråbox tills Stil har ritat (kameran och glitter).
+- **Kartan:** `plats_sedan` ("x,y") med `sedan` (ett pussel): föremålet står där när pusslet är gjort (baronen vid rotens fot efter STEGE). Ett område får vara 3 × 1 skärmar (dalen, 139.3) utöver 2 × 3.
+- **Budgeten** (`verktyg/innehall/budget.js`, 139.5): en rond i en ordduell räknas som ett läsval, en replik med `vantar_pa` är en handling (inte ett passivt steg), och kapitlets sista scen räknas inte mot taket för passiva steg när han inte gör något i den (slutbilderna).
+- **Tillståndet `dis`** (dimman i kapitel 5) är grått och disigt under figurerna, med stavens glimt, och `dimma` (gläntan) är vit. Äventyrets sista sparpunkt (`pass_slut` sist i det sista kapitlet) leder till startskärmen, inte till frågan.
 2.62 (beslut 134.3 och 136.6): **hjälpen per läsval (mästarprovet).** Ett tillägg, filer i 2.61 gäller fortfarande.
 - **`hjalptrappa`** på `P1_las_och_valj`: en lista med steg som kommer efter fel i just det läsvalet (samma stig igen räknas inte). Varje steg har `efter_fel` (antal, i stigande ordning) och något av:
   - `replik`: en replik efter felet, till exempel 🔊 FARFAR: "Läs raden igen!" (`upplast: true`, eftersom det är en instruktion);

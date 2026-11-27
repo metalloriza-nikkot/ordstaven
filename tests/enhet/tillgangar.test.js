@@ -236,7 +236,15 @@ describe('mellanscenernas bilder och bildkorten', () => {
     'baronen_kommer', 'flaskan_hittad',
     // 118.4: kapitel 4:s gråbox (Rum.js, kapitel 4 i gråbox), med Stils bilder där de finns
     'ankomst_berget', 'baronen_kikare_berg', 'blocket_lyfts', 'mynningen_stangs', 'ungens_ogon', 'grottan_visar_vaggen', 'ungen_fot_avtryck',
-    'ungen_slar_isen', 'blocket_driva', 'svansarna', 'kartbit5_molnkant', 'skata_harmar_molnkant', 'resan_molnkant']);
+    'ungen_slar_isen', 'blocket_driva', 'svansarna', 'kartbit5_molnkant', 'skata_harmar_molnkant', 'resan_molnkant',
+    // 139.8: kapitel 5:s gråbox, med kameran och figurerna som finns (Rum.js, k5FigurGar och kameranVisar)
+    'ankomst_molnkant', 'baronen_bugar', 'baronen_in_i_dimman', 'fotspar_syns', 'skatans_bo', 'baronen_pa_roten', 'baronen_klattrar_ner',
+    'kryper_under_roten', 'baronen_gar_tillbaka', 'en_stig_kvar', 'ungen_ropar', 'bona_frost', 'fler_agg', 'dalen_frost']);
+  // 139.8: kapitel 5:s mellanscener som visar beskrivningen för den vuxne i gråboxen, tills Stil har ritat (139.9).
+  // Listan får bara krympa, och kapitel 5 är inte klart förrän den är tom (ingen text för den vuxne, 65 och 133.8)
+  const K5_I_GRABOX = new Set(['farfars_teckning', 'ungen_nyser_biten', 'dimman_glesnar', 'vralet', 'in_mot_vralet', 'skuggan_kommer',
+    'mamma_nosar', 'prickarna', 'mamma_och_ungen', 'mamma_kanner_igen', 'dalen_vaknar', 'lovet', 'ungen_leker', 'ungen_vander',
+    'baronen_tittar_pa_biten', 'slut_rosa', 'slut_apan', 'slut_floden', 'slut_baronen_skolan', 'slut_lasrummet', 'slut_radion', 'slut_staven']);
   it('varje mellanscen med bild har grafik (morgonen i sängen, luftskeppets lägen, sidovyerna, ungen på kartbiten, ägget)', () => {
     const saknas = [];
     for (const k of kapitel) for (const sc of k.scener) for (const st of sc.steg) {
@@ -253,6 +261,7 @@ describe('mellanscenernas bilder och bildkorten', () => {
           : STILS_REGI[st.bild] ? STILS_REGI[st.bild].every((r) => ramar.has(r))
           // kapitel 2:s gråbox (69.1): ritas med figurerna som finns och gråboxens former
           : GRABOX_REGI.has(st.bild) ? true
+          : k.id === 'kap-05' && K5_I_GRABOX.has(st.bild) ? true
           // närbilderna på läsplattan (brevramen, Stil del 3): bildkorten prövas i kvall.test.js
           : st.bild === 'brevram_nara' ? true
           : existsSync(new URL(`assets/sidovyer/${st.bild}_bakgrund.png`, rot));
@@ -278,9 +287,9 @@ describe('mellanscenernas bilder och bildkorten', () => {
   });
   it('uppdragslappen (2d): varje uppdrag har sitt bildkort, och lappens papper, kompassros och stämpel finns', () => {
     const saknas = [];
-    // ett kapitel i gråbox (118.4, kapitel 4) har platshållare tills Stil har ritat korten
+    // ett kapitel i gråbox (118.4, kapitel 4, och 139.8, kapitel 5) har platshållare tills Stil har ritat korten
     const vantar = JSON.parse(las('kartor/den-gomda-dalen/platshallare.json').toString()).bilder;
-    for (const k of kapitel) for (const u of k.uppdrag || []) if (!existsSync(new URL(`assets/bildkort/${u.bild}.png`, rot)) && !(k.id === 'kap-04' && vantar[u.bild])) saknas.push(`${k.id} ${u.id}: ${u.bild}`);
+    for (const k of kapitel) for (const u of k.uppdrag || []) if (!existsSync(new URL(`assets/bildkort/${u.bild}.png`, rot)) && !(['kap-04', 'kap-05'].includes(k.id) && vantar[u.bild])) saknas.push(`${k.id} ${u.id}: ${u.bild}`);
     expect(saknas).toEqual([]);
     for (const f of ['lapp_uppdrag', 'lapp_kompassros', 'stampel', 'ikon_uppdrag', 'ikon_klar', 'ikon_fram']) expect(existsSync(new URL(`assets/ui/${f}.png`, rot)), f).toBe(true);
   });
