@@ -16,11 +16,11 @@
  },
  "meta": {
   "namn": "Berget",
-  "version": "0.11",
+  "version": "0.12",
   "datum": "2026-11-27",
   "agare": "Innehåll",
   "kalla": "Berättelsen 21 v0.5.2, manus 21 v0.3.1 och ritningarna 21b v0.2.1, godkända av den vuxne (beslut 118.1).",
-  "teknik": "Nytt i kapitlet (118.4): bokstavsstigen P18_bokstavsstig i ett kapitel (k4_stig1–3, kartan har stig_<id>), snön som stannar i luften tills STOR SKÖLD är skriven, färgtabellen för mörkret som LJUS stänger av, P9 utan chiffer (k4_ladan), tre rum utan Tiled-karta, och regierna: ankomst_berget, baronen_kikare_berg, blocket_lyfts, stor_skold_ras, mynningen_stangs, grottan_glittrar, grottan_visar_vaggen, fotavtryck_stor, ungen_fot_avtryck, ungen_slar_isen, blocket_driva, fossil_svans, svansarna, ladan_oppnas, kartbit5_molnkant, skata_harmar_molnkant och resan_molnkant. Musiken står som spel tills Stil har en slinga för berget. Föremålens id är förslag, och Teknik sätter dem efter kartan. Pass 121: vagg_gemener är en skylt med gemener (gemener: true, som en bubbla), isficka_bar (frivilligt, F1), ristning_tand och tand_isen (F3) och stig_k4_stig4, hylla, klippa och klippan_uppe i stenfältet med tillståndet hylla. Effekterna stege_klippan, rep_klippan och trappa_klippan, och de nära: ett_trappsteg_klippan, en_kort_stege_klippan och ett_kort_rep_klippan. Bilden klippan_hog i molnet. Pass 122: rummet berget_valvet (vagg_valvet, gang_salen, gang_galleriet och stig_k4_stig_valv), gang_valvet och gang_istapparna i grottan, scenerna k4s03_valvet och k4s03_galleriet, och regin mynningen_stangs med scenen efter STOR SKÖLD (122.2). Pass 124: rummen berget_gangen (R1), berget_salen (R2), berget_valvet (R3), berget_galleriet (R4), berget_tandgrottan och berget_sprickan (R5) ersätter berget_grottan. Id:n och mått får ändras. Nya föremål: mynningen_inifran, isficka, isklump_1–3, farfars_kompass, gang_salen_in, tavla_farfar, tand_genom_isen, oppning_tandgrottan, gang_sprickan och gang_galleriet_tillbaka. ge_sak ryggsack farfars_kompass. k4_stenarna har kan_oppnas_igen, och galleriet öppnar den med oppna_lasplatta.",
+  "teknik": "Nytt i kapitlet (118.4): bokstavsstigen P18_bokstavsstig i ett kapitel (k4_stig1–3, kartan har stig_<id>), snön som stannar i luften tills STOR SKÖLD är skriven, färgtabellen för mörkret som LJUS stänger av, P9 utan chiffer (k4_ladan), tre rum utan Tiled-karta, och regierna: ankomst_berget, baronen_kikare_berg, blocket_lyfts, stor_skold_ras, mynningen_stangs, grottan_glittrar, grottan_visar_vaggen, fotavtryck_stor, ungen_fot_avtryck, ungen_slar_isen, blocket_driva, fossil_svans, svansarna, ladan_oppnas, kartbit5_molnkant, skata_harmar_molnkant och resan_molnkant. Musiken står som spel tills Stil har en slinga för berget. Föremålens id är förslag, och Teknik sätter dem efter kartan. Pass 121: vagg_gemener är en skylt med gemener (gemener: true, som en bubbla), isficka_bar (frivilligt, F1), ristning_tand och tand_isen (F3) och stig_k4_stig4, hylla, klippa och klippan_uppe i stenfältet med tillståndet hylla. Effekterna stege_klippan, rep_klippan och trappa_klippan, och de nära: ett_trappsteg_klippan, en_kort_stege_klippan och ett_kort_rep_klippan. Bilden klippan_hog i molnet. Pass 122: rummet berget_valvet (vagg_valvet, gang_salen, gang_galleriet och stig_k4_stig_valv), gang_valvet och gang_istapparna i grottan, scenerna k4s03_valvet och k4s03_galleriet, och regin mynningen_stangs med scenen efter STOR SKÖLD (122.2). Pass 124: rummen berget_gangen (R1), berget_salen (R2), berget_valvet (R3), berget_galleriet (R4), berget_tandgrottan och berget_sprickan (R5) ersätter berget_grottan. Id:n och mått får ändras. Nya föremål: mynningen_inifran, isficka, isklump_1–3, farfars_kompass, gang_salen_in, tavla_farfar, tand_genom_isen, oppning_tandgrottan, gang_sprickan och gang_galleriet_tillbaka. ge_sak ryggsack farfars_kompass. k4_stenarna har kan_oppnas_igen, och galleriet öppnar den med oppna_lasplatta. 138.5 (0.121.0): de åtta mellanscenerna utan bild har en regi som `bild`: grottan_glittrar (gången och in i galleriet), tavlan_visar_valvet, valvet_visar_skriften, gatan_i_boken, tanden_i_isen, klippan_reser_sig och ungen_glider_klippan. Klippans mål är kvar som `klippa`: kartan säger var foten är (mal_vid: regi_klippan).",
   "anteckning": "Tre pass (114.4). En ny formel (STOR SKÖLD), LJUS på huvudvägen, FLYG frivilligt. Inga nya figurer.",
   "andrat_v02": "2026-11-21 (beslut 119.3, granskning 10): Farfars replik om den sista biten i pass 3, snöraset i ett svep, hjälptrappan i stig 3, en grotta av is, lådan med INTE KALL, gåtan i boken, RÄTT sten, instruktionerna till stig 2, FLYG och STOR SKÖLD, och tre repliker. Mellanscenen där han skriver av gåtan är ny och har ännu ingen bild.",
   "andrat_v03": "2026-11-22 (beslut 120.2–120.3 och 121.2–121.5): grottan efter Stils plan A–E med gemenernas vägg och avstickarna F1–F3, raset som en scen, stig 4 (tand) i F3 med en sida i Dinoboken, klippan med STEGE, REP och TRAPPA, och passgränsen: pass 2 slutar när gåtan står i boken, och pass 3 börjar med stig 3.",
@@ -31,7 +31,8 @@
   "andrat_v08": "2026-11-25 (beslut 128.10.3, rättelse i ett fryst kapitel, en replik mot en): fröet för baronens bit på stenfältet: den har bara ord, om vägen in.",
   "andrat_v09": "2026-11-26 (beslut 132.3, ljud i ett fryst kapitel, godkänt i 127.6): speldosan. berget_tandgrottan har musik \"tandgrottan\", Stils slinga. Den gäller i hela rummet, och kapitlets \"spel\" kommer tillbaka i galleriet.",
   "andrat_v10": "2026-11-26 (beslut 133.6 och 133.11, kapitel 4:s rättelsepass): stig 4:s rutnät där TAND svänger med ett enda spår, stigen som slutar vid tanden, och UPP som ordkort i molnet vid stig 1 med instruktionen \"Hoppa på bokstäverna i ordet upp!\".",
-  "andrat_v11": "2026-11-27 (beslut 135.7): gå-stegen. pa_vagen på HOPPA ÖVER VATTNET (\"Gå genom gången\"), LÄS VÄGGEN OCH HOPPA (\"Gå dit pilen visar\") och HITTA UT (\"Hitta en väg ut\"), där berättelsens instruktion i rummen före är en ledtråd, en fråga eller ingenting. Ankomsten nämner inte luftskeppet, som syns först efter valet vid gaffeln (133.2)."
+  "andrat_v11": "2026-11-27 (beslut 135.7): gå-stegen. pa_vagen på HOPPA ÖVER VATTNET (\"Gå genom gången\"), LÄS VÄGGEN OCH HOPPA (\"Gå dit pilen visar\") och HITTA UT (\"Hitta en väg ut\"), där berättelsens instruktion i rummen före är en ledtråd, en fråga eller ingenting. Ankomsten nämner inte luftskeppet, som syns först efter valet vid gaffeln (133.2).",
+  "andrat_v12": "2026-11-27 (beslut 137.3): han går själv till ljuset efter stig 3 (\"Gå till ljuset!\"), och först där slår ungen upp isen; han går själv till klippans fot (\"Gå till klippan!\") före skrivpusslet, och där visar ungen att det är för högt; grottans fem rum har musiken isgrottan, och tandgrottan har kvar speldosan. Fotavtryckets sida har redan ordet \"En stor fot\"."
  },
  "var_var_vi": [
   {
@@ -212,7 +213,8 @@
      "gemener": true
     }
    },
-   "anteckning": "R1 (124.2), ca 320 × 384. Mynningen syns inifrån, igentäppt av snö (mynningen_inifran). Han skriver LJUS här. Gången slingrar sig, och F1 ligger vid en sväng framåt i gångriktningen: en isficka med ett varmt ljus i det blå (isficka) och tre isklumpar (isklump_1–3). Under den sista ligger Farfars kompass. Farfars vägg med paren (vagg_gemener) står sist, precis före gången till salen (gang_salen_in). I mork syns bara hjälten, ungen och stavens glimt, och mörkret ligger tätt över figurerna."
+   "anteckning": "R1 (124.2), ca 320 × 384. Mynningen syns inifrån, igentäppt av snö (mynningen_inifran). Han skriver LJUS här. Gången slingrar sig, och F1 ligger vid en sväng framåt i gångriktningen: en isficka med ett varmt ljus i det blå (isficka) och tre isklumpar (isklump_1–3). Under den sista ligger Farfars kompass. Farfars vägg med paren (vagg_gemener) står sist, precis före gången till salen (gang_salen_in). I mork syns bara hjälten, ungen och stavens glimt, och mörkret ligger tätt över figurerna.",
+   "musik": "isgrottan"
   },
   {
    "id": "berget_salen",
@@ -224,7 +226,8 @@
     "tavla_farfar",
     "gang_valvet"
    ],
-   "anteckning": "R2 (124.2), ca 640 × 192. En sal med vatten. Stig 2 går över vattnet (stig_k4_stig2), och ordet TAVLA står i versaler över golvet. Farfars tavla (tavla_farfar) står på andra stranden och syns redan när han kommer in, så att ordet besvarar en fråga: vad står där borta? Gången till valvet (gang_valvet) ligger bakom tavlan och nås bara över stigen. Ingen annan sal syns härifrån."
+   "anteckning": "R2 (124.2), ca 640 × 192. En sal med vatten. Stig 2 går över vattnet (stig_k4_stig2), och ordet TAVLA står i versaler över golvet. Farfars tavla (tavla_farfar) står på andra stranden och syns redan när han kommer in, så att ordet besvarar en fråga: vad står där borta? Gången till valvet (gang_valvet) ligger bakom tavlan och nås bara över stigen. Ingen annan sal syns härifrån.",
+   "musik": "isgrottan"
   },
   {
    "id": "berget_valvet",
@@ -242,7 +245,8 @@
      "text": "Hoppa inte på skata. Hoppa på skatt."
     }
    },
-   "anteckning": "Ett rum till i isgrottan (122.11), R3, mellan salen (R2) och galleriet (R4), högst 2 × 2 skärmar. Han kommer in från salen (gang_salen) och går ut till galleriet (gang_galleriet), som bara går att nå över stigen. Ett blått valv av is med en isvak tvärs över rummet och flak i tre rader. På väggen före vaken har Farfar ristat en mening (vagg_valvet), en glimt i isen som läses på läsplattan när han trycker. Stigen har ankaret stig_k4_stig_valv. Det är ljust, eftersom LJUS redan lyser."
+   "anteckning": "Ett rum till i isgrottan (122.11), R3, mellan salen (R2) och galleriet (R4), högst 2 × 2 skärmar. Han kommer in från salen (gang_salen) och går ut till galleriet (gang_galleriet), som bara går att nå över stigen. Ett blått valv av is med en isvak tvärs över rummet och flak i tre rader. På väggen före vaken har Farfar ristat en mening (vagg_valvet), en glimt i isen som läses på läsplattan när han trycker. Stigen har ankaret stig_k4_stig_valv. Det är ljust, eftersom LJUS redan lyser.",
+   "musik": "isgrottan"
   },
   {
    "id": "berget_galleriet",
@@ -281,7 +285,8 @@
      "text": "Svansen har en klubba."
     }
    },
-   "anteckning": "R4 (124.2), ca 640 × 384. Gåtans tre rader står på olika väggar, så att han letar (vila). F2 ligger i en nisch: isblocket under ishyllan syns redan från ingången. Genom en klar isvägg syns tanden (tand_genom_isen), och bredvid den går öppningen till tandgrottan (oppning_tandgrottan). Gången till sprickan (gang_sprickan) ligger sist. Pass 3 börjar här."
+   "anteckning": "R4 (124.2), ca 640 × 384. Gåtans tre rader står på olika väggar, så att han letar (vila). F2 ligger i en nisch: isblocket under ishyllan syns redan från ingången. Genom en klar isvägg syns tanden (tand_genom_isen), och bredvid den går öppningen till tandgrottan (oppning_tandgrottan). Gången till sprickan (gang_sprickan) ligger sist. Pass 3 börjar här.",
+   "musik": "isgrottan"
   },
   {
    "id": "berget_tandgrottan",
@@ -329,7 +334,8 @@
      "text": "Svansen har en klubba."
     }
    },
-   "anteckning": "R5 (124.2), ca 320 × 384. Stig 3 går uppåt (stig_k4_stig3, upp) mot sprickan i norr, och dagsljuset från sprickan syns hela tiden. Farfars vägg (vagg_ut) står vid stigens fot. Ungen slår upp isen, och utgången (utgang_stenfalt) leder till hyllan."
+   "anteckning": "R5 (124.2), ca 320 × 384. Stig 3 går uppåt (stig_k4_stig3, upp) mot sprickan i norr, och dagsljuset från sprickan syns hela tiden. Farfars vägg (vagg_ut) står vid stigens fot. Ungen slår upp isen, och utgången (utgang_stenfalt) leder till hyllan.",
+   "musik": "isgrottan"
   },
   {
    "id": "berget_stenfalt",
@@ -525,7 +531,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Gången är smal och slingrar sig, men nu glittrar den i alla färger. Ungen går tätt intill. Längre in har Farfar ristat bokstäver i isen, stora och små."
+     "beskrivning": "Gången är smal och slingrar sig, men nu glittrar den i alla färger. Ungen går tätt intill. Längre in har Farfar ristat bokstäver i isen, stora och små.",
+     "bild": "grottan_glittrar"
     },
     {
      "typ": "replik",
@@ -620,7 +627,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Hjälten står vid Farfars tavla. På den har Farfar ristat sin kompassros och en pil mot ett valv."
+     "beskrivning": "Hjälten står vid Farfars tavla. På den har Farfar ristat sin kompassros och en pil mot ett valv.",
+     "bild": "tavlan_visar_valvet"
     },
     {
      "typ": "ga_till",
@@ -642,7 +650,8 @@
    "steg": [
     {
      "typ": "mellanscen",
-     "beskrivning": "Gången öppnar sig i ett blått valv. Tvärs över ligger en isvak, och på väggen före vaken glimmar Farfars skrift."
+     "beskrivning": "Gången öppnar sig i ett blått valv. Tvärs över ligger en isvak, och på väggen före vaken glimmar Farfars skrift.",
+     "bild": "valvet_visar_skriften"
     },
     {
      "typ": "ga_till",
@@ -662,7 +671,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Gången leder in i ett galleri med glittrande väggar. Bakom en vägg av klar is skymtar något stort."
+     "beskrivning": "Gången leder in i ett galleri med glittrande väggar. Bakom en vägg av klar is skymtar något stort.",
+     "bild": "grottan_glittrar"
     },
     {
      "typ": "replik",
@@ -725,7 +735,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Hjälten skriver av gåtans tre rader i sin bok, en rad i taget. Ungen tittar på. Nu har han gåtan med sig, och den går att läsa igen."
+     "beskrivning": "Hjälten skriver av gåtans tre rader i sin bok, en rad i taget. Ungen tittar på. Nu har han gåtan med sig, och den går att läsa igen.",
+     "bild": "gatan_i_boken"
     },
     {
      "typ": "oppna_lasplatta",
@@ -820,7 +831,8 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Stigen slutar vid isväggen. Där sitter den: en uråldrig tand, större än hjältens hand. Ungen skuttar efter i hans spår, nosar på tanden och nyser av kylan."
+     "beskrivning": "Stigen slutar vid isväggen. Där sitter den: en uråldrig tand, större än hjältens hand. Ungen skuttar efter i hans spår, nosar på tanden och nyser av kylan.",
+     "bild": "tanden_i_isen"
     },
     {
      "typ": "replik",
@@ -849,7 +861,7 @@
     "text": "Var var vi? Ni läste Farfars gåta.",
     "upplast": true
    },
-   "anteckning": "R5 (124.2): stig 3 uppåt mot sprickan, med dagsljuset synligt hela tiden. Ungen slår upp isen, och de kliver ut på hyllan under klippan.",
+   "anteckning": "R5 (124.2): stig 3 uppåt mot sprickan, med dagsljuset synligt hela tiden. Ungen slår upp isen, och de kliver ut på hyllan under klippan. 137.3.5: efter stigen går han själv till ljuset (\"Gå till ljuset!\" och ga_till till sprickan), och först där slår ungen upp isen. Han ska ha sett strimman innan något händer med den (79.3). Kameran och tiderna är Tekniks regi.",
    "steg": [
     {
      "typ": "las_skylt",
@@ -860,8 +872,18 @@
      "pussel_id": "k4_stig3"
     },
     {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Gå till ljuset!",
+     "upplast": true
+    },
+    {
+     "typ": "ga_till",
+     "mal": "spricka"
+    },
+    {
      "typ": "mellanscen",
-     "beskrivning": "Hjälten står på det sista flaket. Genom en smal spricka i isen syns dagsljus. Ungen ställer sig vid sprickan, vänder sig om och slår med klubbsvansen, en gång, två gånger. Isen rasar ut, och solen strömmar in.",
+     "beskrivning": "Hjälten står vid sprickan i isen, där dagsljuset lyser in. Ungen ställer sig bredvid, vänder sig om och slår med klubbsvansen, en gång, två gånger. Isen rasar ut, och solen strömmar in.",
      "bild": "ungen_slar_isen",
      "tillstand_efter": "ut"
     }
@@ -880,14 +902,30 @@
    "steg": [
     {
      "typ": "mellanscen",
-     "beskrivning": "De kliver ut på en smal hylla i solen. Ovanför reser sig en hög klippa av blank is. Ungen försöker klättra och glider ner igen."
+     "beskrivning": "De kliver ut på en smal hylla i solen. Ovanför reser sig en hög klippa av blank is.",
+     "bild": "klippan_reser_sig"
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Gå till klippan!",
+     "upplast": true
+    },
+    {
+     "typ": "ga_till",
+     "mal": "klippa"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Vid klippans fot tittar ungen upp. Den försöker klättra och glider ner igen. Det är för högt.",
+     "bild": "ungen_glider_klippan"
     },
     {
      "typ": "pussel",
      "pussel_id": "k4_klippan"
     }
    ],
-   "anteckning": "121.4 och 122.4: ett skrivpussel där han väljer ordet själv. Instruktionen säger målet: Ni måste upp på klippan!"
+   "anteckning": "121.4 och 122.4: ett skrivpussel där han väljer ordet själv. Instruktionen säger målet: Ni måste upp på klippan! 137.3.6: han går själv till klippans fot (\"Gå till klippan!\"), och där visar ungen att det är för högt. Sedan skriver han ordet, och stegen, repet eller trappan kommer där han står. Han klättrar upp själv. Ingen ny replik om höjden, så taket på tre repliker håller."
   },
   {
    "id": "k4s05_stenfaltet",

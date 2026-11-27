@@ -267,6 +267,9 @@ export function lasKarta(tmj) {
       // utsikt (102.3) = regipunkten kameran glider till när han använder föremålet (hornet på avsatsen: regi_on), så
       // att han ser vad det gör, och tillbaka efteråt
       if (egen.utsikt) ut.utsikt = String(egen.utsikt);
+      // mal_vid (138.4) = ett stort föremål (klippan, hela väggen) har ett bestämt ställe att gå till: regipunkten. Ett
+      // ga_till dit är framme där, och det glimtar och ungen nosar mot det stället
+      if (egen.mal_vid) ut.malVid = String(egen.mal_vid);
       objekt.push(ut);
     }
   }

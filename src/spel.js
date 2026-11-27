@@ -1699,6 +1699,7 @@ export function skapaSpel(d) {
         // det som händer syns redan (rummet, en animation eller nästa steg, beslut 65): ingen ruta, bara en stund
         if (st.syns_redan) { logg.handelse('mellanscen', 'syns redan'); await vanta(tid(SYNS_REDAN_MS)); return; }
         const ms = tid(Math.min(6000, 1800 + st.beskrivning.split(' ').length * 140));
+        logg.handelse('mellanscen', 'text för den vuxne'); // kontrollen räknar dem (138.5)
         await ui.visaRegi(st.beskrivning, ms); ui.doljRegi(); return;
       }
       case 'ljud': {

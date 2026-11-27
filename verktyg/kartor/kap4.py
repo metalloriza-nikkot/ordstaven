@@ -25,7 +25,8 @@ RUMSBILDER = ROT / 'assets' / 'rum' / 'kap-04'
 # Det som är målat i rummens bilder (LASMIG_127): kartan har kvar platserna, men gråboxen ritar dem inte
 I_BILDEN = {
     # stigen: bryggan, skyltstolparna (orden står på läsplattan), snöhögarna, Farfars sten och mynningen
-    'stig_floden', 'skylt_isgrottan', 'skylt_issjon', 'skylt_eldgrottan',
+    # (skyltarna är egna höga bilder sedan lev137, 138.3)
+    'stig_floden',
     *(f'snohog_{i}' for i in range(1, 5)), 'sten_farfar', 'mynningen',
     # grottan
     'vagg_gemener', 'vagg_valvet', 'gata_1', 'gata_2', 'gata_3', 'ishylla', 'tand_genom_isen',
@@ -45,6 +46,13 @@ FOREMALSBILDER = {
     'sten_is': {'bild': 'sten_kall_klubbsvans'},
     'halet': {'bild': 'sten_hal'},
     'sten_klubba': {'bild': 'sten_varm_klubbsvans_01', 'bild_anim': 'sten_varm_klubbsvans_01,sten_varm_klubbsvans_02', 'anim_ms': 500},
+    # stigen (lev137, 138.3): skyltarna vid gaffeln och granarna är höga bilder som sorteras efter foten bland figurerna,
+    # så att han går bakom dem norr om foten och framför dem söder om den. Rummets bild har bara skuggorna.
+    **{f'skylt_{v}': {'bild': 'skylt_berg'} for v in ('eldgrottan', 'isgrottan', 'issjon')},
+    **{g: {'bild': b} for g, b in (('granar_platan', 'gran_platan'), ('granar_isfallet', 'gran_isfallet'),
+                                     ('granar_bryggan', 'gran_bryggan'), ('gran_foten_1', 'gran_foten_1'),
+                                     ('gran_foten_2', 'gran_foten_2'), ('granar_foten_3', 'gran_foten_3'),
+                                     ('granar_sjon', 'gran_sjon'))},
     # Farfars låda under den speciella stenen (118.5)
     'lada_farfar': {'bild': 'lada_farfar_stangd'},
     # ishyllan: det tunga isblocket som glittrar, och avtrycket under det (118.5)
@@ -164,6 +172,11 @@ RUMMEN = {
             # granarnas stammar vid foten och på platån
             vagg(50, 462, 46, 12), vagg(96, 516, 12, 10), vagg(256, 512, 14, 10), vagg(396, 436, 48, 12),
             vagg(366, 516, 36, 10), vagg(446, 532, 24, 10), vagg(160, 238, 36, 10),
+            # granarna själva (lev137): dekor på väggarnas rutor, med bilden på rutans nederkant
+            sak('granar_bryggan', 50, 462, 46, 12, dekor=True), sak('gran_foten_1', 96, 516, 12, 10, dekor=True),
+            sak('gran_foten_2', 256, 512, 14, 10, dekor=True), sak('granar_isfallet', 396, 436, 48, 12, dekor=True),
+            sak('granar_foten_3', 366, 516, 36, 10, dekor=True), sak('granar_sjon', 446, 532, 24, 10, dekor=True),
+            sak('granar_platan', 160, 238, 36, 10, dekor=True),
             # gaffeln: tre skyltar (orden står på läsplattan), ELDGROTTAN till vänster, ISGROTTAN i mitten och ISSJÖN
             sak('skylt_eldgrottan', 168, 423, 22, 18, sida='under'),
             sak('skylt_isgrottan', 201, 413, 22, 18, sida='under'),
@@ -360,7 +373,9 @@ STENFALT_KLIPPA = {
         punkt('start', 60, 312),
         punkt('regi_luftskepp', 200, 30),
         punkt('regi_driva', 230, 100),
-        punkt('regi_klippan', 316, 312),
+        # klippans fot (138.4): där han går till, där ungen försöker klättra och glider ned, och där stegen kommer, mitt
+        # under klippan_uppe
+        punkt('regi_klippan', 316, 298),
         # uppe på stenfältet när scenen efter klippan börjar (omstart)
         punkt('regi_hjalte_k4s05_stenfaltet', 316, 164),
         # molnhavet i norr, kanten i öster och branten i väster (Stils väggar, 120.1)
@@ -382,7 +397,7 @@ STENFALT_KLIPPA = {
         sak('luftskepp_borta', 300, 8, 40, 20, dekor=True, ankare=True),
         sak('stig_molnkanten', 488, 14, 20, 18, sida='under'),
         # den isade klippan tvärs över (y 180–284), istapparna längs kanten, och vägen upp när ordet är skrivet
-        sak('klippa', 0, 180, 624, 104, sida='under'),
+        sak('klippa', 0, 180, 624, 104, sida='under', mal_vid='regi_klippan'),
         sak('istappar_klippan', 0, 180, 624, 6, dekor=True),
         sak('klippan_uppe', 300, 176, 32, 112, golv=True, oppning=True),
         # nere: hyllan, och nedanför den molnen och dalen långt ned med floden

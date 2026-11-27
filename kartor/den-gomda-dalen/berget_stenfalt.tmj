@@ -77,7 +77,7 @@
      "name": "regi_klippan",
      "type": "",
      "x": 316,
-     "y": 312,
+     "y": 298,
      "width": 0,
      "height": 0,
      "rotation": 0,
@@ -448,6 +448,11 @@
        "name": "i_bilden",
        "type": "bool",
        "value": true
+      },
+      {
+       "name": "mal_vid",
+       "type": "string",
+       "value": "regi_klippan"
       },
       {
        "name": "sida",

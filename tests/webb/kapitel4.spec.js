@@ -201,6 +201,9 @@ test('kapitel 4 pass 2: mörkret, LJUS, gemenernas vägg, salen med stig 2 och v
   for (const u of ['gang_salen_in', 'gang_valvet', 'gang_galleriet']) expect(loggen).toContain(`[framme] ${u}`);
   const regi = (await page.evaluate(() => window.__ORDSTAVEN.grafik())).regi.join('\n');
   for (const r of ['mörkret', 'grottan_glittrar', 'grottan_visar_vaggen']) expect(regi).toContain(r);
+  // 138.5: tavlan visar valvet, och valvet visar skriften, utan text för den vuxne
+  for (const r of ['tavlan_visar_valvet', 'valvet_visar_skriften']) expect(regi).toContain(r);
+  expect(loggen).not.toContain('[mellanscen] text för den vuxne');
 });
 
 test('kapitel 4 pass 3: gåtan i galleriet, stig 3 med klo, klippan, stenarna, ordlåset VARM och resan mot molnkanten', async ({ page }, info) => {
@@ -224,6 +227,12 @@ test('kapitel 4 pass 3: gåtan i galleriet, stig 3 med klo, klippan, stenarna, o
   // locket: STENEN ÄR och fälten i luckan, ingen nyckel (P9 utan chiffer, 2.54)
   expect(loggen).not.toContain('k4_ladan: fel');
   const regi = (await page.evaluate(() => window.__ORDSTAVEN.grafik())).regi.join('\n');
+  // 138.4: han går till klippans bestämda ställe (regi_klippan, x 316), där ungen glider ned och stegen kommer
+  expect(regi).toMatch(/ungen_glider_klippan vid x 3[0-3]\d/);
+  expect(regi).toMatch(/klippan: stege upp vid x 31[0-9]/);
+  // 138.5: mellanscenerna i passet har sina regier, och ingen visar text för den vuxne
+  for (const r of ['gatan_i_boken', 'klippan_reser_sig']) expect(regi).toContain(r);
+  expect(loggen).not.toContain('[mellanscen] text för den vuxne');
   for (const r of ['ungen_slar_isen', 'klippan: stege upp', 'blocket_driva', 'fossil_svans', 'svansarna', 'ladan_oppnas', 'kartbit5_molnkant', 'skata_harmar_molnkant', 'resan_molnkant']) expect(regi).toContain(r);
 });
 
@@ -352,6 +361,9 @@ test('kapitel 4: stig 4 i tandgrottan, och han hoppar tillbaka till stranden (12
   const fynd = await page.evaluate(() => window.__fynd);
   expect(fynd.text).toContain('EN STOR TAND');
   expect(fynd.bild).toBe('tand_isen');
+  // 138.5: kameran visar tanden i isen innan fyndet, utan text för den vuxne
+  expect((await page.evaluate(() => window.__ORDSTAVEN.grafik())).regi.join('\n')).toContain('tanden_i_isen');
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).not.toContain('[mellanscen] text för den vuxne');
   // tanden står mellan hans händer (Stils bild i världen), med strålarna bakom
   expect((await page.evaluate(() => window.__ORDSTAVEN.grafik())).regi.join('\n')).toContain('fyndet hålls upp: tand_isen');
   await page.screenshot({ path: 'test-results/kap4-stig4-tanden.png' });
@@ -365,6 +377,30 @@ test('kapitel 4: stig 4 i tandgrottan, och han hoppar tillbaka till stranden (12
   expect(ute.rum).toBe('berget_galleriet');
   expect(ute.d).toBeLessThan(40);
   await page.screenshot({ path: 'test-results/kap4-ut-ur-tandgrottan.png' });
+});
+
+test('kapitel 4: granarna och skyltarna i stigen är höga bilder som han går bakom och framför (138.3)', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(90000);
+  await starta(page, 'k4s01_foten');
+  await page.waitForFunction(() => window.__ORDSTAVEN.spel.scene.getScene('Rum')?.rumId === 'berget_stigen');
+  await page.waitForTimeout(800);
+  const svar = await page.evaluate(() => {
+    const r = window.__ORDSTAVEN.spel.scene.getScene('Rum');
+    const hoga = [...r.hogaBilder].map((g) => ({ ram: g.frame?.name, fot: g.fot, x: g.x }));
+    // han ställer sig norr om granen vid isfallet (foten y 448) och sedan söder om den
+    const fore = (y) => { r.pos = { x: 420, y }; r.placera(); r.sorteraFigurer(); const g = [...r.hogaBilder].find((b) => b.frame?.name === 'gran_isfallet'); const l = r.lagerFigurer.list; return l.indexOf(g) > l.indexOf(r.hjalte); };
+    return { hoga, norr: fore(430), soder: fore(470) };
+  });
+  const ramar = svar.hoga.map((h) => h.ram);
+  for (const g of ['gran_platan', 'gran_isfallet', 'gran_bryggan', 'gran_foten_1', 'gran_foten_2', 'gran_foten_3', 'gran_sjon']) expect(ramar).toContain(g);
+  expect(ramar.filter((r) => r === 'skylt_berg').length).toBe(3);
+  // norr om foten ritas granen framför honom (han går bakom), söder om den ritas han framför granen
+  expect(svar.norr).toBe(true);
+  expect(svar.soder).toBe(false);
+  await page.evaluate(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); r.pos = { x: 420, y: 430 }; r.placera(); r.sorteraFigurer(); r.smutsig = true; });
+  await page.waitForTimeout(300);
+  await page.screenshot({ path: 'test-results/kap4-granen-bakom.png' });
 });
 
 test('kapitel 4: fotavtrycket under isblocket syns innan fyndet kommer, och han håller inte upp det (137.3.3)', async ({ page }, info) => {

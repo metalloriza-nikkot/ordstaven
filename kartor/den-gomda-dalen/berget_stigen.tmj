@@ -11,7 +11,7 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 43,
+ "nextobjectid": 50,
  "properties": [
   {
    "name": "bild",
@@ -311,6 +311,167 @@
     },
     {
      "id": 22,
+     "name": "granar_bryggan",
+     "type": "sak",
+     "x": 50,
+     "y": 462,
+     "width": 46,
+     "height": 12,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "gran_bryggan"
+      },
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 23,
+     "name": "gran_foten_1",
+     "type": "sak",
+     "x": 96,
+     "y": 516,
+     "width": 12,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "gran_foten_1"
+      },
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 24,
+     "name": "gran_foten_2",
+     "type": "sak",
+     "x": 256,
+     "y": 512,
+     "width": 14,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "gran_foten_2"
+      },
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 25,
+     "name": "granar_isfallet",
+     "type": "sak",
+     "x": 396,
+     "y": 436,
+     "width": 48,
+     "height": 12,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "gran_isfallet"
+      },
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 26,
+     "name": "granar_foten_3",
+     "type": "sak",
+     "x": 366,
+     "y": 516,
+     "width": 36,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "gran_foten_3"
+      },
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 27,
+     "name": "granar_sjon",
+     "type": "sak",
+     "x": 446,
+     "y": 532,
+     "width": 24,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "gran_sjon"
+      },
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 28,
+     "name": "granar_platan",
+     "type": "sak",
+     "x": 160,
+     "y": 238,
+     "width": 36,
+     "height": 10,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "gran_platan"
+      },
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 29,
      "name": "skylt_eldgrottan",
      "type": "sak",
      "x": 168,
@@ -321,9 +482,9 @@
      "visible": true,
      "properties": [
       {
-       "name": "i_bilden",
-       "type": "bool",
-       "value": true
+       "name": "bild",
+       "type": "string",
+       "value": "skylt_berg"
       },
       {
        "name": "sida",
@@ -333,7 +494,7 @@
      ]
     },
     {
-     "id": 23,
+     "id": 30,
      "name": "skylt_isgrottan",
      "type": "sak",
      "x": 201,
@@ -344,9 +505,9 @@
      "visible": true,
      "properties": [
       {
-       "name": "i_bilden",
-       "type": "bool",
-       "value": true
+       "name": "bild",
+       "type": "string",
+       "value": "skylt_berg"
       },
       {
        "name": "sida",
@@ -356,7 +517,7 @@
      ]
     },
     {
-     "id": 24,
+     "id": 31,
      "name": "skylt_issjon",
      "type": "sak",
      "x": 221,
@@ -367,9 +528,9 @@
      "visible": true,
      "properties": [
       {
-       "name": "i_bilden",
-       "type": "bool",
-       "value": true
+       "name": "bild",
+       "type": "string",
+       "value": "skylt_berg"
       },
       {
        "name": "sida",
@@ -379,7 +540,7 @@
      ]
     },
     {
-     "id": 25,
+     "id": 32,
      "name": "",
      "type": "vagg",
      "x": 0,
@@ -390,7 +551,7 @@
      "visible": true
     },
     {
-     "id": 26,
+     "id": 33,
      "name": "",
      "type": "vagg",
      "x": 356,
@@ -401,7 +562,7 @@
      "visible": true
     },
     {
-     "id": 27,
+     "id": 34,
      "name": "",
      "type": "vagg",
      "x": 80,
@@ -412,7 +573,7 @@
      "visible": true
     },
     {
-     "id": 28,
+     "id": 35,
      "name": "stig_k4_stig1",
      "type": "sak",
      "x": 312,
@@ -445,7 +606,7 @@
      ]
     },
     {
-     "id": 29,
+     "id": 36,
      "name": "",
      "type": "vagg",
      "x": 276,
@@ -463,7 +624,7 @@
      ]
     },
     {
-     "id": 30,
+     "id": 37,
      "name": "",
      "type": "vagg",
      "x": 0,
@@ -474,7 +635,7 @@
      "visible": true
     },
     {
-     "id": 31,
+     "id": 38,
      "name": "snohog_1",
      "type": "sak",
      "x": 418,
@@ -497,7 +658,7 @@
      ]
     },
     {
-     "id": 32,
+     "id": 39,
      "name": "snohog_2",
      "type": "sak",
      "x": 475,
@@ -520,7 +681,7 @@
      ]
     },
     {
-     "id": 33,
+     "id": 40,
      "name": "snohog_3",
      "type": "sak",
      "x": 535,
@@ -543,7 +704,7 @@
      ]
     },
     {
-     "id": 34,
+     "id": 41,
      "name": "snohog_4",
      "type": "sak",
      "x": 588,
@@ -566,7 +727,7 @@
      ]
     },
     {
-     "id": 35,
+     "id": 42,
      "name": "sten_farfar",
      "type": "sak",
      "x": 497,
@@ -589,7 +750,7 @@
      ]
     },
     {
-     "id": 36,
+     "id": 43,
      "name": "",
      "type": "vagg",
      "x": 0,
@@ -600,7 +761,7 @@
      "visible": true
     },
     {
-     "id": 37,
+     "id": 44,
      "name": "",
      "type": "vagg",
      "x": 0,
@@ -611,7 +772,7 @@
      "visible": true
     },
     {
-     "id": 38,
+     "id": 45,
      "name": "",
      "type": "vagg",
      "x": 626,
@@ -622,7 +783,7 @@
      "visible": true
     },
     {
-     "id": 39,
+     "id": 46,
      "name": "",
      "type": "vagg",
      "x": 562,
@@ -633,7 +794,7 @@
      "visible": true
     },
     {
-     "id": 40,
+     "id": 47,
      "name": "mynningen",
      "type": "sak",
      "x": 562,
@@ -656,7 +817,7 @@
      ]
     },
     {
-     "id": 41,
+     "id": 48,
      "name": "ras_mynningen",
      "type": "sak",
      "x": 562,
@@ -679,7 +840,7 @@
      ]
     },
     {
-     "id": 42,
+     "id": 49,
      "name": "fagel_320_470",
      "type": "omgivning",
      "x": 320,

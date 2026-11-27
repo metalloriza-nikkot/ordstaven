@@ -1274,6 +1274,12 @@ export class Rum extends Phaser.Scene {
       ungen_fot_avtryck: () => this.ungenFotAvtryck(),
       ungen_slar_isen: () => this.ungenSlarIsen(),
       ljusstrimman: () => this.ljusstrimman(),
+      // 138.5: mellanscenerna i kapitel 4 som visade text för den vuxne. Kameran visar det beskrivningen talar om
+      tavlan_visar_valvet: () => this.kameranVisar(['tavla_farfar', 'gang_valvet'], 'tavlan_visar_valvet'),
+      valvet_visar_skriften: () => this.kameranVisar(['vagg_valvet'], 'valvet_visar_skriften'),
+      tanden_i_isen: () => this.kameranVisar(['tand_isen', 'tand_genom_isen'], 'tanden_i_isen', true),
+      klippan_reser_sig: () => this.klippanReserSig(),
+      ungen_glider_klippan: () => this.ungenGliderKlippan(),
       blocket_driva: () => this.blocketDriva(),
       fossil_svans: () => this.fossilSvans(),
       svansarna: () => this.svansarna(),
@@ -5659,6 +5665,66 @@ export class Rum extends Phaser.Scene {
     return 1600;
   }
 
+  /**
+   * Kameran visar föremålen i tur och ordning (138.5), ca 1,3 s vid varje, och det glittrar där. Med `forsta` visas
+   * bara det första som finns i rummet. Sedan följer kameran honom igen. @param {string[]} ids @param {string} namn
+   * @param {boolean} [forsta] @returns {number}
+   */
+  kameranVisar(ids, namn, forsta = false) {
+    let mal = ids.map((id) => this.k4Punkt(id)).filter((p) => !!p);
+    if (forsta) mal = mal.slice(0, 1);
+    if (!mal.length) return 0;
+    const VID = 1300;
+    mal.forEach((p, i) => {
+      this.time.delayedCall(i * VID, () => { this.regiFokus = p; this.smutsig = true; });
+      this.time.delayedCall(i * VID + 600, () => this.k4Glitter(p, 18));
+    });
+    this.time.delayedCall(mal.length * VID + 200, () => { this.regiFokus = null; });
+    this.k4Logg(namn);
+    return mal.length * VID + 600;
+  }
+
+  /** Klippan reser sig över hyllan (138.5): kameran tittar upp längs den blanka isen och sedan ned igen. @returns {number} */
+  klippanReserSig() {
+    const o = this.objekt.find((x) => x.id === 'klippa'); if (!o) return 0;
+    const x = this.regiPunkter?.regi_klippan?.x ?? Math.round(o.x + o.b / 2);
+    this.vand = { x: 0, y: -1 }; this.ritaHjalte();
+    this.regiFokus = { x, y: o.y + 20 };
+    this.time.delayedCall(700, () => this.k4Glitter({ x, y: o.y + 8 }, 24));
+    this.time.delayedCall(2200, () => { this.regiFokus = null; });
+    this.k4Logg('klippan_reser_sig');
+    return 2600;
+  }
+
+  /**
+   * Vid klippans fot (138.4–138.5): ungen går till regi_klippan, tittar upp, klättrar en bit, glider ned och försöker
+   * en gång till. Det är för högt. Hjälten står bredvid och tittar. @returns {number}
+   */
+  ungenGliderKlippan() {
+    const p = this.regiPunkter?.regi_klippan ?? this.k4Punkt('klippa');
+    if (!p || !this.unge.visible) return 0;
+    const smuts = () => { this.smutsig = true; };
+    const fot = this.hinder.narmasteFria({ x: p.x + 14, y: p.y });
+    const ms = this.ungeGarTill(fot);
+    this.regiFokus = { x: p.x, y: p.y - 30 };
+    this.vand = { x: Math.sign(fot.x - this.pos.x) || 1, y: 0 }; this.ritaHjalte();
+    const forsok = (t0, hojd) => {
+      const t = { p: 0 };
+      this.time.delayedCall(t0, () => {
+        this.ungeVand = { x: 0, y: -1 };
+        this.tweens.add({ targets: t, p: 1, duration: 450, yoyo: true, hold: 120, ease: 'Sine.easeOut', onUpdate: () => {
+          this.ungePos = { x: fot.x, y: Math.round(fot.y - hojd * t.p) }; this.ungeFast = null; this.placera(); smuts();
+        }, onComplete: () => { this.ungePos = { ...fot }; this.placera(); smuts(); } });
+      });
+    };
+    forsok(ms + 300, 14);
+    forsok(ms + 1500, 20);
+    this.time.delayedCall(ms + 2700, () => { this.ungeVand = { x: 0, y: -1 }; this.ungeLage('skakar', 'ner', 200, 2); smuts(); });
+    this.time.delayedCall(ms + 3300, () => { this.regiFokus = null; });
+    this.k4Logg(`ungen_glider_klippan vid x ${fot.x}`);
+    return ms + 3500;
+  }
+
   /** Kameran glider till Farfars skrift som glimmar i isen på andra sidan stigen, och tillbaka. @returns {number} */
   grottanVisarVaggen() {
     // 124.2: i salen glider kameran till Farfars tavla på andra stranden (förut gåtans vägg i den stora grottan)
@@ -5818,8 +5884,10 @@ export class Rum extends Phaser.Scene {
     const o = this.ruta('klippan_uppe') || this.ruta('klippa');
     if (!o) return 0;
     const smuts = () => { this.smutsig = true; };
-    const x = Math.round(o.x + o.b / 2);
-    const fot = this.hinder.narmasteFria({ x, y: o.y + o.h + 8 });
+    // stegen kommer alltid vid regi_klippan (138.4), där han gick till och där ungen gled ned
+    const rp = this.regiPunkter?.regi_klippan;
+    const x = rp ? rp.x : Math.round(o.x + o.b / 2);
+    const fot = this.hinder.narmasteFria(rp ? { x: rp.x, y: rp.y } : { x, y: o.y + o.h + 8 });
     const start = { ...this.pos };
     const gaMs = Math.round(Math.min(2400, Math.hypot(fot.x - start.x, fot.y - start.y) / 0.07));
     const g = { p: 0 };
@@ -5867,7 +5935,7 @@ export class Rum extends Phaser.Scene {
       smuts();
     });
     this.time.delayedCall(fore + RITA_MS + klattring + 700, () => { this.regiFokus = null; });
-    this.k4Logg(`klippan: ${sort} upp`);
+    this.k4Logg(`klippan: ${sort} upp vid x ${fot.x}`);
     return fore + RITA_MS + klattring + 800;
   }
 
@@ -6588,7 +6656,13 @@ export class Rum extends Phaser.Scene {
   }
 
   /** Objektets ruta i rumskoordinater. @param {string} id */
-  ruta(id) { return this.objekt.find((o) => o.id === id) ?? null; }
+  ruta(id) {
+    const o = this.objekt.find((x) => x.id === id) ?? null;
+    // ett föremål med ett bestämt ställe (kartans mal_vid, klippan 138.4): rutan är en liten ruta på det stället, så
+    // att han är framme där och det glimtar där. Väggen och bilden följer föremålet som förut (de läser objekten)
+    const p = o?.malVid ? this.regiPunkter?.[o.malVid] : null;
+    return p ? { ...o, x: p.x - 12, y: p.y - 10, b: 24, h: 10 } : o;
+  }
 
   /** @param {number} _t @param {number} dtMs */
   update(_t, dtMs) {

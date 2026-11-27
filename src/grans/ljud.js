@@ -31,6 +31,8 @@ import styckeSegerM4a from '../../assets/ljud/musik/stycke_seger.m4a?url';
 import styckeSegerOgg from '../../assets/ljud/musik/stycke_seger.ogg?url';
 import tandgrottanM4a from '../../assets/ljud/musik/tandgrottan.m4a?url';
 import tandgrottanOgg from '../../assets/ljud/musik/tandgrottan.ogg?url';
+import isgrottanM4a from '../../assets/ljud/musik/isgrottan.m4a?url';
+import isgrottanOgg from '../../assets/ljud/musik/isgrottan.ogg?url';
 import styckeRasetM4a from '../../assets/ljud/musik/stycke_raset.m4a?url';
 import styckeRasetOgg from '../../assets/ljud/musik/stycke_raset.ogg?url';
 import { pausPlan } from '../karna/musik.js';
@@ -64,6 +66,8 @@ export const MUSIK = /** @type {Record<string, { m4a: string, ogg: string, loopS
   floden: { m4a: flodenM4a, ogg: flodenOgg, loopStart: 0.5, loopEnd: 42.239138 },
   // speldosan i tandgrottan (127.6, LASMIG_127): 37,9 s, Stils slutpunkt
   tandgrottan: { m4a: tandgrottanM4a, ogg: tandgrottanOgg, loopStart: 0.5, loopEnd: 38.394739 },
+  // grottans fem rum (137.3.7, LASMIG_137): 68,6 s i D lydisk, Stils slutpunkt
+  isgrottan: { m4a: isgrottanM4a, ogg: isgrottanOgg, loopStart: 0.5, loopEnd: 69.071429 },
 });
 /** Byte mellan slingor: den gamla tonas ut och den nya in på ca 1 s (Stil, 10c). Efter pausen tonas den in mjukare. */
 /**
