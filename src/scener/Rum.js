@@ -1273,6 +1273,7 @@ export class Rum extends Phaser.Scene {
       fotavtryck_stor: () => this.isblockSvavar(),
       ungen_fot_avtryck: () => this.ungenFotAvtryck(),
       ungen_slar_isen: () => this.ungenSlarIsen(),
+      ljusstrimman: () => this.ljusstrimman(),
       blocket_driva: () => this.blocketDriva(),
       fossil_svans: () => this.fossilSvans(),
       svansarna: () => this.svansarna(),
@@ -3747,6 +3748,22 @@ export class Rum extends Phaser.Scene {
     this.smutsig = true;
   }
 
+  /**
+   * Om ett fynd har en bild i världen som hjälten kan hålla upp (`id` eller `id_01` i någon atlas). Ett fotavtryck i
+   * isen eller en målning på ett skal har det inte, och hålls aldrig upp (137.3.3). @param {string} [id]
+   */
+  harVarldsbild(id) { return !!id && !!(this.regiram(id) ?? this.regiram(`${id}_01`)); }
+
+  /**
+   * Fyndet ligger kvar (137.3.3): hjälten håller inte upp något han inte kan lyfta. Han står kvar och tittar på det, och
+   * ungen tittar på honom. Närbilden med ordet visas av textlagret. @param {number} ms @param {string} [id]
+   */
+  fyndetLiggerKvar(ms, id) {
+    this.ungeTittarPa = { x: this.pos.x, y: this.pos.y - 20, till: this.time.now + ms };
+    this.regiLogg.push(`fyndet ligger kvar${id ? `: ${id}` : ''}`); if (this.regiLogg.length > 160) this.regiLogg.shift();
+    this.smutsig = true;
+  }
+
   /** Baronens tropikhjälm trillar ur gondolen och landar i gräset, där den ligger kvar. */
   tappaHjalmen() {
     const l = this.luft; if (!l || !this.textures.get('baronen').has('baronen_hjalm')) return;
@@ -4249,7 +4266,7 @@ export class Rum extends Phaser.Scene {
    * @param {{ rum: string | null, scen?: string, tillstand: string | null, innehall: (string | { id: string, syns_i?: string[] })[], unge: boolean, nyttRum: boolean,
    *           karta?: import('../karna/karta.js').Karta | null, franRum?: string | null,
    *           delar?: Record<string, { farg: number | null, storlek: string | null }[]>, visade?: string[],
-   *           kvar?: import('../karna/rumslayout.js').Objekt[] }} v
+   *           kvar?: import('../karna/rumslayout.js').Objekt[], utanScenPlats?: boolean }} v
    * visade = dolda föremål som ett steg har visat (visa_foremal), kvar = det som står kvar efter hugget (bild_kvar)
    */
   visa(v) {
@@ -4322,7 +4339,8 @@ export class Rum extends Phaser.Scene {
         // där han står när en viss scen börjar i rummet (102.3, kartans regi_hjalte_<scen>): på avsatsen vid hornet,
         // som bara nås med hissen, och på skalet ute på floden i resan. Platsen är exakt och flyttas inte till närmaste
         // fria punkt (på skalet kan han inte gå)
-        const plats = v.scen ? this.regiPunkter?.[`hjalte_${v.scen}`] : null;
+        // 137.3.4: tillbaka från en avstickare (tandgrottan) står han vid dörren han gick ut genom, inte på scenens plats
+        const plats = v.scen && !(v.utanScenPlats && dorr) ? this.regiPunkter?.[`hjalte_${v.scen}`] : null;
         // står han på scenens plats har han inte kommit in genom dörren (122.11: från valvet in i galleriet)
         if (plats) this.inkom = null;
         const start = plats || hiss || (dorr ? framfor(dorr) : (v.franRum && v.karta?.in?.[v.franRum]) || v.karta?.start || { x: this.storlek.bredd / 2, y: this.storlek.hojd - 12 });
@@ -5658,22 +5676,45 @@ export class Rum extends Phaser.Scene {
     if (!r || this.k4?.blockFlyttat) return r ? 300 : 0;
     const smuts = () => { this.smutsig = true; };
     this.k4 = { ...(this.k4 || {}), blockFlyttat: true };
-    this.tweens.add({ targets: r, y: r.y - 14, duration: 500, ease: 'Sine.easeOut', onUpdate: smuts });
-    this.tweens.add({ targets: r, x: r.x + 40, duration: 600, delay: 500, onUpdate: smuts });
-    this.tweens.add({ targets: r, y: r.y, duration: 300, delay: 1100, onUpdate: smuts });
-    const o = this.ruta('fotavtryck');
+    // 137.3.3: blocket står kvar där det landade när rummet ritas om (när fotavtrycket under det visas). Förut ritades
+    // det tillbaka över avtrycket, så att han aldrig såg vad han hade hittat
+    const bo = this.objekt.find((x) => x.id === 'isblock');
+    if (bo) this.flyttade.set('isblock', { x: bo.x + 40, y: bo.y });
+    // avtrycket är dolt tills visa_foremal visar det, så platsen tas från blocket (avtrycket ligger framför det i kartan).
+    // Förut blev platsen null, och varken glittret eller kameran kom
+    const o = this.ruta('fotavtryck') ?? (bo ? { x: bo.x - 2, y: bo.y + 26, b: 28, h: 14 } : null);
+    // 137.3.3: i den smala nischen står han och ungen framför blocket och skymmer avtrycket. Först tar han några steg
+    // bakåt (söderut) med blicken mot nischen, och ungen kliver åt sidan. Sedan lyfts blocket, och kameran står på
+    // avtrycket medan det glittrar, så att han ser vad han har hittat innan fyndet kommer
+    const BAK = 500;
+    if (o) {
+      const fran = { ...this.pos }, till = this.hinder.narmasteFria({ x: o.x + o.b / 2, y: o.y + o.h + 38 });
+      const u0 = { ...this.ungePos }, u1 = this.hinder.narmasteFria({ x: till.x - 22, y: till.y - 2 });
+      const t = { p: 0 };
+      this.tweens.add({ targets: t, p: 1, duration: BAK, onUpdate: () => {
+        this.pos = { x: Math.round(fran.x + (till.x - fran.x) * t.p), y: Math.round(fran.y + (till.y - fran.y) * t.p) };
+        this.ungePos = { x: Math.round(u0.x + (u1.x - u0.x) * t.p), y: Math.round(u0.y + (u1.y - u0.y) * t.p) };
+        this.vand = { x: 0, y: -1 }; this.gar = true; this.gang = (this.gang || 0) + 2; this.ritaHjalte(); this.placera(); smuts();
+      }, onComplete: () => { this.gar = false; this.vand = { x: 0, y: -1 }; this.ritaHjalte(); this.placera(); smuts(); } });
+      this.regiFokus = { x: o.x + o.b / 2, y: o.y + o.h + 20 };
+      this.time.delayedCall(BAK + 1100 + 2400, () => { this.regiFokus = null; });
+    }
+    this.tweens.add({ targets: r, y: r.y - 14, duration: 500, delay: BAK, ease: 'Sine.easeOut', onUpdate: smuts });
+    this.tweens.add({ targets: r, x: r.x + 40, duration: 600, delay: BAK + 500, onUpdate: smuts });
+    this.tweens.add({ targets: r, y: r.y, duration: 300, delay: BAK + 1100, onUpdate: smuts });
     // Stils frostglitter på avtrycket (fotavtryck_glitter_01–03, 28 × 14, ca 200 ms per bild) i några sekunder (LASMIG_127)
     const g1 = this.regiram('fotavtryck_glitter_01');
-    if (o && g1) this.time.delayedCall(1200, () => {
+    if (o && g1) this.time.delayedCall(BAK + 1200, () => {
       const img = this.add.image(o.x, o.y, g1.nyckel, g1.ram).setOrigin(0, 0);
       this.lagerObjekt.add(img); this.lagda.push(img);
       let i = 0;
       const t = this.time.addEvent({ delay: 200, repeat: 17, callback: () => { i = (i + 1) % 3; if (img.active) img.setFrame(`fotavtryck_glitter_0${i + 1}`); smuts(); } });
       this.time.delayedCall(3700, () => { t.remove(); this.tweens.add({ targets: img, alpha: 0, duration: 300, onUpdate: smuts, onComplete: () => img.destroy() }); });
     });
-    else if (o) this.time.delayedCall(1200, () => this.k4Glitter({ x: o.x + o.b / 2, y: o.y + o.h / 2 }, 14));
+    else if (o) this.time.delayedCall(BAK + 1200, () => this.k4Glitter({ x: o.x + o.b / 2, y: o.y + o.h / 2 }, 14));
     this.k4Logg('fotavtryck_stor');
-    return 1600;
+    // han ser avtrycket ca 2 s innan nästa steg (visa_foremal och ungens fot)
+    return BAK + 1400 + 2000;
   }
 
   /** Ungen ställer sin fot i det stora avtrycket och står stilla en stund. @returns {number} */
@@ -5685,12 +5726,31 @@ export class Rum extends Phaser.Scene {
     return ms + 2400;
   }
 
+  /**
+   * Efter stig 3 (137.3.5): kameran visar isväggen med ljusstrimman en stund, så att han ser det han sedan ska gå till.
+   * Strimman lyser upp lite och det glittrar i isen. @returns {number}
+   */
+  ljusstrimman() {
+    const s = this.k4Punkt('spricka'); if (!s) return 0;
+    const fokus = { x: s.x, y: s.y + 30 };
+    this.regiFokus = fokus;
+    const ljus = /** @type {any} */ (this.ritade.get('ljussken_sprickan'));
+    if (ljus?.setAlpha) this.tweens.add({ targets: ljus, alpha: { from: 0.6, to: 1 }, duration: 500, yoyo: true, repeat: 2, onUpdate: () => { this.smutsig = true; } });
+    this.time.delayedCall(600, () => this.k4Glitter({ x: s.x, y: s.y + 8 }, 18));
+    this.time.delayedCall(2400, () => { if (this.regiFokus === fokus) this.regiFokus = null; });
+    this.k4Logg('ljusstrimman visas');
+    return 2600;
+  }
+
   /** Ungen går till sprickan och slår med klubbsvansen två gånger, isen rasar ut och solen strömmar in. @returns {number} */
   ungenSlarIsen() {
     const s = this.k4Punkt('spricka'); if (!s) return 0;
     const smuts = () => { this.smutsig = true; };
     // klubbsvansens ben sitter i isen precis öster om sprickan, ca (181–217, 16–28) (LASMIG_127, 127.6.2): ungen
     // ställer sig under benet med huvudet österut, så att svansen slår i benet
+    // 137.3.5: han har gått till ljuset själv och står vänd mot isväggen. Ungen går fram framför honom
+    this.vand = { x: 0, y: -1 }; this.ritaHjalte();
+    this.regiFokus = { x: s.x + 20, y: s.y + 30 };
     const ms = this.unge.visible ? this.ungeGarTill({ x: s.x + 51, y: s.y + 16 }) : 0;
     // Stils unge1_svansslag_hoger_01–03 (ca 150 ms per bild, två slag), och isväggen spricker och rasar ut
     this.time.delayedCall(ms + 50, () => this.ungeLage('svansslag', 'hoger', 150, 2));
@@ -5705,7 +5765,9 @@ export class Rum extends Phaser.Scene {
       this.lagerLjust.add(g); this.lagda.push(g); this.k4Glitter(s, 30); smuts();
     });
     this.k4Logg('ungen_slar_isen');
-    return ms + 2000;
+    // en paus efteråt (137.3.5): solskenet strömmar in, och han hinner se vad som hände innan nästa steg
+    this.time.delayedCall(ms + 3000, () => { this.regiFokus = null; });
+    return ms + 3200;
   }
 
   /**
@@ -5746,26 +5808,49 @@ export class Rum extends Phaser.Scene {
     return { g, ms: delar * 90, x, uppe, nere };
   }
 
-  /** Rätt formel vid klippan: den växer upp, hjälten klättrar upp och ungen kommer efter. @param {'stege' | 'rep' | 'trappa'} sort */
+  /**
+   * Rätt formel vid klippan (137.3.6): han står vid klippans fot (går dit först om han inte redan står där, på
+   * marken), stegen, repet eller trappan växer upp där han står, och han klättrar själv rakt uppför den. Ungen biter i
+   * ryggsäcken. Förut gled han snett upp från där han skrev, så att det såg ut som att han flög.
+   * @param {'stege' | 'rep' | 'trappa'} sort
+   */
   klippanUpp(sort) {
-    const r = this.klippanRita(sort); if (!r) return 0;
+    const o = this.ruta('klippan_uppe') || this.ruta('klippa');
+    if (!o) return 0;
     const smuts = () => { this.smutsig = true; };
-    this.regiFokus = { x: r.x, y: Math.round((r.uppe + r.nere) / 2) };
-    const fran = { ...this.pos }, till = { x: r.x, y: r.uppe - 10 }, t = { p: 0 };
+    const x = Math.round(o.x + o.b / 2);
+    const fot = this.hinder.narmasteFria({ x, y: o.y + o.h + 8 });
+    const start = { ...this.pos };
+    const gaMs = Math.round(Math.min(2400, Math.hypot(fot.x - start.x, fot.y - start.y) / 0.07));
+    const g = { p: 0 };
+    if (gaMs > 80) this.tweens.add({ targets: g, p: 1, duration: gaMs, onUpdate: () => {
+      this.pos = { x: Math.round(start.x + (fot.x - start.x) * g.p), y: Math.round(start.y + (fot.y - start.y) * g.p) };
+      this.vand = Math.abs(fot.x - start.x) > Math.abs(fot.y - start.y) ? { x: Math.sign(fot.x - start.x) || 1, y: 0 } : { x: 0, y: Math.sign(fot.y - start.y) || -1 };
+      this.gar = true; this.gang = (this.gang || 0) + 2; this.ritaHjalte(); this.placera(); smuts();
+    }, onComplete: () => { this.pos = { ...fot }; this.gar = false; this.vand = { x: 0, y: -1 }; this.ritaHjalte(); this.placera(); smuts(); } });
+    else { this.pos = { ...fot }; this.vand = { x: 0, y: -1 }; this.ritaHjalte(); this.placera(); }
+    const fore = Math.max(0, gaMs) + 200;
+    this.regiFokus = { x, y: Math.round(o.y + o.h / 2) };
+    /** @type {any} */ let r = null;
+    const t = { p: 0 };
+    const till = { x, y: o.y - 10 };
     // klättringen tar längre tid uppför en högre klippa (ca 1,4 s för 60 px, 124.8)
-    const klattring = Math.round(Math.max(1400, (fran.y - till.y) * 16));
-    this.time.delayedCall(r.ms + 300, () => {
+    const klattring = Math.round(Math.max(1400, (fot.y - till.y) * 16));
+    const RITA_MS = 700;
+    this.time.delayedCall(fore, () => { r = this.klippanRita(sort); smuts(); });
+    this.time.delayedCall(fore + RITA_MS + 300, () => {
       this.tweens.add({ targets: t, p: 1, duration: klattring, ease: 'Sine.easeInOut', onUpdate: () => {
-        this.pos = { x: fran.x + (r.x - fran.x) * Math.min(1, t.p * 3), y: fran.y + (till.y - fran.y) * t.p };
+        this.pos = { x, y: Math.round(fot.y + (till.y - fot.y) * t.p) };
         this.vand = { x: 0, y: -1 }; this.placera(); smuts();
       }, onComplete: () => { this.pos = { ...till }; this.placera(); smuts(); } });
     });
+    const fran = fot;
     // ungen flyger inte (122.4, spelarens regel): den klamrar sig fast under hjälten och biter i ryggsäcken medan han
     // klättrar. Med Stils hjalte_klattrar_unge_upp_01–02 är ungen med i hjältens bild, annars hänger gråboxens unge
     // tätt under honom hela vägen upp
     const klattrar = this.textures.get(this.hjalteTextur).has('hjalte_klattrar_unge_upp_01') ? ['hjalte_klattrar_unge_upp_01', 'hjalte_klattrar_unge_upp_02'] : null;
     const ungeMed = this.unge.visible;
-    this.time.delayedCall(r.ms + 250, () => {
+    this.time.delayedCall(fore + RITA_MS + 250, () => {
       if (ungeMed && !klattrar) this.ungeGarTill({ x: fran.x, y: fran.y + 6 });
       if (ungeMed && klattrar) this.unge.setVisible(false);
     });
@@ -5775,15 +5860,15 @@ export class Rum extends Phaser.Scene {
       else { this.ungePos = { x: this.pos.x - 3, y: this.pos.y + 7 }; this.ungeFast = null; this.placera(); }
       smuts();
     } });
-    this.time.delayedCall(r.ms + 300 + klattring + 50, () => {
+    this.time.delayedCall(fore + RITA_MS + 300 + klattring + 50, () => {
       halla.remove();
       if (ungeMed) { this.unge.setVisible(true); this.ungePos = { x: till.x - 14, y: till.y + 2 }; this.placera(); }
       if (klattrar) this.ritaHjalte();
       smuts();
     });
-    this.time.delayedCall(r.ms + klattring + 700, () => { this.regiFokus = null; });
+    this.time.delayedCall(fore + RITA_MS + klattring + 700, () => { this.regiFokus = null; });
     this.k4Logg(`klippan: ${sort} upp`);
-    return r.ms + klattring + 800;
+    return fore + RITA_MS + klattring + 800;
   }
 
   /** Nästan rätt vid klippan: det som växer är för kort, gungar och blir borta. @param {'stege' | 'rep' | 'trappa'} sort */

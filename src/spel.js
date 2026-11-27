@@ -1297,6 +1297,8 @@ export function skapaSpel(d) {
   }
   /** Scenen där hjälten senast sov (en gång per scen). */
   let sovitI = /** @type {string | null} */ (null);
+  /** 137.3.4: han kommer tillbaka från en avstickare och ska stå vid dörren han gick ut genom, inte på scenens plats */
+  let tillbakaGenomDorren = false;
   async function visaScen(scen = b.scen, steg = undefined) {
     if (!scen) return;
     // spelet startade om mitt i en avstickare: rummet han var i visas, med scenens id (beslut 26.2)
@@ -1320,7 +1322,8 @@ export function skapaSpel(d) {
     if (glida) { rum.frys(true); forra = await rum.bild(); }
     if (tonas) { rum.frys(true); await ui.tona(true, tid(300)); }
     rum.visa({ rum: scen.rum, scen: scen.id, tillstand: b.rumsTillstand(scen.rum), innehall: r ? innehallNu(r) : [], kvar: r ? kvarNu(r) : [], bytta: r ? byttaNu(r) : [], unge: tillstand.spelare.unge?.folj ?? !!tillstand.spelare.unge?.namn, nyttRum: nytt,
-      karta: scen.rum ? kartor[scen.rum] ?? null : null, franRum, delar: scen.rum ? delarIRummet(kartor[scen.rum]) : {}, visade: scen.rum ? b.visade(scen.rum) : [] });
+      karta: scen.rum ? kartor[scen.rum] ?? null : null, franRum, delar: scen.rum ? delarIRummet(kartor[scen.rum]) : {}, visade: scen.rum ? b.visade(scen.rum) : [], utanScenPlats: tillbakaGenomDorren });
+    tillbakaGenomDorren = false;
     // platser som står kvar strukna (mästarprovet i kapitel 5, 132.4)
     if (scen.rum) rum.visaPlatser(b.platstillstand(scen.rum));
     if (nytt) rullning.rumOppnat(); // rummet laddas: glapp nu säger inget om datorn (75.6)
@@ -1793,11 +1796,15 @@ export function skapaSpel(d) {
    * närbild med sin bild och sitt ord. Sedan flyger det in i bokknappen (eller pausknappen, där MIN BOK är), som
    * glimtar. Ett tryck hoppar över. Körs av sig själv vid `dinobok` och `ge_sak`, så datan behöver inte ändras.
    * @param {string} bild HTML @param {string} text @param {string} vad för loggen @param {string} [id] fyndets bild i
-   * världen (föremålet), som hjälten håller mellan händerna om den finns
+   * världen (föremålet), som hjälten håller mellan händerna om den finns @param {boolean} [lyfts] false för det han
+   * inte kan lyfta
    */
-  async function fyndogonblick(bild, text, vad, id) {
+  async function fyndogonblick(bild, text, vad, id, lyfts = true) {
     logg.handelse('fynd', vad);
-    rum.hallUppFynd(tid(FYND_MS), id);
+    // 137.3.3: det han inte kan lyfta (ett fotavtryck, en målning) håller han inte upp. Det ligger kvar i rummet, och
+    // närbilden visar det med sitt ord
+    if (lyfts) rum.hallUppFynd(tid(FYND_MS), id);
+    else rum.fyndetLiggerKvar(tid(FYND_MS), id);
     ljud.spela('fanfar');
     const mal = ui.$('#hud-lapp').hidden ? '#hud-paus' : '#hud-lapp';
     await ui.visaFynd(bild, text, tid(FYND_MS), mal);
@@ -1812,7 +1819,7 @@ export function skapaSpel(d) {
   /** Dinoboken får en sida: fyndögonblicket med sidans bild och bildtext, och pausknappen glimtar. @param {any} st */
   async function dinobok(st) {
     nyttIHjalteboken();
-    await fyndogonblick(bilder.html(st.sida.bild), st.sida.bildtext ?? '', `dinoboken: ${st.sida.bild}`, st.sida.bild);
+    await fyndogonblick(bilder.html(st.sida.bild), st.sida.bildtext ?? '', `dinoboken: ${st.sida.bild}`, st.sida.bild, rum.harVarldsbild(st.sida.bild));
   }
   /** Ungen lär sig något nytt (stubbe i gråboxen: ungen hoppar och låter glad). @param {any} st */
   async function ungeTillagg(st) {
@@ -2477,6 +2484,7 @@ export function skapaSpel(d) {
     delete av.avstickare; spara();
     aktuelltSteg = forra;
     logg.handelse('avstickare', `tillbaka i ${hem}`);
+    tillbakaGenomDorren = true;
     await visaScen(hemScen, st);
     for (const [nyckel, r] of radion) senaste.set(nyckel, r);
   }

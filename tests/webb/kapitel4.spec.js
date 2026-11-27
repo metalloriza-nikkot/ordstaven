@@ -357,6 +357,49 @@ test('kapitel 4: stig 4 i tandgrottan, och han hoppar tillbaka till stranden (12
   await page.screenshot({ path: 'test-results/kap4-stig4-tanden.png' });
   await expect(page.locator('#fynd')).toBeHidden({ timeout: 6000 });
   expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('[fynd] dinoboken: tand_isen');
+  // 137.3.4: han går ut ur tandgrottan och kommer ut vid öppningen i galleriet, där han gick in
+  await page.evaluate(gaMotSida, 'gang_galleriet_tillbaka');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 20000 }).toContain('[avstickare] tillbaka i berget_galleriet');
+  await page.waitForTimeout(600);
+  const ute = await page.evaluate(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); const o = r.ruta('oppning_tandgrottan'); return { rum: r.rumId, d: Math.hypot(r.pos.x - (o.x + o.b / 2), r.pos.y - (o.y + o.h / 2)) }; });
+  expect(ute.rum).toBe('berget_galleriet');
+  expect(ute.d).toBeLessThan(40);
+  await page.screenshot({ path: 'test-results/kap4-ut-ur-tandgrottan.png' });
+});
+
+test('kapitel 4: fotavtrycket under isblocket syns innan fyndet kommer, och han håller inte upp det (137.3.3)', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(120000);
+  await starta(page, 'k4s03_galleriet', 0, { berget_galleriet: 'ljus' });
+  for (let i = 0; i < 10; i++) { await page.locator('#plattan:not([hidden]) .replik-ruta').click({ timeout: 300 }).catch(() => {}); await page.waitForTimeout(200); }
+  // han går fram till isblocket i nischen, och där lockar det
+  await page.evaluate(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); const o = r.ruta('isblock'); r.pos = { x: o.x + o.b / 2 + 60, y: o.y + o.h + 60 }; r.placera(); window.__ORDSTAVEN.gaMot(o.x + o.b / 2, o.y + o.h + 8); });
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.steg()?.pussel_id), { timeout: 20000 }).toBe('k4_ishyllan');
+  await page.waitForTimeout(1000);
+  await page.locator('#plattan .replik-ruta').click().catch(() => {}); await page.waitForTimeout(800);
+  await page.evaluate(() => {
+    const e = document.querySelector('#fynd'); window.__fynd = null;
+    new MutationObserver(() => { if (!e.hidden && e.querySelector('.fynd-kort') && !window.__fynd) { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); const f = r.ritade.get('fotavtryck'); window.__fynd = { text: e.querySelector('.fynd-text')?.textContent ?? '', fot: f ? { topp: f.y - f.height, syns: f.visible } : null, block: r.ritade.get('isblock')?.x, hjalten: { ...r.pos } }; } }).observe(e, { attributes: true, childList: true, subtree: true });
+  });
+  for (const c of 'FLYG') await page.keyboard.type(c);
+  await page.keyboard.press('Enter');
+  for (const slut = Date.now() + 30000; Date.now() < slut && !(await page.evaluate(() => window.__fynd));) {
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    await page.waitForTimeout(200);
+  }
+  const fynd = await page.evaluate(() => window.__fynd);
+  // ordet står i närbilden, och avtrycket ligger helt i rummet (tårna ovanför kanten förut), med blocket åt sidan
+  expect(fynd.text).toContain('EN STOR FOT');
+  expect(fynd.fot.syns).toBe(true);
+  expect(fynd.fot.topp).toBeGreaterThanOrEqual(0);
+  const o = await page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').ruta('fotavtryck'));
+  expect(fynd.block).toBeGreaterThan(o.x + o.b);
+  // han har backat ut ur nischen, så att han inte står framför avtrycket
+  expect(fynd.hjalten.y).toBeGreaterThan(o.y + o.h);
+  const regi = (await page.evaluate(() => window.__ORDSTAVEN.grafik())).regi.join('\n');
+  expect(regi).toContain('fyndet ligger kvar: fotavtryck_stor');
+  expect(regi).not.toContain('fyndet hålls upp');
+  await page.screenshot({ path: 'test-results/kap4-fotavtrycket.png' });
 });
 
 test('kapitel 4: F1 i gången, isklumparna och Farfars kompass (124.3)', async ({ page }, info) => {

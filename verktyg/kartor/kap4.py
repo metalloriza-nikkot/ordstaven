@@ -260,7 +260,10 @@ RUMMEN = {
             # F2: ishyllan med isblocket i nischen, och fotavtrycket under blocket (hemligheten)
             sak('ishylla', 200, 12, 76, 8, sida='under'),
             sak('isblock', 226, 16, 24, 14, sida='alla'),
-            sak('fotavtryck', 224, 18, 28, 14, sida='alla'),
+            # 137.3.3: avtrycket (Stils fotavtryck_is, 52 × 48) ritas med nederkanten mitt på föremålets. Med föremålet
+            # på y 18 hamnade tårna ovanför rummets kant, så det syntes aldrig som en fot. Nu ligger hälen framför nischen
+            # och tårna inne i den, under där blocket stod
+            sak('fotavtryck', 224, 42, 28, 14, sida='alla'),
             # tanden genom den klara isen, och öppningen till tandgrottan där det lockar (ungen nosar, det glimtar)
             sak('tand_genom_isen', 236, 352, 28, 8, dekor=True),
             utg('oppning_tandgrottan', 196, 376, 28, 8, golv=True, riktning='ned', till='berget_tandgrottan', lockradie=100),
