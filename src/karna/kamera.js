@@ -1,5 +1,5 @@
 // @ts-check
-// Kameran (beslut 14 och 18.1). Ett område kan vara större än skärmen, högst ungefär 2×2 skärmar. Skärmen visar då
+// Kameran (beslut 14 och 18.1). Ett område kan vara större än skärmen, högst 2 × 3 skärmar. Skärmen visar då
 // en bit av det, och kameran följer hjälten inom områdets gränser. Den stannar vid kanterna, så att inget utanför
 // området syns. Den rör sig i hela pixlar och har en mittzon: inom zonen kan hjälten gå utan att bilden rör sig.
 // När en fråga ställs visar kameran hela valet (alla alternativ och skylten). Ren logik: inga beroenden.
@@ -18,8 +18,8 @@ import { RUM } from './skalning.js';
  */
 export const KAMERA = Object.freeze({ zon: Object.freeze({ x: 32, y: 24 }), framat: 0, fart: 240, skylt: 30, kant: 12 });
 
-/** Största område: ungefär 2×2 skärmar. */
-export const STORSTA = Object.freeze({ bredd: RUM.bredd * 2, hojd: RUM.hojd * 2 });
+/** Största område: 2 skärmar brett och 3 högt (stigen i kapitel 4 efter skiss 6, 133.13.3). */
+export const STORSTA = Object.freeze({ bredd: RUM.bredd * 2, hojd: RUM.hojd * 3 });
 
 /** Håll kameran inom områdets gränser, i hela pixlar. @param {Punkt} k @param {Storlek} s @returns {Punkt} */
 export function inomGranserna(k, s) {

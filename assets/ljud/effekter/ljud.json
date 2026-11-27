@@ -733,5 +733,12 @@
   "signatur": false,
   "styrka_db": -10,
   "sekunder": 3.6
+ },
+ "fanfar": {
+  "grupp": "Överallt",
+  "vad": "Fyndögonblicket: hjälten håller upp ett fynd. En kort, glad fanfar som kliver uppåt och stannar kvar på den sista tonen, med en liten klocka (ca 1,6 s med klangen). Egen melodi, längre och större än kapitlets",
+  "signatur": false,
+  "styrka_db": -6,
+  "sekunder": 1.6
  }
 }

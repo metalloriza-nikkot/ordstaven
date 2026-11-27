@@ -889,7 +889,9 @@ export class Rum extends Phaser.Scene {
     const namn = pose || (klattrar ? `hjalte_klattra_upp_0${1 + (Math.floor(this.pos.y / 6) % 2)}` : `hjalte_ga_${r}_0${i + 1}`);
     if (this.kropp.frame.name !== namn) { this.kropp.setFrame(namn); this.smutsig = true; }
     // en hel bild (32 × 40) står med fötterna där gångens bild (16 × 24) har dem
-    const px = helPose ? -8 : 0, py = helPose ? -16 : 0;
+    // fyndet (Stils hjalte_haller_upp_ner_01, 24 × 32, LASMIG_135): 4 till vänster och 8 högre än gångens bild
+    const haller = !!helPose && /^hjalte_haller_upp_/.test(helPose);
+    const px = haller ? -4 : helPose ? -8 : 0, py = haller ? -8 : helPose ? -16 : 0;
     if (this.kropp.x !== px || this.kropp.y !== py) { this.kropp.setPosition(px, py); this.smutsig = true; }
     this.stav?.setVisible(!!this.harStav && !klattrar && !helPose && !blaser);
     if (this.stav && !helPose) {
@@ -3711,18 +3713,32 @@ export class Rum extends Phaser.Scene {
   }
 
   /**
-   * Hjälten håller upp ett fynd (133.10, som i Zelda): Stils `hjalte_haller_upp_<håll>` om den finns (annars
-   * `hjalte_haller_upp_ner`), och i gråbox vänder han sig mot spelaren och det glittrar över hans huvud. Ungen tittar
-   * på honom. Står ms, sedan som förut. @param {number} ms
+   * Hjälten håller upp ett fynd (133.10, som i Zelda): Stils `hjalte_haller_upp_<håll>_01` om den finns (annars
+   * `hjalte_haller_upp_ner_01`, LASMIG_135), och fyndets egen bild i världen (om den finns) mellan händerna, med Stils
+   * strålar (`efx_fynd_01–02`, ca 150 ms per bild) bakom. I gråbox vänder han sig mot spelaren och det glittrar över
+   * hans huvud. Ungen tittar på honom. Står ms, sedan som förut. @param {number} ms @param {string} [id] fyndets bild
    */
-  hallUppFynd(ms) {
+  hallUppFynd(ms, id) {
     const hall = riktningFor(this.vand);
-    const pose = [`hjalte_haller_upp_${hall}`, 'hjalte_haller_upp_ner'].find((n) => this.textures.exists('hjalte') && this.textures.get('hjalte').has(n));
-    if (pose) this.sattPose(pose);
+    const har = (/** @type {string} */ n) => this.textures.exists('hjalte') && this.textures.get('hjalte').has(n);
+    const pose = [`hjalte_haller_upp_${hall}_01`, 'hjalte_haller_upp_ner_01', `hjalte_haller_upp_${hall}`, 'hjalte_haller_upp_ner'].find(har);
+    if (pose) { this.vand = { x: 0, y: 1 }; this.sattPose(pose); }
     else { this.vand = { x: 0, y: 1 }; this.ritaHjalte(); this.k4Glitter({ x: this.pos.x, y: this.pos.y - 30 }, 16); }
+    // fyndet mellan händerna: nederkanten mitt på (12, 4) i Stils bild, som står 4 till vänster och 8 högre
+    const hand = { x: this.hjalte.x + (pose ? 8 : FIGUR.bredd / 2), y: this.hjalte.y + (pose ? -4 : -6) };
+    /** @type {any[]} */ const visas = [];
+    const efx = ['efx_fynd_01', 'efx_fynd_02'].map((r) => this.regiram(r)).filter(Boolean);
+    const sak = id ? this.regiram(id) ?? this.regiram(`${id}_01`) : null;
+    const mitt = { x: hand.x, y: hand.y - (sak ? Math.round(/** @type {any} */ (this.textures.getFrame(sak.nyckel, sak.ram))?.height / 2 || 8) : 8) };
+    if (efx.length) {
+      const e0 = /** @type {any} */ (efx[0]);
+      const s = this.add.image(mitt.x, mitt.y, e0.nyckel, e0.ram); this.lagerLuft.add(s); visas.push(s);
+      if (efx.length > 1) { let n = 0; const ev = this.time.addEvent({ delay: 150, loop: true, callback: () => { if (!s.active) { ev.remove(); return; } n = 1 - n; const f = /** @type {any} */ (efx[n]); s.setTexture(f.nyckel, f.ram); this.smutsig = true; } }); }
+    }
+    if (sak) { const b = this.add.image(hand.x, hand.y, sak.nyckel, sak.ram).setOrigin(0.5, 1); this.lagerLuft.add(b); visas.push(b); }
     this.ungeTittarPa = { x: this.pos.x, y: this.pos.y - 20, till: this.time.now + ms };
-    this.time.delayedCall(ms, () => { if (pose && this.hjaltePose === pose) this.sattPose(null); });
-    this.regiLogg.push('fyndet hålls upp'); if (this.regiLogg.length > 160) this.regiLogg.shift();
+    this.time.delayedCall(ms, () => { for (const v of visas) v.destroy(); if (pose && this.hjaltePose === pose) this.sattPose(null); this.smutsig = true; });
+    this.regiLogg.push(`fyndet hålls upp${sak ? `: ${id}` : ''}`); if (this.regiLogg.length > 160) this.regiLogg.shift();
     this.smutsig = true;
   }
 
@@ -4241,6 +4257,7 @@ export class Rum extends Phaser.Scene {
     // figurerna på kvällen (84.2): bilderna byggs första gången, sedan byts bara atlasens källa
     sattKvall(this, this.harRum && v.tillstand === 'kvall' ? KVALL_TABELL : null);
     if (v.nyttRum || !this.harRum) this.regiPunkter = (this.harRum && v.karta?.regi) || {};
+    if (v.nyttRum && this.harRum && this.regiPunkter.snoyra) this.snoyra(this.regiPunkter.snoyra);
     if (v.nyttRum || !this.harRum) this.inomhus = !!v.karta?.inomhus;
     this.lampor = v.karta?.lampor || [];
     this.morkerNatt = v.karta?.morker ?? null;
@@ -5065,7 +5082,22 @@ export class Rum extends Phaser.Scene {
       this.tweens.add({ targets: g, y: topp.y - 2, alpha: 0.2, duration: 1800, delay: i * 500, repeat: -1, onUpdate: smuts });
     }
     this.k4Logg('ankomst_berget');
-    return 2000;
+    // Stils ankomstbild (133.3, LASMIG_135): berget från långt håll (320 × 384), först foten med de två små figurerna,
+    // sedan glider bilden uppåt till toppen på ca 3 s och vilar där. 01 och 02 växlar var 600:e ms (röken och molnen).
+    // Sedan tonar bilden bort och rummet syns. Bara läge och bildbyten (golvdatorn)
+    const ramar = ['sidovy_k4_ankomst_01', 'sidovy_k4_ankomst_02'];
+    if (!ramar.every((n) => this.textures.exists(n))) return 2000;
+    this.rensaSidovy();
+    const k = this.kamera, c = this.sidovy, GLID = 3000, VILA = 1200;
+    c.setPosition(k.x, k.y).setVisible(true).setAlpha(1);
+    const bild = this.add.image(0, RUM.hojd - 384, ramar[0]).setOrigin(0, 0);
+    c.add(bild);
+    let n = 0;
+    const byte = this.time.addEvent({ delay: 600, loop: true, callback: () => { if (!bild.active) { byte.remove(); return; } n = 1 - n; bild.setTexture(ramar[n]); smuts(); } });
+    this.tweens.add({ targets: bild, y: 0, duration: GLID, delay: 400, ease: 'Sine.easeInOut', onUpdate: () => { bild.y = Math.round(bild.y); smuts(); } });
+    this.tweens.add({ targets: c, alpha: 0, duration: 400, delay: 400 + GLID + VILA, onUpdate: smuts, onComplete: () => { byte.remove(); this.rensaSidovy(); c.setAlpha(1); smuts(); } });
+    this.k4Logg('ankomsten från långt håll');
+    return 400 + GLID + VILA + 450;
   }
 
   /** Baronen läser stenen med kikaren (ett blänk i gondolen). @returns {number} */
@@ -5183,9 +5215,25 @@ export class Rum extends Phaser.Scene {
     const rasMs = 2200;
     const ramar = (/** @type {string} */ bas, n = 3) => Array.from({ length: n }, (_, i) => `${bas}_0${i + 1}`).filter((r) => this.regiram(r));
     const frontRamar = ramar('ras_front');
-    // fronten: Stils ras_front_01–03 (112 × 56, ca 90 ms per bild), tre i rad längs berget (LASMIG_122)
+    // 133.5 (LASMIG_135): lavinen är en hög vägg av snö som välter fram nedför sluttningen mot dem (Stils
+    // lavin_front_01–03, 160 × 96, ca 120 ms per bild medan den rör sig), med skuggan på marken direkt under nederkanten
+    // (lavin_skugga, under figurerna). Den börjar vid blocket och stannar med nederkanten ca 12 px norr om deras huvuden,
+    // där _01 står kvar som snöväggen tills STOR SKÖLD är skriven
+    const lavinRamar = ramar('lavin_front');
+    const lavin = lavinRamar.length === 3;
+    const lavinStopp = Math.round(Math.min(this.pos.y, this.ungePos.y) - 36);
     /** @type {any} */ let front;
-    if (frontRamar.length) {
+    /** @type {any} */ let skugga = null;
+    if (lavin) {
+      const f = /** @type {any} */ (this.regiram(lavinRamar[0]));
+      front = this.add.image(stopp.x, Math.min(lavinStopp - 40, Math.round(bl.y + 10)), f.nyckel, f.ram).setOrigin(0.5, 1);
+      const sk = this.regiram('lavin_skugga');
+      if (sk) {
+        skugga = this.add.image(front.x, front.y, sk.nyckel, sk.ram).setOrigin(0.5, 0).setAlpha(0);
+        this.lagerFigurer.addAt(skugga, 0); this.lagda.push(skugga);
+        const folj = this.time.addEvent({ delay: 30, loop: true, callback: () => { if (!skugga.active || !front.active) { folj.remove(); skugga.destroy(); return; } skugga.setPosition(front.x, Math.round(front.y)).setAlpha(front.alpha).setVisible(front.visible); } });
+      }
+    } else if (frontRamar.length) {
       const f = /** @type {any} */ (this.regiram(frontRamar[0]));
       front = this.add.container(stopp.x, -40);
       for (const dx of [-100, 0, 100]) front.add(this.add.image(dx, (dx === 0 ? 0 : 6), f.nyckel, f.ram));
@@ -5195,7 +5243,8 @@ export class Rum extends Phaser.Scene {
         .fillStyle(0x8c8378, 1).fillCircle(-30, 4, 4).fillCircle(20, -6, 3).fillCircle(60, 2, 4);
     }
     front.setAlpha(0); this.lagerLuft.add(front); this.lagda.push(front);
-    if (frontRamar.length > 1) { let i = 0; const ev = this.time.addEvent({ delay: 90, loop: true, callback: () => { if (!front.active || !front.visible) { ev.remove(); return; } i = (i + 1) % frontRamar.length; const f = /** @type {any} */ (this.regiram(frontRamar[i])); front.list.forEach((/** @type {any} */ b, k) => { const g = /** @type {any} */ (this.regiram(frontRamar[(i + k) % frontRamar.length])); b.setTexture(g.nyckel, g.ram); }); void f; smuts(); } }); }
+    if (lavin) { let i = 0; const ev = this.time.addEvent({ delay: 120, loop: true, callback: () => { if (!front.active || this.k4?.lavinStar) { ev.remove(); return; } i = (i + 1) % 3; const f = /** @type {any} */ (this.regiram(lavinRamar[i])); front.setTexture(f.nyckel, f.ram); smuts(); } }); }
+    else if (frontRamar.length > 1) { let i = 0; const ev = this.time.addEvent({ delay: 90, loop: true, callback: () => { if (!front.active || !front.visible) { ev.remove(); return; } i = (i + 1) % frontRamar.length; const f = /** @type {any} */ (this.regiram(frontRamar[i])); front.list.forEach((/** @type {any} */ b, k) => { const g = /** @type {any} */ (this.regiram(frontRamar[(i + k) % frontRamar.length])); b.setTexture(g.nyckel, g.ram); }); void f; smuts(); } }); }
     // 126.6: raset i stor skala. Kameran klipper till berget på långt håll (hela rummet på en skärm, figurerna små),
     // och raset dånar nedför hela berget. Ungen kryper bakom hjälten medan snön kommer. När snön stannar klipper
     // kameran tillbaka till dem, och det blir tyst. Bara kamerans skala, läge, opacitet och bildbyte (golvdatorn)
@@ -5206,7 +5255,7 @@ export class Rum extends Phaser.Scene {
     });
     this.time.delayedCall(tSno + 900, () => { this.regiLjud('rassel'); this.cameras.main.shake(400, 0.005); });
     this.time.delayedCall(tSno + Math.round(rasMs * 0.4), () => this.ungeBakomHjalten());
-    this.tweens.add({ targets: front, y: stopp.y - 6, duration: rasMs, delay: tSno, ease: 'Quad.easeIn', onUpdate: () => { if (!fjarr) this.regiFokus = { x: front.x, y: Math.max(96, front.y + 50) }; smuts(); } });
+    this.tweens.add({ targets: front, y: lavin ? lavinStopp : stopp.y - 6, duration: rasMs, delay: tSno, ease: 'Quad.easeIn', onUpdate: () => { if (lavin) front.y = Math.round(front.y); if (!fjarr) this.regiFokus = { x: front.x, y: Math.max(96, front.y + (lavin ? 10 : 50)) }; smuts(); } });
     // stenarna studsar nedför framför fronten (bildbyte i stället för att snurra), och snödammet yr upp och tonar bort
     // Stils ras_sten_01–04 (16 × 14) och ras_sten_liten_01–04 (10 × 9), som snurrar med ca 80 ms per bild
     const stora = ['ras_sten_01', 'ras_sten_02', 'ras_sten_03', 'ras_sten_04'].filter((r) => this.regiram(r));
@@ -5234,9 +5283,10 @@ export class Rum extends Phaser.Scene {
     });
     // snöväggen: fronten stannar och blir en vägg av snö över dem, som smular (Stils ras_vagg_01–02, annars
     // snomassa_01–02, annars gråbox)
-    const vagg = ramar('ras_vagg', 2).length === 2 ? ['ras_vagg_01', 'ras_vagg_02'] : this.regiram('snomassa_01') && this.regiram('snomassa_02') ? ['snomassa_01', 'snomassa_02'] : null;
+    const vagg = lavin ? null : ramar('ras_vagg', 2).length === 2 ? ['ras_vagg_01', 'ras_vagg_02'] : this.regiram('snomassa_01') && this.regiram('snomassa_02') ? ['snomassa_01', 'snomassa_02'] : null;
     /** @type {any} */ let sno;
-    if (vagg) {
+    if (lavin) sno = front;
+    else if (vagg) {
       const sm = /** @type {any} */ (this.regiram(vagg[0]));
       // väggens fot (y 72 i bilden) står ca 12 px norr om deras huvuden (LASMIG_122), och bilderna växlar var 300:e ms
       sno = vagg[0] === 'ras_vagg_01' ? this.add.image(stopp.x, Math.round(Math.min(this.pos.y, this.ungePos.y) - 36), sm.nyckel, sm.ram).setOrigin(0.5, 72 / 88) : this.add.image(stopp.x, stopp.y, sm.nyckel, sm.ram);
@@ -5247,7 +5297,7 @@ export class Rum extends Phaser.Scene {
       sno.fillStyle(0xdbe6ef, 1).fillRect(-88, -34, 176, 50).fillStyle(0xf4f8fc, 1).fillEllipse(0, -34, 184, 30).fillRect(-80, -30, 160, 34)
         .fillStyle(0x8c8378, 1).fillCircle(-50, -10, 4).fillCircle(30, -16, 5).fillCircle(64, -2, 3).fillStyle(0xbfe6ff, 1).fillRect(-14, -4, 8, 6).fillRect(40, -22, 6, 5);
     }
-    sno.setAlpha(0); this.lagerLuft.add(sno); this.lagda.push(sno);
+    if (!lavin) { sno.setAlpha(0); this.lagerLuft.add(sno); this.lagda.push(sno); }
     // den igenrasade mynningen (tillståndet ras) syns först när snön har rasat (mynningen_stangs)
     this.k4 = { ...(this.k4 || {}), rasDolt: true };
     const dolj = this.time.addEvent({ delay: 50, loop: true, callback: () => { const r = /** @type {any} */ (this.ritade.get('ras_mynningen')); if (!this.k4?.rasDolt) { dolj.remove(); r?.setVisible?.(true); smuts(); return; } if (r?.visible) { r.setVisible(false); smuts(); } } });
@@ -5262,8 +5312,13 @@ export class Rum extends Phaser.Scene {
     });
     // ungen kikar fram bakom hjälten och tittar upp på snön
     this.time.delayedCall(tVagg + 700, () => this.ungeKikarFram());
-    this.tweens.add({ targets: sno, alpha: 1, duration: 250, delay: tVagg, onUpdate: smuts });
-    this.tweens.add({ targets: front, alpha: 0, duration: 300, delay: tVagg + 100, onUpdate: smuts });
+    if (lavin) {
+      // fronten stannar: _01 står kvar (LASMIG_135)
+      this.time.delayedCall(tVagg, () => { this.k4 = { ...(this.k4 || {}), lavinStar: true }; const f = /** @type {any} */ (this.regiram(lavinRamar[0])); if (front.active) front.setTexture(f.nyckel, f.ram); smuts(); });
+    } else {
+      this.tweens.add({ targets: sno, alpha: 1, duration: 250, delay: tVagg, onUpdate: smuts });
+      this.tweens.add({ targets: front, alpha: 0, duration: 300, delay: tVagg + 100, onUpdate: smuts });
+    }
     this.k4 = { ...(this.k4 || {}), sno };
     this.time.delayedCall(tVagg + 2400, () => { this.regiFokus = null; });
     this.k4Logg('blocket_lyfts'); this.k4Logg('snöraset i ett svep'); this.k4Logg('snön stannar i luften');
@@ -5272,19 +5327,21 @@ export class Rum extends Phaser.Scene {
 
   /**
    * Berget på långt håll (126.6): kameran visar hela rummet på en skärm (skalan hälften), med figurerna små, från ms
-   * (eller av direkt). Det går bara i ett rum som är 2 × 2 skärmar eller mindre, och textlagret i världen göms medan
-   * skalan inte stämmer med det. @param {boolean} pa @param {number} [om] ms @returns {boolean} om det går
+   * (eller av direkt). Det går bara i ett rum som är högst 2 skärmar brett, och i ett högre rum syns 2 × 2 skärmar av
+   * det. Textlagret i världen göms medan skalan inte stämmer med det. @param {boolean} pa @param {number} [om] ms @returns {boolean} om det går
    */
   fjarrvy(pa, om = 0) {
     const k = this.cameras.main;
-    if (pa && (this.storlek.bredd > 640 || this.storlek.hojd > 384 || enSkarm(this.storlek))) return false;
+    if (pa && (this.storlek.bredd > 640 || enSkarm(this.storlek))) return false;
     const gor = () => {
       const S = this.storlek;
       this.k4 = { ...(this.k4 || {}), fjarran: pa };
       if (pa) {
-        // klipp (ingen glidning): hela rummet mitt på skärmen, i halva skalan
+        // klipp (ingen glidning): hela rummet mitt på skärmen, i halva skalan. Ett högre rum (stigen efter skiss 6,
+        // 640 × 576) visar 384 pixlar av höjden, med hjälten nere vid bildens nederkant så att berget ovanför syns
         k.setZoom(0.5);
-        this.sattKamera({ x: Math.round(S.bredd / 2 - RUM.bredd / 2), y: Math.round(S.hojd / 2 - RUM.hojd / 2) });
+        const cy = S.hojd <= 2 * RUM.hojd ? S.hojd / 2 : Math.max(RUM.hojd, Math.min(S.hojd - RUM.hojd, this.pos.y - RUM.hojd / 2 + 24));
+        this.sattKamera({ x: Math.round(S.bredd / 2 - RUM.bredd / 2), y: Math.round(cy - RUM.hojd / 2) });
         this.k4Logg('raset på långt håll');
       } else {
         // klipp tillbaka till dem (regiFokus, annars hjälten)
@@ -5297,6 +5354,39 @@ export class Rum extends Phaser.Scene {
     };
     if (om > 0) this.time.delayedCall(om, gor); else gor();
     return true;
+  }
+
+  /**
+   * Snöyra som drar över marken (133.13.4, stenfältet): vinden blåser från väster, och snön driver i tunna strimmor
+   * över fältet kring kartans punkt `regi_snoyra` (± 70 pixlar i höjd), hela rummets bredd. Stils snoyra_01–03 när de
+   * finns (byter bild var 200:e ms), annars gråbox. Bara läge och bildbyten, 10 gånger i sekunden (golvdatorn). Försvinner med rummet.
+   * @param {{ x: number, y: number }} p
+   */
+  snoyra(p) {
+    const B = this.storlek.bredd, ramar = ['snoyra_01', 'snoyra_02', 'snoyra_03'].map((r) => this.regiram(r)).filter(Boolean);
+    /** @type {{ g: any, v: number, y0: number, fas: number }[]} */ const strimmor = [];
+    for (let i = 0; i < 12; i++) {
+      const x = (i * 97) % B, y0 = Math.round(p.y - 70 + ((i * 53) % 140));
+      /** @type {any} */ let g;
+      if (ramar.length) { const f = /** @type {any} */ (ramar[i % ramar.length]); g = this.add.image(x, y0, f.nyckel, f.ram).setAlpha(0.8); }
+      else { g = this.add.graphics({ x, y: y0 }); g.fillStyle(0xa9bfd8, 0.85).fillRect(0, 0, 6 + (i % 3) * 4, 1).fillStyle(0xc4d4e6, 0.7).fillRect(-6, 1, 5, 1); }
+      this.lagerLuft.add(g); this.lagda.push(g);
+      strimmor.push({ g, v: 50 + (i % 4) * 12, y0, fas: i * 0.7 });
+    }
+    let t = 0, bild = 0;
+    const ev = this.time.addEvent({ delay: 100, loop: true, callback: () => {
+      if (!strimmor[0].g.active) { ev.remove(); return; }
+      t += 0.1;
+      if (ramar.length && Math.round(t * 10) % 2 === 0) bild = (bild + 1) % ramar.length;
+      for (const s of strimmor) {
+        let x = s.g.x + s.v * 0.1;
+        if (x > B + 16) x = -16;
+        s.g.setPosition(Math.round(x), Math.round(s.y0 + Math.sin(t * 2 + s.fas) * 3));
+        if (ramar.length && s.g.setTexture) { const f = /** @type {any} */ (ramar[(bild + strimmor.indexOf(s)) % ramar.length]); s.g.setTexture(f.nyckel, f.ram); }
+      }
+      this.smutsig = true;
+    } });
+    this.k4Logg?.('snöyra över fältet');
   }
 
   /** Ungen kryper ihop bakom hjälten, på andra sidan om raset (126.6). */
@@ -6354,6 +6444,8 @@ export class Rum extends Phaser.Scene {
       if (niva <= 0) continue;
       gar.add(o.ljudSlinga); ljud?.slinga(o.ljudSlinga, niva);
     }
+    // vinden över stenfältet (133.13.4): Stils ljud vind går i slinga i rummet med snöyran, när det finns
+    if (this.regiPunkter?.snoyra) { gar.add('vind'); ljud?.slinga('vind', 0.5); }
     for (const id of this.ljudSlingor || []) if (!gar.has(id)) ljud?.slinga(id, null);
     this.ljudSlingor = gar;
   }

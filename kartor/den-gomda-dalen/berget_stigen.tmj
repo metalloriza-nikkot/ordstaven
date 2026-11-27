@@ -5,19 +5,14 @@
  "orientation": "orthogonal",
  "renderorder": "right-down",
  "width": 40,
- "height": 24,
+ "height": 36,
  "tilewidth": 16,
  "tileheight": 16,
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 39,
+ "nextobjectid": 43,
  "properties": [
-  {
-   "name": "bild",
-   "type": "string",
-   "value": "berget_stigen"
-  },
   {
    "name": "rum",
    "type": "string",
@@ -38,12 +33,120 @@
    "objects": [
     {
      "id": 1,
+     "name": "start",
+     "type": "",
+     "x": 48,
+     "y": 506,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 2,
+     "name": "regi_floden",
+     "type": "",
+     "x": 16,
+     "y": 506,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 3,
+     "name": "regi_toppen",
+     "type": "",
+     "x": 120,
+     "y": 30,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 4,
+     "name": "regi_block",
+     "type": "",
+     "x": 500,
+     "y": 96,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 5,
+     "name": "regi_snon",
+     "type": "",
+     "x": 594,
+     "y": 134,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 6,
+     "name": "regi_hjalte_k4s02_mynningen",
+     "type": "",
+     "x": 594,
+     "y": 194,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 7,
+     "name": "regi_vag_eldgrottan",
+     "type": "",
+     "x": 108,
+     "y": 364,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 8,
+     "name": "regi_vag_isgrottan",
+     "type": "",
+     "x": 316,
+     "y": 340,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 9,
+     "name": "regi_vag_issjon",
+     "type": "",
+     "x": 596,
+     "y": 476,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 10,
      "name": "",
      "type": "vagg",
      "x": 0,
-     "y": 0,
-     "width": 24,
-     "height": 64,
+     "y": 395,
+     "width": 20,
+     "height": 98,
      "rotation": 0,
      "visible": true,
      "properties": [
@@ -55,120 +158,13 @@
      ]
     },
     {
-     "id": 2,
-     "name": "",
-     "type": "vagg",
-     "x": 24,
-     "y": 0,
-     "width": 616,
-     "height": 64,
-     "rotation": 0,
-     "visible": true
-    },
-    {
-     "id": 3,
-     "name": "start",
-     "type": "",
-     "x": 48,
-     "y": 344,
-     "width": 0,
-     "height": 0,
-     "rotation": 0,
-     "visible": true,
-     "point": true
-    },
-    {
-     "id": 4,
-     "name": "regi_floden",
-     "type": "",
-     "x": 16,
-     "y": 360,
-     "width": 0,
-     "height": 0,
-     "rotation": 0,
-     "visible": true,
-     "point": true
-    },
-    {
-     "id": 5,
-     "name": "regi_toppen",
-     "type": "",
-     "x": 470,
-     "y": 70,
-     "width": 0,
-     "height": 0,
-     "rotation": 0,
-     "visible": true,
-     "point": true
-    },
-    {
-     "id": 6,
-     "name": "regi_block",
-     "type": "",
-     "x": 540,
-     "y": 96,
-     "width": 0,
-     "height": 0,
-     "rotation": 0,
-     "visible": true,
-     "point": true
-    },
-    {
-     "id": 7,
-     "name": "regi_snon",
-     "type": "",
-     "x": 584,
-     "y": 104,
-     "width": 0,
-     "height": 0,
-     "rotation": 0,
-     "visible": true,
-     "point": true
-    },
-    {
-     "id": 8,
-     "name": "regi_vag_eldgrottan",
-     "type": "",
-     "x": 56,
-     "y": 284,
-     "width": 0,
-     "height": 0,
-     "rotation": 0,
-     "visible": true,
-     "point": true
-    },
-    {
-     "id": 9,
-     "name": "regi_vag_issjon",
-     "type": "",
-     "x": 350,
-     "y": 362,
-     "width": 0,
-     "height": 0,
-     "rotation": 0,
-     "visible": true,
-     "point": true
-    },
-    {
-     "id": 10,
-     "name": "regi_vag_isgrottan",
-     "type": "",
-     "x": 584,
-     "y": 126,
-     "width": 0,
-     "height": 0,
-     "rotation": 0,
-     "visible": true,
-     "point": true
-    },
-    {
      "id": 11,
      "name": "",
      "type": "vagg",
      "x": 0,
-     "y": 64,
-     "width": 24,
-     "height": 320,
+     "y": 519,
+     "width": 20,
+     "height": 37,
      "rotation": 0,
      "visible": true,
      "properties": [
@@ -183,20 +179,15 @@
      "id": 12,
      "name": "stig_floden",
      "type": "sak",
-     "x": 24,
-     "y": 344,
-     "width": 20,
-     "height": 30,
+     "x": 0,
+     "y": 493,
+     "width": 30,
+     "height": 26,
      "rotation": 0,
      "visible": true,
      "properties": [
       {
        "name": "dekor",
-       "type": "bool",
-       "value": true
-      },
-      {
-       "name": "i_bilden",
        "type": "bool",
        "value": true
       }
@@ -204,22 +195,17 @@
     },
     {
      "id": 13,
-     "name": "stigspar_in",
-     "type": "sak",
-     "x": 44,
-     "y": 340,
+     "name": "",
+     "type": "vagg",
+     "x": 530,
+     "y": 424,
      "width": 110,
-     "height": 8,
+     "height": 118,
      "rotation": 0,
      "visible": true,
      "properties": [
       {
-       "name": "dekor",
-       "type": "bool",
-       "value": true
-      },
-      {
-       "name": "i_bilden",
+       "name": "vatten",
        "type": "bool",
        "value": true
       }
@@ -227,208 +213,107 @@
     },
     {
      "id": 14,
-     "name": "stigspar_isgrottan_1",
-     "type": "sak",
-     "x": 172,
-     "y": 306,
-     "width": 40,
-     "height": 8,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 556,
+     "width": 640,
+     "height": 20,
      "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "dekor",
-       "type": "bool",
-       "value": true
-      },
-      {
-       "name": "i_bilden",
-       "type": "bool",
-       "value": true
-      }
-     ]
+     "visible": true
     },
     {
      "id": 15,
-     "name": "stigspar_isgrottan_2",
-     "type": "sak",
-     "x": 206,
-     "y": 296,
-     "width": 40,
-     "height": 8,
+     "name": "",
+     "type": "vagg",
+     "x": 50,
+     "y": 462,
+     "width": 46,
+     "height": 12,
      "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "dekor",
-       "type": "bool",
-       "value": true
-      },
-      {
-       "name": "i_bilden",
-       "type": "bool",
-       "value": true
-      }
-     ]
+     "visible": true
     },
     {
      "id": 16,
-     "name": "stigspar_isgrottan_3",
-     "type": "sak",
-     "x": 240,
-     "y": 286,
-     "width": 50,
-     "height": 8,
+     "name": "",
+     "type": "vagg",
+     "x": 96,
+     "y": 516,
+     "width": 12,
+     "height": 10,
      "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "dekor",
-       "type": "bool",
-       "value": true
-      },
-      {
-       "name": "i_bilden",
-       "type": "bool",
-       "value": true
-      }
-     ]
+     "visible": true
     },
     {
      "id": 17,
-     "name": "stigspar_isgrottan_4",
-     "type": "sak",
-     "x": 284,
-     "y": 276,
-     "width": 30,
-     "height": 8,
+     "name": "",
+     "type": "vagg",
+     "x": 256,
+     "y": 512,
+     "width": 14,
+     "height": 10,
      "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "dekor",
-       "type": "bool",
-       "value": true
-      },
-      {
-       "name": "i_bilden",
-       "type": "bool",
-       "value": true
-      }
-     ]
+     "visible": true
     },
     {
      "id": 18,
-     "name": "stigspar_issjon_1",
-     "type": "sak",
-     "x": 168,
-     "y": 350,
-     "width": 44,
-     "height": 8,
+     "name": "",
+     "type": "vagg",
+     "x": 396,
+     "y": 436,
+     "width": 48,
+     "height": 12,
      "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "dekor",
-       "type": "bool",
-       "value": true
-      },
-      {
-       "name": "i_bilden",
-       "type": "bool",
-       "value": true
-      }
-     ]
+     "visible": true
     },
     {
      "id": 19,
-     "name": "stigspar_issjon_2",
-     "type": "sak",
-     "x": 206,
-     "y": 358,
-     "width": 150,
-     "height": 8,
+     "name": "",
+     "type": "vagg",
+     "x": 366,
+     "y": 516,
+     "width": 36,
+     "height": 10,
      "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "dekor",
-       "type": "bool",
-       "value": true
-      },
-      {
-       "name": "i_bilden",
-       "type": "bool",
-       "value": true
-      }
-     ]
+     "visible": true
     },
     {
      "id": 20,
-     "name": "stigspar_eldgrottan_1",
-     "type": "sak",
-     "x": 120,
-     "y": 300,
-     "width": 40,
-     "height": 8,
+     "name": "",
+     "type": "vagg",
+     "x": 446,
+     "y": 532,
+     "width": 24,
+     "height": 10,
      "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "dekor",
-       "type": "bool",
-       "value": true
-      },
-      {
-       "name": "i_bilden",
-       "type": "bool",
-       "value": true
-      }
-     ]
+     "visible": true
     },
     {
      "id": 21,
-     "name": "stigspar_eldgrottan_2",
-     "type": "sak",
-     "x": 90,
-     "y": 290,
+     "name": "",
+     "type": "vagg",
+     "x": 160,
+     "y": 238,
      "width": 36,
-     "height": 8,
+     "height": 10,
      "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "dekor",
-       "type": "bool",
-       "value": true
-      },
-      {
-       "name": "i_bilden",
-       "type": "bool",
-       "value": true
-      }
-     ]
+     "visible": true
     },
     {
      "id": 22,
-     "name": "stigspar_eldgrottan_3",
+     "name": "skylt_eldgrottan",
      "type": "sak",
-     "x": 60,
-     "y": 280,
-     "width": 36,
-     "height": 8,
+     "x": 168,
+     "y": 423,
+     "width": 22,
+     "height": 18,
      "rotation": 0,
      "visible": true,
      "properties": [
       {
-       "name": "dekor",
-       "type": "bool",
-       "value": true
-      },
-      {
-       "name": "i_bilden",
-       "type": "bool",
-       "value": true
+       "name": "sida",
+       "type": "string",
+       "value": "under"
       }
      ]
     },
@@ -436,18 +321,13 @@
      "id": 23,
      "name": "skylt_isgrottan",
      "type": "sak",
-     "x": 170,
-     "y": 300,
+     "x": 201,
+     "y": 413,
      "width": 22,
      "height": 18,
      "rotation": 0,
      "visible": true,
      "properties": [
-      {
-       "name": "i_bilden",
-       "type": "bool",
-       "value": true
-      },
       {
        "name": "sida",
        "type": "string",
@@ -459,52 +339,13 @@
      "id": 24,
      "name": "skylt_issjon",
      "type": "sak",
-     "x": 150,
-     "y": 348,
+     "x": 221,
+     "y": 449,
      "width": 22,
      "height": 18,
      "rotation": 0,
      "visible": true,
      "properties": [
-      {
-       "name": "i_bilden",
-       "type": "bool",
-       "value": true
-      },
-      {
-       "name": "sida",
-       "type": "string",
-       "value": "over"
-      }
-     ]
-    },
-    {
-     "id": 25,
-     "name": "",
-     "type": "vagg",
-     "x": 24,
-     "y": 370,
-     "width": 616,
-     "height": 14,
-     "rotation": 0,
-     "visible": true
-    },
-    {
-     "id": 26,
-     "name": "skylt_eldgrottan",
-     "type": "sak",
-     "x": 96,
-     "y": 270,
-     "width": 22,
-     "height": 18,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "i_bilden",
-       "type": "bool",
-       "value": true
-      },
       {
        "name": "sida",
        "type": "string",
@@ -513,11 +354,44 @@
      ]
     },
     {
+     "id": 25,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 290,
+     "width": 276,
+     "height": 105,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 26,
+     "name": "",
+     "type": "vagg",
+     "x": 356,
+     "y": 290,
+     "width": 284,
+     "height": 105,
+     "rotation": 0,
+     "visible": true
+    },
+    {
      "id": 27,
+     "name": "",
+     "type": "vagg",
+     "x": 80,
+     "y": 395,
+     "width": 56,
+     "height": 14,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 28,
      "name": "stig_k4_stig1",
      "type": "sak",
-     "x": 296,
-     "y": 219,
+     "x": 312,
+     "y": 341,
      "width": 8,
      "height": 8,
      "rotation": 0,
@@ -546,12 +420,12 @@
      ]
     },
     {
-     "id": 28,
+     "id": 29,
      "name": "",
      "type": "vagg",
-     "x": 24,
-     "y": 180,
-     "width": 616,
+     "x": 276,
+     "y": 302,
+     "width": 80,
      "height": 86,
      "rotation": 0,
      "visible": true,
@@ -564,43 +438,161 @@
      ]
     },
     {
-     "id": 29,
-     "name": "",
-     "type": "vagg",
-     "x": 24,
-     "y": 64,
-     "width": 616,
-     "height": 44,
-     "rotation": 0,
-     "visible": true
-    },
-    {
      "id": 30,
      "name": "",
      "type": "vagg",
-     "x": 24,
-     "y": 108,
-     "width": 504,
-     "height": 20,
+     "x": 0,
+     "y": 180,
+     "width": 60,
+     "height": 110,
      "rotation": 0,
      "visible": true
     },
     {
      "id": 31,
+     "name": "snohog_1",
+     "type": "sak",
+     "x": 418,
+     "y": 249,
+     "width": 24,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 32,
+     "name": "snohog_2",
+     "type": "sak",
+     "x": 475,
+     "y": 227,
+     "width": 24,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 33,
+     "name": "snohog_3",
+     "type": "sak",
+     "x": 535,
+     "y": 220,
+     "width": 24,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 34,
+     "name": "snohog_4",
+     "type": "sak",
+     "x": 588,
+     "y": 222,
+     "width": 24,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 35,
+     "name": "sten_farfar",
+     "type": "sak",
+     "x": 497,
+     "y": 249,
+     "width": 22,
+     "height": 14,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 36,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 0,
+     "width": 640,
+     "height": 105,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 37,
+     "name": "",
+     "type": "vagg",
+     "x": 0,
+     "y": 105,
+     "width": 562,
+     "height": 75,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 38,
+     "name": "",
+     "type": "vagg",
+     "x": 626,
+     "y": 105,
+     "width": 14,
+     "height": 75,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 39,
+     "name": "",
+     "type": "vagg",
+     "x": 562,
+     "y": 105,
+     "width": 64,
+     "height": 43,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 40,
      "name": "mynningen",
      "type": "sak",
-     "x": 552,
-     "y": 112,
+     "x": 562,
+     "y": 148,
      "width": 64,
      "height": 28,
      "rotation": 0,
      "visible": true,
      "properties": [
-      {
-       "name": "i_bilden",
-       "type": "bool",
-       "value": true
-      },
       {
        "name": "sida",
        "type": "string",
@@ -609,11 +601,11 @@
      ]
     },
     {
-     "id": 32,
+     "id": 41,
      "name": "ras_mynningen",
      "type": "sak",
-     "x": 552,
-     "y": 114,
+     "x": 562,
+     "y": 150,
      "width": 64,
      "height": 26,
      "rotation": 0,
@@ -632,126 +624,11 @@
      ]
     },
     {
-     "id": 33,
-     "name": "snohog_1",
-     "type": "sak",
-     "x": 380,
-     "y": 138,
-     "width": 24,
-     "height": 16,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "i_bilden",
-       "type": "bool",
-       "value": true
-      },
-      {
-       "name": "sida",
-       "type": "string",
-       "value": "alla"
-      }
-     ]
-    },
-    {
-     "id": 34,
-     "name": "snohog_2",
-     "type": "sak",
-     "x": 450,
-     "y": 156,
-     "width": 24,
-     "height": 16,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "i_bilden",
-       "type": "bool",
-       "value": true
-      },
-      {
-       "name": "sida",
-       "type": "string",
-       "value": "alla"
-      }
-     ]
-    },
-    {
-     "id": 35,
-     "name": "snohog_3",
-     "type": "sak",
-     "x": 540,
-     "y": 156,
-     "width": 24,
-     "height": 16,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "i_bilden",
-       "type": "bool",
-       "value": true
-      },
-      {
-       "name": "sida",
-       "type": "string",
-       "value": "alla"
-      }
-     ]
-    },
-    {
-     "id": 36,
-     "name": "snohog_4",
-     "type": "sak",
-     "x": 600,
-     "y": 160,
-     "width": 24,
-     "height": 16,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "i_bilden",
-       "type": "bool",
-       "value": true
-      },
-      {
-       "name": "sida",
-       "type": "string",
-       "value": "alla"
-      }
-     ]
-    },
-    {
-     "id": 37,
-     "name": "sten_farfar",
-     "type": "sak",
-     "x": 470,
-     "y": 134,
-     "width": 22,
-     "height": 14,
-     "rotation": 0,
-     "visible": true,
-     "properties": [
-      {
-       "name": "i_bilden",
-       "type": "bool",
-       "value": true
-      },
-      {
-       "name": "sida",
-       "type": "string",
-       "value": "alla"
-      }
-     ]
-    },
-    {
-     "id": 38,
-     "name": "fagel_200_236",
+     "id": 42,
+     "name": "fagel_320_470",
      "type": "omgivning",
-     "x": 200,
-     "y": 300,
+     "x": 320,
+     "y": 470,
      "width": 12,
      "height": 12,
      "rotation": 0,

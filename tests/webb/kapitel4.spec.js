@@ -350,7 +350,8 @@ test('kapitel 4: stig 4 i tandgrottan, och han hoppar tillbaka till stranden (12
   const fynd = await page.evaluate(() => window.__fynd);
   expect(fynd.text).toContain('EN STOR TAND');
   expect(fynd.bild).toBe('tand_isen');
-  expect((await page.evaluate(() => window.__ORDSTAVEN.grafik())).regi).toContain('fyndet hålls upp');
+  // tanden står mellan hans händer (Stils bild i världen), med strålarna bakom
+  expect((await page.evaluate(() => window.__ORDSTAVEN.grafik())).regi.join('\n')).toContain('fyndet hålls upp: tand_isen');
   await page.screenshot({ path: 'test-results/kap4-stig4-tanden.png' });
   await expect(page.locator('#fynd')).toBeHidden({ timeout: 6000 });
   expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).toContain('[fynd] dinoboken: tand_isen');
@@ -400,7 +401,8 @@ test('kapitel 4: rummens bilder och det som rör sig (128.4, LASMIG_127)', async
   test.skip(info.project.name !== 'mac-helskarm', 'bilderna är desamma överallt');
   test.setTimeout(240000);
   const rummen = [
-    ['k4s01_foten', 'berget_stigen', 'rum_berget_stigen', []],
+    // stigen är gråbox tills Stil målar den mot kartan efter skiss 6 (133.13.3)
+    ['k4s01_foten', 'berget_stigen', null, []],
     ['k4s03_gangen', 'berget_gangen', 'rum_berget_gangen_mork', ['f1_ljus']],
     ['k4s03_gangen', 'berget_gangen', 'rum_berget_gangen', ['f1_ljus', 'isklump_1'], 3],
     ['k4s03_salen', 'berget_salen', 'rum_berget_salen', ['orgel_blank', 'tavla_farfar']],
@@ -434,7 +436,7 @@ test('kapitel 4: rummens bilder och det som rör sig (128.4, LASMIG_127)', async
     // läsplattan döljs bara för bilden
     await page.evaluate(() => { for (const e of document.querySelectorAll('#plattan, .replik-ruta')) e.style.visibility = 'hidden'; });
     await page.waitForTimeout(400);
-    await page.locator('canvas').first().screenshot({ path: `test-results/kap4-rum-${scen.replace('k4s0', '')}-${golv.replace('rum_', '')}.png` });
+    await page.locator('canvas').first().screenshot({ path: `test-results/kap4-rum-${scen.replace('k4s0', '')}-${(golv ?? rum).replace('rum_', '')}.png` });
   }
 });
 
@@ -454,10 +456,11 @@ test('kapitel 4: vid gaffeln visar kameran alla tre vägarnas mål lika länge, 
   await starta(page, 'k4s01_foten');
   // ankomsten glider inte upp mot toppen och visar inget luftskepp
   await tillsSteg(page, 'pussel');
-  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 30000 }).toContain('vägens mål isgrottan');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 30000 }).toContain('vägens mål issjon');
   const loggen = await page.evaluate(() => window.__ORDSTAVEN.logg());
   const rader = loggen.split('\n').filter((r) => /vägens mål/.test(r));
-  expect(rader.map((r) => r.replace(/.*vägens mål /, '').trim())).toEqual(['eldgrottan', 'issjon', 'isgrottan']);
+  // från väster efter skiss 6: eldgrottan vid branten, isfallet och sjön i öster
+  expect(rader.map((r) => r.replace(/.*vägens mål /, '').trim())).toEqual(['eldgrottan', 'isgrottan', 'issjon']);
   // ingen av dem pekas ut, och baronen syns inte förrän han har valt
   expect((await page.evaluate(() => window.__ORDSTAVEN.grafik())).k4Skepp).toBeNull();
   await page.screenshot({ path: 'test-results/kap4-133-gaffeln.png' });
@@ -511,9 +514,24 @@ test('kapitel 4: bokstäverna står på flaken innan instruktionen kommer (133.6
   await expect(page.locator('#tanke .instruktion')).toBeVisible();
   // 135.6: UPP står på ett eget ordkort i molnet
   await expect(page.locator('#tanke .moln-ord')).toHaveText('UPP');
+  // ett tryck på ett flak innan han är vid kanten tar honom dit, och sedan börjar stigen. I stigen efter skiss 6 står
+  // isfallet ca 200 pixlar från bryggan, så han går först en bit mot det, tills flaken syns på skärmen
+  const kant = await page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').stigKanten);
+  await page.evaluate(({ x, y }) => window.__ORDSTAVEN.gaMot(x, y + 30), kant);
+  await expect.poll(() => page.evaluate(({ x, y }) => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); return Math.hypot(r.pos.x - x, r.pos.y - y - 30) < 12; }, kant), { timeout: 15000 }).toBe(true);
+  await page.waitForTimeout(800);
   await page.screenshot({ path: 'test-results/kap4-133-flaken.png' });
-  // ett tryck på ett flak innan han är vid kanten tar honom dit, och sedan börjar stigen
-  await page.locator('#stigord .flakord').first().click();
+  // ett flak som syns på skärmen (de översta står ännu ovanför bilden)
+  const punkt = await page.evaluate(() => {
+    const c = document.querySelector('canvas').getBoundingClientRect();
+    for (const e of document.querySelectorAll('#stigord .flakord')) {
+      const q = e.getBoundingClientRect(), x = q.left + q.width / 2, y = q.top + q.height / 2;
+      if (x > c.left && x < c.right && y > c.top + 20 && y < c.bottom - 20) return { x, y };
+    }
+    return null;
+  });
+  expect(punkt).not.toBeNull();
+  await page.mouse.click(punkt.x, punkt.y);
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 15000 }).toContain('k4_stig1: han är vid kanten');
   // instruktionen läses igen vid kanten, och bokstäverna står kvar medan den läses
   await expect(page.locator('#plattan.replik')).toBeVisible();

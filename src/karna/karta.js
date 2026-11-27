@@ -38,7 +38,7 @@ import { STORSTA } from './kamera.js';
  * inomhus = rummet har väggram (bakvägg, sidoväggar, främre kant). in = var hjälten kommer in från ett rum
  * som inte har någon utgång hit (punkter som heter in_<rum>, t.ex. trädgården från köket). lampor = där det lyser i mörkret.
  * regi = punkter för regin (regi_<namn>): regi_farfar är där Farfar står i dörren (67.2).
- * storlek = områdets storlek i pixlar (kartans bredd och höjd): en skärm (320×192) eller större, högst 640×384.
+ * storlek = områdets storlek i pixlar (kartans bredd och höjd): en skärm (320×192) eller större, högst 640×576.
  * massiv = väggar inne i rummet (typen vagg), som ger rummet en annan form än en rektangel. Ute är de hus, eller vatten
  * med egenskapen vatten (kapitel 2:s gråbox: träsket, dammen och stranden).
  * overHinder = ridåns rutor (rutlagret over) som hinder, en ruta per rad av rutor bredvid varandra (56.3): ridån
@@ -92,7 +92,7 @@ export const sortFor = (id) => (UTGANG.test(id) ? 'utgang' : 'sak');
 export function lasKarta(tmj) {
   if (!tmj || tmj.type !== 'map') throw new Error('inte en Tiled-karta');
   const bredd = tmj.width * tmj.tilewidth, hojd = tmj.height * tmj.tileheight;
-  // ett område är minst en skärm och högst ungefär 2×2 skärmar (beslut 14). Är det större än skärmen följer kameran hjälten.
+  // ett område är minst en skärm och högst 2 × 3 skärmar (beslut 14 och 133.13.3). Är det större än skärmen följer kameran hjälten.
   if (bredd < RUM.bredd || hojd < RUM.hojd || bredd > STORSTA.bredd || hojd > STORSTA.hojd) {
     throw new Error(`kartan är ${bredd}×${hojd}, ett område är ${RUM.bredd}×${RUM.hojd} till ${STORSTA.bredd}×${STORSTA.hojd}`);
   }

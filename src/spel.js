@@ -1792,11 +1792,12 @@ export function skapaSpel(d) {
    * Fyndögonblicket (133.10, som i Zelda): hjälten håller upp fyndet, en kort fanfar spelar, och fyndet visas i
    * närbild med sin bild och sitt ord. Sedan flyger det in i bokknappen (eller pausknappen, där MIN BOK är), som
    * glimtar. Ett tryck hoppar över. Körs av sig själv vid `dinobok` och `ge_sak`, så datan behöver inte ändras.
-   * @param {string} bild HTML @param {string} text @param {string} vad för loggen
+   * @param {string} bild HTML @param {string} text @param {string} vad för loggen @param {string} [id] fyndets bild i
+   * världen (föremålet), som hjälten håller mellan händerna om den finns
    */
-  async function fyndogonblick(bild, text, vad) {
+  async function fyndogonblick(bild, text, vad, id) {
     logg.handelse('fynd', vad);
-    rum.hallUppFynd(tid(FYND_MS));
+    rum.hallUppFynd(tid(FYND_MS), id);
     ljud.spela('fanfar');
     const mal = ui.$('#hud-lapp').hidden ? '#hud-paus' : '#hud-lapp';
     await ui.visaFynd(bild, text, tid(FYND_MS), mal);
@@ -1806,12 +1807,12 @@ export function skapaSpel(d) {
     nyttIHjalteboken();
     logg.handelse('gåva', `${st.sort}: ${st.id}`);
     // gåvans bildkort om Stil har ritat det, annars ikonen för sorten
-    await fyndogonblick(bilder.harKort(st.id) ? bilder.html(st.id) : ikon(st.sort === 'ryggsack' ? 'ryggsack' : 'klader', 'stor'), '', `${st.sort}: ${st.id}`);
+    await fyndogonblick(bilder.harKort(st.id) ? bilder.html(st.id) : ikon(st.sort === 'ryggsack' ? 'ryggsack' : 'klader', 'stor'), '', `${st.sort}: ${st.id}`, st.id);
   }
   /** Dinoboken får en sida: fyndögonblicket med sidans bild och bildtext, och pausknappen glimtar. @param {any} st */
   async function dinobok(st) {
     nyttIHjalteboken();
-    await fyndogonblick(bilder.html(st.sida.bild), st.sida.bildtext ?? '', `dinoboken: ${st.sida.bild}`);
+    await fyndogonblick(bilder.html(st.sida.bild), st.sida.bildtext ?? '', `dinoboken: ${st.sida.bild}`, st.sida.bild);
   }
   /** Ungen lär sig något nytt (stubbe i gråboxen: ungen hoppar och låter glad). @param {any} st */
   async function ungeTillagg(st) {

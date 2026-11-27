@@ -24,9 +24,8 @@ from kap2 import KARTOR, ROT, karta, liv, punkt, sak, utg, vagg  # noqa: E402
 RUMSBILDER = ROT / 'assets' / 'rum' / 'kap-04'
 # Det som är målat i rummens bilder (LASMIG_127): kartan har kvar platserna, men gråboxen ritar dem inte
 I_BILDEN = {
-    # stigen: bron, stigspåren, skyltstolparna (orden står på läsplattan), snöhögarna, Farfars sten och valvet i branten
-    'stig_floden', 'stigspar_in', *(f'stigspar_isgrottan_{i}' for i in range(1, 5)), 'stigspar_issjon_1', 'stigspar_issjon_2',
-    *(f'stigspar_eldgrottan_{i}' for i in range(1, 4)), 'skylt_isgrottan', 'skylt_issjon', 'skylt_eldgrottan',
+    # stigen: bryggan, skyltstolparna (orden står på läsplattan), snöhögarna, Farfars sten och mynningen
+    'stig_floden', 'skylt_isgrottan', 'skylt_issjon', 'skylt_eldgrottan',
     *(f'snohog_{i}' for i in range(1, 5)), 'sten_farfar', 'mynningen',
     # grottan
     'vagg_gemener', 'vagg_valvet', 'gata_1', 'gata_2', 'gata_3', 'ishylla', 'tand_genom_isen',
@@ -137,65 +136,53 @@ def stig(pid, mitt, steg, rader, y0=0, y1=192, upp=False, x0=0, x1=640, **extra)
 
 
 RUMMEN = {
-    # 2 × 1 skärmar (manus 21 v0.3.1): bergets fot vid floden i väster, där sköldpaddan lägger till, och stigen upp mot
-    # öster. Vid gaffeln tre gamla skyltar (läsvalet i rummet), med var sin stig bakom. Stig 1 (UPP) är isade flak
-    # uppför branten, med ordet på en gammal stolpe. Bakom den grottans mynning i norr, med fyra snöhögar framför. Farfars
-    # sten ligger under den tredje han lyfter (sak_vid), och syns när han har lyft den. Snön rasar över mynningen (ras).
+    # Skiss 6 (godkänd 27/11, 133.13.3 och 135.4): 640 × 576, 2 × 3 skärmar. Nerifrån: foten vid floden (y 395–556), där
+    # sköldpaddan lägger till vid bryggan i väster, gaffeln med de tre skyltarna, en frusen sjö i öster (ISSJÖN) och
+    # södra kanten mot dalen. Sedan branten (y 290–395) med eldgrottans varma sken vid foten (ELDGROTTAN) och isfallet
+    # (ISGROTTAN), där stig 1 (UPP) går uppför. Ovanför den platån (y 180–290) med de fyra snöhögarna och Farfars sten,
+    # och branten med mynningen i nordost. Överst sluttningen med blocket (y 75–105) och kammen med toppen som ryker. I
+    # väster slutar platån, sluttningen och kammen i ett stup (x ca 50–70), med molnhavet nedanför. Kameran visar de tre
+    # vägarnas mål vid gaffeln (regi_vag_<mål>), och ingen av rutorna når mynningen (135.4).
     'berget_stigen': {
-        # 121.2 (0.105.0): 2 × 2 skärmar. Sluttningen ovanför mynningen är högre (y 0–108), så att luftskeppet ryms
-        # ovanför blocket när Herr Skata knyter repet. Allt annat ligger som i 0.104.0, 64 pixlar längre ned.
-        'storlek': (40, 24),
+        'storlek': (40, 36),
         'objekt': [
-            vagg(0, 0, 24, 64, vatten=True), vagg(24, 0, 616, 64),
-            *ned(64, [
-                punkt('start', 48, 280),
-                punkt('regi_floden', 16, 296),
-                punkt('regi_toppen', 470, 6),
-                punkt('regi_block', 540, 32),
-                punkt('regi_snon', 584, 40),
-                # 133.2: vägarnas mål vid gaffeln. Kameran visar dem lika länge före läsvalet, från väster: ELDGROTTAN
-                # längst bort i nordväst, ISSJÖN i öster längs branten och ISGROTTAN vid mynningen. Stils skiss sätter
-                # målen i den nya stigen (133.13.3), och då flyttar punkterna dit
-                punkt('regi_vag_eldgrottan', 56, 220),
-                punkt('regi_vag_issjon', 350, 298),
-                punkt('regi_vag_isgrottan', 584, 62),
-                # floden i väster
-                vagg(0, 0, 24, 320, vatten=True),
-                sak('stig_floden', 24, 280, 20, 30, dekor=True),
-                # 122.2: stigarna vid gaffeln, i gråbox spår i snön (dekor, under figurerna): in från floden, och tre
-                # som syns gå åt var sitt håll. ISGROTTAN nordost mot stupet och stig 1, ISSJÖN österut längs branten i
-                # söder, och ELDGROTTAN nordväst mot stupets västra del. Stil gör dem till riktiga stigar i rummet
-                sak('stigspar_in', 44, 276, 110, 8, dekor=True),
-                sak('stigspar_isgrottan_1', 172, 242, 40, 8, dekor=True),
-                sak('stigspar_isgrottan_2', 206, 232, 40, 8, dekor=True),
-                sak('stigspar_isgrottan_3', 240, 222, 50, 8, dekor=True),
-                sak('stigspar_isgrottan_4', 284, 212, 30, 8, dekor=True),
-                sak('stigspar_issjon_1', 168, 286, 44, 8, dekor=True),
-                sak('stigspar_issjon_2', 206, 294, 150, 8, dekor=True),
-                sak('stigspar_eldgrottan_1', 120, 236, 40, 8, dekor=True),
-                sak('stigspar_eldgrottan_2', 90, 226, 36, 8, dekor=True),
-                sak('stigspar_eldgrottan_3', 60, 216, 36, 8, dekor=True),
-                # gaffeln: tre skyltar, ISGROTTAN mot stupet och de andra två mot var sitt håll
-                sak('skylt_isgrottan', 170, 236, 22, 18, sida='under'),
-                sak('skylt_issjon', 150, 284, 22, 18, sida='over'),
-                # branten ned mot dalen i söder (Stil, LASMIG_skiss2, 120.1)
-                vagg(24, 306, 616, 14),
-                sak('skylt_eldgrottan', 96, 206, 22, 18, sida='under'),
-                # stig 1 (UPP): tre steg uppför stupet och två rader sida vid sida, stupet tvärs över rummet (y 116–202)
-                *stig('k4_stig1', (300, 159), 3, 2, upp=True, x0=24, x1=640, luftskepp=True),
-                # övre halvan: sluttningen mot stenfältet (där blocket står) är brant, och mynningen ligger i nordöstra
-                # hörnet under den, med snöhögarna framför. Farfars sten under den tredje (dold tills han har lyft den)
-                vagg(24, 0, 616, 44),
-                vagg(24, 44, 504, 20),
-                sak('mynningen', 552, 48, 64, 28, sida='under'),
-                sak('ras_mynningen', 552, 50, 64, 26, sida='under'),
-                sak('snohog_1', 380, 74, 24, 16, sida='alla'),
-                sak('snohog_2', 450, 92, 24, 16, sida='alla'),
-                sak('snohog_3', 540, 92, 24, 16, sida='alla'),
-                sak('snohog_4', 600, 96, 24, 16, sida='alla'),
-                sak('sten_farfar', 470, 70, 22, 14, sida='alla'),
-                liv('fagel', 200, 236, 12, 12),
-            ]),
+            punkt('start', 48, 506),
+            punkt('regi_floden', 16, 506),
+            punkt('regi_toppen', 120, 30),
+            punkt('regi_block', 500, 96),
+            punkt('regi_snon', 594, 134),
+            # pass 1 från "Var var vi?" (k4s02): han står framför mynningen, där raset kommer
+            punkt('regi_hjalte_k4s02_mynningen', 594, 194),
+            punkt('regi_vag_eldgrottan', 108, 364),
+            punkt('regi_vag_isgrottan', 316, 340),
+            punkt('regi_vag_issjon', 596, 476),
+            # floden och bryggan i väster, sjön i öster och södra kanten mot dalen
+            vagg(0, 395, 20, 98, vatten=True), vagg(0, 519, 20, 37, vatten=True),
+            sak('stig_floden', 0, 493, 30, 26, dekor=True),
+            vagg(530, 424, 110, 118, vatten=True),
+            vagg(0, 556, 640, 20),
+            # granarnas stammar vid foten och på platån
+            vagg(50, 462, 46, 12), vagg(96, 516, 12, 10), vagg(256, 512, 14, 10), vagg(396, 436, 48, 12),
+            vagg(366, 516, 36, 10), vagg(446, 532, 24, 10), vagg(160, 238, 36, 10),
+            # gaffeln: tre skyltar (orden står på läsplattan), ELDGROTTAN till vänster, ISGROTTAN i mitten och ISSJÖN
+            sak('skylt_eldgrottan', 168, 423, 22, 18, sida='under'),
+            sak('skylt_isgrottan', 201, 413, 22, 18, sida='under'),
+            sak('skylt_issjon', 221, 449, 22, 18, sida='under'),
+            # branten, med eldgrottans mynning vid foten, och isfallet där stig 1 går uppför (tre steg och två rader)
+            vagg(0, 290, 276, 105), vagg(356, 290, 284, 105), vagg(80, 395, 56, 14),
+            *stig('k4_stig1', (316, 345), 3, 2, upp=True, x0=276, x1=356, luftskepp=True),
+            # platån: stupet i väster, snöhögarna och Farfars sten under den tredje (dold tills han har lyft den)
+            vagg(0, 180, 60, 110),
+            sak('snohog_1', 418, 249, 24, 16, sida='alla'),
+            sak('snohog_2', 475, 227, 24, 16, sida='alla'),
+            sak('snohog_3', 535, 220, 24, 16, sida='alla'),
+            sak('snohog_4', 588, 222, 24, 16, sida='alla'),
+            sak('sten_farfar', 497, 249, 22, 14, sida='alla'),
+            # branten med mynningen, och ovanför den sluttningen med blocket och kammen (dit går han aldrig)
+            vagg(0, 0, 640, 105), vagg(0, 105, 562, 75), vagg(626, 105, 14, 75), vagg(562, 105, 64, 43),
+            sak('mynningen', 562, 148, 64, 28, sida='under'),
+            sak('ras_mynningen', 562, 150, 64, 26, sida='under'),
+            liv('fagel', 320, 470, 12, 12),
         ],
     },
     # 124.2 (granskning 11): grottan är fem rum i följd med en kort gång mellan varje, och ingen sal syns från en annan.
@@ -289,7 +276,8 @@ RUMMEN = {
             *golv_vaggar(320, 192, golv=[(16, 24, 48, 152), (240, 24, 64, 152)], vatten=[(72, 24, 168, 152)]),
             utg('gang_galleriet_tillbaka', 24, 24, 28, 8, golv=True, riktning='upp', till='berget_galleriet'),
             sak('ristning_tand', 16, 100, 6, 18, sida='hoger'),
-            sak('stig_k4_stig4', 152, 96, 8, 8, dekor=True, ankare=True, tillbaka=True),
+            # 133.11: stigen står högt, så att han landar på den bortre stranden vid tanden i isväggen
+            sak('stig_k4_stig4', 152, 64, 8, 8, dekor=True, ankare=True, tillbaka=True),
             sak('tand_gloria', 268, 18, 36, 24, dekor=True),
             sak('tand_isen', 276, 24, 20, 12, sida='under'),
         ],
@@ -373,7 +361,11 @@ STENFALT_KLIPPA = {
         # uppe på stenfältet när scenen efter klippan börjar (omstart)
         punkt('regi_hjalte_k4s05_stenfaltet', 316, 164),
         # molnhavet i norr, kanten i öster och branten i väster (Stils väggar, 120.1)
-        vagg(0, 0, 640, 26), vagg(624, 26, 16, 310), vagg(0, 56, 40, 80),
+        # skiss 6 (135.4): väster om passet slutar fältet i norr i en kant (y 40) mot molnhavet. Passets två klippor står
+        # öster om x 452, med skåran mellan dem där stigen går vidare mot molnkanten
+        vagg(0, 0, 452, 40), vagg(452, 0, 36, 30), vagg(508, 0, 132, 30), vagg(624, 30, 16, 306), vagg(0, 56, 40, 80),
+        # snöyran som drar över fältet, och vinden som hörs (133.13.4)
+        punkt('regi_snoyra', 320, 110),
         sak('sten_varm', 380, 130, 26, 20, sida='alla'),
         sak('sten_taggar', 110, 100, 26, 20, sida='alla'),
         sak('sten_is', 250, 56, 26, 20, sida='alla'),
@@ -385,7 +377,7 @@ STENFALT_KLIPPA = {
         sak('snodriva_taggar', 106, 114, 34, 8, dekor=True, ovanpa=True),
         sak('snodriva_is', 246, 70, 34, 8, dekor=True, ovanpa=True),
         sak('luftskepp_borta', 300, 8, 40, 20, dekor=True, ankare=True),
-        sak('stig_molnkanten', 480, 26, 30, 16, sida='under'),
+        sak('stig_molnkanten', 488, 14, 20, 18, sida='under'),
         # den isade klippan tvärs över (y 180–284), istapparna längs kanten, och vägen upp när ordet är skrivet
         sak('klippa', 0, 180, 624, 104, sida='under'),
         sak('istappar_klippan', 0, 180, 624, 6, dekor=True),
