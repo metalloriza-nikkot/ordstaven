@@ -2792,9 +2792,14 @@ export function skapaSpel(d) {
     // papper, och skylten öppnas när han går dit eller trycker på papperet. Den läses aldrig upp.
     const skylt = p.skylt ? skyltarIRummet().find((x) => x.id === p.skylt) ?? null : null;
     if (p.skylt && !skylt) logg.handelse('FEL', `${p.id}: skylten ${p.skylt} finns inte i rummet`);
-    const fraga = () => visaMoln(skylt ? `<button type="button" class="tanke-lapp tanke-skylt" aria-label="Skylten">${ikon('lapp', 'stor')}</button>`
-      : harLapp ? `<button type="button" class="tanke-lapp" aria-label="Lappen">${ikon('lapp', 'stor')}</button>`
-      : v.s.bild ? bilder.html(v.s.bild) : v.s.text ? `<span class="moln-text">${lasText(p, v.s.text)}</span>` : null, p.instruktion ?? null);
+    /** hjälptrappan (134.3, mästarprovet): ordet som avgör glimtar i molnet från trappans andra steg */
+    let glimtOrd = /** @type {string | null} */ (null);
+    const fraga = () => {
+      visaMoln(skylt ? `<button type="button" class="tanke-lapp tanke-skylt" aria-label="Skylten">${ikon('lapp', 'stor')}</button>`
+        : harLapp ? `<button type="button" class="tanke-lapp" aria-label="Lappen">${ikon('lapp', 'stor')}</button>`
+        : v.s.bild ? bilder.html(v.s.bild) : v.s.text ? `<span class="moln-text">${lasText(p, v.s.text)}</span>` : null, p.instruktion ?? null);
+      if (glimtOrd) for (const e of /** @type {HTMLElement[]} */ ([...ui.$('#tanke').querySelectorAll('.moln-text .ord')])) if (versaler(e.dataset.ord || '') === glimtOrd) e.classList.add('glimtar');
+    };
     if (skylt) {
       skyltStyrs.add(skylt.id); skyltSpar = spar; skyltPusselNu = skylt.id;
       // 109.2 (ersätter 101.5): skylten öppnas bara när han trycker. Har han just kommit in i rummet glimtar den, så
@@ -2836,6 +2841,31 @@ export function skapaSpel(d) {
       let vid = null;
       const hjalpSpar = skapaHjalpSpar(() => speltid());
       const peka = () => { const r = kvarAlt().find((a) => a.ratt); return !!r?.objekt && rum.ungePekar(r.objekt); };
+      /**
+       * Hjälptrappan per läsval (134.3, manus 22: mästarprovet). Varje steg kommer efter så många fel i det här läsvalet
+       * (samma stig igen räknas inte): `replik` (Farfar: "Läs raden igen!"), `ord` (ordet som avgör glimtar i molnet,
+       * och står kvar så) och `ratt` (det rätta alternativet glimtar, och kameran visar det en stund). Det sista står kvar
+       * markerat tills han har valt.
+       */
+      let trappSteg = 0;
+      const trappa = async () => {
+        const lista = Array.isArray(p.hjalptrappa) ? p.hjalptrappa : [];
+        while (trappSteg < lista.length && v.s.fel >= (Number(lista[trappSteg].efter_fel) || 1)) {
+          const t = lista[trappSteg++];
+          if (t.replik) await replik(t.replik);
+          if (t.ord) glimtOrd = versaler(String(t.ord));
+          const r = t.ratt ? kvarAlt().find((a) => a.ratt) : null;
+          if (r?.objekt && rum.ruta(r.objekt)) {
+            const o = rum.ruta(r.objekt), fokus = rum.regiFokus;
+            rum.regiFokus = { x: o.x + o.b / 2, y: o.y + o.h / 2 };
+            rum.markera(r.objekt, true); ui.pulseraSkylt?.(r.objekt);
+            logg.handelse('hjälp', `${p.id}: ${r.objekt} glimtar`);
+            await vanta(tid(1600));
+            rum.regiFokus = fokus;
+          }
+          logg.handelse('hjälp', `${p.id}: trappans steg ${trappSteg} efter ${v.s.fel} fel${t.ord ? `, ${versaler(String(t.ord))} glimtar` : ''}`);
+        }
+      };
       const vakt = { spar: hjalpSpar, pekOmMs: () => pekningOmMs({ antalAlternativ: kvarAlt().length, antalFel: v.s.fel, sedanStartMs: hjalpSpar.sedanStart() }), peka };
       // knuffen upprepar frågan: tankebubblan blinkar, eller lappen lyser om frågan står på en lapp
       const k = knuffKlocka(p.knuff ?? (harLapp ? { handling: '' } : undefined), () => { ui.pulseraTanke(); if (harLapp) ui.pulsera('#hud-lapp'); if (skylt) ui.pulseraSkylt(skylt.id); if (rum.aggKnuff?.()) logg.handelse('ägget', 'hackar tänder'); }, vakt);
@@ -2973,6 +3003,7 @@ export function skapaSpel(d) {
             }
           }
           if (nySpikad) ljud.spela('bonk'); // en fel dörr spikas igen: två komiska bonk (10c)
+          await trappa();
           // varianten kan ha bytts (förenkling): lådorna visar de nya alternativens färg och storlek
           for (const a of v.s.alternativ) { if (a.objekt && synligaEgenskaper(a.bild || a.id)) rum.visaDelar(a.objekt, delarAv([a], p)); }
           rum.sattInteraktiva(kvarSaker());

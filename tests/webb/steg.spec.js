@@ -829,6 +829,51 @@ test('mästarprovet (132.4): tre läsval i följd på samma stigar, den rätta s
   expect(await page.evaluate(() => [...window.__ORDSTAVEN.spel.scene.getScene('Rum').platsStreck.ids.values()].filter((g) => g.active).length)).toBe(3);
 });
 
+test('mästarprovet: hjälpen per rad (134.3), Farfar efter ett fel, ordet som avgör glimtar efter två och stigen efter tre', async ({ page }) => {
+  test.setTimeout(120000);
+  // påhittad rad och stigar (inte kapitel 5:s), med trappan som manus 22 beskriver den
+  const stig = (name, x) => ({ name, type: 'utgang', x, y: 30, width: 28, height: 70, properties: { golv: true, riktning: 'upp' } });
+  const alt = (id, ratt) => ({ id, objekt: `stig_${id}`, bild: 'stig', ...(ratt ? { ratt: true, tillstand_efter: 'struken' } : {}) });
+  const rad = {
+    id: 't_trapprad', typ: 'P1_las_och_valj', i_rummet: true, hjalp: 'ett_ord',
+    varianter: { L6: { text: 'Stigen går inte vid ån.', alternativ: ['a', 'b', 'c', 'd'].map((x) => alt(x, x === 'a')) } },
+    vid_fel: { reaktion: 'dimman vänder honom', bild: 'ut_ur_fel_stig' },
+    hjalptrappa: [{ efter_fel: 1, replik: R('Läs raden igen!', 'farfar', { upplast: true }) }, { efter_fel: 2, ord: 'ån' }, { efter_fel: 3, ratt: true }],
+  };
+  await provscen(page, { id: 't_trappa', pass: 1, rum: 'provmast', steg: [{ typ: 'pussel', pussel_id: rad.id }, R('Nu går vi.')] }, null, {
+    pussel: [rad],
+    rum: { provmast: { innehall: ['stig_a', 'stig_b', 'stig_c', 'stig_d'] } },
+    kartor: { provmast: provkarta([stig('stig_a', 24), stig('stig_b', 100), stig('stig_c', 176), stig('stig_d', 252)], { x: 160, y: 170 }) },
+  });
+  const logg = () => page.evaluate(() => window.__ORDSTAVEN.logg());
+  const vantaFri = () => expect.poll(() => page.evaluate(() => !window.__ORDSTAVEN.fryst() && window.__ORDSTAVEN.synlig() && window.__ORDSTAVEN.position().y > 104), { timeout: 15000 }).toBe(true);
+  await expect(page.locator('#tanke')).toContainText('STIGEN GÅR INTE VID ÅN.', { timeout: 8000 });
+  // ett fel: Farfar säger "Läs raden igen!", och inget glimtar än
+  await tryckPa(page, 'stig_d');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('LÄS RADEN IGEN!', { timeout: 15000 });
+  await expect(page.locator('#tanke .ord.glimtar')).toHaveCount(0);
+  await page.locator('#plattan .replik-ruta .vidare').click();
+  await vantaFri();
+  await expect(page.locator('#tanke .ord.glimtar')).toHaveCount(0);
+  // två fel: ÅN glimtar i molnet och står kvar
+  await tryckPa(page, 'stig_c');
+  await expect.poll(logg, { timeout: 15000 }).toContain('trappans steg 2 efter 2 fel, ÅN glimtar');
+  await vantaFri();
+  await expect(page.locator('#tanke .ord.glimtar')).toHaveText('ÅN');
+  await page.screenshot({ path: 'test-results/mastarprovet-ordet-glimtar.png' });
+  // tre fel: den rätta stigen glimtar, och ordet glimtar fortfarande
+  await tryckPa(page, 'stig_b');
+  await expect.poll(logg, { timeout: 15000 }).toContain('[hjälp] t_trapprad: stig_a glimtar');
+  await vantaFri();
+  await expect(page.locator('#tanke .ord.glimtar')).toHaveText('ÅN');
+  await page.locator('canvas').first().screenshot({ path: 'test-results/mastarprovet-stigen-glimtar.png' });
+  // samma stig igen räknas inte, och han kan fortfarande välja rätt
+  await tryckPa(page, 'stig_a');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').regiLogg.join(' | ')), { timeout: 8000 }).toContain('streck av ljus över stig_a');
+  await expect(page.locator('#plattan .replik-ruta .text')).toHaveText('NU GÅR VI.', { timeout: 10000 });
+  expect((await logg()).match(/trappans steg/g)).toHaveLength(3);
+});
+
 test('läsval i rummet: ett rätt alternativ med effekt gör det i rummet (101.3, säckhissen på den stora säcken)', async ({ page }) => {
   test.setTimeout(60000);
   const pussel = {

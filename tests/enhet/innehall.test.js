@@ -492,4 +492,22 @@ describe('lappen utan alternativ (kapitel 5:s bit, 132.4)', () => {
     v.alternativ.find((a) => !a.ratt).tillstand_efter = 'struken';
     expect(kontrollera(d).fel.join('\n')).toMatch(/tillstand_efter gäller bara ett rätt alternativ/);
   });
+  it('hjälptrappan per läsval (2.62, mästarprovet): ordet står i texten, stegen i ordning, och det rätta glimtar bara i rummet', () => {
+    const d = riktigt();
+    const p = d.kapitel[0].pussel.find((x) => x.id === 'p0_dinomat');
+    const v = Object.values(p.varianter)[0];
+    const ettOrd = String(Array.isArray(v.text) ? v.text[0] : v.text).split(/\s+/)[0].replace(/[^A-Za-zÅÄÖåäö]/g, '');
+    p.hjalptrappa = [{ efter_fel: 1, replik: { text: 'Läs raden igen!', talare: 'farfar', upplast: true } }, { efter_fel: 2, ord: ettOrd.toLowerCase() }];
+    expect(kontrollera(d).fel.join('\n')).not.toMatch(/hjalptrappa/);
+    p.hjalptrappa.push({ efter_fel: 2, ord: 'giraff' }, { efter_fel: 4, ratt: true });
+    const fel = kontrollera(d).fel.join('\n');
+    expect(fel).toMatch(/hjalptrappa\[2\]: efter_fel 2 kommer inte efter/);
+    expect(fel).toMatch(/hjalptrappa\[2\]: ordet giraff står inte i texten/);
+    if (p.i_rummet) expect(fel).not.toMatch(/hjalptrappa\[3\]: ratt/);
+    else expect(fel).toMatch(/hjalptrappa\[3\]: ratt \(det rätta glimtar\) gäller bara ett läsval i rummet/);
+    p.i_rummet = !p.i_rummet;
+    const fel2 = kontrollera(d).fel.join('\n');
+    if (p.i_rummet) expect(fel2).not.toMatch(/hjalptrappa\[3\]: ratt/);
+    else expect(fel2).toMatch(/hjalptrappa\[3\]: ratt/);
+  });
 });

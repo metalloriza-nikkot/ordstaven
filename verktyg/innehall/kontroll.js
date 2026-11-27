@@ -596,6 +596,21 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
             const ordI = (/** @type {any} */ t) => ord(rader(t).join(' ')).some((o) => versaler(o) === versaler(p.lys_ord));
             if (!(vari.text && ordI(vari.text)) && !ratt.some((a) => a.ord && ordI(a.ord))) fel.push(var_(`${vp}: ordet ${p.lys_ord} står inte i texten eller på ett rätt kort`));
           }
+          // hjälptrappan per läsval (134.3, mästarprovet): ordet som glimtar står i texten, och stegen kommer i ordning
+          if (Array.isArray(p.hjalptrappa)) {
+            if (flera) fel.push(var_(`${vp}: hjalptrappa gäller bara P1`));
+            let fore = 0;
+            for (const [i, t] of p.hjalptrappa.entries()) {
+              const tp = `${vp} hjalptrappa[${i}]`;
+              if (!t.replik && !t.ord && !t.ratt) fel.push(var_(`${tp}: steget behöver replik, ord eller ratt`));
+              if (t.efter_fel <= fore) fel.push(var_(`${tp}: efter_fel ${t.efter_fel} kommer inte efter steget före (${fore})`));
+              fore = t.efter_fel;
+              if (t.replik) replikKontroll(t.replik, `${tp} replik`);
+              if (t.ord && !(vari.text && ord(rader(vari.text).join(' ')).some((o) => versaler(o) === versaler(t.ord)))) fel.push(var_(`${tp}: ordet ${t.ord} står inte i texten`));
+              if (t.ratt && !p.i_rummet) fel.push(var_(`${tp}: ratt (det rätta glimtar) gäller bara ett läsval i rummet`));
+            }
+            if (p.efter_3_fel) varningar.push(var_(`${vp}: både hjalptrappa och efter_3_fel. Trappan räcker`));
+          }
           if (flera && (ratt.length < 1 || ratt.length === vari.alternativ.length)) fel.push(var_(`${vp}: minst ett alternativ ska vara rätt och minst ett fel`));
           const ids = vari.alternativ.map((a) => a.id);
           if (new Set(ids).size !== ids.length) fel.push(var_(`${vp}: två alternativ har samma id`));

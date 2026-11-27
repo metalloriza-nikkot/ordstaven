@@ -34,9 +34,13 @@ for (const mapp of readdirSync(rot, { withFileTypes: true }).filter((d) => d.isD
     console.log(`   ${b.kapitel === 'aventyr' ? 'aventyr.json' : b.kapitel}: ${delar} visar texten för den vuxne${b.klart ? '' : b.kapitel === 'aventyr' ? ' (äventyret är inte klart)' : ' (kapitlet är inte klart)'}`);
   }
   // 135.7: rummen där molnet visar berättelsens instruktion i stället för gå-steget (pa_vagen)
+  // (136.4): de tomma molnen ska vara noll i kapitel 0–4. De andra visar en uppgift med verb och mål, och är riktiga
   if (r.molnet?.length) {
-    console.log(`   molnet i rummen före stegets rum, utan pa_vagen (${r.molnet.length}):`);
-    for (const m of r.molnet) console.log(`     ${m.kapitel} ${m.rum} (${m.scen} steg ${m.steg + 1}, ${m.typ}): boken säger ${m.boken} i ${m.stegetsRum}, molnet ${m.visas ? `visar "${m.instruktion}"` : `är tomt${m.instruktion ? ` ("${m.instruktion}" är ingen uppgift)` : ''}`}`);
+    const tomma = r.molnet.filter((m) => !m.visas), visar = r.molnet.filter((m) => m.visas);
+    console.log(`   molnet är tomt i rummen före stegets rum (${tomma.length}, ska vara 0):`);
+    for (const m of tomma) console.log(`     ${m.kapitel} ${m.rum} (${m.scen} steg ${m.steg + 1}, ${m.typ}): boken säger ${m.boken} i ${m.stegetsRum}${m.instruktion ? ` ("${m.instruktion}" är ingen uppgift)` : ''}`);
+    console.log(`   molnet visar berättelsens instruktion i stället för pa_vagen (${visar.length}):`);
+    for (const m of visar) console.log(`     ${m.kapitel} ${m.rum} (${m.scen} steg ${m.steg + 1}, ${m.typ}): boken säger ${m.boken} i ${m.stegetsRum}, molnet visar "${m.instruktion}"`);
   }
   for (const f of r.fel) console.log('FEL      ' + f);
   for (const v of r.varningar) console.log('varning  ' + v);

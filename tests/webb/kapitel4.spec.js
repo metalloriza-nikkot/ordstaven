@@ -589,5 +589,7 @@ test('kapitel 4: lockelsen i grottan visar ingen text för den vuxne, och molnet
   // 133.9: HOPPA ÖVER VATTNET görs i salen, så molnet i gången visar det inte
   const moln = await page.locator('#tanke').textContent();
   expect(moln || '').not.toMatch(/HOPPA ÖVER VATTNET/);
+  // 136.4: i stället står gå-steget (pa_vagen, Innehålls pass 135)
+  await expect(page.locator('#tanke')).toContainText('GÅ GENOM GÅNGEN');
   await page.screenshot({ path: 'test-results/kap4-133-gangen.png' });
 });

@@ -110,4 +110,12 @@ describe('molnet säger alltid en uppgift (135.7)', () => {
     kapitel.uppdrag[0].steg[1].pa_vagen = 'Gå genom grottan';
     expect(molnetsInstruktioner(kapitel)).toEqual([]);
   });
+  it('molnet är aldrig tomt på vägen i kapitel 0–4, och det som visas börjar med ett verb (136.4)', () => {
+    for (const id of ['kap-00', 'kap-01', 'kap-02', 'kap-03', 'kap-04']) {
+      const k = JSON.parse(readFileSync(new URL(`../../content/den-gomda-dalen/${id}.json`, import.meta.url), 'utf8'));
+      const l = molnetsInstruktioner(k);
+      expect(l.filter((r) => !r.visas), id).toEqual([]);
+      for (const r of l) expect(borjarMedVerb(r.instruktion), `${id} ${r.rum}`).toBe(true);
+    }
+  });
 });

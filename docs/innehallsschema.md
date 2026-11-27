@@ -1,6 +1,12 @@
 # Innehållsschema – kapitel i format 2
 
-Version 2.61 (2026-11-27). Ägs av teknikspåret.
+Version 2.62 (2026-11-27). Ägs av teknikspåret.
+2.62 (beslut 134.3 och 136.6): **hjälpen per läsval (mästarprovet).** Ett tillägg, filer i 2.61 gäller fortfarande.
+- **`hjalptrappa`** på `P1_las_och_valj`: en lista med steg som kommer efter fel i just det läsvalet (samma stig igen räknas inte). Varje steg har `efter_fel` (antal, i stigande ordning) och något av:
+  - `replik`: en replik efter felet, till exempel 🔊 FARFAR: "Läs raden igen!" (`upplast: true`, eftersom det är en instruktion);
+  - `ord`: ordet i texten som avgör. Det glimtar i molnet och står kvar så tills läsvalet är löst. Kontrollen prövar att ordet står i texten;
+  - `ratt: true`: det rätta alternativet glimtar, och kameran visar det en stund. Det står kvar markerat tills han har valt. Bara i ett läsval i rummet (`i_rummet`).
+- I mästarprovet har varje rad sin egen trappa, eftersom varje rad är ett eget P1: `[{"efter_fel": 1, "replik": {…"Läs raden igen!"}}, {"efter_fel": 2, "ord": "vattnet"}, {"efter_fel": 3, "ratt": true}]`. Lägg inte `efter_3_fel` bredvid trappan (kontrollen varnar).
 2.61 (beslut 135.6–135.7): **ordkortet och molnet som alltid säger en uppgift.** Ett tillägg, filer i 2.60 gäller fortfarande.
 - **`ordkort`** (boolean) på `P18_bokstavsstig`: ordet står på ett eget kort i molnet och bredvid instruktionen, som ordet i "Var var vi?". Det läses inte upp.
 - **Molnet i rummen före stegets rum** (135.7): `pa_vagen` om det finns. Annars berättelsens instruktion, men bara om den börjar med ett verb ur listan i `src/karna/uppdrag.js` (`VERB_I_MOLNET`). Annars står inget i molnet. Kontrollen listar varje rum där molnet visar berättelsens instruktion i stället för `pa_vagen`, och varnar där molnet blir tomt medan han går.

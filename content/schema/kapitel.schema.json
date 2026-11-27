@@ -1478,6 +1478,37 @@
         "lys_ord": {
           "type": "string",
           "description": "Ett ord som lyser i guld i texten och på kortet när han har valt rätt (2.43, INTE vid bryggan), som lys_ord på oppna_lasplatta (2.31)."
+        },
+        "hjalptrappa": {
+          "description": "Hjälpen per läsval (2.62, 134.3, mästarprovet i manus 22): stöd steg för steg efter fel i det här läsvalet. Samma stig igen räknas inte.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "efter_fel"
+            ],
+            "properties": {
+              "efter_fel": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "så många fel innan steget kommer"
+              },
+              "replik": {
+                "$ref": "#/$defs/replik",
+                "description": "en replik som kommer efter felet (Farfar: \"Läs raden igen!\")"
+              },
+              "ord": {
+                "type": "string",
+                "description": "ordet i texten som avgör: det glimtar i molnet och står kvar så"
+              },
+              "ratt": {
+                "const": true,
+                "description": "det rätta alternativet glimtar i rummet, och kameran visar det en stund (bara i ett läsval i rummet)"
+              }
+            }
+          }
         }
       }
     },
