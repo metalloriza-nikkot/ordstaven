@@ -1,7 +1,9 @@
 // Spelar hela kapitel 2 i gråbox (Teknik 20 del 5), som en spelare med tryck på marken och tangentbordet: från
 // träsket genom byn, navet (vassen först), Tant Rosas hus och till elden. Rätt svar tas från innehållet.
 import { test, expect } from './hjalp/klocka.js';
+import { provaUngenEfterVarje } from './hjalp/ungen.js';
 import { readFileSync } from 'node:fs';
+provaUngenEfterVarje(test);
 
 const kap = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-02.json', import.meta.url), 'utf8'));
 const pussel = new Map(kap.pussel.map((p) => [p.id, p]));

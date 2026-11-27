@@ -740,5 +740,12 @@
   "signatur": false,
   "styrka_db": -6,
   "sekunder": 1.6
+ },
+ "vind": {
+  "grupp": "Kapitel 4",
+  "vad": "Vinden på stenfältet: en slinga (loop) på 4 s, ett lågt vinande med två mjuka vindbyar per varv. Spelas med loop, sömlös",
+  "signatur": false,
+  "styrka_db": -16,
+  "sekunder": 4.0
  }
 }

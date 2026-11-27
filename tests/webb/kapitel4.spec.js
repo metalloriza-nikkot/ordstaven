@@ -3,8 +3,10 @@
 // ordlåset läggs med brickorna. I stig 3 prövas lockordet klo först, och grenen sjunker tillbaka (116.2).
 import { expect } from '@playwright/test';
 import { test } from './hjalp/klocka.js';
+import { provaUngenEfterVarje } from './hjalp/ungen.js';
 import { readFileSync } from 'node:fs';
 import { skapaStig, hjalpFlak, valj } from '../../src/karna/bokstavsstig.js';
+provaUngenEfterVarje(test);
 const PAKET = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8'));
 
 const kap = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-04.json', import.meta.url), 'utf8'));
@@ -38,7 +40,7 @@ async function tillKanten(page) {
 }
 
 /** Starta kapitel 4 vid en scen, med namnen klara. @param {any} page @param {string} scenId */
-async function starta(page, scenId, steg = 0, rumstillstand = {}) {
+async function starta(page, scenId, steg = 0, rumstillstand = {}, url = './?snabb&kapitel=kap-04') {
   const scen = kap.scener.findIndex((s) => s.id === scenId);
   await page.goto('./?snabb&ny&kapitel=kap-04');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
@@ -50,7 +52,7 @@ async function starta(page, scenId, steg = 0, rumstillstand = {}) {
     t.spelare.unge = { format: 1, steg: 1, formagor: [], ...t.spelare.unge, namn: 'KNOPP', folj: true };
     localStorage.setItem('ordstaven_spar', JSON.stringify(t));
   }, { scenId, scen, steg, pass: kap.scener[scen].pass, rumstillstand });
-  await page.goto('./?snabb&kapitel=kap-04');
+  await page.goto(url);
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.click('.start-knapp');
 }
@@ -401,8 +403,8 @@ test('kapitel 4: rummens bilder och det som rör sig (128.4, LASMIG_127)', async
   test.skip(info.project.name !== 'mac-helskarm', 'bilderna är desamma överallt');
   test.setTimeout(240000);
   const rummen = [
-    // stigen är gråbox tills Stil målar den mot kartan efter skiss 6 (133.13.3)
-    ['k4s01_foten', 'berget_stigen', null, []],
+    // stigen målad mot kartan efter skiss 6 (lev136)
+    ['k4s01_foten', 'berget_stigen', 'rum_berget_stigen', []],
     ['k4s03_gangen', 'berget_gangen', 'rum_berget_gangen_mork', ['f1_ljus']],
     ['k4s03_gangen', 'berget_gangen', 'rum_berget_gangen', ['f1_ljus', 'isklump_1'], 3],
     ['k4s03_salen', 'berget_salen', 'rum_berget_salen', ['orgel_blank', 'tavla_farfar']],
@@ -592,4 +594,30 @@ test('kapitel 4: lockelsen i grottan visar ingen text för den vuxne, och molnet
   // 136.4: i stället står gå-steget (pa_vagen, Innehålls pass 135)
   await expect(page.locator('#tanke')).toContainText('GÅ GENOM GÅNGEN');
   await page.screenshot({ path: 'test-results/kap4-133-gangen.png' });
+});
+
+test('golvdatorn i det högre rummet (136.3): canvas och fyra gånger långsammare processor i stigen (640 × 576) och på stenfältet med snöyran', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(150000);
+  const fel = [];
+  page.on('pageerror', (e) => fel.push(String(e)));
+  const mat = () => page.evaluate(() => new Promise((r) => { let n = 0; const t0 = performance.now(); const f = () => { n++; if (performance.now() - t0 < 2000) requestAnimationFrame(f); else r(n / 2); }; requestAnimationFrame(f); }));
+  /** @type {Record<string, number>} */ const takt = {};
+  for (const [scen, mal] of [['k4s01_foten', { x: 300, y: 470 }], ['k4s05_stenfaltet', { x: 500, y: 160 }]]) {
+    await starta(page, scen, 0, {}, './?snabb&kapitel=kap-04&canvas');
+    expect(await page.evaluate(() => window.__ORDSTAVEN.ritning())).toBe('canvas');
+    for (let k = 0; k < 20; k++) { const r = await page.$('#plattan .replik-ruta'); if (!r) break; await r.click().catch(() => {}); await page.waitForTimeout(200); }
+    const c = await page.context().newCDPSession(page);
+    await c.send('Emulation.setCPUThrottlingRate', { rate: 4 });
+    // hjälten går genom rummet medan kameran följer honom (och snöyran driver på stenfältet)
+    await page.evaluate(({ x, y }) => window.__ORDSTAVEN.gaMot(x, y), mal);
+    await mat();
+    takt[scen] = /** @type {number} */ (await mat());
+    await c.send('Emulation.setCPUThrottlingRate', { rate: 1 });
+    await page.locator('canvas').first().screenshot({ path: `test-results/kap4-golv-${scen}.png` });
+  }
+  console.log('canvas, 4× långsammare: bildrutor per sekund', takt);
+  // bara en röktest, som i fas1.spec.js: testmaskinen ritar i mjukvara, så gränsen är låg. Takten mäts på MacBooken
+  for (const [scen, fps] of Object.entries(takt)) expect(fps, `bildrutor per sekund i ${scen}`).toBeGreaterThan(15);
+  expect(fel).toEqual([]);
 });

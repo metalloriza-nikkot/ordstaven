@@ -14,6 +14,11 @@
  "nextobjectid": 43,
  "properties": [
   {
+   "name": "bild",
+   "type": "string",
+   "value": "berget_stigen"
+  },
+  {
    "name": "rum",
    "type": "string",
    "value": "berget_stigen"
@@ -190,6 +195,11 @@
        "name": "dekor",
        "type": "bool",
        "value": true
+      },
+      {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
       }
      ]
     },
@@ -311,6 +321,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "under"
@@ -329,6 +344,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "under"
@@ -346,6 +366,11 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
       {
        "name": "sida",
        "type": "string",
@@ -460,6 +485,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"
@@ -477,6 +507,11 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
       {
        "name": "sida",
        "type": "string",
@@ -496,6 +531,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"
@@ -514,6 +554,11 @@
      "visible": true,
      "properties": [
       {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
+      {
        "name": "sida",
        "type": "string",
        "value": "alla"
@@ -531,6 +576,11 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
       {
        "name": "sida",
        "type": "string",
@@ -593,6 +643,11 @@
      "rotation": 0,
      "visible": true,
      "properties": [
+      {
+       "name": "i_bilden",
+       "type": "bool",
+       "value": true
+      },
       {
        "name": "sida",
        "type": "string",

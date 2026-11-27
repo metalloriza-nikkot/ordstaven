@@ -1799,6 +1799,66 @@
     "w": 14,
     "h": 96
    }
+  },
+  "vimpel_01": {
+   "frame": {
+    "x": 0,
+    "y": 2541,
+    "w": 16,
+    "h": 10
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 10
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 10
+   }
+  },
+  "vimpel_02": {
+   "frame": {
+    "x": 17,
+    "y": 2541,
+    "w": 16,
+    "h": 10
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 10
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 10
+   }
+  },
+  "vimpel_03": {
+   "frame": {
+    "x": 34,
+    "y": 2541,
+    "w": 16,
+    "h": 10
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 10
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 10
+   }
   }
  },
  "meta": {
@@ -1806,7 +1866,7 @@
   "format": "RGBA8888",
   "size": {
    "w": 226,
-   "h": 2541
+   "h": 2552
   },
   "scale": "1",
   "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."

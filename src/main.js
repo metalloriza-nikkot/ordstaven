@@ -378,7 +378,7 @@ redo.then(() => { startKlar = true; window.clearTimeout(startVakt); window.remov
   /** Hjältens bild just nu (bildens namn, texturen med färgerna) och om staven syns. */
   hjaltebild: () => ({ bild: rum.kropp?.frame.name ?? null, textur: rum.kropp?.texture.key ?? null, stav: !!rum.stav?.visible }),
   /** Grafiken i rummet: golvets bild, och sängens bild (sover han i den). */
-  grafik: () => ({ golv: rum.golvBild?.visible ? rum.golvBild.texture.key : null, sang: (() => { const o = rum.objekt.find((/** @type {any} */ x) => x.sovplats); const r = o ? rum.ritade.get(o.id) : null; return r?.frame?.name ?? null; })(),
+  grafik: () => ({ ungeIVagg: { ...rum.ungeIVagg }, ungeIVaggVar: { ...rum.ungeIVaggVar }, golv: rum.golvBild?.visible ? rum.golvBild.texture.key : null, sang: (() => { const o = rum.objekt.find((/** @type {any} */ x) => x.sovplats); const r = o ? rum.ritade.get(o.id) : null; return r?.frame?.name ?? null; })(),
     luftskepp: rum.luft ? rum.luft.img.frame.name : null, k4Skepp: rum.k4?.skepp?.active ? (rum.k4.skepp.frame?.name ?? "gråbox") : null, hjalm: rum.lagerLuft.list.some((/** @type {any} */ o) => o.frame?.name === 'baronen_hjalm'),
     sidovy: rum.sidovy.visible, senasteSidovy: rum.senasteSidovy, regi: [...rum.regiLogg], unge: rum.unge.visible }),
   /** Det senaste samtalet (vem som talade och åt vilket håll hjälten vände sig), och figurens bild. @param {string} [id] */

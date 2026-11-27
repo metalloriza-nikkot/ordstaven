@@ -1,7 +1,9 @@
 // Spelar hela prologen i webbläsaren, som en spelare: trycker på det som syns på skärmen.
 // Rätt svar tas från innehållet. Testläget (?snabb) stänger av rösten och kortar pauserna.
 import { test, expect } from './hjalp/klocka.js';
+import { provaUngenEfterVarje } from './hjalp/ungen.js';
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
+provaUngenEfterVarje(test);
 
 // PW_CANVAS=1 spelar med canvas-ritningen (som en dator utan WebGL)
 const CANVAS = process.env.PW_CANVAS ? '&canvas' : '';

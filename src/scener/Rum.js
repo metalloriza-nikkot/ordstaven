@@ -170,6 +170,10 @@ export class Rum extends Phaser.Scene {
     this.ungeMal = null;
     /** @type {{ mal: { x: number, y: number }, tid: number, punkter: { x: number, y: number }[] } | null} ungens väg runt hindren (133.7) */
     this.ungeVagen = null;
+    /** @type {Record<string, number>} ms som ungen har gått inne i en vägg, per rum (136) */
+    this.ungeIVagg = {};
+    /** @type {Record<string, any>} var ungen stod första gången den gick i en vägg, per rum */
+    this.ungeIVaggVar = {};
     /** @type {Set<string>} stigar som är spärrade med en gren (förenklingen): man kan inte gå på dem */
     this.sparrade = new Set();
     /** @type {any[]} saker som hjälten har lagt ifrån sig i rummet */
@@ -1847,6 +1851,7 @@ export class Rum extends Phaser.Scene {
     this.tweens.add({ targets: tb, p: 1, duration: 900, onUpdate: () => { if (g.active) this.ritaBubbla(g, Math.round(b0.x + (b1.x - b0.x) * tb.p), Math.round(b0.y + (b1.y - b0.y) * tb.p + Math.sin(tb.p * 8) * 2), 6); this.smutsig = true; } });
     this.hallUngen(this.ungePos.x, this.ungePos.y);
     this.time.delayedCall(500, () => { this.ungeLage('hopp', pa.x >= this.ungePos.x ? 'hoger' : 'vanster', 217, 1); }); // jättehoppet i Stils bilder (del 3b)
+    this.ungePaStocken = true; // stocken bär ungen ut i vattnet (räknas inte som att ungen går i en vägg, 136)
     this.time.delayedCall(500, () => this.ungeBage(pa, 650, 26, () => {
       // bubblan spricker när ungen landar, och stocken glider ut med ungen
       g.destroy();
@@ -1855,7 +1860,7 @@ export class Rum extends Phaser.Scene {
       this.tweens.add({ targets: t, p: 1, duration: 2600, ease: 'Sine.easeOut', onUpdate: () => {
         if (r?.active) { r.x = Math.round(rx + ut.dx * t.p); r.y = Math.round(ry + ut.dy * t.p); }
         this.ungePos = { x: pa.x + ut.dx * t.p, y: pa.y + ut.dy * t.p }; this.placera(); this.smutsig = true;
-      }, onComplete: () => { const sv = this.ungeSvavar; if (sv) { sv.x = this.ungePos.x; sv.y = this.ungePos.y; sv.styrd = false; } } });
+      }, onComplete: () => { this.ungePaStocken = false; const sv = this.ungeSvavar; if (sv) { sv.x = this.ungePos.x; sv.y = this.ungePos.y; sv.styrd = false; } } });
     }));
     this.regiLogg.push('ungen hoppar på stocken');
     return 3000;
@@ -4252,7 +4257,7 @@ export class Rum extends Phaser.Scene {
     let viaHissen = false;
     if (v.nyttRum || !this.harRum) { this.rumsbild = (this.harRum && v.karta?.bild) || null; this.falt = faltFor(this.rumsbild); this.mark = (this.harRum && v.karta?.mark) || null; this.rumId = v.rum; this.markObjekt = v.karta?.objekt || []; }
     this.visaUnge = v.unge;
-    if (v.nyttRum) { for (const id of [...this.ramSlinga.keys(), ...this.ramTimrar.keys()]) this.stoppaRamar(id); this.ramFor.clear(); this.dolda.clear(); this.ungeMal = null; this.ungeVagen = null; this.ungeTittarPa = null; this.ungeKlattrar = null; this.stegeNu = null; this.ungeSang = null; this.ungeLyft = 0; this.ungeFast = null; this.hjalteFast = null; this.lerig = 0; this.undvik = []; this.hinderUndvik = null; this.regiFokus = null; this.forstFokus = false; if (this.ungeSvavar) { this.ungeSvavar.g.destroy(); this.ungeSvavar = null; } for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas?.remove(); this.sover = null; } this.vaknar = null; this.rensaRegi(); this.k3UngeIVattnet = false; this.k3Huvud = null; this.k3Mjol = null; this.k3Skugga = null; this.k3Simmar = null; this.k3Ankare = null; this.k3Bubbla = null; this.k3AnkareMitt = null; if (this.k4?.fjarran) { this.cameras.main.setZoom(1); this.b.vidFjarrvy?.(false); } this.k4 = null; this.rensaStig(); viaHissen = this.k3IHissen; this.k3IHissen = false; this.hjalte.setAlpha(1); this.unge.setAlpha(1); this.naraVinkat.clear(); this.blasNr++; if (this.hjaltePose?.startsWith('hjalte_blaser_')) this.sattPose(null); }
+    if (v.nyttRum) { for (const id of [...this.ramSlinga.keys(), ...this.ramTimrar.keys()]) this.stoppaRamar(id); this.ramFor.clear(); this.dolda.clear(); this.ungeMal = null; this.ungeVagen = null; this.ungePaStocken = false; this.ungeTittarPa = null; this.ungeKlattrar = null; this.stegeNu = null; this.ungeSang = null; this.ungeLyft = 0; this.ungeFast = null; this.hjalteFast = null; this.lerig = 0; this.undvik = []; this.hinderUndvik = null; this.regiFokus = null; this.forstFokus = false; if (this.ungeSvavar) { this.ungeSvavar.g.destroy(); this.ungeSvavar = null; } for (const g of this.lagda) g.destroy(); this.lagda = []; this.sparrade.clear(); if (this.sover) { this.sover.andas?.remove(); this.sover = null; } this.vaknar = null; this.rensaRegi(); this.k3UngeIVattnet = false; this.k3Huvud = null; this.k3Mjol = null; this.k3Skugga = null; this.k3Simmar = null; this.k3Ankare = null; this.k3Bubbla = null; this.k3AnkareMitt = null; if (this.k4?.fjarran) { this.cameras.main.setZoom(1); this.b.vidFjarrvy?.(false); } this.k4 = null; this.rensaStig(); viaHissen = this.k3IHissen; this.k3IHissen = false; this.hjalte.setAlpha(1); this.unge.setAlpha(1); this.naraVinkat.clear(); this.blasNr++; if (this.hjaltePose?.startsWith('hjalte_blaser_')) this.sattPose(null); }
     this.tillstand = v.tillstand;
     // figurerna på kvällen (84.2): bilderna byggs första gången, sedan byts bara atlasens källa
     sattKvall(this, this.harRum && v.tillstand === 'kvall' ? KVALL_TABELL : null);
@@ -4848,13 +4853,18 @@ export class Rum extends Phaser.Scene {
 
   /**
    * Vart ungen ska gå nu på väg mot t (133.7). Med fri sikt rakt dit. Annars längs rummets väg runt hindren
-   * (samma A* som hjälten), som räknas om när målet har flyttat sig eller efter en stund. Står ungen i ett hinder
-   * (regin har satt den där) går den rakt, så att den kommer loss. Finns ingen väg står den kvar.
-   * @param {{ x: number, y: number }} t @returns {{ x: number, y: number }}
+   * (samma A* som hjälten), som räknas om när målet har flyttat sig eller efter en stund. Ett mål i ett hinder blir
+   * närmaste fria punkt. Står ungen i ett hinder (regin har satt den där) går den först rakt ut till närmaste fria
+   * punkt (136). Finns ingen väg står den kvar.
+   * @param {{ x: number, y: number }} t0 @returns {{ x: number, y: number }}
    */
-  ungeStyr(t) {
+  ungeStyr(t0) {
     const h = this.hinder, u = this.ungePos;
-    if (!h.fri(u) || h.sikt(u, t)) { this.ungeVagen = null; return t; }
+    // 136: ett mål inne i en vägg (en bit bakom hjälten när han går längs väggen) blir närmaste fria punkt, och står
+    // ungen själv i en vägg (den sattes där av en regi eller vid dörren) går den först rakt ut till närmaste fria punkt
+    const t = h.fri(t0) ? t0 : h.narmasteFria({ x: t0.x, y: t0.y });
+    if (!h.fri(u)) { this.ungeVagen = null; const ut = h.narmasteFria({ x: u.x, y: u.y }); return Math.hypot(ut.x - u.x, ut.y - u.y) < 0.5 ? t : ut; }
+    if (h.sikt(u, t)) { this.ungeVagen = null; return t; }
     let v = this.ungeVagen;
     const nu = this.time.now;
     if (!v || Math.hypot(v.mal.x - t.x, v.mal.y - t.y) > 12 || nu - v.tid > 1000) {
@@ -5035,6 +5045,20 @@ export class Rum extends Phaser.Scene {
     }
     this.lagerLuft.add(g); this.lagda.push(g);
     this.k4 = { ...(this.k4 || {}), skepp: g };
+    // vimpeln på stenfältet (136.5, LASMIG_136): Stils vimpel_01–03 (16 × 10) fladdrar i vinden på ballongens topp. Rutan
+    // står på (55, −6) i skeppets ruta, följer skeppet varje bildruta och byter bild var 150:e ms
+    if (this.regiPunkter?.snoyra && g.setFrame && this.textures.get('baronen').has('vimpel_01')) {
+      const v = this.add.image(0, 0, 'baronen', 'vimpel_01').setOrigin(0, 0);
+      this.lagerLuft.add(v); this.lagda.push(v);
+      let n = 0, nasta = 0;
+      const folj = () => {
+        if (!v.active || !g.active) { this.events.off('update', folj); if (v.active) v.destroy(); return; }
+        v.setPosition(Math.round(g.x - 56 * g.scaleX + 55 * g.scaleX), Math.round(g.y - K4_SKEPP_OVER * g.scaleY - 6 * g.scaleY)).setScale(g.scaleX, g.scaleY).setVisible(g.visible).setAlpha(g.alpha);
+        if (this.time.now >= nasta) { nasta = this.time.now + 150; n = (n + 1) % 3; v.setFrame(`vimpel_0${n + 1}`); this.smutsig = true; }
+      };
+      this.events.on('update', folj); folj();
+      this.k4Logg('vimpeln fladdrar');
+    }
     return g;
   }
 
@@ -5368,7 +5392,7 @@ export class Rum extends Phaser.Scene {
     for (let i = 0; i < 12; i++) {
       const x = (i * 97) % B, y0 = Math.round(p.y - 70 + ((i * 53) % 140));
       /** @type {any} */ let g;
-      if (ramar.length) { const f = /** @type {any} */ (ramar[i % ramar.length]); g = this.add.image(x, y0, f.nyckel, f.ram).setAlpha(0.8); }
+      if (ramar.length) { const f = /** @type {any} */ (ramar[i % ramar.length]); g = this.add.image(x, y0, f.nyckel, f.ram); }
       else { g = this.add.graphics({ x, y: y0 }); g.fillStyle(0xa9bfd8, 0.85).fillRect(0, 0, 6 + (i % 3) * 4, 1).fillStyle(0xc4d4e6, 0.7).fillRect(-6, 1, 5, 1); }
       this.lagerLuft.add(g); this.lagda.push(g);
       strimmor.push({ g, v: 50 + (i % 4) * 12, y0, fas: i * 0.7 });
@@ -6552,7 +6576,9 @@ export class Rum extends Phaser.Scene {
     if (this.nivaer.finns) this.foljNivan();
     // ungen följer efter på avstånd, eller springer dit den pekar
     const m = this.ungeMal;
-    const tx = m ? m.x : this.pos.x - 16, ty = m ? m.y : this.pos.y;
+    let tx = m ? m.x : this.pos.x - 16, ty = m ? m.y : this.pos.y;
+    // bakom hjälten i en vägg (han går längs väggen): ungen ställer sig på närmaste fria punkt (136)
+    if (!m && !this.hinder.fri({ x: tx, y: ty })) { const f = this.hinder.narmasteFria({ x: tx, y: ty }); tx = f.x; ty = f.y; }
     const dx = tx - this.ungePos.x, dy = ty - this.ungePos.y, l = Math.hypot(dx, dy);
     const narmare = m ? 1 : 6;
     // ungen klättrar inte med honom på stegen: den väntar nedanför, och klättrar efter när han är uppe
@@ -6592,6 +6618,14 @@ export class Rum extends Phaser.Scene {
       else this.ungeVand = { x: this.pos.x - this.ungePos.x, y: 0.01 };
     }
     this.ungeGar = ungenGar;
+    // 136: tiden ungen går inne i en vägg när den följer hjälten och spelaren styr (inte under en regi, där ungen kan stå
+    // på stocken ute i vattnet), per rum. Testerna läser den (tests/webb/hjalp/ungen.js)
+    if (ungenGar && !m && !this.fryst && !this.ungePaStocken && this.unge.visible && !this.hinder.fri(this.ungePos)) {
+      const id = this.rumId || '?';
+      this.ungeIVagg[id] = Math.round((this.ungeIVagg[id] || 0) + dtMs);
+      const lista = (this.ungeIVaggVar[id] ||= []);
+      if (lista.length < 6 && (!lista.length || this.time.now - lista[lista.length - 1].t > 400)) lista.push({ t: Math.round(this.time.now), x: Math.round(this.ungePos.x), y: Math.round(this.ungePos.y), hjalten: { x: Math.round(this.pos.x), y: Math.round(this.pos.y) }, mal: { x: Math.round(tx), y: Math.round(ty) } });
+    }
     // andningen och nosandet byter bild också när inget flyttar sig
     if (this.ungeBild && this.unge.visible) this.ritaUngen();
     if (flyttad || l > narmare || m || this.buren) this.placera();

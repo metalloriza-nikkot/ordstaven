@@ -4,7 +4,9 @@
 // chiffret. Pass 3: fenan, kramen, tången med skalkanten mitt i, SKÖLD, ordduellen och resan. Kapitlet står inte i
 // listan än, så det öppnas med ?kapitel=kap-03 (för den vuxne).
 import { test, expect } from './hjalp/klocka.js';
+import { provaUngenEfterVarje } from './hjalp/ungen.js';
 import { readFileSync } from 'node:fs';
+provaUngenEfterVarje(test);
 
 const kap = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-03.json', import.meta.url), 'utf8'));
 const pussel = new Map(kap.pussel.map((p) => [p.id, p]));
