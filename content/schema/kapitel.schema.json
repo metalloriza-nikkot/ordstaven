@@ -2906,6 +2906,10 @@
           "type": "boolean",
           "description": "Ordet står i versaler på andra sidan (stolpen). false = ordet står inte i klartext."
         },
+        "ordkort": {
+          "type": "boolean",
+          "description": "Ordet står på ett eget kort i molnet och bredvid instruktionen, som ordet i \"Var var vi?\" (2.61, beslut 135.6). Det läses inte upp."
+        },
         "rutnat": {
           "type": "array",
           "minItems": 1,

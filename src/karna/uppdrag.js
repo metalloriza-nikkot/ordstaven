@@ -115,9 +115,28 @@ export function stegetsRum(steg, kapitel) {
 }
 
 /**
- * Vad molnet visar för bokens steg i ett rum (133.9): steget först i det rum där det görs. I rummen före står stegets
- * `pa_vagen` (ett gå-steg, GÅ GENOM GROTTAN) om datan har ett, och annars inget av steget: då står berättelsens egen
- * instruktion, som utan uppdrag. @param {any} steg @param {any} kapitel @param {string | null | undefined} rum
+ * Verben som en rad i molnet börjar med (125.2): molnet säger alltid en uppgift med verb och mål. Kontrollen och
+ * molnet använder samma lista.
+ */
+export const VERB_I_MOLNET = new Set(['GÅ', 'LÄS', 'VÄLJ', 'HITTA', 'TA', 'SKRIV', 'HÄMTA', 'TÄND', 'LÄGG', 'ÖPPNA', 'VIFTA', 'HUGG', 'KOM', 'SKYDDA',
+  'LÄMNA', 'SÄTT', 'PACKA', 'TRYCK', 'RÄDDA', 'KRAMA', 'FÖLJ', 'DRA', 'LYFT', 'LYS', 'SAMLA', 'LOSSA', 'ÅK', 'BLÅS', 'LETA', 'HOPPA', 'MATA',
+  'GE', 'KLÄTTRA', 'SPRING', 'SIMMA', 'ROPA', 'VÄCK', 'BÄR', 'FLYG', 'TITTA', 'LYSSNA', 'STRYK', 'KRYP', 'SÖK', 'BYGG', 'SPÅRA', 'NOSA', 'HJÄLP']);
+
+/**
+ * Börjar texten med ett verb ur listan (efter platshållarna)? Versalerna räknas med svensk regel.
+ * @param {string | null | undefined} text
+ */
+export function borjarMedVerb(text) {
+  if (!text) return false;
+  const forsta = text.replace(/\{(unge|hjalte)\}/gi, '').trim().split(/[\s,.!?:;]+/)[0] || '';
+  return VERB_I_MOLNET.has(forsta.toLocaleUpperCase('sv-SE'));
+}
+
+/**
+ * Vad molnet visar för bokens steg i ett rum (133.9 och 135.7): steget först i det rum där det görs. I rummen före
+ * står stegets `pa_vagen` (ett gå-steg, GÅ GENOM GROTTAN) om datan har ett. Annars står berättelsens egen
+ * instruktion, men bara om den börjar med ett verb (sort `instruktion`), och annars inget.
+ * @param {any} steg @param {any} kapitel @param {string | null | undefined} rum
  * @returns {{ sort: 'steget' | 'pa_vagen' | 'inget', text: string | null }}
  */
 export function molnetForSteg(steg, kapitel, rum) {
@@ -125,4 +144,50 @@ export function molnetForSteg(steg, kapitel, rum) {
   if (!dar || !rum || dar === rum) return { sort: 'steget', text: steg?.text ?? null };
   if (typeof steg.pa_vagen === 'string' && steg.pa_vagen) return { sort: 'pa_vagen', text: steg.pa_vagen };
   return { sort: 'inget', text: null };
+}
+
+/** Stegtyperna där molnet visar en instruktion medan han går (135.7): mål, bära, ungen och navet. */
+const GAR_STEG = new Set(['ga_till', 'bara', 'nav']);
+
+/**
+ * Berättelsens instruktion före ett steg, som motorn tar den (`instruktionFore` i spel.js): den närmaste upplästa
+ * repliken bakåt i scenen, förbi mellanscener, visa_ui och ljud. En replik som väntar på en handling hoppas över.
+ * I navet efter en gren gäller den sista upplästa repliken i `mellan_grenar`. @param {any[]} steg @param {number} j
+ */
+function instruktionForeSteg(steg, j) {
+  for (let i = j - 1; i >= 0; i--) {
+    const x = steg[i];
+    if (x.typ === 'replik') { if (x.vantar_pa) continue; return x.upplast && !x.kapitelrubrik ? x : null; }
+    if (!['mellanscen', 'visa_ui', 'ljud'].includes(x.typ)) return null;
+  }
+  return null;
+}
+
+/**
+ * Rummen där molnet visar berättelsens instruktion i stället för ett gå-steg (135.7). För varje steg där han går
+ * (`ga_till`, `bara`, `nav`) och bokens steg görs i ett annat rum utan `pa_vagen`: vad molnet visar i stället.
+ * `visas` är sant när instruktionen börjar med ett verb och alltså står i molnet, och falskt när molnet är tomt.
+ * @param {any} kapitel
+ * @returns {{ rum: string, scen: string, steg: number, typ: string, boken: string, stegetsRum: string, instruktion: string | null, visas: boolean }[]}
+ */
+export function molnetsInstruktioner(kapitel) {
+  const { lista } = kompileraUppdrag(kapitel);
+  if (!lista.length) return [];
+  const ut = [];
+  (kapitel.scener || []).forEach((/** @type {any} */ sc, i) => {
+    (sc.steg || []).forEach((/** @type {any} */ st, j) => {
+      if (!GAR_STEG.has(st.typ)) return;
+      const nu = lappenNu(lista, [i, j])?.nu;
+      if (!nu) return;
+      const m = molnetForSteg(nu, kapitel, sc.rum);
+      if (m.sort !== 'inget') return;
+      const fore = instruktionForeSteg(sc.steg, j);
+      const mellan = st.typ === 'nav' ? [...(st.mellan_grenar || [])].reverse().find((/** @type {any} */ x) => x.typ === 'replik' && x.upplast) : null;
+      const rad = (/** @type {any} */ r, /** @type {string} */ typ) => ut.push({ rum: sc.rum, scen: sc.id, steg: j, typ, boken: nu.text,
+        stegetsRum: /** @type {string} */ (stegetsRum(nu, kapitel)), instruktion: r?.text ?? null, visas: borjarMedVerb(r?.text) });
+      rad(fore, st.typ);
+      if (mellan) rad(mellan, 'nav efter en gren');
+    });
+  });
+  return ut;
 }

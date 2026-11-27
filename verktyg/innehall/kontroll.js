@@ -4,7 +4,7 @@
 import Ajv from 'ajv/dist/2020.js';
 import { readFileSync } from 'node:fs';
 import { rader, versaler, ord, PLATSHALLARE } from '../../src/karna/text.js';
-import { kompileraUppdrag, hittaSteg } from '../../src/karna/uppdrag.js';
+import { kompileraUppdrag, hittaSteg, VERB_I_MOLNET, molnetsInstruktioner } from '../../src/karna/uppdrag.js';
 import { SLINGOR } from '../../src/karna/musik.js';
 import { kandaLjud, ljudLista } from '../../src/karna/ljudid.js';
 import { beskrivningarSomVisas, aventyretsBeskrivningar, reaktionerSomVisas } from '../../src/karna/mellanscen.js';
@@ -59,9 +59,7 @@ function harBelaning(steg = []) {
  * Verben som ett steg i molnet börjar med (125.2). Listan är de verb som stegen har i dag. Ett nytt verb läggs till här;
  * kontrollen varnar bara, så att ett steg som inte är ett verb syns.
  */
-const VERB_I_MOLNET = new Set(['GÅ', 'LÄS', 'VÄLJ', 'HITTA', 'TA', 'SKRIV', 'HÄMTA', 'TÄND', 'LÄGG', 'ÖPPNA', 'VIFTA', 'HUGG', 'KOM', 'SKYDDA',
-  'LÄMNA', 'SÄTT', 'PACKA', 'TRYCK', 'RÄDDA', 'KRAMA', 'FÖLJ', 'DRA', 'LYFT', 'LYS', 'SAMLA', 'LOSSA', 'ÅK', 'BLÅS', 'LETA', 'HOPPA', 'MATA',
-  'GE', 'KLÄTTRA', 'SPRING', 'SIMMA', 'ROPA', 'VÄCK', 'BÄR', 'FLYG', 'TITTA', 'LYSSNA', 'STRYK', 'KRYP', 'SÖK', 'BYGG', 'SPÅRA', 'NOSA', 'HJÄLP']);
+// verben som en rad i molnet börjar med står i src/karna/uppdrag.js (135.7)
 /** Pusslets rätta svar i ord (svar, formlerna, de rätta alternativen), för att knepet aldrig ska säga dem. @param {any} p */
 function rattSvar(p) {
   const ut = [];
@@ -774,5 +772,9 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
   const aKlart = aventyr.meta?.klart === true;
   beskrivningar.push({ kapitel: 'aventyr', klart: aKlart, platser: aKvar, reaktioner: [] });
   if (aKlart) for (const b of aKvar) fel.push(`aventyr.json ${b.plats}: äventyret är klart, men mellanscenen visar texten för den vuxne ("${b.beskrivning}"). Ge den syns_redan, eller stryk den.`);
-  return { fel, varningar, pass: passInfo, beskrivningar };
+  // 135.7: rummen där molnet visar berättelsens instruktion i stället för gå-steget (pa_vagen). En instruktion som
+  // inte börjar med ett verb står inte i molnet, och då är molnet tomt medan han går: det varnar kontrollen för
+  const molnet = kapitel.flatMap((k) => molnetsInstruktioner(k).map((r) => ({ kapitel: k.id, ...r })));
+  for (const r of molnet) if (!r.visas) varningar.push(`${r.kapitel} ${r.scen} steg ${r.steg + 1} (${r.rum}): molnet är tomt medan han går mot ${r.stegetsRum} (${r.boken}), eftersom ${r.instruktion ? `"${r.instruktion}" inte är en uppgift` : 'ingen instruktion står före'}. Sätt pa_vagen på steget (135.7)`);
+  return { fel, varningar, pass: passInfo, beskrivningar, molnet };
 }

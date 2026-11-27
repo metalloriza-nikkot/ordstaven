@@ -16,7 +16,7 @@
  },
  "meta": {
   "namn": "Berget",
-  "version": "0.9",
+  "version": "0.10",
   "datum": "2026-11-26",
   "agare": "Innehåll",
   "kalla": "Berättelsen 21 v0.5.2, manus 21 v0.3.1 och ritningarna 21b v0.2.1, godkända av den vuxne (beslut 118.1).",
@@ -29,7 +29,8 @@
   "andrat_v06": "2026-11-24 (beslut 127.3 och 127.9): regin ungens_ogon på mellanscenen i mörkret, utan lucka_pip, \"Min gamla kompass! Den tappade jag här!\", och bär under de två första isklumparna.",
   "andrat_v07": "2026-11-25 (beslut 125 och 127.5): stegen HOPPA ÖVER VATTNET, LÄS VÄGGEN OCH HOPPA och KOM UPP PÅ KLIPPAN, Farfars knep, och F1, F2 och tandgrottan som hemligheter.",
   "andrat_v08": "2026-11-25 (beslut 128.10.3, rättelse i ett fryst kapitel, en replik mot en): fröet för baronens bit på stenfältet: den har bara ord, om vägen in.",
-  "andrat_v09": "2026-11-26 (beslut 132.3, ljud i ett fryst kapitel, godkänt i 127.6): speldosan. berget_tandgrottan har musik \"tandgrottan\", Stils slinga. Den gäller i hela rummet, och kapitlets \"spel\" kommer tillbaka i galleriet."
+  "andrat_v09": "2026-11-26 (beslut 132.3, ljud i ett fryst kapitel, godkänt i 127.6): speldosan. berget_tandgrottan har musik \"tandgrottan\", Stils slinga. Den gäller i hela rummet, och kapitlets \"spel\" kommer tillbaka i galleriet.",
+  "andrat_v10": "2026-11-26 (beslut 133.6 och 133.11, kapitel 4:s rättelsepass): stig 4:s rutnät där TAND svänger med ett enda spår, stigen som slutar vid tanden, och UPP som ordkort i molnet vid stig 1 med instruktionen \"Hoppa på bokstäverna i ordet upp!\"."
  },
  "var_var_vi": [
   {
@@ -818,7 +819,7 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Längst in sitter något i isväggen: en uråldrig tand, större än hjältens hand. Ungen nosar på den och nyser av kylan."
+     "beskrivning": "Stigen slutar vid isväggen. Där sitter den: en uråldrig tand, större än hjältens hand. Ungen skuttar efter i hans spår, nosar på tanden och nyser av kylan."
     },
     {
      "typ": "replik",
@@ -834,7 +835,7 @@
      }
     }
    ],
-   "anteckning": "Stig 4 (124.12.4), frivillig och i ett eget litet rum med öppningen i galleriet. Tanden syns genom isen redan från galleriet. Ordet kommer ur Farfars ristning av en tand, och tanden blir en sida i Dinoboken. Lockelsen är densamma som vid F1.",
+   "anteckning": "Stig 4 (124.12.4), frivillig och i ett eget litet rum med öppningen i galleriet. Tanden syns genom isen redan från galleriet. Ordet kommer ur Farfars ristning av en tand, och tanden blir en sida i Dinoboken. Lockelsen är densamma som vid F1. 133.11: stigen leder till tanden. Han landar vid isväggen där tanden sitter, och sidan i Dinoboken kommer där, med fyndögonblicket (133.10). Sedan går han tillbaka över flaken han redan har läst.",
    "hemlighet": true
   },
   {
@@ -1090,13 +1091,14 @@
    "instruktion": {
     "typ": "replik",
     "talare": "berattare",
-    "text": "Hoppa på bokstäverna som stavar upp!",
+    "text": "Hoppa på bokstäverna i ordet upp!",
     "upplast": true
    },
    "knuff": {
     "efter_sek": 15
    },
-   "anteckning": "21b v0.2.1, stig 1. Gemener som liknar sina versaler, inga återvändsgränder. Ordet står på en gammal stolpe. 121.2: luftskeppet glider förbi högt ovanför medan han hoppar, så att han vet att något är på väg. Det är en regi i rummet och inget steg."
+   "anteckning": "21b v0.2.1, stig 1. Gemener som liknar sina versaler, inga återvändsgränder. Ordet står på en gammal stolpe. 121.2: luftskeppet glider förbi högt ovanför medan han hoppar, så att han vet att något är på väg. Det är en regi i rummet och inget steg. 133.6: ordet UPP står på ett eget ordkort i molnet, som ordet i \"Var var vi?\", så att det syns som det ord han ska hoppa. Instruktionen säger \"i ordet upp\", eftersom \"som stavar upp\" kunde läsas som att stava upp något.",
+   "ordkort": true
   },
   {
    "id": "k4_snon",
@@ -1530,9 +1532,9 @@
    "ord": "tand",
    "visa_ord": false,
    "rutnat": [
-    "k e m e",
-    "t a n d",
-    "s o r e"
+    "k o n e",
+    "s a m d",
+    "t e r o"
    ],
    "hjalptrappa": [
     {
@@ -1554,7 +1556,7 @@
     "efter_sek": 15,
     "handling": "ristningen glimtar"
    },
-   "anteckning": "Stig 4 (121.3 och 124.12.4), frivillig och svårast i kapitlet: ord ur en bild. Ordet står inte i text någonstans, bara som Farfars ristning av en tand, och han stavar det själv i gemener (a, n och d med egen form). Ett enda spår t, a, n, d i mittraden, och m står ovanför n. Ingen återvändsgränd (124.4): den som läser fel hoppar på m eller e, som knakar. Hjälptrappan: efter ett fel glimtar ristningen, efter två står TAND i versaler."
+   "anteckning": "Stig 4 (121.3, 124.12.4 och 133.11), frivillig och svårast i kapitlet: ord ur en bild. Ordet står inte i text någonstans, bara som Farfars ristning av en tand, och han stavar det själv i gemener (a, n och d med egen form). 133.11: TAND svänger, t i nedersta raden, a i mitten, n överst och d i mitten, så att bara den som läser hittar vägen. Varje rätt bokstav finns en gång i sin kolumn: ett enda spår och ingen återvändsgränd (124.4, prövat med skriptet i pass 133). Den som läser fel hoppar på m under n, eller på e eller o, som knakar. Stigen slutar vid isväggen där tanden sitter. Hjälptrappan: efter ett fel glimtar ristningen, efter två står TAND i versaler."
   },
   {
    "id": "k4_stig3",

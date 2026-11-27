@@ -1,7 +1,7 @@
 // @ts-check
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { kompileraUppdrag, lappenNu, klaraFore, hittaSteg, stegetsRum, molnetForSteg } from '../../src/karna/uppdrag.js';
+import { kompileraUppdrag, lappenNu, klaraFore, hittaSteg, stegetsRum, molnetForSteg, borjarMedVerb, molnetsInstruktioner } from '../../src/karna/uppdrag.js';
 
 const R = (text) => ({ typ: 'replik', talare: 'berattare', text, upplast: true });
 /** Ett påhittat kapitel med två uppdrag (som prologens första): gå ut, gå upp, tänd; sedan värm ägget. */
@@ -85,5 +85,29 @@ describe('molnet visar steget först i det rum där det görs (133.9)', () => {
   it('utan rum att jämföra med står steget som förut', () => {
     expect(molnetForSteg(steg, kapitel, null).sort).toBe('steget');
     expect(molnetForSteg({ text: 'Y', klart: { scen: 'okand' } }, kapitel, 'berget_gangen').sort).toBe('steget');
+  });
+});
+
+describe('molnet säger alltid en uppgift (135.7)', () => {
+  it('en instruktion är en uppgift när den börjar med ett verb', () => {
+    expect(borjarMedVerb('Gå in i kvarnen!')).toBe(true);
+    expect(borjarMedVerb('{unge}, hoppa!')).toBe(false);
+    expect(borjarMedVerb('Krama {unge}!')).toBe(true);
+    expect(borjarMedVerb('Isen i grottan bär bara de små bokstäverna!')).toBe(false);
+    expect(borjarMedVerb(null)).toBe(false);
+  });
+  it('listan över rummen där molnet visar berättelsens instruktion i stället för pa_vagen', () => {
+    const kapitel = {
+      scener: [
+        { id: 'gangen', rum: 'gangen', steg: [{ typ: 'pussel', pussel_id: 'ljus' }, { typ: 'replik', text: 'Isen bär bara små bokstäver!', upplast: true }, { typ: 'ga_till', mal: 'ut' }] },
+        { id: 'salen', rum: 'salen', steg: [{ typ: 'pussel', pussel_id: 'p' }] },
+      ],
+      uppdrag: [{ id: 'u', rubrik: 'U', bild: 'b', pass: 1, steg: [{ text: 'Tänd ljus', klart: { scen: 'gangen', pussel: 'ljus' } }, { text: 'Hoppa över vattnet', klart: { scen: 'salen', pussel: 'p' } }], stampel: { scen: 'salen', efter: { pussel: 'p' } } }],
+    };
+    const l = molnetsInstruktioner(kapitel);
+    expect(l).toHaveLength(1);
+    expect(l[0]).toMatchObject({ rum: 'gangen', stegetsRum: 'salen', visas: false, instruktion: 'Isen bär bara små bokstäver!' });
+    kapitel.uppdrag[0].steg[1].pa_vagen = 'Gå genom grottan';
+    expect(molnetsInstruktioner(kapitel)).toEqual([]);
   });
 });

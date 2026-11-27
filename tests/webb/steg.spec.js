@@ -1051,7 +1051,7 @@ test('hopp till kapitel 1 (?kapitel=kap-01): prologen spolas fram, namnen fråga
     await page.keyboard.type(namn);
     await expect(page.locator('#plattan .namnrutor .ruta.fylld')).toHaveCount(namn.length, { timeout: 5000 });
     await page.keyboard.press('Enter');
-    await expect(page.locator('#plattan .dop-ruta')).toBeHidden({ timeout: 10000 });
+    await expect(page.locator('#plattan .namnrutor .ruta.fylld')).not.toHaveCount(namn.length, { timeout: 10000 }); // nästa dop kan komma efter 30 ms
   }
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.tillstand().spelare.unge.namn), { timeout: 10000 }).toBe('KNOPP');
   expect(await page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('k1s01_brynet');
@@ -1170,7 +1170,7 @@ test('kapitel 1 med kartorna (T5): bara varianten syns, den rätta stenen öppna
     await page.keyboard.type(namn);
     await expect(page.locator('#plattan .namnrutor .ruta.fylld')).toHaveCount(namn.length, { timeout: 5000 });
     await page.keyboard.press('Enter');
-    await expect(page.locator('#plattan .dop-ruta')).toBeHidden({ timeout: 10000 });
+    await expect(page.locator('#plattan .namnrutor .ruta.fylld')).not.toHaveCount(namn.length, { timeout: 10000 }); // nästa dop kan komma efter 30 ms
   }
   /** Klicka fram repliker tills villkoret gäller. */
   const fram = async (villkor, ms = 30000) => {
@@ -1230,7 +1230,9 @@ async function hoppaKapitel1(page, i) {
     await page.keyboard.type(namn);
     await expect(page.locator('#plattan .namnrutor .ruta.fylld')).toHaveCount(namn.length, { timeout: 5000 });
     await page.keyboard.press('Enter');
-    await expect(page.locator('#plattan .dop-ruta')).toBeHidden({ timeout: 10000 });
+    // namnet är taget när rutorna inte längre står fyllda: nästa dop (ungens namn) kan komma redan efter 30 ms i
+    // snabbläget, så att vänta på att rutan göms hinner inte alltid se den gömd
+    await expect(page.locator('#plattan .namnrutor .ruta.fylld')).not.toHaveCount(namn.length, { timeout: 10000 });
   }
 }
 /**
@@ -1451,7 +1453,7 @@ test('menyn för vuxna hoppar till en scen i ett senare kapitel: det som kommer 
     await page.keyboard.type(namn);
     await expect(page.locator('#plattan .namnrutor .ruta.fylld')).toHaveCount(namn.length, { timeout: 5000 });
     await page.keyboard.press('Enter');
-    await expect(page.locator('#plattan .dop-ruta')).toBeHidden({ timeout: 10000 });
+    await expect(page.locator('#plattan .namnrutor .ruta.fylld')).not.toHaveCount(namn.length, { timeout: 10000 }); // nästa dop kan komma efter 30 ms
   }
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.tillstand().spelare.unge.namn), { timeout: 10000 }).toBe('KNOPP');
   expect(await page.evaluate(() => window.__ORDSTAVEN.scen())).toBe('k1s07_stigarna');
@@ -2291,6 +2293,25 @@ test('en knuff före valet räknas som hjälp för nivån (beslut 62.2): tredje 
 });
 
 
+test('knuffen räknar spelets klocka (134.4): medan fönstret saknar fokus kommer ingen knuff, och den kommer när han är tillbaka', async ({ page }) => {
+  test.setTimeout(60000);
+  const luckor = kap01.pussel.find((p) => p.id === 'k1_luckorna');
+  await provscen(page, { id: 't_knuffklocka', pass: 1, rum: 'vinden', tillstand: 'natt_upplyst', steg: [{ typ: 'pussel', pussel_id: 't_luckorna3' }, R('Klart.')] },
+    null, { pussel: [{ ...luckor, id: 't_luckorna3', knuff: { ...luckor.knuff, efter_sek: 3 } }] });
+  await page.click('#plattan .replik-ruta');
+  await expect(page.locator('#plattan .kort.lucka')).toHaveCount(3, { timeout: 5000 });
+  // han går ifrån efter en sekund: fönstret tappar fokus i tio sekunder, mer än knuffens tre
+  await page.waitForTimeout(1000);
+  await page.evaluate(() => window.dispatchEvent(new Event('blur')));
+  await page.waitForTimeout(10000);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).not.toContain('[knuff] ungen sträcker fram fötterna igen');
+  // tillbaka: knuffen kommer när resten av de tre sekunderna har gått i spelets tid, inte direkt
+  await page.evaluate(() => window.dispatchEvent(new Event('focus')));
+  await page.waitForTimeout(800);
+  expect(await page.evaluate(() => window.__ORDSTAVEN.logg())).not.toContain('[knuff] ungen sträcker fram fötterna igen');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 8000 }).toContain('[knuff] ungen sträcker fram fötterna igen');
+});
+
 test('musiken följer platsen (27, beslut 64.5): rummet före kapitlet, steget musik, scenens tystnad, och räddningen in och ut', async ({ page }) => {
   test.setTimeout(60000);
   const musik = async () => (await page.evaluate(() => window.__ORDSTAVEN.musik())).onskad;
@@ -2410,7 +2431,7 @@ test('skogsbrynet efter hugget (beslut 66.1): från liangången norrut och öste
     await page.waitForTimeout(200);
     await page.keyboard.type(namn);
     await page.keyboard.press('Enter');
-    await expect(page.locator('#plattan .dop-ruta')).toBeHidden({ timeout: 10000 });
+    await expect(page.locator('#plattan .namnrutor .ruta.fylld')).not.toHaveCount(namn.length, { timeout: 10000 }); // nästa dop kan komma efter 30 ms
   }
   await page.waitForTimeout(500);
   // sparat i k1s02 när han ska gå dit gråten hörs: lianerna är huggna, hålet i häcken syns, och buskarna är redan gjorda
@@ -2480,7 +2501,7 @@ test('gläntans träd i L3 har Stils bilder (beslut 66.2): inget av de tre träd
     await page.waitForTimeout(200);
     await page.keyboard.type(namn);
     await page.keyboard.press('Enter');
-    await expect(page.locator('#plattan .dop-ruta')).toBeHidden({ timeout: 10000 });
+    await expect(page.locator('#plattan .namnrutor .ruta.fylld')).not.toHaveCount(namn.length, { timeout: 10000 }); // nästa dop kan komma efter 30 ms
   }
   await page.waitForTimeout(500);
   // sparat i k1s07 med läsnivå L3: varianten med det stora gamla, det stora unga och det lilla gamla trädet
@@ -2693,7 +2714,7 @@ test('kapitel 2 går att gå in i (del 2): SVÄRD och vassväggen, skylten, vatt
   for (const namn of ['TESTA', 'KNOPP']) {
     for (let i = 0; i < 30 && !(await page.locator('#plattan .dop-ruta').isVisible()); i++) { await page.locator('#plattan .replik-ruta').click({ timeout: 300 }).catch(() => {}); await page.waitForTimeout(150); }
     await page.waitForTimeout(200); await page.keyboard.type(namn); await page.keyboard.press('Enter');
-    await expect(page.locator('#plattan .dop-ruta')).toBeHidden({ timeout: 10000 });
+    await expect(page.locator('#plattan .namnrutor .ruta.fylld')).not.toHaveCount(namn.length, { timeout: 10000 }); // nästa dop kan komma efter 30 ms
   }
   const pos = () => page.evaluate(() => window.__ORDSTAVEN.position());
   const tryck = async (t, ms) => { await page.keyboard.down(t); await page.waitForTimeout(ms); await page.keyboard.up(t); await page.waitForTimeout(60); };

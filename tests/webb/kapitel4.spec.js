@@ -509,12 +509,15 @@ test('kapitel 4: bokstäverna står på flaken innan instruktionen kommer (133.6
   const flak = await page.locator('#stigord .flakord').allTextContents();
   expect(flak.join('')).toMatch(/[up]/);
   await expect(page.locator('#tanke .instruktion')).toBeVisible();
+  // 135.6: UPP står på ett eget ordkort i molnet
+  await expect(page.locator('#tanke .moln-ord')).toHaveText('UPP');
   await page.screenshot({ path: 'test-results/kap4-133-flaken.png' });
   // ett tryck på ett flak innan han är vid kanten tar honom dit, och sedan börjar stigen
   await page.locator('#stigord .flakord').first().click();
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 15000 }).toContain('k4_stig1: han är vid kanten');
   // instruktionen läses igen vid kanten, och bokstäverna står kvar medan den läses
   await expect(page.locator('#plattan.replik')).toBeVisible();
+  await expect(page.locator('#plattan .vvv-ord')).toHaveText('UPP');
   await expect(page.locator('#stigord .flakord').first()).toBeVisible();
   await page.screenshot({ path: 'test-results/kap4-133-flaken-kanten.png' });
 });

@@ -136,7 +136,7 @@ test('MIN BOK, fliken KLART: tio rader per uppslag, öppnas på det senaste, och
     await page.waitForTimeout(200); await page.keyboard.type(namn);
     await expect(page.locator('#plattan .namnrutor .ruta.fylld')).toHaveCount(namn.length, { timeout: 5000 });
     await page.keyboard.press('Enter');
-    await expect(page.locator('#plattan .dop-ruta')).toBeHidden({ timeout: 10000 });
+    await expect(page.locator('#plattan .namnrutor .ruta.fylld')).not.toHaveCount(namn.length, { timeout: 10000 }); // nästa dop kan komma efter 30 ms
   }
   await expect(page.locator('#hud-paus')).toBeVisible({ timeout: 10000 });
   // fram till första steget där läsplattan är stängd (pausknappen går inte medan en replik står)

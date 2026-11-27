@@ -7,7 +7,7 @@ import { readFileSync } from 'node:fs';
 
 const prov = JSON.parse(readFileSync(new URL('../fixturer/testrum-stig.json', import.meta.url), 'utf8'));
 
-async function oppna(page, fil = prov) {
+async function oppna(page, fil = prov, fore = async () => {}) {
   await page.goto('./?snabb&ny');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.evaluate((f) => localStorage.setItem('ordstaven_testrum_stig', JSON.stringify(f)), fil);
@@ -15,6 +15,7 @@ async function oppna(page, fil = prov) {
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.click('.start-knapp');
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 15000 }).toBe('tr_stig');
+  await fore();
   // instruktionen (133.6: bokstäverna står redan på flaken medan den läses, så vänta tills den är stängd)
   for (let i = 0; i < 20 && !(await page.locator('#stigord .flakord').first().isVisible().catch(() => false) && await page.locator('#plattan').isHidden()); i++) {
     for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
@@ -81,6 +82,17 @@ test('bokstavsstigen: utan ord i klartext står ordet i versaler efter två fel,
   await page.keyboard.press('ArrowDown');
   await expect(page.locator('#stigord .stigord-versal')).toContainText('MOSSA');
   await page.screenshot({ path: 'test-results/stig-versaler.png' });
+});
+
+// 134.4: stigens knuff räknar spelets klocka, så den kommer inte medan fönstret saknar fokus
+test('bokstavsstigen: knuffen kommer inte medan fönstret saknar fokus, utan när han är tillbaka (134.4)', async ({ page }) => {
+  test.setTimeout(120000);
+  // i snabbläget kommer knuffen efter 30 ms, så fönstret tappar fokus redan medan instruktionen står
+  await oppna(page, { ...prov, stigar: [{ ...prov.stigar[1], knuff: { efter_sek: 2 } }] }, () => page.evaluate(() => window.dispatchEvent(new Event('blur'))));
+  await page.waitForTimeout(8000);
+  expect(await logg(page)).not.toContain('kanten lyser vid m');
+  await page.evaluate(() => window.dispatchEvent(new Event('focus')));
+  await expect.poll(async () => (await logg(page)).includes('kanten lyser vid m, ungen piper på kanten'), { timeout: 10000 }).toBe(true);
 });
 
 // 116.4: Innehålls fil (content/testrum-stig.json) med kapitel 4:s tre stigar. Utan provfil öppnar testrummet den, och

@@ -1,6 +1,9 @@
 # Innehållsschema – kapitel i format 2
 
-Version 2.60 (2026-11-26). Ägs av teknikspåret.
+Version 2.61 (2026-11-27). Ägs av teknikspåret.
+2.61 (beslut 135.6–135.7): **ordkortet och molnet som alltid säger en uppgift.** Ett tillägg, filer i 2.60 gäller fortfarande.
+- **`ordkort`** (boolean) på `P18_bokstavsstig`: ordet står på ett eget kort i molnet och bredvid instruktionen, som ordet i "Var var vi?". Det läses inte upp.
+- **Molnet i rummen före stegets rum** (135.7): `pa_vagen` om det finns. Annars berättelsens instruktion, men bara om den börjar med ett verb ur listan i `src/karna/uppdrag.js` (`VERB_I_MOLNET`). Annars står inget i molnet. Kontrollen listar varje rum där molnet visar berättelsens instruktion i stället för `pa_vagen`, och varnar där molnet blir tomt medan han går.
 2.60 (beslut 133.9): **gå-steget.** Ett tillägg, filer i 2.59 gäller fortfarande.
 - **`uppdrag[].steg[].pa_vagen`**: det molnet visar i rummen före det rum där steget görs, med verb och mål (GÅ GENOM GROTTAN). Rummet är rummet för scenen i `klart.scen`. Steget självt står i molnet först i sitt rum. Utan `pa_vagen` står berättelsens egen instruktion i rummen före, som utan uppdrag. Boken NU och radion har alltid steget. Kontrollen varnar när gå-steget inte börjar med ett verb, och när scenen saknar rum.
 - Ett gå-steg kan också vara ett vanligt steg med `klart.ga_till` i det rum där han går. Då får det en egen rad i boken och ett eget streck.

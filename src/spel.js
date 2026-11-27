@@ -30,7 +30,7 @@ import { ikon, uiBild } from './grans/ikoner.js';
 import { visaStartskarm, startBild } from './grans/startskarm.js';
 import { menyBild, vlage, satt9slice } from './grans/menybilder.js';
 import { spelaIntro } from './grans/intro.js';
-import { kompileraUppdrag, lappenNu, klaraFore, jamfor, molnetForSteg } from './karna/uppdrag.js';
+import { kompileraUppdrag, lappenNu, klaraFore, jamfor, molnetForSteg, borjarMedVerb } from './karna/uppdrag.js';
 import { skapaUppdragslapp, lappText, stampelPlats, visaStampel, LAPP_IHOP_MS } from './grans/uppdragslapp.js';
 
 const KNUFF_MS = 9000;
@@ -126,6 +126,24 @@ export function skapaSpel(d) {
   const bortaSlutar = (orsak) => {
     if (!borta.delete(orsak) || borta.size || bortaSedan === null) return 0;
     const ms = performance.now() - bortaSedan; bortaMs += ms; bortaSedan = null; return ms;
+  };
+  /**
+   * En klocka som räknar speltid (134.4): fn körs när ms av spelets tid har gått, alltså utan tiden då spelet stod
+   * pausat eller fönstret saknade fokus. En knuff kommer därför aldrig medan han är borta, och den räknas inte som
+   * hjälp som han inte har sett. Ger en funktion som stoppar klockan. @param {() => void} fn @param {number} ms
+   */
+  const speltidKlocka = (fn, ms) => {
+    const start = speltid();
+    let t = 0, stoppad = false;
+    const kolla = () => {
+      if (stoppad) return;
+      if (bortaSedan !== null) { t = window.setTimeout(kolla, 250); return; }
+      const kvar = ms - (speltid() - start);
+      if (kvar > 1) { t = window.setTimeout(kolla, kvar); return; }
+      fn();
+    };
+    t = window.setTimeout(kolla, ms);
+    return () => { stoppad = true; window.clearTimeout(t); };
   };
   /** När passet började, och hur mycket som var bortaräknat då (passets speltid). */
   let bortaVidPassStart = 0, passStartMs = performance.now();
@@ -524,12 +542,19 @@ export function skapaSpel(d) {
     // 133.9: steget står i molnet först i det rum där det görs. I rummen före står gå-steget (pa_vagen), och utan
     // det berättelsens egen instruktion. Boken NU har alltid steget, och radion säger det
     const m = molnetForSteg(l.nu, b?.kapitel, aktuelltRum);
-    if (m.sort === 'inget') return instr;
+    // 135.7: berättelsens instruktion står bara om den är en uppgift (verb och mål), annars står inget i molnet
+    if (m.sort === 'inget') {
+      const ok = !!instr && borjarMedVerb(instr.text);
+      if (instr && !ok) logg.handelse('moln', `ingen uppgift i molnet i ${aktuelltRum}: "${instr.text}" är ingen uppgift`);
+      return ok ? instr : null;
+    }
     return { talare: 'berattare', text: lappTal(/** @type {string} */ (m.text)), upplast: true };
   };
   /** Molnets innehåll: bilden (eller lappen) och uppgiften med högtalaren. @param {string | null} bild @param {any} r */
   function molnHtml(bild, r) {
-    return `${bild ? `<span class="moln-bild">${bild}</span>` : ''}${r ? `<span class="instruktion">${ui.rader(r.text, varden())}</span><button type="button" class="moln-hogtalare" aria-label="Läs igen">${ikon('hogtalare')}</button>` : ''}`;
+    // ordkortet (135.6): ordet han ska läsa eller stava står på ett eget kort i molnet, som i "Var var vi?"
+    const kort = r?.ordAttLasa ? `<span class="moln-ord vvv-ord"><span class="vvv-text">${ui.rader(r.ordAttLasa.ord, varden(), 'kort-ord')}</span></span>` : '';
+    return `${bild ? `<span class="moln-bild">${bild}</span>` : ''}${kort}${r ? `<span class="instruktion">${ui.rader(r.text, varden())}</span><button type="button" class="moln-hogtalare" aria-label="Läs igen">${ikon('hogtalare')}</button>` : ''}`;
   }
   /**
    * Vänta tills kameran står still (den har glidit dit den ska), eller tills framme() säger ja, som längst ms. Still
@@ -934,9 +959,10 @@ export function skapaSpel(d) {
 
   function knuffKlocka(knuff, extra, vakt, efterMs = KNUFF_MS) {
     if (!knuff) return { nollstall() {}, stopp() {} };
-    let t = 0, t2 = 0;
+    // 134.4: knuffen räknar spelets klocka, så tiden då spelet är pausat eller fönstret saknar fokus räknas inte
+    let stoppT = () => {}, stoppT2 = () => {};
     const visa = async () => {
-      if (pausad) { t2 = window.setTimeout(visa, 500); return; }
+      if (pausad || bortaSedan !== null) { stoppT2 = speltidKlocka(visa, 250); return; }
       const visad = !!knuff.pekar && !!vakt?.peka?.();
       logg.handelse('knuff', knuff.handling, { pekar: !!knuff.pekar, ungenPekar: visad });
       vakt?.spar.knuff(!!knuff.pekar);
@@ -945,18 +971,18 @@ export function skapaSpel(d) {
       ui.doljRegi();
     };
     const starta = () => {
-      clearTimeout(t); clearTimeout(t2);
-      t = window.setTimeout(() => {
+      stoppT(); stoppT2();
+      stoppT = speltidKlocka(() => {
         if (pausad) { starta(); return; }
         extra?.(); vakt?.spar.knuff(false);
         if (!knuff.handling && !knuff.replik) return;
         const om = knuff.pekar && vakt ? vakt.pekOmMs() : 0;
-        if (om > 0) { logg.handelse('knuff', 'pekningen väntar', { ms: om }); t2 = window.setTimeout(visa, om); }
+        if (om > 0) { logg.handelse('knuff', 'pekningen väntar', { ms: om }); stoppT2 = speltidKlocka(visa, om); }
         else visa();
       }, (knuff.efter_sek ? knuff.efter_sek * 1000 : efterMs));
     };
     starta();
-    return { nollstall: starta, stopp() { clearTimeout(t); clearTimeout(t2); } };
+    return { nollstall: starta, stopp() { stoppT(); stoppT2(); } };
   }
 
   /** Loggen: varje val, och om en knuff eller pekning kom före det. @param {any} p @param {string} altId @param {string} resultat @param {ReturnType<typeof skapaHjalpSpar>} spar */
@@ -3655,6 +3681,8 @@ export function skapaSpel(d) {
    * Väntar tills han har gått till stigens kant själv (122.3). Är han redan nära börjar stigen direkt.
    * @param {any} p @param {{ strand: { x: number, y: number }, upp: boolean }} lage
    */
+  /** Bokstavsstigens instruktion, med ordet på ett eget kort när datan säger `ordkort` (135.6). @param {any} p */
+  const stigInstruktion = (p) => (p.ordkort && p.ord ? { ...p.instruktion, ordAttLasa: { ord: p.ord } } : p.instruktion);
   async function tillKanten(p, lage, visaBokstaver = () => {}) {
     const nara = () => {
       const dx = Math.abs(rum.pos.x - lage.strand.x), dy = Math.abs(rum.pos.y - lage.strand.y);
@@ -3665,7 +3693,7 @@ export function skapaSpel(d) {
     rum.stigKanten = { ...lage.strand };
     // 133.6: bokstäverna står på flaken innan instruktionen kommer, också medan han går till kanten
     visaBokstaver();
-    if (p.instruktion) { visaMoln(null, p.instruktion); placeraMoln([]); }
+    if (p.instruktion) { visaMoln(null, stigInstruktion(p)); placeraMoln([]); }
     const start = speltid();
     const k = knuffKlocka({ handling: '' }, () => {
       const pekar = rum.ungePekar(`stig_${p.id}`);
@@ -3754,19 +3782,20 @@ export function skapaSpel(d) {
     stigNu();
     const pilUnderInstruktionen = lyssnaHandling((h) => { if (h.typ === 'ga' && h.kod && !ui.plattan.hidden) { vantandeHopp = `pil:${h.kod}`; stangInstruktionen(); } });
     ui.$('#stigord').classList.add('under-instruktion');
-    try { if (p.instruktion) await replik(p.instruktion); } finally { pilUnderInstruktionen(); ui.$('#stigord').classList.remove('under-instruktion'); }
+    try { if (p.instruktion) await replik(stigInstruktion(p)); } finally { pilUnderInstruktionen(); ui.$('#stigord').classList.remove('under-instruktion'); }
     stigNu = rita;
     rita();
-    if (p.instruktion) visaMoln(null, p.instruktion);
+    if (p.instruktion) visaMoln(null, stigInstruktion(p));
     logg.handelse('stig', `${p.id}: ${g.ord} (${g.kolumner} × ${g.rader})`);
     /** @type {(v: any) => void} */ let klar = () => {};
     const slut = new Promise((res) => { klar = res; });
     // knuffen: efter en stund utan hopp nosar ungen mot nästa rätta flak, och kanten lyser
     const knuffMs = (p.knuff?.efter_sek ?? 15) * 1000;
-    let knuffT = 0;
+    /** stoppar stigens knuff (134.4) */ let stoppKnuff = () => {};
     const knuffa = () => {
-      window.clearTimeout(knuffT);
-      knuffT = window.setTimeout(() => {
+      stoppKnuff();
+      // 134.4: stigens knuff räknar spelets klocka
+      stoppKnuff = speltidKlocka(() => {
         const h = hjalpFlak(s); if (!h || upptagen) return;
         // ungen står kvar på kanten och piper, likadant var han än står (119.4): kanten på flaket lyser, aldrig bokstaven.
         // Med en hjälptrappa som inte är slut är knuffen trappans första steg (väggen glimtar, ungen viftar med svansen)
@@ -3878,7 +3907,7 @@ export function skapaSpel(d) {
       if (v.startsWith('pil:')) pilHopp(v.slice(4)); else { const [r, k] = v.split(',').map(Number); hoppa({ r, k }); }
     }
     try { await slut; } finally {
-      stopp(); window.clearTimeout(knuffT); stigNu = null; ui.stigord([], () => {}); visaMoln(null);
+      stopp(); stoppKnuff(); stigNu = null; ui.stigord([], () => {}); visaMoln(null);
       rum.regiFokus = null;
       rum.stigKant(null);
     }

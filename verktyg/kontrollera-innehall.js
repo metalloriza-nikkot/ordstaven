@@ -33,6 +33,11 @@ for (const mapp of readdirSync(rot, { withFileTypes: true }).filter((d) => d.isD
     const delar = [n ? `${n} mellanscener` : '', m ? `${m} reaktioner och knuffar` : ''].filter(Boolean).join(' och ');
     console.log(`   ${b.kapitel === 'aventyr' ? 'aventyr.json' : b.kapitel}: ${delar} visar texten för den vuxne${b.klart ? '' : b.kapitel === 'aventyr' ? ' (äventyret är inte klart)' : ' (kapitlet är inte klart)'}`);
   }
+  // 135.7: rummen där molnet visar berättelsens instruktion i stället för gå-steget (pa_vagen)
+  if (r.molnet?.length) {
+    console.log(`   molnet i rummen före stegets rum, utan pa_vagen (${r.molnet.length}):`);
+    for (const m of r.molnet) console.log(`     ${m.kapitel} ${m.rum} (${m.scen} steg ${m.steg + 1}, ${m.typ}): boken säger ${m.boken} i ${m.stegetsRum}, molnet ${m.visas ? `visar "${m.instruktion}"` : `är tomt${m.instruktion ? ` ("${m.instruktion}" är ingen uppgift)` : ''}`}`);
+  }
   for (const f of r.fel) console.log('FEL      ' + f);
   for (const v of r.varningar) console.log('varning  ' + v);
   fel += r.fel.length; varningar += r.varningar.length;
