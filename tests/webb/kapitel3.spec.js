@@ -762,3 +762,43 @@ test('kapitel 3: STOR SKÖLD har en glipa mellan orden i fälten', async ({ page
   for (const [i, m] of mellan.entries()) if (i !== 3) expect(Math.abs(m - mellan[0])).toBeLessThan(2);
   await page.screenshot({ path: 'test-results/kap3-stor-skold-glipa.png' });
 });
+
+test('kapitel 3 och 2: det höga i floden och byn sorteras efter foten, och de fasta sakerna har en vägg (138.6–138.7)', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mac-helskarm', 'ett projekt räcker');
+  test.setTimeout(90000);
+  /** @param {string} rum @param {string[]} bilder @param {{ x: number, y: number }[]} vaggar */
+  const prova = async (rum, bilder, vaggar) => {
+    await page.waitForFunction((rum) => window.__ORDSTAVEN.spel.scene.getScene('Rum')?.rumId === rum, rum, { timeout: 20000 });
+    await page.waitForTimeout(800);
+    const svar = await page.evaluate((vaggar) => {
+      const r = window.__ORDSTAVEN.spel.scene.getScene('Rum');
+      return { ramar: [...r.hogaBilder].map((g) => g.frame?.name), fria: vaggar.map((p) => r.hinder.fri(p)) };
+    }, vaggar);
+    for (const b of bilder) expect(svar.ramar.some((r) => r === b || r === `${b}_kvall`)).toBe(true);
+    // ingen kan stå mitt i disken, högen eller nätets ställning
+    expect(svar.fria).toEqual(vaggar.map(() => false));
+  };
+  await starta(page, 'k3s01_floden');
+  await prova('floden', ['stand_1', 'stand_2', 'stand_3', 'kaj_sackar', 'kaj_tunnor', 'brygga_stolpar', 'flod_tvattlina'], [{ x: 119, y: 42 }, { x: 201, y: 42 }, { x: 313, y: 42 }, { x: 582, y: 168 }]);
+  // han står norr om det första ståndet och ritas bakom det
+  await page.evaluate(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); r.pos = { x: 119, y: 32 }; r.placera(); r.sorteraFigurer(); r.smutsig = true; });
+  await page.waitForTimeout(300);
+  await page.screenshot({ path: 'test-results/kap3-standen.png' });
+  const kap2 = JSON.parse(readFileSync(new URL('../../content/den-gomda-dalen/kap-02.json', import.meta.url), 'utf8'));
+  await page.goto('./?snabb&ny&kapitel=kap-02');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  const scen = kap2.scener.findIndex((s) => s.id === 'k2s02_byn');
+  await page.evaluate(({ scen, pass }) => {
+    const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
+    Object.assign(av, { kapitelId: 'kap-02', scen, scenId: 'k2s02_byn', steg: 0, startad: false, pass });
+    t.spelare.hjalte.namn = 'TESTA'; t.spelare.unge = { format: 1, steg: 1, formagor: [], ...t.spelare.unge, namn: 'KNOPP', folj: true };
+    localStorage.setItem('ordstaven_spar', JSON.stringify(t));
+  }, { scen, pass: kap2.scener[scen].pass });
+  await page.goto('./?snabb&kapitel=kap-02');
+  await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
+  await page.click('.start-knapp');
+  await prova('byn', ['byn_tvattlina', 'fiskarens_nat'], [{ x: 89, y: 318 }]);
+  await page.evaluate(() => { const r = window.__ORDSTAVEN.spel.scene.getScene('Rum'); r.pos = { x: 236, y: 226 }; r.placera(); r.sorteraFigurer(); r.smutsig = true; });
+  await page.waitForTimeout(300);
+  await page.screenshot({ path: 'test-results/kap2-tvattlinan.png' });
+});

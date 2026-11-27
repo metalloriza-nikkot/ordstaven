@@ -11,7 +11,7 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 51,
+ "nextobjectid": 54,
  "properties": [
   {
    "name": "bild",
@@ -83,6 +83,73 @@
     },
     {
      "id": 3,
+     "name": "byn_tvattlina",
+     "type": "sak",
+     "x": 198,
+     "y": 232,
+     "width": 76,
+     "height": 4,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "byn_tvattlina"
+      },
+      {
+       "name": "bild_kvall",
+       "type": "string",
+       "value": "byn_tvattlina_kvall"
+      },
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 4,
+     "name": "fiskarens_nat",
+     "type": "sak",
+     "x": 56,
+     "y": 314,
+     "width": 66,
+     "height": 6,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "bild",
+       "type": "string",
+       "value": "fiskarens_nat"
+      },
+      {
+       "name": "bild_kvall",
+       "type": "string",
+       "value": "fiskarens_nat_kvall"
+      },
+      {
+       "name": "dekor",
+       "type": "bool",
+       "value": true
+      }
+     ]
+    },
+    {
+     "id": 5,
+     "name": "",
+     "type": "vagg",
+     "x": 56,
+     "y": 314,
+     "width": 66,
+     "height": 6,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 6,
      "name": "",
      "type": "vagg",
      "x": 0,
@@ -93,7 +160,7 @@
      "visible": true
     },
     {
-     "id": 4,
+     "id": 7,
      "name": "",
      "type": "vagg",
      "x": 24,
@@ -104,7 +171,7 @@
      "visible": true
     },
     {
-     "id": 5,
+     "id": 8,
      "name": "fagel_48_52",
      "type": "omgivning",
      "x": 48,
@@ -122,7 +189,7 @@
      ]
     },
     {
-     "id": 6,
+     "id": 9,
      "name": "",
      "type": "vagg",
      "x": 128,
@@ -133,7 +200,7 @@
      "visible": true
     },
     {
-     "id": 7,
+     "id": 10,
      "name": "",
      "type": "vagg",
      "x": 40,
@@ -144,7 +211,7 @@
      "visible": true
     },
     {
-     "id": 8,
+     "id": 11,
      "name": "",
      "type": "vagg",
      "x": 208,
@@ -155,7 +222,7 @@
      "visible": true
     },
     {
-     "id": 9,
+     "id": 12,
      "name": "",
      "type": "vagg",
      "x": 360,
@@ -166,7 +233,7 @@
      "visible": true
     },
     {
-     "id": 10,
+     "id": 13,
      "name": "",
      "type": "vagg",
      "x": 416,
@@ -177,7 +244,7 @@
      "visible": true
     },
     {
-     "id": 11,
+     "id": 14,
      "name": "",
      "type": "vagg",
      "x": 496,
@@ -188,7 +255,7 @@
      "visible": true
     },
     {
-     "id": 12,
+     "id": 15,
      "name": "",
      "type": "vagg",
      "x": 580,
@@ -199,7 +266,7 @@
      "visible": true
     },
     {
-     "id": 13,
+     "id": 16,
      "name": "",
      "type": "vagg",
      "x": 600,
@@ -210,7 +277,7 @@
      "visible": true
     },
     {
-     "id": 14,
+     "id": 17,
      "name": "",
      "type": "vagg",
      "x": 368,
@@ -221,7 +288,7 @@
      "visible": true
     },
     {
-     "id": 15,
+     "id": 18,
      "name": "",
      "type": "vagg",
      "x": 452,
@@ -232,7 +299,7 @@
      "visible": true
     },
     {
-     "id": 16,
+     "id": 19,
      "name": "",
      "type": "vagg",
      "x": 0,
@@ -250,7 +317,7 @@
      ]
     },
     {
-     "id": 17,
+     "id": 20,
      "name": "",
      "type": "vagg",
      "x": 604,
@@ -268,7 +335,7 @@
      ]
     },
     {
-     "id": 18,
+     "id": 21,
      "name": "fiskaren",
      "type": "figur",
      "x": 88,
@@ -301,7 +368,7 @@
      ]
     },
     {
-     "id": 19,
+     "id": 22,
      "name": "tvatterskan",
      "type": "figur",
      "x": 232,
@@ -334,7 +401,7 @@
      ]
     },
     {
-     "id": 20,
+     "id": 23,
      "name": "barnet_drake",
      "type": "figur",
      "x": 420,
@@ -377,7 +444,7 @@
      ]
     },
     {
-     "id": 21,
+     "id": 24,
      "name": "",
      "type": "vagg",
      "x": 392,
@@ -388,7 +455,7 @@
      "visible": true
     },
     {
-     "id": 22,
+     "id": 25,
      "name": "drake_tak",
      "type": "sak",
      "x": 414,
@@ -421,7 +488,7 @@
      ]
     },
     {
-     "id": 23,
+     "id": 26,
      "name": "fjader",
      "type": "sak",
      "x": 140,
@@ -444,7 +511,7 @@
      ]
     },
     {
-     "id": 24,
+     "id": 27,
      "name": "udden",
      "type": "sak",
      "x": 604,
@@ -462,7 +529,7 @@
      ]
     },
     {
-     "id": 25,
+     "id": 28,
      "name": "lagereld",
      "type": "sak",
      "x": 572,
@@ -490,7 +557,7 @@
      ]
     },
     {
-     "id": 26,
+     "id": 29,
      "name": "ved_1",
      "type": "sak",
      "x": 486,
@@ -518,7 +585,7 @@
      ]
     },
     {
-     "id": 27,
+     "id": 30,
      "name": "ved_2",
      "type": "sak",
      "x": 618,
@@ -546,7 +613,7 @@
      ]
     },
     {
-     "id": 28,
+     "id": 31,
      "name": "ved_3",
      "type": "sak",
      "x": 528,
@@ -574,7 +641,7 @@
      ]
     },
     {
-     "id": 29,
+     "id": 32,
      "name": "regi_fiskaren_kvall",
      "type": "",
      "x": 556,
@@ -586,7 +653,7 @@
      "point": true
     },
     {
-     "id": 30,
+     "id": 33,
      "name": "regi_tvatterskan_kvall",
      "type": "",
      "x": 582,
@@ -598,7 +665,7 @@
      "point": true
     },
     {
-     "id": 31,
+     "id": 34,
      "name": "regi_barnet_drake_kvall",
      "type": "",
      "x": 600,
@@ -610,7 +677,7 @@
      "point": true
     },
     {
-     "id": 32,
+     "id": 35,
      "name": "regi_tant_rosa_kvall",
      "type": "",
      "x": 540,
@@ -622,7 +689,7 @@
      "point": true
     },
     {
-     "id": 33,
+     "id": 36,
      "name": "lyktor_udden",
      "type": "sak",
      "x": 558,
@@ -645,7 +712,7 @@
      ]
     },
     {
-     "id": 34,
+     "id": 37,
      "name": "dorr_rosa",
      "type": "utgang",
      "x": 376,
@@ -678,7 +745,7 @@
      ]
     },
     {
-     "id": 35,
+     "id": 38,
      "name": "brevram",
      "type": "sak",
      "x": 401,
@@ -706,7 +773,7 @@
      ]
     },
     {
-     "id": 36,
+     "id": 39,
      "name": "dorr_stort_bla",
      "type": "utgang",
      "x": 444,
@@ -734,7 +801,7 @@
      ]
     },
     {
-     "id": 37,
+     "id": 40,
      "name": "dorr_stort_rosa",
      "type": "utgang",
      "x": 392,
@@ -762,7 +829,7 @@
      ]
     },
     {
-     "id": 38,
+     "id": 41,
      "name": "dorr_litet_bla",
      "type": "utgang",
      "x": 464,
@@ -790,7 +857,7 @@
      ]
     },
     {
-     "id": 39,
+     "id": 42,
      "name": "tant_rosa",
      "type": "figur",
      "x": 404,
@@ -823,7 +890,7 @@
      ]
     },
     {
-     "id": 40,
+     "id": 43,
      "name": "brunnen",
      "type": "sak",
      "x": 488,
@@ -846,7 +913,7 @@
      ]
     },
     {
-     "id": 41,
+     "id": 44,
      "name": "stig_vassen",
      "type": "utgang",
      "x": 332,
@@ -879,7 +946,7 @@
      ]
     },
     {
-     "id": 42,
+     "id": 45,
      "name": "stig_dammen",
      "type": "utgang",
      "x": 552,
@@ -912,7 +979,7 @@
      ]
     },
     {
-     "id": 43,
+     "id": 46,
      "name": "stig_bryggan",
      "type": "utgang",
      "x": 600,
@@ -945,7 +1012,7 @@
      ]
     },
     {
-     "id": 44,
+     "id": 47,
      "name": "brygga_fran_torget",
      "type": "sak",
      "x": 604,
@@ -963,7 +1030,7 @@
      ]
     },
     {
-     "id": 45,
+     "id": 48,
      "name": "rep_vassen",
      "type": "sak",
      "x": 326,
@@ -981,7 +1048,7 @@
      ]
     },
     {
-     "id": 46,
+     "id": 49,
      "name": "skylt_vassen",
      "type": "sak",
      "x": 368,
@@ -1004,7 +1071,7 @@
      ]
     },
     {
-     "id": 47,
+     "id": 50,
      "name": "rep_brunnen",
      "type": "sak",
      "x": 546,
@@ -1022,7 +1089,7 @@
      ]
     },
     {
-     "id": 48,
+     "id": 51,
      "name": "skylt_brunnen",
      "type": "sak",
      "x": 528,
@@ -1045,7 +1112,7 @@
      ]
     },
     {
-     "id": 49,
+     "id": 52,
      "name": "rep_bryggan",
      "type": "sak",
      "x": 592,
@@ -1063,7 +1130,7 @@
      ]
     },
     {
-     "id": 50,
+     "id": 53,
      "name": "skylt_bryggan",
      "type": "sak",
      "x": 574,

@@ -208,6 +208,16 @@ RUMMEN = {
             punkt('start', 54, 56),
             punkt('regi_hiss', 510, 98),
             punkt('regi_on', ON[0], ON[1]),
+            # lev138 (138.6–138.7): det höga är egna bilder som sorteras efter foten bland figurerna, och de fasta sakerna
+            # har en vägg vid foten. Stånden står på stigens södra halva, så han kommer förbi norr om dem och mellan dem.
+            # Stolparna och tvättlinan har ingen vägg (pråmarna är redan vägg, och under linan går han)
+            sak('stand_1', 104, 36, 30, 8, dekor=True, bild='stand_1', bild_kvall='stand_1_kvall'), vagg(106, 36, 26, 8),
+            sak('stand_2', 186, 36, 30, 8, dekor=True, bild='stand_2', bild_kvall='stand_2_kvall'), vagg(188, 36, 26, 8),
+            sak('stand_3', 296, 36, 34, 8, dekor=True, bild='stand_3', bild_kvall='stand_3_kvall'), vagg(298, 36, 30, 8),
+            sak('kaj_sackar', 558, 160, 48, 10, dekor=True, bild='kaj_sackar', bild_kvall='kaj_sackar_kvall'), vagg(560, 162, 44, 8),
+            sak('kaj_tunnor', 598, 172, 30, 10, dekor=True, bild='kaj_tunnor', bild_kvall='kaj_tunnor_kvall'), vagg(600, 174, 28, 8),
+            sak('brygga_stolpar', 90, 66, 246, 2, dekor=True, bild='brygga_stolpar', bild_kvall='brygga_stolpar_kvall'),
+            sak('flod_tvattlina', 298, 49, 48, 4, dekor=True, bild='flod_tvattlina', bild_kvall='flod_tvattlina_kvall'),
             punkt('regi_pramar', 215, 84),
             punkt('regi_hjalte_k3s02_loftet', 520, 98),
             punkt('regi_hjalte_k3s03_hornet', 566, 98),

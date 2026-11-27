@@ -182,6 +182,10 @@ RUMMEN = {
         'objekt': [
             utg('stig_kanten', 0, 280, 40, 24, **STIG, riktning='vanster', till='trasket_kanten'),
             punkt('start', 48, 296),
+            # lev138 (138.6–138.7): tvättlinan (han går under den, ingen vägg) och fiskarens nät (vägg vid ställningen)
+            # är egna bilder som sorteras efter foten bland figurerna
+            sak('byn_tvattlina', 198, 232, 76, 4, dekor=True, bild='byn_tvattlina', bild_kvall='byn_tvattlina_kvall'),
+            sak('fiskarens_nat', 56, 314, 66, 6, dekor=True, bild='fiskarens_nat', bild_kvall='fiskarens_nat_kvall'), vagg(56, 314, 66, 6),
             # pålhusen i NV, och raden av hus längs norra kanten som bara öppnar sig vid stigarna
             vagg(0, 0, 330, 40), vagg(24, 64, 64, 40), liv('fagel', 48, 52, 12, 12), vagg(128, 64, 72, 48), vagg(40, 136, 56, 40), vagg(208, 128, 64, 40),
             # 77.4: torgets fyra hus, korsade två och två: i norr Tant Rosas lilla hus med rosa dörr och ett stort
