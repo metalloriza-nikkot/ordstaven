@@ -3557,6 +3557,15 @@ export class Rum extends Phaser.Scene {
     // fäktningen i kapitel 5 (132.4): baronen på marken, som backar vid rätt kort och tar ett steg fram vid fel
     if (ram === 'faktning' && figur === 'baronen' && this.textures.exists('baronen')) {
       this.duellGra?.destroy(); this.duellGra = null;
+      // 143.6 (lev142): fäktningen står på hällarna väster om skylten. Hjälten ställs på regi_faktning, vänd åt höger,
+      // och ungen ställer sig bakom honom, så att baronen backar mot domaren och aldrig in i dimman
+      const vid = this.regiPunkter?.regi_faktning;
+      if (vid) {
+        this.pos = { x: vid.x, y: vid.y }; this.vand = { x: 1, y: 0 };
+        const u = this.hinder.narmasteFria({ x: vid.x - 22, y: vid.y + 2 });
+        this.ungePos = { x: u.x, y: u.y }; this.ungeMal = null; this.ungeVand = { x: 1, y: 0 };
+        this.placera();
+      }
       this.duellFig = new BaronMark(this, this.pos, 24);
       return this.duellFig;
     }

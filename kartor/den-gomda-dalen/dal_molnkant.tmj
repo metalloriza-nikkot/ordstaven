@@ -11,7 +11,7 @@
  "infinite": false,
  "compressionlevel": -1,
  "nextlayerid": 2,
- "nextobjectid": 19,
+ "nextobjectid": 21,
  "properties": [
   {
    "name": "rum",
@@ -160,9 +160,9 @@
      "name": "skylt_baronens_dal",
      "type": "sak",
      "x": 548,
-     "y": 60,
+     "y": 34,
      "width": 16,
-     "height": 14,
+     "height": 40,
      "rotation": 0,
      "visible": true,
      "properties": [
@@ -175,6 +175,36 @@
     },
     {
      "id": 10,
+     "name": "regi_faktning",
+     "type": "",
+     "x": 470,
+     "y": 116,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 11,
+     "name": "dimman_kant",
+     "type": "sak",
+     "x": 580,
+     "y": 96,
+     "width": 12,
+     "height": 24,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "sida",
+       "type": "string",
+       "value": "alla"
+      }
+     ]
+    },
+    {
+     "id": 12,
      "name": "baronen_molnkant",
      "type": "figur",
      "x": 520,
@@ -207,7 +237,7 @@
      ]
     },
     {
-     "id": 11,
+     "id": 13,
      "name": "bit_baronen",
      "type": "sak",
      "x": 500,
@@ -225,7 +255,7 @@
      ]
     },
     {
-     "id": 12,
+     "id": 14,
      "name": "bubbla_skolan",
      "type": "sak",
      "x": 470,
@@ -243,7 +273,7 @@
      ]
     },
     {
-     "id": 13,
+     "id": 15,
      "name": "spindel_baronen",
      "type": "sak",
      "x": 478,
@@ -261,7 +291,7 @@
      ]
     },
     {
-     "id": 14,
+     "id": 16,
      "name": "hatten_platt",
      "type": "sak",
      "x": 486,
@@ -279,7 +309,7 @@
      ]
     },
     {
-     "id": 15,
+     "id": 17,
      "name": "stovlarna_pol",
      "type": "sak",
      "x": 494,
@@ -297,7 +327,7 @@
      ]
     },
     {
-     "id": 16,
+     "id": 18,
      "name": "bit_baronen_upp",
      "type": "sak",
      "x": 502,
@@ -315,7 +345,7 @@
      ]
     },
     {
-     "id": 17,
+     "id": 19,
      "name": "bit_upp_och_ner",
      "type": "sak",
      "x": 510,
@@ -333,7 +363,7 @@
      ]
     },
     {
-     "id": 18,
+     "id": 20,
      "name": "fagel_300_40",
      "type": "omgivning",
      "x": 300,

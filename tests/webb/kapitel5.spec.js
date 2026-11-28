@@ -51,7 +51,10 @@ async function starta(page, scenId, steg = 0, extra = null) {
  * @returns {Promise<{ scener: string[], rondFel: string[] }>}
  */
 async function spelaPasset(page, namn, { hemligheter = false } = {}) {
-  const ev = (fn, arg) => page.evaluate(fn, arg);
+  // efter äventyrets sista bild laddas sidan om till startskärmen: en fråga mitt i omladdningen försöker igen
+  const ev = async (fn, arg) => {
+    for (let i = 0; ; i++) { try { return await page.evaluate(fn, arg); } catch (e) { if (i >= 20) throw e; await page.waitForTimeout(300); } }
+  };
   const vidare = async () => { for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta, .stang)').all()) await v.click({ timeout: 300 }).catch(() => {}); };
   const typ = async (ord) => { for (const c of ord) { if ('ÅÄÖ'.includes(c)) await ev((k) => window.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true })), c.toLowerCase()); else await page.keyboard.type(c); } };
   const anvand = async (id) => {

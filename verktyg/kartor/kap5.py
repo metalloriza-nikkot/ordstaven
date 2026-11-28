@@ -61,7 +61,12 @@ RUMMEN = {
             vagg(600, 24, 40, 136), sak('dimman_ost', 596, 24, 44, 136, dekor=True),
             sak('mast_luftskepp', 40, 40, 12, 40, sida='alla'),
             sak('skylt_luftskeppet', 64, 66, 14, 12, sida='alla'),
-            sak('skylt_baronens_dal', 548, 60, 16, 14, sida='under'),
+            # 143.6 (lev142): skylten är en hög stolpe med Herr Skata överst som domare (fötterna på y 34), och
+            # fäktningen står på hällarna väster om den (regi_faktning). Baronen backar mot domaren, aldrig in i dimman
+            sak('skylt_baronens_dal', 548, 34, 16, 40, sida='under'),
+            punkt('regi_faktning', 470, 116),
+            # 141.4: pass 1 slutar med att han går till dimmans kant (Innehålls mål i kap-05 v0.4)
+            sak('dimman_kant', 580, 96, 12, 24, sida='alla'),
             figur('baronen_molnkant', 520, 92, bild='baronen_ga_vanster_01', skugga=True, sida='alla', talare='baronen'),
             sak('bit_baronen', 500, 120, 10, 8, sida='alla'),
             # det baronen pekar på i fäktningen (bildkorten), dolda i rummet
@@ -145,13 +150,15 @@ RUMMEN = {
         'objekt': [
             punkt('start', 48, 120),
             vagg(0, 0, 960, 20), vagg(0, 172, 960, 20),
-            vagg(452, 20, 60, 60), sak('ordtradet', 452, 20, 60, 60, sida='under'),
-            # 140.5: gråboxen i 10i:s mått (mamma 64 × 48, långhalsen 64 × 64, taggryggen och hornnosen 64 × 48),
-            # varje vuxen intill sitt bo
+            # 143.4 (lev140): Ordträdets fot på y 124, med en vägg vid stammen. Kronan blir en hög bild som han går
+            # bakom, och i gråboxen är trädet rutan ovanför stammen
+            vagg(466, 108, 32, 16), sak('ordtradet', 452, 44, 60, 80, sida='under'),
+            # 140.5: gråboxen i 10i:s mått (mamma 64 × 48, långhalsen 64 × 64, taggryggen och hornnosen 64 × 48).
+            # 143.6 (lev142): varje vuxen står bredvid sitt bo, på samma mark och med ansiktet mot ägget
             figur('mamma', 376, 72, 64, 48, sida='alla'),
-            figur('langhals', 136, 40, 64, 64, dekor=True),
-            figur('taggrygg', 656, 56, 64, 48, dekor=True),
-            figur('hornnos', 816, 104, 64, 48, dekor=True),
+            figur('langhals', 140, 26, 64, 64, dekor=True),
+            figur('taggrygg', 652, 42, 64, 48, dekor=True),
+            figur('hornnos', 812, 92, 64, 48, dekor=True),
             sak('bo_langhals', 200, 70, 28, 16, sida='alla'),
             sak('bo_taggrygg', 620, 70, 28, 16, sida='alla'),
             sak('bo_hornnos', 780, 120, 28, 16, sida='alla'),

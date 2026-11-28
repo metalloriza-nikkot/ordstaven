@@ -16,7 +16,7 @@
  },
  "meta": {
   "namn": "Berget",
-  "version": "0.13",
+  "version": "0.14",
   "datum": "2026-11-27",
   "agare": "Innehåll",
   "kalla": "Berättelsen 21 v0.5.2, manus 21 v0.3.1 och ritningarna 21b v0.2.1, godkända av den vuxne (beslut 118.1).",
@@ -33,7 +33,8 @@
   "andrat_v10": "2026-11-26 (beslut 133.6 och 133.11, kapitel 4:s rättelsepass): stig 4:s rutnät där TAND svänger med ett enda spår, stigen som slutar vid tanden, och UPP som ordkort i molnet vid stig 1 med instruktionen \"Hoppa på bokstäverna i ordet upp!\".",
   "andrat_v11": "2026-11-27 (beslut 135.7): gå-stegen. pa_vagen på HOPPA ÖVER VATTNET (\"Gå genom gången\"), LÄS VÄGGEN OCH HOPPA (\"Gå dit pilen visar\") och HITTA UT (\"Hitta en väg ut\"), där berättelsens instruktion i rummen före är en ledtråd, en fråga eller ingenting. Ankomsten nämner inte luftskeppet, som syns först efter valet vid gaffeln (133.2).",
   "andrat_v12": "2026-11-27 (beslut 137.3): han går själv till ljuset efter stig 3 (\"Gå till ljuset!\"), och först där slår ungen upp isen; han går själv till klippans fot (\"Gå till klippan!\") före skrivpusslet, och där visar ungen att det är för högt; grottans fem rum har musiken isgrottan, och tandgrottan har kvar speldosan. Fotavtryckets sida har redan ordet \"En stor fot\".",
-  "andrat_v13": "2026-11-28 (beslut 140.2.2–140.2.3): baronen blir uppgiven när han har släppt stenen, och stenen landar i hålet på stenfältet, så att text och bild säger samma sak."
+  "andrat_v13": "2026-11-28 (beslut 140.2.2–140.2.3): baronen blir uppgiven när han har släppt stenen, och stenen landar i hålet på stenfältet, så att text och bild säger samma sak.",
+  "andrat_v14": "2026-11-28 (beslut 142.2): blocket dunsar ner i snön och ligger i drivan, utan hål, så att texten stämmer med bilden."
  },
  "var_var_vi": [
   {
@@ -371,7 +372,7 @@
      ]
     }
    ],
-   "anteckning": "640 × 384 (122.4), större än förut, så att han letar efter stenarna. De står utspridda, och några ligger halvt gömda i snödrivor. Att leta är en vila. Fem platser: fyra stenar och hålet där baronens block ligger, sedan han släppte det (140.2.3). Blocket ligger i hålet, och inget rep eller annat orange syns vid kanten. Ånga från sten_varm, sten_taggar och sten_klubba, och frost på sten_is. Avtrycken är fossil i sten, aldrig djur som sover (granskning 9). Molnkanten långt borta i norr, och stig_molnkanten längs bergskammen dit de går i slutet. 121.4: grottans spricka leder ut på en smal hylla (hylla) under en hög klippa av blank is (klippa). Stenfältet ligger uppe på klippan. I hylla går klippan inte att gå uppför. Formeln (STEGE, REP eller TRAPPA) byter till dag, och vägen upp (klippan_uppe) syns. 124.9: sten_klubba står längst bort och en varm sten utan klubba närmast. Varje sten har ett kännemärke, ingen är helt dold (halvt i snön går bra), och ångan syns på avstånd. Stigen mot molnkanten syns först när kartbiten är tagen.",
+   "anteckning": "640 × 384 (122.4), större än förut, så att han letar efter stenarna. De står utspridda, och några ligger halvt gömda i snödrivor. Att leta är en vila. Fem platser: fyra stenar och baronens block i en snödriva, där han släppte det (142.2). Föremålet heter halet, men det finns inget hål, inget rep och inget orange. Ånga från sten_varm, sten_taggar och sten_klubba, och frost på sten_is. Avtrycken är fossil i sten, aldrig djur som sover (granskning 9). Molnkanten långt borta i norr, och stig_molnkanten längs bergskammen dit de går i slutet. 121.4: grottans spricka leder ut på en smal hylla (hylla) under en hög klippa av blank is (klippa). Stenfältet ligger uppe på klippan. I hylla går klippan inte att gå uppför. Formeln (STEGE, REP eller TRAPPA) byter till dag, och vägen upp (klippan_uppe) syns. 124.9: sten_klubba står längst bort och en varm sten utan klubba närmast. Varje sten har ett kännemärke, ingen är helt dold (halvt i snön går bra), och ångan syns på avstånd. Stigen mot molnkanten syns först när kartbiten är tagen.",
    "skyltar": {
     "lada_farfar": {
      "text": [
@@ -942,7 +943,7 @@
    "steg": [
     {
      "typ": "mellanscen",
-     "beskrivning": "Hjälten och ungen kliver ut på ett fält med stenar som ryker. Långt borta i snön hänger luftskeppet. Blocket glider ur repet och dunsar ner i ett hål i snön, där det blir liggande. Baronen tittar ner på det länge.",
+     "beskrivning": "Hjälten och ungen kliver ut på ett fält med stenar som ryker. Långt borta i snön hänger luftskeppet. Blocket glider ur repet och dunsar ner i snön, där det blir liggande. Baronen tittar ner på det länge.",
      "bild": "blocket_driva"
     },
     {
@@ -1819,7 +1820,7 @@
        "objekt": "halet",
        "bild": "halet",
        "vid_valj": {
-        "reaktion": "ungen tittar ner på baronens sten i hålet och fnissar",
+        "reaktion": "ungen klappar på baronens sten i drivan och fnissar",
         "replik": {
          "talare": "berattare",
          "text": "Här ligger baronens sten.",

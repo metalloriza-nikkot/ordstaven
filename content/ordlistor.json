@@ -2,8 +2,8 @@
  "$schema": "schema/ordlistor.schema.json",
  "format": 1,
  "meta": {
-  "version": "0.24",
-  "datum": "2026-11-27",
+  "version": "0.25",
+  "datum": "2026-11-28",
   "agare": "Innehåll",
   "textform": "Orden lagras med små bokstäver, formler i versaler. Böjda former (skogen, bron) står med när de används som alternativ.",
   "beskrivning": "Ordlistor 1-6 for ORDSTAVEN. Bilderna ar platshallare (emoji) for grabox. Ett ord ligger i den hogsta lista som nagot av dess drag kraver.",
@@ -27,7 +27,8 @@
   "andrat_v021": "Kapitel 4 (manus 21 v0.6): skatt (valvets stig) och konstig (Farfars sten).",
   "andrat_v022": "Kapitel 4 (manus 21 v0.7): isen (uppdraget i pass 2).",
   "andrat_v023": "Beslut 125 (pass 127): formel, åk, blås, lyktorna, krama och halvan i stegen som verb och mål.",
-  "andrat_v024": "Kapitel 5 (manus 22 v0.2): fäktningens kort, biten, skyltarna, medaljen, korten vid bona, Var var vi? och uppdragen."
+  "andrat_v024": "Kapitel 5 (manus 22 v0.2): fäktningens kort, biten, skyltarna, medaljen, korten vid bona, Var var vi? och uppdragen.",
+  "andrat_v025": "Kapitel 5 v0.4 (beslut 141): tillbaka och snart (avskedet) och ordträdet (uppdragslappen)."
  },
  "listor": {
   "1": "Korta ljudenliga ord, 2-3 bokstaver, ingen konsonantgrupp, ingen dubbelteckning",
@@ -3771,6 +3772,33 @@
    "tema": "berättelse",
    "flaggor": [],
    "varfor": "Kapitel 5 v0.1 (manus 22 v0.2): fäktningens kort"
+  },
+  {
+   "ord": "tillbaka",
+   "lista": 4,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.4 (beslut 141): avskedet"
+  },
+  {
+   "ord": "snart",
+   "lista": 2,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [],
+   "varfor": "Kapitel 5 v0.4 (beslut 141): avskedet"
+  },
+  {
+   "ord": "ordträdet",
+   "lista": 3,
+   "bild": null,
+   "tema": "berättelse",
+   "flaggor": [
+    "aao",
+    "berattelseord"
+   ],
+   "varfor": "Kapitel 5 v0.4 (beslut 141): uppdragslappen"
   }
  ]
 }

@@ -244,7 +244,9 @@ describe('mellanscenernas bilder och bildkorten', () => {
   // Listan får bara krympa, och kapitel 5 är inte klart förrän den är tom (ingen text för den vuxne, 65 och 133.8)
   const K5_I_GRABOX = new Set(['farfars_teckning', 'ungen_nyser_biten', 'dimman_glesnar', 'vralet', 'in_mot_vralet', 'skuggan_kommer',
     'mamma_nosar', 'prickarna', 'mamma_och_ungen', 'mamma_kanner_igen', 'dalen_vaknar', 'lovet', 'ungen_leker', 'ungen_vander',
-    'baronen_tittar_pa_biten', 'slut_rosa', 'slut_apan', 'slut_floden', 'slut_baronen_skolan', 'slut_lasrummet', 'slut_radion', 'slut_staven']);
+    'baronen_tittar_pa_biten', 'slut_rosa',
+    // 141 (kap-05 v0.4): baronen håller upp biten, kramen vid avskedet och dalen i epilogen, tills Stil har ritat
+    'baronen_visar_biten', 'avsked_kram', 'slut_dalen', 'slut_apan', 'slut_floden', 'slut_baronen_skolan', 'slut_lasrummet', 'slut_radion', 'slut_staven']);
   it('varje mellanscen med bild har grafik (morgonen i sängen, luftskeppets lägen, sidovyerna, ungen på kartbiten, ägget)', () => {
     const saknas = [];
     for (const k of kapitel) for (const sc of k.scener) for (const st of sc.steg) {

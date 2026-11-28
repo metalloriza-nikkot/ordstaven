@@ -16,14 +16,16 @@
  },
  "meta": {
   "namn": "Dalen bakom molnen",
-  "version": "0.3",
+  "version": "0.5",
   "datum": "2026-11-27",
   "agare": "Innehåll",
   "kalla": "Berättelsen 22 v0.2.3 och manus 22 v0.2, godkända av den vuxne (130.1 och 2026-11-27).",
   "teknik": "Nytt i kapitlet: ram faktning med två utfall per rond, lapparna k5_bit_fram, k5_bit_bak och k5_medaljen, mästarprovet (k5_rad1–3) med struken och hjälptrappa, vantar_pa ropa, rummets tillstånd dis (grått och disigt, inte svart), hemligheterna k5s02_gomman och k5s03_lagret, steget musik med slingan slutet, och slutbilderna i k5s08_slutet. Fem rum utan Tiled-karta. Föremålens id är förslag, och Teknik sätter dem efter kartan.",
   "anteckning": "Tre pass. En ny formel (STORT LJUS), LJUS, SVÄRD och STEGE på huvudvägen. Inga nya namngivna figurer. Hemligheterna är frivilliga och står inte i boken.",
   "andrat_v02": "2026-11-27 (beslut 139.5–139.6): SVÄRD och bladväggen är strukna i pass 2, och han följer spåren till baronens hatt. Uppdraget DIMMAN har två steg. En sparpunkt utan passets slut står före slutbilderna.",
-  "andrat_v03": "2026-11-28 (beslut 139.4, 139.7 och 140.6, schema 2.63): varje fel kort i fäktningen har baronens eget svar, och de nio regierna står i vid_ratt, vid_fel och vid_vinst. Mellanscenerna kryper_under_roten och en_stig_kvar är borta, eftersom regin kommer i vid_ratt."
+  "andrat_v03": "2026-11-28 (beslut 139.4, 139.7 och 140.6, schema 2.63): varje fel kort i fäktningen har baronens eget svar, och de nio regierna står i vid_ratt, vid_fel och vid_vinst. Mellanscenerna kryper_under_roten och en_stig_kvar är borta, eftersom regin kommer i vid_ratt.",
+  "andrat_v04": "2026-11-28 (beslut 141 och 142.6): baronen visar biten själv, gå-steget till dimman, baronens repliker vid roten, Farfar om äggen och Ordträdet, avskedet med kram och läsval, epilogen med fem bilder och eftertexten, och musiken natten och dalen_frost.",
+  "andrat_v05": "2026-11-28 (beslut 143.3, schema 2.64): stryker på de sju stegen, så att gjorda rader stryks på bitens framsida och i mästarprovet."
  },
  "var_var_vi": [
   {
@@ -147,7 +149,8 @@
     {
      "id": "bit_upp_och_ner",
      "dold": true
-    }
+    },
+    "dimman_kant"
    ],
    "skyltar": {
     "skylt_baronens_dal": {
@@ -228,7 +231,8 @@
      "papper": "traskylt"
     }
    },
-   "anteckning": "Ca 2 × 2 skärmar, söder till norr. dis: grått och disigt som en mörk kväll, mörka trädskuggor och stavens glimt, inte svart (manus 22 v0.2). ljus: LJUS lyser upp diset, och fotspåren och baronens skylt syns. Fotspåren slingrar sig norrut, och baronens hatt ligger i gräset där de tar slut. Åt öster busken med Herr Skatas bo (hemligheten k5s02_gomman). Utgången i norr leder till roten. Bladväggen och SVÄRD är strukna (139.5)."
+   "anteckning": "Ca 2 × 2 skärmar, söder till norr. dis: grått och disigt som en mörk kväll, mörka trädskuggor och stavens glimt, inte svart (manus 22 v0.2). ljus: LJUS lyser upp diset, och fotspåren och baronens skylt syns. Fotspåren slingrar sig norrut, och baronens hatt ligger i gräset där de tar slut. Åt öster busken med Herr Skatas bo (hemligheten k5s02_gomman). Utgången i norr leder till roten. Bladväggen och SVÄRD är strukna (139.5).",
+   "musik": "natten"
   },
   {
    "id": "dal_roten",
@@ -255,7 +259,8 @@
      "text": "Farfar sov här. Glöm inte sylten!"
     }
    },
-   "anteckning": "2 × 1 skärmar, nytt rum i v0.2. Den jättelika roten med svart bark: hålet under (rot_under, och gang_glantan där de kryper in) och vägen upp (rot_upp). Baronen sitter högst uppe. Bakom roten i väster Farfars gamla läger: eldstaden med stenar runt, en duk över något, och ristningen i barken (hemligheten k5s03_lagret). Lägret går att nå innan han kryper under roten."
+   "anteckning": "2 × 1 skärmar, nytt rum i v0.2. Den jättelika roten med svart bark: hålet under (rot_under, och gang_glantan där de kryper in) och vägen upp (rot_upp). Baronen sitter högst uppe. Bakom roten i väster Farfars gamla läger: eldstaden med stenar runt, en duk över något, och ristningen i barken (hemligheten k5s03_lagret). Lägret går att nå innan han kryper under roten.",
+   "musik": "natten"
   },
   {
    "id": "dal_glantan",
@@ -276,7 +281,8 @@
     "stig_c",
     "stig_d"
    ],
-   "anteckning": "Ca 2 × 2 skärmar. En lång slingrande väg genom vit dimma i söder, där ungen leder (glantan_mitt är vägskälet). Gläntan med fyra stigar i norr. A går tätt intill vattnet, mellan två stenar, med blå blommor. B inte vid vattnet, två stenar, gula blommor. C inte vid vattnet, en sten, blå blommor. D inte vid vattnet, två stenar, blå blommor. Blommorna växer bakom stenarna sett från vägskälet. Varje drag finns på tre av fyra stigar. Stig D leder ut. Ingen hemlighet här: mästarprovet står ensamt."
+   "anteckning": "Ca 2 × 2 skärmar. En lång slingrande väg genom vit dimma i söder, där ungen leder (glantan_mitt är vägskälet). Gläntan med fyra stigar i norr. A går tätt intill vattnet, mellan två stenar, med blå blommor. B inte vid vattnet, två stenar, gula blommor. C inte vid vattnet, en sten, blå blommor. D inte vid vattnet, två stenar, blå blommor. Blommorna växer bakom stenarna sett från vägskälet. Varje drag finns på tre av fyra stigar. Stig D leder ut. Ingen hemlighet här: mästarprovet står ensamt.",
+   "musik": "natten"
   },
   {
    "id": "dal_dalen",
@@ -297,7 +303,8 @@
     },
     "molnen_ut"
    ],
-   "anteckning": "3 × 1 skärmar. Ordträdet i mitten, tre bon en bit isär med var sin vuxen (grön långhals, blå taggrygg och röd hornnos), och frostiga ägg längre bort. frost: allt grått och Ordträdets löv bleka. farg: efter STORT LJUS, med regnbågslöv. Hjälten går mot molnen (molnen_ut) i avskedet."
+   "anteckning": "3 × 1 skärmar. Ordträdet i mitten, tre bon en bit isär med var sin vuxen (grön långhals, blå taggrygg och röd hornnos), och frostiga ägg längre bort. frost: allt grått och Ordträdets löv bleka. farg: efter STORT LJUS, med regnbågslöv. Hjälten går mot molnen (molnen_ut) i avskedet.",
+   "musik": "dalen_frost"
   }
  ],
  "scener": [
@@ -311,7 +318,7 @@
     "text": "Var var vi? Ni kom till molnkanten.",
     "upplast": true
    },
-   "anteckning": "Manus 22 v0.2, pass 1. Baronen utmanar med heder, fäktningen, och sedan biten som han läser fel medan den står på skärmen. Ingen säger att det är fel.",
+   "anteckning": "Manus 22 v0.3, pass 1. Baronen utmanar med heder, fäktningen, och sedan håller baronen själv upp biten och läser den högt och fel (141.3). Hjälten är ingen tjuv: det är baronens fåfänga som visar biten. Ingen säger att det är fel. Passet slutar med att hjälten själv går till dimman (141.4). dimman_kant är dimmans kant bredvid skylten.",
    "steg": [
     {
      "typ": "mellanscen",
@@ -356,11 +363,6 @@
      "pussel_id": "k5_faktning"
     },
     {
-     "typ": "mellanscen",
-     "beskrivning": "Paraplyet har fällt ihop sig över baronen, och bara stövlarna syns. Ungen jublar.",
-     "bild": "ordduell_seger"
-    },
-    {
      "typ": "replik",
      "talare": "berattare",
      "text": "Du vann ordduellen!",
@@ -379,14 +381,14 @@
     },
     {
      "typ": "replik",
-     "talare": "farfar",
-     "text": "Det är ju mina ord! Titta på biten!",
-     "upplast": true,
-     "via": "radio"
+     "talare": "baronen",
+     "text": "Titta! Den sista biten!",
+     "upplast": true
     },
     {
-     "typ": "ga_till",
-     "mal": "bit_baronen"
+     "typ": "mellanscen",
+     "beskrivning": "Baronen håller upp biten med båda händerna, så att hjälten ser den, och läser den högt.",
+     "bild": "baronen_visar_biten"
     },
     {
      "typ": "oppna_lasplatta",
@@ -416,6 +418,10 @@
      "bild": "baronen_in_i_dimman"
     },
     {
+     "typ": "ga_till",
+     "mal": "dimman_kant"
+    },
+    {
      "typ": "sparpunkt",
      "pass_slut": true,
      "valfri": false
@@ -441,7 +447,11 @@
     },
     {
      "typ": "pussel",
-     "pussel_id": "k5_ljus"
+     "pussel_id": "k5_ljus",
+     "stryker": {
+      "lapp": "k5_bit_fram",
+      "rad": 0
+     }
     },
     {
      "typ": "mellanscen",
@@ -573,7 +583,7 @@
     {
      "typ": "replik",
      "talare": "baronen",
-     "text": "Ta den. Jag hittar ändå aldrig rätt.",
+     "text": "Ta sista biten. Jag läser ändå aldrig rätt.",
      "upplast": true
     },
     {
@@ -594,12 +604,16 @@
     },
     {
      "typ": "pussel",
-     "pussel_id": "k5_roten"
+     "pussel_id": "k5_roten",
+     "stryker": {
+      "lapp": "k5_bit_fram",
+      "rad": 1
+     }
     },
     {
      "typ": "replik",
      "talare": "baronen",
-     "text": "Under?! Det stod under?! … Jag läser alltid fel.",
+     "text": "Under?! Det stod under?!",
      "upplast": true
     },
     {
@@ -700,7 +714,11 @@
     },
     {
      "typ": "ga_till",
-     "mal": "glantan_mitt"
+     "mal": "glantan_mitt",
+     "stryker": {
+      "lapp": "k5_bit_fram",
+      "rad": 2
+     }
     },
     {
      "typ": "mellanscen",
@@ -730,15 +748,27 @@
     },
     {
      "typ": "pussel",
-     "pussel_id": "k5_rad1"
+     "pussel_id": "k5_rad1",
+     "stryker": {
+      "lapp": "k5_bit_bak",
+      "rad": 0
+     }
     },
     {
      "typ": "pussel",
-     "pussel_id": "k5_rad2"
+     "pussel_id": "k5_rad2",
+     "stryker": {
+      "lapp": "k5_bit_bak",
+      "rad": 1
+     }
     },
     {
      "typ": "pussel",
-     "pussel_id": "k5_rad3"
+     "pussel_id": "k5_rad3",
+     "stryker": {
+      "lapp": "k5_bit_bak",
+      "rad": 2
+     }
     },
     {
      "typ": "ga_till",
@@ -760,7 +790,11 @@
      "talare": "berattare",
      "text": "Läs sista raden på biten!",
      "upplast": true,
-     "vantar_pa": "ropa"
+     "vantar_pa": "ropa",
+     "stryker": {
+      "lapp": "k5_bit_fram",
+      "rad": 3
+     }
     },
     {
      "typ": "mellanscen",
@@ -883,12 +917,19 @@
     "text": "Var var vi? Äggen var kalla.",
     "upplast": true
    },
-   "anteckning": "Tre bon med egna kort (ord, två egenskaper, negation), och sedan kapitlets nya formel. Gå-steget till bo 1 ligger före Farfars repliker (v0.2). Slutets musik börjar när dalen vaknar.",
+   "anteckning": "Farfar säger att äggen är kalla och att bara ordkraft kan väcka dem innan han går till det första boet (141.8). Tre bon med egna kort (ord, två egenskaper, negation). Sedan säger Farfar att det behövs mycket ljus, och han går själv till Ordträdet och skriver kapitlets nya formel där (141.9). Slutets musik börjar när dalen vaknar.",
    "steg": [
     {
      "typ": "mellanscen",
      "beskrivning": "Runt trädet ligger bon med frostiga ägg. Vid varje bo vaktar en trött vuxen dinosaurie: en grön långhals, en blå med taggar på ryggen och en röd med horn på nosen. Mamma puffar på ett ägg och tittar på hjälten.",
      "bild": "bona_frost"
+    },
+    {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Äggen är kalla. Bara ordkraft kan väcka dem!",
+     "upplast": true,
+     "via": "radio"
     },
     {
      "typ": "ga_till",
@@ -934,6 +975,17 @@
      "via": "radio"
     },
     {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Det behövs mycket ljus. Gå till Ordträdet!",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "typ": "ga_till",
+     "mal": "ordtradet"
+    },
+    {
      "typ": "pussel",
      "pussel_id": "k5_stort_ljus"
     },
@@ -971,7 +1023,7 @@
     "text": "Var var vi? Dalen vaknade!",
     "upplast": true
    },
-   "anteckning": "Avskedet. Radion stannar hos mamma, ungen ger lövet, och pennstrecket går över TA UNGEN HEM när det sista steget är klart, som vid varje uppdrag (130.3). Han stänger boken själv. Rubriken är TA {UNGE} HEM, eftersom UNGEN har NG, som är spärrat. Sist en sparpunkt utan passets slut (139.6): den som slutar mitt i slutbilderna får se dem igen, och ingen fråga kommer före slutbilderna.",
+   "anteckning": "Avskedet med hjältens egna handlingar (141.10.2): radion stannar hos mamma, han kramar ungen, han säger \"Jag kommer tillbaka snart!\" (ett läsval, eftersom hjälten är spelaren och inte har någon röst), och han går själv mot kanten. Ungen vänder sig om en gång. Farfar säger att uppdraget är klart när kartan är hel (141.10.1). Pennstrecket går över TA {UNGE} HEM när han går, och han stänger boken själv (130.3). Rubriken är TA {UNGE} HEM, eftersom UNGEN har NG, som är spärrat. Sist en sparpunkt utan passets slut (139.6).",
    "steg": [
     {
      "typ": "mellanscen",
@@ -1012,12 +1064,35 @@
      "via": "radio"
     },
     {
+     "typ": "replik",
+     "talare": "farfar",
+     "text": "Uppdraget är klart. Dags att gå hem!",
+     "upplast": true,
+     "via": "radio"
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Krama {unge} hej då!",
+     "upplast": true,
+     "vantar_pa": "krama_ungen"
+    },
+    {
+     "typ": "mellanscen",
+     "beskrivning": "Hjälten kramar ungen länge, och ungen gnider nosen mot hans kind.",
+     "bild": "avsked_kram"
+    },
+    {
+     "typ": "pussel",
+     "pussel_id": "k5_hej_da"
+    },
+    {
      "typ": "ga_till",
      "mal": "molnen_ut"
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "Ungen springer efter en bit, stannar och tittar tillbaka mot mamma. Sedan springer den hem till henne och viftar med svansen.",
+     "beskrivning": "Hjälten går mot kanten. Ungen springer efter en bit, stannar och tittar tillbaka mot mamma. Sedan springer den hem till henne och viftar med svansen.",
      "bild": "ungen_vander"
     },
     {
@@ -1038,8 +1113,14 @@
     "text": "Var var vi? Äventyret är slut.",
     "upplast": true
    },
-   "anteckning": "Slutbilderna (manus 22 v0.2): ett tryck för varje, och raden under läses upp. De är undantagna från taket för passiva steg. Musiken slutet spelar genom alla, utan att byta när bilderna visar byn, skogen och floden. Efter den sista bilden kommer startskärmen, utan \"Fortsättning följer\". 139.6: sparpunkten före slutbilderna står sist i k5s07_avskedet. Den sista sparpunkten här avslutar äventyret, och Teknik bestämmer vad som visas efter den (startskärmen, inte frågan om att fortsätta).",
+   "anteckning": "Epilogen (141.10.3): \"Tänk vad ordkraft kan göra!\" och fem bilder av dem han har hjälpt med ordkraft, ett tryck för varje, med raden under uppläst: byn, apan, floden, baronen i skolan och dalen som är vaken. Sedan läsrummet, där hjälten sitter bredvid Farfar, och eftertexten (141.10.4): titeln med \"Far & son produktion\" i textlagret, och \"Och så var sagan slut.\" Inga namn. Slutbilderna är undantagna från taket för passiva steg (128.10.2). Musiken slutet spelar genom alla. Den sista sparpunkten avslutar äventyret och leder till startskärmen. Reserven (141.12): tre bilder i stället för fem, och då stryks floden och apan först.",
    "steg": [
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Tänk vad ordkraft kan göra!",
+     "upplast": true
+    },
     {
      "typ": "mellanscen",
      "beskrivning": "Byn vid träsket i kväll. Elden brinner, och Tant Rosa vinkar.",
@@ -1098,6 +1179,17 @@
     },
     {
      "typ": "mellanscen",
+     "beskrivning": "Dalen i solsken. Ungen leker med de nya ungarna under Ordträdet, och mamma vaktar med radion bredvid sig.",
+     "bild": "slut_dalen"
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Dalen är vaken.",
+     "upplast": true
+    },
+    {
+     "typ": "mellanscen",
      "beskrivning": "Farfars läsrum. Hjälten sitter bredvid Farfar under läslampan. Farfar slår upp sin gamla bok. Bredvid hans bild av den lilla dinon finns en ny: hjälten, ungen och mamma under Ordträdet. Lövet ligger på sidan.",
      "bild": "slut_lasrummet"
     },
@@ -1117,8 +1209,14 @@
     },
     {
      "typ": "mellanscen",
-     "beskrivning": "I hörnet glimtar staven en gång. Titeln tonar fram, och sedan SLUT.",
+     "beskrivning": "I hörnet glimtar staven en gång. Titeln tonar fram, och under den står: Far & son produktion.",
      "bild": "slut_staven"
+    },
+    {
+     "typ": "replik",
+     "talare": "berattare",
+     "text": "Och så var sagan slut.",
+     "upplast": true
     },
     {
      "typ": "sparpunkt",
@@ -1475,7 +1573,7 @@
      ]
     }
    },
-   "anteckning": "Bitens framsida (129.4): en lapp utan alternativ. I pass 1 är den baronens (oppna_lasplatta utan kan_oppnas_igen) och han läser fel medan den står på skärmen. Den blir hjältens när han tar emot biten vid roten. Inga rader lyser."
+   "anteckning": "Bitens framsida (129.4): en lapp utan alternativ. I pass 1 är den baronens: han håller upp den och läser fel medan den står på skärmen (141.3). Den blir hjältens när baronen ger honom den vid roten. Gjorda rader stryks med pennstrecket (141.7): rad 1 efter LJUS, rad 2 efter KRYP UNDER, rad 3 när han har följt ungen till gläntan, och rad 4 efter ROPA."
   },
   {
    "id": "k5_bit_bak",
@@ -1491,7 +1589,7 @@
      ]
     }
    },
-   "anteckning": "Bitens baksida (129.4), som baronen aldrig såg. Kommer fram när ungen nyser i gläntan."
+   "anteckning": "Bitens baksida (129.4), som baronen aldrig såg. Kommer fram när ungen nyser i gläntan. I mästarprovet står alla tre raderna kvar, och de rader han har klarat är överstrukna (141.7): rad 1 efter k5_rad1, rad 2 efter k5_rad2 och rad 3 efter k5_rad3."
   },
   {
    "id": "k5_medaljen",
@@ -1941,7 +2039,7 @@
     "handling": "staven drar ett streck av ljus över stigen",
     "fest": "liten"
    },
-   "anteckning": "Mästarprovet (132.4 och 134.3): raden som gäller står som frågan i molnet, och han trycker på den stig som inte stämmer. Den står kvar struken. Varje drag finns på tre av fyra stigar, så det går inte att se svaret utan att läsa. Hjälpen per rad: Farfar, ordet som avgör, och sist stigen."
+   "anteckning": "Mästarprovet (132.4, 134.3 och 141.7): lappen visar alla tre raderna, och de klarade är överstrukna. Raden som gäller står som frågan i molnet, och han trycker på den stig som inte stämmer. Den står kvar struken. Varje drag finns på tre av fyra stigar, så det går inte att se svaret utan att läsa. Hjälpen per rad: Farfar, ordet som avgör, och sist stigen."
   },
   {
    "id": "k5_rad2",
@@ -2004,7 +2102,7 @@
     "handling": "staven drar ett streck av ljus över stigen",
     "fest": "liten"
    },
-   "anteckning": "Mästarprovet (132.4 och 134.3): raden som gäller står som frågan i molnet, och han trycker på den stig som inte stämmer. Den står kvar struken. Varje drag finns på tre av fyra stigar, så det går inte att se svaret utan att läsa. Hjälpen per rad: Farfar, ordet som avgör, och sist stigen."
+   "anteckning": "Mästarprovet (132.4, 134.3 och 141.7): lappen visar alla tre raderna, och de klarade är överstrukna. Raden som gäller står som frågan i molnet, och han trycker på den stig som inte stämmer. Den står kvar struken. Varje drag finns på tre av fyra stigar, så det går inte att se svaret utan att läsa. Hjälpen per rad: Farfar, ordet som avgör, och sist stigen."
   },
   {
    "id": "k5_rad3",
@@ -2063,7 +2161,7 @@
     "fest": "liten",
     "bild": "en_stig_kvar"
    },
-   "anteckning": "Mästarprovet (132.4 och 134.3): raden som gäller står som frågan i molnet, och han trycker på den stig som inte stämmer. Den står kvar struken. Varje drag finns på tre av fyra stigar, så det går inte att se svaret utan att läsa. Hjälpen per rad: Farfar, ordet som avgör, och sist stigen."
+   "anteckning": "Mästarprovet (132.4, 134.3 och 141.7): lappen visar alla tre raderna, och de klarade är överstrukna. Raden som gäller står som frågan i molnet, och han trycker på den stig som inte stämmer. Den står kvar struken. Varje drag finns på tre av fyra stigar, så det går inte att se svaret utan att läsa. Hjälpen per rad: Farfar, ordet som avgör, och sist stigen."
   },
   {
    "id": "k5_bo1",
@@ -2347,6 +2445,46 @@
    },
    "tillstand_efter": "farg",
    "anteckning": "Kapitlets nya formel, egenskap och ord (S4), med glipan mellan orden som STOR SKÖLD. Den förklaras innan han skriver (104.3). STORTLJUS, STORA LJUS, STOR LJUS och JÄTTELJUS godtas: klimax är ingen grammatiklektion. Regin stort_ljus_dalen kommer efter."
+  },
+  {
+   "id": "k5_hej_da",
+   "typ": "P1_las_och_valj",
+   "hjalp": "ett_ord",
+   "instruktion": {
+    "typ": "replik",
+    "talare": "berattare",
+    "text": "Vad säger du till {unge}?",
+    "upplast": true
+   },
+   "varianter": {
+    "L3": {
+     "text": "Hej då!",
+     "alternativ": [
+      {
+       "id": "snart",
+       "ord": "Jag kommer tillbaka snart!",
+       "ratt": true
+      },
+      {
+       "id": "baron",
+       "ord": "Jag är en baron!",
+       "vid_valj": {
+        "reaktion": "ungen fnissar och sätter nosen i vädret, precis som baronen",
+        "replik": {
+         "talare": "berattare",
+         "text": "Ha ha! Försök igen.",
+         "upplast": true
+        }
+       }
+      }
+     ]
+    }
+   },
+   "vid_ratt": {
+    "handling": "hjälten säger det högt, och ungen viftar så att hela svansen far åt alla håll",
+    "fest": "liten"
+   },
+   "anteckning": "Avskedet (141.10.2). Hjälten är spelaren och har ingen röst, så han säger \"Jag kommer tillbaka snart!\" genom att läsa och välja det. Det felaktiga kortet är ett litet skämt om baronen, som är kort och ofarligt."
   }
  ],
  "uppdrag": [
@@ -2372,17 +2510,17 @@
      "knep": "Läs korten och titta på baronen!"
     },
     {
-     "text": "TITTA PÅ BITEN",
+     "text": "GÅ TILL DIMMAN",
      "klart": {
       "scen": "k5s01_molnkanten",
-      "ga_till": "bit_baronen"
+      "ga_till": "dimman_kant"
      }
     }
    ],
    "stampel": {
     "scen": "k5s01_molnkanten",
     "efter": {
-     "bild": "baronen_in_i_dimman"
+     "ga_till": "dimman_kant"
     }
    }
   },
@@ -2534,6 +2672,13 @@
      "knep": "Titta på den som väntar!"
     },
     {
+     "text": "GÅ TILL ORDTRÄDET",
+     "klart": {
+      "scen": "k5s06_aggen",
+      "ga_till": "ordtradet"
+     }
+    },
+    {
      "text": "VÄCK HELA DALEN",
      "klart": {
       "scen": "k5s06_aggen",
@@ -2563,20 +2708,27 @@
      }
     },
     {
-     "text": "TA LÖVET",
+     "text": "KRAMA {UNGE}",
      "klart": {
       "scen": "k5s07_avskedet",
-      "ga_till": "lovet"
+      "vantar_pa": "krama_ungen"
+     }
+    },
+    {
+     "text": "GÅ HEM",
+     "klart": {
+      "scen": "k5s07_avskedet",
+      "ga_till": "molnen_ut"
      }
     }
    ],
    "stampel": {
     "scen": "k5s07_avskedet",
     "efter": {
-     "ga_till": "lovet"
+     "ga_till": "molnen_ut"
     }
    },
-   "anteckning": "Pennstrecket går över TA {UNGE} HEM när båda stegen är klara, som vid varje uppdrag, och han stänger boken själv (130.3)."
+   "anteckning": "Avskedet (141.10.2): radion, kramen och att han går själv. Pennstrecket går över TA {UNGE} HEM när han går, och han stänger boken själv (130.3). Lövet tar han som en vila, utan eget steg."
   }
  ]
 }
