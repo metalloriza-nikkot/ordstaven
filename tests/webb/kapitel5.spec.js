@@ -175,8 +175,8 @@ test('kapitel 5 pass 3: mamma, kramen, radion, bona, STORT LJUS, avskedet och sl
   clearInterval(samla);
   expect(scener).toEqual(expect.arrayContaining(['k5s05_dalen', 'k5s06_aggen', 'k5s07_avskedet', 'k5s08_slutet']));
   for (const id of ['k5_bo1', 'k5_bo2', 'k5_bo3', 'k5_stort_ljus']) expect(logg, id).toContain(id);
-  // 139.8: efter äventyrets sista bild kommer startskärmen, inte frågan om att fortsätta
-  expect(logg).toContain('äventyret är slut');
+  // 139.8: efter äventyrets sista bild kommer startskärmen, inte frågan om att fortsätta. Loggen samlas var 500:e ms,
+  // så raden om slutet hinner ibland försvinna med omladdningen (ultrabred i den stora kontrollen): startskärmen avgör
   await expect(page.locator('.start-knapp')).toBeVisible({ timeout: 15000 });
   await expect(page.locator('.pass-slut')).toHaveCount(0);
 });
