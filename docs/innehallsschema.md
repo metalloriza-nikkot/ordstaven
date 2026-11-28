@@ -1,6 +1,12 @@
 # Innehållsschema – kapitel i format 2
 
-Version 2.63 (2026-11-28). Ägs av teknikspåret.
+Version 2.64 (2026-11-28). Ägs av teknikspåret.
+2.64 (beslut 141.7): **strecken på lappen.** Ett tillägg, filer i 2.63 gäller fortfarande.
+- **`stryker`** på vilket steg som helst: `{"lapp": "<läsvalets id>", "rad": <nummer från 0>}`, eller en lista med flera. När steget är klart drar pennan ett streck över raden på lappen (samma streck som i boken, 125.3), och raden står struken varje gång han läser lappen igen. Lappen är ett `P1_las_och_valj` med en text i rader (`k5_bit_fram`, `k5_bit_bak`). Exempel: `{"typ": "pussel", "pussel_id": "k5_formel_ljus", "stryker": {"lapp": "k5_bit_fram", "rad": 0}}`.
+  - **Har han lappen** (den finns i `av.lappar`) när steget är klart, visas den på läsplattan i ca 2 s medan strecket dras, och ett tryck stänger den. Har han den inte än, är raden ändå struken när han får den (tänd ljus görs före roten).
+  - **Mästarprovet:** ett läsval (`typ: pussel`) som stryker en rad visar hela lappen när han öppnar den (bokknappen eller molnets papper), med de klara raderna strukna och raden som gäller markerad. Raden som gäller är raden steget stryker. Molnet visar raden som frågan, som förut (130.3).
+  - Kontrollen säger till om lappen inte är ett läsval i kapitlet, eller om raden inte finns.
+  - Strecken sparas i `av.strukna` (`{ lapp: [rad, ...] }`), och de spolas fram och nollställs med resten av framstegen.
 2.63 (beslut 139.4 och 139.7): **kortets eget svar i ordduellen, och kapitel 5:s regier.** Ett tillägg, filer i 2.62 gäller fortfarande.
 - **`vid_fel`** på ett kort i ordduellen (`ronder[].utfall[].alternativ[]`): kortets eget svar när han väljer det. Det går före utfallets `vid_fel`: fälten som står här (`replik`, `handling`, `bild`) ersätter samma fält där, och resten tas från utfallet. Så visar ett halvrätt kort vilken halva som var fel: `{"text": "Hög och har ett bo", "vid_fel": {"replik": {"talare": "baronen", "text": "Hög! Precis! … Ett bo?", "upplast": true}}}`.
 - **`handling.bild`** har kapitel 5:s regier: `dimman_tands`, `kryper_under_roten`, `en_stig_kvar`, `agg_klacks_langhals`, `agg_klacks_taggrygg`, `agg_klacks_hornnos`, `agget_nyser`, `stort_ljus_dalen` och `paraplyet_faller_ihop`. De är gråbox tills Stil har ritat (kameran och glitter).

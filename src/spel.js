@@ -53,6 +53,8 @@ const MAL_KNUFF_MS = 15000;
 const SKRIV_KNUFF_MS = 25000;
 /** Styrbilden kommer igen när han har stått vid en sak så här länge utan att göra något (granskningen A 23). */
 const STYR_STILLA_MS = 4500;
+/** Hur länge lappen står när en rad stryks på den (141.7): strecket dras på 0,4 s, och sedan läser han det som är kvar */
+const STRECK_LAPP_MS = 2200;
 const vanta = (/** @type {number} */ ms) => new Promise((r) => setTimeout(r, ms));
 /**
  * Pusseltyper som räknas som läsval och följer läsvalens nivå (2.47, 87.4): hornet och ordduellen. Nivån sätts och
@@ -222,10 +224,23 @@ export function skapaSpel(d) {
    * Läsvalets text som rader. De första `redan_last` raderna har han redan läst (brevets första mening, 2.31): de
    * står grå med en bock. @param {any} p @param {string | string[]} text
    */
-  const lasText = (p, text) => {
+  const lasText = (p, text, nyss = /** @type {number[]} */ ([]), nu = -1) => {
     const n = p?.redan_last || 0;
-    if (!n || !Array.isArray(text)) return ui.rader(text, varden());
-    return text.map((r, i) => (i < n ? ui.rader([r], varden()).replace('class="rad"', 'class="rad bockad redan-last"') : ui.rader([r], varden()))).join('');
+    // raderna han har gjort är strukna (141.7): samma pennstreck som i boken (125.3), och det nyss strukna dras nu.
+    // Raden som gäller nu (mästarprovet) är markerad
+    const strukna = Array.isArray(text) ? (av?.strukna?.[p?.id] || []) : [];
+    if ((!n && !strukna.length && nu < 0) || !Array.isArray(text)) return ui.rader(text, varden());
+    return text.map((r, i) => {
+      if (i < n) return ui.rader([r], varden()).replace('class="rad"', 'class="rad bockad redan-last"');
+      if (i === nu && !strukna.includes(i)) return ui.rader([r], varden()).replace('class="rad"', 'class="rad nu-rad"');
+      if (strukna.includes(i)) return ui.rader([r], varden()).replace('class="rad"', `class="rad struken${nyss.includes(i) ? ' nyss' : ''}"`).replace(/<\/span>$/, `${streckHtml('lapp-streck')}</span>`);
+      return ui.rader([r], varden());
+    }).join('');
+  };
+  /** Pennstrecket (Stils streck_vänster, _mitt och _höger, 125.3), eller ett blått streck utan dem. @param {string} klass */
+  const streckHtml = (klass) => {
+    const [sv, sm, sh] = ['streck_vanster', 'streck_mitt', 'streck_hoger'].map((n) => uiBild(n));
+    return sv && sm && sh ? `<span class="${klass}" aria-hidden="true"><img src="${sv}" alt=""><i style="background-image:url('${sm}')"></i><img src="${sh}" alt=""></span>` : `<span class="${klass} blatt" aria-hidden="true"><i></i></span>`;
   };
   const varden = () => b.varden();
 
@@ -4295,12 +4310,42 @@ export function skapaSpel(d) {
   }
 
   /** Lappen (läsplattan utan pussel): visas, nosen tillåten, stängs med ▶. @param {any} p @param {boolean} forsta */
+  /**
+   * Strecket på lappen (141.7): när ett steg gör en rad klar dras ett pennstreck över den. Har han lappen (av.lappar)
+   * visas den en kort stund medan strecket dras, med de andra raderna, så att han ser vad som är kvar. Ett tryck
+   * stänger den. Lappar han inte har än får strecket ändå, och det syns när han får dem.
+   * @param {{ lapp: string, rad: number }[]} rader
+   */
+  async function visaStreck(rader) {
+    const perLapp = new Map();
+    for (const r of rader) perLapp.set(r.lapp, [...(perLapp.get(r.lapp) || []), r.rad]);
+    for (const [id, nyss] of perLapp) {
+      logg.handelse('strecket', `${id}: rad ${nyss.map((n) => n + 1).join(', ')} stryks på lappen`);
+      const p = b.pussel(id);
+      if (!p || !(av.lappar || []).includes(id)) continue;
+      const v = skapaValj(p, { niva: nivaFor(p) });
+      if (!Array.isArray(v.s.text)) continue;
+      const frys = !rum.fryst; if (frys) rum.frys(true);
+      const el = ui.visaPlatta(`<div class="pussel-ruta"><div class="lapp p-${ui.esc(p.papper || 'lapp')}">${lasText(p, v.s.text, nyss)}</div><button type="button" class="vidare synlig" aria-label="Stäng">▶</button></div>`, 'pussel lapp-vy streck-vy');
+      ljud.spela('papper');
+      requestAnimationFrame(() => requestAnimationFrame(() => el.querySelectorAll('.rad.struken.nyss').forEach((r) => r.classList.add('dras'))));
+      const vidare = /** @type {HTMLElement} */ (el.querySelector('.vidare'));
+      await Promise.race([ui.vantaFortsatt(vidare, lyssnaHandling), vanta(tid(STRECK_LAPP_MS))]);
+      ui.doljPlatta(); if (frys) rum.frys(false);
+    }
+  }
+
   async function visaLapp(p, forsta) {
     if (!p) return;
+    // mästarprovet (141.7): ett läsval som stryker en rad på en lapp visar hela lappen, med de gjorda raderna strukna
+    // och raden som gäller nu markerad, så att han ser hela slutledningen och inte en rad i taget
+    const sr = aktuelltSteg?.pussel_id === p.id && aktuelltSteg.stryker ? [].concat(aktuelltSteg.stryker)[0] : null;
+    const hel = sr ? b.pussel(sr.lapp) : null;
+    if (hel) { logg.handelse('lappen', `${p.id}: hela ${hel.id}, rad ${sr.rad + 1} gäller`); p = hel; }
     const niva = nivaFor(p);
     const v = skapaValj(p, { niva });
     rum.frys(true);
-    const el = ui.visaPlatta(`<div class="pussel-ruta"><div class="lapp p-${ui.esc(p.papper || 'lapp')}">${v.s.text ? lasText(p, v.s.text) : ''}</div><button type="button" class="vidare synlig" aria-label="Stäng">▶</button></div>`, 'pussel lapp-vy');
+    const el = ui.visaPlatta(`<div class="pussel-ruta"><div class="lapp p-${ui.esc(p.papper || 'lapp')}">${v.s.text ? lasText(p, v.s.text, [], hel ? sr.rad : -1) : ''}</div><button type="button" class="vidare synlig" aria-label="Stäng">▶</button></div>`, 'pussel lapp-vy');
     tillatNos(p, { hjalp: false });
     const vidare = /** @type {HTMLElement} */ (el.querySelector('.vidare'));
     await ui.vantaFortsatt(vidare, lyssnaHandling);
@@ -5155,6 +5200,8 @@ export function skapaSpel(d) {
         b.klar(res || {});
         rum.sattStav((tillstand.spelare.hjalte.formler || []).length > 0);
         spara();
+        // raderna på lappen som steget gjorde klara (141.7): har han lappen, visas den medan strecket dras
+        if (b.senastStrukna?.length) await visaStreck(b.senastStrukna);
       }
       // kapitlets sista uppdrag får sin stämpel också när kapitlet slutar med berättelsens stund
       await uppdateraLapp();

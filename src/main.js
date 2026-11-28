@@ -173,7 +173,9 @@ const webglFinns = (() => {
 })();
 const canvasLage = parametrar.has('canvas') || canvasSparad || !webglFinns;
 // kameran (beslut 14): textlagret flyttar skyltarna, händerna och bubblorna med den
-const rum = new Rum({ inmatning, logg, mjukvara: canvasLage, vidKamera: (k, stor) => ui.kamera(k, layout.skala.cssSkala, stor), vidFjarrvy: (pa) => ui.fjarrvy(pa), plattaOppen: () => !ui.plattan.hidden,
+const rum = new Rum({ inmatning, logg, mjukvara: canvasLage,
+  // var berättelsen står (142.5): loggen skriver scenen och steget när han trycker på en piltangent medan världen står still
+  sammanhang: () => { try { return { scen: spelet?.scen ?? null, steg: spelet?.steg?.typ ?? null, pussel: spelet?.steg?.pussel_id ?? null, platta: !ui.plattan.hidden }; } catch { return {}; } }, vidKamera: (k, stor) => ui.kamera(k, layout.skala.cssSkala, stor), vidFjarrvy: (pa) => ui.fjarrvy(pa), plattaOppen: () => !ui.plattan.hidden,
   ljud: { spela: (id) => ljud.spela(id), stycke: (n) => ljud.stycke(n), slinga: (id, n) => ljud.effektSlinga(id, n) } });
 const spel = new Phaser.Game({
   // ?canvas tvingar canvas-ritningen (som när datorn saknar WebGL), för att kunna testa den

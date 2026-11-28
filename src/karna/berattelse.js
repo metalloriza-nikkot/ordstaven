@@ -17,6 +17,23 @@ function sakraAventyr(av) {
   av.bar = av.bar || 0; av.visade = av.visade || {}; av.frivilligt = av.frivilligt || []; av.skrivet = av.skrivet || {};
   // platsernas tillstånd per rum (mästarprovet i kapitel 5, 132.4): { rum: { föremål: tillstånd } }
   av.platstillstand = av.platstillstand || {};
+  // raderna som är strukna på lapparna (141.7): { lapp: [rad, ...] }
+  av.strukna = av.strukna || {};
+}
+
+/**
+ * Stegets streck på lapparna (141.7, schema 2.64): raderna i `stryker` blir strukna när steget är klart.
+ * @param {any} av @param {any} st @returns {{ lapp: string, rad: number }[]} raderna som ströks nu
+ */
+export function strykRader(av, st) {
+  if (!st?.stryker) return [];
+  av.strukna = av.strukna || {};
+  const ut = [];
+  for (const r of Array.isArray(st.stryker) ? st.stryker : [st.stryker]) {
+    const lista = (av.strukna[r.lapp] = av.strukna[r.lapp] || []);
+    if (!lista.includes(r.rad)) { lista.push(r.rad); ut.push({ lapp: r.lapp, rad: r.rad }); }
+  }
+  return ut;
 }
 
 /**
@@ -103,6 +120,7 @@ export function spolaFram({ kapitel, tillstand, aventyrId, tillScen }) {
     for (const st of scen.steg) {
       // bären räknas inte: spolningen ska gå att göra på en sparning som redan har spelat kapitlet
       if (st.typ !== 'ge_bar') stegetsEffekt(st, { tillstand, av, unge, pussel, rumId: scen.rum ?? null });
+      strykRader(av, st);
       const p = st.typ === 'pussel' ? pussel.get(st.pussel_id) : null;
       if (!p) continue;
       if (p.typ === 'P11_formel') { const f = tillstand.spelare.hjalte.formler; if (!f.includes(p.svar)) f.push(p.svar); }
@@ -271,6 +289,8 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
     stegetsEffekt(st, { tillstand, av, unge, pussel, rumId });
   }
   let effektGjord = false;
+  /** @type {{ lapp: string, rad: number }[]} raderna som det senaste klara steget strök (141.7) */
+  let senastStrukna = [];
 
   return {
     kapitel,
@@ -281,6 +301,8 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
     get scenIndex() { return scenIndex; },
     get stegIndex() { return stegIndex; },
     get slut() { return scenIndex >= kapitel.scener.length; },
+    /** Raderna som det senaste klara steget strök på lapparna (141.7). */
+    get senastStrukna() { return senastStrukna; },
     /** Pusslet med ett id. @param {string} id */
     pussel(id) { return pussel.get(id); },
     /** Rummet med ett id. @param {string} id */
@@ -312,6 +334,8 @@ export function skapaBerattelse({ aventyr, kapitel, tillstand, aventyrId, logg }
       const scen = kapitel.scener[scenIndex];
       if (!scen) return;
       const st = stegIndex === -1 ? null : iMellan() ? scen.steg[stegIndex].mellan_grenar[/** @type {any} */ (av.nav).mellan] : scen.steg[stegIndex];
+      // raderna på lapparna som steget gör klara (141.7)
+      senastStrukna = st ? strykRader(av, st) : [];
       /** @type {any} */
       let p = null;
       if (st && st.typ === 'pussel') {

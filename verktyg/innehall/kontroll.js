@@ -333,6 +333,14 @@ export function kontrollera({ aventyr, kapitel, ordlistor, kartor }) {
     const perPass = new Map();
     /** Kontrollera ett steg i en scen (eller i ett rums frivilliga föremål) och räkna tiden. */
     const kollaSteg = (st, sp, s, pp) => {
+      // 2.64 (141.7): raden som steget stryker finns på en lapp i kapitlet
+      if (st.stryker) for (const r of Array.isArray(st.stryker) ? st.stryker : [st.stryker]) {
+        const lp = pussel.get(r.lapp);
+        const texter = lp ? Object.values(lp.varianter || {}).map((v) => v.text).filter((t) => Array.isArray(t)) : [];
+        if (!lp || lp.typ !== 'P1_las_och_valj') fel.push(var_(`${sp}: stryker en rad på ${r.lapp}, som inte är en lapp (P1) i kapitlet`));
+        else if (!texter.length) fel.push(var_(`${sp}: ${r.lapp} har ingen text i rader att stryka i`));
+        else if (texter.some((t) => r.rad >= t.length)) fel.push(var_(`${sp}: ${r.lapp} har inte raden ${r.rad} (räknat från 0)`));
+      }
       switch (st.typ) {
         case 'replik':
         replikKontroll(st, sp); pp.sek += 1.5 + ord(rader(st.text).join(' ')).length * 0.45;

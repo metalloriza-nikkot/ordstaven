@@ -662,6 +662,9 @@
             "tillstand_efter": {
               "$ref": "#/$defs/id",
               "description": "Rummets tillstånd när mellanscenen börjar (2.47): ön stiger i k3s01 och rummet byter till on. Ett tillstånd som rummet har."
+            },
+            "stryker": {
+              "$ref": "#/$defs/stryker"
             }
           }
         },
@@ -685,6 +688,9 @@
             },
             "ljudord": {
               "$ref": "#/$defs/ljudord"
+            },
+            "stryker": {
+              "$ref": "#/$defs/stryker"
             }
           }
         },
@@ -702,6 +708,9 @@
             },
             "slinga": {
               "$ref": "#/$defs/slinga"
+            },
+            "stryker": {
+              "$ref": "#/$defs/stryker"
             }
           }
         },
@@ -749,6 +758,9 @@
             },
             "knuff": {
               "$ref": "#/$defs/knuff"
+            },
+            "stryker": {
+              "$ref": "#/$defs/stryker"
             }
           }
         },
@@ -805,6 +817,9 @@
             "leta": {
               "type": "boolean",
               "description": "Målet är dolt eller måste hittas (halvan i vassen, vedpinnarna, 2.44): att leta räknas som vila i budgeten (78.3). Spelet gör inget annorlunda."
+            },
+            "stryker": {
+              "$ref": "#/$defs/stryker"
             }
           }
         },
@@ -826,6 +841,9 @@
             },
             "till": {
               "$ref": "#/$defs/id"
+            },
+            "stryker": {
+              "$ref": "#/$defs/stryker"
             }
           }
         },
@@ -846,6 +864,9 @@
             },
             "kalla": {
               "$ref": "#/$defs/replik"
+            },
+            "stryker": {
+              "$ref": "#/$defs/stryker"
             }
           }
         },
@@ -867,6 +888,9 @@
             },
             "bild": {
               "$ref": "#/$defs/id"
+            },
+            "stryker": {
+              "$ref": "#/$defs/stryker"
             }
           }
         },
@@ -883,6 +907,9 @@
             },
             "pussel_id": {
               "$ref": "#/$defs/id"
+            },
+            "stryker": {
+              "$ref": "#/$defs/stryker"
             }
           }
         },
@@ -911,6 +938,9 @@
             "kan_oppnas_igen": {
               "type": "boolean",
               "description": "Går före pusslets kan_oppnas_igen (132.4): biten i kapitel 5 visas i pass 1 utan att vara hans och blir hans (true) när han tar emot den i pass 2."
+            },
+            "stryker": {
+              "$ref": "#/$defs/stryker"
             }
           }
         },
@@ -932,6 +962,9 @@
                 "radioramen",
                 "hjalteboken"
               ]
+            },
+            "stryker": {
+              "$ref": "#/$defs/stryker"
             }
           }
         },
@@ -952,6 +985,9 @@
             "kostnad": {
               "type": "integer",
               "minimum": 0
+            },
+            "stryker": {
+              "$ref": "#/$defs/stryker"
             }
           }
         },
@@ -969,6 +1005,9 @@
             "antal": {
               "type": "integer",
               "minimum": 1
+            },
+            "stryker": {
+              "$ref": "#/$defs/stryker"
             }
           }
         },
@@ -987,6 +1026,9 @@
               "type": "integer",
               "minimum": 1,
               "maximum": 7
+            },
+            "stryker": {
+              "$ref": "#/$defs/stryker"
             }
           }
         },
@@ -1013,6 +1055,9 @@
             },
             "fest": {
               "$ref": "#/$defs/fest"
+            },
+            "stryker": {
+              "$ref": "#/$defs/stryker"
             }
           }
         },
@@ -1061,6 +1106,9 @@
                   }
                 }
               }
+            },
+            "stryker": {
+              "$ref": "#/$defs/stryker"
             }
           }
         },
@@ -1086,6 +1134,9 @@
             },
             "bara_bilder": {
               "type": "boolean"
+            },
+            "stryker": {
+              "$ref": "#/$defs/stryker"
             }
           },
           "description": "Spelaren väljer hjältens palettbyten (huden och dräkten). Formen är fast."
@@ -1109,6 +1160,9 @@
             "fraga": {
               "$ref": "#/$defs/replik",
               "description": "Frågan som läses upp vid passets slut, t.ex. \"Vill du fortsätta? Eller sluta för idag?\". Visas ovanför de två bilderna."
+            },
+            "stryker": {
+              "$ref": "#/$defs/stryker"
             }
           }
         },
@@ -1132,6 +1186,9 @@
               "items": {
                 "$ref": "#/$defs/id"
               }
+            },
+            "stryker": {
+              "$ref": "#/$defs/stryker"
             }
           }
         },
@@ -1149,6 +1206,9 @@
             },
             "folj": {
               "type": "boolean"
+            },
+            "stryker": {
+              "$ref": "#/$defs/stryker"
             }
           }
         },
@@ -1166,6 +1226,9 @@
             },
             "foremal": {
               "$ref": "#/$defs/id"
+            },
+            "stryker": {
+              "$ref": "#/$defs/stryker"
             }
           }
         },
@@ -1183,6 +1246,9 @@
             },
             "foremal": {
               "$ref": "#/$defs/id"
+            },
+            "stryker": {
+              "$ref": "#/$defs/stryker"
             }
           }
         },
@@ -1208,6 +1274,9 @@
             },
             "id": {
               "$ref": "#/$defs/id"
+            },
+            "stryker": {
+              "$ref": "#/$defs/stryker"
             }
           }
         },
@@ -1238,6 +1307,9 @@
                   "type": "string"
                 }
               }
+            },
+            "stryker": {
+              "$ref": "#/$defs/stryker"
             }
           }
         },
@@ -1255,6 +1327,9 @@
             },
             "id": {
               "$ref": "#/$defs/id"
+            },
+            "stryker": {
+              "$ref": "#/$defs/stryker"
             }
           }
         },
@@ -1275,6 +1350,9 @@
             },
             "anteckning": {
               "$ref": "#/$defs/anteckning"
+            },
+            "stryker": {
+              "$ref": "#/$defs/stryker"
             }
           }
         }
@@ -1346,6 +1424,9 @@
         "kapitelrubrik": {
           "type": "boolean",
           "description": "Repliken är kapitlets rubrik i slutet av kapitlet före (\"Kapitel 1. Skogen.\"). Den visas inte när nästa kapitel är låst (kapitel_last), eftersom slutrutan kommer i stället."
+        },
+        "stryker": {
+          "$ref": "#/$defs/stryker"
         }
       }
     },
@@ -3060,6 +3141,38 @@
         "syns_redan": {
           "type": "boolean",
           "description": "Det som lockar syns redan (2.58): glimten och ungen visar det, så beskrivningen visas inte för den vuxne. Den står kvar som anteckning."
+        }
+      }
+    },
+    "stryker": {
+      "description": "2.64 (141.7): när steget är klart drar pennan ett streck över en rad på en lapp han har (som i boken, 125.3), och raden står struken när han läser lappen igen. lapp = läsvalet (P1 med en text i rader, oftast med kan_oppnas_igen), rad = radens nummer, räknat från 0. Flera rader: en lista. Har han lappen när steget är klart, visas den en kort stund medan strecket dras.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/stryker_rad"
+        },
+        {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/stryker_rad"
+          }
+        }
+      ]
+    },
+    "stryker_rad": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lapp",
+        "rad"
+      ],
+      "properties": {
+        "lapp": {
+          "$ref": "#/$defs/id"
+        },
+        "rad": {
+          "type": "integer",
+          "minimum": 0
         }
       }
     }

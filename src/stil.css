@@ -1065,3 +1065,16 @@ html, body {
 .moln-streck-linje img:first-child { width: 9px; } .moln-streck-linje img:last-child { width: 12px; }
 .moln-streck-linje i { flex: 1; min-width: 0; background-size: 24px 15px; background-repeat: repeat-x; image-rendering: pixelated; }
 .moln-streck-linje i.blatt { background: #3a5fcf; height: 6px; margin-top: 4px; border-radius: 3px; }
+
+/* raderna han har gjort är strukna på lappen (141.7): samma pennstreck som i boken (125.3). Det nyss strukna dras
+   från vänster på 0,4 s när lappen visas */
+.lapp .rad.struken { position: relative; color: #6a5a3a; width: fit-content; }
+.lapp-streck { position: absolute; left: -6px; top: 50%; height: 15px; width: calc(100% + 12px); transform: translateY(-50%); display: flex; overflow: hidden; pointer-events: none; }
+.lapp-streck img { height: 15px; width: auto; flex: none; image-rendering: pixelated; }
+.lapp-streck img:first-child { width: 9px; } .lapp-streck img:last-child { width: 12px; }
+.lapp-streck i { flex: 1; min-width: 0; background-size: 24px 15px; background-repeat: repeat-x; image-rendering: pixelated; }
+.lapp-streck.blatt i { background: #3a5fcf; height: 6px; margin-top: 4px; border-radius: 3px; }
+.lapp .rad.struken.nyss .lapp-streck { width: 0; transition: width 0.4s linear; }
+.lapp .rad.struken.nyss.dras .lapp-streck { width: calc(100% + 12px); }
+/* mästarprovet (141.7): raden som gäller nu på hela lappen */
+.lapp .rad.nu-rad { width: fit-content; background: rgba(242, 193, 78, .45); border-radius: 6px; box-shadow: 0 0 0 4px rgba(242, 193, 78, .45); }

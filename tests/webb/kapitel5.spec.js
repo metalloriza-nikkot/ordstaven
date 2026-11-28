@@ -30,17 +30,17 @@ async function tryckPaUngen(page) {
 }
 
 /** Starta kapitel 5 vid en scen, med namnen och formlerna klara. @param {any} page @param {string} scenId */
-async function starta(page, scenId, steg = 0) {
+async function starta(page, scenId, steg = 0, extra = null) {
   const scen = kap.scener.findIndex((s) => s.id === scenId);
   await page.goto('./?snabb&ny&kapitel=kap-05');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
-  await page.evaluate(({ scenId, scen, steg, pass }) => {
+  await page.evaluate(({ scenId, scen, steg, pass, extra }) => {
     const t = window.__ORDSTAVEN.tillstand(); const av = t.aventyr['den-gomda-dalen'];
-    Object.assign(av, { kapitelId: 'kap-05', scen, scenId, steg, startad: steg > 0, pass });
+    Object.assign(av, { kapitelId: 'kap-05', scen, scenId, steg, startad: steg > 0, pass }, extra || {});
     t.spelare.hjalte.namn = 'TESTA'; t.spelare.hjalte.formler = ['LJUS', 'SVÄRD', 'FLYG', 'SKÖLD', 'STOR SKÖLD'];
     t.spelare.unge = { format: 1, steg: 1, formagor: [], ...t.spelare.unge, namn: 'KNOPP', folj: true };
     localStorage.setItem('ordstaven_spar', JSON.stringify(t));
-  }, { scenId, scen, steg, pass: kap.scener[scen].pass });
+  }, { scenId, scen, steg, pass: kap.scener[scen].pass, extra });
   await page.goto('./?snabb&kapitel=kap-05');
   await page.waitForFunction(() => window.__ORDSTAVEN && window.__ORDSTAVEN.spel.isRunning);
   await page.click('.start-knapp');
@@ -186,6 +186,67 @@ test('kapitel 5 pass 3: mamma, kramen, radion, bona, STORT LJUS, avskedet och sl
   // så raden om slutet hinner ibland försvinna med omladdningen (ultrabred i den stora kontrollen): startskärmen avgör
   await expect(page.locator('.start-knapp')).toBeVisible({ timeout: 15000 });
   await expect(page.locator('.pass-slut')).toHaveCount(0);
+});
+
+test('141.6: ungen som leder genom gläntans dimma väntar in hjälten och kommer aldrig mer än en halv skärm före', async ({ page }) => {
+  test.setTimeout(120000);
+  // steg 2: ungen sätter nosen i marken och springer före in i dimman (unge_till glantan_mitt), steg 3: gå dit
+  await starta(page, 'k5s04_glantan', 2);
+  const lage = () => page.evaluate(() => ({ u: window.__ORDSTAVEN.ungePos(), h: window.__ORDSTAVEN.spel.scene.getScene('Rum').pos, typ: window.__ORDSTAVEN.steg()?.typ }));
+  await page.waitForFunction(() => !!window.__ORDSTAVEN.ruta('glantan_mitt'), null, { timeout: 15000 });
+  const mal = await page.evaluate(() => { const o = window.__ORDSTAVEN.ruta('glantan_mitt'); return { x: o.x + o.b / 2, y: o.y + o.h / 2 }; });
+  const prover = [];
+  // först står hjälten still medan ungen springer: den stannar och väntar
+  for (let i = 0; i < 16; i++) {
+    for (const v of await page.locator('#plattan:not([hidden]) :is(.vidare, .replik-ruta)').all()) await v.click({ timeout: 300 }).catch(() => {});
+    prover.push(await lage()); await page.waitForTimeout(400);
+  }
+  // sedan går han efter ungen, ett stycke i taget, tills ungen är framme
+  for (let i = 0; i < 60; i++) {
+    const l = await lage(); prover.push(l);
+    if (Math.hypot(l.u.x - mal.x, l.u.y - mal.y) < 24 && Math.hypot(l.h.x - mal.x, l.h.y - mal.y) < 40) break;
+    await page.evaluate(({ x, y }) => window.__ORDSTAVEN.gaMot(x, y), l.u);
+    await page.waitForTimeout(500);
+  }
+  const avstand = prover.map((p) => ({ dx: Math.abs(p.u.x - p.h.x), dy: Math.abs(p.u.y - p.h.y) }));
+  // ungefär en halv skärm (320 × 192): ungen stannar vid 150 × 88 och får glida några pixlar innan den står
+  for (const a of avstand) { expect(a.dx, 'ungen i x före hjälten').toBeLessThanOrEqual(166); expect(a.dy, 'ungen i y före hjälten').toBeLessThanOrEqual(104); }
+  const regi = (await page.evaluate(() => window.__ORDSTAVEN.grafik())).regi.join('\n');
+  expect(regi).toContain('ungen väntar in hjälten');
+  expect(regi).toContain('ungen går vidare');
+  const sist = prover.at(-1);
+  expect(Math.hypot(sist.u.x - mal.x, sist.u.y - mal.y), 'ungen kommer fram till vägskälet').toBeLessThan(24);
+  await page.screenshot({ path: 'test-results/kap5-141-ungen-framme.png' });
+});
+
+test('141.7: raderna han har gjort står strukna på lappen när han läser den igen', async ({ page }) => {
+  test.setTimeout(90000);
+  // efter mästarprovet läser han bitens framsida igen: ljuset och roten är gjorda och strukna, nosen och ropet är kvar
+  const steg = kap.scener.find((s) => s.id === 'k5s04_glantan').steg.findIndex((s) => s.typ === 'oppna_lasplatta' && s.pussel_id === 'k5_bit_fram');
+  await starta(page, 'k5s04_glantan', steg, { lappar: ['k5_bit_fram', 'k5_bit_bak'], strukna: { k5_bit_fram: [0, 1] } });
+  for (let i = 0; i < 40 && !(await page.locator('#plattan .lapp .rad').first().isVisible().catch(() => false)); i++) {
+    for (const v of await page.locator(':is(#plattan, #remsa, body) .replik-ruta:visible, #plattan:not([hidden]) .vidare').all()) await v.click({ timeout: 300 }).catch(() => {});
+    await page.waitForTimeout(400);
+  }
+  await expect(page.locator('#plattan .lapp .rad')).toHaveCount(4, { timeout: 5000 });
+  await expect(page.locator('#plattan .lapp .rad.struken')).toHaveCount(2);
+  await expect(page.locator('#plattan .lapp .rad').nth(0)).toHaveClass(/struken/);
+  await expect(page.locator('#plattan .lapp .rad').nth(2)).not.toHaveClass(/struken/);
+  await expect(page.locator('#plattan .lapp .rad.struken .lapp-streck').first()).toBeVisible();
+  await page.screenshot({ path: 'test-results/kap5-141-lappen-struken.png' });
+});
+
+test('142.5: loggen skriver rummet och scenen när han trycker på en piltangent medan världen står still', async ({ page }) => {
+  test.setTimeout(60000);
+  // repliken "Läs biten! Vad står det sen?" håller världen stilla
+  await starta(page, 'k5s04_glantan', 1);
+  await page.waitForFunction(() => window.__ORDSTAVEN.fryst(), null, { timeout: 15000 });
+  await page.keyboard.down('ArrowRight'); await page.waitForTimeout(300); await page.keyboard.up('ArrowRight');
+  await page.waitForTimeout(200);
+  await page.keyboard.down('ArrowUp'); await page.waitForTimeout(300); await page.keyboard.up('ArrowUp');
+  await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.logg()), { timeout: 5000 }).toMatch(/piltangent medan världen står still: dal_glantan, k5s04_glantan/);
+  const rader = (await page.evaluate(() => window.__ORDSTAVEN.logg())).split('\n').filter((r) => r.includes('piltangent medan världen står still: '));
+  expect(rader.length).toBe(2);
 });
 
 test('golvdatorn i kapitel 5 (139.8.5): canvas och fyra gånger långsammare processor i dimman (2 × 2, dis) och i gläntans dimma', async ({ page }, info) => {
