@@ -16,13 +16,14 @@
  },
  "meta": {
   "namn": "Dalen bakom molnen",
-  "version": "0.2",
+  "version": "0.3",
   "datum": "2026-11-27",
   "agare": "Innehåll",
   "kalla": "Berättelsen 22 v0.2.3 och manus 22 v0.2, godkända av den vuxne (130.1 och 2026-11-27).",
   "teknik": "Nytt i kapitlet: ram faktning med två utfall per rond, lapparna k5_bit_fram, k5_bit_bak och k5_medaljen, mästarprovet (k5_rad1–3) med struken och hjälptrappa, vantar_pa ropa, rummets tillstånd dis (grått och disigt, inte svart), hemligheterna k5s02_gomman och k5s03_lagret, steget musik med slingan slutet, och slutbilderna i k5s08_slutet. Fem rum utan Tiled-karta. Föremålens id är förslag, och Teknik sätter dem efter kartan.",
   "anteckning": "Tre pass. En ny formel (STORT LJUS), LJUS, SVÄRD och STEGE på huvudvägen. Inga nya namngivna figurer. Hemligheterna är frivilliga och står inte i boken.",
-  "andrat_v02": "2026-11-27 (beslut 139.5–139.6): SVÄRD och bladväggen är strukna i pass 2, och han följer spåren till baronens hatt. Uppdraget DIMMAN har två steg. En sparpunkt utan passets slut står före slutbilderna."
+  "andrat_v02": "2026-11-27 (beslut 139.5–139.6): SVÄRD och bladväggen är strukna i pass 2, och han följer spåren till baronens hatt. Uppdraget DIMMAN har två steg. En sparpunkt utan passets slut står före slutbilderna.",
+  "andrat_v03": "2026-11-28 (beslut 139.4, 139.7 och 140.6, schema 2.63): varje fel kort i fäktningen har baronens eget svar, och de nio regierna står i vid_ratt, vid_fel och vid_vinst. Mellanscenerna kryper_under_roten och en_stig_kvar är borta, eftersom regin kommer i vid_ratt."
  },
  "var_var_vi": [
   {
@@ -596,11 +597,6 @@
      "pussel_id": "k5_roten"
     },
     {
-     "typ": "mellanscen",
-     "beskrivning": "Hjälten och ungen kryper in under roten.",
-     "bild": "kryper_under_roten"
-    },
-    {
      "typ": "replik",
      "talare": "baronen",
      "text": "Under?! Det stod under?! … Jag läser alltid fel.",
@@ -743,11 +739,6 @@
     {
      "typ": "pussel",
      "pussel_id": "k5_rad3"
-    },
-    {
-     "typ": "mellanscen",
-     "beskrivning": "Tre streck av ljus, och en stig är kvar.",
-     "bild": "en_stig_kvar"
     },
     {
      "typ": "ga_till",
@@ -1169,10 +1160,20 @@
          "ratt": true
         },
         {
-         "text": "Du flög till skogen!"
+         "text": "Du flög till skogen!",
+         "vid_fel": {
+          "replik": {
+           "talare": "baronen",
+           "text": "Ha! Miss!",
+           "upplast": true
+          }
+         }
         },
         {
-         "text": "Du flög till skatan!"
+         "text": "Du flög till skatan!",
+         "vid_fel": {
+          "handling": "Herr Skata flaxar och skrattar på skylten, och baronen poserar ändå"
+         }
         }
        ],
        "vid_ratt": {
@@ -1203,10 +1204,24 @@
          "ratt": true
         },
         {
-         "text": "Rädd för en spegel!"
+         "text": "Rädd för en spegel!",
+         "vid_fel": {
+          "replik": {
+           "talare": "baronen",
+           "text": "Rädd för en spegel? Jag älskar speglar!",
+           "upplast": true
+          }
+         }
         },
         {
-         "text": "Rädd för en spik!"
+         "text": "Rädd för en spik!",
+         "vid_fel": {
+          "replik": {
+           "talare": "baronen",
+           "text": "Ha! Miss!",
+           "upplast": true
+          }
+         }
         }
        ],
        "vid_ratt": {
@@ -1243,10 +1258,24 @@
          "ratt": true
         },
         {
-         "text": "Hög och har ett bo"
+         "text": "Hög och har ett bo",
+         "vid_fel": {
+          "replik": {
+           "talare": "baronen",
+           "text": "Hög! Precis! … Ett bo?",
+           "upplast": true
+          }
+         }
         },
         {
-         "text": "Platt och fin"
+         "text": "Platt och fin",
+         "vid_fel": {
+          "replik": {
+           "talare": "baronen",
+           "text": "Fin! Precis! … Platt?",
+           "upplast": true
+          }
+         }
         }
        ],
        "vid_ratt": {
@@ -1277,10 +1306,24 @@
          "ratt": true
         },
         {
-         "text": "Torra och har en snigel"
+         "text": "Torra och har en snigel",
+         "vid_fel": {
+          "replik": {
+           "talare": "baronen",
+           "text": "Torra! Precis! … En snigel?",
+           "upplast": true
+          }
+         }
         },
         {
-         "text": "Blöta och rena"
+         "text": "Blöta och rena",
+         "vid_fel": {
+          "replik": {
+           "talare": "baronen",
+           "text": "Rena! Precis! … Blöta?",
+           "upplast": true
+          }
+         }
         }
        ],
        "vid_ratt": {
@@ -1317,10 +1360,24 @@
          "ratt": true
         },
         {
-         "text": "Men kan du äta den?"
+         "text": "Men kan du äta den?",
+         "vid_fel": {
+          "replik": {
+           "talare": "baronen",
+           "text": "… Den smakar papper.",
+           "upplast": true
+          }
+         }
         },
         {
-         "text": "Men kan du flyga?"
+         "text": "Men kan du flyga?",
+         "vid_fel": {
+          "replik": {
+           "talare": "baronen",
+           "text": "Ja! Med luftskepp!",
+           "upplast": true
+          }
+         }
         }
        ],
        "vid_ratt": {
@@ -1351,10 +1408,26 @@
          "ratt": true
         },
         {
-         "text": "Men den är en hatt!"
+         "text": "Men den är en hatt!",
+         "vid_fel": {
+          "handling": "baronen lägger biten på hatten och poserar",
+          "replik": {
+           "talare": "baronen",
+           "text": "Hm. Den passar mig!",
+           "upplast": true
+          }
+         }
         },
         {
-         "text": "Men den är en fisk!"
+         "text": "Men den är en fisk!",
+         "vid_fel": {
+          "handling": "Herr Skata nafsar efter biten",
+          "replik": {
+           "talare": "baronen",
+           "text": "Skata! Släpp! Den är min!",
+           "upplast": true
+          }
+         }
         }
        ],
        "vid_ratt": {
@@ -1382,9 +1455,10 @@
    },
    "vid_vinst": {
     "handling": "staven parerar en sista gång, och paraplyet fäller ihop sig över baronen med ett plopp, så att bara stövlarna syns. Herr Skata lyfter vingen på skylten som en domare.",
-    "fest": "stor"
+    "fest": "stor",
+    "bild": "paraplyet_faller_ihop"
    },
-   "anteckning": "Fäktningen (manus 22 v0.2, den vuxne 27/11): fin och artig med bugningar och utfall, men en stav mot ett paraply, och baronen tar det på blodigt allvar. Två utfall per rond, och motorn slumpar ett (ordduell.js), så den som spelar om får oftast andra skryt. Samma nivå i båda utfallen: ord, mening med två egenskaper, och repliken där slutet avgör. Korten läses aldrig upp. Staven rör aldrig baronen, bara paraplyet. Manuset har ett svar per fel kort, och schemat har ett per utfall. Väntar på ledningen (alternativ[].vid_fel): 1A SKOGEN \"Ha! Miss!\", SKATAN Herr Skata flaxar och skrattar. 1B SPEGEL \"Rädd för en spegel? Jag älskar speglar!\", SPIK \"Ha! Miss!\". 2A HÖG \"Hög! Precis! … Ett bo?\", FIN \"Fin! Precis! … Platt?\". 2B TORRA \"Torra! Precis! … En snigel?\", RENA \"Rena! Precis! … Blöta?\". 3A ÄTA \"… Den smakar papper.\", FLYGA \"Ja! Med luftskepp!\". 3B HATT (han lägger biten på hatten) \"Hm. Den passar mig!\", FISK (Herr Skata nafsar efter biten) \"Skata! Släpp! Den är min!\". Tills dess har varje utfall ett gemensamt svar. Segern är att paraplyet fäller ihop sig över baronen (v0.2), inte ut och in som i kapitel 3."
+   "anteckning": "Fäktningen (manus 22 v0.2, den vuxne 27/11): fin och artig med bugningar och utfall, men en stav mot ett paraply, och baronen tar det på blodigt allvar. Två utfall per rond, och motorn slumpar ett (ordduell.js), så den som spelar om får oftast andra skryt. Samma nivå i båda utfallen: ord, mening med två egenskaper, och repliken där slutet avgör. Korten läses aldrig upp. Staven rör aldrig baronen, bara paraplyet. Varje fel kort har baronens eget svar (alternativ[].vid_fel, schema 2.63), och utfallets vid_fel är reserven. Segern är att paraplyet fäller ihop sig över baronen (paraplyet_faller_ihop), inte ut och in som i kapitel 3."
   },
   {
    "id": "k5_bit_fram",
@@ -1510,7 +1584,8 @@
    },
    "vid_ratt": {
     "handling": "ljusbollen tänds, diset lyser upp och glittrar, och man ser långt mellan träden",
-    "fest": "mellan"
+    "fest": "mellan",
+    "bild": "dimman_tands"
    },
    "vid_fel": {
     "reaktion": "staven fräser, pff",
@@ -1792,7 +1867,8 @@
    ],
    "vid_ratt": {
     "handling": "hjälten och ungen kryper in under roten",
-    "fest": "liten"
+    "fest": "liten",
+    "bild": "kryper_under_roten"
    },
    "knuff": {
     "handling": "lappknappen glimtar"
@@ -1984,7 +2060,8 @@
    },
    "vid_ratt": {
     "handling": "staven drar ett streck av ljus över stigen",
-    "fest": "liten"
+    "fest": "liten",
+    "bild": "en_stig_kvar"
    },
    "anteckning": "Mästarprovet (132.4 och 134.3): raden som gäller står som frågan i molnet, och han trycker på den stig som inte stämmer. Den står kvar struken. Varje drag finns på tre av fyra stigar, så det går inte att se svaret utan att läsa. Hjälpen per rad: Farfar, ordet som avgör, och sist stigen."
   },
@@ -2031,11 +2108,13 @@
    ],
    "vid_ratt": {
     "handling": "kortet flyger till ägget och lyser i stavens färger. Skalet spricker, en liten unge piper, och den vuxna hoppar av glädje.",
-    "fest": "mellan"
+    "fest": "mellan",
+    "bild": "agg_klacks_langhals"
    },
    "vid_fel": {
     "reaktion": "ägget nyser, och kortet hoppar tillbaka",
-    "ljud": "nys"
+    "ljud": "nys",
+    "bild": "agget_nyser"
    },
    "knuff": {
     "handling": "den som väntar vid boet tittar upp"
@@ -2085,11 +2164,13 @@
    ],
    "vid_ratt": {
     "handling": "kortet flyger till ägget och lyser i stavens färger. Skalet spricker, en liten unge piper, och den vuxna hoppar av glädje.",
-    "fest": "mellan"
+    "fest": "mellan",
+    "bild": "agg_klacks_taggrygg"
    },
    "vid_fel": {
     "reaktion": "ägget nyser, och kortet hoppar tillbaka",
-    "ljud": "nys"
+    "ljud": "nys",
+    "bild": "agget_nyser"
    },
    "knuff": {
     "handling": "den som väntar vid boet tittar upp"
@@ -2139,11 +2220,13 @@
    ],
    "vid_ratt": {
     "handling": "kortet flyger till ägget och lyser i stavens färger. Skalet spricker, en liten unge piper, och den vuxna hoppar av glädje.",
-    "fest": "mellan"
+    "fest": "mellan",
+    "bild": "agg_klacks_hornnos"
    },
    "vid_fel": {
     "reaktion": "ägget nyser, och kortet hoppar tillbaka",
-    "ljud": "nys"
+    "ljud": "nys",
+    "bild": "agget_nyser"
    },
    "knuff": {
     "handling": "den som väntar vid boet tittar upp"
@@ -2247,7 +2330,8 @@
    },
    "vid_ratt": {
     "handling": "regnbågsljuset pulserar ur staven, och en jättestor ljusboll stiger över dalen",
-    "fest": "stor"
+    "fest": "stor",
+    "bild": "stort_ljus_dalen"
    },
    "vid_fel": {
     "reaktion": "staven fräser, pff",
