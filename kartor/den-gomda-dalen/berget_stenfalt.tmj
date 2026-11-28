@@ -256,17 +256,17 @@
      "id": 15,
      "name": "halet",
      "type": "sak",
-     "x": 470,
-     "y": 120,
-     "width": 30,
-     "height": 18,
+     "x": 206,
+     "y": 104,
+     "width": 48,
+     "height": 14,
      "rotation": 0,
      "visible": true,
      "properties": [
       {
        "name": "bild",
        "type": "string",
-       "value": "sten_hal"
+       "value": "block_driva"
       },
       {
        "name": "sida",

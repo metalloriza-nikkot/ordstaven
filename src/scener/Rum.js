@@ -5748,8 +5748,13 @@ export class Rum extends Phaser.Scene {
 
   /** Baronen bugar djupt (139.8, gråbox): bilden trycks ihop och reser sig två gånger. @param {string} id @returns {number} */
   k5Bugar(id) {
+    // lev139: står han kvar efter fäktningen kravlar han ut under paraplyet och bugar med hatten på sned
+    if (this.duellFig instanceof BaronMark && this.duellFig.sida) return this.duellFig.kravlarUt();
     const r = /** @type {any} */ (this.ritade.get(id));
     if (!r) return 0;
+    if (r.texture?.key === 'baronen' && this.textures.get('baronen').has('baronen_bugar_sned_vanster_01')) {
+      r.setFrame('baronen_bugar_sned_vanster_01'); this.smutsig = true; this.k4Logg('baronen_bugar'); return 1400;
+    }
     this.tweens.add({ targets: r, scaleY: 0.8, duration: 300, yoyo: true, repeat: 1, onUpdate: () => { this.smutsig = true; } });
     this.k4Logg('baronen_bugar');
     return 1400;
@@ -5790,7 +5795,17 @@ export class Rum extends Phaser.Scene {
     const p = this.regiPunkter?.regi_klippan ?? this.k4Punkt('klippa');
     if (!p || !this.unge.visible) return 0;
     const smuts = () => { this.smutsig = true; };
-    const fot = this.hinder.narmasteFria({ x: p.x + 14, y: p.y });
+    // 140.2.1: foten är nere på marken, bredvid hjälten. narmasteFria kunde välja en punkt uppe på klippans krön (den
+    // fria ytan i klippan_uppe), och då klättrade ungen upp själv. Sök bara nedanför och bredvid regi_klippan
+    let fot = null;
+    for (const dy of [0, 4, 8, 12, 16, 20, 24]) {
+      for (const dx of [14, -14, 18, -18, 22, -22]) {
+        const q = { x: p.x + dx, y: p.y + dy };
+        if (this.hinder.fri(q)) { fot = q; break; }
+      }
+      if (fot) break;
+    }
+    fot = fot ?? { x: this.pos.x + 14, y: this.pos.y };
     const ms = this.ungeGarTill(fot);
     this.regiFokus = { x: p.x, y: p.y - 30 };
     this.vand = { x: Math.sign(fot.x - this.pos.x) || 1, y: 0 }; this.ritaHjalte();
@@ -5807,6 +5822,9 @@ export class Rum extends Phaser.Scene {
     forsok(ms + 1500, 20);
     this.time.delayedCall(ms + 2700, () => { this.ungeVand = { x: 0, y: -1 }; this.ungeLage('skakar', 'ner', 200, 2); smuts(); });
     this.time.delayedCall(ms + 3300, () => { this.regiFokus = null; });
+    // 140.2.1: ungen står kvar nere vid foten tills stegen finns (klippanUpp släpper den). Utan det följde den hjälten
+    // in i klippans öppning och klättrade upp själv medan han skrev formeln
+    this.k4 = { ...(this.k4 || {}), ungeVidFoten: { ...fot } };
     this.k4Logg(`ungen_glider_klippan vid x ${fot.x}`);
     return ms + 3500;
   }
@@ -5969,6 +5987,8 @@ export class Rum extends Phaser.Scene {
   klippanUpp(sort) {
     const o = this.ruta('klippan_uppe') || this.ruta('klippa');
     if (!o) return 0;
+    // stegen finns: ungen följer med upp (140.2.1)
+    if (this.k4?.ungeVidFoten) this.k4 = { ...this.k4, ungeVidFoten: null };
     const smuts = () => { this.smutsig = true; };
     // stegen kommer alltid vid regi_klippan (138.4), där han gick till och där ungen gled ned
     const rp = this.regiPunkter?.regi_klippan;
@@ -6046,9 +6066,14 @@ export class Rum extends Phaser.Scene {
     rep.lineStyle(1, 0xd9782f, 1).lineBetween(sk.x, sk.y + 16, sk.x, sk.y + 24);
     this.lagerLuft.add(block); this.lagda.push(block);
     this.regiFokus = { x: sk.x, y: sk.y + 40 };
+    // 140.2.3: blocket landar där det sedan ligger kvar (kartans halet med block_driva). Platsens bild är gömd tills
+    // blocket är nere, och sedan tar den över, så att det inte blir två block
+    const platsen = /** @type {any} */ (driva ? this.ritade.get('halet') : null);
+    if (platsen) platsen.setVisible(false);
     this.time.delayedCall(1000, () => { rep.clear(); smuts(); });
     this.tweens.add({ targets: block, x: d.x, y: d.y, duration: 600, delay: 1000, ease: 'Quad.easeIn', onUpdate: smuts, onComplete: () => {
-      if (driva && block.setTexture) block.setTexture(driva.nyckel, driva.ram);
+      if (platsen?.active) { platsen.setVisible(true); block.setVisible(false); }
+      else if (driva && block.setTexture) block.setTexture(driva.nyckel, driva.ram);
       else if (block.clear) { block.clear(); block.fillStyle(0x8c8378, 1).fillRect(-10, -2, 20, 8).fillStyle(0xf4f8fc, 1).fillEllipse(0, 4, 34, 12); }
       this.k4Glitter(d, 16); smuts();
     } });
@@ -6822,8 +6847,11 @@ export class Rum extends Phaser.Scene {
     // ungen följer efter på avstånd, eller springer dit den pekar
     const m = this.ungeMal;
     let tx = m ? m.x : this.pos.x - 16, ty = m ? m.y : this.pos.y;
+    // vid klippans fot (140.2.1): ungen väntar där den gled ned, tills stegen finns
+    const vidFoten = !m && this.k4?.ungeVidFoten;
+    if (vidFoten) { tx = vidFoten.x; ty = vidFoten.y; }
     // bakom hjälten i en vägg (han går längs väggen): ungen ställer sig på närmaste fria punkt (136)
-    if (!m && !this.hinder.fri({ x: tx, y: ty })) { const f = this.hinder.narmasteFria({ x: tx, y: ty }); tx = f.x; ty = f.y; }
+    if (!m && !vidFoten && !this.hinder.fri({ x: tx, y: ty })) { const f = this.hinder.narmasteFria({ x: tx, y: ty }); tx = f.x; ty = f.y; }
     const dx = tx - this.ungePos.x, dy = ty - this.ungePos.y, l = Math.hypot(dx, dy);
     const narmare = m ? 1 : 6;
     // ungen klättrar inte med honom på stegen: den väntar nedanför, och klättrar efter när han är uppe

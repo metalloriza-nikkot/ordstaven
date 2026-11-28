@@ -33,6 +33,10 @@ import tandgrottanM4a from '../../assets/ljud/musik/tandgrottan.m4a?url';
 import tandgrottanOgg from '../../assets/ljud/musik/tandgrottan.ogg?url';
 import isgrottanM4a from '../../assets/ljud/musik/isgrottan.m4a?url';
 import isgrottanOgg from '../../assets/ljud/musik/isgrottan.ogg?url';
+import slutetM4a from '../../assets/ljud/musik/slutet.m4a?url';
+import slutetOgg from '../../assets/ljud/musik/slutet.ogg?url';
+import dalenFrostM4a from '../../assets/ljud/musik/dalen_frost.m4a?url';
+import dalenFrostOgg from '../../assets/ljud/musik/dalen_frost.ogg?url';
 import styckeRasetM4a from '../../assets/ljud/musik/stycke_raset.m4a?url';
 import styckeRasetOgg from '../../assets/ljud/musik/stycke_raset.ogg?url';
 import { pausPlan } from '../karna/musik.js';
@@ -68,6 +72,9 @@ export const MUSIK = /** @type {Record<string, { m4a: string, ogg: string, loopS
   tandgrottan: { m4a: tandgrottanM4a, ogg: tandgrottanOgg, loopStart: 0.5, loopEnd: 38.394739 },
   // grottans fem rum (137.3.7, LASMIG_137): 68,6 s i D lydisk, Stils slutpunkt
   isgrottan: { m4a: isgrottanM4a, ogg: isgrottanOgg, loopStart: 0.5, loopEnd: 69.071429 },
+  // kapitel 5 (lev139): slutbildernas slinga och den frostiga dalen
+  slutet: { m4a: slutetM4a, ogg: slutetOgg, loopStart: 0.5, loopEnd: 62.435488 },
+  dalen_frost: { m4a: dalenFrostM4a, ogg: dalenFrostOgg, loopStart: 0.5, loopEnd: 53.833333 },
 });
 /** Byte mellan slingor: den gamla tonas ut och den nya in på ca 1 s (Stil, 10c). Efter pausen tonas den in mjukare. */
 /**

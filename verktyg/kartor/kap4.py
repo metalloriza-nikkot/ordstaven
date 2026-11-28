@@ -44,7 +44,9 @@ FOREMALSBILDER = {
     'sten_varm': {'bild': 'sten_varm_slat_01', 'bild_anim': 'sten_varm_slat_01,sten_varm_slat_02', 'anim_ms': 500},
     'sten_taggar': {'bild': 'sten_varm_taggsvans_01', 'bild_anim': 'sten_varm_taggsvans_01,sten_varm_taggsvans_02', 'anim_ms': 500},
     'sten_is': {'bild': 'sten_kall_klubbsvans'},
-    'halet': {'bild': 'sten_hal'},
+    # 140.2.3 (lev140): baronens block ligger kvar i drivan där det landade (Stils block_driva, utan repets orange).
+    # Hålet med repet (sten_hal) sa att stenen hade legat här, fast den låg i stigen, och blocket landade någon annanstans
+    'halet': {'bild': 'block_driva'},
     'sten_klubba': {'bild': 'sten_varm_klubbsvans_01', 'bild_anim': 'sten_varm_klubbsvans_01,sten_varm_klubbsvans_02', 'anim_ms': 500},
     # stigen (lev137, 138.3): skyltarna vid gaffeln och granarna är höga bilder som sorteras efter foten bland figurerna,
     # så att han går bakom dem norr om foten och framför dem söder om den. Rummets bild har bara skuggorna.
@@ -372,6 +374,7 @@ STENFALT_KLIPPA = {
     'objekt': [
         punkt('start', 60, 312),
         punkt('regi_luftskepp', 200, 30),
+        # blocket landar i drivan (bildens mitt på regi_driva, foten på y 118), där det sedan ligger kvar (halet, 140.2.3)
         punkt('regi_driva', 230, 100),
         # klippans fot (138.4): där han går till, där ungen försöker klättra och glider ned, och där stegen kommer, mitt
         # under klippan_uppe
@@ -387,7 +390,10 @@ STENFALT_KLIPPA = {
         sak('sten_varm', 380, 130, 26, 20, sida='alla'),
         sak('sten_taggar', 110, 100, 26, 20, sida='alla'),
         sak('sten_is', 250, 56, 26, 20, sida='alla'),
-        sak('halet', 470, 120, 30, 18, sida='alla'),
+        # 140.2.3 (lev140): det femte stället i gåtan är baronens block där det landade, inget hål. Id:t står kvar, så
+        # att datan inte ändras. Bilden block_driva (56 × 36) står med foten på rutans nederkant (230, 118) och
+        # sorteras efter foten. Regin blocket_driva tar över bilden när blocket har landat
+        sak('halet', 206, 104, 48, 14, sida='alla'),
         sak('sten_klubba', 560, 44, 26, 20, sida='alla'),
         # lådan ligger tätt under stenen (ingen glipa att klämmas in i), och han står framför den
         sak('lada_farfar', 564, 64, 18, 12, sida='under'),

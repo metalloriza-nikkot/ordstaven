@@ -146,7 +146,12 @@ RUMMEN = {
             punkt('start', 48, 120),
             vagg(0, 0, 960, 20), vagg(0, 172, 960, 20),
             vagg(452, 20, 60, 60), sak('ordtradet', 452, 20, 60, 60, sida='under'),
-            figur('mamma', 380, 76, 56, 40, sida='alla'),
+            # 140.5: gråboxen i 10i:s mått (mamma 64 × 48, långhalsen 64 × 64, taggryggen och hornnosen 64 × 48),
+            # varje vuxen intill sitt bo
+            figur('mamma', 376, 72, 64, 48, sida='alla'),
+            figur('langhals', 136, 40, 64, 64, dekor=True),
+            figur('taggrygg', 656, 56, 64, 48, dekor=True),
+            figur('hornnos', 816, 104, 64, 48, dekor=True),
             sak('bo_langhals', 200, 70, 28, 16, sida='alla'),
             sak('bo_taggrygg', 620, 70, 28, 16, sida='alla'),
             sak('bo_hornnos', 780, 120, 28, 16, sida='alla'),

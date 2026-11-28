@@ -85,15 +85,19 @@ async function spelaPasset(page, namn, { hemligheter = false } = {}) {
       const d = pussel.get('k5_faktning');
       const u = d.ronder.flatMap((r) => r.utfall).find((x) => x.alternativ.every((a) => texter.includes(norm(a.text))));
       if (!u) { await page.waitForTimeout(300); continue; }
+      if (!bilder.has('faktning')) { bilder.add('faktning'); await page.screenshot({ path: `test-results/kap5-${namn}-faktning.png` }); }
       const ratt = texter.indexOf(norm(u.alternativ.find((a) => a.ratt).text));
       const egen = u.alternativ.find((a) => !a.ratt && a.vid_fel);
       if (!felValt && egen) {
         felValt = true; rondFel.push(norm(egen.text));
         await kort.nth(texter.indexOf(norm(egen.text))).click(); await page.waitForTimeout(800);
+        await page.screenshot({ path: `test-results/kap5-${namn}-faktning-fel.png` });
         rondFel.push(norm(await page.locator('#plattan').innerText().catch(() => '')));
         await page.waitForTimeout(1700); continue;
       }
-      await kort.nth(ratt).click(); await page.waitForTimeout(2500); continue;
+      await kort.nth(ratt).click(); await page.waitForTimeout(300);
+      if (!bilder.has('faktning-ratt')) { bilder.add('faktning-ratt'); await page.screenshot({ path: `test-results/kap5-${namn}-faktning-ratt.png` }); }
+      await page.waitForTimeout(2200); continue;
     }
     if (await page.locator('#plattan :is(.formel-skriv, .formel-ruta)').first().isVisible().catch(() => false) && p?.typ === 'P11_formel') {
       await typ(p.formler[0].ord.replace(' ', '')); await page.keyboard.press('Enter'); await page.waitForTimeout(1200); continue;
@@ -148,6 +152,9 @@ test('kapitel 5 pass 1: molnkanten, skylten, fäktningen med ett eget svar på e
   if (egna) expect(rondFel.length).toBe(2);
   const logg = await page.evaluate(() => window.__ORDSTAVEN.logg());
   expect(logg).toMatch(/k5_faktning/);
+  // lev139: fäktningen med Stils bilder, från sidan: bugningen, parader, poser, paraplyet och bugningen efteråt
+  const regi = (await page.evaluate(() => window.__ORDSTAVEN.grafik())).regi.join('\n');
+  for (const r of ['faktning_borjar', 'pose:hjalte_bugar_hoger_01', 'pose:hjalte_parerar_hoger_01', 'baronen_backar', 'baronen_poserar', 'paraplyet_faller_ihop', 'baronen_bugar']) expect(regi).toContain(r);
   await expect(page.locator('.pass-slut')).toBeVisible();
 });
 

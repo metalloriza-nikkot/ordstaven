@@ -572,6 +572,9 @@ test('kapitel 4: luftskeppet är Stils med baronen och Herr Skata, aldrig gråbo
   await page.waitForTimeout(1500);
   await page.evaluate(() => window.__ORDSTAVEN.regi('blocket_driva'));
   await expect.poll(skepp).toMatch(/^luftskepp_/);
+  // 140.2.3: stenen ligger kvar i drivan där den landade (Stils block_driva), utan hål och utan orange
+  await page.waitForTimeout(2500);
+  await page.screenshot({ path: 'test-results/kap4-140-stenfaltet-drivan.png' });
   await page.screenshot({ path: 'test-results/kap4-133-luftskepp-stenfaltet.png' });
   await page.evaluate(() => window.__ORDSTAVEN.regi('skata_harmar_molnkant'));
   await expect.poll(skepp, { timeout: 8000 }).toBe('luftskepp_skata_landar');
@@ -699,4 +702,44 @@ test('golvdatorn i det högre rummet (136.3): canvas och fyra gånger långsamma
   // bara en röktest, som i fas1.spec.js: testmaskinen ritar i mjukvara, så gränsen är låg. Takten mäts på MacBooken
   for (const [scen, fps] of Object.entries(takt)) expect(fps, `bildrutor per sekund i ${scen}`).toBeGreaterThan(15);
   expect(fel).toEqual([]);
+});
+
+test('140.2.1: ungen står kvar vid klippans fot medan han skriver, och följer med upp först när stegen finns', async ({ page }) => {
+  test.setTimeout(120000);
+  // från Gå till klippan! (steg 2): han går till foten, där ungen försöker klättra och glider ned (steg 3)
+  await starta(page, 'k4s05_klippan', 2);
+  const unge = () => page.evaluate(() => window.__ORDSTAVEN.ungePos());
+  for (let i = 0; i < 120 && (await page.evaluate(() => window.__ORDSTAVEN.steg()?.typ)) !== 'pussel'; i++) {
+    if ((await page.evaluate(() => window.__ORDSTAVEN.steg()?.typ)) === 'ga_till') await page.evaluate(() => window.__ORDSTAVEN.gaMot(316, 300));
+    for (const v of await page.locator(':is(#plattan, #remsa, body) :is(.vidare, .replik-ruta):visible').all()) await v.click({ timeout: 300 }).catch(() => {});
+    await page.waitForTimeout(250);
+  }
+  // regin vid foten (ungen försöker klättra och glider ned) håller världen stilla. Sedan står ungen kvar nere, och
+  // skrivpusslet öppnas när han trycker vid klippan
+  await page.waitForFunction(() => !window.__ORDSTAVEN.fryst(), null, { timeout: 20000 });
+  const fore = [];
+  for (let i = 0; i < 6; i++) { fore.push(await unge()); await page.waitForTimeout(500); }
+  await page.screenshot({ path: 'test-results/kap4-140-klippan-foten.png' });
+  for (let i = 0; i < 10 && !(await page.locator('#plattan .formel-skriv').isVisible()); i++) {
+    for (const v of await page.locator(':is(#plattan, #remsa, body) :is(.vidare, .replik-ruta):visible').all()) await v.click({ timeout: 300 }).catch(() => {});
+    if (!(await page.evaluate(() => window.__ORDSTAVEN.fryst()))) await page.keyboard.press('Space');
+    await page.waitForTimeout(600);
+  }
+  await expect(page.locator('#plattan .formel-skriv')).toBeVisible({ timeout: 10000 });
+  for (const u of fore) expect(u.y, `ungen på y ${u.y} innan han skriver`).toBeGreaterThan(270);
+  // klippan är väggen 180–284, och foten är under den (regi_klippan y 298). Ungens två försök når högst ca 20 px upp
+  // och glider ned igen. Krönet är y 180, där den stod förut (140.2.1)
+  const lagen = [];
+  for (let i = 0; i < 16; i++) { lagen.push(await unge()); await page.waitForTimeout(500); }
+  for (const u of lagen) expect(u.y, `ungen på y ${u.y} medan han skriver`).toBeGreaterThan(270);
+  expect(lagen.at(-1).y, 'ungen står nere vid foten').toBeGreaterThan(290);
+  const regi = (await page.evaluate(() => window.__ORDSTAVEN.grafik())).regi.join(' ');
+  expect(regi).toMatch(/ungen_glider_klippan vid x/);
+  // när formeln är skriven klättrar de upp tillsammans, och ungen är uppe sedan
+  for (const c of 'STEGE') await page.keyboard.type(c);
+  await page.keyboard.press('Enter');
+  await page.waitForFunction(() => window.__ORDSTAVEN.ungePos().y < 260, null, { timeout: 30000 });
+  await page.screenshot({ path: 'test-results/kap4-140-klippan-stegen.png' });
+  await page.waitForFunction(() => window.__ORDSTAVEN.ungePos().y < 180, null, { timeout: 30000 });
+  await page.screenshot({ path: 'test-results/kap4-140-klippan-uppe.png' });
 });

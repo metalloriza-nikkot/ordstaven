@@ -25,10 +25,7 @@ const FILER = [
 // 118.4: kapitel 4:s gråbox. Bilderna i formlerna, läsvalet vid skyltarna och uppdragens kort väntar på Stil (efter
 // kartversionen), och står som gråboxens platshållare tills dess
 // 121.3: tanden i isen (Dinobokens sida i F3) väntar också på Stil
-const VANTAR_PA_STIL = new Set(['snon_hanger', 'tankebubbla_stor_bubbla', 'isblock_hylla', 'morker_grotta', 'tankebubbla_isgrotta', 'kort_grotta', 'kort_is', 'kort_sten',
-  // 139.8: kapitel 5:s gråbox. Skrytets bildkort, bona, formlernas bilder, lappens papper, Farfars teckning och
-  // uppdragens kort väntar på Stil (139.9), och står som gråboxens platshållare tills dess
-  ...['bit_baronen_upp', 'bit_upp_och_ner', 'bo_hornnos', 'bo_langhals', 'bo_taggrygg', 'dalen_full_av_agg', 'dis_dimman', 'farfars_teckning', 'hatten_platt', 'kort_agg', 'kort_dimma', 'kort_hem', 'kort_mamma', 'kort_molnkant', 'kort_rot', 'kort_stig', 'lapp_bit_fram', 'spindel_baronen', 'sten_pa_duken', 'stovlarna_pol']]);
+const VANTAR_PA_STIL = new Set(['snon_hanger', 'tankebubbla_stor_bubbla', 'isblock_hylla', 'morker_grotta', 'tankebubbla_isgrotta', 'kort_grotta', 'kort_is', 'kort_sten']);
 
 /** Fält vars värde är en bild på läsplattan. En mellanscens och en reaktions `bild` är en regi i rummet, inte en bild. */
 const BILDFALT = new Set(['bild', 'ledbild', 'pekar_pa']);
