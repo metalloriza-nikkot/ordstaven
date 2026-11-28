@@ -1,9 +1,89 @@
 {
  "frames": {
-  "herr_skata_flyga_hoger_01": {
+  "herr_skata_domare_hoger_01": {
    "frame": {
     "x": 0,
     "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "herr_skata_domare_hoger_02": {
+   "frame": {
+    "x": 17,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "herr_skata_domare_vanster_01": {
+   "frame": {
+    "x": 0,
+    "y": 17,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "herr_skata_domare_vanster_02": {
+   "frame": {
+    "x": 17,
+    "y": 17,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "herr_skata_flyga_hoger_01": {
+   "frame": {
+    "x": 0,
+    "y": 34,
     "w": 18,
     "h": 12
    },
@@ -23,7 +103,7 @@
   "herr_skata_flyga_hoger_02": {
    "frame": {
     "x": 19,
-    "y": 0,
+    "y": 34,
     "w": 18,
     "h": 12
    },
@@ -43,7 +123,7 @@
   "herr_skata_flyga_vanster_01": {
    "frame": {
     "x": 0,
-    "y": 13,
+    "y": 47,
     "w": 18,
     "h": 12
    },
@@ -63,7 +143,7 @@
   "herr_skata_flyga_vanster_02": {
    "frame": {
     "x": 19,
-    "y": 13,
+    "y": 47,
     "w": 18,
     "h": 12
    },
@@ -83,7 +163,7 @@
   "herr_skata_krascha_hoger_01": {
    "frame": {
     "x": 0,
-    "y": 26,
+    "y": 60,
     "w": 20,
     "h": 16
    },
@@ -103,7 +183,7 @@
   "herr_skata_krascha_hoger_02": {
    "frame": {
     "x": 21,
-    "y": 26,
+    "y": 60,
     "w": 20,
     "h": 16
    },
@@ -123,7 +203,7 @@
   "herr_skata_krascha_hoger_03": {
    "frame": {
     "x": 42,
-    "y": 26,
+    "y": 60,
     "w": 20,
     "h": 16
    },
@@ -143,7 +223,7 @@
   "herr_skata_krascha_hoger_04": {
    "frame": {
     "x": 63,
-    "y": 26,
+    "y": 60,
     "w": 20,
     "h": 16
    },
@@ -163,7 +243,7 @@
   "herr_skata_krascha_vanster_01": {
    "frame": {
     "x": 0,
-    "y": 43,
+    "y": 77,
     "w": 20,
     "h": 16
    },
@@ -183,7 +263,7 @@
   "herr_skata_krascha_vanster_02": {
    "frame": {
     "x": 21,
-    "y": 43,
+    "y": 77,
     "w": 20,
     "h": 16
    },
@@ -203,7 +283,7 @@
   "herr_skata_krascha_vanster_03": {
    "frame": {
     "x": 42,
-    "y": 43,
+    "y": 77,
     "w": 20,
     "h": 16
    },
@@ -223,7 +303,7 @@
   "herr_skata_krascha_vanster_04": {
    "frame": {
     "x": 63,
-    "y": 43,
+    "y": 77,
     "w": 20,
     "h": 16
    },
@@ -243,7 +323,7 @@
   "herr_skata_sitta_hoger_01": {
    "frame": {
     "x": 0,
-    "y": 60,
+    "y": 94,
     "w": 16,
     "h": 12
    },
@@ -263,7 +343,7 @@
   "herr_skata_sitta_vanster_01": {
    "frame": {
     "x": 0,
-    "y": 73,
+    "y": 107,
     "w": 16,
     "h": 12
    },
@@ -283,7 +363,7 @@
   "herr_skata_titta_hoger_01": {
    "frame": {
     "x": 0,
-    "y": 86,
+    "y": 120,
     "w": 16,
     "h": 12
    },
@@ -303,7 +383,7 @@
   "herr_skata_titta_vanster_01": {
    "frame": {
     "x": 0,
-    "y": 99,
+    "y": 133,
     "w": 16,
     "h": 12
    },
@@ -323,7 +403,7 @@
   "runt_fonster_skata_01": {
    "frame": {
     "x": 0,
-    "y": 112,
+    "y": 146,
     "w": 28,
     "h": 22
    },
@@ -343,7 +423,7 @@
   "runt_fonster_skata_02": {
    "frame": {
     "x": 29,
-    "y": 112,
+    "y": 146,
     "w": 28,
     "h": 22
    },
@@ -363,7 +443,7 @@
   "runt_fonster_skata_03": {
    "frame": {
     "x": 58,
-    "y": 112,
+    "y": 146,
     "w": 28,
     "h": 22
    },
@@ -383,7 +463,7 @@
   "runt_fonster_skata_04": {
    "frame": {
     "x": 87,
-    "y": 112,
+    "y": 146,
     "w": 28,
     "h": 22
    },
@@ -403,7 +483,7 @@
   "runt_fonster_skata_05": {
    "frame": {
     "x": 116,
-    "y": 112,
+    "y": 146,
     "w": 28,
     "h": 22
    },
@@ -426,7 +506,7 @@
   "format": "RGBA8888",
   "size": {
    "w": 145,
-   "h": 135
+   "h": 169
   },
   "scale": "1",
   "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."

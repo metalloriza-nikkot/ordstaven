@@ -1,9 +1,49 @@
 {
  "frames": {
-  "lov_regnbage": {
+  "bit_marken": {
    "frame": {
     "x": 0,
     "y": 0,
+    "w": 14,
+    "h": 10
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 14,
+    "h": 10
+   },
+   "sourceSize": {
+    "w": 14,
+    "h": 10
+   }
+  },
+  "duken": {
+   "frame": {
+    "x": 0,
+    "y": 11,
+    "w": 24,
+    "h": 14
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 14
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 14
+   }
+  },
+  "lov_regnbage": {
+   "frame": {
+    "x": 0,
+    "y": 26,
     "w": 12,
     "h": 8
    },
@@ -19,14 +59,114 @@
     "w": 12,
     "h": 8
    }
+  },
+  "medalj_baronen": {
+   "frame": {
+    "x": 0,
+    "y": 35,
+    "w": 12,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 12,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 12,
+    "h": 16
+   }
+  },
+  "skatbo_fjader": {
+   "frame": {
+    "x": 0,
+    "y": 52,
+    "w": 16,
+    "h": 7
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 7
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 7
+   }
+  },
+  "skatbo_nyckel": {
+   "frame": {
+    "x": 17,
+    "y": 52,
+    "w": 12,
+    "h": 7
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 12,
+    "h": 7
+   },
+   "sourceSize": {
+    "w": 12,
+    "h": 7
+   }
+  },
+  "skatbo_sked": {
+   "frame": {
+    "x": 30,
+    "y": 52,
+    "w": 12,
+    "h": 6
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 12,
+    "h": 6
+   },
+   "sourceSize": {
+    "w": 12,
+    "h": 6
+   }
+  },
+  "sten_duken": {
+   "frame": {
+    "x": 0,
+    "y": 60,
+    "w": 24,
+    "h": 14
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 14
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 14
+   }
   }
  },
  "meta": {
   "image": "dal.png",
   "format": "RGBA8888",
   "size": {
-   "w": 13,
-   "h": 9
+   "w": 43,
+   "h": 75
   },
   "scale": "1",
   "om": "Skrivs av verktyg/grafik/inkorg.py. Bildens namn är filens namn i inkorgen."

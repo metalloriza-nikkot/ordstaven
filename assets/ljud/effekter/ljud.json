@@ -747,5 +747,33 @@
   "signatur": false,
   "styrka_db": -16,
   "sekunder": 4.0
+ },
+ "unge_rop": {
+  "grupp": "Kapitel 5",
+  "vad": "Ungen ropar så högt den kan vid ROPA (ca 1,3 s). Sedan är det tyst, och det tysta hör till",
+  "signatur": false,
+  "styrka_db": -6,
+  "sekunder": 2.1
+ },
+ "mamma_vral": {
+  "grupp": "Kapitel 5",
+  "vad": "Mammas vrål långt borta: ungens läte i låg ton, stort och djupt, med ett dovt brum under och dalens eko (ca 3,2 s). Varmt, aldrig farligt",
+  "signatur": false,
+  "styrka_db": -7,
+  "sekunder": 3.14
+ },
+ "unge_pip": {
+  "grupp": "Kapitel 5",
+  "vad": "Ett litet pip från dalen genom radion i Farfars kök (ca 0,8 s), slutbild 6",
+  "signatur": false,
+  "styrka_db": -12,
+  "sekunder": 0.72
+ },
+ "agg_spricker": {
+  "grupp": "Kapitel 5",
+  "vad": "Ett ägg spricker: små knak som blir fler och tätare, skalet ger efter, och ett litet pip (ca 1,4 s)",
+  "signatur": false,
+  "styrka_db": -9,
+  "sekunder": 1.4
  }
 }
