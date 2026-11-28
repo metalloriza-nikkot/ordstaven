@@ -254,7 +254,7 @@ test('halmdockan i duellens testrum (91.5): ropar, blir förvirrad och tappar si
   expect(saker).toEqual(['halmdocka_sak_halmstra_01', 'halmdocka_sak_hatt_01', 'halmdocka_sak_knapp_01']);
 });
 
-test('fäktningens ram (132.4): baronen på marken backar vid rätt kort, tar ett steg fram vid fel, och paraplyet vänds vid segern', async ({ page }) => {
+test('fäktningens ram (132.4, lev139): baronen från sidan backar vid rätt kort, poserar och tar ett steg fram vid fel, och paraplyet fäller ihop sig vid segern', async ({ page }) => {
   test.setTimeout(120000);
   // testrummets fixtur, med baronen som motståndare och fäktningens ram (kapitel 5)
   const prov = JSON.parse(readFileSync(new URL('../fixturer/testrum-duell-prov.json', import.meta.url), 'utf8'));
@@ -269,7 +269,8 @@ test('fäktningens ram (132.4): baronen på marken backar vid rätt kort, tar et
   await page.click('.start-knapp');
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.scen()), { timeout: 15000 }).toBe('tr_duell');
   const regi = () => page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').regiLogg.join(' | '));
-  const fot = () => page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').duellFig?.fot ?? null);
+  // från sidan (Stils bilder): han står öster om hjälten, så bakåt är österut (x växer)
+  const fot = () => page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').duellFig?.x ?? null);
   // baronen står på marken (inte på repstegen)
   await expect.poll(() => page.evaluate(() => window.__ORDSTAVEN.spel.scene.getScene('Rum').duellFig?.slag ?? null), { timeout: 15000 }).toBe('faktning');
   const norm = (s) => s.replace(/\|/g, '').replace(/\s+/g, ' ').trim().toLocaleUpperCase('sv-SE');
@@ -282,12 +283,12 @@ test('fäktningens ram (132.4): baronen på marken backar vid rätt kort, tar et
       const fore = await fot();
       if (!felValt) {
         felValt = true; await kort.nth(1 - ratt).click();
-        await expect.poll(regi, { timeout: 4000 }).toContain('baronen tar ett steg fram');
-        await expect.poll(fot, { timeout: 3000 }).toBeGreaterThan(fore);
+        await expect.poll(regi, { timeout: 4000 }).toContain('baronen_poserar');
+        await expect.poll(fot, { timeout: 3000 }).toBeLessThan(fore);
         await page.waitForTimeout(1500); continue;
       }
       await kort.nth(ratt).click(); rond++;
-      await expect.poll(fot, { timeout: 3000 }).toBeLessThan(fore);
+      await expect.poll(fot, { timeout: 3000 }).toBeGreaterThan(fore);
       if (!bild) { bild = true; await page.waitForTimeout(400); await page.locator('canvas').first().screenshot({ path: 'test-results/faktning-baronen-backar.png' }); }
       await page.waitForTimeout(2000); continue;
     }
@@ -295,7 +296,8 @@ test('fäktningens ram (132.4): baronen på marken backar vid rätt kort, tar et
     await page.waitForTimeout(250);
   }
   expect(rond).toBe(3);
+  expect(await regi()).toContain('faktning_borjar');
   expect(await regi()).toContain('baronen_backar');
-  await expect.poll(regi, { timeout: 10000 }).toContain('paraplyet ut och in');
+  await expect.poll(regi, { timeout: 10000 }).toContain('paraplyet_faller_ihop');
   await page.locator('canvas').first().screenshot({ path: 'test-results/faktning-segern.png' });
 });

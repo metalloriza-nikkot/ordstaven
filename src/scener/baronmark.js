@@ -162,11 +162,14 @@ export class BaronMark {
     this.slinga('ropar', 250); this.scen.regiLogg?.push('baronen ropar');
   }
 
-  /** Han går till ett nytt ställe (x från sidan, y annars). @param {number} till @param {number} ms */
-  ga(till, ms) {
+  /**
+   * Han går till ett nytt ställe (x från sidan, y annars). Stället gäller direkt, så att en replik som avbryter
+   * rörelsen (stoppa) ställer honom där han skulle hamna. @param {number} till @param {number} ms @param {number} [vanta]
+   */
+  ga(till, ms, vanta = 0) {
     if (this.sida) {
       this.x = till;
-      this.scen.tweens.add({ targets: this.img, x: till, duration: ms, ease: 'Sine.easeOut', onUpdate: () => { this.img.x = Math.round(this.img.x); this.scen.smutsig = true; } });
+      this.scen.tweens.add({ targets: this.img, x: till, duration: ms, delay: vanta, ease: 'Sine.easeOut', onUpdate: () => { this.img.x = Math.round(this.img.x); this.scen.smutsig = true; } });
       return;
     }
     this.fot = till;
@@ -181,7 +184,8 @@ export class BaronMark {
       this.hjaltePose('hjalte_parerar_hoger_01', 0); this.hjaltePose('hjalte_parerar_hoger_02', 200); this.hjaltePose(null, 800);
       this.scen.b?.ljud?.spela('pling');
       this.visaNamn('baronen_backar_vanster_01');
-      this.sen(250, () => { this.visaNamn('baronen_backar_vanster_02'); this.ga(Math.min(bredd - 24, this.x + STEG_BAK), 400); });
+      this.sen(250, () => this.visaNamn('baronen_backar_vanster_02'));
+      this.ga(Math.min(bredd - 24, this.x + STEG_BAK), 400, 250);
       this.scen.regiLogg?.push('baronen_backar');
       this.sen(800, () => this.tomgang());
       return 900;
@@ -199,7 +203,8 @@ export class BaronMark {
     if (this.sida) {
       this.visaNamn('baronen_poserar_vanster_01');
       this.sen(250, () => this.visaNamn('baronen_poserar_vanster_02'));
-      this.sen(500, () => { this.visaNamn('baronen_poserar_vanster_03'); this.ga(this.x - STEG_FRAM, 300); });
+      this.sen(500, () => this.visaNamn('baronen_poserar_vanster_03'));
+      this.ga(this.x - STEG_FRAM, 300, 500);
       this.scen.regiLogg?.push('baronen_poserar');
       this.sen(1100, () => this.tomgang());
       return 1200;
